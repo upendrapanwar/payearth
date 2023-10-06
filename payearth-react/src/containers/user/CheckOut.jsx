@@ -449,10 +449,11 @@ class CheckOut extends Component {
                 
                 if(response.status) {
                     this.addOrderTimeLine(response.data.data,orderStatus);
+                    this.saveOrderDetails(response.data.data,product_sku,orderStatus);
                     console.log(response);
                     toast.dismiss();
                     toast.success('Order Placed Successfull', {autoClose: 3000});
-                    this.props.history.push('/order-summary/'+response.data.data);
+                    //this.props.history.push('/order-summary/'+response.data.data);
                 }
                 //console.log(response.data.data.order)
             }).catch(error => {
@@ -492,6 +493,47 @@ class CheckOut extends Component {
         }).then((response) => {
             console.log(response.data.data);
             this.updateOrderStatus(orderId, response.data.data)
+        }).catch(error => {
+            console.log(error)
+            toast.error(error);
+        });
+    }
+    /******************************************************************************/
+    /******************************************************************************/
+    /**
+     * Saves the order id and status in the order details collection
+     * 
+     * @param {*} orderId 
+     * @param {*} orderStatus 
+     */
+    saveOrderDetails = (orderId, productData, orderStatus) => {
+        let reqBody = {}
+        var prodArray = [];
+        for(var i=0;i< productData.length;i++) {
+            prodArray.push({
+                orderId: orderId,
+                productId: productData[i].productId,
+                quantity: productData[i].quantity,
+                price: productData[i].price,
+                color: productData[i].color,
+                size: productData[i].size,
+                userId: this.authInfo.id,
+                sellerId: productData[i].sellerId,
+                isService: false,
+            });
+        }
+        reqBody = {
+            data: prodArray
+        }
+        axios.post('user/saveorderdetails', reqBody.data, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${this.authInfo.token}`,
+            }
+        }).then((response) => {
+            console.log(response.data.data);
+            //this.updateOrderStatus(orderId, response.data.data)
         }).catch(error => {
             console.log(error)
             toast.error(error);

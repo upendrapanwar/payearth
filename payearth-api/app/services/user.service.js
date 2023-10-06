@@ -1,4 +1,8 @@
 ﻿const config = require('../config/index');
+const mongoose = require('mongoose');
+mongoose.connect(process.env.MONGODB_URI || config.connectionString, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.Promise = global.Promise;
+const Schema = mongoose.Types;
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const nodemailer = require('nodemailer');
@@ -1568,16 +1572,15 @@ async function saveOrdertrackingTime(req) {
 /************************************************************************************/
 /************************************************************************************/
 async function saveorderdetails(req) {
-    console.log(req);
     try {
         var param = req.body;
        
         let input;
         console.log(param);
         input = {
-            orderId:       param.orderId,
+            orderId:   param.orderId,
             productId: param.productId,
-            isActive:      true
+            isActive:  true
         };
        
         const OrderDetails = new OrderDetails(param);
