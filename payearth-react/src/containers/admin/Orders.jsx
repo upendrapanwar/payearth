@@ -74,6 +74,7 @@ class Orders extends Component {
     getProductData = async (productId) => {
         var product_id = '';
         
+        
         if(typeof(productId) == 'object') {
             console.log(productId[0].productId);
             product_id = productId[0].productId;
