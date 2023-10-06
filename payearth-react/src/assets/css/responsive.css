@@ -1,0 +1,300 @@
+/*  Website Name: Pay Earth
+ *  Author: A......
+ *  Description: Responsive CSS File
+ *  Version: CSS3
+ */
+
+@media only screen and (max-width: 1920px) {
+    .container {
+        max-width: 1410px;
+    }
+}
+
+@media only screen and (max-width: 1440px) {
+    .offer_alert .text_wrapper {
+        justify-content: flex-start;
+    }
+    .hero_sec>.container-fluid,
+    .popular_brands_sec>.container-fluid {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+    .popular_products_sec {
+        overflow: hidden;
+    }
+}
+
+@media only screen and (max-width: 1366px) {
+    .offer_alert .custom_btn {
+        margin-left: 100px;
+    }
+    .deals_sec .cards_wrapper>div:first-child {
+        width: 378px;
+    }
+    .deals_sec .cards_wrapper>div:nth-child(2) {
+        width: 480px;
+    }
+    .deals_sec .cards_wrapper>div:nth-child(3) {
+        width: 278px;
+    }
+    .deals_sec .cards_wrapper>div {
+        height: 236px;
+    }
+    .trending_products_sec .cards_wrapper .card:first-child {
+        max-width: 590px;
+    }
+}
+
+@media only screen and (max-width: 1280px) {
+    .offer_alert .custom_btn {
+        margin-left: 36px;
+    }
+    .offer_alert .custom_btn {
+        width: 230px;
+        padding: 8px;
+    }
+    #heroCarousel .carousel-inner .carousel-item>img,
+    .hero_sec img {
+        height: 450px;
+    }
+    .popular_products_sec .cards_wrapper,
+    .trending_products_sec .cards_wrapper {
+        justify-content: flex-start;
+    }
+    .popular_products_sec .cards_wrapper>.card,
+    .trending_products_sec .cards_wrapper>.card {
+        margin-right: 30px;
+    }
+    .recent_search_sec .card .text_wrapper>div {
+        display: block;
+    }
+    .recent_search_sec .card .text_wrapper .btn {
+        width: 100%;
+    }
+    .recent_search_sec .card .text_wrapper .btn:last-child {
+        margin-left: 0;
+        margin-top: 12px;
+    }
+}
+
+@media only screen and (max-width: 1024px) {
+    .offer_alert {
+        min-height: 140px;
+        height: auto;
+    }
+    .offer_alert .custom_btn {
+        margin: 18px 0 0 0;
+    }
+    .offer_alert .text_wrapper {
+        justify-content: center;
+    }
+    .offer_alert .btn-close {
+        right: 20px;
+    }
+    .main_nav .navbar-toggler {
+        border: 2px solid var(--secondary_color);
+    }
+    .main_nav .navbar-toggler:focus {
+        box-shadow: none;
+    }
+    .main_nav .navbar-toggler:hover {
+        background-color: #fbf500;
+    }
+    .main_nav .offcanvas-header .btn-close {
+        border: 1px solid #222327;
+        border-radius: 50%;
+    }
+    .header .main_nav form,
+    .header .main_nav .nav_wrapper .btn-group>.btn,
+    .header .main_nav .nav_wrapper .btn-group {
+        width: 100%;
+    }
+    .header .main_nav form {
+        border: 0;
+        margin-right: 0;
+    }
+    .header .main_nav form select,
+    .header .main_nav form .form-control,
+    .header .main_nav form button {
+        border-radius: 80px;
+        width: 100%;
+        margin-bottom: 12px;
+    }
+    .deals_sec .cards_wrapper>div {
+        margin-top: 18px;
+    }
+    #buyerLoginModal .modal-dialog,
+    #buyerRegisterModal .modal-dialog,
+    #buyerForgotPwdModal .modal-dialog {
+        max-width: 100%;
+        padding: 0 12px;
+    }
+    #buyerLoginModal .modal-content,
+    #buyerRegisterModal .modal-content,
+    #buyerForgotPwdModal .modal-content {
+        width: auto;
+    }
+}
+
+@media only screen and (max-width: 992px) {
+    .contact_form_page .col-lg-4 {
+        border-right: none;
+        border-bottom: 1px solid #d7d7d7;
+    }
+    .contact_info {
+        max-width: 750px;
+        margin: 0px auto;
+    }
+    .cont_info {
+        margin: 25px auto 0 auto;
+    }
+    .cont_info li {
+        display: inline-block;
+        margin-right: 10px;
+        vertical-align: top;
+    }
+    .orders_table,
+    .orders_tabs {
+        overflow-y: hidden;
+        overflow-x: scroll;
+    }
+    .orders_table .table {
+        min-width: 700px;
+    }
+    .orders_tabs .nav {
+        flex-wrap: nowrap;
+    }
+    .orders_tabs .nav-tabs .nav-link {
+        min-width: inherit;
+        max-width: auto;
+        line-height: 18px;
+    }
+}
+
+@media only screen and (max-width: 812px) {
+    #heroCarousel .carousel-inner .carousel-item>img,
+    .hero_sec img {
+        height: 360px;
+    }
+}
+
+@media only screen and (max-width: 668px) {
+    #buyerLoginModal .modal-content .img_wrapper,
+    #buyerRegisterModal .modal-content .img_wrapper,
+    #buyerForgotPwdModal .modal-content .img_wrapper {
+        display: none;
+    }
+    #buyerLoginModal .modal-content .form_wrapper,
+    #buyerRegisterModal .modal-content .form_wrapper,
+    #buyerForgotPwdModal .modal-content .form_wrapper {
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 568px) {
+    .offer_alert .short_des,
+    .offer_alert .dont_miss {
+        margin: 18px 0 0 0;
+    }
+    .header .main_nav .navbar-brand {
+        max-width: 110px;
+    }
+    #heroCarousel .carousel-inner .carousel-item>img,
+    .hero_sec img {
+        height: 168px;
+    }
+    .heading {
+        display: block;
+    }
+    .view_more {
+        float: left;
+        margin-top: 12px;
+    }
+    .deals_sec .cards_wrapper {
+        margin-top: 18px;
+    }
+    .deals_sec .cards_wrapper>div:first-child,
+    .deals_sec .cards_wrapper>div:nth-child(2),
+    .deals_sec .cards_wrapper>div:nth-child(3) {
+        width: 100%;
+        height: auto;
+    }
+    .deals_sec .cards_wrapper>div img {
+        width: 100%;
+    }
+    .deals_sec .cards_wrapper>div>a {
+        width: 100%;
+    }
+    .super_rewards_sec::before {
+        content: none;
+    }
+    .popular_products_sec .cards_wrapper>.card,
+    .trending_products_sec .cards_wrapper>.card {
+        margin-right: 0;
+    }
+    .trending_products_sec .cards_wrapper .card:first-child {
+        max-width: 100%;
+        width: 100%;
+        margin-right: 0;
+    }
+    .popular_brands_sec .main_wrapper {
+        padding: 60px 0 48px 0;
+    }
+    .footer .top>form,
+    .footer .top>.play_store_box,
+    .footer .top>.app_store_box {
+        margin: 24px 12px 0 0;
+    }
+    .footer .top>form,
+    .footer .top>p {
+        max-width: 100%;
+        width: 100%;
+    }
+    .footer .bottom .payment_methods {
+        margin-top: 18px;
+    }
+}
+
+@media only screen and (max-width: 475px) {
+    .header .top_bar .nav_wrapper>ul:first-child {
+        display: none;
+    }
+    .header .top_bar .nav_wrapper>ul:last-child {
+        margin-left: 12px;
+    }
+    .popular_products_sec .cards_wrapper>.card>.text_wrapper,
+    .trending_products_sec .cards_wrapper>.card>.text_wrapper {
+        padding: 18px 18px;
+    }
+    #buyerLoginModal .modal-content .form_wrapper>div,
+    #buyerRegisterModal .modal-content .form_wrapper>div,
+    #buyerForgotPwdModal .modal-content .form_wrapper>div {
+        width: 100%;
+    }
+    .header .top_bar {
+        height: auto;
+    }
+    .header .top_bar .nav_wrapper .login_link {
+        width: 100%;
+        display: inline-block;
+        max-width: 160px;
+        overflow: hidden;
+        height: 32px;
+    }
+}
+
+@media only screen and (max-width: 414px) {
+    .popular_products_sec .cards_wrapper>.card,
+    .trending_products_sec .cards_wrapper>.card {
+        width: 100%;
+    }
+    #buyerRegisterModal .modal-content .form_wrapper>div>form .radio_wrapper>label {
+        width: 100%;
+    }
+    #buyerRegisterModal .radio_wrapper label:first-child {
+        margin-right: 0;
+    }
+    #buyerRegisterModal .radio_wrapper label:last-child {
+        margin-top: 12px;
+    }
+}

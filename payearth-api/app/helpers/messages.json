@@ -1,0 +1,337 @@
+{
+    "common": {
+        "400_error": "Bad Request.",
+        "no_user_err": "User not found.",
+        "no_data_err": "Data not found.",
+        "invalid": "Invalid inputs"
+    },
+    "admin": {
+        "signup": {
+            "success": "Registered successfully.",
+            "error": "Registration failed."
+        },
+        "login": {
+            "success": "Login successfully.",
+            "error": "Invalid login credentials.",
+            "active": "Account not activated."
+        },
+        "password": {
+            "verif_link": "Verification link sent successfully, please check your email inbox.",
+            "verif_link_err": "Verification link is not valid.",
+            "email_exist": "Email is not registered with us.",
+            "reset_success": "Password reset successfully.",
+            "update_success": "Password updated successfully.",
+            "confirm_pass_err": "Confirm password not matched.",
+            "old_pass_err": "Old password not matched"
+        },
+        "users": {
+            "status_update": "Status updated successfully.",
+            "delete": "User Deleted successfully."
+        },
+        "coupon": {
+            "success": "Coupon added successfully.",
+            "error": "Coupon not added."
+        },
+        "category": {
+            "add": {
+                "success": "Category added successfully.",
+                "error": "Category not added."
+            },
+            "edit": {
+                "success": "Category edited successfully.",
+                "error": "Category not edited."
+            },
+            "status": {
+                "success": "Category status changed successfully.",
+                "error": "Category status not changed."
+            },
+            "delete": "Category deleted successfully."
+        },
+        "brand": {
+            "add": {
+                "success": "Brand added successfully.",
+                "error": "Brand not added."
+            },
+            "edit": {
+                "success": "Brand edited successfully.",
+                "error": "Brand not edited."
+            },
+            "status": {
+                "success": "Brand status changed successfully.",
+                "error": "Brand status not changed."
+            },
+            "delete": "Brand deleted successfully."
+        },
+        "deal": {
+            "add": {
+                "success": "Deal added successfully.",
+                "error": "Deal not added."
+            },
+            "edit": {
+                "success": "Deal edited successfully.",
+                "error": "Deal not edited."
+            },
+            "status": {
+                "success": "Deal status changed successfully.",
+                "error": "Deal status not changed."
+            },
+            "delete": "Deal deleted successfully."
+        },
+        "banner": {
+            "add": {
+                "success": "Banner added successfully.",
+                "error": "Banner not added."
+            },
+            "edit": {
+                "success": "Banner edited successfully.",
+                "error": "Banner not edited."
+            },
+            "status": {
+                "success": "Banner status changed successfully.",
+                "error": "Banner status not changed."
+            },
+            "delete": "Banner deleted successfully."
+        },
+        "trendingproduct": {
+            "add": {
+                "success": "Product added into trending list successfully.",
+                "error": "Product not added."
+            },
+            "status": {
+                "success": "Trending product status changed successfully.",
+                "error": "Trending product status not changed."
+            },
+            "delete": "Product removed from trending list successfully."
+        },
+        "popularproduct": {
+            "add": {
+                "success": "Product added into popular list successfully.",
+                "error": "Product not added."
+            },
+            "status": {
+                "success": "Popular product status changed successfully.",
+                "error": "Popular product status not changed."
+            },
+            "delete": "Product removed from popular list successfully."
+        },
+        "color": {
+            "add": {
+                "success": "Color added successfully.",
+                "error": "Color not added."
+            },
+            "edit": {
+                "success": "Color edited successfully.",
+                "error": "Color not edited."
+            },
+            "status": {
+                "success": "Color status changed successfully.",
+                "error": "Color status not changed."
+            },
+            "delete": "Color deleted successfully."
+        }
+    },
+    "user": {
+        "signup": {
+            "success": "Signup successfully.",
+            "error": "Signup failed."
+        },
+        "login": {
+            "success": "Login successfully.",
+            "error": "Invalid login credentials.",
+            "active": "User not activated."
+        },
+        "password": {
+            "verif_link": "Verification link sent successfully, please check your email inbox.",
+            "verif_link_err": "Verification link is not valid.",
+            "email_exist": "Email is not registered with us.",
+            "reset_success": "Password reset successfully.",
+            "update_success": "Password updated successfully.",
+            "confirm_pass_err": "Confirm password not matched.",
+            "old_pass_err": "Old password not matched"
+        },
+        "profile": {
+            "update_success": "Profile updated successfully."
+        },
+        "wishlist": {
+            "add": {
+                "success": "Product added into wishlist successfully.",
+                "error": "Product did not add into wishlist."
+            },
+            "delete": "Product removed from wishlist successfully."
+        },
+        "savelater": {
+            "add": {
+                "success": "Product added into savelater successfully.",
+                "error": "Product did not add into savelater."
+            },
+            "delete": "Product removed from savelater successfully."
+        },
+        "order": {
+            "add": {
+                "success": "Order added successfully.",
+                "error": "Error while saving order."
+            },
+            "delete": "Order removed successfully."
+        },
+        "review": {
+            "add": {
+                "success": "Review submitted successfully.",
+                "error": "Review submit failed."
+            }
+        },
+        "complaint": {
+            "add": {
+                "success": "Complaint submitted successfully.",
+                "error": "Complaint submit failed."
+            }
+        },
+        "cancel": {
+            "add": {
+                "success": "Cancel request submitted successfully.",
+                "error": "Cancel request submit failed."
+            }
+        },
+
+        "returnOrder": {
+            "add": {
+                "success": "Return request submitted successfully.",
+                "error": "Return request submit failed."
+            },
+            "edit": {
+                "success": "Return request edited successfully.",
+                "error": "Return request edit failed."
+            }
+        }
+
+
+
+    },
+    "seller": {
+        "signup": {
+            "success": "Signup successfully.",
+            "error": "Signup failed."
+        },
+        "login": {
+            "success": "Login successfully.",
+            "error": "Invalid login credentials.",
+            "active": "User not activated."
+        },
+        "password": {
+            "verif_link": "Verification link sent successfully, please check your email inbox.",
+            "verif_link_err": "Verification link is not valid.",
+            "email_exist": "Email is not registered with us.",
+            "reset_success": "Password reset successfully.",
+            "update_success": "Password updated successfully.",
+            "confirm_pass_err": "Confirm password not matched.",
+            "old_pass_err": "Old password not matched"
+        },
+        "needhelp": {
+            "success": "Submitted successfully.",
+            "error": "Form submission failed."
+        },
+        "contactus": {
+            "success": "Submitted successfully.",
+            "error": "Form submission failed."
+        }
+    },
+    "product": {
+        "add": {
+            "success": "Product added successfully.",
+            "error": "Product add failed."
+        },
+        "edit": {
+            "success": "Product edited successfully.",
+            "error": "Product edit failed."
+        },
+        "status": {
+            "success": "Status changed successfully.",
+            "error": "Status change failed."
+        }
+    },
+    "featuredImage": {
+        "success": "Featured Image added successfully.",
+        "error": "Featured Image add failed."
+    },
+    "service": {
+        "add": {
+            "success": "Service added successfully.",
+            "error": "Service add failed."
+        },
+        "edit": {
+            "success": "Service edited successfully.",
+            "error": "Service edit failed."
+        }
+    },
+    "post": {
+        "add": {
+            "success": "Post added successfully.",
+            "error": "Post add failed."
+        },
+        "edit": {
+            "success": "Post edited successfully.",
+            "error": "Post edit failed."
+        },
+        "status": {
+            "success": "Status changed successfully.",
+            "error": "Status change failed."
+        }
+    },
+    "postimage": {
+        "add": {
+            "success": "Post Images added successfully.",
+            "error": "Post Images add failed."
+        },
+        "edit": {
+            "success": "Post Images edited successfully.",
+            "error": "Post Images edit failed."
+        }
+    },
+    "postvideo": {
+        "add": {
+            "success": "Post Videos added successfully.",
+            "error": "Post Videos add failed."
+        },
+        "edit": {
+            "success": "Post Videos edited successfully.",
+            "error": "Post Videos edit failed."
+        }
+    },
+
+    "postlike": {
+        "yes": {
+            "success": "Post liked successfully.",
+            "error": "Post like failed."
+        },
+        "no": {
+            "success": "Post disliked successfully.",
+            "error": "Post disliked failed."
+        }
+    },
+
+    "postcomment": {
+        "add": {
+            "success": "Post Comment added successfully.",
+            "error": "Post Comment add failed."
+        },
+        "edit": {
+            "success": "Post Comment edited successfully.",
+            "error": "Post Comment edit failed."
+        },
+        "delete": {
+            "success": "Post Comment deleted successfully.",
+            "error": "Post Comment delete failed."
+        }
+    },
+
+    "follow": {
+        "yes": {
+            "success": "Follow request sent successfully.",
+            "error": "Follow request not sent."
+        },
+        "no": {
+            "success": "Unfollowed successfully.",
+            "error": "unfollow failed."
+        }
+    }
+
+}
