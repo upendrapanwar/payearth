@@ -44,6 +44,7 @@ module.exports = {
     getOrderStatus,
     getOrderTrackingTime,
     getOrderById,
+    //getUserOrderById,
     getOrderDataById,
     addComplaint,
     addCancel,
@@ -1012,7 +1013,7 @@ async function getOrders(req) {
             {
                 path: "paymentId",
                 model: Payment,
-                select: "paymentMode amountPaid"
+                select: "paymentMode amountPaid invoiceNo paymentAccount invoiceUrl"
             }
             ],
             lean: true,
@@ -1137,6 +1138,70 @@ async function getOrderById(id) {
     }
 
 }
+/*
+async function getUserOrderById(id) {
+    const order = await Order.findById(id).select('id orderCode productId userId amount quantity isActive orderStatus createdAt')
+        .populate([{
+            path: "productId",
+            model: Product,
+            select: "id name price featuredImage avgRating isService",
+            populate: {
+                path: "cryptoPrices",
+                model: CryptoConversion,
+                select: "name code cryptoPriceUSD",
+                match: { isActive: true, asCurrency: true }
+            }
+        },
+        {
+            path: "orderStatus",
+            model: OrderTrackingTimeline,
+            select: "updatedAt",
+            populate: {
+                path: "orderStatusId",
+                model: OrderStatus,
+                select: "lname title"
+            }
+        },
+        
+        {
+            path: "userId",
+            model: User,
+            select: "id name"
+        }
+        ]);
+
+    if (!order) {
+        return false;
+    } else {
+
+        //get order tracking timeline data
+        let orderTimeline = await OrderTrackingTimeline.find({ orderId: order.id })
+            .select("orderId orderStatusId updatedAt")
+            .sort({ createdAt: 'asc' })
+            .populate("orderStatusId", "id lname title", { isActive: true });
+
+        //get payment data
+        let payment = await Payment.findOne({ orderId: order.id, userId: order.userId._id })
+            .select("invoiceNo invoiceUrl").exec();
+
+        //get review data
+        let reviewData = await Review.findOne({ productId: order.productId._id, userId: order.userId._id })
+            .select("rating review reviewImages isActive").exec();
+
+        //get complaint data
+        let complaintData = await ProductComplaint.findOne({ orderId: order.id, productId: order.productId._id, userId: order.userId._id }).select("rating complaint complaintImages isActive").exec();
+
+        let result = {
+            order: order,
+            orderTimeline: orderTimeline,
+            invoice: payment,
+            reviewData: reviewData,
+            complaintData: complaintData
+        };
+        return result;
+    }
+
+}*/
 /**
  * Get order details by order id
  * 
@@ -1574,21 +1639,21 @@ async function saveOrdertrackingTime(req) {
 async function saveorderdetails(req) {
     try {
         var param = req.body;
-       
+        const options = { ordered: true };
         let input;
-        console.log(param);
+        
         input = {
             orderId:   param.orderId,
             productId: param.productId,
             isActive:  true
         };
-       
-        const OrderDetails = new OrderDetails(param);
         
-        const data = await OrderDetails.save();
+        //const OrderDetails = new OrderDetails();
+        //const data = await OrderDetails.save();
+        const data = await OrderDetails.insertMany(param, options);
         if (data) {
-            console.log(data._id);
-            return data._id;
+            console.log('id=',data);
+            return true;
         } else {
             return false;
         }

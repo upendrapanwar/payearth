@@ -73,6 +73,7 @@ class MyOrders extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`
             }
         }).then((response) => {
+            console.log(response.data.data.orders);
             if (response.data.status) {
                 this.setState({
                     data: response.data.data.orders,
@@ -177,11 +178,16 @@ class MyOrders extends Component {
                                             <table className="table table-responsive table-hover pe_table">
                                                 <thead>
                                                     <tr>
-                                                        <th>ORDER IMAGE</th>
+                                                        {/*<th>ORDER IMAGE</th>
                                                         <th>ORDER ID</th>
                                                         <th>PRODUCT/ SERVICE NAME</th>
                                                         <th>TYPE</th>
                                                         <th>QUANTITY</th>
+                                                        <th>AMOUNT</th>
+                                                        <th>STATUS</th>*/}
+                                                        <th>ORDER ID</th>
+                                                        <th>TYPE</th>
+                                                        <th>Paymnet</th>
                                                         <th>AMOUNT</th>
                                                         <th>STATUS</th>
                                                         <th></th>
@@ -192,7 +198,8 @@ class MyOrders extends Component {
                                                         return  <tr key={index}>
                                                                     <td>
                                                                         <div className="odr_item_img">
-                                                                            <img src={config.apiURI + value.productId.featuredImage} alt={value.productId.name} />
+                                                                            {/*<img src={config.apiURI + value.productId.featuredImage} alt={value.productId.name} />*/}
+                                                                            <img src="" alt=""/>
                                                                         </div>
                                                                     </td>
                                                                     <td>{value.orderCode}</td>

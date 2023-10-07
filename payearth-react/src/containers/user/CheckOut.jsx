@@ -453,7 +453,7 @@ class CheckOut extends Component {
                     console.log(response);
                     toast.dismiss();
                     toast.success('Order Placed Successfull', {autoClose: 3000});
-                    //this.props.history.push('/order-summary/'+response.data.data);
+                    this.props.history.push('/order-summary/'+response.data.data);
                 }
                 //console.log(response.data.data.order)
             }).catch(error => {
@@ -492,7 +492,7 @@ class CheckOut extends Component {
             }
         }).then((response) => {
             console.log(response.data.data);
-            this.updateOrderStatus(orderId, response.data.data)
+            //this.updateOrderStatus(orderId, response.data.data)
         }).catch(error => {
             console.log(error)
             toast.error(error);
@@ -533,7 +533,7 @@ class CheckOut extends Component {
             }
         }).then((response) => {
             console.log(response.data.data);
-            //this.updateOrderStatus(orderId, response.data.data)
+            this.updateOrderStatus(orderId, response.data.data)
         }).catch(error => {
             console.log(error)
             toast.error(error);
