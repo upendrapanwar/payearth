@@ -7,7 +7,6 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { setLoading } from './../../store/reducers/global-reducer';
-import config from './../../config.json';
 import { Link } from 'react-router-dom';
 import SpinnerLoader from './../../components/common/SpinnerLoader';
 import NotFound from './../../components/common/NotFound';
@@ -22,6 +21,8 @@ class MyOrders extends Component {
         this.authInfo = store.getState().auth.authInfo;
         this.state = {
             data: [],
+            orderDataSet:'',
+            columns:'',
             reqBody: {
                 count: {
                     page: 1,
@@ -48,7 +49,35 @@ class MyOrders extends Component {
 
     getOrders = (pagination, param) => {
         let reqBody = {};
-
+        let orderData = '';
+        let orderDataArray = '';
+        const columnsArray = [
+            {
+                name: 'ORDER ID',
+                selector: row => row.id,
+                sortable: true,
+            },
+            {
+                name: 'INVOICE NUMBER',
+                selector: row => row.invoice_number,
+                sortable: true,
+            },
+            {
+                name: 'PAYMENT MODE',
+                selector: row => row.payment_mode,
+                sortable: true,
+            },
+            {
+                name: 'AMOUNT NUMBER',
+                selector: row => row.amount,
+                sortable: true,
+            },
+            {
+                name: 'ORDER STATUS',
+                selector: row => row.order_status,
+                sortable: true,
+            },
+        ];
         if (pagination === true) {
             reqBody = {
                 count: {
@@ -73,12 +102,24 @@ class MyOrders extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`
             }
         }).then((response) => {
-            console.log(response.data.data.orders);
+            console.log('data=',response.data.data.orders);
+            console.log('status=',response.data.status);
             if (response.data.status) {
+                orderData = response.data.data.orders.map((value) => {
+                    orderDataArray.push({id:value.orderCode,invoice_number:value.paymentId.invoiceNo,payment_mode:value.paymentId.paymentAccount,amount:value.paymentId.amountPaid,order_status:value.orderStatus.orderStatusId.title})
+                    return orderDataArray;
+                })
+                console.log('orderData=',orderData);
+                console.log('columnsArray=',columnsArray);
+                
                 this.setState({
+                    columns: columnsArray,
+                    orderDataSet: orderData,
                     data: response.data.data.orders,
                     pagination: response.data.data.paginationData
                 });
+                    
+                
             }
         }).catch(error => {
             if(error.response && error.response.data.status === false) {
@@ -110,37 +151,10 @@ class MyOrders extends Component {
     }
 
     getAllData = () => {
-        const columns = [
-            {
-                name: 'Title',
-                selector: row => row.title,
-                sortable: true,
-            },
-            {
-                name: 'Year',
-                selector: row => row.year,
-                sortable: true,
-            },
-        ];
-
-        const data = [
-            {
-                id: 1,
-                title: 'Beetlejuice',
-                year: '1988',
-            },
-            {
-                id: 2,
-                title: 'Ghostbusters',
-                year: '1984',
-            },
-        ]
-
-
         return (
             <DataTable
-                columns={columns}
-                data={data}
+                columns={this.state.columns}
+                data={this.state.orderDataSet}
             />
         );
     }
@@ -163,7 +177,7 @@ class MyOrders extends Component {
                                     <div className="cart_wrap">
                                         <div className="items_incart">
                                             <span className="text-uppercase">{pagination.totalOrders ? pagination.totalOrders : 0} ITEMS IN YOUR ORDERS</span>
-                                            {this.getAllData}
+                                            
                                             <Select
                                                 className="sort_select text-normal"
                                                 options={sortingOptions}
@@ -174,6 +188,7 @@ class MyOrders extends Component {
                                         </div>
                                     </div>
                                     <div className="cart_list cart_wrap pb-5">
+                                       {this.getAllData()}
                                         {data.length > 0 ?
                                             <table className="table table-responsive table-hover pe_table">
                                                 <thead>
@@ -186,28 +201,30 @@ class MyOrders extends Component {
                                                         <th>AMOUNT</th>
                                                         <th>STATUS</th>*/}
                                                         <th>ORDER ID</th>
-                                                        <th>TYPE</th>
-                                                        <th>Paymnet</th>
+                                                        <th>INVOICE NUMBER</th>
+                                                        <th>PAYMENT MODE</th>
                                                         <th>AMOUNT</th>
-                                                        <th>STATUS</th>
+                                                        <th>ORDER STATUS</th>
+                                                        
                                                         <th></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {data.length && data.map((value, index) => {
                                                         return  <tr key={index}>
-                                                                    <td>
+                                                                    {/*<td>
                                                                         <div className="odr_item_img">
-                                                                            {/*<img src={config.apiURI + value.productId.featuredImage} alt={value.productId.name} />*/}
-                                                                            <img src="" alt=""/>
+                                                                            <img src={config.apiURI + value.productId.featuredImage} alt={value.productId.name} />
+                                                                            
                                                                         </div>
-                                                                    </td>
+                                                                    </td>*/}
                                                                     <td>{value.orderCode}</td>
-                                                                    <td>{value.productId.name}</td>
-                                                                    <td>{value.productId.isService ? 'Service' : 'Product'}</td>
-                                                                    <td>{value.quantity}</td>
-                                                                    <td>${value.productId.price}</td>
-                                                                    <td>{/*value.orderStatus.orderStatusId.title*/}</td>
+                                                                    <td>{value.paymentId.invoiceNo}</td>
+                                                                    <td>{value.paymentId.paymentAccount}</td>
+                                                                    <td>${value.paymentId.amountPaid}</td>
+                                                                    <td>{value.orderStatus.orderStatusId.title}</td>
+                                                                    
+                                                                    
                                                                     {/* <td><Link to="#" className="btn custom_btn btn_yellow_bordered">View Details</Link></td> */}
                                                                     <td><Link to={`/order-detail/${value.id}`} className="btn custom_btn btn_yellow_bordered">View Details</Link></td>
                                                                 </tr>
