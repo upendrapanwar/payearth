@@ -2268,7 +2268,7 @@ async function createCmsPost(req, res) {
 // Get all post data
 async function getCmsPostData() {
     try {
-        const allPosts = await cmsPost.find({ seo, title, description    });
+        const allPosts = await cmsPost.find({ seo, title, description }).select().sort({ createdAt: 'desc' });
         if (allPosts && allPosts.length > 0)
             return allPosts;
     } catch (error) {
@@ -2306,7 +2306,7 @@ async function cmsGetByStatus(req) {
     const status = req.params.status;
     // console.log("status", status)
     try {
-        const allPost = await cmsPost.find({});
+        const allPost = await cmsPost.find({}).select().sort({ createdAt: 'desc' });
         const filteredStatus = allPost.filter(item => item.status === status);
         return filteredStatus;
     } catch (error) {
@@ -2358,7 +2358,7 @@ async function createCmsPage(req, res) {
 async function cmsPageGetByStatus(req) {
     const status = req.params.status;
     try {
-        const allPages = await cmsPage.find({});
+        const allPages = await cmsPage.find().select().sort({ createdAt: 'desc' });
         const filteredStatus = allPages.filter(item => item.status === status);
         return filteredStatus;
     } catch (error) {
@@ -2428,7 +2428,7 @@ async function createCmsCategory(req, res) {
 
 async function getCmsCategoryData() {
     try {
-        const allCate = await cmsCategory.find({});
+        const allCate = await cmsCategory.find().select().sort({ createdAt: 'desc' });
         if (allCate && allCate.length > 0)
             return allCate;
     } catch (error) {

@@ -54,31 +54,31 @@ class MyOrders extends Component {
             {
                 name: 'ORDER ID',
                 selector: row => row.id,
-                cell: row => <h3>{row.id}</h3>,
+                //cell: row => <h3>{row.id}</h3>,
                 sortable: true,
             },
             {
                 name: 'INVOICE NUMBER',
                 selector: row => row.invoice_number,
-                cell: row => <h3>{row.invoice_number}</h3>,
+                //cell: row => <h3>{row.invoice_number}</h3>,
                 sortable: true,
             },
             {
                 name: 'PAYMENT MODE',
                 selector: row => row.payment_mode,
-                cell: row => <h3>{row.payment_mode}</h3>,
+                //cell: row => <h3>{row.payment_mode}</h3>,
                 sortable: true,
             },
             {
                 name: 'AMOUNT NUMBER',
                 selector: row => row.amount,
-                cell: row => <h3>{row.amount}</h3>,
+                //cell: row => <h3>{row.amount}</h3>,
                 sortable: true,
             },
             {
                 name: 'ORDER STATUS',
                 selector: row => row.order_status,
-                cell: row => <h3>{row.order_status}</h3>,
+                //cell: row => <h3>{row.order_status}</h3>,
                 sortable: true,
             },
         ];
@@ -173,15 +173,11 @@ class MyOrders extends Component {
     getAllData = () => {
         
         setTimeout(() => {
-            console.log('columns',this.state.columns);
-            console.log('data',this.state.orderDataSet);
+            
             return (
                 <DataTable
                     columns={this.state.columns}
                     data={this.state.orderDataSet}
-                    noDataComponent="Your Text Here"
-                    pagination
-                    
                 />
             );
         }, 1000);
@@ -189,10 +185,24 @@ class MyOrders extends Component {
     }
 
     render() {
-        const { data, pagination, sortingOptions, defaultSelectedOption } = this.state;
+        //const { data, pagination, sortingOptions, defaultSelectedOption } = this.state;
         const { loading } = store.getState().global;
-        
+        const data = [{ id: 1, title: 'Conan the Barbarian', summary: 'Orphaned boy Conan is enslaved after his village is destroyed...',  year: '1982' } ...];
+const columns = [
+  {
+    name: 'Title',
+    sortable: true,
+    cell: row => <div><div style={{ fontWeight: bold }}>{row.title}</div>{row.summary}</div>,
+  },
+  {
+    name: 'Year',
+    selector: 'year',
+    sortable: true,
+    right: true,
+  },
+];
         return (
+            
             <React.Fragment>
                 { loading === true ? <SpinnerLoader /> : '' }
                 <Header />
@@ -217,18 +227,24 @@ class MyOrders extends Component {
                                         </div>
                                     </div>
                                     <div className="cart_list cart_wrap pb-5">
-                                       <div>{this.getAllData}</div>
+                                        {}
+                                        {setTimeout(() => {
+                                            console.log('columns',this.state.columns);
+                                            console.log('data',this.state.orderDataSet);
+                                            <DataTable
+                                                title="Table"
+                                                columns={this.state.columns}
+                                                data={this.state.orderDataSet}
+                                                noDataComponent="Your Text Here"
+                                                pagination
+                                                
+                                            />
+                                        }, 2000)}
+                                        {/*
                                         {data.length > 0 ?
                                             <table className="table table-responsive table-hover pe_table">
                                                 <thead>
                                                     <tr>
-                                                        {/*<th>ORDER IMAGE</th>
-                                                        <th>ORDER ID</th>
-                                                        <th>PRODUCT/ SERVICE NAME</th>
-                                                        <th>TYPE</th>
-                                                        <th>QUANTITY</th>
-                                                        <th>AMOUNT</th>
-                                                        <th>STATUS</th>*/}
                                                         <th>ORDER ID</th>
                                                         <th>INVOICE NUMBER</th>
                                                         <th>PAYMENT MODE</th>
@@ -239,28 +255,21 @@ class MyOrders extends Component {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
+                                                    <tr><td></td></tr>
                                                     {data.length && data.map((value, index) => {
                                                         return  <tr key={index}>
-                                                                    {/*<td>
-                                                                        <div className="odr_item_img">
-                                                                            <img src={config.apiURI + value.productId.featuredImage} alt={value.productId.name} />
-                                                                            
-                                                                        </div>
-                                                                    </td>*/}
                                                                     <td>{value.orderCode}</td>
                                                                     <td>{value.paymentId.invoiceNo}</td>
                                                                     <td>{value.paymentId.paymentAccount}</td>
                                                                     <td>${value.paymentId.amountPaid}</td>
                                                                     <td>{value.orderStatus.orderStatusId.title}</td>
                                                                     
-                                                                    
-                                                                    {/* <td><Link to="#" className="btn custom_btn btn_yellow_bordered">View Details</Link></td> */}
                                                                     <td><Link to={`/order-detail/${value.id}`} className="btn custom_btn btn_yellow_bordered">View Details</Link></td>
                                                                 </tr>
                                                     })}
                                                 </tbody>
                                             </table>
-                                        : <NotFound msg="Data not found." /> }
+                                        : <NotFound msg="Data not found." />}
 
                                         {data.length > 0 &&
                                             <div className="pagination">
@@ -271,6 +280,7 @@ class MyOrders extends Component {
                                                 </ul>
                                             </div>
                                         }
+                                        */}
                                     </div>
                                 </div>
                             </div>
