@@ -122,7 +122,9 @@ class Register extends Component {
         });
         this.getStates(reqBody.country_code);
     }
-
+    handleClose = () => {
+        this.props.history.push('/');
+    }
     render() {
         const {loading} = store.getState().global;
         const {
@@ -143,6 +145,7 @@ class Register extends Component {
                                     <Link to="/" className="navbar-brand py-0" ><img src={logo} alt="logo" className="img-fluid" /></Link>
                                     <div className="sel_register">
                                         <div className="form_wrapper">
+                                        <button onClick={this.handleClose} type="button" className="btn-close mo_btn" style={{float:"right"}} aria-label="Close"></button>
                                             <h4 className="form_title mb-4">Seller register</h4>
                                             <Formik
                                                 initialValues={{

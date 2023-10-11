@@ -1260,7 +1260,15 @@ ul {
 #buyerChangePwdModal .modal-content .img_wrapper>.btn-close:hover {
     background-color: var(--primary_color);
 }
-
+.close-btn {
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    z-index: 1;
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+}
 .regiter_form .radio_wrapper {
     display: flex;
     flex-wrap: wrap;

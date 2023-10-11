@@ -52,35 +52,35 @@ class MyOrders extends Component {
         var orderData = '';
         let columnsArray = [
             {
-                name: 'ORDER ID',
+                name: 'id',
                 selector: row => row.id,
-                //cell: row => <h3>{row.id}</h3>,
+                cell: row => <h3>{row.id}</h3>,
                 sortable: true,
             },
             {
-                name: 'INVOICE NUMBER',
+                name: 'invoice_number',
                 selector: row => row.invoice_number,
-                //cell: row => <h3>{row.invoice_number}</h3>,
+                cell: row => <h3>{row.invoice_number}</h3>,
                 sortable: true,
             },
             {
-                name: 'PAYMENT MODE',
+                name: 'payment_mode',
                 selector: row => row.payment_mode,
-                //cell: row => <h3>{row.payment_mode}</h3>,
+                cell: row => <h3>{row.payment_mode}</h3>,
                 sortable: true,
             },
             {
-                name: 'AMOUNT NUMBER',
+                name: 'amount',
                 selector: row => row.amount,
-                //cell: row => <h3>{row.amount}</h3>,
+                cell: row => <h3>{row.amount}</h3>,
                 sortable: true,
             },
             {
-                name: 'ORDER STATUS',
+                name: 'order_status',
                 selector: row => row.order_status,
-                //cell: row => <h3>{row.order_status}</h3>,
+                cell: row => <h3>{row.order_status}</h3>,
                 sortable: true,
-            },
+            }
         ];
         if (pagination === true) {
             reqBody = {
@@ -110,9 +110,7 @@ class MyOrders extends Component {
             console.log('status=',response.data.status);
             if (response.data.status) {
                 orderData = this.getDatatableData(response.data.data.orders);
-                columnsArray = JSON.stringify(columnsArray);
-                console.log('orderData=',orderData);
-                console.log('columnsArray=',columnsArray);
+                columnsArray = JSON.stringify(columnsArray, null, 2);
                 this.setState({
                     columns: columnsArray,
                     orderDataSet: orderData,
@@ -157,7 +155,7 @@ class MyOrders extends Component {
             
             //console.log('orderDataArray',orderDataArray);
         })
-        return JSON.stringify(orderDataArray);
+        return JSON.stringify(orderDataArray, null, 2);
         
     }
 
@@ -178,6 +176,7 @@ class MyOrders extends Component {
                 <DataTable
                     columns={this.state.columns}
                     data={this.state.orderDataSet}
+
                 />
             );
         }, 1000);
@@ -185,22 +184,9 @@ class MyOrders extends Component {
     }
 
     render() {
-        //const { data, pagination, sortingOptions, defaultSelectedOption } = this.state;
+        const { data, pagination, sortingOptions, defaultSelectedOption } = this.state;
         const { loading } = store.getState().global;
-        const data = [{ id: 1, title: 'Conan the Barbarian', summary: 'Orphaned boy Conan is enslaved after his village is destroyed...',  year: '1982' } ...];
-const columns = [
-  {
-    name: 'Title',
-    sortable: true,
-    cell: row => <div><div style={{ fontWeight: bold }}>{row.title}</div>{row.summary}</div>,
-  },
-  {
-    name: 'Year',
-    selector: 'year',
-    sortable: true,
-    right: true,
-  },
-];
+        
         return (
             
             <React.Fragment>
@@ -227,18 +213,22 @@ const columns = [
                                         </div>
                                     </div>
                                     <div className="cart_list cart_wrap pb-5">
-                                        {}
+                                        
                                         {setTimeout(() => {
-                                            console.log('columns',this.state.columns);
-                                            console.log('data',this.state.orderDataSet);
-                                            <DataTable
-                                                title="Table"
-                                                columns={this.state.columns}
-                                                data={this.state.orderDataSet}
-                                                noDataComponent="Your Text Here"
-                                                pagination
-                                                
-                                            />
+                                            var datas = this.state.orderDataSet;
+                                            if(datas.length) {
+                                                console.log('columns',this.state.columns);
+                                                console.log('data',this.state.orderDataSet);
+                                                <DataTable
+                                                    title="Table"
+                                                    columns={this.state.columns}
+                                                    data={this.state.orderDataSet}
+                                                    noDataComponent="Your Text Here"
+                                                    pagination
+                                                    
+                                                    
+                                                />
+                                            }
                                         }, 2000)}
                                         {/*
                                         {data.length > 0 ?
