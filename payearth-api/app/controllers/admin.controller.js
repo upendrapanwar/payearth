@@ -176,6 +176,18 @@ router.delete('/deletePost/:id', deletePost);
 router.put("/cmsUpdatePost/:id", cmsUpdatePost);
 router.get("/cmsGetPostById/:id", cmsGetPostById)
 router.get("/cmsGetByStatus/:status", cmsGetByStatus);
+
+router.post("/cmsPage", createCmsPage);
+router.get("/cmsPageByStatus/:status", cmsPageGetByStatus);
+router.get("/cmsGetPageById/:id", cmsGetPageById);
+router.put("/cmsUpdatePage/:id", cmsUpdatePage);
+router.delete("/deletePage/:id", deletePage);
+
+router.post("/cmsCategory", createCmsCategory);
+router.get("/getCmsAllCategory", getCmsCategoryData);
+router.get("/cmsGetCategoryById/:id", cmsGetCategoryById);
+router.put("/cmsUpdateCategory/:id", cmsUpdateCategory);
+router.delete("/categoryDelete/:id", categoryDelete);
 module.exports = router;
 
 function register(req, res, next) {
@@ -630,5 +642,104 @@ function cmsGetPostById(req, res, next) {
 function cmsGetByStatus(req, res, next) {
     adminService.cmsGetByStatus(req)
         .then(posts => posts ? res.status(200).json({ status: true, data: posts }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+// CMS POST..................
+function createCmsPost(req, res, next) {
+    adminService.createCmsPost(req)
+        .then(posts => posts ? res.status(200).json({ status: true, data: posts }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function getCmsPost(req, res, next) {
+    adminService.getCmsPostData(req)
+        .then(posts => posts ? res.status(200).json({ status: true, data: posts }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function deletePost(req, res, next) {
+    adminService.cmsDeletePost(req)
+        .then(post => post ? res.json({ status: true, message: "Successfull Delete" }) : res.json({ status: false, message: "ERROR" }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function cmsUpdatePost(req, res, next) {
+    adminService.cmsUpdatePost(req)
+        .then(post => post ? res.json({ status: true, message: "Successfull Update" }) : res.json({ status: false, message: "ERROR" }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function cmsGetPostById(req, res, next) {
+    adminService.cmsGetPostById(req)
+        .then(posts => posts ? res.status(200).json({ status: true, data: posts }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function cmsGetByStatus(req, res, next) {
+    adminService.cmsGetByStatus(req)
+        .then(posts => posts ? res.status(200).json({ status: true, data: posts }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+// CMS PAGE.....
+function createCmsPage(req, res, next) {
+    adminService.createCmsPage(req)
+        .then(pages => pages ? res.status(200).json({ status: true, data: pages }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function cmsPageGetByStatus(req, res, next) {
+    adminService.cmsPageGetByStatus(req)
+        .then(pages => pages ? res.status(200).json({ status: true, data: pages }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function cmsGetPageById(req, res, next) {
+    adminService.cmsGetPageById(req)
+        .then(pages => pages ? res.status(200).json({ status: true, data: pages }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function cmsUpdatePage(req, res, next) {
+    adminService.cmsUpdatePage(req)
+        .then(page => page ? res.json({ status: true, message: "Successfull Update" }) : res.json({ status: false, message: "ERROR" }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function deletePage(req, res, next) {
+    adminService.cmsDeletePage(req)
+        .then(page => page ? res.json({ status: true, message: "Successfull Delete" }) : res.json({ status: false, message: "ERROR" }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+// category
+function createCmsCategory(req, res, next) {
+    adminService.createCmsCategory(req)
+        .then(category => category ? res.status(200).json({ status: true, data: category }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function getCmsCategoryData(req, res, next) {
+    adminService.getCmsCategoryData(req)
+        .then(cate => cate ? res.status(200).json({ status: true, data: cate }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function cmsGetCategoryById(req, res, next) {
+    adminService.cmsGetCategoryById(req)
+        .then(cate => cate ? res.status(200).json({ status: true, data: cate }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function cmsUpdateCategory(req, res, next) {
+    adminService.cmsUpdateCategory(req)
+        .then(cate => cate ? res.json({ status: true, message: "Successfull Update" }) : res.json({ status: false, message: "ERROR" }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function categoryDelete(req, res, next) {
+    adminService.categoryDelete(req)
+        .then(cate => cate ? res.json({ status: true, message: "Successfull Delete" }) : res.json({ status: false, message: "ERROR" }))
         .catch(err => next(res.json({ status: false, message: err })));
 }

@@ -49,32 +49,36 @@ class MyOrders extends Component {
 
     getOrders = (pagination, param) => {
         let reqBody = {};
-        let orderData = '';
-        let orderDataArray = '';
-        const columnsArray = [
+        var orderData = '';
+        let columnsArray = [
             {
                 name: 'ORDER ID',
                 selector: row => row.id,
+                cell: row => <h3>{row.id}</h3>,
                 sortable: true,
             },
             {
                 name: 'INVOICE NUMBER',
                 selector: row => row.invoice_number,
+                cell: row => <h3>{row.invoice_number}</h3>,
                 sortable: true,
             },
             {
                 name: 'PAYMENT MODE',
                 selector: row => row.payment_mode,
+                cell: row => <h3>{row.payment_mode}</h3>,
                 sortable: true,
             },
             {
                 name: 'AMOUNT NUMBER',
                 selector: row => row.amount,
+                cell: row => <h3>{row.amount}</h3>,
                 sortable: true,
             },
             {
                 name: 'ORDER STATUS',
                 selector: row => row.order_status,
+                cell: row => <h3>{row.order_status}</h3>,
                 sortable: true,
             },
         ];
@@ -105,13 +109,10 @@ class MyOrders extends Component {
             console.log('data=',response.data.data.orders);
             console.log('status=',response.data.status);
             if (response.data.status) {
-                orderData = response.data.data.orders.map((value) => {
-                    orderDataArray.push({id:value.orderCode,invoice_number:value.paymentId.invoiceNo,payment_mode:value.paymentId.paymentAccount,amount:value.paymentId.amountPaid,order_status:value.orderStatus.orderStatusId.title})
-                    return orderDataArray;
-                })
+                orderData = this.getDatatableData(response.data.data.orders);
+                columnsArray = JSON.stringify(columnsArray);
                 console.log('orderData=',orderData);
                 console.log('columnsArray=',columnsArray);
-                
                 this.setState({
                     columns: columnsArray,
                     orderDataSet: orderData,
@@ -140,6 +141,25 @@ class MyOrders extends Component {
         }
         return html;
     }
+    
+    getDatatableData = (orderDataObj) => {
+        
+        let orderDataArray = [];
+        orderDataObj.forEach(function(value) {
+            //console.log('value',value);
+            orderDataArray.push({
+                id:value.orderCode,
+                invoice_number: value.paymentId.invoiceNo,
+                payment_mode:value.paymentId.paymentAccount,
+                amount:value.paymentId.amountPaid,
+                order_status:value.orderStatus.orderStatusId.title
+            });
+            
+            //console.log('orderDataArray',orderDataArray);
+        })
+        return JSON.stringify(orderDataArray);
+        
+    }
 
     handleChange = selectedOption => {
         let reqBody = this.state.reqBody;
@@ -151,12 +171,21 @@ class MyOrders extends Component {
     }
 
     getAllData = () => {
-        return (
-            <DataTable
-                columns={this.state.columns}
-                data={this.state.orderDataSet}
-            />
-        );
+        
+        setTimeout(() => {
+            console.log('columns',this.state.columns);
+            console.log('data',this.state.orderDataSet);
+            return (
+                <DataTable
+                    columns={this.state.columns}
+                    data={this.state.orderDataSet}
+                    noDataComponent="Your Text Here"
+                    pagination
+                    
+                />
+            );
+        }, 1000);
+        
     }
 
     render() {
@@ -188,7 +217,7 @@ class MyOrders extends Component {
                                         </div>
                                     </div>
                                     <div className="cart_list cart_wrap pb-5">
-                                       {this.getAllData()}
+                                       <div>{this.getAllData}</div>
                                         {data.length > 0 ?
                                             <table className="table table-responsive table-hover pe_table">
                                                 <thead>

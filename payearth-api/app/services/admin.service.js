@@ -11,7 +11,7 @@ const db = require("../helpers/db");
 const msg = require('../helpers/messages.json');
 const fs = require('fs');
 
-const { Admin, User, Seller, Coupon, Product, Category, Brand, TodayDeal, BannerImage, TrendingProduct, PopularProduct, Color, OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline, ProductSales, cmsPost } = require("../helpers/db");
+const { Admin, User, Seller, Coupon, Product, Category, Brand, TodayDeal, BannerImage, TrendingProduct, PopularProduct, Color, OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline, ProductSales, cmsPost, cmsPage, cmsCategory } = require("../helpers/db");
 
 module.exports = {
     authenticate,
@@ -90,6 +90,18 @@ module.exports = {
     cmsUpdatePost,
     cmsGetByStatus,
     cmsGetPostById,
+    
+    createCmsPage,
+    cmsPageGetByStatus,
+    cmsGetPageById,
+    cmsUpdatePage,
+    cmsDeletePage,
+
+    createCmsCategory,
+    getCmsCategoryData,
+    cmsGetCategoryById,
+    cmsUpdateCategory,
+    categoryDelete,
 };
 
 // Validator function
@@ -2308,6 +2320,148 @@ async function cmsGetPostById(req) {
     // console.log("id", postId)
     try {
         const result = await cmsPost.find({ _id: postId })
+        return result
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// ************************Cms page model******************************
+async function createCmsPage(req, res) {
+    try {
+        var param = req.body;
+        // console.log(param)
+
+        let input = {
+            image: param.image,
+            seo: param.seo,
+            pageTitle: param.pageTitle,
+            description: param.description,
+            publishDate: param.publishDate,
+            author: param.author,
+            status: param.status
+        };
+        const pages = new cmsPage(input);
+        const data = await pages.save();
+        // console.log("RES data", data)
+        if (data) {
+            // console.log(data._id);
+            return data;
+        }
+        return false;
+    } catch (error) {
+        console.log('Error', error);
+    }
+}
+
+// Status
+async function cmsPageGetByStatus(req) {
+    const status = req.params.status;
+    try {
+        const allPages = await cmsPage.find({});
+        const filteredStatus = allPages.filter(item => item.status === status);
+        return filteredStatus;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+// ByID
+async function cmsGetPageById(req) {
+    const pageId = req.params.id;
+    try {
+        const result = await cmsPage.find({ _id: pageId })
+        return result
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// Update Page
+async function cmsUpdatePage(req) {
+    const pageId = req.params.id;
+    const { image, pageTitle, description, status } = req.body;
+    try {
+        const page = await cmsPage.findByIdAndUpdate(pageId, { image, pageTitle, description, status }, { new: true });
+        // console.log("update post", post)
+        return page;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+// Delete Page
+async function cmsDeletePage(req) {
+    const pageId = req.params.id;
+    try {
+        const result = await cmsPage.deleteOne({ _id: pageId })
+        return result
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+//*************************cms Category***************** */
+
+async function createCmsCategory(req, res) {
+    try {
+        var param = req.body;
+        let input = {
+            names: param.names,
+            slug: param.slug,
+            description: param.description,
+            publishDate: param.publishDate,
+            author: param.author,
+        };
+        const category = new cmsCategory(input);
+        const data = await category.save();
+        // console.log("RES data", data)
+        if (data) {
+            // console.log(data._id);
+            return data;
+        }
+        return false;
+    } catch (error) {
+        console.log('Error', error);
+    }
+}
+
+async function getCmsCategoryData() {
+    try {
+        const allCate = await cmsCategory.find({});
+        if (allCate && allCate.length > 0)
+            return allCate;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function cmsGetCategoryById(req) {
+    const pageId = req.params.id;
+    try {
+        const result = await cmsCategory.find({ _id: pageId })
+        return result
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function cmsUpdateCategory(req) {
+    const categoryId = req.params.id;
+    const { names, slug, description } = req.body;
+    try {
+        const category = await cmsCategory.findByIdAndUpdate(categoryId, { names, slug, description }, { new: true });
+        return category;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+// Delete Category
+async function categoryDelete(req) {
+    const categoryId = req.params.id;
+    try {
+        const result = await cmsCategory.deleteOne({ _id: categoryId })
         return result
     } catch (error) {
         console.log(error);

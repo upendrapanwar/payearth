@@ -63,6 +63,18 @@ import AdminOrders from './containers/admin/Orders';
 import AdminDashboard from './containers/admin/Dashboard';
 import AdminPayments from './containers/admin/Payments';
 import AdminChat from './containers/admin/Chat';
+
+import AdminPostModule from './containers/admin/PostModule';
+import AdminPostModuleAddNew from './containers/admin/PostModuleAddNew';
+import AdminPostEdit from './containers/admin/PostModelEdit'
+
+import AdminPageModule from './containers/admin/PageModule';
+import AdminPageModuleAddNew from './containers/admin/PageModuleAddNew';
+import AdminPageEdit from './containers/admin/PageModelEdit';
+
+import AdminCategoryModel from './containers/admin/CategoryModule';
+import AdminCategoryModelEdit from './containers/admin/CategoryModuleEdit';
+
 import ManageOrderDetails from './containers/admin/ManageOrderDetails';
 import ManageProducts from './containers/admin/ManageProducts';
 import ManageProductDetails from './containers/admin/ManageProductDetails';
@@ -142,6 +154,16 @@ function App() {
                     <PublicRoute path="/admin/forgot-password" restricted={false} component={AdminForgotPwd} exact />
                     <PublicRoute path="/admin/reset-password" restricted={false} component={AdminResetPwd} exact />
                     <PublicRoute path="/admin/payments" restricted={false} component={AdminPayments} exact />
+					<PublicRoute path="/admin/post-module" restricted={false} component={AdminPostModule} exact />
+					<PublicRoute path="/admin/post-module-add-new" restricted={false} component={AdminPostModuleAddNew} exact />
+					<PublicRoute path='/admin/post-module-edit/:id' restricted={false} component={AdminPostEdit} exact />
+
+					<PublicRoute path="/admin/page-module" restricted={false} component={AdminPageModule} exact />					
+					<PublicRoute path="/admin/page-module-add-new" restricted={false} component={AdminPageModuleAddNew} exact />
+					<PublicRoute path='/admin/page-module-edit/:id' restricted={false} component={AdminPageEdit} exact />
+
+					<PublicRoute path="/admin/category-module" restricted={false} component={AdminCategoryModel} exact />
+					<PublicRoute path="/admin/category-module-edit/:id" restricted={false} component={AdminCategoryModelEdit} exact />
 					<PublicRoute path="/admin/manage-payment-details/:id" restricted={false} component={ManagePaymentDetails} exact />
 					<PublicRoute path="/admin/chat" restricted={false} component={AdminChat} exact />
 					<PublicRoute path="/admin/manage-order-details/:id" restricted={false} component={ManageOrderDetails} exact />
