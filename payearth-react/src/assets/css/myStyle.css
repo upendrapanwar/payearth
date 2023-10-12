@@ -1682,7 +1682,10 @@ input[type="search"] {
 .createpost .cp_top {
     padding: 5px 30px;
 }
-
+.createpost-padd {
+    padding-left: 15px;
+    padding-right: 15px;
+}
 .cp_preview_box {
     padding: 5px 30px;
 }
@@ -2463,7 +2466,7 @@ input[type="search"] {
 }
 
 .adv_banner_panel .crt_bnr_fieldRow label {
-    font-weight: 600;
+    font-weight: 700;
     padding-bottom: 5px;
 }
 
@@ -2674,7 +2677,49 @@ input[type="search"] {
     padding: 15px;
     margin-bottom: 15px;
 }
+.addPost_left_container .cp_body {
+    padding-bottom: 25px;
+}
 
+.addPost_left_container .cp_body .crt_bnr_fieldRow {
+    margin-bottom: 10px;
+}
+
+.addPost_left_container .cp_body .crt_bnr_fieldRow label {
+    padding-bottom: 5px;
+    font-weight: 500;
+}
+
+.addPost_left_container .cp_body .crt_bnr_fieldRow .ql-editor {
+    height: 350px;
+}
+
+.addPost_table_extention .data-table-extensions .data-table-extensions-action {
+    display: none;
+}
+
+.addPost_button_singleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.addPost_button_singleRow .custom_btn {
+    width: auto;
+}
+
+.data-table-extensions-filter .filter-text {
+    border: 1px solid #c8c8c8;
+    box-sizing: border-box;
+    border-radius: 6px;
+    height: 32px;
+}
+
+.addPost_table_extention {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+}
 @media (max-width: 992px) {
     .admin-dashboard-wrapper .orders_table,
     .admin-dashboard-wrapper .orders_tabs {
@@ -2725,5 +2770,35 @@ input[type="search"] {
         width: auto;
         padding: 15px 0px;
         float: none;
+    }
+    .cnt_mob_lr0 {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .addPost_table_extention .custom_btn {
+        min-width: 100px;
+        margin: 5px 3px;
+        font-size: 14px;
+    }
+
+    .admin-dashboard-wrapper .orders_tabs .nav-tabs .nav-link {
+        font-size: 14px;
+        margin-right: 5px;
+    }
+
+    .side_menu_wrap .offcanvas-header,
+    .side_menu_wrap .offcanvas-body {
+        max-width: 320px;
+
+    }
+
+    ul.side_menu_links li i {
+        margin-right: 15px;
+    }
+
+    ul.side_menu_links li a {
+        font-size: 16px;
+        padding: 10px 0;
     }
 }

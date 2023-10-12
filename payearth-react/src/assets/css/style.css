@@ -1365,7 +1365,7 @@ ul {
 
 .side_menu_wrap .offcanvas-header,
 .side_menu_wrap .offcanvas-body {
-    max-width: 288px;
+    max-width: 320px;
     margin: 0 auto;
     padding: 1rem 0;
     width: 100%;
