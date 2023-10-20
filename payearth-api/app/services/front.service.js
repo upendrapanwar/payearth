@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 mongoose.connect(process.env.MONGODB_URI || config.connectionString, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.Promise = global.Promise;
 
-const { Category, Product, Review, User, Brand, TrendingProduct, TodayDeal, RecentSearchProduct, BannerImage, PopularProduct, Color, ServiceVideo, CryptoConversion } = require("../helpers/db");
+const { Category, Product, Review, User, Brand, TrendingProduct, TodayDeal, RecentSearchProduct, BannerImage, PopularProduct, Color, ServiceVideo, CryptoConversion, cmsPost, cmsPage } = require("../helpers/db");
 
 module.exports = {
     getReviews,
@@ -24,6 +24,10 @@ module.exports = {
     getProductById,
     getServiceListing,
     getServiceById,
+    cmsPublishBlog,
+    cmsBlogDetails,
+    cmsPublishPage,
+    cmsPageDetails, 
 };
 
 async function getReviews(id) {
@@ -742,4 +746,47 @@ async function getServiceById(id) {
         .populate("createdBy", "name");
     if (!product) return false;
     return product;
+}
+// Get Published Blog 
+async function cmsPublishBlog(req) {
+    try {
+        const all = await cmsPost.find({ status: req }).sort({ createdAt: 'desc' });
+        return all;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+// Get Blog Details
+
+async function cmsBlogDetails(req) {
+    const blogId = req.params.id;
+    try {
+        const result = await cmsPost.find({ _id: blogId })
+        return result
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// Publish page
+async function cmsPublishPage(req) {
+    try {
+        const all = await cmsPage.find({ status: req }).sort({ createdAt: 'desc' });
+        return all;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+// pageDetailByID
+
+async function cmsPageDetails(req) {
+    const pageId = req.params.id;
+    try {
+        const result = await cmsPage.find({ _id: pageId })
+        return result
+    } catch (error) {
+        console.log(error);
+    }
 }

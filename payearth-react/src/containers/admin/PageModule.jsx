@@ -19,7 +19,7 @@ class AdminPageModule extends Component {
         super(props);
         this.authInfo = store.getState().auth.authInfo;
         this.state = {
-           
+
             selectedRows: [],
             publish: [],
             draft: [],
@@ -33,25 +33,6 @@ class AdminPageModule extends Component {
         this.getPublished();
         this.getDraft();
         this.getTrash();
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-
-        // if (this.state.publish !== prevState.publish) {
-        //     this.getPublished();
-        //     this.getDraft();
-        //     this.getTrash();
-        // }
-        // if (this.state.draft !== prevState.draft) {
-        //     this.getPublished();
-        //     this.getDraft();
-        //     this.getTrash();
-        // }
-        // if (this.state.trash !== prevState.trash) {
-        //     this.getPublished();
-        //     this.getDraft();
-        //     this.getTrash();
-        // }
     }
 
     // conformDelete = () => {
@@ -158,6 +139,9 @@ class AdminPageModule extends Component {
 
     handleEdit = (id) => {
         this.props.history.push(`/admin/page-module-edit/${id}`);
+    }
+    handleDetails = (id) => {
+        this.props.history.push(`/page-detail/${id}`)
     }
 
     handleRowSelected = (state) => {
@@ -270,6 +254,12 @@ class AdminPageModule extends Component {
             cell: (row) => (
                 <>
                     <button
+                        onClick={() => this.handleDetails(row.id)}
+                        className="custom_btn btn_yellow_bordered w-auto btn"
+                    >
+                        View
+                    </button>
+                    <button
                         onClick={() => this.handleEdit(row.id)}
                         className="custom_btn btn_yellow_bordered w-auto btn"
                     >
@@ -380,7 +370,7 @@ class AdminPageModule extends Component {
             selectedRows
         } = this.state;
 
-       
+
 
         if (loading) {
             return <SpinnerLoader />

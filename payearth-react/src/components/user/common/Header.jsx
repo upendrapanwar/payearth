@@ -540,6 +540,8 @@ const Header = (props) => {
                                                         <input className="form-control border-start height-auto" type="search" placeholder={isService === 0 ? "Search Product..." : "Search Service..."} value={searchOption} onChange={handleSearchInput} />
                                                         <button className="btn btn_dark" type="button" onClick={handleSearch}>Search</button>
                                                     </form>
+                                                    <Link className="btn btn_yellow mx-2" to="/blog-model"> Blog</Link>
+                                                    <Link className="btn btn_yellow mx-2" to="/page-model"> Page</Link>
                                                     <div className="btn-group" role="group" aria-label="Basic example">
                                                         <button type="button" value="0" className={isService === 0 ? "btn custom_btn active" : "btn custom_btn"} onClick={handleIsService} >Products</button>
                                                         <button type="button" value="1" className={isService === 1 ? "btn custom_btn active" : "btn custom_btn"} onClick={handleIsService} >Services</button>

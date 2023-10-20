@@ -2268,7 +2268,7 @@ async function createCmsPost(req, res) {
 // Get all post data
 async function getCmsPostData() {
     try {
-        const allPosts = await cmsPost.find({ seo, title, description }).select().sort({ createdAt: 'desc' });
+        const allPosts = await cmsPost.find({ seo, title, description, shortdescription, keywords }).select().sort({ createdAt: 'desc' });
         if (allPosts && allPosts.length > 0)
             return allPosts;
     } catch (error) {
@@ -2380,7 +2380,7 @@ async function cmsGetPageById(req) {
 // Update Page
 async function cmsUpdatePage(req) {
     const pageId = req.params.id;
-    const { image, pageTitle, description, status } = req.body;
+    const { image,seo, keywords, pageTitle, description, status } = req.body;
     try {
         const page = await cmsPage.findByIdAndUpdate(pageId, { image, pageTitle, description, status }, { new: true });
         // console.log("update post", post)

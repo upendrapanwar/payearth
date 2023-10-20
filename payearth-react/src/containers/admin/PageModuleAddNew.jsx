@@ -24,19 +24,23 @@ class AdminPageModuleAddNew extends Component {
         this.authInfo = store.getState().auth.authInfo;
 
         this.state = {
+            seo: '',
+            keywords: '',
             image: '',
             pageTitle: '',
             description: '',
             status: '',
         };
     }
-
     handleTitleChange = (e) => {
         this.setState({ pageTitle: e.target.value });
     }
-    // handleSeoChange = (e) => {
-    //     this.setState({ seo: e.target.value });
-    // }
+    handleSeoChange = (e) => {
+        this.setState({ seo: e.target.value });
+    }
+    handleKeywordsChange = (e) => {
+        this.setState({ keywords: e.target.value });
+    }
     handleDescriptionChange = (description) => {
         this.setState({ description });
     };
@@ -75,15 +79,16 @@ class AdminPageModuleAddNew extends Component {
     };
 
     savePost = (status) => {
-        const { image, pageTitle, description } = this.state;
+        const { image, pageTitle, keywords, seo, description } = this.state;
         const url = 'admin/cmsPage';
 
         const pageData = {
+            seo,
+            keywords,
             image,
             pageTitle,
             description,
             status,
-
         };
         axios.post(url, pageData, {
             headers: {
@@ -99,7 +104,7 @@ class AdminPageModuleAddNew extends Component {
                 console.error('Error saving post:', error);
             });
 
-        this.setState({ image: "", pageTitle: "", description: "" })
+        this.setState({ image: "", pageTitle: "", description: "", keywords: "", seo: "" })
     };
 
 
@@ -126,16 +131,7 @@ class AdminPageModuleAddNew extends Component {
                                             </div>
                                         </div>
                                     </div>
-                                    {/* <div className="crt_bnr_fieldRow">
-                                        <div className="crt_bnr_field">
-                                            <label for="">Seo Title</label>
-                                            <div className="field_item">
-                                                <input className="form-control" type="text" name="seo" id="" value={this.state.seo}
-                                                    onChange={this.handleSeoChange}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div> */}
+
                                     <div className="crt_bnr_fieldRow">
                                         <div className="crt_bnr_field">
                                             <label>Description</label>
@@ -156,6 +152,36 @@ class AdminPageModuleAddNew extends Component {
                                                             ['clean']
                                                         ]
                                                     }}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="crt_bnr_fieldRow">
+                                        <div className="crt_bnr_field">
+                                            <label for="">Seo Title</label>
+                                            <div className="field_item">
+                                                <input
+                                                    className="form-control"
+                                                    type="text"
+                                                    name="seo"
+                                                    id=""
+                                                    value={this.state.seo}
+                                                    onChange={this.handleSeoChange}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="crt_bnr_fieldRow">
+                                        <div className="crt_bnr_field">
+                                            <label for="">Keywords</label>
+                                            <div className="field_item">
+                                                <input
+                                                    className="form-control"
+                                                    type="text"
+                                                    name="keywords"
+                                                    id=""
+                                                    value={this.state.keywords}
+                                                    onChange={this.handleKeywordsChange}
                                                 />
                                             </div>
                                         </div>

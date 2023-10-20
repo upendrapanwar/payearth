@@ -24,20 +24,55 @@ class AdminPostModuleAddNew extends Component {
         this.authInfo = store.getState().auth.authInfo;
 
         this.state = {
+            categoryDate: [],
             image: '',
             seo: '',
+            keywords: '',
             title: '',
             description: '',
+            shortdescription: '',
             status: '',
             category: '',
         };
     }
 
+    componentDidMount() {
+        this.getCategory();
+    }
+
+    getCategory = () => {
+        axios.get('/admin/getCmsAllCategory', {
+            headers: {
+                'Authorization': `Bearer ${this.authInfo.token}`
+            },
+        })
+            .then(res => {
+                this.setState({
+                    categoryDate: res.data.data,
+                    loading: false,
+                    error: null
+                })
+            })
+            .catch(error => {
+                this.setState({
+                    categoryDate: [],
+                    loading: false,
+                    error: error
+                })
+            })
+    }
+
     handleTitleChange = (e) => {
         this.setState({ title: e.target.value });
     }
+    handleShortDescription = (e) => {
+        this.setState({ shortdescription: e.target.value });
+    }
     handleSeoChange = (e) => {
         this.setState({ seo: e.target.value });
+    }
+    handleKeywordsChange = (e) => {
+        this.setState({ keywords: e.target.value });
     }
     handleDescriptionChange = (description) => {
         this.setState({ description });
@@ -74,14 +109,16 @@ class AdminPostModuleAddNew extends Component {
     }
 
     savePost = (status) => {
-        const { image, seo, title, description, category } = this.state;
+        const { image, seo, keywords, title, description, shortdescription, category, } = this.state;
         const url = 'admin/cmsPost';
 
         const postData = {
             image,
             seo,
+            keywords,
             title,
             description,
+            shortdescription,
             status,
             category,
         };
@@ -99,13 +136,14 @@ class AdminPostModuleAddNew extends Component {
                 console.error('Error saving post:', error);
             });
 
-        this.setState({ image: "", title: "", description: "", category: "", seo: "" })
+        this.setState({ image: "", title: "", description: "", category: "", seo: "", keywords: "", shortdescription: "" })
 
     };
 
 
     render() {
-        const { image } = this.state;
+        const { image, categoryDate } = this.state;
+        console.log("category data all", categoryDate)
         return (
             <React.Fragment>
                 <Header />
@@ -127,17 +165,17 @@ class AdminPostModuleAddNew extends Component {
                                             </div>
                                         </div>
                                     </div>
-
                                     <div className="crt_bnr_fieldRow">
                                         <div className="crt_bnr_field">
-                                            <label htmlFor="">Seo Title</label>
+                                            <label htmlFor="">Short Description</label>
                                             <div className="field_item">
-                                                <input className="form-control" type="text" name="seo" id="" value={this.state.seo}
-                                                    onChange={this.handleSeoChange}
+                                                <input className="form-control" type="text" name="shortdescription" id="" value={this.state.shortdescription}
+                                                    onChange={this.handleShortDescription}
                                                 />
                                             </div>
                                         </div>
                                     </div>
+
                                     <div className="crt_bnr_fieldRow">
                                         <div className="crt_bnr_field">
                                             <label>Description</label>
@@ -157,6 +195,36 @@ class AdminPostModuleAddNew extends Component {
                                                             ['clean']
                                                         ]
                                                     }}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="crt_bnr_fieldRow">
+                                        <div className="crt_bnr_field">
+                                            <label htmlFor="">Seo Title</label>
+                                            <div className="field_item">
+                                                <input
+                                                    className="form-control"
+                                                    type="text"
+                                                    name="seo"
+                                                    id=""
+                                                    value={this.state.seo}
+                                                    onChange={this.handleSeoChange}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="crt_bnr_fieldRow">
+                                        <div className="crt_bnr_field">
+                                            <label htmlFor="">keywords</label>
+                                            <div className="field_item">
+                                                <input
+                                                    className="form-control"
+                                                    type="text"
+                                                    name="keywords"
+                                                    id=""
+                                                    value={this.state.keywords}
+                                                    onChange={this.handleKeywordsChange}
                                                 />
                                             </div>
                                         </div>
@@ -185,7 +253,17 @@ class AdminPostModuleAddNew extends Component {
                             <div className="cumm_sidebar_box bg-white p-3 rounded-3">
                                 <div className="cumm_title">Category</div>
                                 <div className="filter_box">
-                                    <div className="form-check mb-3 mt-4">
+                                    {categoryDate.map(item => <div className="form-check mb-3 mt-4">
+                                        <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            value={item.names}
+                                            onChange={this.handleCheckboxChange}
+                                            checked={this.state.category.includes(item.names)}
+                                        />
+                                        <label className="form-check-label" htmlFor="latestPost">{item.names}</label>
+                                    </div>)}
+                                    {/* <div className="form-check mb-3 mt-4">
                                         <input
                                             className="form-check-input"
                                             type="checkbox"
@@ -214,7 +292,7 @@ class AdminPostModuleAddNew extends Component {
                                             checked={this.state.category.includes("Education")}
                                         />
                                         <label className="form-check-label" htmlFor="CommentedPost">Education</label>
-                                    </div>
+                                    </div> */}
                                     <div className="filter_btn_box">
                                         <button
                                             className='btn custom_btn btn_yellow_bordered'

@@ -19,6 +19,8 @@ class AdminPostModule extends Component {
     constructor(props) {
         super(props);
         this.authInfo = store.getState().auth.authInfo;
+        this.userInfo = store.getState().auth.userInfo;
+        // console.log("Auth", this.userInfo.name)
         this.state = {
             
             selectedRows: [],
@@ -147,7 +149,7 @@ class AdminPostModule extends Component {
                     console.log("error", error)
                 })
         }
-        // window.location.reload();
+        // window.location.reload(); 
         this.setState({ loading: true })
         this.getPublished();
         this.getDraft();
@@ -211,29 +213,37 @@ class AdminPostModule extends Component {
         this.getTrash();
     }
 
+    blogDetails = (id) => {
+        this.props.history.push(`/blog-detail/${id}`);
+    }
+
     published_column = [
         {
             name: 'Seo Title',
             selector: (row, i) => row.seo,
             sortable: true,
-            width: "200px",
+            width: "150px",
         },
         {
             name: "Title",
             selector: (row, i) => row.title,
             sortable: true,
-            width: "200px",
+            width: "220px",
         },
         {
             name: "Category",
             selector: (row, i) => row.category,
             sortable: true,
-            width: "200px",
+            width: "220px",
         },
+        
+
+        // author
         {
             name: 'Publish Date & Time',
             selector: (row, i) => row.updatedAt,
             sortable: true,
+            width: "200px",
 
             cell: row => {
                 const date = new Date(row.updatedAt).toLocaleString();
@@ -244,12 +254,18 @@ class AdminPostModule extends Component {
             name: "Status",
             selector: (row, i) => row.status,
             sortable: true,
-            width: "120px",
+            width: "140px",
         },
         {
             name: 'Actions',
             cell: (row) => (
                 <>
+                <button
+                        onClick={() => this.blogDetails(row.id)}
+                        className="custom_btn btn_yellow_bordered w-auto btn"
+                    >
+                        View
+                    </button>
                     <button
                         onClick={() => this.handleEdit(row.id)}
                         className="custom_btn btn_yellow_bordered w-auto btn"

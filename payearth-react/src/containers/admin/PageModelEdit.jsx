@@ -23,12 +23,14 @@ class AdminPageEdit extends Component {
         this.dispatch = dispatch;
         this.authInfo = store.getState().auth.authInfo;
         this.state = {
+            seo: '',
+            keywords: '',
             image: '',
             pageTitle: '',
             description: '',
         };
     }
- 
+
     componentDidMount() {
         this.getPostById();
     }
@@ -47,6 +49,8 @@ class AdminPageEdit extends Component {
             for (var i = 0; i < result.length; i++) {
                 console.log(result.length)
                 this.setState({
+                    keywords: result[i].keywords,
+                    seo: result[i].seo,
                     pageTitle: result[i].pageTitle,
                     description: result[i].description,
                     image: result[i].image
@@ -60,9 +64,12 @@ class AdminPageEdit extends Component {
     handleTitleChange = (e) => {
         this.setState({ pageTitle: e.target.value });
     }
-    // handleSeoChange = (e) => {
-    //     this.setState({ seo: e.target.value })
-    // }
+    handleSeoChange = (e) => {
+        this.setState({ seo: e.target.value });
+    }
+    handleKeywordsChange = (e) => {
+        this.setState({ keywords: e.target.value });
+    }
     handleDescriptionChange = (description) => {
         this.setState({ description });
     }
@@ -95,10 +102,12 @@ class AdminPageEdit extends Component {
     updatePost = (e) => {
         e.preventDefault();
         const { id } = this.props.match.params;
-        const { image, pageTitle, description } = this.state;
+        const { image, pageTitle, description, keywords, seo } = this.state;
 
         const url = `/admin/cmsUpdatePage/${id}`;
         const postData = {
+            keywords,
+            seo,
             image,
             pageTitle,
             description,
@@ -162,21 +171,6 @@ class AdminPageEdit extends Component {
                                             </div>
                                         </div>
 
-                                        {/* <div className="crt_bnr_fieldRow">
-                                            <div className="crt_bnr_field">
-                                                <label for="">Seo Title</label>
-                                                <div className="field_item">
-                                                    <input
-                                                        className="form-control"
-                                                        type="text"
-                                                        name="seo"
-                                                        id=""
-                                                        value={this.state.seo}
-                                                        onChange={this.handleSeoChange}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div> */}
                                         <div className="crt_bnr_fieldRow">
                                             <div className="crt_bnr_field">
                                                 <label>Description</label>
@@ -196,6 +190,36 @@ class AdminPageEdit extends Component {
                                                                 ['clean']
                                                             ]
                                                         }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="crt_bnr_fieldRow">
+                                            <div className="crt_bnr_field">
+                                                <label for="">Seo Title</label>
+                                                <div className="field_item">
+                                                    <input
+                                                        className="form-control"
+                                                        type="text"
+                                                        name="seo"
+                                                        id=""
+                                                        value={this.state.seo}
+                                                        onChange={this.handleSeoChange}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="crt_bnr_fieldRow">
+                                            <div className="crt_bnr_field">
+                                                <label for="">Keywords</label>
+                                                <div className="field_item">
+                                                    <input
+                                                        className="form-control"
+                                                        type="text"
+                                                        name="seo"
+                                                        id=""
+                                                        value={this.state.keywords}
+                                                        onChange={this.handleKeywordsChange}
                                                     />
                                                 </div>
                                             </div>

@@ -46,10 +46,12 @@ module.exports = {
     getOrderById,
     //getUserOrderById,
     getOrderDataById,
+    getOrderDetails,
     addComplaint,
     addCancel,
     addReturn,
     getPayments,
+    getPaymentsById,
     getSellerByProductId,
     savepaymentdata,
     saveOrdertrackingTime,
@@ -1210,7 +1212,57 @@ async function getUserOrderById(id) {
  */
 async function getOrderDataById(req) {
     try {
-        let result = await Order.findById(req).select();
+        let result = await Order.findById(req).select('orderCode product_sku price paymentId sellerId billingFirstName billingLastName billingCompanyName billingCounty billingStreetAddress billingStreetAddress1 billingCity billingCountry billingPostCode billingPhone billingEmail billingNote deliveryCharge taxPercent taxAmount discount orderStatus productId userId createdId')
+        .populate({
+            path: 'productId.productId',
+            model: Product,
+            select: ('productId name')
+        })
+        .populate({
+            path: 'orderStatus',
+            Model: OrderTrackingTimeline,
+            populate:({
+                path: 'orderStatusId',
+                model: OrderStatus,
+                select: 'lname'
+            })
+        })
+        if (result) {
+            return result;
+        } else {
+            return false;
+        }
+    } catch (err) {
+        console.log('Error', err);
+        return false;
+    }
+}
+
+async function getOrderDetails(id) {
+    try {
+        let result = await OrderDetails.find({userId: id})
+        .select('orderId productId quantity price userId sellerId createdAt')
+        .populate({
+            path:'orderId',
+            model: Order,
+            select:'orderCode billingFirstName billingLastName billingCompanyName billingCounty billingStreetAddress billingStreetAddress1 billingCity billingCountry billingPostCode billingPhone billingEmail billingNote deliveryCharge taxPercent taxAmount discount',
+            populate:({
+                path:'orderStatus',
+                model: OrderTrackingTimeline,
+                populate:({
+                    path:'orderStatusId',
+                    model:OrderStatus,
+                    select:'title'
+                })
+
+            })
+        })
+        .populate({
+            path: 'productId',
+            model: Product,
+            select: ('name')
+        })
+        
         if (result) {
             return result;
         } else {
@@ -1467,7 +1519,27 @@ async function addReturn(req) {
     }
 }
 
+async function getPaymentsById(id) {
+    try {
+        const payments = await Payment.find({ userId: id })
+      .select('invoiceNo orderId userId amountPaid paymentMode paymentAccount createdAt')
+    .populate([{
+        path: 'userId',
+        model: User,
+        select: 'name email'
+    }]);
 
+        if (!payments) {
+            console.log('User not found');
+            return false;
+        }
+
+        return payments;
+    } catch (error) {
+        console.error('Error fetching user payments:', error);
+        return false;
+    }
+}
 async function getPayments(req) {
     try {
 

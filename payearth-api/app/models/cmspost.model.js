@@ -7,11 +7,11 @@ const schema = new Schema({
         type: String,
         require: false,
     },
-    seo: {
+    title: {
         type: String,
         required: false,
     },
-    title: {
+    shortdescription: {
         type: String,
         required: false,
     },
@@ -26,7 +26,14 @@ const schema = new Schema({
     author: {
         type: Schema.Types.ObjectId,
         ref: 'Admin',
-        required: false
+    },
+    seo: {
+        type: String,
+        required: false,
+    },
+    keywords: {
+        type: String,
+        required: false,
     },
     status: {
         type: String,
