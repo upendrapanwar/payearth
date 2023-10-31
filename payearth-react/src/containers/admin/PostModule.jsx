@@ -494,7 +494,7 @@ class AdminPostModule extends Component {
                                                     <div className="noti_wrap">
                                                         <div className="">
                                                             <span>
-                                                                <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/post-module-add-new"> Create Post</Link>
+                                                                <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/post-module-add-new"> Create New Post</Link>
                                                             </span>
                                                         </div>
                                                     </div>
