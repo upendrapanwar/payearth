@@ -32,6 +32,15 @@ class AdminCategoryModel extends Component {
         this.getCategory();
     }
 
+    generateUniqueSlug = (names) => {
+        return names
+            .toLowerCase()
+            .replace(/[^a-z0-9 -]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim();
+    }
+
     getCategory = () => {
         axios.get('/admin/getCmsAllCategory', {
             headers: {
@@ -58,31 +67,67 @@ class AdminCategoryModel extends Component {
         this.setState({ selectedRows: state.selectedRows });
     };
 
-    handleDeleteSeletedData = () => {
+    // handleDeleteSeletedData = () => {
+    //     const { selectedRows } = this.state;
+    //     // console.log("selected data", selectedRows)
+    //     for (let i = 0; i < selectedRows.length; i++) {
+    //         const ids = selectedRows[i].id
+    //         axios.delete(`/admin/categoryDelete/${ids}`, {
+    //             headers: {
+    //                 'Authorization': `Bearer ${this.authInfo.token}`
+    //             }
+    //         }).then((res) => { console.log('Row Data', res.data) })
+    //             .catch((error) => {
+    //                 console.log("error", error)
+    //             })
+    //         this.setState({ loading: true })
+    //     }
+    //     this.getCategory();
+    // }
+
+    handleDeleteSeletedData = (id) => {
         const { selectedRows } = this.state;
-        // console.log("selected data", selectedRows)
-        for (let i = 0; i < selectedRows.length; i++) {
-            const ids = selectedRows[i].id
-            axios.delete(`/admin/categoryDelete/${ids}`, {
+        if (selectedRows == false) {
+            axios.delete(`/admin/categoryDelete/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
-            }).then((res) => { console.log('Row Data', res.data) })
+            }).then((res) => {
+                this.getCategory();
+                console.log(res.data)
+            })
                 .catch((error) => {
                     console.log("error", error)
                 })
-            this.setState({ loading: true })
+            // this.setState({ loading: true })
+
+        } else {
+            for (let i = 0; i < selectedRows.length; i++) {
+                const ids = selectedRows[i].id
+                axios.delete(`/admin/categoryDelete/${ids}`, {
+                    headers: {
+                        'Authorization': `Bearer ${this.authInfo.token}`
+                    }
+                }).then((res) => {
+                    this.getCategory();
+                    console.log('Row Data', res.data)
+                })
+                    .catch((error) => {
+                        console.log("error", error)
+                    })
+            }
+            // window.location.reload(); 
+            // this.setState({ loading: true })
         }
-        this.getCategory();
     }
 
     handleTitleChange = (e) => {
         this.setState({ names: e.target.value });
     };
 
-    handleSlugChange = (e) => {
-        this.setState({ slug: e.target.value });
-    };
+    // handleSlugChange = (e) => {
+    //     this.setState({ slug: e.target.value });
+    // };
 
     handleDescriptionChange = (description) => {
         this.setState({ description });
@@ -90,7 +135,8 @@ class AdminCategoryModel extends Component {
 
     handleSubmit = () => {
         toast.success("Category Add Succesfully", { autoClose: 3000 })
-        const { names, slug, description } = this.state;
+        const { names, description } = this.state;
+        const slug = this.generateUniqueSlug(names);
         const url = 'admin/cmsCategory';
         const categoryData = {
             names,
@@ -105,15 +151,16 @@ class AdminCategoryModel extends Component {
             }
         })
             .then((response) => {
-                console.log("POST SUCCESS", response.data);
+                this.getCategory();
+                console.log("Add Succesfully", response.data);
             })
             .catch((error) => {
-                console.error('Error saving post:', error);
+                console.error('Error in saving category:', error);
             });
 
-        this.setState({ names: "", slug: "", description: "" })
+        this.setState({ names: "", description: "" })
 
-        this.getCategory();
+
     }
 
     category_column = [
@@ -122,35 +169,36 @@ class AdminCategoryModel extends Component {
             selector: (row, i) => row.names,
             sortable: true,
         },
-        {
-            name: "Slug",
-            selector: (row, i) => row.slug,
-            sortable: true
-        },
         // {
-        //     name: ' Date & Time',
-        //     selector: (row, i) => row.updatedAt,
-        //     sortable: true,
-        //     cell: row => {
-        //         const date = new Date(row.updatedAt).toLocaleString();
-        //         return <div>{date}</div>;
-        //     },
+        //     name: "Slug",
+        //     selector: (row, i) => row.slug,
+        //     sortable: true
         // },
+        {
+            name: ' Date & Time',
+            selector: (row, i) => row.updatedAt,
+            sortable: true,
+            cell: row => {
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                const date = new Date(row.updatedAt).toLocaleDateString('en-US', options);
+                return <div>{date}</div>;
+            },
+        },
         {
             name: 'Actions',
             cell: (row) => (
                 <>
                     <button
                         onClick={() => this.handleEdit(row.id)}
-                        className="custom_btn btn_yellow_bordered w-auto btn"
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width"
                     >
                         Edit
                     </button>
 
                     <button
                         // onClick={() => this.handleStatusTrash(row._id)}
-                        className="custom_btn btn_yellow_bordered w-auto btn"
-                        onClick={this.handleDeleteSeletedData}
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width"
+                        onClick={() => this.handleDeleteSeletedData(row._id)}
                     >
                         Delete
                     </button>
@@ -189,7 +237,7 @@ class AdminCategoryModel extends Component {
                                 <div className="cp_body">
                                     <div className="crt_bnr_fieldRow">
                                         <div className="crt_bnr_field">
-                                            <label htmlFor="">Name</label>
+                                            <label htmlFor="">Category Name</label>
                                             <div className="field_item">
                                                 <input
                                                     className="form-control"
@@ -203,7 +251,7 @@ class AdminCategoryModel extends Component {
                                         </div>
                                     </div>
 
-                                    <div className="crt_bnr_fieldRow">
+                                    {/* <div className="crt_bnr_fieldRow">
                                         <div className="crt_bnr_field">
                                             <label htmlFor="">Slug</label>
                                             <div className="field_item">
@@ -217,7 +265,7 @@ class AdminCategoryModel extends Component {
                                                 />
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> */}
 
                                     <div className="crt_bnr_fieldRow">
                                         <div className="crt_bnr_field">
@@ -233,7 +281,7 @@ class AdminCategoryModel extends Component {
                                                         toolbar: [
                                                             [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
                                                             [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                                                            ['bold', 'italic', 'underline'],
+                                                            ['bold', 'italic', 'underline', 'strike'],
                                                             // ['link', 'image'],
                                                             // ['clean']
                                                         ]

@@ -37,4 +37,6 @@ module.exports = {
     PostVideos: require('../models/postvideos.model'),
     FollowRequest: require('../models/followrequest.model'),
     cmsPost: require('../models/cmspost.model'),
+    cmsPage: require('../models/cmspage.model'),
+    cmsCategory : require('../models/cmscategory.model')
 };

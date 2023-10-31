@@ -103,6 +103,7 @@ const Modal = (props) => {
             }
         });
     }
+    
 
     return(
         <Fragment>

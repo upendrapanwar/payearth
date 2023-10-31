@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import Header from '../../components/admin/common/Header';
 import Footer from '../../components/common/Footer';
-
+import slugify from 'slugify';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-
 import store from '../../store/index';
 import { setLoading } from '../../store/reducers/global-reducer';
-
+import emptyImg from './../../assets/images/emptyimage.png'
 
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -24,20 +23,100 @@ class AdminPostModuleAddNew extends Component {
         this.authInfo = store.getState().auth.authInfo;
 
         this.state = {
+            allSlugs: [],
+            categoryDate: [],
             image: '',
             seo: '',
+            seodescription: '',
+            keywords: '',
             title: '',
             description: '',
+            shortdescription: '',
             status: '',
             category: '',
         };
     }
 
+    componentDidMount() {
+        this.getCategory();
+    }
+
+    // generateUniqueSlug = (title) => {
+    //     const { allSlugs } = this.state;
+    //     console.log("allSlug", allSlugs)
+    //     const data = title
+    //         .toLowerCase()
+    //         .replace(/[^a-z0-9 -]/g, '')
+    //         .replace(/\s+/g, '-')
+    //         .replace(/-+/g, '-')
+    //         .trim();
+
+    //     const slug = allSlugs.filter(item => item.slug == data);
+    //     if (slug.length == 0) {
+
+    //         return title
+    //             .toLowerCase()
+    //             .replace(/[^a-z0-9 -]/g, '')
+    //             .replace(/\s+/g, '-')
+    //             .replace(/-+/g, '-')
+    //             .trim();
+    //     } else {
+    //         const originalTitle = title + "-" + allSlugs.length;
+
+    //         return originalTitle
+    //             .toLowerCase()
+    //             .replace(/[^a-z0-9 -]/g, '')
+    //             .replace(/\s+/g, '-')
+    //             .replace(/-+/g, '-')
+    //             .trim();
+    //     }
+    // }
+
+    generateUniqueSlug = (title) => {
+        return title
+            .toLowerCase()
+            .replace(/[^a-z0-9 -]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim();
+    }
+
+    getCategory = () => {
+        axios.get('/admin/getCmsAllCategory', {
+            headers: {
+                'Authorization': `Bearer ${this.authInfo.token}`
+            },
+        })
+            .then(res => {
+                this.setState({
+                    categoryDate: res.data.data,
+                    loading: false,
+                    error: null
+                })
+            })
+            .catch(error => {
+                this.setState({
+                    categoryDate: [],
+                    loading: false,
+                    error: error
+                })
+            })
+    }
+
     handleTitleChange = (e) => {
         this.setState({ title: e.target.value });
     }
+    handleShortDescription = (e) => {
+        this.setState({ shortdescription: e.target.value });
+    }
     handleSeoChange = (e) => {
         this.setState({ seo: e.target.value });
+    }
+    handleSeoDescChange = (e) => {
+        this.setState({ seodescription: e.target.value });
+    }
+    handleKeywordsChange = (e) => {
+        this.setState({ keywords: e.target.value });
     }
     handleDescriptionChange = (description) => {
         this.setState({ description });
@@ -52,7 +131,7 @@ class AdminPostModuleAddNew extends Component {
     }
     handleCheckboxChange = (event) => {
         const { value, checked } = event.target;
-        console.log("value", value)
+        // console.log("value", value)
         if (checked) {
             this.setState((prevState) => ({
                 category: [...prevState.category, value],
@@ -67,21 +146,31 @@ class AdminPostModuleAddNew extends Component {
     handleSaveDraft = () => {
         toast.success("POST SAVE IN DRAFT", { autoClose: 3000 })
         this.savePost("draft");
+        this.props.history.push('/admin/post-module')
     }
     handlePublish = () => {
         toast.success("POST PUBLISHED", { autoClose: 3000 })
         this.savePost("published");
+        this.props.history.push('/admin/post-module')
     }
 
     savePost = (status) => {
-        const { image, seo, title, description, category } = this.state;
+        const { image, seo, seodescription, keywords, title, description, shortdescription, category, } = this.state;
+
+        const slug = this.generateUniqueSlug(title);
+        // console.log("uniqueSlug", uniqueSlug)
+
         const url = 'admin/cmsPost';
 
         const postData = {
             image,
             seo,
+            seodescription,
+            keywords,
             title,
+            slug,
             description,
+            shortdescription,
             status,
             category,
         };
@@ -99,13 +188,14 @@ class AdminPostModuleAddNew extends Component {
                 console.error('Error saving post:', error);
             });
 
-        this.setState({ image: "", title: "", description: "", category: "", seo: "" })
-
+        this.setState({ image: "", title: "", description: "", category: "", seo: "", keywords: "", shortdescription: "", seodescription: "", })
     };
 
 
     render() {
-        const { image } = this.state;
+        const { image, categoryDate } = this.state;
+        // console.log("category data all", categoryDate)
+
         return (
             <React.Fragment>
                 <Header />
@@ -127,17 +217,17 @@ class AdminPostModuleAddNew extends Component {
                                             </div>
                                         </div>
                                     </div>
-
                                     <div className="crt_bnr_fieldRow">
                                         <div className="crt_bnr_field">
-                                            <label htmlFor="">Seo Title</label>
+                                            <label htmlFor="">Short Description</label>
                                             <div className="field_item">
-                                                <input className="form-control" type="text" name="seo" id="" value={this.state.seo}
-                                                    onChange={this.handleSeoChange}
+                                                <input className="form-control" type="text" name="shortdescription" id="" value={this.state.shortdescription}
+                                                    onChange={this.handleShortDescription}
                                                 />
                                             </div>
                                         </div>
                                     </div>
+
                                     <div className="crt_bnr_fieldRow">
                                         <div className="crt_bnr_field">
                                             <label>Description</label>
@@ -161,6 +251,51 @@ class AdminPostModuleAddNew extends Component {
                                             </div>
                                         </div>
                                     </div>
+                                    <div className="crt_bnr_fieldRow">
+                                        <div className="crt_bnr_field">
+                                            <label htmlFor="">Seo Title</label>
+                                            <div className="field_item">
+                                                <input
+                                                    className="form-control"
+                                                    type="text"
+                                                    name="seo"
+                                                    id=""
+                                                    value={this.state.seo}
+                                                    onChange={this.handleSeoChange}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="crt_bnr_fieldRow">
+                                        <div className="crt_bnr_field">
+                                            <label htmlFor="">Seo Description</label>
+                                            <div className="field_item">
+                                                <input
+                                                    className="form-control"
+                                                    type="text"
+                                                    name="seo"
+                                                    id=""
+                                                    value={this.state.seodescription}
+                                                    onChange={this.handleSeoDescChange}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="crt_bnr_fieldRow">
+                                        <div className="crt_bnr_field">
+                                            <label htmlFor="">keywords</label>
+                                            <div className="field_item">
+                                                <input
+                                                    className="form-control"
+                                                    type="text"
+                                                    name="keywords"
+                                                    id=""
+                                                    value={this.state.keywords}
+                                                    onChange={this.handleKeywordsChange}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -169,9 +304,10 @@ class AdminPostModuleAddNew extends Component {
                                 <div className="cumm_title">Featured Image</div>
                                 <div className="filter_box">
                                     <div align="center">
-                                        {image && (
+                                        {!image ? <img src={emptyImg} alt='...' style={{ maxWidth: "50%" }} /> : <img src={image} style={{ maxWidth: "70%" }} />}
+                                        {/* {image && (
                                             <img src={image} style={{ maxWidth: "70%" }} />
-                                        )}
+                                        )} */}
                                     </div>
                                     <div className="form-check mb-3 mt-4">
                                         <input
@@ -185,7 +321,17 @@ class AdminPostModuleAddNew extends Component {
                             <div className="cumm_sidebar_box bg-white p-3 rounded-3">
                                 <div className="cumm_title">Category</div>
                                 <div className="filter_box">
-                                    <div className="form-check mb-3 mt-4">
+                                    {categoryDate.map(item => <div className="form-check mb-3 mt-4">
+                                        <input
+                                            className="form-check-input"
+                                            type="checkbox"
+                                            value={item.names}
+                                            onChange={this.handleCheckboxChange}
+                                            checked={this.state.category.includes(item.names)}
+                                        />
+                                        <label className="form-check-label" htmlFor="latestPost">{item.names}</label>
+                                    </div>)}
+                                    {/* <div className="form-check mb-3 mt-4">
                                         <input
                                             className="form-check-input"
                                             type="checkbox"
@@ -214,7 +360,7 @@ class AdminPostModuleAddNew extends Component {
                                             checked={this.state.category.includes("Education")}
                                         />
                                         <label className="form-check-label" htmlFor="CommentedPost">Education</label>
-                                    </div>
+                                    </div> */}
                                     <div className="filter_btn_box">
                                         <button
                                             className='btn custom_btn btn_yellow_bordered'

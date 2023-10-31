@@ -20,15 +20,15 @@ import communityIcon from './../../../assets/icons/community_icon.svg'
 import bannerIcon from './../../../assets/icons/banners_icon.svg'
 import supportIcon from './../../../assets/icons/support_icon.svg'
 import clostBtn from './../../../assets/icons/close_icon.svg';
-import {useDispatch} from 'react-redux';
-import {setLoginStatus, setUserInfo} from './../../../store/reducers/auth-reducer';
+import { useDispatch } from 'react-redux';
+import { setLoginStatus, setUserInfo } from './../../../store/reducers/auth-reducer';
 
 function Header() {
     const dispatch = useDispatch();
     const logout = () => {
         localStorage.clear();
-        dispatch(setLoginStatus({isLoggedIn: false}));
-        dispatch(setUserInfo({userInfo: []}));
+        dispatch(setLoginStatus({ isLoggedIn: false }));
+        dispatch(setUserInfo({ userInfo: [] }));
         window.location.href = '/admin/login';
     }
     //**************** */
@@ -45,26 +45,26 @@ function Header() {
     //*************** */
     return (
         <React.Fragment>
-             <div className="offcanvas offcanvas-start side_menu_wrap" tabIndex="-1" id="sideMenu" aria-labelledby="sideMenuLabel">
+            <div className="offcanvas offcanvas-start side_menu_wrap" tabIndex="-1" id="sideMenu" aria-labelledby="sideMenuLabel">
                 <div className="offcanvas-header">
                     <button type="button" className="view_more text-reset" data-bs-dismiss="offcanvas" aria-label="Close"><img src={clostBtn} className="img-fluid" alt="" /> Close</button>
                 </div>
                 <div className="offcanvas-body">
                     <div className="side_menu_body">
                         <ul className="side_menu_links">
-                        <li><Link to="/admin/post-module" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> CMS Post Module</Link></li>
-                            <li><Link to="/admin/post-module-add-new" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> CMS Post Module AddNew</Link></li>
-                            
-                            <li><Link to="/admin/category-module" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> CMS Category Module</Link></li>
-                            {/* <li><Link to="/admin/category-module-edit" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> CMS Category Module Edit</Link></li> */}
+                            <li><Link to="/admin/post-module" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Posts</Link></li>
+                            <li><Link to="/admin/post-module-add-new" onClick={() => removeBackdrop()}><i className="icon"><img src={bannerIcon} alt="" /></i> Create Post</Link></li>
 
-                            <li><Link to="/admin/page-module" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> CMS Page Module</Link></li>
-                            <li><Link to="/admin/page-module-add-new" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> CMS Page Module AddNew</Link></li>
+                            <li><Link to="/admin/page-module" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Pages </Link></li>
+                            <li><Link to="/admin/page-module-add-new" onClick={() => removeBackdrop()}><i className="icon"><img src={bannerIcon} alt="" /></i> Create Page </Link></li>
+                            
+                            <li><Link to="/admin/category-module" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Create Category </Link></li>
+
                             <li><Link to="/admin/orders" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Manage Orders</Link></li>
                             <li><Link to="/admin/payments" onClick={() => removeBackdrop()}><i className="icon"><img src={creditCardIcon} alt="" /></i> Payments</Link></li>
                             <li><Link to="/admin/chat" onClick={() => removeBackdrop()}><i className="icon"><img src={chatIcon} alt="" /></i> Chats</Link></li>
                             <li><Link to="/admin/manage-products" onClick={() => removeBackdrop()}><i className="icon"><img src={productIcon} alt="" /></i> Manage Products</Link></li>
-                            
+
                             <li><Link to="/admin/manage-services" onClick={() => removeBackdrop()}><i className="icon"><img src={serviceIcon} alt="" /></i>Manage Services</Link></li>
                             <li><Link to="/admin/coupons" onClick={() => removeBackdrop()}><i className="icon"><img src={discountIcon} alt="" /></i> Manage Discounts</Link></li>
                             <li><Link to="/admin/manage-customers" onClick={() => removeBackdrop()}><i className="icon"><img src={customersIcon} alt="" /></i> Manage Customers</Link></li>

@@ -12,7 +12,7 @@ const schema = new Schema({
         price: { type: Number, required: false, default: 0 },
         color: { type: String, required: false, default: "" },
         size: { type: String, required: false, default: "" },
-        sellerId: { type: Schema.Types.ObjectId, required: false },
+        sellerId: { type: Schema.Types.ObjectId, required: false }, 
     },
     paymentId: { type: mongoose.Schema.Types.ObjectId, ref: "Payment", required: true },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: false },

@@ -1,7 +1,7 @@
 var mongoose = require("mongoose");
 require('@mongoosejs/double');
 const mongoosePaginate = require("mongoose-paginate-v2");
-const Schema = mongoose.Schema;
+const Schema = mongoose.Schema; 
 
 const schema = new Schema({
     invoiceNo: { type: String, unique: true, required: false, index: true, default: function() { return getRandomString(17); } },
@@ -24,7 +24,6 @@ schema.set("toJSON", { virtuals: true, versionKey: false });
 schema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model("Payment", schema);
-
 
 function getRandomString(length) {
     var randomChars = '0123456789';

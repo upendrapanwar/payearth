@@ -19,6 +19,10 @@ function jwt() {
             /\/front*/,
             /\/community\/front*/,
             /\/twitter*/,
+            /\/publishBlog*/,
+            /\/blogDetail*/,
+            /\/publishPage*/,
+            /\/pageDetail*/,
 
             //admin
             '/admin/login',

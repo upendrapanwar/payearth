@@ -7,7 +7,7 @@ import 'react-quill/dist/quill.snow.css';
 
 import store from '../../store/index';
 import { setLoading } from '../../store/reducers/global-reducer';
-
+import emptyImg from './../../assets/images/emptyimage.png'
 
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -24,19 +24,89 @@ class AdminPageModuleAddNew extends Component {
         this.authInfo = store.getState().auth.authInfo;
 
         this.state = {
+            allPageSlugs: [],
             image: '',
             pageTitle: '',
             description: '',
             status: '',
+            seo: '',
+            seodescription: '',
+            keywords: '',
         };
+    }
+
+    // getPageSlugData = () => {
+    //     axios.get('/admin/pageSlug', {
+    //         headers: {
+    //             'Authorization': `Bearer ${this.authInfo.token}`
+    //         },
+    //     })
+    //         .then(res => {
+    //             this.setState({
+    //                 allPageSlugs: res.data.data,
+    //                 loading: false,
+    //                 error: null
+    //             })
+    //         })
+    //         .catch(error => {
+    //             this.setState({
+    //                 allPageSlugs: [],
+    //                 loading: false,
+    //                 error: error
+    //             })
+    //         })
+    // }
+
+    // generateUniqueSlug = (pageTitle) => {
+    //     const { allPageSlugs } = this.state;
+    //     console.log("allSlug", allPageSlugs)
+    //     const data = pageTitle
+    //         .toLowerCase() // Convert text to lowercase
+    //         .replace(/[^a-z0-9 -]/g, '') // Remove non-alphanumeric characters except for spaces and hyphens
+    //         .replace(/\s+/g, '-') // Replace spaces with hyphens
+    //         .replace(/-+/g, '-') // Replace consecutive hyphens with a single hyphen
+    //         .trim(); // Trim any leading or trailing whitespace
+
+    //     const slug = allPageSlugs.filter(item => item.slug == data)
+    //     if(slug.length == 0){
+    //         return pageTitle
+    //         .toLowerCase() 
+    //         .replace(/[^a-z0-9 -]/g, '')
+    //         .replace(/\s+/g, '-') 
+    //         .replace(/-+/g, '-') 
+    //         .trim(); 
+    //     }else{
+    //         const originalTitle = pageTitle + "-" + allPageSlugs.length;
+    //         return originalTitle
+    //         .toLowerCase()
+    //         .replace(/[^a-z0-9 -]/g, '')
+    //         .replace(/\s+/g, '-') 
+    //         .replace(/-+/g, '-') 
+    //         .trim(); 
+    //     }
+    // }
+
+    generateUniqueSlug = (pageTitle) => {
+        return pageTitle
+            .toLowerCase()
+            .replace(/[^a-z0-9 -]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim();
     }
 
     handleTitleChange = (e) => {
         this.setState({ pageTitle: e.target.value });
     }
-    // handleSeoChange = (e) => {
-    //     this.setState({ seo: e.target.value });
-    // }
+    handleSeoChange = (e) => {
+        this.setState({ seo: e.target.value });
+    }
+    handleSeoDescChange = (e) => {
+        this.setState({ seodescription: e.target.value });
+    }
+    handleKeywordsChange = (e) => {
+        this.setState({ keywords: e.target.value });
+    }
     handleDescriptionChange = (description) => {
         this.setState({ description });
     };
@@ -67,23 +137,30 @@ class AdminPageModuleAddNew extends Component {
     handleSaveDraft = () => {
         toast.success("POST SAVE IN DRAFT", { autoClose: 3000 })
         this.savePost("draft");
+        this.props.history.push('/admin/page-module')
     };
 
     handlePublish = () => {
-        toast.success("POST PUBLISHED", { autoClose: 3000 })
+        toast.success("PAGE PUBLISHED", { autoClose: 3000 })
         this.savePost("published");
+        this.props.history.push('/admin/page-module')
     };
 
     savePost = (status) => {
-        const { image, pageTitle, description } = this.state;
+        const { image, pageTitle, keywords, seo, seodescription, description } = this.state;
+
+        const slug = this.generateUniqueSlug(pageTitle)
         const url = 'admin/cmsPage';
 
         const pageData = {
+            seo,
+            seodescription,
+            keywords,
             image,
             pageTitle,
+            slug,
             description,
             status,
-
         };
         axios.post(url, pageData, {
             headers: {
@@ -99,7 +176,7 @@ class AdminPageModuleAddNew extends Component {
                 console.error('Error saving post:', error);
             });
 
-        this.setState({ image: "", pageTitle: "", description: "" })
+        this.setState({ image: "", pageTitle: "", description: "", keywords: "", seo: "", seodescription: "" })
     };
 
 
@@ -126,16 +203,7 @@ class AdminPageModuleAddNew extends Component {
                                             </div>
                                         </div>
                                     </div>
-                                    {/* <div className="crt_bnr_fieldRow">
-                                        <div className="crt_bnr_field">
-                                            <label for="">Seo Title</label>
-                                            <div className="field_item">
-                                                <input className="form-control" type="text" name="seo" id="" value={this.state.seo}
-                                                    onChange={this.handleSeoChange}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div> */}
+
                                     <div className="crt_bnr_fieldRow">
                                         <div className="crt_bnr_field">
                                             <label>Description</label>
@@ -160,6 +228,52 @@ class AdminPageModuleAddNew extends Component {
                                             </div>
                                         </div>
                                     </div>
+                                    <div className="crt_bnr_fieldRow">
+                                        <div className="crt_bnr_field">
+                                            <label for="">Seo Title</label>
+                                            <div className="field_item">
+                                                <input
+                                                    className="form-control"
+                                                    type="text"
+                                                    name="seo"
+                                                    id=""
+                                                    value={this.state.seo}
+                                                    onChange={this.handleSeoChange}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="crt_bnr_fieldRow">
+                                        <div className="crt_bnr_field">
+                                            <label htmlFor="">Seo Description</label>
+                                            <div className="field_item">
+                                                <input
+                                                    className="form-control"
+                                                    type="text"
+                                                    name="seo"
+                                                    id=""
+                                                    value={this.state.seodescription}
+                                                    onChange={this.handleSeoDescChange}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="crt_bnr_fieldRow">
+                                        <div className="crt_bnr_field">
+                                            <label for="">Keywords</label>
+                                            <div className="field_item">
+                                                <input
+                                                    className="form-control"
+                                                    type="text"
+                                                    name="keywords"
+                                                    id=""
+                                                    value={this.state.keywords}
+                                                    onChange={this.handleKeywordsChange}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -168,9 +282,10 @@ class AdminPageModuleAddNew extends Component {
                                 <div className="cumm_title">Featured Image</div>
                                 <div className="filter_box">
                                     <div align="center">
-                                        {image && (
+                                        {!image ? <img src={emptyImg} alt='...' style={{ maxWidth: "50%" }} /> : <img src={image} alt="Loading...." style={{ maxWidth: "70%" }} />}
+                                        {/* {image && (
                                             <img src={image} style={{ maxWidth: "70%" }} />
-                                        )}
+                                        )} */}
                                     </div>
                                     <div className="form-check mb-3 mt-4">
                                         <input

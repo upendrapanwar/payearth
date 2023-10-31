@@ -169,16 +169,36 @@
         max-width: auto;
         line-height: 18px;
     }
+    .popular_products_sec .cards_wrapper,
+        .trending_products_sec .cards_wrapper {
+            /* justify-content: flex-start; */
+            justify-content: space-between;
+        }
+          .btn-width{
+            width: 350px !important;
+          }
 }
+
+
 
 @media only screen and (max-width: 812px) {
     #heroCarousel .carousel-inner .carousel-item>img,
     .hero_sec img {
         height: 360px;
     }
+    .admin-dashboard-wrapper .btn-width{
+        width: 450px !important;
+      }
+
+      .dash_inner_wrap .btn.action_btn_new {
+        width: auto !important;
+    }
 }
 
 @media only screen and (max-width: 668px) {
+    .header .top_bar ul>li>a {
+        padding: 14px 11px;
+    }
     #buyerLoginModal .modal-content .img_wrapper,
     #buyerRegisterModal .modal-content .img_wrapper,
     #buyerForgotPwdModal .modal-content .img_wrapper {
@@ -189,9 +209,15 @@
     #buyerForgotPwdModal .modal-content .form_wrapper {
         width: 100%;
     }
+    .deals_sec .card-deal-wrap{
+        width: 250px;
+    }
 }
 
 @media only screen and (max-width: 568px) {
+    .header .top_bar ul>li>a {
+        padding: 14px 11px;
+    }
     .offer_alert .short_des,
     .offer_alert .dont_miss {
         margin: 18px 0 0 0;
@@ -256,8 +282,11 @@
 }
 
 @media only screen and (max-width: 475px) {
-    .header .top_bar .nav_wrapper>ul:first-child {
+    /* .header .top_bar .nav_wrapper>ul:first-child {
         display: none;
+    } */
+    .header .top_bar ul>li>a {
+        padding: 14px 11px;
     }
     .header .top_bar .nav_wrapper>ul:last-child {
         margin-left: 12px;
@@ -273,6 +302,8 @@
     }
     .header .top_bar {
         height: auto;
+        padding-top: 10px;
+        padding-bottom: 10px;
     }
     .header .top_bar .nav_wrapper .login_link {
         width: 100%;
@@ -281,9 +312,17 @@
         overflow: hidden;
         height: 32px;
     }
+    .popular_products_sec .cards_wrapper,
+    .trending_products_sec .cards_wrapper {
+        /* justify-content: flex-start; */
+        justify-content: space-between;
+    }
 }
 
 @media only screen and (max-width: 414px) {
+    .header .top_bar ul>li>a {
+        padding: 14px 11px;
+    }
     .popular_products_sec .cards_wrapper>.card,
     .trending_products_sec .cards_wrapper>.card {
         width: 100%;
@@ -296,5 +335,10 @@
     }
     #buyerRegisterModal .radio_wrapper label:last-child {
         margin-top: 12px;
+    }
+    .popular_products_sec .cards_wrapper,
+    .trending_products_sec .cards_wrapper {
+        /* justify-content: flex-start; */
+        justify-content: space-between;
     }
 }

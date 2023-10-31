@@ -1,13 +1,13 @@
 var mongoose = require("mongoose");
 const Schema = mongoose.Schema;
- 
+
 
 const schema = new Schema({
     image: {
         type: String,
         require: false,
     },
-    seo: {
+    keywords: {
         type: String,
         required: false,
     },
@@ -15,7 +15,18 @@ const schema = new Schema({
         type: String,
         required: false,
     },
+    slug: {
+        type: String,
+    },
     description: {
+        type: String,
+        required: false,
+    },
+    seo: {
+        type: String,
+        required: false,
+    },
+    seodescription: {
         type: String,
         required: false,
     },

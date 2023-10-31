@@ -19,7 +19,7 @@ class AdminPageModule extends Component {
         super(props);
         this.authInfo = store.getState().auth.authInfo;
         this.state = {
-           
+
             selectedRows: [],
             publish: [],
             draft: [],
@@ -34,46 +34,6 @@ class AdminPageModule extends Component {
         this.getDraft();
         this.getTrash();
     }
-
-    componentDidUpdate(prevProps, prevState) {
-
-        // if (this.state.publish !== prevState.publish) {
-        //     this.getPublished();
-        //     this.getDraft();
-        //     this.getTrash();
-        // }
-        // if (this.state.draft !== prevState.draft) {
-        //     this.getPublished();
-        //     this.getDraft();
-        //     this.getTrash();
-        // }
-        // if (this.state.trash !== prevState.trash) {
-        //     this.getPublished();
-        //     this.getDraft();
-        //     this.getTrash();
-        // }
-    }
-
-    // conformDelete = () => {
-    //     <div className="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
-    //         aria-hidden="true">
-    //         <div className="modal-dialog" role="document">
-    //             <div className="modal-content">
-    //                 <div className="modal-header">
-    //                     <h5 className="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-    //                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    //                 </div>
-    //                 <div className="modal-body">
-    //                     Are you sure you want to delete this item?
-    //                 </div>
-    //                 <div className="modal-footer">
-    //                     <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-    //                     <button type="button" className="btn btn-danger" id="confirmDelete">Delete</button>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     </div>
-    // }
 
     getPublished = () => {
         let status = "published"
@@ -144,6 +104,11 @@ class AdminPageModule extends Component {
             })
     }
 
+    getUpdate = () => {
+        this.getPublished();
+        this.getDraft();
+        this.getTrash();
+    }
 
     handlePremanentDelete = async (id) => {
         await axios.delete(`/admin/deletePage/${id}`, {
@@ -159,90 +124,151 @@ class AdminPageModule extends Component {
     handleEdit = (id) => {
         this.props.history.push(`/admin/page-module-edit/${id}`);
     }
+    handleDetails = (slug) => {
+        this.props.history.push(`/page-detail/${slug}`)
+    }
 
     handleRowSelected = (state) => {
         this.setState({ selectedRows: state.selectedRows });
     };
 
-    handleDeleteSeletedData = () => {
+    handleDeleteSeletedData = (id) => {
         const { selectedRows } = this.state;
-        // console.log("selected data", selectedRows)
-        for (let i = 0; i < selectedRows.length; i++) {
-            const ids = selectedRows[i].id
-            axios.delete(`/admin/deletePage/${ids}`, {
+        if (selectedRows == false) {
+            axios.delete(`/admin/deletePage/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
-            }).then((res) => { console.log('Row Data', res.data) })
+            }).then((res) => {
+                console.log(res.data)
+                this.getUpdate()
+            })
                 .catch((error) => {
                     console.log("error", error)
                 })
+            this.setState({ loading: true })
+
+        } else {
+            for (let i = 0; i < selectedRows.length; i++) {
+                const ids = selectedRows[i].id
+                axios.delete(`/admin/deletePage/${ids}`, {
+                    headers: {
+                        'Authorization': `Bearer ${this.authInfo.token}`
+                    }
+                }).then((res) => {
+                    this.getUpdate()
+                    console.log('Row Data', res.data)
+                })
+                    .catch((error) => {
+                        console.log("error", error)
+                    })
+            }
+            // window.location.reload(); 
+            this.setState({ loading: true })
         }
-        // window.location.reload();
-        this.setState({ loading: true })
-        this.getPublished();
-        this.getDraft();
-        this.getTrash();
     }
 
     handleStatusPublish = (id) => {
-        axios.put("/admin/cmsUpdatePage/" + id, { status: 'published' }, {
-            headers: {
-                'Authorization': `Bearer ${this.authInfo.token}`
-            }
-        })
-            .then(res => console.log(res.data)).catch(err => console.log("errorr message is : ", err.message))
-
-        this.setState({ loading: true })
-        this.getPublished();
-        this.getDraft();
-        this.getTrash();
-    }
-
-    // handleStatusTrash = (id) => {
-    //     axios.put("/admin/cmsUpdatePage/" + id, { status: 'trash' }, {
-    //         headers: {
-    //             'Authorization': `Bearer ${this.authInfo.token}`
-    //         }
-    //     })
-    //         .then(res => console.log(res.data)).catch(err => console.log("errorr message is : ", err.message))
-
-    //     this.setState({ loading: true })
-    //     this.getPublished();
-    //     this.getDraft();
-    //     this.getTrash();
-    // }
-
-    handleStatusTrash = () => {
         const { selectedRows } = this.state;
-
-        for (let i = 0; i < selectedRows.length; i++) {
-            const ids = selectedRows[i].id
-            axios.put("/admin/cmsUpdatePage/" + ids, { status: 'trash' }, {
+        console.log("selected Row", selectedRows)
+        if (selectedRows == false) {
+            axios.put("/admin/cmsUpdatePage/" + id, { status: 'published' }, {
                 headers: {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             })
-                .then(res => console.log(res.data))
-                .catch(err => console.log("errorr message is : ", err.message))
+                .then((res) => {
+                    this.getUpdate()
+                    console.log(res.data)
+                }).catch(err => console.log("errorr message is : ", err.message))
+            this.setState({ loading: true })
+        } else {
+            for (let i = 0; i < selectedRows.length; i++) {
+                const ids = selectedRows[i].id
+                axios.put("/admin/cmsUpdatePage/" + ids, { status: 'published' }, {
+                    headers: {
+                        'Authorization': `Bearer ${this.authInfo.token}`
+                    }
+                })
+                    .then((res) => {
+                        this.getUpdate()
+                        console.log(res.data)
+                    })
+                    .catch(err => console.log("errorr message is : ", err.message))
+            }
+            this.setState({ selectedRows: "" })
+            this.setState({ loading: true })
+
         }
-        this.setState({ loading: true })
-        this.getPublished();
-        this.getTrash();
     }
 
-    handleStateDraft = (id) => {
-        axios.put("/admin/cmsUpdatePage/" + id, { status: 'published' }, {
-            headers: {
-                'Authorization': `Bearer ${this.authInfo.token}`
-            }
-        })
-            .then(res => console.log(res.data)).catch(err => console.log("errorr message is : ", err.message))
 
-        this.setState({ loading: true })
-        this.getPublished();
-        this.getDraft();
-        this.getTrash();
+
+
+    handleStatusTrash = (id) => {
+        const { selectedRows } = this.state;
+        console.log("selected Row", selectedRows)
+        if (selectedRows == false) {
+            axios.put("/admin/cmsUpdatePage/" + id, { status: 'trash' }, {
+                headers: {
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            }).then((res) => {
+                this.getUpdate()
+                console.log(res.data)
+            }).catch(err => console.log("errorr message is : ", err.message))
+            this.setState({ loading: true })
+        } else {
+            for (let i = 0; i < selectedRows.length; i++) {
+                const ids = selectedRows[i].id
+                axios.put("/admin/cmsUpdatePage/" + ids, { status: 'trash' }, {
+                    headers: {
+                        'Authorization': `Bearer ${this.authInfo.token}`
+                    }
+                })
+                    .then(res => console.log(res.data))
+                    .catch(err => console.log("errorr message is : ", err.message))
+            }
+            this.setState({ selectedRows: "" })
+            this.setState({ loading: true })
+            this.getPublished();
+            this.getDraft();
+        }
+    }
+
+    handleStateRestore = (id) => {
+        const { selectedRows } = this.state;
+        console.log("selected Row", selectedRows)
+        if (selectedRows == false) {
+            axios.put("/admin/cmsUpdatePage/" + id, { status: 'published' }, {
+                headers: {
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            })
+                .then((res) => {
+                    this.getUpdate()
+                    console.log(res.data)
+                }).catch(err => console.log("errorr message is : ", err.message))
+            this.setState({ loading: true })
+
+        } else {
+            for (let i = 0; i < selectedRows.length; i++) {
+                const ids = selectedRows[i].id
+                axios.put("/admin/cmsUpdatePage/" + ids, { status: 'published' }, {
+                    headers: {
+                        'Authorization': `Bearer ${this.authInfo.token}`
+                    }
+                })
+                    .then((res) => {
+                        this.getUpdate()
+                        console.log(res.data)
+                    })
+                    .catch(err => console.log("errorr message is : ", err.message))
+            }
+            this.setState({ selectedRows: "" })
+            this.setState({ loading: true })
+
+        }
     }
 
     published_column = [
@@ -270,14 +296,20 @@ class AdminPageModule extends Component {
             cell: (row) => (
                 <>
                     <button
+                        onClick={() => this.handleDetails(row.slug)}
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+                    >
+                        View
+                    </button>
+                    <button
                         onClick={() => this.handleEdit(row.id)}
-                        className="custom_btn btn_yellow_bordered w-auto btn"
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
                     >
                         Edit
                     </button>
                     <button
                         onClick={() => this.handleStatusTrash(row._id)}
-                        className="custom_btn btn_yellow_bordered w-auto btn"
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
                     >
                         Trash
                     </button>
@@ -311,14 +343,14 @@ class AdminPageModule extends Component {
             cell: (row) => (
                 <>
                     <button
-                        className="custom_btn btn_yellow_bordered w-auto btn"
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
                         onClick={() => this.handleStatusPublish(row._id)}
                     >
                         Publish
                     </button>
                     <button
-                        className="custom_btn btn_yellow_bordered w-auto btn"
-                        onClick={this.handleDeleteSeletedData}
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+                        onClick={() => this.handleDeleteSeletedData(row._id)}
                     >
                         Delete
                     </button>
@@ -353,14 +385,14 @@ class AdminPageModule extends Component {
                 <>
                     <button
                         type='submit'
-                        className="custom_btn btn_yellow_bordered w-auto btn"
-                        onClick={() => this.handleStateDraft(row._id)}
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+                        onClick={() => this.handleStateRestore(row._id)}
                     >
                         Restore
                     </button>
                     <button
-                        className="custom_btn btn_yellow_bordered w-auto btn"
-                        onClick={this.handleDeleteSeletedData}
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+                        onClick={() => this.handleDeleteSeletedData(row._id)}
                     >
                         Delete
                     </button>
@@ -380,7 +412,7 @@ class AdminPageModule extends Component {
             selectedRows
         } = this.state;
 
-       
+
 
         if (loading) {
             return <SpinnerLoader />
@@ -401,7 +433,7 @@ class AdminPageModule extends Component {
                                     <div className="bg-white rounded-3 pt-3 pb-5">
                                         <div className="dash_inner_wrap">
                                             <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center flex_mob_none">
-                                                <div className="dash_title">Page Module</div>
+                                                <div className="dash_title">Page</div>
                                                 <div className="search_customer_field">
                                                     <div className="noti_wrap">
                                                         <div className="">

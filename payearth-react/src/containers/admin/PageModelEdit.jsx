@@ -23,12 +23,15 @@ class AdminPageEdit extends Component {
         this.dispatch = dispatch;
         this.authInfo = store.getState().auth.authInfo;
         this.state = {
+            seo: '',
+            seodescription: '',
+            keywords: '',
             image: '',
             pageTitle: '',
             description: '',
         };
     }
- 
+
     componentDidMount() {
         this.getPostById();
     }
@@ -49,7 +52,10 @@ class AdminPageEdit extends Component {
                 this.setState({
                     pageTitle: result[i].pageTitle,
                     description: result[i].description,
-                    image: result[i].image
+                    image: result[i].image,
+                    keywords: result[i].keywords,
+                    seo: result[i].seo,
+                    seodescription: result[i].seodescription,
                 })
             }
         }).catch((error) => {
@@ -60,9 +66,15 @@ class AdminPageEdit extends Component {
     handleTitleChange = (e) => {
         this.setState({ pageTitle: e.target.value });
     }
-    // handleSeoChange = (e) => {
-    //     this.setState({ seo: e.target.value })
-    // }
+    handleSeoChange = (e) => {
+        this.setState({ seo: e.target.value });
+    }
+    handleSeoDescChange = (e) => {
+        this.setState({ seodescription: e.target.value });
+    }
+    handleKeywordsChange = (e) => {
+        this.setState({ keywords: e.target.value });
+    }
     handleDescriptionChange = (description) => {
         this.setState({ description });
     }
@@ -92,16 +104,28 @@ class AdminPageEdit extends Component {
         }
     };
 
-    updatePost = (e) => {
-        e.preventDefault();
+    handleSaveDraft = () => {
+        this.updatePost("draft");
+        this.props.history.push('/admin/page-module')
+    }
+    handlePublishUpdate = () => {
+        this.updatePost("published")
+        this.props.history.push('/admin/page-module')
+    }
+
+    updatePost = (status) => {
         const { id } = this.props.match.params;
-        const { image, pageTitle, description } = this.state;
+        const { image, pageTitle, description, keywords, seo, seodescription } = this.state;
 
         const url = `/admin/cmsUpdatePage/${id}`;
         const postData = {
+            keywords,
+            seo,
+            seodescription,
             image,
             pageTitle,
             description,
+            status,
         };
         axios.put(url, postData, {
             headers: {
@@ -117,19 +141,16 @@ class AdminPageEdit extends Component {
                 console.error('Error saving post:', error);
             });
 
-        this.props.history.push('/admin/page-module')
-        // toast.success("Update Succesfully", { autoClose: 3000 })
-        // window.location.reload("");
+        this.setState({ keywords: "", seo: "", seodescription: "", image: "", pageTitle: "", description: "" })
+        toast.success("Update Succesfully", { autoClose: 3000 })
     };
 
-
     render() {
-
         return (
             <React.Fragment>
                 <Header />
                 <div className="container">
-                    <form onSubmit={this.updatePost} >
+                    <form onSubmit={this.handlePublishUpdate} >
                         <div className="row">
                             <div className="col-lg-9">
                                 <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
@@ -162,21 +183,6 @@ class AdminPageEdit extends Component {
                                             </div>
                                         </div>
 
-                                        {/* <div className="crt_bnr_fieldRow">
-                                            <div className="crt_bnr_field">
-                                                <label for="">Seo Title</label>
-                                                <div className="field_item">
-                                                    <input
-                                                        className="form-control"
-                                                        type="text"
-                                                        name="seo"
-                                                        id=""
-                                                        value={this.state.seo}
-                                                        onChange={this.handleSeoChange}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div> */}
                                         <div className="crt_bnr_fieldRow">
                                             <div className="crt_bnr_field">
                                                 <label>Description</label>
@@ -196,6 +202,51 @@ class AdminPageEdit extends Component {
                                                                 ['clean']
                                                             ]
                                                         }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="crt_bnr_fieldRow">
+                                            <div className="crt_bnr_field">
+                                                <label for="">Seo Title</label>
+                                                <div className="field_item">
+                                                    <input
+                                                        className="form-control"
+                                                        type="text"
+                                                        name="seo"
+                                                        id=""
+                                                        value={this.state.seo}
+                                                        onChange={this.handleSeoChange}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="crt_bnr_fieldRow">
+                                            <div className="crt_bnr_field">
+                                                <label htmlFor="">Seo Description</label>
+                                                <div className="field_item">
+                                                    <input
+                                                        className="form-control"
+                                                        type="text"
+                                                        name="seo"
+                                                        id=""
+                                                        value={this.state.seodescription}
+                                                        onChange={this.handleSeoDescChange}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="crt_bnr_fieldRow">
+                                            <div className="crt_bnr_field">
+                                                <label for="">Keywords</label>
+                                                <div className="field_item">
+                                                    <input
+                                                        className="form-control"
+                                                        type="text"
+                                                        name="seo"
+                                                        id=""
+                                                        value={this.state.keywords}
+                                                        onChange={this.handleKeywordsChange}
                                                     />
                                                 </div>
                                             </div>
@@ -260,6 +311,12 @@ class AdminPageEdit extends Component {
                                                 type="submit"
                                             >
                                                 Update
+                                            </button>
+                                            <button
+                                                className='btn custom_btn btn_yellow_bordered'
+                                                onClick={this.handleSaveDraft}
+                                            >
+                                                Draft
                                             </button>
                                         </div>
                                     </div>

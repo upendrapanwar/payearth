@@ -134,7 +134,7 @@ class CheckOut extends Component {
                 'paymentMode': 'usd',
                 'paymentAccount': 'Authorize .Net',
                 'invoiceUrl':'',
-                'paymentStatus' :'paid',
+                'paymentStatus' :'Paid',
             }];
             console.log(paymentData);
             var paymentIds = this.managePaymentData(paymentData);
@@ -145,6 +145,7 @@ class CheckOut extends Component {
                 this.setState({ "paymentId": result })
             })
             console.log(paymentId)
+            console.log("Payment PAID or UNPAID check here: ", this.state.status)
             
             //window.location.href('/OrderDetail')
         }
@@ -392,6 +393,7 @@ class CheckOut extends Component {
                     }
                 })
             }
+
             let product_sku = this.state.productSku;
             let reqBody = {}
             let user = this.authInfo.id
@@ -430,7 +432,7 @@ class CheckOut extends Component {
                     discount:              0,
                     price:                 this.getTotal().totalAmmount, 
                     total:                 this.getTotal().totalAmmount,
-                    orderStatus:           null,
+                    orderStatus:           orderStatus,
                     isActive:              true,
                     isService:             false 
                 },
@@ -532,8 +534,10 @@ class CheckOut extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`,
             }
         }).then((response) => {
-            console.log(response.data.data);
+            console.log("Save order details ",response.data.data);
+            console.log("ORDER ID CHECK",orderId);
             this.updateOrderStatus(orderId, response.data.data)
+
         }).catch(error => {
             console.log(error)
             toast.error(error);
@@ -548,13 +552,9 @@ class CheckOut extends Component {
      * @param {*} orderTrackingId 
      */
     updateOrderStatus = (orderId, orderTrackingId) => {
-        let reqBody = {}
-        reqBody = {
-            data: {
-                orderId:       orderId,
-                orderStatus: orderTrackingId,
-            },
-            
+        let reqBody = {
+            orderId: orderId,
+            orderStatus: orderTrackingId,
         }
         axios.post('user/updateorderstatus', reqBody.data, {
             headers: {
@@ -563,7 +563,7 @@ class CheckOut extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`,
             }
         }).then((response) => {
-            console.log(response.data.data);
+            console.log("ORDER STATUS", response.data.data);
         }).catch(error => {
             console.log(error)
             toast.error(error);

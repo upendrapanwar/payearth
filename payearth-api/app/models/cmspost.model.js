@@ -1,17 +1,23 @@
 var mongoose = require("mongoose");
 const Schema = mongoose.Schema;
- 
+
 
 const schema = new Schema({
     image: {
         type: String,
         require: false,
     },
-    seo: {
+    title: {
         type: String,
         required: false,
     },
-    title: {
+    slug: {
+        type: String,
+        unique: true,
+        trim: true,
+        default: 0
+    },
+    shortdescription: {
         type: String,
         required: false,
     },
@@ -26,7 +32,18 @@ const schema = new Schema({
     author: {
         type: Schema.Types.ObjectId,
         ref: 'Admin',
-        required: false
+    },
+    seo: {
+        type: String,
+        required: false,
+    },
+    seodescription: {
+        type: String,
+        required: false,
+    },
+    keywords: {
+        type: String,
+        required: false,
     },
     status: {
         type: String,

@@ -132,12 +132,14 @@ router.post('/coupons/new', getNewCoupons);
 router.post('/coupons/checkpayment', checkPayment);
 router.post('/coupons/check',checkCoupon)
 router.post('/coupons/status',couponStatus)
-router.post('/orders/:id', getOrders);
+router.post('/orders/:id', getOrders); 
 
 router.post('/saveorder', saveOrder);
 router.post('/payments/:id', getPayments);
+router.get('/paymentsbyid/:id', getPaymentsById);
 router.get('/orders/:id', getOrderById);
 router.get('/orderbyid/:id', getOrderDataById);
+router.get('/orderdetails/:id', getOrderDetails);
 router.get('/orderstatus', getOrderStatus);
 router.get('/ordertrackingtime', getOrderTrackingTime);
 router.post('/saveordertracking', saveOrdertrackingTime);
@@ -320,13 +322,18 @@ function deleteFromCart(req, res, next) {
         .catch(err => next(res.status(400).json({ status: false, message: err })));
 }
 
-function getOrderById(req, res, next) {
+function getOrderById(req, res, next) { 
     userService.getOrderById(req.params.id)
         .then(order => order ? res.status(200).json({ status: true, data: order }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
 function getOrderDataById(req, res, next) {
     userService.getOrderDataById(req.params.id)
+        .then(order => order ? res.status(200).json({ status: true, data: order }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+function getOrderDetails(req, res, next) {
+    userService.getOrderDetails(req.params.id)
         .then(order => order ? res.status(200).json({ status: true, data: order }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
@@ -358,11 +365,16 @@ function addReturn(req, res, next) {
 }
 
 function getPayments(req, res, next) {
-    userService.getPayments(req)
+    userService.getPayments(reqBody)
         .then(payments => payments ? res.status(200).json({ status: true, data: payments }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
-/**
+function getPaymentsById(req, res, next) {
+    userService.getPaymentsById(req.params.id)
+        .then(payments => payments ? res.status(200).json({ status: true, data: payments }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+/** 
  * 
  * @param {*} req 
  * @param {*} res 

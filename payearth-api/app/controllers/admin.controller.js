@@ -176,13 +176,13 @@ router.delete('/deletePost/:id', deletePost);
 router.put("/cmsUpdatePost/:id", cmsUpdatePost);
 router.get("/cmsGetPostById/:id", cmsGetPostById)
 router.get("/cmsGetByStatus/:status", cmsGetByStatus);
-
+router.get('/postSlug', getAllPostSlug)
 router.post("/cmsPage", createCmsPage);
 router.get("/cmsPageByStatus/:status", cmsPageGetByStatus);
 router.get("/cmsGetPageById/:id", cmsGetPageById);
 router.put("/cmsUpdatePage/:id", cmsUpdatePage);
 router.delete("/deletePage/:id", deletePage);
-
+router.get('/pageSlug', getAllPageSlug)
 router.post("/cmsCategory", createCmsCategory);
 router.get("/getCmsAllCategory", getCmsCategoryData);
 router.get("/cmsGetCategoryById/:id", cmsGetCategoryById);
@@ -682,6 +682,12 @@ function cmsGetByStatus(req, res, next) {
         .catch(err => next(res.json({ status: false, message: err })));
 }
 
+function getAllPostSlug(req, res, next) {
+    adminService.getAllPostSlug(req)
+        .then(slug => slug ? res.status(200).json({ status: true, data: slug }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
 // CMS PAGE.....
 function createCmsPage(req, res, next) {
     adminService.createCmsPage(req)
@@ -713,12 +719,20 @@ function deletePage(req, res, next) {
         .catch(err => next(res.json({ status: false, message: err })));
 }
 
+function getAllPageSlug(req, res, next) {
+    adminService.getAllPageSlug(req)
+        .then(slug => slug ? res.status(200).json({ status: true, data: slug }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
 // category
 function createCmsCategory(req, res, next) {
     adminService.createCmsCategory(req)
         .then(category => category ? res.status(200).json({ status: true, data: category }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
+
+
 
 function getCmsCategoryData(req, res, next) {
     adminService.getCmsCategoryData(req)

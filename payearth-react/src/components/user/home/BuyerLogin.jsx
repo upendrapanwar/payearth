@@ -41,10 +41,10 @@ const BuyerLogin = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="img_wrapper">
+                    {/* <div className="img_wrapper">
                         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         <img src={buyerLogin} alt="buyer-login" />
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>

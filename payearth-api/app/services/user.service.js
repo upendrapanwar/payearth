@@ -8,8 +8,7 @@ const bcrypt = require("bcryptjs");
 const nodemailer = require('nodemailer');
 const msg = require('../helpers/messages.json');
 const Webhook = require('coinbase-commerce-node').Webhook;
-const { User, Coupon, Product, Wishlist, UserCoupon, Review, ProductComplaint, Order, OrderStatus, OrderTrackingTimeline, OrderCancel, OrderReturn, Payment, CryptoConversion, Savelater, Cart, OrderDetails } = require("../helpers/db");
-
+const { User, Seller, Coupon, Product, Wishlist, UserCoupon, Review, ProductComplaint, Order, OrderStatus, OrderTrackingTimeline, OrderCancel, OrderReturn, Payment, CryptoConversion, Savelater, Cart, OrderDetails } = require("../helpers/db");
 
 module.exports = {
     authenticate,
@@ -25,7 +24,7 @@ module.exports = {
     getWishList,
     deleteWishlist,
     getSaveLaterList,
-    removeProductFromWishlist,
+    removeProductFromWishlist, 
     removeProductFromSavelater,
     getMyCoupons,
     getNewCoupons,
@@ -46,10 +45,12 @@ module.exports = {
     getOrderById,
     //getUserOrderById,
     getOrderDataById,
+    getOrderDetails,
     addComplaint,
     addCancel,
     addReturn,
     getPayments,
+    getPaymentsById,
     getSellerByProductId,
     savepaymentdata,
     saveOrdertrackingTime,
@@ -863,7 +864,7 @@ async function saveOrder(req) {
             deliveryCharge:        param.deliveryCharge,
             taxPercent:            param.taxPercent,
             taxAmount:             param.taxAmount,
-            discount:              param.discount,
+            discount:              param.discount, 
             total:                 param.total,
             orderStatus:           param.orderStatus,
             isActive:              param.isActive,
@@ -959,6 +960,7 @@ async function deleteFromCart(req) {
         return false;
     }
 }
+
 async function getOrders(req) {
     try {
 
@@ -966,7 +968,7 @@ async function getOrders(req) {
         var id = req.params.id; //user id
         var sortOption = { createdAt: 'desc' }; //default
         var page = 0;
-        var limit = 5;
+        var limit = 10;
         var skip = 0;
         var whereCondition = { userId: id, isActive: true };
 
@@ -1221,6 +1223,81 @@ async function getOrderDataById(req) {
         return false;
     }
 }
+
+async function getOrderDetails(id) {
+    try {
+        const orders = await Order.find({ userId: id })
+            .select('orderCode price paymentId billingFirstName billingLastName billingCompanyName billingCounty billingStreetAddress billingStreetAddress1 billingCity billingCountry billingPostCode billingPhone billingEmail billingNote deliveryCharge taxPercent taxAmount discount orderStatus total createdAt')
+            .populate([
+                {
+                        path: 'orderStatus',
+                        model: OrderStatus,
+                        select: 'title'
+                }, 
+                {
+                    path: 'paymentId',
+                    model: Payment,
+                    select: 'invoiceNo amountPaid paymentMode paymentAccount createdAt paymentStatus'
+                },
+            ])
+
+
+        // Collect all orderIds
+        const orderIds = orders.map(order => order._id);
+
+        const orderDetails = await OrderDetails.find({ orderId: { $in: orderIds } })
+            .populate({
+                path: 'productId',
+                model: Product,
+                select: 'name',
+            })
+            .populate({
+                path: 'sellerId',
+                model: Seller,
+                select: 'name email phone full_address',
+            });
+            
+
+        // Create a map to associate orderIds with their corresponding product data
+        const orderDetailsMap = {};
+        orderDetails.forEach(detail => {
+            if (!orderDetailsMap[detail.orderId]) {
+                orderDetailsMap[detail.orderId] = [];
+            }
+            orderDetailsMap[detail.orderId].push(detail);
+        });
+
+        // Create an array of results, each containing order and product data
+        const result = orders.map(order => {
+            const orderId = order._id;
+            if (orderDetailsMap[orderId]) {
+                return {
+                    order: order,
+                    orderDetails: orderDetailsMap[orderId]
+                };
+            } else {
+                return {
+                    order: order,
+                    orderDetails: []
+                };
+            }
+        });
+
+        return {
+            data: result
+        };
+    } catch (err) {
+        console.log('Error:', err);
+        return {
+            status: false,
+            data: "An error occurred while fetching data."
+        };
+    }
+}
+
+
+
+
 /**************************************************************************/
 /**************************************************************************/
 
@@ -1463,6 +1540,33 @@ async function addReturn(req) {
 
         return await OrderReturn.findById(data.id).select();
     } else {
+        return false;
+    }
+}
+
+async function getPaymentsById(id) {
+    try {
+        const payments = await Payment.find({ userId: id })
+        .select('invoiceNo orderId userId amountPaid paymentMode paymentAccount createdAt')
+        .populate({
+            path: 'orderId',
+            modal: Order,
+            select: 'billingCompanyName deliveryCharge taxAmount discount price'
+        })
+        .populate([{
+            path: 'userId',
+            model: User,
+            select: 'name email'
+        }])
+        
+        if (!payments) {
+            console.log('User not found');
+            return false;
+        }
+
+        return payments;
+    } catch (error) {
+        console.error('Error fetching user payments:', error);
         return false;
     }
 }

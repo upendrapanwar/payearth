@@ -13,14 +13,13 @@ import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 
 
-
-
 class AdminPostModule extends Component {
     constructor(props) {
         super(props);
         this.authInfo = store.getState().auth.authInfo;
+        // console.log("Auth", this.userInfo.name)
         this.state = {
-            
+
             selectedRows: [],
             publish: [],
             draft: [],
@@ -37,13 +36,12 @@ class AdminPostModule extends Component {
         this.getTrash();
     }
 
-    // componentDidUpdate(prevProps, prevState) {
-    //     if (this.props.someProps !== prevProps.someProps) {
-    //         this.getPublished();
-    //         this.getDraft();
-    //         this.getTrash();
-    //     }
-    // }
+    getUpdate = () => {
+        this.getPublished();
+        this.getDraft();
+        this.getTrash();
+    }
+
 
     getPublished = () => {
         let status = "published"
@@ -129,114 +127,187 @@ class AdminPostModule extends Component {
         this.props.history.push(`/admin/post-module-edit/${id}`);
     }
 
+    blogDetails = (slug) => {
+        this.props.history.push(`/blog-detail/${slug}`);
+    }
+
     handleRowSelected = (state) => {
         this.setState({ selectedRows: state.selectedRows });
     };
 
-    handleDeleteSeletedData = () => {
+    handleDeleteSeletedData = (id) => {
         const { selectedRows } = this.state;
-        // console.log("selected data", selectedRows)
-        for (let i = 0; i < selectedRows.length; i++) {
-            const ids = selectedRows[i].id
-            axios.delete(`/admin/deletePost/${ids}`, {
+        if (selectedRows == false) {
+            axios.delete(`/admin/deletePost/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
-            }).then((res) => { console.log('Row Data', res.data) })
+            }).then((res) => {
+                this.getUpdate()
+                console.log(res)
+            })
                 .catch((error) => {
                     console.log("error", error)
                 })
+            this.setState({ loading: true })
+        } else {
+            for (let i = 0; i < selectedRows.length; i++) {
+                const ids = selectedRows[i].id
+                axios.delete(`/admin/deletePost/${ids}`, {
+                    headers: {
+                        'Authorization': `Bearer ${this.authInfo.token}`
+                    }
+                }).then((res) => {
+                    this.getUpdate()
+                    console.log('Row Data', res.data)
+                })
+                    .catch((error) => {
+                        console.log("error", error)
+                    })
+            }
+            // window.location.reload(); 
+            this.setState({ loading: true })
+
         }
-        // window.location.reload();
-        this.setState({ loading: true })
-        this.getPublished();
-        this.getDraft();
-        this.getTrash();
     }
 
     handleStatusPublish = (id) => {
-        axios.put("/admin/cmsUpdatePost/" + id, { status: 'published' }, {
-            headers: {
-                'Authorization': `Bearer ${this.authInfo.token}`
-            }
-        })
-            .then(res => console.log(res.data)).catch(err => console.log("errorr message is : ", err.message))
-        this.setState({ loading: true })
-        this.getPublished();
-        this.getDraft();
-        this.getTrash();
-    }
-
-    // handleStatusTrash = (id) => {
-    //     axios.put("/admin/cmsUpdatePost/" + id, { status: 'trash' }, {
-    //         headers: {
-    //             'Authorization': `Bearer ${this.authInfo.token}`
-    //         }
-    //     })
-    //         .then(res => console.log(res.data)).catch(err => console.log("errorr message is : ", err.message))
-    //     this.setState({ loading: true })
-    //     this.getPublished();
-    //     this.getDraft();
-    //     this.getTrash();
-    // }
-
-    handleStatusTrash = () => {
         const { selectedRows } = this.state;
-
-        for (let i = 0; i < selectedRows.length; i++) {
-            const ids = selectedRows[i].id
-            axios.put("/admin/cmsUpdatePost/" + ids, { status: 'trash' }, {
+        console.log("selected Row", selectedRows)
+        if (selectedRows == false) {
+            axios.put("/admin/cmsUpdatePost/" + id, { status: 'published' }, {
                 headers: {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             })
-                .then(res => console.log(res.data))
-                .catch(err => console.log("errorr message is : ", err.message))
+                .then((res) => {
+                    this.getUpdate()
+                    console.log(res.data)
+                }).catch(err => console.log("errorr message is : ", err.message))
+            this.setState({ loading: true })
+
+        } else {
+            for (let i = 0; i < selectedRows.length; i++) {
+                const ids = selectedRows[i].id
+                axios.put("/admin/cmsUpdatePost/" + ids, { status: 'published' }, {
+                    headers: {
+                        'Authorization': `Bearer ${this.authInfo.token}`
+                    }
+                })
+                    .then((res) => {
+                        this.getUpdate()
+                        console.log(res.data)
+                    })
+                    .catch(err => console.log("errorr message is : ", err.message))
+            }
+            this.setState({ selectedRows: "" })
+            this.setState({ loading: true })
+
         }
-        this.setState({ loading: true })
-        this.getPublished();
-        this.getTrash();
     }
 
-    handleStateDraft = (id) => {
-        axios.put("/admin/cmsUpdatePost/" + id, { status: 'published' }, {
-            headers: {
-                'Authorization': `Bearer ${this.authInfo.token}`
+
+    handleStatusTrash = (id) => {
+        const { selectedRows } = this.state;
+        console.log("selected Row", selectedRows)
+        if (selectedRows == false) {
+            axios.put("/admin/cmsUpdatePost/" + id, { status: 'trash' }, {
+                headers: {
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            })
+                .then((res) => {
+                    this.getUpdate()
+                    console.log(res.data)
+                }).catch(err => console.log("errorr message is : ", err.message))
+            this.setState({ loading: true })
+            this.getPublished();
+            this.getTrash();
+        } else {
+            for (let i = 0; i < selectedRows.length; i++) {
+                const ids = selectedRows[i].id
+                axios.put("/admin/cmsUpdatePost/" + ids, { status: 'trash' }, {
+                    headers: {
+                        'Authorization': `Bearer ${this.authInfo.token}`
+                    }
+                })
+                    .then((res) => {
+                        this.getUpdate()
+                        console.log(res.data)
+                    })
+                    .catch(err => console.log("errorr message is : ", err.message))
             }
-        })
-            .then(res => console.log(res.data)).catch(err => console.log("errorr message is : ", err.message))
-        this.setState({ loading: true })
-        this.getPublished();
-        this.getDraft();
-        this.getTrash();
+            this.setState({ selectedRows: "" })
+            this.setState({ loading: true })
+
+        }
     }
+
+    handleStateRestore = (id) => {
+        const { selectedRows } = this.state;
+        console.log("selected Row", selectedRows)
+        if (selectedRows == false) {
+            axios.put("/admin/cmsUpdatePost/" + id, { status: 'published' }, {
+                headers: {
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            })
+                .then((res) => {
+                    this.getUpdate()
+                    console.log(res.data)
+                }).catch(err => console.log("errorr message is : ", err.message))
+            this.setState({ loading: true })
+
+        } else {
+            for (let i = 0; i < selectedRows.length; i++) {
+                const ids = selectedRows[i].id
+                axios.put("/admin/cmsUpdatePost/" + ids, { status: 'published' }, {
+                    headers: {
+                        'Authorization': `Bearer ${this.authInfo.token}`
+                    }
+                })
+                    .then((res) => {
+                        this.getUpdate()
+                        console.log(res.data)
+                    })
+                    .catch(err => console.log("errorr message is : ", err.message))
+            }
+            this.setState({ selectedRows: "" })
+            this.setState({ loading: true })
+        }
+    }
+
+
 
     published_column = [
-        {
-            name: 'Seo Title',
-            selector: (row, i) => row.seo,
-            sortable: true,
-            width: "200px",
-        },
+        // {
+        //     name: 'Seo Title',
+        //     selector: (row, i) => row.seo,
+        //     sortable: true,
+        //     
+        // },
         {
             name: "Title",
             selector: (row, i) => row.title,
             sortable: true,
-            width: "200px",
+
         },
         {
             name: "Category",
             selector: (row, i) => row.category,
             sortable: true,
-            width: "200px",
+
         },
+        // author
         {
             name: 'Publish Date & Time',
             selector: (row, i) => row.updatedAt,
             sortable: true,
 
+
             cell: row => {
-                const date = new Date(row.updatedAt).toLocaleString();
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                const date = new Date(row.updatedAt).toLocaleDateString('en-US', options);
                 return <div>{date}</div>;
             },
         },
@@ -244,21 +315,28 @@ class AdminPostModule extends Component {
             name: "Status",
             selector: (row, i) => row.status,
             sortable: true,
-            width: "120px",
+
         },
         {
             name: 'Actions',
+            // width: "350px",
             cell: (row) => (
                 <>
                     <button
+                        onClick={() => this.blogDetails(row.slug)}
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+                    >
+                        View
+                    </button>
+                    <button
                         onClick={() => this.handleEdit(row.id)}
-                        className="custom_btn btn_yellow_bordered w-auto btn"
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
                     >
                         Edit
                     </button>
                     <button
                         onClick={() => this.handleStatusTrash(row._id)}
-                        className="custom_btn btn_yellow_bordered w-auto btn"
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
                     >
                         Trash
                     </button>
@@ -268,23 +346,23 @@ class AdminPostModule extends Component {
     ]
 
     draft_column = [
-        {
-            name: 'Seo Title',
-            selector: (row, i) => row.seo,
-            sortable: true,
-            width: "200px",
-        },
+        // {
+        //     name: 'Seo Title',
+        //     selector: (row, i) => row.seo,
+        //     sortable: true,
+        //     // width: "200px",
+        // },
         {
             name: "Title",
             selector: (row, i) => row.title,
             sortable: true,
-            width: "200px",
+            // width: "200px",
         },
         {
             name: "Category",
             selector: (row, i) => row.category,
             sortable: true,
-            width: "200px",
+            // width: "200px",
         },
         {
             name: 'Created Date & Time',
@@ -299,22 +377,22 @@ class AdminPostModule extends Component {
             name: "Status",
             selector: (row, i) => row.status,
             sortable: true,
-            width: "120px",
+            // width: "120px",
         },
         {
             name: 'Actions',
             cell: (row) => (
                 <>
                     <button
-                        className="custom_btn btn_yellow_bordered w-auto btn"
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
                         onClick={() => this.handleStatusPublish(row._id)}
                     >
                         Publish
                     </button>
 
                     <button
-                        className="custom_btn btn_yellow_bordered w-auto btn"
-                        onClick={this.handleDeleteSeletedData}
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+                        onClick={() => this.handleDeleteSeletedData(row._id)}
                     >
                         Delete
                     </button>
@@ -324,23 +402,24 @@ class AdminPostModule extends Component {
     ]
 
     trash_column = [
-        {
-            name: 'Seo Title',
-            selector: (row, i) => row.seo,
-            sortable: true,
-            width: "200px",
-        },
+        // {
+        //     name: 'Seo Title',
+        //     selector: (row, i) => row.seo,
+        //     sortable: true,
+        //     // width: "200px",
+
+        // },
         {
             name: "Title",
             selector: (row, i) => row.title,
             sortable: true,
-            width: "200px",
+            // width: "200px",
         },
         {
             name: "Category",
             selector: (row, i) => row.category,
             sortable: true,
-            width: "200px",
+            // width: "200px",
         },
         {
             name: 'Created Date & Time',
@@ -355,7 +434,7 @@ class AdminPostModule extends Component {
             name: "Status",
             selector: (row, i) => row.status,
             sortable: true,
-            width: "120px",
+            // width: "120px",
         },
         {
             name: 'Actions',
@@ -363,14 +442,14 @@ class AdminPostModule extends Component {
                 <>
                     <button
                         type='submit'
-                        className="custom_btn btn_yellow_bordered w-auto btn"
-                        onClick={() => this.handleStateDraft(row._id)}
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+                        onClick={() => this.handleStateRestore(row._id)}
                     >
                         Restore
                     </button>
                     <button
-                        className="custom_btn btn_yellow_bordered w-auto btn"
-                        onClick={this.handleDeleteSeletedData}
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+                        onClick={ () => this.handleDeleteSeletedData(row._id)}
                     >
                         Delete
                     </button>
@@ -412,7 +491,7 @@ class AdminPostModule extends Component {
                                     <div className="bg-white rounded-3 pt-3 pb-5">
                                         <div className="dash_inner_wrap">
                                             <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center flex_mob_none">
-                                                <div className="dash_title">Post Module</div>
+                                                <div className="dash_title">Post</div>
                                                 <div className="search_customer_field">
                                                     <div className="noti_wrap">
                                                         <div className="">

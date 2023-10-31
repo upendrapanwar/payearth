@@ -47,12 +47,11 @@ class AdminCategoryModelEdit extends Component {
     handleSubmit = () => {
         toast.success("Category Add Succesfully", { autoClose: 3000 })
 
-        const { names, slug, description } = this.state;
+        const { names, description } = this.state;
         const url = 'admin/cmsCategory';
 
         const categoryData = {
             names,
-            slug,
             description,
         }
         axios.post(url, categoryData, {
@@ -63,6 +62,7 @@ class AdminCategoryModelEdit extends Component {
             }
         })
             .then((response) => {
+                this.getCategory();
                 console.log("POST SUCCESS", response.data);
             })
             .catch((error) => {
@@ -70,7 +70,6 @@ class AdminCategoryModelEdit extends Component {
             });
 
         this.setState({ names: "", slug: "", description: "" })
-        this.getCategory();
     }
 
     getCategory = () => {
@@ -149,21 +148,21 @@ class AdminCategoryModelEdit extends Component {
                     description: result[i].description,
                 })
             }
+            this.getCategory();
         }).catch((error) => {
             console.error('Error:', error);
         });
-        this.getCategory();
+       
     }
 
     updateCategory = (e) => {
         e.preventDefault();
         const { id } = this.props.match.params;
-        const { names, slug, description } = this.state;
+        const { names, description } = this.state;
 
         const url = `/admin/cmsUpdateCategory/${id}`;
         const categoryData = {
             names,
-            slug,
             description,
         };
         axios.put(url, categoryData, {
@@ -218,22 +217,6 @@ class AdminCategoryModelEdit extends Component {
                                                         id=""
                                                         value={this.state.names}
                                                         onChange={this.handleTitleChange}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="crt_bnr_fieldRow">
-                                            <div className="crt_bnr_field">
-                                                <label htmlFor="">Slug</label>
-                                                <div className="field_item">
-                                                    <input
-                                                        className="form-control"
-                                                        type="text"
-                                                        name="slug"
-                                                        id=""
-                                                        value={this.state.slug}
-                                                        onChange={this.handleSlugChange}
                                                     />
                                                 </div>
                                             </div>

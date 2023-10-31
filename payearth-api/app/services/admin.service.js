@@ -70,6 +70,7 @@ module.exports = {
     deleteColor,
     statusColor,
 
+    //Order
     getOrders,
     getUserOrders,
     getOrderById,
@@ -84,19 +85,21 @@ module.exports = {
     getproductData,
     getProductNameById,
     filterOrderData,
+
+    //CMS
     createCmsPost,
     getCmsPostData,
     cmsDeletePost,
     cmsUpdatePost,
     cmsGetByStatus,
     cmsGetPostById,
-    
+    getAllPostSlug,
     createCmsPage,
     cmsPageGetByStatus,
     cmsGetPageById,
     cmsUpdatePage,
     cmsDeletePage,
-
+    getAllPageSlug,
     createCmsCategory,
     getCmsCategoryData,
     cmsGetCategoryById,
@@ -105,11 +108,11 @@ module.exports = {
 };
 
 // Validator function
-function isValidObjectId(id){
-     console.log('id='+id)
-    if(ObjectId.isValid(id)){
-        if((String)(new ObjectId(id)) === id)
-            return true;       
+function isValidObjectId(id) {
+    console.log('id=' + id)
+    if (ObjectId.isValid(id)) {
+        if ((String)(new ObjectId(id)) === id)
+            return true;
         return false;
     }
     return false;
@@ -462,12 +465,12 @@ async function getSellers(req) {
 async function createCoupon(param) {
 
     //if (await Coupon.findOne({ code: param.code })) { throw 'Coupon Code "' + param.code + '" already exists.'; }
-    if (await Coupon.findOne({ code: param.coupon_code})) { throw 'Coupon Code "' + param.coupon_code + '" already exists.'; }
+    if (await Coupon.findOne({ code: param.coupon_code })) { throw 'Coupon Code "' + param.coupon_code + '" already exists.'; }
     const input = {
         "code": param.coupon_code.trim(),
         "discount_per": param.discount_percentage,
         "start": param.start_date,
-        "end": param.end_date,      
+        "end": param.end_date,
     };
 
     const coupon = new Coupon(input);
@@ -1444,17 +1447,17 @@ async function getOrders(req) {
             orArr = [{ "lname": "completed" }];
         }  
 
-        if(param.filter.status == "Pending" && param.filter.type == "pending") {  
+        if (param.filter.status == "Pending" && param.filter.type == "pending") {
             orArr = [{ "lname": "pending" }];
         }
 
-        if((param.filter.status == "Packed" && param.filter.type == "ongoing") || (param.filter.status == "Processing" && param.filter.type == "ongoing") || (param.filter.status == "Shipped" && param.filter.type == "ongoing") || (param.filter.status == "Delivered" && param.filter.type == "ongoing")) {                                                                                                              
+        if ((param.filter.status == "Packed" && param.filter.type == "ongoing") || (param.filter.status == "Processing" && param.filter.type == "ongoing") || (param.filter.status == "Shipped" && param.filter.type == "ongoing") || (param.filter.status == "Delivered" && param.filter.type == "ongoing")) {
             orArr = [{ "lname": "processing" }, { "lname": "packed" }, { "lname": "shipped" }, { "lname": "delivered" }];
             console.log('processing');
             //orArr = [{ "lname": "ongoing" }];
         }
 
-        if((param.filter.status == "Cancel Refund" && param.filter.type == "cancel_refund") || (param.filter.status == "Cancelled" && param.filter.type == "cancel_refund") || (param.filter.status == "Refunded" && param.filter.type == "cancel_refund") || (param.filter.status == "Declined" && param.filter.type == "cancel_refund") || (param.filter.status == "Disputed" && param.filter.type == "cancel_refund") || (param.filter.status == "FAILED" && param.filter.type == "cancel_refund") || (param.filter.status == "Returned" && param.filter.type == "cancel_refund") || (param.filter.status == "Return Request" && param.filter.type == "cancel_refund") || (param.filter.status == "Cancel Request" && param.filter.type == "cancel_refund")) {
+        if ((param.filter.status == "Cancel Refund" && param.filter.type == "cancel_refund") || (param.filter.status == "Cancelled" && param.filter.type == "cancel_refund") || (param.filter.status == "Refunded" && param.filter.type == "cancel_refund") || (param.filter.status == "Declined" && param.filter.type == "cancel_refund") || (param.filter.status == "Disputed" && param.filter.type == "cancel_refund") || (param.filter.status == "FAILED" && param.filter.type == "cancel_refund") || (param.filter.status == "Returned" && param.filter.type == "cancel_refund") || (param.filter.status == "Return Request" && param.filter.type == "cancel_refund") || (param.filter.status == "Cancel Request" && param.filter.type == "cancel_refund")) {
             orArr = [{ "lname": "cancelled" }, { "lname": "refunded" }, { "lname": "declined" }, { "lname": "disputed" }, { "lname": "failed" }, { "lname": "returned" }, { "lname": "return_request" }, { "lname": "cancel_request" }];
         }
         //console.log(orArr);
@@ -1555,19 +1558,19 @@ async function getOrders(req) {
             //search for orders
             //if(param.search && param.search.length > 0) {
                 let ordercode_text = param.search; //text
-                
-                var orderIdArray = [];
-                
-                var orders = await Order.find({ orderCode: ordercode_text}).select("id").exec();
-                
-                if (orders && orders.length > 0) {
 
-                    for (var i = 0; i < orders.length; i++) {
-                        let id = orders[i]._id;
-                        orderIdArray.push(id);
-                    }
+            var orderIdArray = [];
+
+            var orders = await Order.find({ orderCode: ordercode_text }).select("id").exec();
+
+            if (orders && orders.length > 0) {
+
+                for (var i = 0; i < orders.length; i++) {
+                    let id = orders[i]._id;
+                    orderIdArray.push(id);
                 }
-                //console.log(orderIdArray);
+            }
+            //console.log(orderIdArray);
                 if (orderIdArray.length > 0) {
                     whereCondition['$and'].push({ _id: { $in: orderIdArray } });
                 }
@@ -2236,19 +2239,31 @@ async function getproductData(productId) {
 /******************************************************************************/
 
 // Publish Posts through Admin.........   
-// last update 28-8-23.......
+
 //POST API
 async function createCmsPost(req, res) {
     try {
         var param = req.body;
-        // console.log(param)
+        const titleCount = await cmsPost.find({ title: param.title }).count()
+        let slug = "";
+        if (titleCount > 0) {
+            slug = param.slug + titleCount;
+        } else {
+            slug = param.slug
+        }
+
+        // console.log("Slug", slug)
         let input = {
             image: param.image,
-            seo: param.seo,
             title: param.title,
+            slug: slug,
+            shortdescription: param.shortdescription,
             description: param.description,
             category: param.category,
             publishDate: param.publishDate,
+            seo: param.seo,
+            seodescription: param.seodescription,
+            keywords: param.keywords,
             author: param.author,
             status: param.status
         };
@@ -2268,7 +2283,7 @@ async function createCmsPost(req, res) {
 // Get all post data
 async function getCmsPostData() {
     try {
-        const allPosts = await cmsPost.find({ seo, title, description    });
+        const allPosts = await cmsPost.find({ seo, seodescription, title, slug, description, shortdescription, keywords }).select().sort({ createdAt: 'desc' });
         if (allPosts && allPosts.length > 0)
             return allPosts;
     } catch (error) {
@@ -2291,9 +2306,9 @@ async function cmsDeletePost(req) {
 async function cmsUpdatePost(req) {
     const postId = req.params.id;
     // console.log("postID", postId)
-    const { image, seo, title, description, category, status } = req.body;
+    const { image, seo, seodescription, title, shortdescription, description, keywords, category, status } = req.body;
     try {
-        const post = await cmsPost.findByIdAndUpdate(postId, { image, seo, title, description, category, status }, { new: true });
+        const post = await cmsPost.findByIdAndUpdate(postId, { image, seo, seodescription, title, shortdescription, description, keywords, category, status }, { new: true });
         // console.log("update post", post)
         return post;
     } catch (error) {
@@ -2306,7 +2321,7 @@ async function cmsGetByStatus(req) {
     const status = req.params.status;
     // console.log("status", status)
     try {
-        const allPost = await cmsPost.find({});
+        const allPost = await cmsPost.find({}).select().sort({ createdAt: 'desc' });
         const filteredStatus = allPost.filter(item => item.status === status);
         return filteredStatus;
     } catch (error) {
@@ -2326,16 +2341,39 @@ async function cmsGetPostById(req) {
     }
 }
 
+//slug
+
+async function getAllPostSlug() {
+    try {
+        const allCate = await cmsPost.find({}).select('slug')
+        if (allCate && allCate.length > 0)
+            return allCate;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 // ************************Cms page model******************************
 async function createCmsPage(req, res) {
     try {
         var param = req.body;
-        // console.log(param)
+        const titleCount = await cmsPage.find({ pageTitle: param.pageTitle }).count()
+        let slug = "";
+        if (titleCount > 0) {
+            slug = param.slug + titleCount;
+        } else {
+            slug = param.slug
+        }
+
+        // console.log("page Slug", slug)
 
         let input = {
             image: param.image,
             seo: param.seo,
+            seodescription: param.seodescription,
+            keywords: param.keywords,
             pageTitle: param.pageTitle,
+            slug: slug,
             description: param.description,
             publishDate: param.publishDate,
             author: param.author,
@@ -2358,7 +2396,7 @@ async function createCmsPage(req, res) {
 async function cmsPageGetByStatus(req) {
     const status = req.params.status;
     try {
-        const allPages = await cmsPage.find({});
+        const allPages = await cmsPage.find({}).select().sort({ createdAt: 'desc' });
         const filteredStatus = allPages.filter(item => item.status === status);
         return filteredStatus;
     } catch (error) {
@@ -2380,9 +2418,9 @@ async function cmsGetPageById(req) {
 // Update Page
 async function cmsUpdatePage(req) {
     const pageId = req.params.id;
-    const { image, pageTitle, description, status } = req.body;
+    const { image, seo, seodescription, keywords, pageTitle, description, status } = req.body;
     try {
-        const page = await cmsPage.findByIdAndUpdate(pageId, { image, pageTitle, description, status }, { new: true });
+        const page = await cmsPage.findByIdAndUpdate(pageId, { image, seo, seodescription, keywords, pageTitle, description, status }, { new: true });
         // console.log("update post", post)
         return page;
     } catch (error) {
@@ -2398,6 +2436,17 @@ async function cmsDeletePage(req) {
         return result
     } catch (error) {
         console.log(error);
+    }
+}
+
+//all slug
+async function getAllPageSlug() {
+    try {
+        const allCate = await cmsPage.find({}).select('slug')
+        if (allCate && allCate.length > 0)
+            return allCate;
+    } catch (error) {
+        console.log(error)
     }
 }
 
@@ -2428,7 +2477,7 @@ async function createCmsCategory(req, res) {
 
 async function getCmsCategoryData() {
     try {
-        const allCate = await cmsCategory.find({});
+        const allCate = await cmsCategory.find().select().sort({ createdAt: 'desc' });
         if (allCate && allCate.length > 0)
             return allCate;
     } catch (error) {

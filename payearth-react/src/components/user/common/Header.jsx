@@ -420,12 +420,12 @@ const Header = (props) => {
             console.log(error);
         });
     }, [dispatch, productCategories, readUrlResult.catId, isService, location, isToggle, flag]);
-    
+
     const cart = useSelector((state) => state.cart)
-    localStorage.setItem('cart',cart);
+    localStorage.setItem('cart', cart);
     const getTotalQuantity = () => {
         let total = 0
-        if(!loginStatus) {
+        if (!loginStatus) {
             return total;
         }
         //console.log('loginStatus='+loginStatus);
@@ -435,12 +435,12 @@ const Header = (props) => {
             for (const key in cartItems) {
                 total += cartItems[key].quantity
             }
-            
+
             //total += item.quantity
-            })
-            localStorage.setItem('totalQuantity', total);    
+        })
+        localStorage.setItem('totalQuantity', total);
         return total
-      }
+    }
     return (
         <React.Fragment>
             {loginModal && <LoginModal onloginHide={closemodalHandler} onregisterShow={showregisterHandler} onForgotShow={showForgotHandler} />}
@@ -479,10 +479,12 @@ const Header = (props) => {
                                 <div className="nav_wrapper">
                                     <ul>
                                         {
-                                            JSON.parse( localStorage.getItem('isLoggedIn')) &&
+                                            JSON.parse(localStorage.getItem('isLoggedIn')) &&
                                             <li><Link to="/community">Community</Link></li>
                                         }
                                         <li><Link to="/user-contact">Contact</Link></li>
+                                        <li><Link to="/blog-model">Blog</Link></li>
+                                        <li><Link to="/page-model">Page</Link></li>
                                     </ul>
                                     <ul>
                                         <li className="login_links_wrapper me-3">
@@ -505,8 +507,8 @@ const Header = (props) => {
                                             </div>
                                         </li>
                                         <li>
-                                            <Link to="#" className="cart_link position-relative" onClick={() => {if(loginStatus) {history.push('/my-cart')} else { return false}}}>{getTotalQuantity() || 0} Cart</Link>
-                                            </li>
+                                            <Link to="#" className="cart_link position-relative" onClick={() => { if (loginStatus) { history.push('/my-cart') } else { return false } }}>{getTotalQuantity() || 0} Cart</Link>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -540,6 +542,9 @@ const Header = (props) => {
                                                         <input className="form-control border-start height-auto" type="search" placeholder={isService === 0 ? "Search Product..." : "Search Service..."} value={searchOption} onChange={handleSearchInput} />
                                                         <button className="btn btn_dark" type="button" onClick={handleSearch}>Search</button>
                                                     </form>
+                                                    
+                                                    
+
                                                     <div className="btn-group" role="group" aria-label="Basic example">
                                                         <button type="button" value="0" className={isService === 0 ? "btn custom_btn active" : "btn custom_btn"} onClick={handleIsService} >Products</button>
                                                         <button type="button" value="1" className={isService === 1 ? "btn custom_btn active" : "btn custom_btn"} onClick={handleIsService} >Services</button>

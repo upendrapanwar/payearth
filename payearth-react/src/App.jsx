@@ -97,12 +97,20 @@ import ManageVendors from './containers/admin/ManageVendors';
 import Community from './containers/community/Community';
 import CommunityProfile from './containers/community/CommunityProfile';
 
+import Blog from './components/common/BlogModel';
+import BlogDetail from './components/common/BlogDetails';
+import PageModel from './components/common/PageModel';
+import PageDetail from './components/common/PageDetails';
+
+import ScrollToTopButton from './containers/user/ScrollToTopButton';
+
 function App() {
 	const userInfo = useSelector(state => state.auth.userInfo);
 	
 	return (
 		<div className="App">
 			<Router>
+			<ScrollToTopButton />
 				<Switch>
 					<PublicRoute path="/" restricted={false} component={Home} exact />
 					<PublicRoute path="/product-listing" restricted={false} component={ProductListing} exact />
@@ -124,6 +132,7 @@ function App() {
 					<PrivateRoute path="/order-detail/:id" component={OrderDetail} roles={[Role.user]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/my-payments" component={MyPayments} roles={[Role.user]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/order-summary/:id" component={OrderSummary} roles={[Role.user]} currentUserRole={userInfo.role} exact />
+					
 					{/* Seller routes */}
 					<PublicRoute path="/seller/login" restricted={false} component={SellerLogin} exact />
 					<PublicRoute path="/seller/register" restricted={false} component={SellerRegister} exact />
@@ -190,6 +199,15 @@ function App() {
 					
 					<PublicRoute path="/community" restricted={false} component={Community} exact />
 					<PublicRoute path="/community-profile" restricted={false} component={CommunityProfile} exact />
+
+					{/* Blog */}
+					<PublicRoute path="/blog-model" restricted={false} component={Blog} exact />   
+					<PublicRoute path="/blog-detail/:slug" restricted={false} component={BlogDetail} exact />   
+
+					{/* PageDetail */}
+					<PublicRoute path="/page-model" restricted={false} component={PageModel} exact />   
+					<PublicRoute path="/page-detail/:slug" restricted={false} component={PageDetail} exact /> 
+
 
                      {/* Not found */}
 					<Route  component={PageNotFound} />
