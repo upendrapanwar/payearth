@@ -35,6 +35,30 @@ class AdminPageModule extends Component {
         this.getTrash();
     }
 
+<<<<<<< HEAD
+=======
+    // conformDelete = () => {
+    //     <div className="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+    //         aria-hidden="true">
+    //         <div className="modal-dialog" role="document">
+    //             <div className="modal-content">
+    //                 <div className="modal-header">
+    //                     <h5 className="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+    //                     <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    //                 </div>
+    //                 <div className="modal-body">
+    //                     Are you sure you want to delete this item?
+    //                 </div>
+    //                 <div className="modal-footer">
+    //                     <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    //                     <button type="button" className="btn btn-danger" id="confirmDelete">Delete</button>
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     </div>
+    // }
+
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     getPublished = () => {
         let status = "published"
         axios.get(`/admin/cmsPageByStatus/${status}`, {
@@ -124,8 +148,13 @@ class AdminPageModule extends Component {
     handleEdit = (id) => {
         this.props.history.push(`/admin/page-module-edit/${id}`);
     }
+<<<<<<< HEAD
     handleDetails = (slug) => {
         this.props.history.push(`/page-detail/${slug}`)
+=======
+    handleDetails = (id) => {
+        this.props.history.push(`/page-detail/${id}`)
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     }
 
     handleRowSelected = (state) => {
@@ -296,8 +325,13 @@ class AdminPageModule extends Component {
             cell: (row) => (
                 <>
                     <button
+<<<<<<< HEAD
                         onClick={() => this.handleDetails(row.slug)}
                         className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+=======
+                        onClick={() => this.handleDetails(row.id)}
+                        className="custom_btn btn_yellow_bordered w-auto btn"
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                     >
                         View
                     </button>

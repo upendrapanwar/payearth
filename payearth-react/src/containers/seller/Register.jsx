@@ -125,7 +125,10 @@ class Register extends Component {
     handleClose = () => {
         this.props.history.push('/');
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     render() {
         const {loading} = store.getState().global;
         const {

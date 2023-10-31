@@ -11,6 +11,10 @@ const schema = new Schema({
         type: String,
         required: false,
     },
+    keywords: {
+        type: String,
+        required: false,
+    },
     pageTitle: {
         type: String,
         required: false,

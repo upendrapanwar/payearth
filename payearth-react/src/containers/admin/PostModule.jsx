@@ -17,6 +17,10 @@ class AdminPostModule extends Component {
     constructor(props) {
         super(props);
         this.authInfo = store.getState().auth.authInfo;
+<<<<<<< HEAD
+=======
+        this.userInfo = store.getState().auth.userInfo;
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
         // console.log("Auth", this.userInfo.name)
         this.state = {
 
@@ -169,6 +173,14 @@ class AdminPostModule extends Component {
             this.setState({ loading: true })
 
         }
+<<<<<<< HEAD
+=======
+        // window.location.reload(); 
+        this.setState({ loading: true })
+        this.getPublished();
+        this.getDraft();
+        this.getTrash();
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     }
 
     handleStatusPublish = (id) => {
@@ -243,6 +255,7 @@ class AdminPostModule extends Component {
         }
     }
 
+<<<<<<< HEAD
     handleStateRestore = (id) => {
         const { selectedRows } = this.state;
         console.log("selected Row", selectedRows)
@@ -286,23 +299,48 @@ class AdminPostModule extends Component {
         //     sortable: true,
         //     
         // },
+=======
+    blogDetails = (id) => {
+        this.props.history.push(`/blog-detail/${id}`);
+    }
+
+    published_column = [
+        {
+            name: 'Seo Title',
+            selector: (row, i) => row.seo,
+            sortable: true,
+            width: "150px",
+        },
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
         {
             name: "Title",
             selector: (row, i) => row.title,
             sortable: true,
+<<<<<<< HEAD
 
+=======
+            width: "220px",
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
         },
         {
             name: "Category",
             selector: (row, i) => row.category,
             sortable: true,
+<<<<<<< HEAD
 
         },
+=======
+            width: "220px",
+        },
+        
+
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
         // author
         {
             name: 'Publish Date & Time',
             selector: (row, i) => row.updatedAt,
             sortable: true,
+            width: "200px",
 
 
             cell: row => {
@@ -315,13 +353,23 @@ class AdminPostModule extends Component {
             name: "Status",
             selector: (row, i) => row.status,
             sortable: true,
+<<<<<<< HEAD
 
+=======
+            width: "140px",
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
         },
         {
             name: 'Actions',
             // width: "350px",
             cell: (row) => (
                 <>
+                <button
+                        onClick={() => this.blogDetails(row.id)}
+                        className="custom_btn btn_yellow_bordered w-auto btn"
+                    >
+                        View
+                    </button>
                     <button
                         onClick={() => this.blogDetails(row.slug)}
                         className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"

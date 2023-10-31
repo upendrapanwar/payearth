@@ -26,7 +26,10 @@ class AdminPostEdit extends Component {
             categoryDate: [],
             image: '',
             seo: '',
+<<<<<<< HEAD
             seodescription: '',
+=======
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
             keywords: '',
             title: '',
             shortdescription: '',
@@ -81,8 +84,12 @@ class AdminPostEdit extends Component {
                     category: result[i].category,
                     image: result[i].image,
                     seo: result[i].seo,
+<<<<<<< HEAD
                     seodescription: result[i].seodescription,
                     keywords: result[i].keywords
+=======
+                    keywords : result[i].keywords
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                 })
             }
         }).catch((error) => {
@@ -99,9 +106,12 @@ class AdminPostEdit extends Component {
     handleSeoChange = (e) => {
         this.setState({ seo: e.target.value })
     }
+<<<<<<< HEAD
     handleSeoDescChange = (e) => {
         this.setState({ seodescription: e.target.value });
     }
+=======
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     handleKeywordsChange = (e) => {
         this.setState({ keywords: e.target.value });
     }
@@ -142,13 +152,20 @@ class AdminPostEdit extends Component {
 
     updatePost = (status) => {
         const { id } = this.props.match.params;
+<<<<<<< HEAD
         const { image, seo, seodescription, keywords, title, shortdescription, description, category } = this.state;
+=======
+        const { image, seo, keywords, title, shortdescription, description, category } = this.state;
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
 
         const url = `/admin/cmsUpdatePost/${id}`;
         const postData = {
             image,
             seo,
+<<<<<<< HEAD
             seodescription,
+=======
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
             keywords,
             title,
             shortdescription,
@@ -170,7 +187,11 @@ class AdminPostEdit extends Component {
                 console.error('Error saving post:', error);
             });
 
+<<<<<<< HEAD
         this.setState({ image: "", seo: "", seodescription: "", keywords: "", title: "", shortdescription: "", description: "", category: "" })
+=======
+        this.setState({ image: "", seo: "", keywords: "", title: "", shortdescription: "", description: "", category: "" })
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
         toast.success("Update succesfully...", { autoClose: 3000 })
     };
 
@@ -270,6 +291,7 @@ class AdminPostEdit extends Component {
                                         </div>
                                         <div className="crt_bnr_fieldRow">
                                             <div className="crt_bnr_field">
+<<<<<<< HEAD
                                                 <label htmlFor="">Seo Description</label>
                                                 <div className="field_item">
                                                     <input
@@ -285,6 +307,8 @@ class AdminPostEdit extends Component {
                                         </div>
                                         <div className="crt_bnr_fieldRow">
                                             <div className="crt_bnr_field">
+=======
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                                                 <label htmlFor="">Keywords</label>
                                                 <div className="field_item">
                                                     <input
@@ -323,6 +347,8 @@ class AdminPostEdit extends Component {
                                     <div className="cumm_title">Category</div>
                                     <div className="filter_box">
                                         {categoryDate.map(item => <div className="form-check mb-3 mt-4">
+<<<<<<< HEAD
+=======
                                             <input
                                                 className="form-check-input"
                                                 type="checkbox"
@@ -332,6 +358,43 @@ class AdminPostEdit extends Component {
                                             />
                                             <label className="form-check-label" htmlFor="latestPost">{item.names}</label>
                                         </div>)}
+
+                                        {/* <div className="form-check mb-3 mt-4">
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                value={item.names}
+                                                onChange={this.handleCheckboxChange}
+                                                checked={this.state.category.includes(item.names)}
+                                            />
+<<<<<<< HEAD
+                                            <label className="form-check-label" htmlFor="latestPost">{item.names}</label>
+                                        </div>)}
+=======
+                                            <label className="form-check-label" for="latestPost">Nature</label>
+                                        </div> */}
+                                        {/* <div className="form-check mb-3">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                value="Sports"
+                                                onChange={this.handleCheckboxChange}
+                                                checked={this.state.category.includes("Sports")}
+                                            />
+                                            <label className="form-check-label" for="popularPost">Sports</label>
+                                        </div> */}
+                                        {/* <div className="form-check mb-3">
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                value="Education"
+                                                onChange={this.handleCheckboxChange}
+                                                checked={this.state.category.includes("Education")}
+                                            />
+                                            <label className="form-check-label" for="CommentedPost">Education</label>
+                                        </div> */}
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                                         <div className="filter_btn_box">
                                             <button className='btn custom_btn btn_yellow_bordered'
                                                 type="submit"

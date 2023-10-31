@@ -24,7 +24,10 @@ class AdminPageEdit extends Component {
         this.authInfo = store.getState().auth.authInfo;
         this.state = {
             seo: '',
+<<<<<<< HEAD
             seodescription: '',
+=======
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
             keywords: '',
             image: '',
             pageTitle: '',
@@ -50,6 +53,8 @@ class AdminPageEdit extends Component {
             for (var i = 0; i < result.length; i++) {
                 console.log(result.length)
                 this.setState({
+                    keywords: result[i].keywords,
+                    seo: result[i].seo,
                     pageTitle: result[i].pageTitle,
                     description: result[i].description,
                     image: result[i].image,
@@ -69,9 +74,12 @@ class AdminPageEdit extends Component {
     handleSeoChange = (e) => {
         this.setState({ seo: e.target.value });
     }
+<<<<<<< HEAD
     handleSeoDescChange = (e) => {
         this.setState({ seodescription: e.target.value });
     }
+=======
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     handleKeywordsChange = (e) => {
         this.setState({ keywords: e.target.value });
     }
@@ -115,13 +123,20 @@ class AdminPageEdit extends Component {
 
     updatePost = (status) => {
         const { id } = this.props.match.params;
+<<<<<<< HEAD
         const { image, pageTitle, description, keywords, seo, seodescription } = this.state;
+=======
+        const { image, pageTitle, description, keywords, seo } = this.state;
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
 
         const url = `/admin/cmsUpdatePage/${id}`;
         const postData = {
             keywords,
             seo,
+<<<<<<< HEAD
             seodescription,
+=======
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
             image,
             pageTitle,
             description,
@@ -223,6 +238,7 @@ class AdminPageEdit extends Component {
                                         </div>
                                         <div className="crt_bnr_fieldRow">
                                             <div className="crt_bnr_field">
+<<<<<<< HEAD
                                                 <label htmlFor="">Seo Description</label>
                                                 <div className="field_item">
                                                     <input
@@ -238,6 +254,8 @@ class AdminPageEdit extends Component {
                                         </div>
                                         <div className="crt_bnr_fieldRow">
                                             <div className="crt_bnr_field">
+=======
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                                                 <label for="">Keywords</label>
                                                 <div className="field_item">
                                                     <input

@@ -96,6 +96,10 @@ import EditProduct from './containers/seller/EditProduct';
 import ManageVendors from './containers/admin/ManageVendors';
 import Community from './containers/community/Community';
 import CommunityProfile from './containers/community/CommunityProfile';
+import Blog from './components/common/BlogModel';
+import BlogDetail from './components/common/BlogDetails';
+import PageModel from './components/common/PageModel';
+import PageDetail from './components/common/PageDetails';
 
 import Blog from './components/common/BlogModel';
 import BlogDetail from './components/common/BlogDetails';
@@ -199,7 +203,11 @@ function App() {
 					
 					<PublicRoute path="/community" restricted={false} component={Community} exact />
 					<PublicRoute path="/community-profile" restricted={false} component={CommunityProfile} exact />
+					{/* Blog */}
+					<PublicRoute path="/blog-model" restricted={false} component={Blog} exact />   
+					<PublicRoute path="/blog-detail/:id" restricted={false} component={BlogDetail} exact />   
 
+<<<<<<< HEAD
 					{/* Blog */}
 					<PublicRoute path="/blog-model" restricted={false} component={Blog} exact />   
 					<PublicRoute path="/blog-detail/:slug" restricted={false} component={BlogDetail} exact />   
@@ -209,6 +217,11 @@ function App() {
 					<PublicRoute path="/page-detail/:slug" restricted={false} component={PageDetail} exact /> 
 
 
+=======
+					{/* PageDetail */}
+					<PublicRoute path="/page-model" restricted={false} component={PageModel} exact />   
+					<PublicRoute path="/page-detail/:id" restricted={false} component={PageDetail} exact /> 
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                      {/* Not found */}
 					<Route  component={PageNotFound} />
 				</Switch>

@@ -23,11 +23,17 @@ class AdminPostModuleAddNew extends Component {
         this.authInfo = store.getState().auth.authInfo;
 
         this.state = {
+<<<<<<< HEAD
             allSlugs: [],
             categoryDate: [],
             image: '',
             seo: '',
             seodescription: '',
+=======
+            categoryDate: [],
+            image: '',
+            seo: '',
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
             keywords: '',
             title: '',
             description: '',
@@ -41,6 +47,7 @@ class AdminPostModuleAddNew extends Component {
         this.getCategory();
     }
 
+<<<<<<< HEAD
     // generateUniqueSlug = (title) => {
     //     const { allSlugs } = this.state;
     //     console.log("allSlug", allSlugs)
@@ -81,6 +88,8 @@ class AdminPostModuleAddNew extends Component {
             .trim();
     }
 
+=======
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     getCategory = () => {
         axios.get('/admin/getCmsAllCategory', {
             headers: {
@@ -112,9 +121,12 @@ class AdminPostModuleAddNew extends Component {
     handleSeoChange = (e) => {
         this.setState({ seo: e.target.value });
     }
+<<<<<<< HEAD
     handleSeoDescChange = (e) => {
         this.setState({ seodescription: e.target.value });
     }
+=======
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     handleKeywordsChange = (e) => {
         this.setState({ keywords: e.target.value });
     }
@@ -155,17 +167,24 @@ class AdminPostModuleAddNew extends Component {
     }
 
     savePost = (status) => {
+<<<<<<< HEAD
         const { image, seo, seodescription, keywords, title, description, shortdescription, category, } = this.state;
 
         const slug = this.generateUniqueSlug(title);
         // console.log("uniqueSlug", uniqueSlug)
 
+=======
+        const { image, seo, keywords, title, description, shortdescription, category, } = this.state;
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
         const url = 'admin/cmsPost';
 
         const postData = {
             image,
             seo,
+<<<<<<< HEAD
             seodescription,
+=======
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
             keywords,
             title,
             slug,
@@ -188,14 +207,23 @@ class AdminPostModuleAddNew extends Component {
                 console.error('Error saving post:', error);
             });
 
+<<<<<<< HEAD
         this.setState({ image: "", title: "", description: "", category: "", seo: "", keywords: "", shortdescription: "", seodescription: "", })
+=======
+        this.setState({ image: "", title: "", description: "", category: "", seo: "", keywords: "", shortdescription: "" })
+
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     };
 
 
     render() {
         const { image, categoryDate } = this.state;
+<<<<<<< HEAD
         // console.log("category data all", categoryDate)
 
+=======
+        console.log("category data all", categoryDate)
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
         return (
             <React.Fragment>
                 <Header />
@@ -268,6 +296,7 @@ class AdminPostModuleAddNew extends Component {
                                     </div>
                                     <div className="crt_bnr_fieldRow">
                                         <div className="crt_bnr_field">
+<<<<<<< HEAD
                                             <label htmlFor="">Seo Description</label>
                                             <div className="field_item">
                                                 <input
@@ -283,6 +312,8 @@ class AdminPostModuleAddNew extends Component {
                                     </div>
                                     <div className="crt_bnr_fieldRow">
                                         <div className="crt_bnr_field">
+=======
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                                             <label htmlFor="">keywords</label>
                                             <div className="field_item">
                                                 <input

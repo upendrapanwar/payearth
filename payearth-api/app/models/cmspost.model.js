@@ -11,12 +11,15 @@ const schema = new Schema({
         type: String,
         required: false,
     },
+<<<<<<< HEAD
     slug: {
         type: String,
         unique: true,
         trim: true,
         default: 0
     },
+=======
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     shortdescription: {
         type: String,
         required: false,
@@ -37,10 +40,13 @@ const schema = new Schema({
         type: String,
         required: false,
     },
+<<<<<<< HEAD
     seodescription: {
         type: String,
         required: false,
     },
+=======
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     keywords: {
         type: String,
         required: false,

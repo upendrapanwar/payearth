@@ -25,12 +25,21 @@ class PageDetail extends Component {
     }
 
     componentDidMount() {
+<<<<<<< HEAD
         this.getPageDetails(); 
     }
 
     getPageDetails = () => {
         const { slug } = this.props.match.params;
         axios.get(`/front/pageDetail/${slug}`).then((response) => {
+=======
+        this.getPageDetails();
+    }
+
+    getPageDetails = () => {
+        const { id } = this.props.match.params;
+        axios.get(`/front/publishPageDetail/${id}`).then((response) => {
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
             // console.log("page Detail : ", response.data.data)
             let result = response.data.data;
 

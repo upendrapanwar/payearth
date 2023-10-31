@@ -12,11 +12,19 @@ function PeModal(props) {
         <div className="modal fade show d-block"  id="buyerLoginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div className="modal-dialog">
                 <div className="modal-content">
+<<<<<<< HEAD
                     <button type="button" className="btn-close mo_btn close-btn" data-bs-dismiss="modal" aria-label="Close" onClick={props.onClose}></button>
+=======
+                <button type="button" className="btn-close mo_btn" data-bs-dismiss="modal" aria-label="Close" onClick={props.onClose}></button>
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                     <div className="form_wrapper">
                         {props.children}
                     </div>
                     <div className="img_wrapper">
+<<<<<<< HEAD
+=======
+                        
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                         <img src={buyerLogin} alt="buyer-login" className="h-100" />
                     </div>
                 </div>

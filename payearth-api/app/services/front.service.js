@@ -25,9 +25,15 @@ module.exports = {
     getServiceListing,
     getServiceById,
     cmsPublishBlog,
+<<<<<<< HEAD
     cmsBlogDetailBySlug,
     cmsPublishPage,
     cmsPageDetails,
+=======
+    cmsBlogDetails,
+    cmsPublishPage,
+    cmsPageDetails, 
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
 };
 
 async function getReviews(id) {
@@ -747,7 +753,10 @@ async function getServiceById(id) {
     if (!product) return false;
     return product;
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
 // Get Published Blog 
 async function cmsPublishBlog(req) {
     try {
@@ -759,6 +768,7 @@ async function cmsPublishBlog(req) {
 }
 
 // Get Blog Details
+<<<<<<< HEAD
 async function cmsBlogDetailBySlug(req) {
     const slug = req.params.slug;
     // console.log("status", status)
@@ -768,6 +778,16 @@ async function cmsBlogDetailBySlug(req) {
         return filteredStatus;
     } catch (error) {
         console.log(error)
+=======
+
+async function cmsBlogDetails(req) {
+    const blogId = req.params.id;
+    try {
+        const result = await cmsPost.find({ _id: blogId })
+        return result
+    } catch (error) {
+        console.log(error);
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     }
 }
 
@@ -782,6 +802,7 @@ async function cmsPublishPage(req) {
 }
 
 // pageDetailByID
+<<<<<<< HEAD
 async function cmsPageDetails(req) {
     const slug = req.params.slug;
     // console.log("status", status)
@@ -791,5 +812,15 @@ async function cmsPageDetails(req) {
         return filteredStatus;
     } catch (error) {
         console.log(error)
+=======
+
+async function cmsPageDetails(req) {
+    const pageId = req.params.id;
+    try {
+        const result = await cmsPage.find({ _id: pageId })
+        return result
+    } catch (error) {
+        console.log(error);
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     }
 }

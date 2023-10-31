@@ -20,10 +20,16 @@ function jwt() {
             /\/community\/front*/,
             /\/twitter*/,
             /\/publishBlog*/,
+<<<<<<< HEAD
             /\/blogDetail*/,
             /\/publishPage*/,
             /\/pageDetail*/,
 
+=======
+            /\/publishBlogDetail*/,
+            /\/publishPage*/,
+            /\/publishPageDetail*/,
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
             //admin
             '/admin/login',
             '/admin/signup',

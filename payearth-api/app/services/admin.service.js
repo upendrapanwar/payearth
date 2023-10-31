@@ -2283,7 +2283,11 @@ async function createCmsPost(req, res) {
 // Get all post data
 async function getCmsPostData() {
     try {
+<<<<<<< HEAD
         const allPosts = await cmsPost.find({ seo, seodescription, title, slug, description, shortdescription, keywords }).select().sort({ createdAt: 'desc' });
+=======
+        const allPosts = await cmsPost.find({ seo, title, description, shortdescription, keywords }).select().sort({ createdAt: 'desc' });
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
         if (allPosts && allPosts.length > 0)
             return allPosts;
     } catch (error) {
@@ -2396,7 +2400,11 @@ async function createCmsPage(req, res) {
 async function cmsPageGetByStatus(req) {
     const status = req.params.status;
     try {
+<<<<<<< HEAD
         const allPages = await cmsPage.find({}).select().sort({ createdAt: 'desc' });
+=======
+        const allPages = await cmsPage.find().select().sort({ createdAt: 'desc' });
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
         const filteredStatus = allPages.filter(item => item.status === status);
         return filteredStatus;
     } catch (error) {
@@ -2418,7 +2426,11 @@ async function cmsGetPageById(req) {
 // Update Page
 async function cmsUpdatePage(req) {
     const pageId = req.params.id;
+<<<<<<< HEAD
     const { image, seo, seodescription, keywords, pageTitle, description, status } = req.body;
+=======
+    const { image,seo, keywords, pageTitle, description, status } = req.body;
+>>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     try {
         const page = await cmsPage.findByIdAndUpdate(pageId, { image, seo, seodescription, keywords, pageTitle, description, status }, { new: true });
         // console.log("update post", post)
