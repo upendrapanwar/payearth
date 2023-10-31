@@ -12,17 +12,12 @@ import DataTable from "react-data-table-component";
 import SortIcon from "@material-ui/icons/ArrowDownward";
 import DataTableExtensions from "react-data-table-component-extensions";
 import "react-data-table-component-extensions/dist/index.css";
-<<<<<<< HEAD
 import Modal from "react-bootstrap/Modal";
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Table from 'react-bootstrap/Table';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-=======
-// import jsPDF from "jspdf";
-import Modal from "react-bootstrap/Modal";
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
 
 class MyOrders extends Component {
   constructor(props) {
@@ -30,16 +25,12 @@ class MyOrders extends Component {
     const { dispatch } = props;
     this.dispatch = dispatch;
     this.authInfo = store.getState().auth.authInfo;
-<<<<<<< HEAD
     this.userInfo = store.getState().auth.userInfo;
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     this.state = {
       data: [],
       loading: true,
       error: null,
       show: false,
-<<<<<<< HEAD
       showModal: false,
       downloading: false,
     };
@@ -164,70 +155,6 @@ class MyOrders extends Component {
             error: null,
           });
         };
-=======
-    };
-  }
-
-  addDays = (date, days) => {
-    let result = new Date(date);
-    result.setDate(result.getDate() + 7);
-    return result;
-  };
-
-  componentDidMount() {
-    this.getOrderDetails();
-  }
-
-  getOrderDetails = () => {
-    this.dispatch(setLoading({ loading: true }));
-    console.log(this.authInfo.id);
-    axios
-      .get("user/orderdetails/" + this.authInfo.id, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json;charset=UTF-8",
-          Authorization: `Bearer ${this.authInfo.token}`,
-        },
-      })
-      .then((response) => {
-        console.log("RES", response.data.data);
-        // if (response.data.status) {
-        const formattedData = response.data.data.map((item) => {
-          const date = new Date(item.createdAt).toLocaleString();
-          const deliveryDate = this.addDays(
-            new Date(item.createdAt),
-            7
-          ).toLocaleString();
-
-          return {
-            _id: item._id,
-            quantity: item.quantity[0],
-            orderCode: item.orderId[0].orderCode,
-            price: item.price,
-            productName: item.productId[0].name,
-            orderStatus: item.orderId[0].orderStatus.orderStatusId.title,
-            createdAt: date,
-            deliveryDate: deliveryDate,
-            id: item.id,
-            billingCompanyName: item.orderId[0].billingCompanyName,
-            billingCounty: item.orderId[0].billingCounty,
-            billingStreetAddress: item.orderId[0].billingStreetAddress,
-            billingStreetAddress1: item.orderId[0].billingStreetAddress1,
-            billingCity: item.orderId[0].billingCity,
-            billingPostCode: item.orderId[0].billingPhone,
-            billingEmail: item.orderId[0].billingEmail,
-            deliveryCharge: item.orderId[0].deliveryCharge,
-            taxAmount: item.orderId[0].taxAmount,
-            discount: item.orderId[0].discount,
-          };
-        });
-        this.setState({
-          data: formattedData,
-          loading: false,
-          error: null,
-        });
-        console.log("RESPONSE", formattedData);
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
         // }
       })
       .catch((error) => {
@@ -239,10 +166,7 @@ class MyOrders extends Component {
             error: error,
             lgShow: false,
             selectedRowData: null,
-<<<<<<< HEAD
             selectedRowDataPDF: null,
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
           });
         }
       })
@@ -250,7 +174,6 @@ class MyOrders extends Component {
         setTimeout(() => {
           this.dispatch(setLoading({ loading: false }));
         }, 300);
-<<<<<<< HEAD
       });
       console.log("RESPONSE", this.state.data)
   };
@@ -424,26 +347,11 @@ class MyOrders extends Component {
   data_column = [
     {
       name: "Order ID",
-=======
-        console.log("RESPONSE***********");
-      });
-  };
-
-  handleDetailsClick = (row) => {
-    this.setState({ selectedRowData: row });
-    this.setState({ show: true });
-  };
-
-  data_column = [
-    {
-      name: "Order Code",
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
       selector: (row, i) => row.orderCode,
       sortable: true,
       width: "200px",
     },
     {
-<<<<<<< HEAD
       name: "Invoice Number",
       selector: (row, i) => row.invoiceNo,
       sortable: true,
@@ -458,10 +366,6 @@ class MyOrders extends Component {
     {
       name: "Total Amount",
       selector: (row, i) => row.total,
-=======
-      name: "Product Name",
-      selector: (row, i) => row.productName,
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
       sortable: true,
       width: "200px",
     },
@@ -472,39 +376,12 @@ class MyOrders extends Component {
       width: "200px",
     },
     {
-<<<<<<< HEAD
       name: "Order Date",
       selector: (row, i) => row.orderDate,
       sortable: true,
 
       cell: (row) => {
         const date = row.orderDate;
-=======
-      name: "Quantity",
-      selector: (row, i) => row.quantity,
-      sortable: true,
-      width: "200px",
-    },
-    {
-      name: "Price",
-      selector: (row, i) => row.price,
-      sortable: true,
-      width: "200px",
-    },
-    {
-      name: "Seller Company Name",
-      selector: (row, i) => row.billingCompanyName,
-      sortable: true,
-      width: "200px",
-    },
-    {
-      name: "Date & Time",
-      selector: (row, i) => row.createdAt,
-      sortable: true,
-
-      cell: (row) => {
-        const date = row.createdAt;
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
         return <div>{date}</div>;
       },
     },
@@ -514,18 +391,13 @@ class MyOrders extends Component {
         <>
           <button
             onClick={() => this.handleDetailsClick(row)}
-<<<<<<< HEAD
             className="btn custom_btn btn_yellow_bordered"
-=======
-            className="btn custom_btn custom_btn_order btn_yellow_bordered"
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
           >
             Details
           </button>
         </>
       ),
     },
-<<<<<<< HEAD
     {
       name: "Download Invoice",
       cell: (row) => (
@@ -545,13 +417,6 @@ class MyOrders extends Component {
   render() {
     const { data, loading, error, selectedRowData, downloading } = this.state;
     const userName = this.userInfo.name;
-=======
-  ];
-
-
-  render() {
-    const { data, loading, error, selectedRowData } = this.state;
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     console.log("Render RESPONSE", data);
     console.log(data.orderCode);
     if (loading) {
@@ -564,10 +429,7 @@ class MyOrders extends Component {
     return (
       <React.Fragment>
         {loading === true ? <SpinnerLoader /> : ""}
-<<<<<<< HEAD
         {downloading === true ? <SpinnerLoader /> : ""}
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
         <Header />
         <PageTitle title="My Orders" />
         <section className="inr_wrap orders_page">
@@ -602,18 +464,10 @@ class MyOrders extends Component {
         </section>
         <Footer />
 
-<<<<<<< HEAD
-
         {/* Modal functionality Added */}
         <Modal
            show={this.state.showModal} 
            onHide={() => this.setState({ showModal: false })}
-=======
-        {/* Modal functionality Added */}
-        <Modal
-          show={this.state.show}
-          onHide={() => this.setState({ show: false })}
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
           dialogClassName="modal-90w"
           aria-labelledby="example-custom-modal-styling-title"
         >
@@ -622,7 +476,6 @@ class MyOrders extends Component {
               Order Details
             </Modal.Title>
           </Modal.Header>
-<<<<<<< HEAD
           <Modal.Body style={{ maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
             {selectedRowData && (
               <div>
@@ -731,123 +584,6 @@ class MyOrders extends Component {
                   </div>
               </div>
             </div>
-=======
-          <Modal.Body className="bg-light">
-            {selectedRowData && (
-              <div className="container ">
-                <div className="row">
-                  <div className="col-lg-6">
-                    <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
-                      <div className="cp_top">
-                        <div className="cumm_title">
-                          Order Id: {selectedRowData.orderCode}
-                        </div>
-                        <br />
-                        <p>Order placed on</p>
-                        <div className="cumm_title">
-                          {selectedRowData.createdAt}
-                        </div>
-                        <br />
-                        {/* <p className="fs-4 text-success">Out for Delivery</p> */}
-                        {/* <p>Your package is on the way</p> */}
-                      </div>
-                      <br />
-                      <br />
-                      <div className="cp_body">
-                        <div className="row">
-                          <div className="col-lg-6">
-                            <p>
-                              <b>Shipping Address</b>
-                            </p>
-
-                            <p>{selectedRowData.billingCompanyName}</p>
-                            <p>
-                              {selectedRowData.billingStreetAddress}{" "}
-                              {selectedRowData.billingStreetAddress1}
-                            </p>
-                            <p>{selectedRowData.billingCity}</p>
-                            <p>{selectedRowData.billingPostCode}</p>
-                            <p>{selectedRowData.billingEmail}</p>
-                          </div>
-                          <div className="col-lg-6">
-                            <p>
-                              <b>Delivery Method</b>
-                            </p>
-                            <p>Standard (5-7 Bussiness Days)</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-lg-6">
-                    <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
-                      <div className="cp_top">
-                        <div className="cumm_title">Order Summery</div>
-                      </div>
-                      <br />
-
-                      <div className="cp_body">
-                        {selectedRowData && (
-                          <div className="row bg-danger rounded bg-opacity-10">
-                            <div className="col-lg-8 mt-2">
-                              <p>
-                                <b>{selectedRowData.productName}</b>
-                              </p>
-                              <p>Quantity: {selectedRowData.quantity}</p>
-                            </div>
-                            <div className="col-lg-4 mt-4">
-                              $ {selectedRowData.price}
-                            </div>
-                          </div>
-                        )}
-
-                        <hr />
-                        <div className="row">
-                          <div className="col-lg-8">
-                            <p>Subtotal</p>
-                          </div>
-                          <div className="col-lg-4">$ {selectedRowData.price}</div>
-                        </div>
-                        <hr />
-                        <div className="row">
-                          <div className="col-lg-8">
-                            <p>Shipping Fee</p>
-                          </div>
-                          <div className="col-lg-4">Free</div>
-                        </div>
-                        <div className="row">
-                          <div className="col-lg-8">
-                            <p>Discount</p>
-                          </div>
-                          <div className="col-lg-4">
-                            $ {selectedRowData.discount}
-                          </div>
-                        </div>
-                        <div className="row">
-                          <div className="col-lg-8">
-                            <p>Taxes</p>
-                          </div>
-                          <div className="col-lg-4">
-                            $ {selectedRowData.taxAmount}
-                          </div>
-                        </div>
-                        <hr />
-                        <div className="row">
-                          <div className="col-lg-8">
-                            <p>
-                              <b>Total</b>
-                            </p>
-                          </div>
-                          <div className="col-lg-4">
-                            $ <b>{selectedRowData.price}</b>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
             )}
             ;
           </Modal.Body>
@@ -857,8 +593,4 @@ class MyOrders extends Component {
   }
 }
 
-<<<<<<< HEAD
 export default connect(setLoading)(MyOrders);
-=======
-export default connect(setLoading)(MyOrders);
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721

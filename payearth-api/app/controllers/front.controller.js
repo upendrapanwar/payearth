@@ -30,11 +30,7 @@ router.post('/product/listing/colors', getColorsListByProducts);
 //For services only
 router.post('/service/listing', getServiceListing);
 router.get('/service/detail/:id', getServiceById);
-//For Publish Blog
-router.get('/publishBlog/:status', cmsPublishBlog);
-router.get('/publishBlogDetail/:id', cmsBlogDetails);
 
-<<<<<<< HEAD
 //For Publish Blog
 router.get('/publishBlog/:status', cmsPublishBlog);
 router.get('/blogDetail/:slug', cmsBlogDetailBySlug);
@@ -42,11 +38,6 @@ router.get('/blogDetail/:slug', cmsBlogDetailBySlug);
 // For Publish Page
 router.get('/publishPage/:status', cmsPublishPage);
 router.get('/pageDetail/:slug', cmsPageDetails);
-=======
-// For Publish Page
-router.get('/publishPage/:status', cmsPublishPage);
-router.get('/publishPageDetail/:id', cmsPageDetails);
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
 
 module.exports = router;
 
@@ -158,24 +149,15 @@ function getServiceById(req, res, next) {
         .then(service => service ? res.status(200).json({ status: true, data: service }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
 function cmsPublishBlog(req, res, next) {
     frontService.cmsPublishBlog(req.params.status)
         .then(blog => blog ? res.status(200).json({ status: true, data: blog }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
 
-<<<<<<< HEAD
 // cmsDetailBySlug
 function cmsBlogDetailBySlug(req, res, next) {
     frontService.cmsBlogDetailBySlug(req)
-=======
-function cmsBlogDetails(req, res, next) {
-    frontService.cmsBlogDetails(req)
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
         .then(blog => blog ? res.status(200).json({ status: true, data: blog }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
@@ -190,10 +172,4 @@ function cmsPageDetails(req, res, next) {
     frontService.cmsPageDetails(req)
         .then(page => page ? res.status(200).json({ status: true, data: page }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
-<<<<<<< HEAD
 }
-
-
-=======
-}
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721

@@ -29,7 +29,6 @@ class BlogDetail extends Component {
     }
 
     getBlogDetails = () => {
-<<<<<<< HEAD
         const { slug } = this.props.match.params;
         console.log("slug", slug)
         // console.log("DetailsID", id)
@@ -37,14 +36,6 @@ class BlogDetail extends Component {
             console.log("Blog Detail : ", response.data.data)
             let result = response.data.data;
  
-=======
-        const { id } = this.props.match.params;
-        // console.log("DetailsID", id)
-        axios.get(`/front/publishBlogDetail/${id}`).then((response) => {
-            console.log("Blog Detail : ", response.data.data)
-            let result = response.data.data;
-
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
             var blogPostDetails = [];
             for (var i = 0; i < result.length; i++) {
                 const numericalDate = new Date(result[0].updatedAt);

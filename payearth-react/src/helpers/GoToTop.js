@@ -5,7 +5,7 @@ function GoToTop() {
     const routePath = useLocation();
     const onTop = () => {
         window.scrollTo({
-            top: 0,
+            top: 0, 
             behavior: 'instant'
         });
     }

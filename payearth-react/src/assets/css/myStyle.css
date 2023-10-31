@@ -1686,10 +1686,6 @@ input[type="search"] {
     padding-left: 15px;
     padding-right: 15px;
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
 .cp_preview_box {
     padding: 5px 30px;
 }
@@ -2685,13 +2681,9 @@ input[type="search"] {
     padding-bottom: 25px;
 }
 
-<<<<<<< HEAD
 .addPost_left_container .cp_body {
     padding-bottom: 25px;
 }
-
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
 .addPost_left_container .cp_body .crt_bnr_fieldRow {
     margin-bottom: 10px;
 }
@@ -2731,11 +2723,6 @@ input[type="search"] {
     padding-left: 15px !important;
     padding-right: 15px !important;
 }
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
 @media (max-width: 992px) {
     .admin-dashboard-wrapper .orders_table,
     .admin-dashboard-wrapper .orders_tabs {

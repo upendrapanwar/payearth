@@ -24,12 +24,7 @@ class AdminPageModuleAddNew extends Component {
         this.authInfo = store.getState().auth.authInfo;
 
         this.state = {
-<<<<<<< HEAD
             allPageSlugs: [],
-=======
-            seo: '',
-            keywords: '',
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
             image: '',
             pageTitle: '',
             description: '',
@@ -39,7 +34,6 @@ class AdminPageModuleAddNew extends Component {
             keywords: '',
         };
     }
-<<<<<<< HEAD
 
     // getPageSlugData = () => {
     //     axios.get('/admin/pageSlug', {
@@ -100,21 +94,15 @@ class AdminPageModuleAddNew extends Component {
             .replace(/-+/g, '-')
             .trim();
     }
-
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     handleTitleChange = (e) => {
         this.setState({ pageTitle: e.target.value });
     }
     handleSeoChange = (e) => {
         this.setState({ seo: e.target.value });
     }
-<<<<<<< HEAD
     handleSeoDescChange = (e) => {
         this.setState({ seodescription: e.target.value });
     }
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     handleKeywordsChange = (e) => {
         this.setState({ keywords: e.target.value });
     }
@@ -158,21 +146,14 @@ class AdminPageModuleAddNew extends Component {
     };
 
     savePost = (status) => {
-<<<<<<< HEAD
         const { image, pageTitle, keywords, seo, seodescription, description } = this.state;
 
         const slug = this.generateUniqueSlug(pageTitle)
-=======
-        const { image, pageTitle, keywords, seo, description } = this.state;
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
         const url = 'admin/cmsPage';
 
         const pageData = {
             seo,
-<<<<<<< HEAD
             seodescription,
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
             keywords,
             image,
             pageTitle,
@@ -194,11 +175,7 @@ class AdminPageModuleAddNew extends Component {
                 console.error('Error saving post:', error);
             });
 
-<<<<<<< HEAD
         this.setState({ image: "", pageTitle: "", description: "", keywords: "", seo: "", seodescription: "" })
-=======
-        this.setState({ image: "", pageTitle: "", description: "", keywords: "", seo: "" })
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
     };
 
 
@@ -267,7 +244,6 @@ class AdminPageModuleAddNew extends Component {
                                     </div>
                                     <div className="crt_bnr_fieldRow">
                                         <div className="crt_bnr_field">
-<<<<<<< HEAD
                                             <label htmlFor="">Seo Description</label>
                                             <div className="field_item">
                                                 <input
@@ -283,8 +259,6 @@ class AdminPageModuleAddNew extends Component {
                                     </div>
                                     <div className="crt_bnr_fieldRow">
                                         <div className="crt_bnr_field">
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                                             <label for="">Keywords</label>
                                             <div className="field_item">
                                                 <input
@@ -298,10 +272,6 @@ class AdminPageModuleAddNew extends Component {
                                             </div>
                                         </div>
                                     </div>
-<<<<<<< HEAD
-
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                                 </div>
                             </div>
                         </div>

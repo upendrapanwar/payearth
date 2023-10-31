@@ -84,7 +84,6 @@ class PageModel extends Component {
         const { pages, currentPage, itemsPerPage, searchQuery, loading, error } = this.state;
         console.log('pages : unde render', pages)
 
-<<<<<<< HEAD
         if (loading) {
             return <SpinnerLoader />
         }
@@ -92,8 +91,6 @@ class PageModel extends Component {
             return <div>Error: {error}</div>;
         }
 
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
         const filteredItems = pages.filter(item =>
             item.title.toLowerCase().includes(searchQuery.toLowerCase())
         );
@@ -145,11 +142,7 @@ class PageModel extends Component {
                     )}
                 </section>
                 <div className='cart-pagination'>
-<<<<<<< HEAD
                     <ul className="pagination-wrapper"> 
-=======
-                    <ul className="pagination-wrapper">
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                         <button
                             onClick={this.prevPage}
                             disabled={currentPage === 1}

@@ -39,11 +39,6 @@ class Blog extends Component {
                 const options = { year: 'numeric', month: 'long', day: 'numeric' };
                 const date = numericalDate.toLocaleDateString('en-US', options);
                 // const date = new Date(item.updatedAt).toLocaleString()
-<<<<<<< HEAD
-
-=======
-              
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                 // const testDescription = content.slice(0, textlimit);
                 // const blogDescription = DOMPurify.sanitize(testDescription);
                 // const description = < div className='cart-headings' dangerouslySetInnerHTML={{ __html: blogDescription }}>
@@ -54,21 +49,12 @@ class Blog extends Component {
                 blogPostData.push({
                     id: item._id,
                     title: item.title,
-<<<<<<< HEAD
                     shortdescription: item.shortdescription,
                     slug: item.slug,
                     seo: item.seo,
                     image: item.image,
                     updatedAt: date,
                     category: item.category
-=======
-                    shortdescription : item.shortdescription,
-                 
-                    seo: item.seo,
-                    image: item.image,
-                    updatedAt: date,
-                    category : item.category
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                 });
             })
             this.setState({ 'blogs': blogPostData, loading: false, error: null })
@@ -77,13 +63,9 @@ class Blog extends Component {
         })
     }
 
-<<<<<<< HEAD
     blogDetails = (slug) => {
         this.props.history.push(`/blog-detail/${slug}`);
-=======
-    blogDetails = (id) => {
-        this.props.history.push(`/blog-detail/${id}`);
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
+
     }
 
     handlePageChange = (pageNumber) => {
@@ -141,22 +123,14 @@ class Blog extends Component {
                                 <div className="cl_head">
                                     <div className='blog-search-wrapper'>
                                         <input
-<<<<<<< HEAD
                                             type="text" class="form-control"
                                             placeholder="Search"
                                             value={searchQuery}
                                             onChange={this.handleSearch}
-=======
-                                        type="text" class="form-control"
-                                        placeholder="Search"
-                                        value={searchQuery}
-                                        onChange={this.handleSearch}
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                                         />
                                     </div>
 
                                     <div className="blog_listing_wrapper">
-<<<<<<< HEAD
                                         {blogData.map(item =>
                                             <div className=" col-md-4 blog_item">
                                                 <div className='blog-inner-panel'>
@@ -166,39 +140,19 @@ class Blog extends Component {
                                                     <div className='blog-list-meta'>
                                                         <span class="post_cat_col"><a href="">{item.category}</a></span>
                                                         <span class="post_date_col">{item.updatedAt}</span>
-=======
-                                        { blogData.map(item =>
-                                            <div className=" col-md-4 blog_item">
-                                               <div className='blog-inner-panel'>
-                                                    <div className='blog-image'>
-                                                    <a href=""><img src={item.image} height={200} width={300} alt="" /></a>
-                                                    </div>
-                                                    <div className='blog-list-meta'>
-                                                            <span class="post_cat_col"><a href="">{item.category}</a></span> 
-                                                            <span class="post_date_col">{item.updatedAt}</span>
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                                                     </div>
                                                     <div className='blog-info'>
                                                         <h3 className='blog-headings'><a href="">{item.title}</a></h3>
                                                         <div className="blogShortinfo">
-<<<<<<< HEAD
                                                             <p>{item.shortdescription}</p>
                                                         </div>
                                                     </div>
                                                     <div className='cart-btn'>
                                                         <button onClick={() => this.blogDetails(item.slug)}>
-=======
-                                                        <p>{item.shortdescription}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className='cart-btn'>
-                                                        <button onClick={() => this.blogDetails(item.id)}>
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                                                             View Details
                                                         </button>
                                                     </div>
                                                 </div>
-<<<<<<< HEAD
                                             </div>
                                         )}
                                     </div>
@@ -232,41 +186,6 @@ class Blog extends Component {
                                     </ul>
                                 </div>
 
-=======
-                                           </div>
-                                        )}
-                                    </div>
-                                </div>
-                              <div className='cart-pagination'>
-                                <ul className="pagination-wrapper">
-                                    <button
-                                        onClick={this.prevPage}
-                                        disabled={currentPage === 1}
-                                    >
-                                        PREV
-                                    </button>
-                                    {Array(Math.ceil(filteredItems.length / itemsPerPage))
-                                        .fill()
-                                        .map((_, index) => <div>
-                                            <button
-                                                key={index}
-                                                className={currentPage === index + 1 ? 'active' : ''}
-                                                onClick={() => this.handlePageChange(index + 1)}
-                                            >
-                                                {index + 1}
-                                            </button>
-                                        </div>
-                                        )}
-                                    <button
-                                        onClick={this.nextPage}
-                                        disabled={itemsPerPage !== blogData.length}
-                                    >
-                                        NEXT
-                                    </button>
-                                </ul>
-                              </div>
-                                
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
                             </div>
                         </div>
                     </div>

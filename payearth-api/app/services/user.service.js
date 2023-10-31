@@ -1597,7 +1597,6 @@ async function addReturn(req) {
 async function getPaymentsById(id) {
     try {
         const payments = await Payment.find({ userId: id })
-<<<<<<< HEAD
         .select('invoiceNo orderId userId amountPaid paymentMode paymentAccount createdAt')
         .populate({
             path: 'orderId',
@@ -1622,26 +1621,7 @@ async function getPaymentsById(id) {
     }
 }
 
-=======
-      .select('invoiceNo orderId userId amountPaid paymentMode paymentAccount createdAt')
-    .populate([{
-        path: 'userId',
-        model: User,
-        select: 'name email'
-    }]);
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
-
-        if (!payments) {
-            console.log('User not found');
-            return false;
-        }
-
-        return payments;
-    } catch (error) {
-        console.error('Error fetching user payments:', error);
-        return false;
-    }
-}
+    
 async function getPayments(req) {
     try {
 

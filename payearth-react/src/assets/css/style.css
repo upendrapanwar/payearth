@@ -1269,11 +1269,8 @@ ul {
 #buyerChangePwdModal .modal-content .img_wrapper>.btn-close:hover {
     background-color: var(--primary_color);
 }
-<<<<<<< HEAD
 
 /* New Added */
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
 .close-btn {
     position: absolute;
     top: 50px;
@@ -1283,8 +1280,6 @@ ul {
     padding: 10px;
     border-radius: 5px;
 }
-<<<<<<< HEAD
-
 .cross-btn {
     position: absolute;
     top: 50px;
@@ -1340,8 +1335,6 @@ ul {
   }
 /* End */
 
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
 .regiter_form .radio_wrapper {
     display: flex;
     flex-wrap: wrap;
@@ -2517,7 +2510,6 @@ span.rate_sts {
     font-size: 14px;
 }
 
-<<<<<<< HEAD
 .cart-content-container .cart-category { padding: 10px 0px;}
 .cart-inner-content  h3.cart-headings {
     font-size: 20px;
@@ -2526,8 +2518,6 @@ span.rate_sts {
     font-size: 14px;
 }
 
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
 .blog_listing_wrapper{
     display: flex;
     justify-content: start;
@@ -2616,10 +2606,6 @@ span.rate_sts {
     opacity: 0.5;
     pointer-events: none;
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
 .clp_item_info {
     display: inline-block;
     width: calc(100% - 145px);
@@ -2628,11 +2614,6 @@ span.rate_sts {
 }
 /* single-detail page css */
 
-<<<<<<< HEAD
-/* single-detail page css */
-
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
 .cart-single-page-wrapper .cart-single-heading {
 
 }
@@ -2683,10 +2664,7 @@ span.rate_sts {
     margin-top: 10px;
     margin-bottom: 15px;
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
 .clp_item_info .custom_btn {
     width: auto;
     font-size: 12px;
@@ -3631,7 +3609,6 @@ z-index: 0;
     line-height: 12px;
   }
 
-<<<<<<< HEAD
   @media (max-width:991px) {
     /* .custom_btn{
         width: 190px !important;
@@ -3650,9 +3627,6 @@ z-index: 0;
     }
   }
 
-
-=======
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
   @media (max-width:767px) {
     .cl_head .cl-row{
         display: block;
@@ -3667,7 +3641,6 @@ z-index: 0;
         display: flex;
         flex-wrap: wrap;
     }
-<<<<<<< HEAD
     .deals_sec .card-deal-wrap{
         width: 250px;
     }
@@ -3684,6 +3657,4 @@ z-index: 0;
         margin: 28px 15px 18px 15px;
     }
   }
-=======
-  }
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
+

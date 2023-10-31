@@ -374,11 +374,7 @@ function getPaymentsById(req, res, next) {
         .then(payments => payments ? res.status(200).json({ status: true, data: payments }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
-<<<<<<< HEAD
 /** 
-=======
-/**
->>>>>>> 2037050c91b1fe7ad972e42de68244346d65e721
  * 
  * @param {*} req 
  * @param {*} res 
