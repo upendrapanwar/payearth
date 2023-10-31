@@ -352,6 +352,12 @@ class MyOrders extends Component {
       width: "200px",
     },
     {
+      name: "Order ID",
+      selector: (row, i) => row.orderCode,
+      sortable: true,
+      width: "200px",
+    },
+    {
       name: "Invoice Number",
       selector: (row, i) => row.invoiceNo,
       sortable: true,
