@@ -10,10 +10,10 @@ const multer = require('multer');
 
 //Brand File Upload
 var storage = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, config.uploadDir + '/brands');
     },
-    filename: function(req, file, cb) {
+    filename: function (req, file, cb) {
         let extArray = file.mimetype.split("/");
         let extension = extArray[extArray.length - 1];
         let newName = file.fieldname + "-" + Math.floor(Math.random() * 10000) + "-" + Date.now() + "." + extension;
@@ -21,7 +21,7 @@ var storage = multer.diskStorage({
     }
 });
 
-const imageFilter = function(req, file, cb) {
+const imageFilter = function (req, file, cb) {
     // Accept image only
     if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
         req.fileValidationError = 'Only image file is allowed!';
@@ -36,10 +36,10 @@ var uploadBrand = multer({ storage: storage, fileFilter: imageFilter, limits: { 
 
 //Deal File Upload
 var storageDeal = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, config.uploadDir + '/deals');
     },
-    filename: function(req, file, cb) {
+    filename: function (req, file, cb) {
         let extArray = file.mimetype.split("/");
         let extension = extArray[extArray.length - 1];
         let newName = file.fieldname + "-" + Math.floor(Math.random() * 10000) + "-" + Date.now() + "." + extension;
@@ -47,7 +47,7 @@ var storageDeal = multer.diskStorage({
     }
 });
 
-const imageFilterDeal = function(req, file, cb) {
+const imageFilterDeal = function (req, file, cb) {
     // Accept image only
     if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
         req.fileValidationError = 'Only image file is allowed!';
@@ -60,10 +60,10 @@ var uploadDeal = multer({ storage: storageDeal, fileFilter: imageFilterDeal, lim
 
 //Multi Banner Files Upload
 var storageBannerMultiple = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, config.uploadDir + '/banner');
     },
-    filename: function(req, file, cb) {
+    filename: function (req, file, cb) {
         let extArray = file.mimetype.split("/");
         let extension = extArray[extArray.length - 1];
         let newName = "IMG-" + Math.floor(Math.random() * 1000000) + "-" + Date.now() + "." + extension;
@@ -71,7 +71,7 @@ var storageBannerMultiple = multer.diskStorage({
     }
 });
 
-const fileFilterBannerMultiple = function(req, file, cb) {
+const fileFilterBannerMultiple = function (req, file, cb) {
     // Accept images only
     if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
         req.fileValidationError = 'Only image files are allowed!';
@@ -188,6 +188,8 @@ router.get("/getCmsAllCategory", getCmsCategoryData);
 router.get("/cmsGetCategoryById/:id", cmsGetCategoryById);
 router.put("/cmsUpdateCategory/:id", cmsUpdateCategory);
 router.delete("/categoryDelete/:id", categoryDelete);
+
+
 module.exports = router;
 
 function register(req, res, next) {
@@ -299,7 +301,7 @@ function listCategory(req, res, next) {
         .then(categories => categories ? res.status(200).json({ status: true, data: categories }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
-function getCategoryById(req, res ,next) {
+function getCategoryById(req, res, next) {
     adminService.getCateogyById(req.params.id)
         .then(categories => categories ? res.status(200).json({ status: true, data: categories }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
@@ -335,7 +337,7 @@ function listBrand(req, res, next) {
         .then(brands => brands ? res.status(200).json({ status: true, data: brands }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
-function getBrand(req,res,next) {
+function getBrand(req, res, next) {
     adminService.getBrandById(req.params.id)
         .then(brands => brands ? res.status(200).json({ status: true, data: brands }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
@@ -552,8 +554,8 @@ function getOrderstatus(req, res, next) {
  */
 function getOrderDataBypaymentId(req, res, next) {
     adminService.getOrderDataBypaymentId(req.params.id)
-        .then(orderData => orderData ? res.status(200).json({status: true, data: orderData}) : res.status(400).json({ status:false, message: msg.common.no_data_err, data: {}}))
-        .catch(err => next(res.json({ status: false, message: err})))
+        .then(orderData => orderData ? res.status(200).json({ status: true, data: orderData }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
+        .catch(err => next(res.json({ status: false, message: err })))
 }
 /******************************************************************************/
 /******************************************************************************/
@@ -568,8 +570,8 @@ function getOrderDataBypaymentId(req, res, next) {
  */
 function getproductData(req, res, next) {
     adminService.getproductData(req.params.id)
-        .then(products => products ? res.status(200).json({ status: true, data: products}) : res.status(400).json({ status: false, message: msg.commom.no_data_err, data: [] }))
-        .catch(err => next(res.json({ status: false, message: err})));
+        .then(products => products ? res.status(200).json({ status: true, data: products }) : res.status(400).json({ status: false, message: msg.commom.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
 }
 /******************************************************************************/
 /******************************************************************************/
@@ -757,3 +759,5 @@ function categoryDelete(req, res, next) {
         .then(cate => cate ? res.json({ status: true, message: "Successfull Delete" }) : res.json({ status: false, message: "ERROR" }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
+
+

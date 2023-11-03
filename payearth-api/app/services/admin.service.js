@@ -11,7 +11,7 @@ const db = require("../helpers/db");
 const msg = require('../helpers/messages.json');
 const fs = require('fs');
 
-const { Admin, User, Seller, Coupon, Product, Category, Brand, TodayDeal, BannerImage, TrendingProduct, PopularProduct, Color, OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline, ProductSales, cmsPost, cmsPage, cmsCategory } = require("../helpers/db");
+const { Admin, User, Seller, Coupon, Product, Category, Brand, TodayDeal, BannerImage, TrendingProduct, PopularProduct, Color, OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline, ProductSales, cmsPost, cmsPage, cmsCategory, bonusProgram , howitwork} = require("../helpers/db");
 
 module.exports = {
     authenticate,
@@ -860,7 +860,7 @@ async function getBrandById(brandid) {
         console.log('Error', err);
         return false;
     }
-    
+
 }
 
 async function deleteBrand(id) {
@@ -1433,19 +1433,19 @@ async function getOrders(req) {
         } else if (param.filter.type == "cancel_refund") {
             orArr = [{ "lname": "cancelled" }, { "lname": "refunded" }, { "lname": "declined" }, { "lname": "disputed" }, { "lname": "failed" }, { "lname": "returned" }, { "lname": "return_request" }, { "lname": "cancel_request" }];
 
-        //} else if (param.filter.type == "complete") {
+            //} else if (param.filter.type == "complete") {
         } else if (param.filter.type == "completed") {
             orArr = [{ "lname": "completed" }];
         }
 
-        if(param.filter.status) {
+        if (param.filter.status) {
             orArr = [];
         }
 
-        if(param.filter.status == "Completed" && param.filter.type == "completed") {                                                                                                              
-            
+        if (param.filter.status == "Completed" && param.filter.type == "completed") {
+
             orArr = [{ "lname": "completed" }];
-        }  
+        }
 
         if (param.filter.status == "Pending" && param.filter.type == "pending") {
             orArr = [{ "lname": "pending" }];
@@ -1462,21 +1462,21 @@ async function getOrders(req) {
         }
         //console.log(orArr);
         //console.log(orArr.length);
-        
+
         var statuses = await OrderStatus.find({ $or: orArr }).select("id lname").exec();;
-        
+
         if (statuses && statuses.length > 0) {
-            
+
             for (var i = 0; i < statuses.length; i++) {
                 let id = statuses[i]._id;
                 let el = { "orderStatusId": id };
                 statusOrArray.push(el);
             }
 
-            
+
             //console.log(orArr);
             var timelines = await OrderTrackingTimeline.find({ $or: statusOrArray }).select("id").exec();
-            
+
             if (timelines && timelines.length > 0) {
                 for (var j = 0; j < timelines.length; j++) {
                     let x = timelines[j]._id;
@@ -1485,10 +1485,10 @@ async function getOrders(req) {
                 }
             }
         }
-        
+
         //console.log(statusOrArray);
         //console.log(timelineOrArray);
-       
+
         var whereCondition = { $and: [{ isActive: true }, { isService: isService }] };
 
         if (timelineOrArray.length > 0) {
@@ -1501,7 +1501,7 @@ async function getOrders(req) {
             let start = new Date(param.filter.date).toISOString();
             let end = param.filter.date;
             end = new Date(end);
-            
+
             end.setDate(end.getDate() + 1);
             end = end.toISOString()
             //console.log('start='+start);
@@ -1509,7 +1509,7 @@ async function getOrders(req) {
             //whereCondition['$and'].push({ createdAt: { $gte: start, $lte: end } });
             whereCondition['$and'].push({ "createdAt": { $gte: new Date(start), $lt: new Date(end) } });
         }
-        
+
         if (param.filter.vendor && param.filter.vendor != "") {
             let vendor_text = param.filter.vendor; //text
             var sellerIdArray = [];
@@ -1521,16 +1521,16 @@ async function getOrders(req) {
                     let id = sellers[i]._id;
                     sellerIdArray.push(id);
                 }
-            }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+            }
 
             if (sellerIdArray.length > 0) {
                 whereCondition['$and'].push({ sellerId: { $in: sellerIdArray } });
             }
-            
+
         }
 
         if (param.filter.customer && param.filter.customer != "") {
-            
+
             let customer_text = param.filter.customer; //text
             var userIdArray = [];
             var users = await User.find({ name: { $regex: '.*' + customer_text + '.*' } }).select("id").exec();
@@ -1547,17 +1547,17 @@ async function getOrders(req) {
                 whereCondition['$and'].push({ userId: { $in: userIdArray } });
             }
         }
-        
+
         //if (param.searching.value && param.searching.value != "") {
         //if (typeof param.searching != "undefined") {
-        
+
         if (typeof param.search != "undefined") {
             //console.log('##')
             //let search_text = param.searching.value; //text
-            
+
             //search for orders
             //if(param.search && param.search.length > 0) {
-                let ordercode_text = param.search; //text
+            let ordercode_text = param.search; //text
 
             var orderIdArray = [];
 
@@ -1571,14 +1571,14 @@ async function getOrders(req) {
                 }
             }
             //console.log(orderIdArray);
-                if (orderIdArray.length > 0) {
-                    whereCondition['$and'].push({ _id: { $in: orderIdArray } });
-                }
+            if (orderIdArray.length > 0) {
+                whereCondition['$and'].push({ _id: { $in: orderIdArray } });
+            }
             //console.log(orderIdArray)
             //end vendors search
             //}
             //search for vendors
-            if(param.search && param.search.length > 0) {
+            if (param.search && param.search.length > 0) {
                 let vendor_text = param.search; //text
                 var sellerIdArray = [];
                 //console.log(vendor_text);
@@ -1596,11 +1596,11 @@ async function getOrders(req) {
                     whereCondition['$and'].push({ sellerId: { $in: sellerIdArray } });
                 }
             }
-            
+
             //end vendors search
 
             //search for customer
-            if(param.search) {
+            if (param.search) {
                 let customer_text = param.search; //text
                 var userIdArray = [];
                 var users = await User.find({ name: { $regex: '.*' + customer_text + '.*' } }).select("id").exec();
@@ -1618,35 +1618,35 @@ async function getOrders(req) {
                 }
                 // end customer search
             }
-            if(param.search) {
-               
+            if (param.search) {
+
                 let search_text = param.search; //text
                 //let search_text = ''; //text
                 //cosole.log('product='+search_text)
                 var productIdArray = [];
                 var products = '';
-                if(isValidObjectId(search_text)) {
+                if (isValidObjectId(search_text)) {
                     //console.log('test');
                     products = await Product.find({ _id: search_text }).select("id").exec();
                 } else {
                     //console.log('test1');
-                    products = await Product.find({ name: { $regex: '.*' + search_text + '.*','$options' : 'i' } }).select("id").exec();
+                    products = await Product.find({ name: { $regex: '.*' + search_text + '.*', '$options': 'i' } }).select("id").exec();
                 }
                 //console.log(products);
                 if (products && products.length > 0) {
-                    
+
                     for (var i = 0; i < products.length; i++) {
                         let id = products[i]._id;
                         productIdArray.push(id);
                     }
                 }
-                
+
                 if (productIdArray.length > 0) {
                     //console.log(productIdArray);
                     whereCondition['$and'].push({ productId: { $in: productIdArray } });
                 }
             }
-            
+
         }
 
         if (param.count) {
@@ -1663,7 +1663,7 @@ async function getOrders(req) {
                 sortOption['createdAt'] = sort_val;
             }
         }
-        
+
         var options = {
             select: 'id orderCode productId userId isActive orderStatus paymentId product_sku createdAt',
             sort: sortOption,
@@ -1704,7 +1704,7 @@ async function getOrders(req) {
             offset: skip,
             limit: limit,
         };
-        
+
         //console.log(whereCondition);
         //console.log(options);
         const result = await Order.paginate(whereCondition, options)
@@ -1758,7 +1758,7 @@ async function getOrders(req) {
                         nextPage: data.nextPage
                     }
                 };
-                
+
                 return res;
             });
         //console.log(result);    
@@ -1774,7 +1774,7 @@ async function getOrders(req) {
     }
 }
 function filterOrderData(data) {
-    var i=0;
+    var i = 0;
     data.map(function (val, index) {
         var productName = '';
         //val.product_name = getProductNameById(val.productId);
@@ -1782,16 +1782,16 @@ function filterOrderData(data) {
         //console.log("val",val.productId);
         //console.log(i++);
         //console.log("val1",typeof(val.productId['productId']));
-        if(typeof val.productId != 'undefined' && typeof val.productId.length != 'undefined') {
+        if (typeof val.productId != 'undefined' && typeof val.productId.length != 'undefined') {
             console.log('test');
             //console.log(val.productId);
             var datap = val.productId;
-            datap.map(function(value,index){
+            datap.map(function (value, index) {
                 console.log(getProductNameById(value.productId))
-                
+
             });
             //console.log('productname=',getProductNameById(val.productId.productId));            
-            
+
         } else {
             console.log('test1');
             //val.product_name = getProductNameById(val.productId);
@@ -1801,7 +1801,7 @@ function filterOrderData(data) {
         }
         //console.log("productname",localStorage.getItem('productname'))
         val.product_name = '';
-        
+
     })
     return data;
 }
@@ -1913,19 +1913,19 @@ async function getPayments(req) {
         var options = {
             select: 'id orderId userId invoiceNo amountPaid paymentMode paymentAccount paymentStatus isActive createdAt',
             sort: sortOption,
-            
+
             populate: [{
                 path: "orderId",
                 model: Order,
                 select: "id orderCode productId",
-                
+
                 populate: {
                     path: "productId",
                     model: Product,
                     select: "id name featuredImage isService"
                 }
             }],
-            
+
             lean: true,
             page: page,
             offset: skip,
@@ -1964,7 +1964,7 @@ async function getPayments(req) {
 
 
 async function getPaymentById(id) {
-    
+
     try {
         const payment = await Payment.findById(id).select('id invoiceNo invoiceUrl amountPaid paymentMode paymentAccount orderId')
             .populate([{
@@ -2186,11 +2186,12 @@ async function getProductSales(req) {
 async function getOrderDataBypaymentId(paymentId) {
     try {
         const OrderData = await Order.findOne({ paymentId: paymentId }).populate(
-            {path: "paymentId",
-             model: Payment,
-             select: "paymentStatus"
-            } 
-            ).exec();
+            {
+                path: "paymentId",
+                model: Payment,
+                select: "paymentStatus"
+            }
+        ).exec();
         if (OrderData) {
             return OrderData;
         } else {
@@ -2217,13 +2218,13 @@ async function getproductData(productId) {
         const productData = await Product.findOne({ _id: productId }).populate({
             select: 'categoryName',
             path: 'category',
-            model: 'Category', 
+            model: 'Category',
         }).populate({
             select: 'brandName',
             path: 'brand',
-            model: 'Brand', 
+            model: 'Brand',
         }).
-        exec();
+            exec();
         if (productData) {
             return productData;
         } else {
@@ -2516,3 +2517,9 @@ async function categoryDelete(req) {
         console.log(error);
     }
 }
+
+
+
+
+
+

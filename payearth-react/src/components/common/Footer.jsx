@@ -15,7 +15,7 @@ import twitterIcon from './../../assets/icons/twitter.svg';
 import facebook from './../../assets/icons/facebook.svg';
 
 const Footer = () => {
-    return(
+    return (
         <footer className="footer">
             <div className="container">
                 <div className="row">
@@ -53,13 +53,13 @@ const Footer = () => {
                     <div className="col-xs-12 col-md-4 col-lg-3">
                         <h6 className="h6 title">About company</h6>
                         <ul className="links-list">
-                            <li><Link to="#">Bonus program</Link></li>
-                            <li><Link to="#">How it works</Link></li>
-                            <li><Link to="#">Shipping and payment</Link></li>
-                            <li><Link to="#">Purity guarantee</Link></li>
-                            <li><Link to="#">Protection</Link></li>
-                            <li><Link to="#">Questions and answers</Link></li>
-                            <li><Link to="#">Contacts</Link></li>
+                            <li><Link to="/page/bonus-program">Bonus program</Link></li>
+                            <li><Link to="/page/how-it-works">How it works</Link></li>
+                            <li><Link to="/page/shipping-and-payment">Shipping and payment</Link></li>
+                            <li><Link to="/page/purity-guarantee">Purity guarantee</Link></li>
+                            <li><Link to="/page/protection">Protection</Link></li>
+                            <li><Link to="/page/questions-and-answers">Questions and answers</Link></li>
+                            <li><Link to="/user-contact">Contacts</Link></li>
                             <li><Link to="#">Give feedback</Link></li>
                         </ul>
                     </div>

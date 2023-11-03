@@ -8,7 +8,7 @@ import DOMPurify from 'dompurify';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
-
+import { Helmet } from 'react-helmet';
 
 class BlogDetail extends Component {
     constructor(props) {
@@ -23,7 +23,7 @@ class BlogDetail extends Component {
             error: null,
         };
     }
- 
+
     componentDidMount() {
         this.getBlogDetails();
     }
@@ -35,7 +35,7 @@ class BlogDetail extends Component {
         axios.get(`/front/blogDetail/${slug}`).then((response) => {
             console.log("Blog Detail : ", response.data.data)
             let result = response.data.data;
- 
+
             var blogPostDetails = [];
             for (var i = 0; i < result.length; i++) {
                 const numericalDate = new Date(result[0].updatedAt);
@@ -50,8 +50,10 @@ class BlogDetail extends Component {
                     category: result[0].category,
                     image: result[0].image,
                     description: description,
+                    updatedAt: date,
                     seo: result[0].seo,
-                    updatedAt: date
+                    seodescription: result[0].seodescription,
+                    keywords: result[0].keywords
                 })
                 this.setState({ 'blogDetails': blogPostDetails, loading: false, error: null });
             }
@@ -68,40 +70,47 @@ class BlogDetail extends Component {
         if (error) {
             return <div>Error: {error}</div>;
         }
-        
+
         console.log("blog Details under render", blogDetails)
         return (
             <React.Fragment>
-                 {loading === true ? <SpinnerLoader /> : ''}
+                {loading === true ? <SpinnerLoader /> : ''}
                 <Header />
                 {/* <div className="inr_top_page_title">
                     <h2>Blog Detail</h2>
                 </div> */}
                 <section className="inr_wrap">
-                    {blogDetails.map(item => 
-                    <div className="container">
-                        {/* <h4><i>  Title :  <b>{item.title}</b></i></h4> */}
-                        <div className="col-md-12 cart-single-page-wrapper">
-                            <div className="cart my_cart">
-                                <div className="cl_head ">
-                                    <div className='cart-single-heading'>
-                                        <h1>{item.title}</h1>
-                                    </div>
-                                    <div className='blog-list-meta'>
-                                            <span class="post_cat_col">{item.category}</span> 
+                    {blogDetails.map(item =>
+                        <div className="container">
+                            {/* <h4><i>  Title :  <b>{item.title}</b></i></h4> */}
+                            <div className="col-md-12 cart-single-page-wrapper">
+                                <div className="cart my_cart">
+                                    <div className="cl_head ">
+                                        <Helmet>
+                                            <title>{item.seo}{" - Pay Earth"}</title>
+                                            <meta name="description" content={item.seodescription} />
+                                            <meta name="keywords" content={item.keywords} />
+                                        </Helmet>
+                                        <div className='cart-single-heading'>
+                                            <h1>{item.title}</h1>
+                                        </div>
+                                        <div className='blog-list-meta'>
+                                            <span class="post_cat_col">{item.category}</span>
                                             <span class="post_date_col">{item.updatedAt}</span>
-                                    </div>
-                                    
-                                    <div className="blog-page-image" >
-                                        <img src={item.image} height={680} width={1080} alt="" />
-                                    </div>
-                                    <div className='blog-single-desc'>
-                                       {item.description}
+                                        </div>
+                                        {item.image == '' ?'':
+                                            <div className="blog-page-image" >
+                                                <img src={item.image} height={680} width={1080} alt="" />
+                                            </div>
+                                        }
+
+                                        <div className='blog-single-desc'>
+                                            {item.description}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                     )}
                 </section>
                 <Footer />

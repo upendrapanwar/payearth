@@ -478,13 +478,14 @@ const Header = (props) => {
                                 {loginStatus && userInfo.role === 'user' ? <button className="btn btn-primary rounded-0 h-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu" aria-controls="sideMenu"><span className="fa fa-bars"></span></button> : ''}
                                 <div className="nav_wrapper">
                                     <ul>
+                                        <li><Link to="/">Home</Link></li>
                                         {
                                             JSON.parse(localStorage.getItem('isLoggedIn')) &&
                                             <li><Link to="/community">Community</Link></li>
                                         }
                                         <li><Link to="/user-contact">Contact</Link></li>
-                                        <li><Link to="/blog-model">Blog</Link></li>
-                                        <li><Link to="/page-model">Page</Link></li>
+                                        <li><Link to="/blog">Blog</Link></li>
+                                        <li><Link to="/page">Page</Link></li>
                                     </ul>
                                     <ul>
                                         <li className="login_links_wrapper me-3">

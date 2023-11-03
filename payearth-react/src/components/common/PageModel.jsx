@@ -8,6 +8,7 @@ import DOMPurify from 'dompurify';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import SpinnerLoader from './SpinnerLoader';
+import { Helmet } from 'react-helmet';
 
 
 class PageModel extends Component {
@@ -71,6 +72,7 @@ class PageModel extends Component {
         this.setState({
             currentPage: this.state.currentPage - 1,
         });
+        window.scrollTo(0, 0);
     }
 
     // Function to go to the next page
@@ -78,11 +80,12 @@ class PageModel extends Component {
         this.setState({
             currentPage: this.state.currentPage + 1,
         });
+        window.scrollTo(0, 0);
     };
 
     render() {
         const { pages, currentPage, itemsPerPage, searchQuery, loading, error } = this.state;
-        console.log('pages : unde render', pages)
+        // console.log('pages : unde render', pages)
 
         if (loading) {
             return <SpinnerLoader />
@@ -102,17 +105,12 @@ class PageModel extends Component {
 
         return (
             <React.Fragment>
-
                 {loading === true ? <SpinnerLoader /> : ''}
                 <Header />
                 <section className="inr_wrap">
+                    <Helmet><title>{"Page - Pay Earth"}</title></Helmet>
                     <div className='blog-search-wrapper'>
-                        <input
-                            type="text" className="form-control"
-                            placeholder="Search"
-                            value={searchQuery}
-                            onChange={this.handleSearch}
-                        />
+                        <input type="text" className="form-control" placeholder="Search" value={searchQuery} onChange={this.handleSearch} />
                     </div>
                     {pageData.map(item =>
                         <div className="container">
@@ -128,10 +126,11 @@ class PageModel extends Component {
                                             {/* <span class="post_cat_col">{item.category}</span>  */}
                                             <span class="post_date_col">{item.updatedAt}</span>
                                         </div>
-
-                                        <div className="blog-page-image" >
-                                            <img src={item.image} height={680} width={1080} alt="" />
-                                        </div>
+                                        {item.image == '' ? '' :
+                                            <div className="blog-page-image" >
+                                                <img src={item.image} height={680} width={1080} alt="" />
+                                            </div>
+                                        }
                                         <div className='blog-single-desc'>
                                             {item.description}
                                         </div>
@@ -142,7 +141,7 @@ class PageModel extends Component {
                     )}
                 </section>
                 <div className='cart-pagination'>
-                    <ul className="pagination-wrapper"> 
+                    <ul className="pagination-wrapper">
                         <button
                             onClick={this.prevPage}
                             disabled={currentPage === 1}
@@ -163,7 +162,7 @@ class PageModel extends Component {
                             )}
                         <button
                             onClick={this.nextPage}
-                            disabled={itemsPerPage !== pageData.length}
+                            disabled={currentPage === Math.ceil(filteredItems.length / itemsPerPage)}
                         >
                             NEXT
                         </button>

@@ -38,5 +38,5 @@ module.exports = {
     FollowRequest: require('../models/followrequest.model'),
     cmsPost: require('../models/cmspost.model'),
     cmsPage: require('../models/cmspage.model'),
-    cmsCategory : require('../models/cmscategory.model')
+    cmsCategory: require('../models/cmscategory.model'),
 };

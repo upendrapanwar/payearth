@@ -9,7 +9,7 @@ import './assets/css/responsive.css';
 import './assets/css/checkout.css';
 import './assets/css/myStyle.css';
 
-import { BrowserRouter as Router, Switch,  Route } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Home from './containers/user/Home';
 import ProductListing from './containers/user/ProductListing';
 import ProductDetail from './containers/user/ProductDetail';
@@ -19,11 +19,11 @@ import MyOrders from './containers/user/MyOrders';
 import MyCart from './containers/user/MyCart';
 import CheckOut from './containers/user/CheckOut';
 import MyWishlist from './containers/user/MyWishlist';
-import SaveLaterlist from './containers/user/SaveLaterlist'; 
+import SaveLaterlist from './containers/user/SaveLaterlist';
 import MyProfile from './containers/user/MyProfile';
 import OrderDetail from './containers/user/OrderDetail';
 import MyPayments from './containers/user/MyPayments';
-import UserContact from './containers/user/Contact'; 
+import UserContact from './containers/user/Contact';
 
 import Notifications from './containers/user/Notifications';
 import Chat from './containers/user/Chat';
@@ -102,15 +102,17 @@ import BlogDetail from './components/common/BlogDetails';
 import PageModel from './components/common/PageModel';
 import PageDetail from './components/common/PageDetails';
 
+
 import ScrollToTopButton from './containers/user/ScrollToTopButton';
 
+ 
 function App() {
 	const userInfo = useSelector(state => state.auth.userInfo);
-	
+
 	return (
 		<div className="App">
 			<Router>
-			<ScrollToTopButton />
+				<ScrollToTopButton />
 				<Switch>
 					<PublicRoute path="/" restricted={false} component={Home} exact />
 					<PublicRoute path="/product-listing" restricted={false} component={ProductListing} exact />
@@ -119,7 +121,7 @@ function App() {
 					<PublicRoute path="/service-detail/:id" restricted={false} component={ServiceDetail} exact />
 					<PublicRoute path="/my-cart" restricted={false} component={MyCart} exact />
 					<PublicRoute path="/checkout" restricted={false} component={CheckOut} exact />
-					
+
 					<PublicRoute path="/notifications" restricted={false} component={Notifications} exact />
 					<PublicRoute path="/chat" restricted={false} component={Chat} exact />
 					<PublicRoute path="/user-contact" restricted={false} component={UserContact} exact />
@@ -132,7 +134,7 @@ function App() {
 					<PrivateRoute path="/order-detail/:id" component={OrderDetail} roles={[Role.user]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/my-payments" component={MyPayments} roles={[Role.user]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/order-summary/:id" component={OrderSummary} roles={[Role.user]} currentUserRole={userInfo.role} exact />
-					
+
 					{/* Seller routes */}
 					<PublicRoute path="/seller/login" restricted={false} component={SellerLogin} exact />
 					<PublicRoute path="/seller/register" restricted={false} component={SellerRegister} exact />
@@ -159,58 +161,59 @@ function App() {
 
 					{/* Admin routes */}
 					<PublicRoute path="/admin/login" restricted={false} component={AdminLogin} exact />
-                    <PublicRoute path="/admin/register" restricted={false} component={AdminRegister} exact />
-                    <PublicRoute path="/admin/forgot-password" restricted={false} component={AdminForgotPwd} exact />
-                    <PublicRoute path="/admin/reset-password" restricted={false} component={AdminResetPwd} exact />
-                    <PublicRoute path="/admin/payments" restricted={false} component={AdminPayments} exact />
+					<PublicRoute path="/admin/register" restricted={false} component={AdminRegister} exact />
+					<PublicRoute path="/admin/forgot-password" restricted={false} component={AdminForgotPwd} exact />
+					<PublicRoute path="/admin/reset-password" restricted={false} component={AdminResetPwd} exact />
+					<PublicRoute path="/admin/payments" restricted={false} component={AdminPayments} exact />
 					<PublicRoute path="/admin/post-module" restricted={false} component={AdminPostModule} exact />
 					<PublicRoute path="/admin/post-module-add-new" restricted={false} component={AdminPostModuleAddNew} exact />
 					<PublicRoute path='/admin/post-module-edit/:id' restricted={false} component={AdminPostEdit} exact />
 
-					<PublicRoute path="/admin/page-module" restricted={false} component={AdminPageModule} exact />					
+					<PublicRoute path="/admin/page-module" restricted={false} component={AdminPageModule} exact />
 					<PublicRoute path="/admin/page-module-add-new" restricted={false} component={AdminPageModuleAddNew} exact />
 					<PublicRoute path='/admin/page-module-edit/:id' restricted={false} component={AdminPageEdit} exact />
 
 					<PublicRoute path="/admin/category-module" restricted={false} component={AdminCategoryModel} exact />
 					<PublicRoute path="/admin/category-module-edit/:id" restricted={false} component={AdminCategoryModelEdit} exact />
+
+			
 					<PublicRoute path="/admin/manage-payment-details/:id" restricted={false} component={ManagePaymentDetails} exact />
 					<PublicRoute path="/admin/chat" restricted={false} component={AdminChat} exact />
 					<PublicRoute path="/admin/manage-order-details/:id" restricted={false} component={ManageOrderDetails} exact />
 					<PublicRoute path="/admin/manage-products" restricted={false} component={ManageProducts} exact />
-                    <PublicRoute path="/admin/manage-product-details" restricted={false} component={ManageProductDetails} exact />
+					<PublicRoute path="/admin/manage-product-details" restricted={false} component={ManageProductDetails} exact />
 					<PublicRoute path="/admin/manage-services" restricted={false} component={ManageServices} exact />
 					<PublicRoute path="/admin/manage-service-details" restricted={false} component={ManageServiceDetails} exact />
 					<PrivateRoute path="/admin/manage-community" component={ManageCommunity} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/admin/manage-reports" component={ManageReports} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/admin/manage-reports-services" component={ManageReportsServices} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
-					
+
 					<PublicRoute path="/admin/manage-notifications" restricted={false} component={ManageNotifications} exact />
 					<PublicRoute path="/admin/manage-customers" restricted={false} component={ManageCustomers} exact />
 					<PrivateRoute path="/admin/orders" component={AdminOrders} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
-                    <PrivateRoute path="/admin/dashboard" component={AdminDashboard} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
-                    <PrivateRoute path="/admin/add-coupon" component={AddCoupon} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
-                    <PrivateRoute path="/admin/coupons" component={CouponsListing} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
-                    <PrivateRoute path="/admin/manage-vendors" component={ManageVendors} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
+					<PrivateRoute path="/admin/dashboard" component={AdminDashboard} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
+					<PrivateRoute path="/admin/add-coupon" component={AddCoupon} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
+					<PrivateRoute path="/admin/coupons" component={CouponsListing} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
+					<PrivateRoute path="/admin/manage-vendors" component={ManageVendors} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
 					{/* Community Routes */}
 					<PrivateRoute path="/admin/manage-banner-advertisement" component={ManageBannerAdvertisement} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/admin/manage-support" component={ManageSupport} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/admin/manage-banner-list" component={ManageBannerList} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
-					
-					
+
+
 					<PublicRoute path="/community" restricted={false} component={Community} exact />
 					<PublicRoute path="/community-profile" restricted={false} component={CommunityProfile} exact />
 
 					{/* Blog */}
-					<PublicRoute path="/blog-model" restricted={false} component={Blog} exact />   
-					<PublicRoute path="/blog-detail/:slug" restricted={false} component={BlogDetail} exact />   
+					<PublicRoute path="/blog" restricted={false} component={Blog} exact />
+					<PublicRoute path="/blog-detail/:slug" restricted={false} component={BlogDetail} exact />
 
 					{/* PageDetail */}
-					<PublicRoute path="/page-model" restricted={false} component={PageModel} exact />   
-					<PublicRoute path="/page-detail/:slug" restricted={false} component={PageDetail} exact /> 
+					<PublicRoute path="/page" restricted={false} component={PageModel} exact />
+					<PublicRoute path="/page/:slug" restricted={false} component={PageDetail} exact />
 
-
-                     {/* Not found */}
-					<Route  component={PageNotFound} />
+					{/* Not found */}
+					<Route component={PageNotFound} />
 				</Switch>
 			</Router>
 		</div>

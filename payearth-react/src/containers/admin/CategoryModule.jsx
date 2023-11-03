@@ -12,6 +12,7 @@ import 'react-quill/dist/quill.snow.css';
 import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
+import { Helmet } from 'react-helmet';
 
 class AdminCategoryModel extends Component {
     constructor(props) {
@@ -118,6 +119,7 @@ class AdminCategoryModel extends Component {
             }
             // window.location.reload(); 
             // this.setState({ loading: true })
+            this.setState({ selectedRows: "" })
         }
     }
 
@@ -196,7 +198,7 @@ class AdminCategoryModel extends Component {
                     </button>
 
                     <button
-                        // onClick={() => this.handleStatusTrash(row._id)}
+
                         className="custom_btn btn_yellow_bordered w-auto btn btn-width"
                         onClick={() => this.handleDeleteSeletedData(row._id)}
                     >
@@ -226,6 +228,9 @@ class AdminCategoryModel extends Component {
                 {loading === true ? <SpinnerLoader /> : ''}
                 <Header />
                 <div className="container">
+                    <Helmet>
+                        <title>{"Category - Pay Earth"}</title>
+                    </Helmet>
                     <div className="row">
                         <div className="col-lg-4">
                             <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">

@@ -11,7 +11,7 @@ import emptyImg from './../../assets/images/emptyimage.png'
 
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
+import { Helmet } from 'react-helmet';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import NotFound from '../../components/common/NotFound';
 import axios from 'axios';
@@ -185,6 +185,9 @@ class AdminPageModuleAddNew extends Component {
             <React.Fragment>
                 <Header />
                 <div className="container">
+                    <Helmet>
+                        <title>{"Create new page - Pay Earth"}</title>
+                    </Helmet>
                     <div className="row">
                         <div className="col-lg-9">
                             <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
@@ -287,6 +290,7 @@ class AdminPageModuleAddNew extends Component {
                                     </div>
                                     <div className="form-check mb-3 mt-4">
                                         <input
+                                            className='choose_img'
                                             type="file"
                                             accept="image/"
                                             onChange={this.handleImageChange}

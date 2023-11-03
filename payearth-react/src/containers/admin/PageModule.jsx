@@ -11,7 +11,7 @@ import axios from 'axios';
 import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
-
+import { Helmet } from 'react-helmet';
 
 
 class AdminPageModule extends Component {
@@ -125,7 +125,7 @@ class AdminPageModule extends Component {
         this.props.history.push(`/admin/page-module-edit/${id}`);
     }
     handleDetails = (slug) => {
-        this.props.history.push(`/page-detail/${slug}`)
+        this.props.history.push(`/page/${slug}`)
     }
 
     handleRowSelected = (state) => {
@@ -139,7 +139,7 @@ class AdminPageModule extends Component {
                 headers: {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
-            }).then((res) => {
+            }).then((res) => { 
                 console.log(res.data)
                 this.getUpdate()
             })
@@ -165,6 +165,7 @@ class AdminPageModule extends Component {
             }
             // window.location.reload(); 
             this.setState({ loading: true })
+            this.setState({ selectedRows: "" })
         }
     }
 
@@ -412,8 +413,6 @@ class AdminPageModule extends Component {
             selectedRows
         } = this.state;
 
-
-
         if (loading) {
             return <SpinnerLoader />
         }
@@ -426,6 +425,9 @@ class AdminPageModule extends Component {
                 {loading === true ? <SpinnerLoader /> : ''}
                 <Header />
                 <section className="admin-dashboard-wrapper post-module">
+                    <Helmet>
+                        <title>{"Page - Pay Earth"}</title>
+                    </Helmet>
                     <div className="inr_wrap dash_inner_wrap admin_manage_banner">
                         <div className="col-md-12">
                             <div className="seller_dash_wrap pt-5 pb-5">

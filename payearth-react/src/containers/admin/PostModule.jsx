@@ -11,7 +11,7 @@ import axios from 'axios';
 import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
-
+import { Helmet } from 'react-helmet';
 
 class AdminPostModule extends Component {
     constructor(props) {
@@ -447,7 +447,7 @@ class AdminPostModule extends Component {
                     </button>
                     <button
                         className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
-                        onClick={ () => this.handleDeleteSeletedData(row._id)}
+                        onClick={() => this.handleDeleteSeletedData(row._id)}
                     >
                         Delete
                     </button>
@@ -482,6 +482,9 @@ class AdminPostModule extends Component {
                 {loading === true ? <SpinnerLoader /> : ''}
                 <Header />
                 <section className="admin-dashboard-wrapper post-module">
+                    <Helmet>
+                        <title>{"Post - Pay Earth"}</title>
+                    </Helmet>
                     <div className="inr_wrap dash_inner_wrap admin_manage_banner">
                         <div className="col-md-12">
                             <div className="seller_dash_wrap pt-5 pb-5">

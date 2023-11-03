@@ -10,7 +10,7 @@ import emptyImg from './../../assets/images/emptyimage.png'
 
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
+import { Helmet } from 'react-helmet';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import NotFound from '../../components/common/NotFound';
 import axios from 'axios';
@@ -40,37 +40,6 @@ class AdminPostModuleAddNew extends Component {
     componentDidMount() {
         this.getCategory();
     }
-
-    // generateUniqueSlug = (title) => {
-    //     const { allSlugs } = this.state;
-    //     console.log("allSlug", allSlugs)
-    //     const data = title
-    //         .toLowerCase()
-    //         .replace(/[^a-z0-9 -]/g, '')
-    //         .replace(/\s+/g, '-')
-    //         .replace(/-+/g, '-')
-    //         .trim();
-
-    //     const slug = allSlugs.filter(item => item.slug == data);
-    //     if (slug.length == 0) {
-
-    //         return title
-    //             .toLowerCase()
-    //             .replace(/[^a-z0-9 -]/g, '')
-    //             .replace(/\s+/g, '-')
-    //             .replace(/-+/g, '-')
-    //             .trim();
-    //     } else {
-    //         const originalTitle = title + "-" + allSlugs.length;
-
-    //         return originalTitle
-    //             .toLowerCase()
-    //             .replace(/[^a-z0-9 -]/g, '')
-    //             .replace(/\s+/g, '-')
-    //             .replace(/-+/g, '-')
-    //             .trim();
-    //     }
-    // }
 
     generateUniqueSlug = (title) => {
         return title
@@ -155,12 +124,8 @@ class AdminPostModuleAddNew extends Component {
 
     savePost = (status) => {
         const { image, seo, seodescription, keywords, title, description, shortdescription, category, } = this.state;
-
         const slug = this.generateUniqueSlug(title);
-        // console.log("uniqueSlug", uniqueSlug)
-
         const url = 'admin/cmsPost';
-
         const postData = {
             image,
             seo,
@@ -186,18 +151,19 @@ class AdminPostModuleAddNew extends Component {
             .catch((error) => {
                 console.error('Error saving post:', error);
             });
-
         this.setState({ image: "", title: "", description: "", category: "", seo: "", keywords: "", shortdescription: "", seodescription: "", })
     };
 
 
     render() {
         const { image, categoryDate } = this.state;
-        // console.log("category data all", categoryDate)
         return (
             <React.Fragment>
                 <Header />
                 <div className="container">
+                    <Helmet>
+                        <title>{"Create new post - Pay Earth"}</title>
+                    </Helmet>
                     <div className="row">
                         <div className="col-lg-9">
                             <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
@@ -303,12 +269,10 @@ class AdminPostModuleAddNew extends Component {
                                 <div className="filter_box">
                                     <div align="center">
                                         {!image ? <img src={emptyImg} alt='...' style={{ maxWidth: "50%" }} /> : <img src={image} style={{ maxWidth: "70%" }} />}
-                                        {/* {image && (
-                                            <img src={image} style={{ maxWidth: "70%" }} />
-                                        )} */}
                                     </div>
                                     <div className="form-check mb-3 mt-4">
                                         <input
+                                            className='choose_img'
                                             type="file"
                                             accept="image/"
                                             onChange={this.handleImageChange}
@@ -329,36 +293,6 @@ class AdminPostModuleAddNew extends Component {
                                         />
                                         <label className="form-check-label" htmlFor="latestPost">{item.names}</label>
                                     </div>)}
-                                    {/* <div className="form-check mb-3 mt-4">
-                                        <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            value="Nature"
-                                            onChange={this.handleCheckboxChange}
-                                            checked={this.state.category.includes("Nature")}
-                                        />
-                                        <label className="form-check-label" htmlFor="latestPost">Nature</label>
-                                    </div>
-                                    <div className="form-check mb-3">
-                                        <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            value="Sports"
-                                            onChange={this.handleCheckboxChange}
-                                            checked={this.state.category.includes("Sports")}
-                                        />
-                                        <label className="form-check-label" htmlFor="popularPost">Sports</label>
-                                    </div>
-                                    <div className="form-check mb-3">
-                                        <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            value="Education"
-                                            onChange={this.handleCheckboxChange}
-                                            checked={this.state.category.includes("Education")}
-                                        />
-                                        <label className="form-check-label" htmlFor="CommentedPost">Education</label>
-                                    </div> */}
                                     <div className="filter_btn_box">
                                         <button
                                             className='btn custom_btn btn_yellow_bordered'
