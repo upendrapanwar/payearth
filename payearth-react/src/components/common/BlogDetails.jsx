@@ -103,7 +103,6 @@ class BlogDetail extends Component {
                                                 <img src={item.image} height={680} width={1080} alt="" />
                                             </div>
                                         }
-
                                         <div className='blog-single-desc'>
                                             {item.description}
                                         </div>

@@ -249,6 +249,7 @@ const Header = (props) => {
                             });
                             ids.push(product.id);
                         });
+                        console.log("productsData", productsData)
                         dispatch(setProducts({ products: productsData }));
                         dispatch(setTotalProducts({ totalProducts: response.data.data.totalProducts }));
                         dispatch(setMaxPrice({ maxPrice: response.data.data.maxPrice }));
@@ -264,6 +265,9 @@ const Header = (props) => {
                         dispatch(setLoading({ loading: false }));
                     }, 300);
                 });
+                // getCategories(catSelectedOption.value);
+                // let url = '/product-listing?cat=' + catSelectedOption.value + '&search=' + searchOption
+                // history.push(url);
             } else {
                 let selectedCat = catSelectedOption.value === '' ? [] : [catSelectedOption.value];
                 reqBody.category_filter = selectedCat;
@@ -271,10 +275,10 @@ const Header = (props) => {
                 reqBody.count = { start: 0, limit: 9 };
                 dispatch(setServiceReqBody({ reqBody: reqBody }));
             }
-
             getCategories(catSelectedOption.value);
             let url = '/product-listing?cat=' + catSelectedOption.value + '&search=' + searchOption
             history.push(url);
+
         } else {
             let reqBody = { ...serviceReqBody };
             if (selectedCategory.value !== catSelectedOption.value) {
@@ -320,10 +324,10 @@ const Header = (props) => {
                             });
                             ids.push(service.id);
                         });
+                        console.log("service data", servicesData)
                         dispatch(setServices({ services: servicesData }));
                         dispatch(setTotalServices({ totalServices: response.data.data.totalServices }));
                         dispatch(setServiceMaxPrice({ maxPrice: response.data.data.maxPrice }));
-
                         getBrands(dispatch);
                         getColors(dispatch);
                     }
@@ -336,6 +340,9 @@ const Header = (props) => {
                         dispatch(setLoading({ loading: false }));
                     }, 300);
                 });
+                // getCategories(catSelectedOption.value);
+                // let url = '/service-listing?cat=' + catSelectedOption.value + '&search=' + searchOption
+                // history.push(url);
             } else {
                 let selectedCat = catSelectedOption.value === '' ? [] : [catSelectedOption.value];
                 reqBody.category_filter = selectedCat;
@@ -343,7 +350,6 @@ const Header = (props) => {
                 reqBody.count = { start: 0, limit: 9 };
                 dispatch(setServiceReqBody({ reqBody: reqBody }));
             }
-
             getCategories(catSelectedOption.value);
             let url = '/service-listing?cat=' + catSelectedOption.value + '&search=' + searchOption
             history.push(url);
@@ -539,7 +545,6 @@ const Header = (props) => {
                                                             onChange={handleCatChange}
                                                             placeholder={<div>Select</div>}
                                                         />
-
                                                         <input className="form-control border-start height-auto" type="search" placeholder={isService === 0 ? "Search Product..." : "Search Service..."} value={searchOption} onChange={handleSearchInput} />
                                                         <button className="btn btn_dark" type="button" onClick={handleSearch}>Search</button>
                                                     </form>
@@ -549,7 +554,7 @@ const Header = (props) => {
                                                     </div>
                                                 </div>
 
-                                                <ul className="navbar-nav justify-content-end flex-grow-1 pe-0">
+                                                {/* <ul className="navbar-nav justify-content-end flex-grow-1 pe-0">
                                                     {data && data.length ?
                                                         data.map((value, index) => {
                                                             let url = `product-listing?cat=${value._id}`;
@@ -557,6 +562,24 @@ const Header = (props) => {
                                                                 <Link className="nav-link dropdown-toggle" to={url} id="offcanvasNavbarDropdown" aria-expanded="false">{value.name}</Link>
                                                                 {subCategories(value['_id'], value.subCategories)}
                                                             </li>
+                                                        }) : ''
+                                                    }
+                                                </ul> */}
+
+                                                <ul className="navbar-nav justify-content-end flex-grow-1 pe-0">
+                                                    {data && data.length ?
+                                                        data.map((value, index) => {
+                                                            if (isService === 0) {
+                                                                return <li className="nav-item dropdown" key={index}>
+                                                                    <Link className="nav-link dropdown-toggle" to={`product-listing?cat=${value._id}`} id="offcanvasNavbarDropdown" aria-expanded="false">{value.name}</Link>
+                                                                    {subCategories(value['_id'], value.subCategories)}
+                                                                </li>
+                                                            } else {
+                                                                return <li className="nav-item dropdown" key={index}>
+                                                                    <Link className="nav-link dropdown-toggle" to={`service-listing?cat=${value._id}`} id="offcanvasNavbarDropdown" aria-expanded="false">{value.name}</Link>
+                                                                    {subCategories(value['_id'], value.subCategories)}
+                                                                </li>
+                                                            }
                                                         }) : ''
                                                     }
                                                 </ul>

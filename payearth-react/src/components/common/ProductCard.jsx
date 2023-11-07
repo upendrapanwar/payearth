@@ -10,12 +10,12 @@ import { toast } from 'react-toastify';
 import { setLoading, setIsLoginModalOpen } from '../../store/reducers/global-reducer';
 import { setSelectedWishItems } from '../../store/reducers/wishlist-reducer';
 
-const ProductCard = ({data, inWishList}) => {
+const ProductCard = ({ data, inWishList }) => {
     const dispatch = useDispatch();
     const authInfo = useSelector(state => state.auth.authInfo);
     const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
     const addToWishlist = productId => {
-        
+
         if (isLoggedIn) {
             let reqBody = {
                 user_id: authInfo.id,
@@ -29,27 +29,27 @@ const ProductCard = ({data, inWishList}) => {
                     'Authorization': `Bearer ${authInfo.token}`
                 }
             }).then(response => {
-                
+
                 if (response.data.status) {
                     selectedWishItemsCopy.push(response.data.data.productId);
                     localStorage.setItem('selectedWishItems', JSON.stringify(selectedWishItemsCopy));
-                    dispatch(setSelectedWishItems({selectedWishItems: selectedWishItemsCopy}));
+                    dispatch(setSelectedWishItems({ selectedWishItems: selectedWishItemsCopy }));
                     toast.dismiss();
                     toast.success(response.data.message);
                 }
             }).catch(error => {
-                
-                if(error.response && error.response.data.status === false) {
+
+                if (error.response && error.response.data.status === false) {
                     toast.error(error.response.data.message);
                 }
             }).finally(() => {
-                
+
                 setTimeout(() => {
-                    dispatch(setLoading({loading: false}));
+                    dispatch(setLoading({ loading: false }));
                 }, 300);
             });
         } else {
-            dispatch(setIsLoginModalOpen({isLoginModalOpen: true}));
+            dispatch(setIsLoginModalOpen({ isLoginModalOpen: true }));
         }
     }
 
@@ -70,28 +70,28 @@ const ProductCard = ({data, inWishList}) => {
             if (response.data.status) {
                 let filteredArray = selectedWishItemsCopy.filter(item => item !== productId);
                 localStorage.setItem('selectedWishItems', JSON.stringify(filteredArray));
-                dispatch(setSelectedWishItems({selectedWishItems: filteredArray}));
+                dispatch(setSelectedWishItems({ selectedWishItems: filteredArray }));
                 toast.success(response.data.message);
             }
         }).catch(error => {
-            if(error.response && error.response.data.status === false) {
+            if (error.response && error.response.data.status === false) {
                 toast.error(error.response.data.message);
             }
         }).finally(() => {
             setTimeout(() => {
-                dispatch(setLoading({loading: false}));
+                dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
 
-    return(
+    return (
         <div className="prod_card">
             <div className="img_wrapper">
                 {data.isService === true ?
                     <div className="ep_tag shadow">
                         <span>EP: {data.videoCount}</span>
                     </div>
-                : ''}
+                    : ''}
 
                 <div className="btns_wrapper">
                     <div className="share_option shadow">
@@ -114,36 +114,36 @@ const ProductCard = ({data, inWishList}) => {
                         <p className="product_name"><Link to={data.isService === false ? `/product-detail/${data.id}` : `/service-detail/${data.id}`}>{data.name}</Link></p>
                     </div>
                     <div className="priceData">
-                        { data.cryptoPrices && data.cryptoPrices.length > 0 ?
+                        {data.cryptoPrices && data.cryptoPrices.length > 0 ?
                             data.cryptoPrices.map((val, index) => {
-                                let crypPrice =  data.price / val.cryptoPriceUSD;
+                                let crypPrice = data.price / val.cryptoPriceUSD;
                                 crypPrice = crypPrice.toFixed(5);
                                 return <p className="price crypto" key={index} > {crypPrice} {val.code}</p>
                             })
-                        : ""}
+                            : ""}
 
                         <p className="price">{data.price} USD</p>
                     </div>
                 </div>
                 {data.quantity && data.quantity.stock_qty !== 0 ?
                     <div className="prod_foot">
-                        <Link className="btn custom_btn btn_yellow" 
-                        //to={data.isService === false ? `/product-detail/${data.id}` : `/service-detail/${data.id}
-                        //`}
-                        to={ `/my-cart` } 
-                        onClick={() => 
-          dispatch(addToCart({
-            id:data.id, name:data.name, image: data.image, price:data.price, quantity:1
-          }))
-        }>Buy Now</Link>
-                        <Link className="btn custom_btn btn_yellow_bordered" to="#" onClick={() => 
-          dispatch(addToCart({
-            id:data.id, name:data.name, image: data.image, price:data.price
-          }))
-        }>Add to cart</Link>
-                        
+                        <Link className="btn custom_btn btn_yellow"
+                            //to={data.isService === false ? `/product-detail/${data.id}` : `/service-detail/${data.id}
+                            //`}
+                            to={`/my-cart`}
+                            onClick={() =>
+                                dispatch(addToCart({
+                                    id: data.id, name: data.name, image: data.image, price: data.price, quantity: 1
+                                }))
+                            }>Buy Now</Link>
+                        <Link className="btn custom_btn btn_yellow_bordered" to="#" onClick={() =>
+                            dispatch(addToCart({
+                                id: data.id, name: data.name, image: data.image, price: data.price
+                            }))
+                        }>Add to cart</Link>
+
                     </div>
-                : <h5 className="text-danger text-center">Out of stock</h5>}
+                    : <h5 className="text-danger text-center">Out of stock</h5>}
             </div>
         </div>
     )

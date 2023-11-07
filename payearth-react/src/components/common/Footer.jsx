@@ -66,7 +66,7 @@ const Footer = () => {
                     <div className="col-xs-12 col-md-4 col-lg-3">
                         <h6 className="h6 title">Categories</h6>
                         <ul className="links-list">
-                            <li><Link to="#">Clothing & accessories</Link></li>
+                            <li><Link to="/product-listing?cat=60535b192565091ce443d53f&search=undefined">Clothing & accessories</Link></li>
                             <li><Link to="#">Electronics</Link></li>
                             <li><Link to="#">Mobile Phones & Accessories</Link></li>
                             <li><Link to="#">Books and CDS</Link></li>

@@ -21,7 +21,7 @@ class ProductListing extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            reqBody: JSON.parse(JSON.stringify({...store.getState().product.reqBody})),
+            reqBody: JSON.parse(JSON.stringify({ ...store.getState().product.reqBody })),
             products: [],
             loading: false,
             maxPrice: 0,
@@ -29,31 +29,31 @@ class ProductListing extends Component {
     }
 
     componentDidMount() {
-        const {dispatch} = this.props;
-        let reqBody = {...this.state.reqBody};
+        const { dispatch } = this.props;
+        let reqBody = { ...this.state.reqBody };
         // let catId = /cat=([^&]+)/.exec(location.search) !== null ? /cat=([^&]+)/.exec(location.search)[1] : '';
         // let subCatId = /subcat=([^&]+)/.exec(location.search) !== null ? /subcat=([^&]+)/.exec(location.search)[1] : '';
 
         reqBody = readUrl(dispatch, reqBody, window.location, setReqBody, 'product-listing');
 
         this.setState(
-            {reqBody},
+            { reqBody },
             () => this.getProducts('didMount')
         );
     }
 
     getProducts = param => {
-        const {dispatch} = this.props;
-        let reqBody = JSON.parse(JSON.stringify({...store.getState().product.reqBody}));
+        const { dispatch } = this.props;
+        let reqBody = JSON.parse(JSON.stringify({ ...store.getState().product.reqBody }));
         let productsData = [];
 
         if (param === 'didMount') {
             reqBody = this.state.reqBody;
-        } else if(param === 'viewMore') {
+        } else if (param === 'viewMore') {
             reqBody.count.limit = reqBody.count.limit + 9;
         }
 
-        dispatch(setLoading({loading: true}));
+        dispatch(setLoading({ loading: true }));
         axios.post('front/product/listing', reqBody).then((response) => {
             if (response.data.status) {
                 let res = response.data.data.products;
@@ -66,40 +66,41 @@ class ProductListing extends Component {
                         price: product.price,
                         avgRating: product.avgRating,
                         quantity: product.quantity,
-                        cryptoPrices:product.cryptoPrices
+                        cryptoPrices: product.cryptoPrices
                     });
                 });
             }
-            this.setState({products: productsData});
-            dispatch(setReqBody({reqBody}));
-            dispatch(setProducts({products: productsData}));
-            dispatch(setTotalProducts({totalProducts: response.data.data.totalProducts}));
-            this.setState({maxPrice: response.data.data.maxPrice});
-            dispatch(setMaxPrice({maxPrice: response.data.data.maxPrice}));
+            console.log("productsData", productsData)
+            this.setState({ products: productsData });
+            dispatch(setReqBody({ reqBody }));
+            dispatch(setProducts({ products: productsData }));
+            dispatch(setTotalProducts({ totalProducts: response.data.data.totalProducts }));
+            this.setState({ maxPrice: response.data.data.maxPrice });
+            dispatch(setMaxPrice({ maxPrice: response.data.data.maxPrice }));
 
             if (param === 'didMount' || param === 'viewMore') {
                 getBrands(dispatch);
                 getColors(dispatch);
             }
         }).catch(error => {
-            if(error.response && error.response.data.status === false) {
-                dispatch(setProducts({products: productsData}));
+            if (error.response && error.response.data.status === false) {
+                dispatch(setProducts({ products: productsData }));
             }
         }).finally(() => {
             setTimeout(() => {
-                dispatch(setLoading({loading: false}));
+                dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
 
     render() {
-        const {loading} = store.getState().global;
-        const {products, totalProducts, categories} = store.getState().product;
-        const {selectedWishItems} = store.getState().wishlist;
+        const { loading } = store.getState().global;
+        const { products, totalProducts, categories } = store.getState().product;
+        const { selectedWishItems } = store.getState().wishlist;
 
         return (
             <React.Fragment>
-                { loading === true ? <SpinnerLoader /> : '' }
+                {loading === true ? <SpinnerLoader /> : ''}
                 <Header pageName="product-listing" reqBody={this.state.reqBody} />
                 <PageTitle title={store.getState().catSearch.selectedCategory.label} />
 
@@ -117,24 +118,24 @@ class ProductListing extends Component {
                                 </div>
                                 <div className="row">
                                     <div className="col-sm-12">
-                                        { products.length === 0 ? <NotFound msg="Product not found." /> : '' }
+                                        {products.length === 0 ? <NotFound msg="Product not found." /> : ''}
                                         <div className="cards_wrapper">
                                             {
                                                 products.map((product, index) => {
                                                     return <ProductCard
-                                                                data={product}
-                                                                key={index}
-                                                                inWishList={selectedWishItems.length !== 0 && selectedWishItems.includes(product.id) ? true : false}
-                                                            />
+                                                        data={product}
+                                                        key={index}
+                                                        inWishList={selectedWishItems.length !== 0 && selectedWishItems.includes(product.id) ? true : false}
+                                                    />
                                                 })
                                             }
                                         </div>
                                     </div>
                                     {
                                         products.length !== 0 && products.length < totalProducts ?
-                                        <div className="col-md-12 more_pord_load_btn">
-                                            <button type="button" onClick={() => this.getProducts('viewMore')} className="view_more">View More</button>
-                                        </div> : ''
+                                            <div className="col-md-12 more_pord_load_btn">
+                                                <button type="button" onClick={() => this.getProducts('viewMore')} className="view_more">View More</button>
+                                            </div> : ''
                                     }
                                 </div>
                             </div>
@@ -142,10 +143,10 @@ class ProductListing extends Component {
                     </div>
                 </section>
                 <Footer />
-                <GoToTop/>
+                <GoToTop />
             </React.Fragment>
         );
     }
 }
 
-export default connect(setProducts) (ProductListing);
+export default connect(setProducts)(ProductListing);

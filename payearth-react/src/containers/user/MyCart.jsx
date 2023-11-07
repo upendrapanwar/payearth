@@ -26,7 +26,6 @@ class MyCart extends Component {
                     limit: 5
                 }
             },
-
         };
 
         toast.configure();
