@@ -148,6 +148,7 @@ const Header = (props) => {
 
     const handleCatChange = selectedOption => setCatSelectedOption(selectedOption);
     const handleSearchInput = event => setSearchOption(event.target.value);
+
     const handleIsService = event => {
         dispatch(setIsService({ isService: parseInt(event.target.value) }));
         if (isToggle === false) {
@@ -249,7 +250,7 @@ const Header = (props) => {
                             });
                             ids.push(product.id);
                         });
-                        console.log("productsData", productsData)
+                        // console.log("productsData", productsData)
                         dispatch(setProducts({ products: productsData }));
                         dispatch(setTotalProducts({ totalProducts: response.data.data.totalProducts }));
                         dispatch(setMaxPrice({ maxPrice: response.data.data.maxPrice }));
@@ -324,7 +325,7 @@ const Header = (props) => {
                             });
                             ids.push(service.id);
                         });
-                        console.log("service data", servicesData)
+                        // console.log("service data", servicesData)
                         dispatch(setServices({ services: servicesData }));
                         dispatch(setTotalServices({ totalServices: response.data.data.totalServices }));
                         dispatch(setServiceMaxPrice({ maxPrice: response.data.data.maxPrice }));
@@ -340,6 +341,7 @@ const Header = (props) => {
                         dispatch(setLoading({ loading: false }));
                     }, 300);
                 });
+
                 // getCategories(catSelectedOption.value);
                 // let url = '/service-listing?cat=' + catSelectedOption.value + '&search=' + searchOption
                 // history.push(url);
@@ -350,9 +352,9 @@ const Header = (props) => {
                 reqBody.count = { start: 0, limit: 9 };
                 dispatch(setServiceReqBody({ reqBody: reqBody }));
             }
-            getCategories(catSelectedOption.value);
-            let url = '/service-listing?cat=' + catSelectedOption.value + '&search=' + searchOption
-            history.push(url);
+            // getCategories(catSelectedOption.value);
+            // let url = '/service-listing?cat=' + catSelectedOption.value + '&search=' + searchOption
+            // history.push(url);
         }
     }
 
@@ -550,7 +552,9 @@ const Header = (props) => {
                                                     </form>
                                                     <div className="btn-group" role="group" aria-label="Basic example">
                                                         <button type="button" value="0" className={isService === 0 ? "btn custom_btn active" : "btn custom_btn"} onClick={handleIsService} >Products</button>
-                                                        <button type="button" value="1" className={isService === 1 ? "btn custom_btn active" : "btn custom_btn"} onClick={handleIsService} >Services</button>
+                                                        <button type="button" value="1" className={isService === 1 ? "btn custom_btn active" : "btn custom_btn"}
+                                                            onClick={handleIsService}
+                                                        >Services</button>
                                                     </div>
                                                 </div>
 
@@ -576,7 +580,8 @@ const Header = (props) => {
                                                                 </li>
                                                             } else {
                                                                 return <li className="nav-item dropdown" key={index}>
-                                                                    <Link className="nav-link dropdown-toggle" to={`service-listing?cat=${value._id}`} id="offcanvasNavbarDropdown" aria-expanded="false">{value.name}</Link>
+                                                                    {/* `service-listing?cat=${value._id}` */}
+                                                                    <Link className="nav-link dropdown-toggle" to="#" id="offcanvasNavbarDropdown" aria-expanded="false">{value.name}</Link>
                                                                     {subCategories(value['_id'], value.subCategories)}
                                                                 </li>
                                                             }
