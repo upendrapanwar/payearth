@@ -52,6 +52,13 @@ const ProductCard = ({ data, inWishList }) => {
             dispatch(setIsLoginModalOpen({ isLoginModalOpen: true }));
         }
     }
+    const openmodalHandler = () => {
+        toast.error("Buyer login failed....");
+        setTimeout(() => {
+            dispatch(setIsLoginModalOpen({ isLoginModalOpen: true }));
+            document.body.style.overflow = 'hidden';
+        }, 2000);
+    }
 
     const removeToWishlist = productId => {
         let reqBody = {
@@ -125,25 +132,68 @@ const ProductCard = ({ data, inWishList }) => {
                         <p className="price">{data.price} USD</p>
                     </div>
                 </div>
+                {/* {console.log("data", data.id)} */}
                 {data.quantity && data.quantity.stock_qty !== 0 ?
                     <div className="prod_foot">
-                        <Link className="btn custom_btn btn_yellow"
+                        {isLoggedIn ? <>
+                            <Link className="btn custom_btn btn_yellow"
+                                //to={data.isService === false ? `/product-detail/${data.id}` : `/service-detail/${data.id}
+                                //`}
+                                to={`/my-cart`}
+                                onClick={() => dispatch(addToCart({ id: data.id, name: data.name, image: data.image, price: data.price, quantity: 1 }))}>
+                                Buy Now
+                            </Link>
+
+                            <Link className="btn custom_btn btn_yellow_bordered" to="#"
+                                onClick={() => dispatch(addToCart({ id: data.id, name: data.name, image: data.image, price: data.price }))}
+                            >
+                                Add to cart
+                            </Link>
+                        </>
+                            :
+                            <>
+                                <Link className="btn custom_btn btn_yellow" to="#"
+                                    onClick={openmodalHandler}
+                                // onClick={() =>
+                                //     dispatch(addToCart({
+                                //         id: data.id, name: data.name, image: data.image, price: data.price
+                                //     }))
+                                // }
+                                >
+                                    Buy Now
+                                </Link>
+                                <Link className="btn custom_btn btn_yellow_bordered" to="#"
+                                    onClick={openmodalHandler}
+                                // onClick={() =>
+                                //     dispatch(addToCart({
+                                //         id: data.id, name: data.name, image: data.image, price: data.price
+                                //     }))
+                                // }
+                                >
+                                    Add to cart
+                                </Link>
+                            </>}
+                        {/* <Link className="btn custom_btn btn_yellow"
                             //to={data.isService === false ? `/product-detail/${data.id}` : `/service-detail/${data.id}
                             //`}
                             to={`/my-cart`}
-                            onClick={() =>
-                                dispatch(addToCart({
-                                    id: data.id, name: data.name, image: data.image, price: data.price, quantity: 1
-                                }))
-                            }>Buy Now</Link>
+                            onClick={() => dispatch(addToCart({ id: data.id, name: data.name, image: data.image, price: data.price, quantity: 1 }))}>
+                            Buy Now
+                        </Link>
+
                         <Link className="btn custom_btn btn_yellow_bordered" to="#" onClick={() =>
                             dispatch(addToCart({
                                 id: data.id, name: data.name, image: data.image, price: data.price
                             }))
-                        }>Add to cart</Link>
-
+                        }>
+                            Add to cart
+                        </Link> */}
                     </div>
-                    : <h5 className="text-danger text-center">Out of stock</h5>}
+                    :
+                    <h5 className="text-danger text-center">
+                        Out of stock
+                    </h5>
+                }
             </div>
         </div>
     )

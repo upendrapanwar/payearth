@@ -23,7 +23,7 @@ const RecentSearch = () => {
                         price: product.productId.price,
                         isService: product.productId.isService,
                         quantity: product.productId.quantity,
-                        cryptoPrices:product.productId.cryptoPrices
+                        cryptoPrices: product.productId.cryptoPrices
                     });
                 });
                 setProducts(productsData);
@@ -36,18 +36,18 @@ const RecentSearch = () => {
         });
     }, []);
 
-    return(
+    return (
         <section className="recent_search_sec">
             <div className="container">
                 <div className="row gy-4">
                     <div className="col-sm-12">
-                        { products && products.length ? <SectionTitle title="Recent Search" viewMore={true} route="#" /> : '' }
+                        {products && products.length ? <SectionTitle title="Recent Search" viewMore={true} route="#" /> : ''}
                     </div>
                     {
                         products && products.length ? products.map((product, index) => {
                             return <div className="col-xs-12 col-md-6 col-lg-4" key={index}>
-                                        <ProductCardHr data={product} />
-                                    </div>
+                                <ProductCardHr data={product} />
+                            </div>
                         }) : ''
                     }
                 </div>

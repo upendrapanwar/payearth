@@ -27,7 +27,7 @@ const PopularProducts = () => {
                         avgRating: product.productId.avgRating,
                         isService: product.productId.isService,
                         quantity: product.productId.quantity,
-                        cryptoPrices:product.productId.cryptoPrices
+                        cryptoPrices: product.productId.cryptoPrices
                     });
                 });
                 setProducts(productsData);
@@ -39,28 +39,28 @@ const PopularProducts = () => {
         });
     }, []);
 
-    return(
+    return (
         <section className="popular_products_sec">
             <div className="container">
                 <div className="row">
                     <div className="col-sm-12">
-                        {products && products.length ? <SectionTitle title="Popular Products" viewMore={false} /> : '' }
+                        {products && products.length ? <SectionTitle title="Popular Products" viewMore={false} /> : ''}
                         <div className="cards_wrapper">
                             {products && products.length ?
                                 products.map((product, index) => {
                                     return <ProductCard
-                                                data={product}
-                                                key={index}
-                                                inWishList={selectedWishItems.length !== 0 && selectedWishItems.includes(product.id) ? true : false}
-                                            />
+                                        data={product}
+                                        key={index}
+                                        inWishList={selectedWishItems.length !== 0 && selectedWishItems.includes(product.id) ? true : false}
+                                    />
                                 })
-                            : ''}
+                                : ''}
                         </div>
                         {products && products.length ?
                             <div className="text-center">
                                 <Link to="#" className="view_more float-none">View More</Link>
                             </div>
-                        : ''}
+                            : ''}
                     </div>
                 </div>
             </div>
