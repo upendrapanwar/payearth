@@ -8,7 +8,7 @@ const bcrypt = require("bcryptjs");
 const nodemailer = require('nodemailer');
 const msg = require('../helpers/messages.json');
 const Webhook = require('coinbase-commerce-node').Webhook;
-const { User, Seller, Coupon, Product, Wishlist, UserCoupon, Review, ProductComplaint, Order, OrderStatus, OrderTrackingTimeline, OrderCancel, OrderReturn, Payment, CryptoConversion, Savelater, Cart, OrderDetails } = require("../helpers/db");
+const { User, Seller, Coupon, Product, Wishlist, UserCoupon, Review, ProductComplaint, Order, OrderStatus, OrderTrackingTimeline, OrderCancel, OrderReturn, Payment, CryptoConversion, Savelater, Cart, OrderDetails, bannerAdvertisement } = require("../helpers/db");
 
 module.exports = {
     authenticate,
@@ -24,7 +24,7 @@ module.exports = {
     getWishList,
     deleteWishlist,
     getSaveLaterList,
-    removeProductFromWishlist, 
+    removeProductFromWishlist,
     removeProductFromSavelater,
     getMyCoupons,
     getNewCoupons,
@@ -55,7 +55,12 @@ module.exports = {
     savepaymentdata,
     saveOrdertrackingTime,
     updateOrderStatus,
-    saveorderdetails
+    saveorderdetails,
+    createUserBanner,
+    getBannersByUserId,
+    deleteBanner,
+    getBannerById,
+    updateBanner
 };
 
 function sendMail(mailOptions) {
@@ -384,7 +389,7 @@ async function getById(id) {
 
 async function getUserByRole(param) {
     //console.log(param.id.payload.id)
-    
+
     //const user = await User.findOne({ _id: param.id, role: param.role });
     const user = await User.findOne({ _id: param.id.payload.id, role: param.role });
     if (!user) return false;
@@ -689,7 +694,7 @@ function rawBody(req, res, next) {
 async function checkPayment(request, response) {
     var event;
     const webhookSecret = '35b12217-47b7-4b0d-aa4d-d48f0c56fc2e';
-   
+
     rawBody()
     try {
         event = Webhook.verifyEventBody(
@@ -843,32 +848,32 @@ async function saveOrder(req) {
         const param = req.body;
 
         let input = {
-            userId:                param.userId,
-            productId:             param.productId,
-            paymentId:             param.paymentId,
-            sellerId:              param.sellerId,
-            price:                 param.price, 
-            product_sku:           param.product_sku,
-            billingFirstName:      param.billingFirstName,
-            billingLastName:       param.billingLastName,
-            billingCompanyName:    param.billingCompanyName,
-            billingCounty:         param.billingCounty,
-            billingStreetAddress:  param.billingStreetAddress,
+            userId: param.userId,
+            productId: param.productId,
+            paymentId: param.paymentId,
+            sellerId: param.sellerId,
+            price: param.price,
+            product_sku: param.product_sku,
+            billingFirstName: param.billingFirstName,
+            billingLastName: param.billingLastName,
+            billingCompanyName: param.billingCompanyName,
+            billingCounty: param.billingCounty,
+            billingStreetAddress: param.billingStreetAddress,
             billingStreetAddress1: param.billingStreetAddress1,
-            billingCity:           param.billingCity,
-            billingCountry:        param.billingCountry,
-            billingPostCode:       param.billingPostCode,
-            billingPhone:          param.billingPhone,
-            billingEmail:          param.billingEmail,
-            billingNote:           param.billingNote,
-            deliveryCharge:        param.deliveryCharge,
-            taxPercent:            param.taxPercent,
-            taxAmount:             param.taxAmount,
-            discount:              param.discount, 
-            total:                 param.total,
-            orderStatus:           param.orderStatus,
-            isActive:              param.isActive,
-            isService:             param.isService
+            billingCity: param.billingCity,
+            billingCountry: param.billingCountry,
+            billingPostCode: param.billingPostCode,
+            billingPhone: param.billingPhone,
+            billingEmail: param.billingEmail,
+            billingNote: param.billingNote,
+            deliveryCharge: param.deliveryCharge,
+            taxPercent: param.taxPercent,
+            taxAmount: param.taxAmount,
+            discount: param.discount,
+            total: param.total,
+            orderStatus: param.orderStatus,
+            isActive: param.isActive,
+            isService: param.isService
         };
 
         const orderItem = new Order(input);
@@ -1057,7 +1062,7 @@ async function getOrders(req) {
 async function getOrderStatus() {
     try {
         const result = await OrderStatus.find({ isActive: true })
-        .sort({ createdAt: 'desc' });
+            .sort({ createdAt: 'desc' });
         if (result && result.length > 0) return result;
         return false;
     } catch (err) {
@@ -1069,7 +1074,7 @@ async function getOrderStatus() {
 async function getOrderTrackingTime() {
     try {
         const result = await OrderTrackingTimeline.find({ isActive: true })
-        .sort({ createdAt: 'desc' });
+            .sort({ createdAt: 'desc' });
         if (result && result.length > 0) return result;
         return false;
     } catch (err) {
@@ -1213,20 +1218,20 @@ async function getUserOrderById(id) {
 async function getOrderDataById(req) {
     try {
         let result = await Order.findById(req).select('orderCode product_sku price paymentId sellerId billingFirstName billingLastName billingCompanyName billingCounty billingStreetAddress billingStreetAddress1 billingCity billingCountry billingPostCode billingPhone billingEmail billingNote deliveryCharge taxPercent taxAmount discount orderStatus productId userId createdId')
-        .populate({
-            path: 'productId.productId',
-            model: Product,
-            select: ('productId name')
-        })
-        .populate({
-            path: 'orderStatus',
-            Model: OrderTrackingTimeline,
-            populate:({
-                path: 'orderStatusId',
-                model: OrderStatus,
-                select: 'lname'
+            .populate({
+                path: 'productId.productId',
+                model: Product,
+                select: ('productId name')
             })
-        })
+            .populate({
+                path: 'orderStatus',
+                Model: OrderTrackingTimeline,
+                populate: ({
+                    path: 'orderStatusId',
+                    model: OrderStatus,
+                    select: 'lname'
+                })
+            })
         if (result) {
             return result;
         } else {
@@ -1240,29 +1245,29 @@ async function getOrderDataById(req) {
 
 async function getOrderDetails(id) {
     try {
-        let result = await OrderDetails.find({userId: id})
-        .select('orderId productId quantity price userId sellerId createdAt')
-        .populate({
-            path:'orderId',
-            model: Order,
-            select:'orderCode billingFirstName billingLastName billingCompanyName billingCounty billingStreetAddress billingStreetAddress1 billingCity billingCountry billingPostCode billingPhone billingEmail billingNote deliveryCharge taxPercent taxAmount discount',
-            populate:({
-                path:'orderStatus',
-                model: OrderTrackingTimeline,
-                populate:({
-                    path:'orderStatusId',
-                    model:OrderStatus,
-                    select:'title'
-                })
+        let result = await OrderDetails.find({ userId: id })
+            .select('orderId productId quantity price userId sellerId createdAt')
+            .populate({
+                path: 'orderId',
+                model: Order,
+                select: 'orderCode billingFirstName billingLastName billingCompanyName billingCounty billingStreetAddress billingStreetAddress1 billingCity billingCountry billingPostCode billingPhone billingEmail billingNote deliveryCharge taxPercent taxAmount discount',
+                populate: ({
+                    path: 'orderStatus',
+                    model: OrderTrackingTimeline,
+                    populate: ({
+                        path: 'orderStatusId',
+                        model: OrderStatus,
+                        select: 'title'
+                    })
 
+                })
             })
-        })
-        .populate({
-            path: 'productId',
-            model: Product,
-            select: ('name')
-        })
-        
+            .populate({
+                path: 'productId',
+                model: Product,
+                select: ('name')
+            })
+
         if (result) {
             return result;
         } else {
@@ -1280,10 +1285,10 @@ async function getOrderDetails(id) {
             .select('orderCode price paymentId billingFirstName billingLastName billingCompanyName billingCounty billingStreetAddress billingStreetAddress1 billingCity billingCountry billingPostCode billingPhone billingEmail billingNote deliveryCharge taxPercent taxAmount discount orderStatus total createdAt')
             .populate([
                 {
-                        path: 'orderStatus',
-                        model: OrderStatus,
-                        select: 'title'
-                }, 
+                    path: 'orderStatus',
+                    model: OrderStatus,
+                    select: 'title'
+                },
                 {
                     path: 'paymentId',
                     model: Payment,
@@ -1306,7 +1311,7 @@ async function getOrderDetails(id) {
                 model: Seller,
                 select: 'name email phone full_address',
             });
-            
+
 
         // Create a map to associate orderIds with their corresponding product data
         const orderDetailsMap = {};
@@ -1597,18 +1602,18 @@ async function addReturn(req) {
 async function getPaymentsById(id) {
     try {
         const payments = await Payment.find({ userId: id })
-        .select('invoiceNo orderId userId amountPaid paymentMode paymentAccount createdAt')
-        .populate({
-            path: 'orderId',
-            modal: Order,
-            select: 'billingCompanyName deliveryCharge taxAmount discount price'
-        })
-        .populate([{
-            path: 'userId',
-            model: User,
-            select: 'name email'
-        }])
-        
+            .select('invoiceNo orderId userId amountPaid paymentMode paymentAccount createdAt')
+            .populate({
+                path: 'orderId',
+                modal: Order,
+                select: 'billingCompanyName deliveryCharge taxAmount discount price'
+            })
+            .populate([{
+                path: 'userId',
+                model: User,
+                select: 'name email'
+            }])
+
         if (!payments) {
             console.log('User not found');
             return false;
@@ -1621,7 +1626,7 @@ async function getPaymentsById(id) {
     }
 }
 
-    
+
 async function getPayments(req) {
     try {
 
@@ -1712,9 +1717,9 @@ async function getPayments(req) {
  * @returns sellerid|null 
  */
 async function getSellerByProductId(id) {
-    
+
     try {
-        const result = await Product.findOne({_id: id}).select("createdBy").exec();
+        const result = await Product.findOne({ _id: id }).select("createdBy").exec();
         var createBy = result.createdBy;
         if (typeof result.createdBy != 'undefined') {
             return createBy.valueOf();
@@ -1732,22 +1737,22 @@ async function getSellerByProductId(id) {
 async function savepaymentdata(req) {
     try {
         var param = req.body;
-       
+
         let input;
-        param.map( result => {
+        param.map(result => {
             input = {
-                userId:         result.userId,
-                sellerId:       result.sellerId,
-                amountPaid:     result.amountPaid,
-                paymentMode:    result.paymentMode,
+                userId: result.userId,
+                sellerId: result.sellerId,
+                amountPaid: result.amountPaid,
+                paymentMode: result.paymentMode,
                 paymentAccount: result.paymentAccount,
-                invoiceUrl:     result.invoiceUrl,
-                paymentStatus:  result.paymentStatus,
-                isActive:       true
+                invoiceUrl: result.invoiceUrl,
+                paymentStatus: result.paymentStatus,
+                isActive: true
             };
-       });
+        });
         const payment = new Payment(input);
-        
+
         const data = await payment.save();
         if (data) {
             console.log(data._id);
@@ -1756,7 +1761,7 @@ async function savepaymentdata(req) {
             return false;
         }
     } catch (err) {
-        console.log('Error',err);
+        console.log('Error', err);
         return false;
     }
 }
@@ -1765,17 +1770,17 @@ async function savepaymentdata(req) {
 async function saveOrdertrackingTime(req) {
     try {
         var param = req.body;
-       
+
         let input;
         //console.log(param);
         input = {
-            orderId:       param.orderId,
+            orderId: param.orderId,
             orderStatusId: param.orderStatusId,
-            isActive:      true
+            isActive: true
         };
-       
+
         const orderTrackTimeLine = new OrderTrackingTimeline(input);
-        
+
         const data = await orderTrackTimeLine.save();
         if (data) {
             //console.log(data._id);
@@ -1784,7 +1789,7 @@ async function saveOrdertrackingTime(req) {
             return false;
         }
     } catch (err) {
-        console.log('Error',err);
+        console.log('Error', err);
         return false;
     }
 }
@@ -1795,24 +1800,24 @@ async function saveorderdetails(req) {
         var param = req.body;
         const options = { ordered: true };
         let input;
-        
+
         input = {
-            orderId:   param.orderId,
+            orderId: param.orderId,
             productId: param.productId,
-            isActive:  true
+            isActive: true
         };
-        
+
         //const OrderDetails = new OrderDetails();
         //const data = await OrderDetails.save();
         const data = await OrderDetails.insertMany(param, options);
         if (data) {
-            console.log('id=',data);
+            console.log('id=', data);
             return true;
         } else {
             return false;
         }
     } catch (err) {
-        console.log('Error',err);
+        console.log('Error', err);
         return false;
     }
 }
@@ -1822,15 +1827,105 @@ async function saveorderdetails(req) {
 async function updateOrderStatus(req) {
     try {
         var param = req.body;
-        console.log('_id='+param.orderId);
-        console.log('order_status='+param.orderStatus);
+        console.log('_id=' + param.orderId);
+        console.log('order_status=' + param.orderStatus);
         //update in order
         await Order.findOneAndUpdate({ _id: param.orderId }, { orderStatus: param.orderStatus }, { new: true });
         return true;
     } catch (err) {
-        console.log('Error',err);
+        console.log('Error', err);
         return false;
     }
 }
 /************************************************************************************/
 /************************************************************************************/
+
+// POST API CREATE NEW BANNER....................................
+
+async function createUserBanner(req, res) {
+    try {
+        var param = req.body;
+        let input = {
+            image: param.image,
+            imageId: param.imageId,
+            video: param.video,
+            videoId: param.videoId,
+            bannerText: param.bannerText,
+            bannerType: param.bannerType,
+            bannerName: param.bannerName,
+            siteUrl: param.siteUrl,
+            category: param.category,
+            startDate: param.startDate,
+            endDate: param.endDate,
+            subscriptionPlan: param.subscriptionPlan,
+            bannerPlacement: param.bannerPlacement,
+            status: param.status,
+            tag: param.tag,
+            keyword: param.keyword,
+            author: param.author
+        };
+        const banner = new bannerAdvertisement(input);
+        const data = await banner.save();
+        // console.log("RES data", data)
+        if (data) {
+            // console.log(data._id);
+            return data;
+        }
+        return false;
+    } catch (error) {
+        console.log('Error', error);
+    }
+}
+
+
+// GET BANNER DATA BY USER id..........................
+
+async function getBannersByUserId(req) {
+    const userId = req.params.id;
+    // console.log("userID Author", userId)
+    try {
+        const result = await bannerAdvertisement.find({ author: userId }).select().sort({ createdAt: 'desc' });
+        return result
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+// DELETE BANNER 
+
+async function deleteBanner(req) {
+    const bannerId = req.params.id;
+    // console.log("delete banner", bannerId)
+    try {
+        const result = await bannerAdvertisement.deleteOne({ _id: bannerId })
+        return result
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+// ByID
+async function getBannerById(req) {
+    const bannerId = req.params.id;
+    try {
+        const result = await bannerAdvertisement.find({ _id: bannerId })
+        return result
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// Update Page
+async function updateBanner(req) {
+    const bannerId = req.params.id;
+    const { image, video, bannerText, bannerName, bannerType, siteUrl, category, bannerPlacement, startDate } = req.body;
+    try {
+        const banner = await bannerAdvertisement.findByIdAndUpdate(bannerId, { image, video, bannerText, bannerName, bannerType, siteUrl, category, startDate, bannerPlacement }, { new: true });
+      //  console.log("update banner", banner)
+        return banner;
+    } catch (error) {
+        console.log(error)
+    }
+}

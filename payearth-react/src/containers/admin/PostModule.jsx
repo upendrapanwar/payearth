@@ -130,7 +130,7 @@ class AdminPostModule extends Component {
     blogDetails = (slug) => {
         this.props.history.push(`/blog-detail/${slug}`);
     }
-
+ 
     handleRowSelected = (state) => {
         this.setState({ selectedRows: state.selectedRows });
     };
@@ -167,7 +167,6 @@ class AdminPostModule extends Component {
             }
             // window.location.reload(); 
             this.setState({ loading: true })
-
         }
     }
 

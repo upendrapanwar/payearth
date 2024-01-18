@@ -39,4 +39,5 @@ module.exports = {
     cmsPost: require('../models/cmspost.model'),
     cmsPage: require('../models/cmspage.model'),
     cmsCategory: require('../models/cmscategory.model'),
+    bannerAdvertisement: require('../models/banner.model'),
 };

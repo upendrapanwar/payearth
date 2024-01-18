@@ -84,7 +84,11 @@ class Blog extends Component {
     };
 
     render() {
-        const { blogs, currentPage, itemsPerPage, searchQuery, loading, error } = this.state;
+        const { blogs, currentPage, itemsPerPage, searchQuery, 
+            
+            loading, error
+        
+        } = this.state;
         if (loading) {
             return <SpinnerLoader />
         }
@@ -116,13 +120,13 @@ class Blog extends Component {
                             <div className="cart my_cart">
                                 <div className="cl_head">
                                     <div className='blog-search-wrapper'>
-                                        <input type="text" class="form-control" placeholder="Search" value={searchQuery} onChange={this.handleSearch} />
+                                        <input type="text" className="form-control" placeholder="Search" value={searchQuery} onChange={this.handleSearch} />
                                     </div>
                                     <div className="blog_listing_wrapper">
                                         {blogData.map(item =>
-                                            <div className=" col-md-4 blog_item">
-                                                <div className='blog-inner-panel'>
-                                                    {item.image == '' ? <div className='blog-image'>
+                                            <div className=" col-md-4 blog_item" key={item.id}>
+                                                <div className='blog-inner-panel' >
+                                                    {item.image == '' ? <div className='blog-image' >
                                                         <img src={noImg} height={200} width={300} alt="" />
                                                     </div> : <div className='blog-image'>
                                                         <Link to={`/blog-detail/${item.slug}`}>
@@ -130,8 +134,8 @@ class Blog extends Component {
                                                         </Link>
                                                     </div>}
                                                     <div className='blog-list-meta'>
-                                                        <Link to={`/blog-detail/${item.slug}`}><span class="post_cat_col">{item.category}</span></Link>
-                                                        <span class="post_date_col">{item.updatedAt}</span>
+                                                        <Link to={`/blog-detail/${item.slug}`}><span className="post_cat_col">{item.category}</span></Link>
+                                                        <span className="post_date_col">{item.updatedAt}</span>
                                                     </div>
                                                     <div className='blog-info'>
                                                         <Link to={`/blog-detail/${item.slug}`}> <h3 className='blog-headings'>{item.title}</h3></Link>

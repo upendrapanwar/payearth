@@ -612,7 +612,7 @@ function getProductSales(req, res, next) {
         .then(sales => sales ? res.status(200).json({ status: true, data: sales }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
-
+ 
 // CMS..................
 function createCmsPost(req, res, next) {
     adminService.createCmsPost(req)
@@ -646,7 +646,7 @@ function cmsGetByStatus(req, res, next) {
         .then(posts => posts ? res.status(200).json({ status: true, data: posts }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
-
+ 
 // CMS POST..................
 function createCmsPost(req, res, next) {
     adminService.createCmsPost(req)
