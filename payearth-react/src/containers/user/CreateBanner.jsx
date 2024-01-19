@@ -12,6 +12,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import { date } from 'yup';
+import { Check } from '@mui/icons-material';
 
 
 class CreateNewBanner extends Component {
@@ -55,53 +56,68 @@ class CreateNewBanner extends Component {
 
     handleImageChange = (e) => {
         const file = e.target.files[0];
-        const data = new FormData()
-        data.append("file", file)
-        data.append("upload_preset", "pay-earth-images")
-        data.append("cloud_name", "pay-earth")
+        console.log(" image file size", file.size)
+        const fileSize = file.size
+        // 5242880 = 5mb
+        const maxSize = 5242880;
+        if (fileSize <= maxSize) {
+            const data = new FormData()
+            data.append("file", file)
+            data.append("upload_preset", "pay-earth-images")
+            data.append("cloud_name", "pay-earth")
 
-        console.log("dataIMAge", data)
-        // https://api.cloudinary.com/v1_1/pay-earth/video/upload   <= video file example
+            console.log("dataIMAge", data)
+            // https://api.cloudinary.com/v1_1/pay-earth/video/upload   <= video file example
 
-        fetch("https://api.cloudinary.com/v1_1/pay-earth/image/upload", {
-            method: "post",
-            body: data
-        }).then((res) => res.json())
-            .then((data) => {
-                // console.log(data.secure_url);
-                console.log("data.............................................", data)
-                this.setState({ image: data.secure_url })
-                this.setState({ imageId: data.public_id })
+            fetch("https://api.cloudinary.com/v1_1/pay-earth/image/upload", {
+                method: "post",
+                body: data
+            }).then((res) => res.json())
+                .then((data) => {
+                    // console.log(data.secure_url);
+                    console.log("data.............................................", data)
+                    this.setState({ image: data.secure_url })
+                    this.setState({ imageId: data.public_id })
+                }).catch((err) => {
+                    console.log(err)
+                })
+        } else {
+            toast.error("Banner size must be less than 5 MB", { autoClose: 3000 })
+        }
 
-
-
-            }).catch((err) => {
-                console.log(err)
-            })
     };
 
     handleVideoChange = (e) => {
         const file = e.target.files[0];
-        console.log("Video File Size", file.size)
-        const data = new FormData()
-        data.append("file", file)
-        data.append("upload_preset", "pay-earth-images")
-        data.append("cloud_name", "pay-earth")
+        console.log("Video File Size", this.formatBytes(file.size))
+        const fileSize = file.size;
+        console.log("fileSize", file.size)
+        // 11534336 = 11MB 
+        const maxSize = 11534336;
+        if (fileSize <= maxSize) {
+            const data = new FormData()
+            data.append("file", file)
+            data.append("upload_preset", "pay-earth-images")
+            data.append("cloud_name", "pay-earth")
 
-        fetch("https://api.cloudinary.com/v1_1/pay-earth/video/upload", {
-            method: "post",
-            body: data
-        }).then((res) => res.json())
-            .then((data) => {
-                // console.log(data.secure_url);
-                console.log("dataIMAge", data)
-                this.setState({ video: data.secure_url })
-                this.setState({ videoSize: this.formatBytes(file.size) });
-                this.setState({ videoId: data.public_id })
+            fetch("https://api.cloudinary.com/v1_1/pay-earth/video/upload", {
+                method: "post",
+                body: data
+            }).then((res) => res.json())
+                .then((data) => {
+                    // console.log(data.secure_url);
+                    console.log("dataIMAge", data)
+                    this.setState({ video: data.secure_url })
+                    this.setState({ videoSize: this.formatBytes(file.size) });
+                    this.setState({ videoId: data.public_id })
 
-            }).catch((err) => {
-                console.log(err)
-            })
+                }).catch((err) => {
+                    console.log(err)
+                })
+        } else {
+            toast.error("Banner size must be less than 11 MB", { autoClose: 3000 })
+        }
+
     }
     // Function to format file size in a human-readable format
     formatBytes = (bytes) => {
@@ -211,14 +227,21 @@ class CreateNewBanner extends Component {
     }
 
 
-    handleSubscriptionPlan = (e) => {
-        // const selectedText = e.target.options[e.target.selectedIndex].text;
-        // console.log("selected TEXT", selectedText)
-        this.setState({ subscriptionPlan: e.target.value });
-        // this.setState({ card: e.target.value });
+    // handleSubscriptionPlan = (e) => {
+    //     // const selectedText = e.target.options[e.target.selectedIndex].text;
+    //     // console.log("selected TEXT", selectedText)
+    //     this.setState({ subscriptionPlan: e.target.value });
+    //     // this.setState({ card: e.target.value });
 
-        // this.calculateDate();
+    //     // this.calculateDate();
+    // };
+
+
+    handleSubscriptionPlan = (card) => {
+        console.log("card : ", card)
+        this.setState({ subscriptionPlan: card });
     };
+
     handleBannerPlacement = (e) => {
         const selectedText = e.target.options[e.target.selectedIndex].text;
         console.log("selected PLACEMENT", selectedText)
@@ -227,7 +250,7 @@ class CreateNewBanner extends Component {
     handleSave = () => {
         toast.success("Banner Create succesfully..", { autoClose: 3000 })
         this.saveBanner("pending");
-        this.props.history.push('/my-banners')
+        this.props.history.push('/bannerCheckout')
     }
     saveBanner = (status) => {
         const { image, imageId, video, videoId, bannerText, bannerType, bannerName, siteUrl, category, startDate, endDate, subscriptionPlan, bannerPlacement, signaturess, author, tag, keyword } = this.state;
@@ -299,15 +322,15 @@ class CreateNewBanner extends Component {
             // Add more cases as needed
             default:
                 return <div className="card">
-                <div className="card-header">
-                    PLAN B
+                    <div className="card-header">
+                        PLAN B
+                    </div>
+                    <div className="card-body">
+                        <h5 className="card-title">Special title treatment</h5>
+                        <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
+                    </div>
                 </div>
-                <div className="card-body">
-                    <h5 className="card-title">Special title treatment</h5>
-                    <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                    {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
-                </div>
-            </div>
 
         }
 
@@ -328,11 +351,14 @@ class CreateNewBanner extends Component {
                         <label htmlFor="">Upload Banner Video</label>
                         <div className="adv_preview_thumb">
                             <div className="thumbPic">
-                                {!video ? <img src={emptyVid} alt='...' style={{ maxWidth: "30%" }} /> : <div><video src={video} autoPlay loop alt="" /> <p>Size: {videoSize}</p> </div>}
+                                {!video ? <div><img src={emptyVid} alt='...' style={{ maxWidth: "40%" }} /> <p className='text-danger'> Size must be less than 11 MB</p></div> : <div><video src={video} autoPlay loop alt="" /> <p>Size: {videoSize}</p> </div>}
                             </div>
                         </div>
+
                         {!video ? "" :
                             <button
+                                type="button"
+                                className="btn btn-secondary btn-sm"
                                 onClick={this.handleDeleteCloudVideo}
                             >
                                 CLEAR
@@ -354,12 +380,14 @@ class CreateNewBanner extends Component {
                         <label htmlFor="">Upload Banner Image</label>
                         <div className="adv_preview_thumb">
                             <div className="thumbPic">
-                                {!image ? <img src={emptyImg} alt='...' style={{ maxWidth: "30%" }} /> : <img src={image} style={{ height: '50%', width: '100%' }} />}
+                                {!image ? <div><img src={emptyImg} alt='...' style={{ maxWidth: "40%" }} /><p className='text-danger'> Size must be less than 5 MB</p></div> : <img src={image} style={{ height: '50%', width: '100%' }} />}
                                 {/* <img src={nicon} alt="" /> */}
                             </div>
                         </div>
                         {!image ? "" :
                             <button
+                                type="button"
+                                className="btn btn-secondary btn-sm"
                                 onClick={this.handleDeleteCloudImage}
                             >
                                 CLEAR
@@ -432,7 +460,6 @@ class CreateNewBanner extends Component {
                     timestamp: timestamp,
                 },
             });
-
             if (response.status === 200) {
                 console.log('Video deleted successfully');
             } else {
@@ -443,13 +470,12 @@ class CreateNewBanner extends Component {
         }
     }
 
-
-
-
     render() {
-
-
-
+        const subPlan = [
+            { id: 1, title: 'Basic', planPrice: "10", description: 'This is Basic content.' },
+            { id: 2, title: 'Standerd', planPrice: "20", description: 'This is Standerd content.' },
+            { id: 3, title: 'Premium', planPrice: "50", description: 'This is Premium content.' },
+        ];
         return (
             <React.Fragment>
                 <Header />
@@ -608,7 +634,7 @@ class CreateNewBanner extends Component {
                                                         </div>
                                                     </div>
 
-                                                    <div className="crt_bnr_fieldRow">
+                                                    {/* <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
                                                             <div className="field_item">
                                                                 <button
@@ -619,7 +645,7 @@ class CreateNewBanner extends Component {
                                                                 </button>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </div> */}
                                                 </div>
 
 
@@ -632,120 +658,53 @@ class CreateNewBanner extends Component {
                                                                 <option value="image"> IMAGE </option>
                                                                 <option value="video"> VIDEO</option>
                                                             </select>
-                                                            {/* <div className="crt_bnr_fieldRow">
-                                                                <div className="input-group mb-2">
-                                                                    <label className="input-group-text" htmlFor="inputGroupSelect01">Banner <br /> Placement</label>
-                                                                    <select onChange={this.handleBannerPlacement} className="form-select" id="inputGroupSelect01">
-                                                                        <option value="Top-side">Top-side</option>
-                                                                        <option value="Right-side">Right-side</option>
-                                                                        <option value="Bottom-side">Bottom-side</option>
-                                                                        <option value="Left-side">Left-side</option>
-                                                                    </select>
-                                                                </div>
-                                                            </div> */}
                                                         </div>
                                                     </div>
 
                                                     <div>
                                                         {this.selectImageOrVideo()}
                                                     </div>
-
-                                                    <div className="crt_bnr_fieldRow">
-                                                        <div className="input-group mb-3">
-                                                            <label className="input-group-text" htmlFor="inputGroupSelect01">Subscription <br /> Plan</label>
-                                                            <select onChange={this.handleSubscriptionPlan} className="form-select" id="inputGroupSelect01">
-                                                                <option value="1 Month">1 Month</option>
-                                                                <option value="3 Month">3 Month </option>
-                                                                <option value="6 Month">6 Month</option>
-                                                                <option value="12 Month">12 Month</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="crt_bnr_fieldRow">
-                                                        <div>
-                                                            <div>{this.renderCardText()}</div>
-                                                        </div>
-                                                    </div>
-
                                                 </div>
                                                 {/* background-color: aliceblue */}
 
                                                 <div className="col-md-12 bg-body-tertiary">
                                                     <div className="wrapper">
-                                                        <div className="pricing-table group">                                                           
-                                                            <div className="block personal fl">
-                                                                <h2 className="title">personal</h2>
-                                                                <div className="content">
-                                                                    <p className="price">
-                                                                        <sup>$</sup>
-                                                                        <span>29</span>
-                                                                        <sub>/mo.</sub>
-                                                                    </p>
-                                                                    <p className="hint">Perfect for freelancers</p>
-                                                                </div>
-                                                                <ul className="features">
-                                                                    <li><span className="fontawesome-cog"></span>1 WordPress Install</li>
-                                                                    <li><span className="fontawesome-star"></span>25,000 visits/mo.</li>
-                                                                    <li><span className="fontawesome-dashboard"></span>Unlimited Data Transfer</li>
-                                                                    <li><span className="fontawesome-cloud"></span>10GB Local Storage</li>
-                                                                </ul>
-                                                                <button className="btn custom_btn btn_yellow mx-auto">
-                                                                    BUY
-                                                                </button>
-                                                            </div>
-
-                                                            <div className="block professional fl">
-                                                                <h2 className="title">Professional</h2>
-
-                                                                <div className="content">
-                                                                    <p className="price">
-                                                                        <sup>$</sup>
-                                                                        <span>99</span>
-                                                                        <sub>/mo.</sub>
-                                                                    </p>
-                                                                    <p className="hint">Suitable for startups</p>
-                                                                </div>
-
-                                                                <ul className="features">
-                                                                    <li><span className="fontawesome-cog"></span>10 WordPress Install</li>
-                                                                    <li><span className="fontawesome-star"></span>100,000 visits/mo.</li>
-                                                                    <li><span className="fontawesome-dashboard"></span>Unlimited Data Transfer</li>
-                                                                    <li><span className="fontawesome-cloud"></span>20GB Local Storage</li>
-                                                                </ul>
-
-                                                                <button className="btn custom_btn btn_yellow mx-auto">
-                                                                    BUY
-                                                                </button>
-
-                                                            </div>
-
-
-                                                            <div className="block business fl">
-                                                                <h2 className="title">Business</h2>
-
-                                                                <div className="content">
-                                                                    <p className="price">
-                                                                        <sup>$</sup>
-                                                                        <span>249</span>
-                                                                        <sub>/mo.</sub>
-                                                                    </p>
-                                                                    <p className="hint">For established business</p>
-                                                                </div>
-                                                                <ul className="features">
-                                                                    <li><span className="fontawesome-cog"></span>25 WordPress Install</li>
-                                                                    <li><span className="fontawesome-star"></span>400,000 visits/mo.</li>
-                                                                    <li><span className="fontawesome-dashboard"></span>Unlimited Data Transfer</li>
-                                                                    <li><span className="fontawesome-cloud"></span>30GB Local Storage</li>
-                                                                </ul>
-                                                                <button className="btn custom_btn btn_yellow mx-auto">
-                                                                    BUY
-                                                                </button>
-
-                                                            </div>
-
+                                                        <div className="pricing-table group">
+                                                            {subPlan.map((card) => <>
+                                                                <li key={card.id} onClick={() => this.handleSubscriptionPlan(card)}>
+                                                                    <div className="block personal fl" >
+                                                                        <h2 className="title" >{card.title}</h2>
+                                                                        <div className="content">
+                                                                            <p className="price">
+                                                                                <sup>$</sup>
+                                                                                <span>{card.planPrice}</span>
+                                                                                <sub>/mo.</sub>
+                                                                            </p>
+                                                                            <p className="hint">Perfect for freelancers</p>
+                                                                        </div>
+                                                                        <ul className="features">
+                                                                            <li><span className="fontawesome-cog"></span>1 WordPress Install</li>
+                                                                            <li><span className="fontawesome-star"></span>25,000 visits/mo.</li>
+                                                                            <li><span className="fontawesome-dashboard"></span>Unlimited Data Transfer</li>
+                                                                            <li><span className="fontawesome-cloud"></span>10GB Local Storage</li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </li>
+                                                            </>
+                                                            )}
                                                         </div>
-
+                                                    </div>
+                                                    <div className="crt_bnr_fieldRow">
+                                                        <div className="crt_bnr_field">
+                                                            <div className="field_item">
+                                                                <button
+                                                                    className="btn custom_btn btn_yellow mx-auto"
+                                                                    onClick={this.handleSave}
+                                                                >
+                                                                    Create Banner
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                     </div>
 
                                                 </div>

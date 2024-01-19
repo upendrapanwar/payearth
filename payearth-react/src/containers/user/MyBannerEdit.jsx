@@ -464,7 +464,7 @@ class MyBannerEdit extends Component {
                                             <div className="row">
                                                 <div className="col-md-6">
                                                     <div className="crt_bnr_fieldRow">
-                                                        <div className="crt_bnr_field">
+                                                        {/* <div className="crt_bnr_field">
                                                             <label htmlFor="">Type of Banner</label>
                                                             <div className="field_item">
                                                                 <select
@@ -477,7 +477,7 @@ class MyBannerEdit extends Component {
                                                                     <option value="Text Banner">Text Banner</option>
                                                                 </select>
                                                             </div>
-                                                        </div>
+                                                        </div> */}
                                                     </div>
 
                                                     <div className="crt_bnr_fieldRow">
@@ -527,7 +527,7 @@ class MyBannerEdit extends Component {
                                                         </div>
                                                     </div>
 
-                                                    <div className="crt_bnr_fieldRow">
+                                                    {/* <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
                                                             <label htmlFor="">Start Date</label>
                                                             <div className="field_item">
@@ -540,9 +540,9 @@ class MyBannerEdit extends Component {
                                                                 />
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </div> */}
 
-                                                    <div className="crt_bnr_fieldRow">
+                                                    {/* <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
                                                             <label htmlFor="">Plan Valid Upto</label>
                                                             <div className="field_item">
@@ -556,7 +556,7 @@ class MyBannerEdit extends Component {
                                                                 />
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </div> */}
 
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
@@ -608,7 +608,7 @@ class MyBannerEdit extends Component {
                                                         </div>
                                                     </div>
 
-                                                    <div className="crt_bnr_fieldRow">
+                                                    {/* <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
                                                             <div className="field_item">
                                                                 <button
@@ -619,7 +619,7 @@ class MyBannerEdit extends Component {
                                                                 </button>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </div> */}
                                                 </div>
 
 
@@ -639,7 +639,7 @@ class MyBannerEdit extends Component {
                                                                 {/* <option value="image"> Image </option>
                                                                  <option value="video"> Video </option> */}
                                                             </select>
-                                                            <div className="crt_bnr_fieldRow">
+                                                            {/* <div className="crt_bnr_fieldRow">
                                                                 <div className="input-group mb-3">
                                                                     <label className="input-group-text" htmlFor="inputGroupSelect01">Banner <br /> Placement</label>
                                                                     <select
@@ -652,7 +652,7 @@ class MyBannerEdit extends Component {
                                                                         <option value="Left-side">Left-side</option>
                                                                     </select>
                                                                 </div>
-                                                            </div>
+                                                            </div> */}
                                                         </div>
                                                     </div>
                                                     <div>
@@ -668,6 +668,8 @@ class MyBannerEdit extends Component {
 
                                                                     {!video ? "" :
                                                                         <button
+                                                                            type="button"
+                                                                            className="btn btn-secondary btn-sm"
                                                                             onClick={this.handleDeleteCloudVideo}
                                                                         >
                                                                             CLEAR
@@ -695,12 +697,13 @@ class MyBannerEdit extends Component {
                                                                     </div>
                                                                     {!image ? "" :
                                                                         <button
+                                                                            type="button"
+                                                                            className="btn btn-secondary btn-sm"
                                                                             onClick={this.handleDeleteCloudImage}
                                                                         >
                                                                             CLEAR
                                                                         </button>
                                                                     }
-
                                                                     <div className="field_item">
                                                                         <input
                                                                             className="form-control"
@@ -710,98 +713,51 @@ class MyBannerEdit extends Component {
                                                                         />
                                                                     </div>
                                                                 </div>
-                                                            </div>
-
-                                                        }
+                                                            </div>}
                                                     </div>
-
-
-
-
-
-                                                    {/* <div className="crt_bnr_fieldRow">
-                                                        <div className="crt_bnr_field">
-                                                            <label htmlFor="">Upload Banner Image</label>
-                                                            <div className="adv_preview_thumb">
-                                                                <div className="thumbPic">
-                                                                    {!image ? <img src={emptyImg} alt='...' style={{ maxWidth: "50%" }} /> : <img src={image} style={{ maxWidth: "50%" }} />}
-                                                                    
-                                                                </div>
-                                                            </div>
-                                                            {!image ? "" :
-                                                                <button
-                                                                    onClick={this.handleDeleteCloudImage}
-                                                                >
-                                                                    CLEAR
-                                                                </button>
-                                                            }
-
-                                                            <div className="field_item">
-                                                                <input
-                                                                    className="choose_img"
-                                                                    type="file"
-                                                                    accept="image/"
-                                                                    onChange={this.handleImageChange}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div> */}
-
-                                                    {/* <div className="crt_bnr_fieldRow">
-                                                        <div className="crt_bnr_field">
-                                                            <label htmlFor="">Upload Banner Video</label>
-                                                            <div className="adv_preview_thumb">
-                                                                <div className="thumbPic">
-                                                                    {!video ? <img src={emptyImg} alt='...' style={{ maxWidth: "50%" }} /> : <div><video src={video} autoPlay loop alt="" /> <p>Size: {videoSize}</p> </div>}
-                                                                </div>
-                                                            </div>
-
-                                                            {!video ? "" :
-                                                                <button
-                                                                    onClick={this.handleDeleteCloudVideo}
-                                                                >
-                                                                    CLEAR
-                                                                </button>
-                                                            }
-                                                            <div className="field_item">
-                                                                <input
-                                                                    className="choose_video"
-                                                                    type="file"
-                                                                    accept="video/*"
-                                                                    onChange={this.handleVideoChange}
-                                                                />
-                                                            </div>
-
-                                                        </div>
-                                                    </div> */}
-
-                                                    <div className="crt_bnr_fieldRow">
-                                                        <div className="input-group mb-3">
-                                                            <label className="input-group-text" htmlFor="inputGroupSelect01">Subscription <br /> Plan</label>
-                                                            <select
-                                                                value={this.state.subscriptionPlan}
-                                                                onChange={this.handleSubscriptionPlan}
-                                                                className="form-select" id="inputGroupSelect01">
-                                                                <option value="1 Month">1 Month</option>
-                                                                <option value="3 Month">3 Month </option>
-                                                                <option value="6 Month">6 Month</option>
-                                                                <option value="12 Month">12 Month</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="crt_bnr_fieldRow">
-                                                        <div>
-                                                            <div>{this.renderCardText()}</div>
-                                                        </div>
-                                                    </div>
-
-
                                                 </div>
 
+                                                <div className="col-md-12 bg-body-tertiary">
+                                                    <div className='center'>
+                                                        <div className="wrapper">
+                                                            <div className="pricing-table group">
+                                                                <div className="block personal fl" >
+                                                                    <h2 className="title" > CARD TITLE</h2>
+                                                                    <div className="content">
+                                                                        <p className="price">
+                                                                            <sup>$</sup>
+                                                                            <span>CARD PRICE</span>
+                                                                            <sub>/mo.</sub>
+                                                                        </p>
+                                                                        <p className="hint">Perfect for freelancers</p>
+                                                                    </div>
+                                                                    <ul className="features">
+                                                                        <li><span className="fontawesome-cog"></span>1 WordPress Install</li>
+                                                                        <li><span className="fontawesome-star"></span>25,000 visits/mo.</li>
+                                                                        <li><span className="fontawesome-dashboard"></span>Unlimited Data Transfer</li>
+                                                                        <li><span className="fontawesome-cloud"></span>10GB Local Storage</li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
+
+                                                    <div className="crt_bnr_fieldRow">
+                                                        <div className="crt_bnr_field">
+                                                            <div className="field_item">
+                                                                <button
+                                                                    className="btn custom_btn btn_yellow mx-auto"
+                                                                    onClick={this.updateSave}
+                                                                >
+                                                                    Update Banner
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
                                             </div>
-
                                         </div>
                                     </div>
                                 </div>

@@ -200,10 +200,9 @@ class MyBanner extends Component {
 
     },
     {
-      name: "Banner Type",
-      selector: (row, i) => row.bannerType,
+      name: "Banner Name",
+      selector: (row, i) => row.bannerName,
       sortable: true,
-
     },
     {
       name: "Banner Text",
@@ -212,20 +211,25 @@ class MyBanner extends Component {
 
     },
     {
-      name: 'Subscription Plan',
-      selector: (row, i) => row.subscriptionPlan,
+      name: "Category",
+      selector: (row, i) => row.category,
       sortable: true,
-      // cell: row => {
-      //     const date = new Date(row.createdAt).toLocaleString();
-      //     return <div>{date}</div>;
-      // },
     },
-    {
-      name: "Banner Placement",
-      selector: (row, i) => row.bannerPlacement,
-      sortable: true,
+    // {
+    //   name: 'Subscription Plan',
+    //   selector: (row, i) => row.subscriptionPlan,
+    //   sortable: true,
+    //   // cell: row => {
+    //   //     const date = new Date(row.createdAt).toLocaleString();
+    //   //     return <div>{date}</div>;
+    //   // },
+    // },
+    // {
+    //   name: "Banner Placement",
+    //   selector: (row, i) => row.bannerPlacement,
+    //   sortable: true,
 
-    },
+    // },
     {
       name: "Status",
       selector: (row, i) => row.status,
@@ -338,30 +342,18 @@ class MyBanner extends Component {
               <div
                 className="banner-container"
               >
-                <a href={this.state.selectedRowData.siteUrl} target="_blank" rel="noopener noreferrer">
+            {/* <a href={this.state.selectedRowData.siteUrl} target="_blank" rel="noopener noreferrer">
+
                   <img
                     src={this.state.selectedRowData.image}
                     alt="Banner"
                     className="banner-image"
                   />
-                </a>
+                </a>  */}
 
                 <a href={this.state.selectedRowData.siteUrl} target="_blank">
-                  <iframe src={this.state.selectedRowData.image} width="560" height="315" frameborder="0" allowfullscreen></iframe>
+                  <iframe src={!this.state.selectedRowData.image ? this.state.selectedRowData.video : this.state.selectedRowData.image } frameborder="0" allowfullscreen></iframe>
                 </a>
-
-                <a  target="_blank" rel="noopener noreferrer">
-                  <iframe
-                    title="Embedded Content"
-                    width="560"
-                    height="315"
-                    src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                    frameBorder="0"
-                    allowFullScreen
-                  ></iframe>
-                </a>
-
-
 
                 <button
                   className="close-button"

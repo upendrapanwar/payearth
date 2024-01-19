@@ -109,6 +109,7 @@ import PageDetail from './components/common/PageDetails';
 
 
 import ScrollToTopButton from './containers/user/ScrollToTopButton';
+import BannerCheckOut from './containers/user/BannerCheckOut';
 
 
 
@@ -141,6 +142,7 @@ function App() {
 					<PrivateRoute path="/my-orders" component={MyOrders} roles={[Role.user]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/my-banners" component={MyBanner} roles={[Role.user]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/create-banner" component={CreateNewBanner} roles={[Role.user]} currentUserRole={userInfo.role} exact />
+					<PublicRoute path="/bannerCheckout" restricted={false} component={BannerCheckOut} exact />
 					<PrivateRoute path="/user/banner-edit/:id" component={MyBannerEdit} roles={[Role.user]} currentUserRole={userInfo.role} exact />
 
 					<PrivateRoute path="/order-detail/:id" component={OrderDetail} roles={[Role.user]} currentUserRole={userInfo.role} exact />

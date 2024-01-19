@@ -41,9 +41,12 @@ const schema = new Schema({
         default: 'pending',
     },
     subscriptionPlan: {
-        type: String,
-        // enum: ['Basic', 'Standard', 'Premium'],
-        default: 'Basic',
+        type: {
+            id: Number,
+            planPrice: String,
+            title: String
+        },
+        required: false,
     },
     bannerPlacement: {
         type: String,
