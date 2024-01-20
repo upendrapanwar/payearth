@@ -249,7 +249,7 @@ class CreateNewBanner extends Component {
     }
     handleSave = () => {
         const { subscriptionPlan } = this.state;
-        toast.success("Banner Create succesfully..", { autoClose: 3000 })
+        // toast.success("Banner Create succesfully..", { autoClose: 3000 })
         this.saveBanner("pending");
         //    this.props.history.push('/bannerCheckout')
 
