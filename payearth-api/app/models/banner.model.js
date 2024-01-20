@@ -44,7 +44,7 @@ const schema = new Schema({
         type: {
             id: Number,
             planPrice: String,
-            title: String
+            planType: String
         },
         required: false,
     },

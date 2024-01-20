@@ -439,7 +439,9 @@ class MyBannerEdit extends Component {
 
     render() {
 
-        const { image, video, selectValueType, siteUrl } = this.state;
+        const { image, video, selectValueType, siteUrl, subscriptionPlan } = this.state;
+
+        console.log("subscriptionPlan : ", subscriptionPlan)
 
         console.log("siteURL", siteUrl)
         return (
@@ -659,14 +661,7 @@ class MyBannerEdit extends Component {
                                                         {selectValueType === "video" || video ?
                                                             <div className="crt_bnr_fieldRow">
                                                                 <div className="crt_bnr_field">
-                                                                    <label htmlFor=""> Upload Banner Video </label>
-                                                                    <div className="adv_preview_thumb">
-                                                                        <div className="thumbPic">
-                                                                            {!video ? <img src={emptyVid} alt='...' style={{ maxWidth: "30%" }} /> : <div> <video src={video} autoPlay loop alt="" style={{ maxWidth: "60%" }} />  </div>}
-                                                                        </div>
-                                                                    </div>
-
-                                                                    {!video ? "" :
+                                                                    <label htmlFor=""> Upload Banner Video &nbsp; {!video ? "" :
                                                                         <button
                                                                             type="button"
                                                                             className="btn btn-secondary btn-sm"
@@ -674,7 +669,22 @@ class MyBannerEdit extends Component {
                                                                         >
                                                                             CLEAR
                                                                         </button>
-                                                                    }
+                                                                    } </label>
+                                                                    <div className="adv_preview_thumb">
+                                                                        <div className="thumbPic">
+                                                                            {!video ? <img src={emptyVid} alt='...' style={{ maxWidth: "30%" }} /> : <div> <video src={video} autoPlay loop alt="" style={{ maxWidth: "60%" }} />  </div>}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {/* {!video ? "" :
+                                                                        <button
+                                                                            type="button"
+                                                                            className="btn btn-secondary btn-sm"
+                                                                            onClick={this.handleDeleteCloudVideo}
+                                                                        >
+                                                                            CLEAR
+                                                                        </button>
+                                                                    } */}
                                                                     <div className="field_item">
                                                                         <input
                                                                             className="form-control"
@@ -688,14 +698,7 @@ class MyBannerEdit extends Component {
                                                             :
                                                             <div className="crt_bnr_fieldRow">
                                                                 <div className="crt_bnr_field">
-                                                                    <label htmlFor="">Upload Banner Image</label>
-                                                                    <div className="adv_preview_thumb">
-                                                                        <div className="thumbPic">
-                                                                            {!image ? <img src={emptyImg} alt='...' style={{ maxWidth: "50%" }} /> : <img src={image} style={{ maxWidth: "50%" }} />}
-                                                                            {/* <img src={nicon} alt="" /> */}
-                                                                        </div>
-                                                                    </div>
-                                                                    {!image ? "" :
+                                                                    <label htmlFor="">Upload Banner Image &nbsp; {!image ? "" :
                                                                         <button
                                                                             type="button"
                                                                             className="btn btn-secondary btn-sm"
@@ -703,7 +706,22 @@ class MyBannerEdit extends Component {
                                                                         >
                                                                             CLEAR
                                                                         </button>
-                                                                    }
+                                                                    }</label>
+                                                                    <div className="adv_preview_thumb">
+                                                                        <div className="thumbPic">
+                                                                            {!image ? <img src={emptyImg} alt='...' style={{ maxWidth: "50%" }} /> : <img src={image} style={{ maxWidth: "50%" }} />}
+                                                                            {/* <img src={nicon} alt="" /> */}
+                                                                        </div>
+                                                                    </div>
+                                                                    {/* {!image ? "" :
+                                                                        <button
+                                                                            type="button"
+                                                                            className="btn btn-secondary btn-sm"
+                                                                            onClick={this.handleDeleteCloudImage}
+                                                                        >
+                                                                            CLEAR
+                                                                        </button>
+                                                                    } */}
                                                                     <div className="field_item">
                                                                         <input
                                                                             className="form-control"
@@ -717,31 +735,38 @@ class MyBannerEdit extends Component {
                                                     </div>
                                                 </div>
 
+
                                                 <div className="col-md-12 bg-body-tertiary">
-                                                    <div className='center'>
-                                                        <div className="wrapper">
-                                                            <div className="pricing-table group">
-                                                                <div className="block personal fl" >
-                                                                    <h2 className="title" > CARD TITLE</h2>
-                                                                    <div className="content">
-                                                                        <p className="price">
-                                                                            <sup>$</sup>
-                                                                            <span>CARD PRICE</span>
-                                                                            <sub>/mo.</sub>
-                                                                        </p>
-                                                                        <p className="hint">Perfect for freelancers</p>
+                                                    <div className="row">
+                                                        <div className="col-md-2">
+
+                                                        </div>
+                                                        <div className="col-md-10">
+                                                            <h3>Your Selected plan : </h3>
+                                                            <div className="wrapper">
+                                                                <div className="pricing-table group">
+                                                                    <div className="block personal f2" >
+                                                                        <h2 className="title" > {subscriptionPlan.planType}</h2>
+                                                                        <div className="content">
+                                                                            <p className="price">
+                                                                                <sup>$</sup>
+                                                                                <span>{subscriptionPlan.planPrice}</span>
+                                                                                <sub>/mo.</sub>
+                                                                            </p>
+                                                                            <p className="hint">Perfect for freelancers</p>
+                                                                        </div>
+                                                                        <ul className="features">
+                                                                            <li><span className="fontawesome-cog"></span>1 WordPress Install</li>
+                                                                            <li><span className="fontawesome-star"></span>25,000 visits/mo.</li>
+                                                                            <li><span className="fontawesome-dashboard"></span>Unlimited Data Transfer</li>
+                                                                            <li><span className="fontawesome-cloud"></span>10GB Local Storage</li>
+                                                                        </ul>
                                                                     </div>
-                                                                    <ul className="features">
-                                                                        <li><span className="fontawesome-cog"></span>1 WordPress Install</li>
-                                                                        <li><span className="fontawesome-star"></span>25,000 visits/mo.</li>
-                                                                        <li><span className="fontawesome-dashboard"></span>Unlimited Data Transfer</li>
-                                                                        <li><span className="fontawesome-cloud"></span>10GB Local Storage</li>
-                                                                    </ul>
                                                                 </div>
                                                             </div>
+
                                                         </div>
                                                     </div>
-
 
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">

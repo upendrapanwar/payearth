@@ -2,6 +2,7 @@ import React, { Component, useRef } from "react";
 import Header from "../../components/user/common/Header";
 import PageTitle from "../../components/user/common/PageTitle";
 import Footer from "../../components/common/Footer";
+import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import axios from "axios";
 import { Box, Text } from "rebass";
@@ -29,35 +30,35 @@ const Button = styled.button({
     border: "2px solid black",
     fontWeight: 600,
     borderRadius: "2px"
-  });
-  
-  const ErrorComponent = (props: {
+});
+
+const ErrorComponent = (props: {
     errors: [];
     onBackButtonClick: () => void;
-  }) => (
+}) => (
     <div>
-      <Text fontSize={3} fontWeight={"500"} mb={3}>
-        Failed to process payment
-      </Text>
-      {props.errors.map(error => (
-        <Text py={2}>{error}</Text>
-      ))}
-      <Button onClick={props.onBackButtonClick}>Go Back</Button>
+        <Text fontSize={3} fontWeight={"500"} mb={3}>
+            Failed to process payment
+        </Text>
+        {props.errors.map(error => (
+            <Text py={2}>{error}</Text>
+        ))}
+        <Button onClick={props.onBackButtonClick}>Go Back</Button>
     </div>
-  );
- 
-  /*
-  const Header = props => (
-    <Flex py={4}>
-      <Heading>react-authorize-net-example</Heading>
-    </Flex>
-  );*/
+);
+
+/*
+const Header = props => (
+  <Flex py={4}>
+    <Heading>react-authorize-net-example</Heading>
+  </Flex>
+);*/
 
 class BannerCheckOut extends Component {
-    
+
     constructor(props) {
         super(props);
-        
+
         this.buttonRef = React.createRef;
         this.clientKey = "3q47VR4QY739gdggD4dP2JJsUNyd54bJJdDDpAdmktL59dA96SZMARZHtG2tDz6V";
         this.apiLoginId = "7e44GKHmR3b";
@@ -68,9 +69,9 @@ class BannerCheckOut extends Component {
             checkoutData: '',
             apiData: [],
             statusData: [],
-            orderStatus:[],
-            paymentId:'',
-            productSku:[],
+            orderStatus: [],
+            paymentId: '',
+            productSku: [],
             //status: "paid" | "unpaid" | ["failure", []],
             status: "unpaid",
             data: [],
@@ -103,8 +104,8 @@ class BannerCheckOut extends Component {
             'amountPaid': this.getTotal().totalAmmount,
             'paymentMode': 'usd',
             'paymentAccount': 'Authorize .Net',
-            'invoiceUrl':'',
-            'paymentStatus' :'failed',
+            'invoiceUrl': '',
+            'paymentStatus': 'failed',
         }];
         var paymentIds = this.managePaymentData(paymentData);
         let paymentId;
@@ -112,7 +113,7 @@ class BannerCheckOut extends Component {
             paymentId = result;
         })
         this.setState({ "paymentId": paymentId })
-        
+
     };
     /**
      * Called On successful payment
@@ -122,19 +123,19 @@ class BannerCheckOut extends Component {
     onSuccessHandler = (response) => {
         console.log(response);
         console.log(response.messages.resultCode);
-        if(response.messages.resultCode === "Ok") {
+        if (response.messages.resultCode === "Ok") {
             this.setState({ status: ["paid", []] });
             toast.dismiss();
-            toast.success('Payment Successfull', {autoClose: 3000});
-            
+            toast.success('Payment Successfull', { autoClose: 3000 });
+
             const paymentData = [{
                 'userId': this.authInfo.id,
                 'sellerId': this.state.productSku,
                 'amountPaid': this.getTotal().totalAmmount,
                 'paymentMode': 'usd',
                 'paymentAccount': 'Authorize .Net',
-                'invoiceUrl':'',
-                'paymentStatus' :'Paid',
+                'invoiceUrl': '',
+                'paymentStatus': 'Paid',
             }];
             console.log(paymentData);
             var paymentIds = this.managePaymentData(paymentData);
@@ -146,16 +147,16 @@ class BannerCheckOut extends Component {
             })
             console.log(paymentId)
             console.log("Payment PAID or UNPAID check here: ", this.state.status)
-            
+
             //window.location.href('/OrderDetail')
         }
         // Process API response on your backend...
-        
+
     };
-    
+
     /**************************************************************************/
     /**************************************************************************/
-    
+
     /**
      * Manages payment Data
      * 
@@ -163,7 +164,7 @@ class BannerCheckOut extends Component {
      */
     managePaymentData = async (paymentData) => {
         let reqBody = this.state.reqBody
-        let res = await axios.post('user/savepayment', paymentData,{
+        let res = await axios.post('user/savepayment', paymentData, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -172,7 +173,7 @@ class BannerCheckOut extends Component {
         })
         console.log(res.data.data);
         let productid = res.data.data;
-        if(typeof productid !='undefined') {
+        if (typeof productid != 'undefined') {
             return productid;
         } else {
             return false;
@@ -200,7 +201,6 @@ class BannerCheckOut extends Component {
     }
     /**************************************************************************/
     /**************************************************************************/
-
     /**
      * Get the sellet id by product id
      *  
@@ -210,21 +210,21 @@ class BannerCheckOut extends Component {
     getSellerId = async (productId) => {
         let reqBody = this.state.reqBody
         //console.log(this.authInfo)
-        let res = await axios.get('user/sellerid/'+productId,{
+        let res = await axios.get('user/sellerid/' + productId, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
                 'Authorization': `Bearer ${this.authInfo.token}`,
             }
         });
-        
+
         let sellerid = res.data.data;
         console.log(res.data.data);
-        if(sellerid) {
-            console.log('sellerid='+sellerid)
+        if (sellerid) {
+            console.log('sellerid=' + sellerid)
             return sellerid;
         }
-        
+
         return false;
     }
     /******************************************************************************/
@@ -232,9 +232,9 @@ class BannerCheckOut extends Component {
     /**
      * Get order status data
      */
-    getOrderStaus  = () => {
+    getOrderStaus = () => {
         let reqBody = this.state.reqBody
-        
+
         axios.get('user/orderstatus', {
             headers: {
                 'Accept': 'application/json',
@@ -242,13 +242,13 @@ class BannerCheckOut extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`,
             }
         }).then((response) => {
-            if(typeof response.data.data != 'undefined') {
+            if (typeof response.data.data != 'undefined') {
                 this.setState({ orderStatus: response.data.data })
                 console.log(response.data.data)
             } else {
                 this.setState({ orderStatus: '' })
-            } 
-            
+            }
+
         }).catch(error => {
             console.log(error)
         });
@@ -256,9 +256,9 @@ class BannerCheckOut extends Component {
     /**
      * Get order tracking time data
      */
-    getOrderTrackingTime  = () => {
+    getOrderTrackingTime = () => {
         let reqBody = this.state.reqBody
-        
+
         axios.get('user/ordertrackingtime', {
             headers: {
                 'Accept': 'application/json',
@@ -266,20 +266,20 @@ class BannerCheckOut extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`,
             }
         }).then((response) => {
-            if(typeof response.data.data != 'undefined') {
+            if (typeof response.data.data != 'undefined') {
                 this.setState({ orderStatus: response.data.data })
                 console.log(response.data.data)
             } else {
                 this.setState({ orderStatus: '' })
-            } 
-            
+            }
+
         }).catch(error => {
             console.log(error)
         });
     }
     /******************************************************************************/
     /******************************************************************************/
-    
+
     /**
      *  get new Coupon code 
      */
@@ -300,7 +300,7 @@ class BannerCheckOut extends Component {
     }   //get new Coupon code
     /******************************************************************************/
     /******************************************************************************/
-    
+
     /**
      * Get product details
      * 
@@ -311,7 +311,7 @@ class BannerCheckOut extends Component {
         let product_sku = [];
         cart.forEach(items => {
             let sellerdata = this.getSellerId(items.id);
-            sellerdata.then((result)=> {
+            sellerdata.then((result) => {
                 product_sku.push({
                     productId: items.id,
                     quantity: items.quantity,
@@ -323,12 +323,12 @@ class BannerCheckOut extends Component {
             })
         })
         console.log(product_sku);
-        if(product_sku) {
+        if (product_sku) {
             this.setState({ "productSku": product_sku })
         } else {
             return false
-        } 
-        
+        }
+
         //return product_sku;
     }
     /******************************************************************************/
@@ -381,14 +381,14 @@ class BannerCheckOut extends Component {
         const orderData = []
         const cart = this.props.cart
         console.log(this.state);
-        
-        if(this.state.status[0] === "paid") {
+
+        if (this.state.status[0] === "paid") {
             let orderStatusData = this.state.orderStatus;
             let orderStatus = '6137423b2651fc157c545d50';//pending
             console.log(orderStatusData);
-            if(typeof orderStatusData != 'undefined') {
-                orderStatusData && orderStatusData.map((d)=>{
-                    if(d.title == "Completed") {
+            if (typeof orderStatusData != 'undefined') {
+                orderStatusData && orderStatusData.map((d) => {
+                    if (d.title == "Completed") {
                         orderStatus = d._id;
                     }
                 })
@@ -397,49 +397,49 @@ class BannerCheckOut extends Component {
             let product_sku = this.state.productSku;
             let reqBody = {}
             let user = this.authInfo.id
-            
+
             reqBody = {
                 count: {
-                    page:  1,
-                    skip:  0,
+                    page: 1,
+                    skip: 0,
                     limit: 2,
-                    data:  '',
+                    data: '',
                 },
                 sorting: {
                     sort_type: "date",
-                    sort_val:  "desc"
+                    sort_val: "desc"
                 },
                 data: {
-                    userId:                this.authInfo.id,
-                    productId:             product_sku,
-                    paymentId:             this.state.paymentId,
-                    sellerId:              product_sku,
-                    product_sku:           product_sku,
-                    billingFirstName:      this.state.billingFirstName,
-                    billingLastName:       this.state.billingLastName,
-                    billingCity:           this.state.billingCity,
-                    billingCompanyName:    this.state.billingCompanyName,
-                    billingCounty:         this.state.billingCounty,
-                    billingNote:           this.state.billingNote,
-                    billingPhone:          this.state.billingPhone,
-                    billingPostCode:       this.state.billingPostCode,
-                    billingStreetAddress:  this.state.billingStreetAddress,
+                    userId: this.authInfo.id,
+                    productId: product_sku,
+                    paymentId: this.state.paymentId,
+                    sellerId: product_sku,
+                    product_sku: product_sku,
+                    billingFirstName: this.state.billingFirstName,
+                    billingLastName: this.state.billingLastName,
+                    billingCity: this.state.billingCity,
+                    billingCompanyName: this.state.billingCompanyName,
+                    billingCounty: this.state.billingCounty,
+                    billingNote: this.state.billingNote,
+                    billingPhone: this.state.billingPhone,
+                    billingPostCode: this.state.billingPostCode,
+                    billingStreetAddress: this.state.billingStreetAddress,
                     billingStreetAddress1: this.state.billingStreetAddress1,
-                    billingEmail:          this.state.billingEmail,
-                    deliveryCharge:        0,
-                    taxPercent:            0,
-                    taxAmount:             0,
-                    discount:              0,
-                    price:                 this.getTotal().totalAmmount, 
-                    total:                 this.getTotal().totalAmmount,
-                    orderStatus:           orderStatus,
-                    isActive:              true,
-                    isService:             false 
+                    billingEmail: this.state.billingEmail,
+                    deliveryCharge: 0,
+                    taxPercent: 0,
+                    taxAmount: 0,
+                    discount: 0,
+                    price: this.getTotal().totalAmmount,
+                    total: this.getTotal().totalAmmount,
+                    orderStatus: orderStatus,
+                    isActive: true,
+                    isService: false
                 },
                 user_id: this.authInfo.id
             }
             console.log(reqBody);
-                        
+
             axios.post('user/saveorder', reqBody.data, {
                 headers: {
                     'Accept': 'application/json',
@@ -448,14 +448,14 @@ class BannerCheckOut extends Component {
                 }
             }).then((response) => {
                 this.setState({ data: response.status })
-                
-                if(response.status) {
-                    this.addOrderTimeLine(response.data.data,orderStatus);
-                    this.saveOrderDetails(response.data.data,product_sku,orderStatus);
+
+                if (response.status) {
+                    this.addOrderTimeLine(response.data.data, orderStatus);
+                    this.saveOrderDetails(response.data.data, product_sku, orderStatus);
                     console.log(response);
                     toast.dismiss();
-                    toast.success('Order Placed Successfull', {autoClose: 3000});
-                    this.props.history.push('/order-summary/'+response.data.data);
+                    toast.success('Order Placed Successfull', { autoClose: 3000 });
+                    this.props.history.push('/order-summary/' + response.data.data);
                 }
                 //console.log(response.data.data.order)
             }).catch(error => {
@@ -465,7 +465,7 @@ class BannerCheckOut extends Component {
         } else {
             toast.dismiss();
             toast.error('Order is not placed.Please try again.');
-            
+
         }
     }
     /******************************************************************************/
@@ -480,11 +480,11 @@ class BannerCheckOut extends Component {
         let reqBody = {}
         reqBody = {
             data: {
-                orderId:       orderId,
+                orderId: orderId,
                 orderStatusId: orderStatus,
-                isActive:      true
+                isActive: true
             },
-            
+
         }
         axios.post('user/saveordertracking', reqBody.data, {
             headers: {
@@ -511,7 +511,7 @@ class BannerCheckOut extends Component {
     saveOrderDetails = (orderId, productData, orderStatus) => {
         let reqBody = {}
         var prodArray = [];
-        for(var i=0;i< productData.length;i++) {
+        for (var i = 0; i < productData.length; i++) {
             prodArray.push({
                 orderId: orderId,
                 productId: productData[i].productId,
@@ -534,8 +534,8 @@ class BannerCheckOut extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`,
             }
         }).then((response) => {
-            console.log("Save order details ",response.data.data);
-            console.log("ORDER ID CHECK",orderId);
+            console.log("Save order details ", response.data.data);
+            console.log("ORDER ID CHECK", orderId);
             this.updateOrderStatus(orderId, response.data.data)
 
         }).catch(error => {
@@ -568,7 +568,7 @@ class BannerCheckOut extends Component {
             console.log(error)
             toast.error(error);
         });
-    } 
+    }
     /**
      * Sets the form data
      * 
@@ -576,26 +576,31 @@ class BannerCheckOut extends Component {
      * @param {*} value 
      */
     //onChange(field, value) {
-        // parent class change handler is always called with field name and value
+    // parent class change handler is always called with field name and value
     //    this.setState({field: value});
-        //this.setState({ "productSku": product_sku })
+    //this.setState({ "productSku": product_sku })
     //}
     onChange(evt) {
         // parent class change handler is always called with field name and value
         const value = evt.target.value;
-        this.setState({...this.state,[evt.target.name]: value});
-        
+        this.setState({ ...this.state, [evt.target.name]: value });
+
     }
     /******************************************************************************/
     /******************************************************************************/
 
     render() {
+
+        const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
+        //  console.log("Date form create banner pages", subscriptionPlanData)
+
+
         const cart = this.props.cart
         const userInfo = JSON.parse(localStorage.getItem('userInfo'));
         const fullname = userInfo.name;
         const [first, last] = fullname.split(' ');
         const { history } = this.props;
-        
+
 
         // submit Function
         this.onSubmit = () => {
@@ -639,7 +644,7 @@ class BannerCheckOut extends Component {
             }
         }    //onSubmit() 
 
-        
+
         //getTotal();
 
         this.onValueChange = (event) => {
@@ -652,11 +657,11 @@ class BannerCheckOut extends Component {
                 this.setState({ formStatus: false })
             }
         }
-        
+
         return (
             <React.Fragment>
                 <Header />
-                <PageTitle title="Banner Payments"/>
+                <PageTitle title="Banner Payments" />
                 <section className="inr_wrap checkout_wrap">
                     <div className="container">
                         <div className="row">
@@ -679,135 +684,27 @@ class BannerCheckOut extends Component {
                                         </div>
                                     </div> */}
                                     <div className="row">
-                                        <div className="col-md-6">
+                                        <div className="col-md-3">
                                             <div style={{ "padding": "0px 0px 0px 25px" }} className="checkout_form_section">
                                                 <div className="items_incart">
-                                                    <h4>BILLING DETAILS</h4>
+                                                    <h4></h4>
                                                 </div>
-                                                <div className="checkout-form">
-                                                    <form id="frmCheckoutHandle" onSubmit={this.onSubmitHandler}>
-                                                        <div className="checkout_form_wrapper">
-                                                            <div className="input-group ">
-                                                                <div className="form_field">
-                                                                    <label htmlFor="">First Name <span>*</span></label>
-                                                                    <input type="text" className="form-control" name="billingFirstName" onChange={this.onChange.bind(this)}/>
-                                                                </div>
-                                                            </div>
-                                                            <div className="input-group ">
-                                                                <div className="form_field">
-                                                                    <label htmlFor="">Last Name<span>*</span></label>
-                                                                    <input type="text" className="form-control" name="billingLastName" onChange={this.onChange.bind(this)}/>
-                                                                </div>
-                                                            </div>
-                                                        </div>
 
-                                                        <div className="checkout_form_wrapper">
-                                                            <div className="input-group ">
-                                                                <div className="form_field" style={{ width: '76%' }}>
-                                                                    <label htmlFor="">Company Name(optional)</label>
-                                                                    <input type="text" className="form-control" name="billingCompanyName" onChange={this.onChange.bind(this)}/>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="checkout_form_wrapper">
-                                                            <div className="input-group ">
-                                                                <div className="form_field" style={{ width: '76%' }}>
-                                                                    <label htmlFor="">County/Region<span>*</span></label>
-                                                                    <input type="text" className="form-control" name="billingCounty" onChange={this.onChange.bind(this)}/>
-                                                                    {/*<div className="dropdown">
-                                                                        <button className="dropdown-toggle form-control text-left" type="button" data-toggle="dropdown">United kingdom
-                                                                            <span className="caret"></span>
-                                                                        </button>
-                                                                        <ul className="dropdown-menu">
-                                                                            <li><a href="/">US</a></li>
-                                                                            <li><a href="/">India</a></li>
-                                                                            <li><a href="/">India</a></li>
-                                                                        </ul>
-                                                                        
-                                                                    </div>*/}
-                                                                </div>
-                                                            </div>
-                                                            
-                                                        </div>
-
-                                                        <div className="checkout_form_wrapper">
-                                                            <div className="input-group ">
-                                                                <div className="form_field" style={{ width: '76%' }}>
-                                                                    <label htmlFor="">Street Address <span>*</span></label>
-                                                                    <input className="form-control" type="text" name="billingStreetAddress" placeholder="House number and street number" style={{ "marginBottom": "15px" }} onChange={this.onChange.bind(this)}/><br />
-                                                                    <input className="form-control" type="text" name="billingStreetAddress1" placeholder="House number" onChange={this.onChange.bind(this)}/>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="checkout_form_wrapper">
-                                                            <div className="input-group ">
-                                                                <div className="form_field" style={{ width: '76%' }}>
-                                                                    <label htmlFor="">Town/City<span>*</span></label>
-                                                                    <input type="text" className="form-control" name="billingCity" onChange={this.onChange.bind(this)}/>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="checkout_form_wrapper">
-                                                            <div className="input-group ">
-                                                                <div className="form_field" style={{ width: '76%' }}>
-                                                                    <label htmlFor="">Country(Optional)</label>
-                                                                    <input type="text" className="form-control" name="billingCountry" onChange={this.onChange.bind(this)}/>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="checkout_form_wrapper">
-                                                            <div className="input-group ">
-                                                                <div className="form_field" style={{ width: '76%' }}>
-                                                                    <label htmlFor="">Postcode<span>*</span></label>
-                                                                    <input type="text" className="form-control" name="billingPostCode" onChange={this.onChange.bind(this)}/>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="checkout_form_wrapper">
-                                                            <div className="input-group ">
-                                                                <div className="form_field" style={{ width: '76%' }}>
-                                                                    <label htmlFor="">Phone<span>*</span></label>
-                                                                    <input type="tel" className="form-control" name="billingPhone" onChange={this.onChange.bind(this)}/>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="checkout_form_wrapper">
-                                                            <div className="input-group ">
-                                                                <div className="form_field" style={{ width: '76%' }}>
-                                                                    <label htmlFor="">Email<span>*</span></label>
-                                                                    <input type="email" className="form-control" name="billingEmail" onChange={this.onChange.bind(this)}/>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="checkout_form_wrapper">
-                                                            <div className="input-group ">
-                                                                <div className="form_field" style={{ width: '76%' }}>
-                                                                    <label htmlFor="">Note<span>*</span></label>
-                                                                    <textarea name="billingNote" className="form-control" placeholder="Note about your oder" id="" cols="30" rows="10" onChange={this.onChange.bind(this)}></textarea>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <button id="frmcheckout" type="submit">Place Order</button>
-                                                    </form>
-                                                </div>
                                             </div>
                                         </div>
                                         <div className="col-md-6">
                                             <div className="payment_method_section">
                                                 <div className="payment_list">
                                                     <ul>
-                                                        <li>Price({this.getTotal().totalQuantity}) : {this.getTotal().totalPrice}$ </li>
+                                                        <li>Type of Plan : <b>{subscriptionPlanData.planType}</b></li>
+                                                        <li>Plan Detail : <b>{subscriptionPlanData.description}</b></li>
+                                                        <li>Price : <b>{subscriptionPlanData.planPrice} $</b></li>
                                                         <li>Tax(18%) : {this.getTotal().tax}$ </li>
-                                                        <li>Discount : {this.getTotal().discount}$ </li>
-                                                        <li>Delivery Charges: 0$ </li>
                                                     </ul>
                                                 </div>
                                                 <div className="subtotal_wrapper">
                                                     <ul>
-                                                        <li>Subtotal  : {this.getTotal().totalAmmount}$</li>
+                                                        <li>Subtotal : <b>{subscriptionPlanData.planPrice} $</b></li>
                                                     </ul>
                                                 </div>
 
@@ -839,32 +736,35 @@ class BannerCheckOut extends Component {
 
                                                         </li>
                                                     </ul>
-                                                    
+
                                                 </div>
                                                 <div className="">
-                                                    
-                                                    <Box className="App" p={3}>
-                                                            {this.state.status[0] === "paid" ? (
+
+                                                    <Box className="App" p={1}>
+                                                        {this.state.status[0] === "paid" ? (
                                                             <Text fontWeight={"500"} fontSize={3} mb={4}>
                                                                 Thank you for your payment!
+
+                                                                <div className="ctn_btn"><Link to="/my-banners" className="view_more">My banner</Link></div>
                                                             </Text>
-                                                            ) : this.state.status === "unpaid" ? (
+                                                            
+                                                        ) : this.state.status === "unpaid" ? (
                                                             <FormContainer
                                                                 environment="sandbox"
                                                                 onError={this.onErrorHandler}
                                                                 onSuccess={this.onSuccessHandler}
-                                                                amount={this.getTotal().totalAmmount}
+                                                                amount={subscriptionPlanData.planPrice}
                                                                 component={FormComponent}
                                                                 clientKey={this.clientKey}
                                                                 apiLoginId={this.apiLoginId}
                                                             />
-                                                            ) : this.state.status[0] === "failure" ? (
+                                                        ) : this.state.status[0] === "failure" ? (
                                                             <ErrorComponent
                                                                 onBackButtonClick={() => this.setState({ status: "unpaid" })}
                                                                 errors={this.state.status[1]}
                                                             />
-                                                            ) : null}
-                                                        </Box>
+                                                        ) : null}
+                                                    </Box>
                                                     {/* <a className="btn custom_btn btn_yellow" >Place Order</a> */}
                                                 </div>
 
@@ -873,13 +773,13 @@ class BannerCheckOut extends Component {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div >
 
-                        </div>
-                    </div>
-                </section>
+                        </div >
+                    </div >
+                </section >
                 <Footer />
-            </React.Fragment>
+            </React.Fragment >
         )
     }
 }

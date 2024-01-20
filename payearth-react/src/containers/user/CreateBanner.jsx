@@ -248,9 +248,15 @@ class CreateNewBanner extends Component {
         this.setState({ bannerPlacement: selectedText })
     }
     handleSave = () => {
+        const { subscriptionPlan } = this.state;
         toast.success("Banner Create succesfully..", { autoClose: 3000 })
         this.saveBanner("pending");
-        this.props.history.push('/bannerCheckout')
+        //    this.props.history.push('/bannerCheckout')
+
+        this.props.history.push({
+            pathname: '/bannerCheckout',
+            state: { subscriptionPlan: subscriptionPlan },
+        });
     }
     saveBanner = (status) => {
         const { image, imageId, video, videoId, bannerText, bannerType, bannerName, siteUrl, category, startDate, endDate, subscriptionPlan, bannerPlacement, signaturess, author, tag, keyword } = this.state;
@@ -348,14 +354,7 @@ class CreateNewBanner extends Component {
             case 'video':
                 return <div className="crt_bnr_fieldRow">
                     <div className="crt_bnr_field">
-                        <label htmlFor="">Upload Banner Video</label>
-                        <div className="adv_preview_thumb">
-                            <div className="thumbPic">
-                                {!video ? <div><img src={emptyVid} alt='...' style={{ maxWidth: "40%" }} /> <p className='text-danger'> Size must be less than 11 MB</p></div> : <div><video src={video} autoPlay loop alt="" /> <p>Size: {videoSize}</p> </div>}
-                            </div>
-                        </div>
-
-                        {!video ? "" :
+                        <label htmlFor="">Upload Banner Video &nbsp;  {!video ? "" :
                             <button
                                 type="button"
                                 className="btn btn-secondary btn-sm"
@@ -363,7 +362,22 @@ class CreateNewBanner extends Component {
                             >
                                 CLEAR
                             </button>
-                        }
+                        }</label>
+                        <div className="adv_preview_thumb">
+                            <div className="thumbPic">
+                                {!video ? <div><img src={emptyVid} alt='...' style={{ maxWidth: "40%" }} /> <p className='text-danger'> Size must be less than 11 MB</p></div> : <div><video src={video} autoPlay loop alt="" /></div>}
+                            </div>
+                        </div>
+
+                        {/* {!video ? "" :
+                            <button
+                                type="button"
+                                className="btn btn-secondary btn-sm"
+                                onClick={this.handleDeleteCloudVideo}
+                            >
+                                CLEAR
+                            </button>
+                        } */}
                         <div className="field_item">
                             <input
                                 className="form-control"
@@ -377,14 +391,7 @@ class CreateNewBanner extends Component {
             default:
                 return <div className="crt_bnr_fieldRow">
                     <div className="crt_bnr_field">
-                        <label htmlFor="">Upload Banner Image</label>
-                        <div className="adv_preview_thumb">
-                            <div className="thumbPic">
-                                {!image ? <div><img src={emptyImg} alt='...' style={{ maxWidth: "40%" }} /><p className='text-danger'> Size must be less than 5 MB</p></div> : <img src={image} style={{ height: '50%', width: '100%' }} />}
-                                {/* <img src={nicon} alt="" /> */}
-                            </div>
-                        </div>
-                        {!image ? "" :
+                        <label htmlFor="">Upload Banner Image &nbsp; {!image ? "" :
                             <button
                                 type="button"
                                 className="btn btn-secondary btn-sm"
@@ -392,7 +399,22 @@ class CreateNewBanner extends Component {
                             >
                                 CLEAR
                             </button>
-                        }
+                        }</label>
+                        <div className="adv_preview_thumb">
+                            <div className="thumbPic">
+                                {!image ? <div><img src={emptyImg} alt='...' style={{ maxWidth: "40%" }} /><p className='text-danger'> Size must be less than 5 MB</p></div> : <img src={image} style={{ height: '50%', width: '100%' }} />}
+                                {/* <img src={nicon} alt="" /> */}
+                            </div>
+                        </div>
+                        {/* {!image ? "" :
+                            <button
+                                type="button"
+                                className="btn btn-secondary btn-sm"
+                                onClick={this.handleDeleteCloudImage}
+                            >
+                                CLEAR
+                            </button>
+                        } */}
 
                         <div className="field_item">
                             <input
@@ -472,9 +494,9 @@ class CreateNewBanner extends Component {
 
     render() {
         const subPlan = [
-            { id: 1, title: 'Basic', planPrice: "10", description: 'This is Basic content.' },
-            { id: 2, title: 'Standerd', planPrice: "20", description: 'This is Standerd content.' },
-            { id: 3, title: 'Premium', planPrice: "50", description: 'This is Premium content.' },
+            { id: 1, planType: 'Basic', planPrice: "10", description: 'This is Basic content.' },
+            { id: 2, planType: 'Standerd', planPrice: "20", description: 'This is Standerd content.' },
+            { id: 3, planType: 'Premium', planPrice: "50", description: 'This is Premium content.' },
         ];
         return (
             <React.Fragment>
@@ -673,7 +695,7 @@ class CreateNewBanner extends Component {
                                                             {subPlan.map((card) => <>
                                                                 <li key={card.id} onClick={() => this.handleSubscriptionPlan(card)}>
                                                                     <div className="block personal fl" >
-                                                                        <h2 className="title" >{card.title}</h2>
+                                                                        <h2 className="title" >{card.planType}</h2>
                                                                         <div className="content">
                                                                             <p className="price">
                                                                                 <sup>$</sup>
