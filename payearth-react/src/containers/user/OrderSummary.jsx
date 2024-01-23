@@ -67,8 +67,8 @@ class OrderSummary extends Component {
                 
             })
         }
-        
     }
+    
     getOrderDetails = () => {
         const orderid = this.props.match.params.id;
         //console.log(this.props.match.params.id)

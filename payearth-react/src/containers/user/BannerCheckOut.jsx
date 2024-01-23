@@ -63,6 +63,7 @@ class BannerCheckOut extends Component {
         this.clientKey = "3q47VR4QY739gdggD4dP2JJsUNyd54bJJdDDpAdmktL59dA96SZMARZHtG2tDz6V";
         this.apiLoginId = "7e44GKHmR3b";
         this.authInfo = store.getState().auth.authInfo;
+        this.subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
         this.state = {
             formStatus: false,
             chargeData: '',
@@ -94,6 +95,9 @@ class BannerCheckOut extends Component {
         };
     }
     onErrorHandler = (response) => {
+
+        const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
+
         console.log(response);
         this.setState({
             status: ["failure", response.messages.message.map(err => err.text)]
@@ -101,7 +105,7 @@ class BannerCheckOut extends Component {
         const paymentData = [{
             'userId': this.authInfo.id,
             'sellerId': this.state.productSku,
-            'amountPaid': this.getTotal().totalAmmount,
+            'amountPaid': subscriptionPlanData.planPrice,
             'paymentMode': 'usd',
             'paymentAccount': 'Authorize .Net',
             'invoiceUrl': '',
@@ -121,6 +125,9 @@ class BannerCheckOut extends Component {
      * @param {*} response 
      */
     onSuccessHandler = (response) => {
+
+        const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
+
         console.log(response);
         console.log(response.messages.resultCode);
         if (response.messages.resultCode === "Ok") {
@@ -131,19 +138,20 @@ class BannerCheckOut extends Component {
             const paymentData = [{
                 'userId': this.authInfo.id,
                 'sellerId': this.state.productSku,
-                'amountPaid': this.getTotal().totalAmmount,
+                'amountPaid': subscriptionPlanData.planPrice,
                 'paymentMode': 'usd',
                 'paymentAccount': 'Authorize .Net',
                 'invoiceUrl': '',
                 'paymentStatus': 'Paid',
             }];
-            console.log(paymentData);
+            console.log("onSuccesshandler", paymentData);
             var paymentIds = this.managePaymentData(paymentData);
             let paymentId;
             paymentIds.then((result) => {
                 console.log(result);
                 paymentId = result;
                 this.setState({ "paymentId": result })
+                this.onSubmitHandler();
             })
             console.log(paymentId)
             console.log("Payment PAID or UNPAID check here: ", this.state.status)
@@ -171,7 +179,7 @@ class BannerCheckOut extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`,
             }
         })
-        console.log(res.data.data);
+        console.log("managepayment Data", res.data.data);
         let productid = res.data.data;
         if (typeof productid != 'undefined') {
             return productid;
@@ -191,6 +199,7 @@ class BannerCheckOut extends Component {
      * Initialize instance and function on did mount
      */
     componentDidMount() {
+       
 
         this.getNewCouponCode();
         this.getOrderStaus();
@@ -244,7 +253,7 @@ class BannerCheckOut extends Component {
         }).then((response) => {
             if (typeof response.data.data != 'undefined') {
                 this.setState({ orderStatus: response.data.data })
-                console.log(response.data.data)
+                console.log("get order status", response.data.data)
             } else {
                 this.setState({ orderStatus: '' })
             }
@@ -377,10 +386,14 @@ class BannerCheckOut extends Component {
      * @param {*} event 
      */
     onSubmitHandler = event => {
-        event.preventDefault();
-        const orderData = []
-        const cart = this.props.cart
-        console.log(this.state);
+
+        const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
+
+
+      //  event.preventDefault();
+      //  const orderData = []
+      //  const cart = this.props.cart
+       // console.log(this.state);
 
         if (this.state.status[0] === "paid") {
             let orderStatusData = this.state.orderStatus;
@@ -396,7 +409,7 @@ class BannerCheckOut extends Component {
 
             let product_sku = this.state.productSku;
             let reqBody = {}
-            let user = this.authInfo.id
+           // let user = this.authInfo.id
 
             reqBody = {
                 count: {
@@ -430,8 +443,8 @@ class BannerCheckOut extends Component {
                     taxPercent: 0,
                     taxAmount: 0,
                     discount: 0,
-                    price: this.getTotal().totalAmmount,
-                    total: this.getTotal().totalAmmount,
+                    price: subscriptionPlanData.planPrice,
+                    total: subscriptionPlanData.planPrice,
                     orderStatus: orderStatus,
                     isActive: true,
                     isService: false
@@ -452,10 +465,10 @@ class BannerCheckOut extends Component {
                 if (response.status) {
                     this.addOrderTimeLine(response.data.data, orderStatus);
                     this.saveOrderDetails(response.data.data, product_sku, orderStatus);
-                    console.log(response);
+                    console.log("response userSave order : ", response);
                     toast.dismiss();
                     toast.success('Order Placed Successfull', { autoClose: 3000 });
-                    this.props.history.push('/order-summary/' + response.data.data);
+                  //  this.props.history.push('/order-summary/' + response.data.data);
                 }
                 //console.log(response.data.data.order)
             }).catch(error => {
@@ -508,22 +521,24 @@ class BannerCheckOut extends Component {
      * @param {*} orderId 
      * @param {*} orderStatus 
      */
-    saveOrderDetails = (orderId, productData, orderStatus) => {
+    saveOrderDetails = (orderId, orderStatus) => {
+
+        const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
         let reqBody = {}
         var prodArray = [];
-        for (var i = 0; i < productData.length; i++) {
+       // for (var i = 0; i < subscriptionPlanData.length; i++) {
             prodArray.push({
                 orderId: orderId,
-                productId: productData[i].productId,
-                quantity: productData[i].quantity,
-                price: productData[i].price,
-                color: productData[i].color,
-                size: productData[i].size,
+             //   productId: productData[i].productId,
+              //  quantity: productData[i].quantity,
+                price: subscriptionPlanData.planPrice,
+              //  color: productData[i].color,
+              //  size: productData[i].size,
                 userId: this.authInfo.id,
-                sellerId: productData[i].sellerId,
+             //   sellerId: productData[i].sellerId,
                 isService: false,
             });
-        }
+      //  }
         reqBody = {
             data: prodArray
         }
@@ -580,18 +595,18 @@ class BannerCheckOut extends Component {
     //    this.setState({field: value});
     //this.setState({ "productSku": product_sku })
     //}
-    onChange(evt) {
-        // parent class change handler is always called with field name and value
-        const value = evt.target.value;
-        this.setState({ ...this.state, [evt.target.name]: value });
+    // onChange(evt) {
+    //     // parent class change handler is always called with field name and value
+    //     const value = evt.target.value;
+    //     this.setState({ ...this.state, [evt.target.name]: value });
 
-    }
+    // }
     /******************************************************************************/
     /******************************************************************************/
 
     render() {
 
-        const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
+    const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
         //  console.log("Date form create banner pages", subscriptionPlanData)
 
 

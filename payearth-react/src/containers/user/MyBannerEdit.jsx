@@ -205,6 +205,7 @@ class MyBannerEdit extends Component {
         toast.success("Banner Update succesfully..", { autoClose: 3000 })
         // this.saveBanner("pending");
         this.updateBanner();
+        this.props.history.push('/my-banners')
     }
     updateBanner = (status) => {
         const { id } = this.props.match.params;
