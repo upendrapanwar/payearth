@@ -65,6 +65,9 @@ class BannerCheckOut extends Component {
         this.authInfo = store.getState().auth.authInfo;
         this.subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
         this.state = {
+            cardNumber: "",
+            cvv: "",
+            expiryDate: "",
             formStatus: false,
             chargeData: '',
             checkoutData: '',
@@ -94,6 +97,11 @@ class BannerCheckOut extends Component {
             moneyComparision: false
         };
     }
+
+    success = () => {
+        console.log("handle payment succes every 10 secound..")
+    }
+
     onErrorHandler = (response) => {
 
         const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
@@ -128,9 +136,10 @@ class BannerCheckOut extends Component {
 
         const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
 
-        console.log(response);
-        console.log(response.messages.resultCode);
-        if (response.messages.resultCode === "Ok") {
+        console.log("resp:", response);
+        console.log("resp:", response.isTrusted === true ? "TRUE" : "FALSE");
+        if (response.isTrusted === true) {
+            console.log("subscription trueeeeeee")
             this.setState({ status: ["paid", []] });
             toast.dismiss();
             toast.success('Payment Successfull', { autoClose: 3000 });
@@ -144,7 +153,7 @@ class BannerCheckOut extends Component {
                 'invoiceUrl': '',
                 'paymentStatus': 'Paid',
             }];
-            console.log("onSuccesshandler", paymentData);
+            console.log("......", paymentData);
             var paymentIds = this.managePaymentData(paymentData);
             let paymentId;
             paymentIds.then((result) => {
@@ -152,6 +161,7 @@ class BannerCheckOut extends Component {
                 paymentId = result;
                 this.setState({ "paymentId": result })
                 this.onSubmitHandler();
+                this.savePayData()
             })
             console.log(paymentId)
             console.log("Payment PAID or UNPAID check here: ", this.state.status)
@@ -161,6 +171,54 @@ class BannerCheckOut extends Component {
         // Process API response on your backend...
 
     };
+
+    /****************************************************************************************** */
+    handleCardNumber = (e) => {
+        this.setState({ cardNumber: e.target.value })
+    }
+    handleExpiry = (e) => {
+        const input = e.target.value.replace(/\D/g, '');
+        if (input.length > 2) {
+            this.setState({ expiryDate: input.slice(0, 2) + '/' + input.slice(2) });
+        } else {
+            this.setState({ expiryDate: input })
+        }
+    }
+    handleCvv = (e) => {
+        this.setState({ cvv: e.target.value })
+    }
+
+
+
+    savePayData = () => {
+
+        const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
+        const { cardNumber, cvv, expiryDate } = this.state;
+        const url = 'user/schedule/payment';
+        const payData = {
+            cardNumber,
+            cvv,
+            expiryDate,
+            amount: subscriptionPlanData.planPrice,
+            planName: subscriptionPlanData.planType
+        };
+        console.log("payData", payData)
+
+        axios.post(url, payData, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${this.authInfo.token}`
+            }
+        }).then((response) => {
+            console.log("SUCCESS", response.date);
+        }).catch((error) => {
+            console.log("error", error);
+        });
+
+        this.setState({ cardNumber: "", cvv: "", expiryDate: "" })
+
+    }
 
     /**************************************************************************/
     /**************************************************************************/
@@ -199,7 +257,7 @@ class BannerCheckOut extends Component {
      * Initialize instance and function on did mount
      */
     componentDidMount() {
-       
+
 
         this.getNewCouponCode();
         this.getOrderStaus();
@@ -390,10 +448,10 @@ class BannerCheckOut extends Component {
         const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
 
 
-      //  event.preventDefault();
-      //  const orderData = []
-      //  const cart = this.props.cart
-       // console.log(this.state);
+        //  event.preventDefault();
+        //  const orderData = []
+        //  const cart = this.props.cart
+        // console.log(this.state);
 
         if (this.state.status[0] === "paid") {
             let orderStatusData = this.state.orderStatus;
@@ -409,7 +467,7 @@ class BannerCheckOut extends Component {
 
             let product_sku = this.state.productSku;
             let reqBody = {}
-           // let user = this.authInfo.id
+            // let user = this.authInfo.id
 
             reqBody = {
                 count: {
@@ -468,7 +526,7 @@ class BannerCheckOut extends Component {
                     console.log("response userSave order : ", response);
                     toast.dismiss();
                     toast.success('Order Placed Successfull', { autoClose: 3000 });
-                  //  this.props.history.push('/order-summary/' + response.data.data);
+                    //  this.props.history.push('/order-summary/' + response.data.data);
                 }
                 //console.log(response.data.data.order)
             }).catch(error => {
@@ -526,19 +584,19 @@ class BannerCheckOut extends Component {
         const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
         let reqBody = {}
         var prodArray = [];
-       // for (var i = 0; i < subscriptionPlanData.length; i++) {
-            prodArray.push({
-                orderId: orderId,
-             //   productId: productData[i].productId,
-              //  quantity: productData[i].quantity,
-                price: subscriptionPlanData.planPrice,
-              //  color: productData[i].color,
-              //  size: productData[i].size,
-                userId: this.authInfo.id,
-             //   sellerId: productData[i].sellerId,
-                isService: false,
-            });
-      //  }
+        // for (var i = 0; i < subscriptionPlanData.length; i++) {
+        prodArray.push({
+            orderId: orderId,
+            //   productId: productData[i].productId,
+            //  quantity: productData[i].quantity,
+            price: subscriptionPlanData.planPrice,
+            //  color: productData[i].color,
+            //  size: productData[i].size,
+            userId: this.authInfo.id,
+            //   sellerId: productData[i].sellerId,
+            isService: false,
+        });
+        //  }
         reqBody = {
             data: prodArray
         }
@@ -606,7 +664,8 @@ class BannerCheckOut extends Component {
 
     render() {
 
-    const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
+        const { expiryDate } = this.state;
+        const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
         //  console.log("Date form create banner pages", subscriptionPlanData)
 
 
@@ -682,22 +741,6 @@ class BannerCheckOut extends Component {
                         <div className="row">
                             <div className="col-md-12">
                                 <div className="cart my_cart">
-                                    {/* <div className="cart_wrap">
-                                        <div className="items_incart">
-                                            <span>have a coupons <a href="/">Click here to have</a></span>
-                                        </div>
-                                        <div className="cart_wrap">
-                                            <div className="checkout_cart_wrap">
-                                                <p>IF YOU HAVE A COUPON CODE,PLEASE APPLY IT BELOW </p>
-                                                <div className="input-group d-flex">
-                                                    <input type="text" className="form-control" placeholder="Enter your coupons code" aria-label="Example text with button addon"
-                                                        id="myCoupon"
-                                                    />
-                                                    <button className="btn custom_btn btn_yellow" type="button" onClick={this.onSubmit} > Apply coupns code</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div> */}
                                     <div className="row">
                                         <div className="col-md-3">
                                             <div style={{ "padding": "0px 0px 0px 25px" }} className="checkout_form_section">
@@ -723,38 +766,8 @@ class BannerCheckOut extends Component {
                                                     </ul>
                                                 </div>
 
-                                                <div className="payment_method_wrapper">
-                                                    {/*<b>Select any option for Payment </b>*/}
-                                                    <ul>
-                                                        <li className="payment_list">
-                                                            <div className="">
-                                                                {/*<input
-                                                                    type="radio"
-                                                                    id=""
-                                                                    name="payment"
-                                                                    value="authorize_net"
-                                                                    checked={this.state.paymentType === "authorize_net"}
-                                                                    onChange={this.onValueChange}
-                                                                />*/}
-                                                                <span>Pay Now</span>
-                                                            </div>
 
-                                                            {/* <div className="dropdown">
-                                                                <button className=" dropdown-toggle" type="button" data-toggle="dropdown">Select Payment Method
-                                                                    <span className="caret"></span></button>
-                                                                <ul className="dropdown-menu">
-                                                                    <li><a href="#">Visa</a></li>
-                                                                    <li><a href="#">Bank to bank</a></li>
-                                                                    <li><a href="#">Paypal</a></li>
-                                                                </ul>
-                                                            </div> */}
-
-                                                        </li>
-                                                    </ul>
-
-                                                </div>
-                                                <div className="">
-
+                                                {/* <div className="">
                                                     <Box className="App" p={1}>
                                                         {this.state.status[0] === "paid" ? (
                                                             <Text fontWeight={"500"} fontSize={3} mb={4}>
@@ -762,7 +775,7 @@ class BannerCheckOut extends Component {
 
                                                                 <div className="ctn_btn"><Link to="/my-banners" className="view_more">My banner</Link></div>
                                                             </Text>
-                                                            
+
                                                         ) : this.state.status === "unpaid" ? (
                                                             <FormContainer
                                                                 environment="sandbox"
@@ -780,9 +793,55 @@ class BannerCheckOut extends Component {
                                                             />
                                                         ) : null}
                                                     </Box>
-                                                    {/* <a className="btn custom_btn btn_yellow" >Place Order</a> */}
+                                                   
+                                                </div> */}
+
+
+                                                <div className="row">
+                                                    <div className="col-6">
+                                                        <input
+                                                            type="text"
+                                                            name="cardNumber"
+                                                            className="form-control"
+                                                            placeholder="Enter 16-digit card number"
+                                                            maxlength="16" pattern="\d{16}"
+                                                            onChange={this.handleCardNumber}
+                                                            required
+                                                        />
+                                                    </div>
+                                                    <div className="col-3">
+                                                        <input
+                                                            type="text"
+                                                            id="expiryDate"
+                                                            name="expiryDate"
+                                                            className="form-control"
+                                                            placeholder="MM/YY"
+                                                            value={expiryDate}
+                                                            // pattern="(0[1-9]|1[0-2])\/\d{2}"
+                                                            onChange={this.handleExpiry}
+                                                            required
+                                                        />
+                                                    </div>
+                                                    &nbsp;
+                                                    <div className="col-2">
+                                                        <input
+                                                            type="text"
+                                                            name="cvv"
+                                                            className="form-control"
+                                                            placeholder="CVC"
+                                                            pattern="\d{3,4}"
+                                                            required
+                                                            onChange={this.handleCvv}
+
+                                                        />
+                                                    </div>
                                                 </div>
 
+                                                &nbsp;
+
+                                                <div className="d-grid gap-2 col-6 mx-auto">
+                                                    <button type="submit" class="btn btn-success" onClick={this.onSuccessHandler}>PAY &nbsp;{subscriptionPlanData.planPrice} $</button>
+                                                </div>
                                             </div>
 
                                         </div>

@@ -5,8 +5,12 @@ const router = express.Router();
 const userService = require('../services/user.service');
 const { registerValidation, loginValidation, changePassValidation, forgotPassValidation, resetPassValidation, editProfileValidation, addReviewValidation, addComplaintValidation, addCancelValidation, addReturnValidation } = require('../validations/user.validation');
 const msg = require('../helpers/messages.json');
-
+var utils = require('../helpers/utils.js');
 const multer = require('multer');
+
+var ApiContracts = require('authorizenet').APIContracts;
+var ApiControllers = require('authorizenet').APIControllers;
+var SDKConstants = require('authorizenet').Constants;
 
 
 //Review Files Upload
@@ -157,7 +161,7 @@ router.get("/getBannersByUserId/:id", getBannersByUserId);
 router.delete("/deleteBanner/:id", deleteBannerAdv);
 router.get("/getBannerById/:id", getBannerById);
 router.put("/updateBanner/:id", updateBanner);
-
+router.post('/schedule/payment', bannerPayment);
 
 module.exports = router;
 
@@ -524,4 +528,17 @@ function updateBanner(req, res, next) {
         .then(banner => banner ? res.json({ status: true, message: "Banner Update Successfully...." }) : res.json({ status: false, message: "ERROR" }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
+
+
+function bannerPayment(req, res, next) {
+    console.log("banner payments")
+    userService.bannerPayment(req)
+        .then(payment => payment ? res.status(200).json({ status: true, data: payment }) : res.json({ status: false, message: "ERROR" }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+
+
+
+
 
