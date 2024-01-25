@@ -944,13 +944,16 @@ async function addService(req) {
     // try {
     //console.log(req.files);
     //return false;
+    console.log('request data value for the data section =>>', req)
+    console.log('hello there');
     const param = req.body;
+    console.log('params =>>', param)
     var lName = param.name.toLowerCase();
 
-
-    if (await Product.findOne({ lname: lName })) {
-        throw 'Service Name "' + param.name + '" already exists.';
-    }
+    console.log('lname =>>', lName);
+    // if (await Product.findOne({ lname: lName })) {
+    //     throw 'Service Name "' + param.name + '" already exists.';
+    // }
 
 
     let input = {
@@ -966,90 +969,95 @@ async function addService(req) {
         updatedBy: param.seller_id
     };
 
+    console.log('input data =>', input);
+
     if (param.sub_category !== "") {
         input['sub_category'] = param.sub_category;
     }
+    console.log('inputs =>>', input)
 
     const service = new Product(input);
 
     const data = await service.save();
+    console.log('data', data);
 
     if (data) {
 
-        const files = req.files;
-        var videosArr = [];
-        var videoCount = 0;
+        // const files = req.files;
+        // var videosArr = [];
+        // var videoCount = 0;
 
-        if (files.length > 0) {
+        // if (files.length > 0) {
 
-            for (var i = 0; i < files.length; i++) {
+        //     for (var i = 0; i < files.length; i++) {
 
-                //for thumb file
-                let upload_folder = 'uploads/video_thumbs';
-                let path = files[i].path;
-                let thumb_file_name = files[i].filename + '-' + Date.now() + '-thumb.png';
-                let thumb_full = upload_folder + '/' + thumb_file_name;
+        //         //for thumb file
+        //         let upload_folder = 'uploads/video_thumbs';
+        //         let path = files[i].path;
+        //         let thumb_file_name = files[i].filename + '-' + Date.now() + '-thumb.png';
+        //         let thumb_full = upload_folder + '/' + thumb_file_name;
 
-                try {
-                    //create thumb file
-                    ffmpeg(path)
-                        .setFfmpegPath(ffmpeg_static)
-                        .screenshots({
-                            timestamps: [0.0],
-                            filename: thumb_file_name,
-                            folder: upload_folder
-                        }).on('end', function() {
-                            //
-                        });
-                } catch (err) {
-                    console.log('Error', err);
-                }
+        //         try {
+        //             //create thumb file
+        //             ffmpeg(path)
+        //                 .setFfmpegPath(ffmpeg_static)
+        //                 .screenshots({
+        //                     timestamps: [0.0],
+        //                     filename: thumb_file_name,
+        //                     folder: upload_folder
+        //                 }).on('end', function() {
+        //                     //
+        //                 });
+        //         } catch (err) {
+        //             console.log('Error', err);
+        //         }
 
 
-                let url = files[i].destination + "/" + files[i].filename;
-                let no = i + 1;
-                let vid_data = {
-                    serviceId: data.id,
-                    video: {
-                        no: no,
-                        title: "Ep-" + no,
-                        description: "Episode-" + no + " of " + param.name,
-                        url: url,
-                        thumb: thumb_full
-                    },
-                    isActive: true
-                };
-                videosArr.push(vid_data);
-                videoCount++;
-            }
-        }
+        //         let url = files[i].destination + "/" + files[i].filename;
+        //         let no = i + 1;
+        //         let vid_data = {
+        //             serviceId: data.id,
+        //             video: {
+        //                 no: no,
+        //                 title: "Ep-" + no,
+        //                 description: "Episode-" + no + " of " + param.name,
+        //                 url: url,
+        //                 thumb: thumb_full
+        //             },
+        //             isActive: true
+        //         };
+        //         videosArr.push(vid_data);
+        //         videoCount++;
+        //     }
+        // }
 
-        if (videosArr && videosArr.length > 0) {
-            //insert multiple videos data at once
-            await ServiceVideo.insertMany(videosArr, async function(error, videos) {
-                if (error == null && videos.length > 0) {
-                    videoIds = [];
-                    for (var j = 0; j < videos.length; j++) {
-                        let videoId = mongoose.Types.ObjectId(videos[j]._id);
-                        videoIds.push(videoId);
-                    }
+        // if (videosArr && videosArr.length > 0) {
+        //     //insert multiple videos data at once
+        //     await ServiceVideo.insertMany(videosArr, async function(error, videos) {
+        //         if (error == null && videos.length > 0) {
+        //             videoIds = [];
+        //             for (var j = 0; j < videos.length; j++) {
+        //                 let videoId = mongoose.Types.ObjectId(videos[j]._id);
+        //                 videoIds.push(videoId);
+        //             }
 
-                    if (videoIds.length > 0) {
-                        let update = { videoCount: videoCount, videos: videoIds };
-                        //update video data into service
-                        await Product.findByIdAndUpdate(data.id, update);
-                    }
-                }
-            });
-        }
+        //             if (videoIds.length > 0) {
+        //                 let update = { videoCount: videoCount, videos: videoIds };
+        //                 //update video data into service
+        //                 await Product.findByIdAndUpdate(data.id, update);
+        //             }
+        //         }
+        //     });
+        // }
 
-        let res = await Product.findById(data.id).select('name category sub_category description validity price isActive isService');
+        // let res = await Product.findById(data.id).select('name category sub_category description validity price isActive isService');
 
-        if (res) {
-            return res;
-        } else {
-            return false;
-        }
+        // if (res) {
+        //     return res;
+        // } else {
+        //     return false;
+        // }
+        return data;
     } else {
         return false;
     }

@@ -103,7 +103,7 @@ router.get('/brands', getBrands);
 
 
 //Service Routes
-router.post('/services', uploadVideo, addServiceValidation, addService);
+router.post('/services', addService);
 router.put('/services/:id', uploadVideo, editServiceValidation, editService);
 router.post('/services/list/:id', getListedServices);
 router.get('/services/:id', getServiceById);
@@ -222,7 +222,7 @@ function editProduct(req, res, next) {
 //Services
 
 function addService(req, res, next) {
-
+    console.log('Hello there how are you....');
     if (req.files && req.files.fileValidationError) { return res.status(400).json({ status: false, message: req.files.fileValidationError }) }
 
     sellerService.addService(req)

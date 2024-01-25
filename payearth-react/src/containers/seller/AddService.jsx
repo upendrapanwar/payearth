@@ -9,7 +9,9 @@ import { connect } from 'react-redux';
 import { setLoading } from '../../store/reducers/global-reducer';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import axios from 'axios';
-import addServiceSchema from './../../validation-schemas/addServiceSchema';
+//import addServiceSchema from './../../validation-schemas/addServiceSchema';
+import {Editor, EditorState} from 'draft-js';
+import 'draft-js/dist/Draft.css';
 import { Link } from 'react-router-dom';
 
 class AddService extends Component {
@@ -27,13 +29,24 @@ class AddService extends Component {
                 videos: [],
                 previews: []
             },
-            featuredImg: {image: '', preview: ''}
+            featuredImg: {image: '', preview: ''},
+            editorState: EditorState.createEmpty()
+        };
+        this.onChange = (editorState) => this.setState({editorState});
+        this.setEditor = (editor) => {
+          this.editor = editor;
+        };
+        this.focusEditor = () => {
+          if (this.editor) {
+            this.editor.focus();
+          }
         };
         toast.configure();
     }
 
     componentDidMount() {
         this.getCategories(null);
+        this.focusEditor();
     }
 
     getCategories = param => {
@@ -139,6 +152,8 @@ class AddService extends Component {
 
     handleSubmit = values => {
         let formData = new FormData();
+        //console.log('seller Id =>>', this.authInfor.id)
+        console.log('values ==>', values);
         formData.append('seller_id', this.authInfo.id);
         formData.append('name', values.name);
         formData.append('category', values.category);
@@ -146,14 +161,18 @@ class AddService extends Component {
         formData.append('description', values.description);
         formData.append('price', values.price);
         formData.append('validity', values.validity);
+       
+        console.log('this.authInfo.id =>>', this.authInfo.id)
+        console.log('options =>>', values)
 
         // Bind images with color
-        this.state.files.videos.forEach(value => {
-            formData.append('videos', value);
-        });
+        // this.state.files.videos.forEach(value => {
+        //     formData.append('videos', value);
+        // });
+        // console.log('formData =>', formData);
 
         this.dispatch(setLoading({loading: true}));
-        axios.post('seller/services', formData, {
+        axios.post('seller/services', values, {
             headers: {
                 'Accept': 'application/form-data',
                 'Content-Type': 'application/json; charset=UTF-8',
@@ -161,13 +180,16 @@ class AddService extends Component {
             }
         }).then(response => {
             if (response.data.status) {
+                console.log('getting response...')
                 this.saveFeaturedImg(response.data.data.id, response.data.message);
             }
         }).catch(error => {
+            console.log('error =>', error)
             if (error.response) {
                 toast.error(error.response.data.message);
             }
         }).finally(() => {
+            console.log('inside the finally block')
             setTimeout(() => {
                 this.dispatch(setLoading({loading: false}));
             }, 300);
@@ -179,11 +201,18 @@ class AddService extends Component {
         const {
             catOptions,
             defaultCatOption,
-            subCatOptions,
+           // subCatOptions,
             defaultSubCatOption,
-            files,
+           // files,
             featuredImg
         } = this.state;
+
+        const styles = {
+            editor: {
+              border: '1px solid gray',
+              minHeight: '6em'
+            }
+          };
 
         return (
             <React.Fragment>
@@ -197,7 +226,7 @@ class AddService extends Component {
                                     <Formik
                                         initialValues={{
                                             name: '',
-                                            category: defaultCatOption.value,
+                                            category: defaultCatOption?.value,
                                             subCategory: defaultSubCatOption.value,
                                             description: '',
                                             price: '',
@@ -206,7 +235,7 @@ class AddService extends Component {
                                             featuredImg: ''
                                         }}
                                         onSubmit={values => this.handleSubmit(values)}
-                                        validationSchema={addServiceSchema}
+                                        //validationSchema={addServiceSchema}
                                     >
                                         {({ values,
                                             errors,
@@ -221,7 +250,7 @@ class AddService extends Component {
                                                     <div className="col-md-12 pt-4 pb-4">
                                                         <div className="dash_title">Add Service</div>
                                                     </div>
-                                                    <div className="col-md-4">
+                                                    <div className="col-md-6">
                                                         <div className="mb-4">
                                                             <label htmlFor="name" className="form-label"> Name of Services <small className="text-danger">*</small></label>
                                                             <input type="text" className="form-control" id="name" aria-describedby="nameHelp"
@@ -235,7 +264,7 @@ class AddService extends Component {
                                                             ) : null}
                                                         </div>
                                                     </div>
-                                                    <div className="col-md-4">
+                                                    <div className="col-md-6">
                                                         <div className="mb-4">
                                                             <label htmlFor="name" className="form-label"> Category <small className="text-danger">*</small></label>
                                                             <Select
@@ -255,7 +284,7 @@ class AddService extends Component {
                                                             ) : null}
                                                         </div>
                                                     </div>
-                                                    <div className="col-md-4">
+                                                   {/* <div className="col-md-4">
                                                         <div className="mb-4">
                                                             <label className="form-label">Subcategory</label>
                                                             <Select
@@ -269,19 +298,29 @@ class AddService extends Component {
                                                                 }}
                                                             />
                                                         </div>
-                                                    </div>
+                                                            </div> */}
                                                     <div className="col-md-8">
                                                         <div className="mb-4">
                                                             <label className="form-label">Description <small className="text-danger">*</small></label>
-                                                            <textarea className="form-control h-100" rows="5"
+                                                        { /*   <textarea id="editor" className="form-control h-100" rows="5"
                                                                 name="description"
                                                                 onChange={handleChange}
                                                                 onBlur={handleBlur}
                                                                 value={values.description}
-                                                            ></textarea>
-                                                            {touched.description && errors.description ? (
+                                                        ></textarea>
+                                                         {touched.description && errors.description ? (
                                                                 <small className="text-danger">{errors.description}</small>
                                                             ) : null}
+                                                         */ }
+
+                                                        <div style={styles.editor} onClick={this.focusEditor}>
+                                                         <Editor
+                                                           ref={this.setEditor}
+                                                           editorState={this.state.editorState}
+                                                           onChange={this.onChange}
+                                                         />
+                                                       </div>
+                                                     
                                                         </div>
                                                     </div>
                                                     <div className="col-md-4">
@@ -298,7 +337,7 @@ class AddService extends Component {
                                                             ) : null}
                                                         </div>
                                                         <div className="mb-4">
-                                                            <label className="form-label"> Validity <small className="text-danger">*</small></label>
+                                                            <label className="form-label"> Subcription <small className="text-danger">*</small></label>
                                                             <input type="text" className="form-control" aria-describedby="nameHelp"
                                                                 name="validity"
                                                                 onChange={handleChange}
@@ -310,7 +349,7 @@ class AddService extends Component {
                                                             ) : null}
                                                         </div>
                                                     </div>
-                                                    <div className="col-md-4">
+                                                 { /*   <div className="col-md-4">
                                                         <label className="form-label">Upload videos</label>
                                                         <ul className="load_services service">
                                                             <li>
@@ -342,7 +381,7 @@ class AddService extends Component {
                                                         {touched.files && errors.files ? (
                                                             <small className="text-danger">{errors.files}</small>
                                                         ) : null}
-                                                    </div>
+                                                        </div> */}
                                                     <div className="col-md-4">
                                                             <label className="form-label">Featured Image</label>
                                                             <input
