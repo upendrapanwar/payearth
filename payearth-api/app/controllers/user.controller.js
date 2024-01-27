@@ -130,9 +130,9 @@ router.post('/remove-from-savelater', removeProductFromSavelater);
 router.post('/my-coupons/:id', getMyCoupons);
 router.post('/coupons/new', getNewCoupons);
 router.post('/coupons/checkpayment', checkPayment);
-router.post('/coupons/check',checkCoupon)
-router.post('/coupons/status',couponStatus)
-router.post('/orders/:id', getOrders); 
+router.post('/coupons/check', checkCoupon)
+router.post('/coupons/status', couponStatus)
+router.post('/orders/:id', getOrders);
 
 router.post('/saveorder', saveOrder);
 router.post('/payments/:id', getPayments);
@@ -151,6 +151,12 @@ router.post('/order/reviews', uploadReview.array('images', 6), addReviewValidati
 router.post('/order/complaints', uploadComplaint.array('images', 6), addComplaintValidation, addComplaint);
 router.post('/order/cancel', uploadCancel.array('images', 6), addCancelValidation, addCancel);
 router.post('/order/return', uploadReturn.array('images', 6), addReturnValidation, addReturn);
+
+router.post('/createUserbanners', createUserBanner);
+router.get("/getBannersByUserId/:id", getBannersByUserId);
+router.delete("/deleteBanner/:id", deleteBannerAdv);
+router.get("/getBannerById/:id", getBannerById);
+router.put("/updateBanner/:id", updateBanner);
 
 
 module.exports = router;
@@ -302,8 +308,8 @@ function addToSaveLater(req, res, next) {
 
 function saveOrder(req, res, next) {
     userService.saveOrder(req)
-    .then(order => order ? res.status(201).json({status: true, message: msg.user.order.add.success,data: order }) : res.status(400).json({status: false, message: msg.user.order.add.error }))
-    .catch(err => next(res.status(400).json({status: false, message: err})));
+        .then(order => order ? res.status(201).json({ status: true, message: msg.user.order.add.success, data: order }) : res.status(400).json({ status: false, message: msg.user.order.add.error }))
+        .catch(err => next(res.status(400).json({ status: false, message: err })));
 }
 
 function addToCart(req, res, next) {
@@ -322,7 +328,7 @@ function deleteFromCart(req, res, next) {
         .catch(err => next(res.status(400).json({ status: false, message: err })));
 }
 
-function getOrderById(req, res, next) { 
+function getOrderById(req, res, next) {
     userService.getOrderById(req.params.id)
         .then(order => order ? res.status(200).json({ status: true, data: order }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
         .catch(err => next(res.json({ status: false, message: err })));
@@ -433,8 +439,8 @@ function getSellerByProductId(req, res, next) {
  */
 function savepaymentdata(req, res, next) {
     userService.savepaymentdata(req)
-    .then(data => data ? res.status(200).json({ status: true, data: data}) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: []}))
-    .catch(err => next(res.json({ status: false, message: err})))
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })))
 }
 /*****************************************************************************************/
 /*****************************************************************************************/
@@ -449,8 +455,8 @@ function savepaymentdata(req, res, next) {
 
 function saveOrdertrackingTime(req, res, next) {
     userService.saveOrdertrackingTime(req)
-    .then(data => data ? res.status(200).json({ status: true, data: data}) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: []}))
-    .catch(err => next(res.json({ status: false, message: err})))
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })))
 }
 /*****************************************************************************************/
 /*****************************************************************************************/
@@ -465,8 +471,8 @@ function saveOrdertrackingTime(req, res, next) {
 
 function saveorderdetails(req, res, next) {
     userService.saveorderdetails(req)
-    .then(data => data ? res.status(200).json({ status: true, data: data}) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: []}))
-    .catch(err => next(res.json({ status: false, message: err})))
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })))
 }
 /*****************************************************************************************/
 /*****************************************************************************************/
@@ -481,9 +487,41 @@ function saveorderdetails(req, res, next) {
  */
 function updateOrderStatus(req, res, next) {
     userService.updateOrderStatus(req)
-    .then(data => data ? res.status(200).json({ status: true, data: data}) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: []}))
-    .catch(err => next(res.json({ status: false, message: err})))
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })))
 }
 
 /*****************************************************************************************/
 /*****************************************************************************************/
+/********BANNER**********************/
+function createUserBanner(req, res, next) {
+    userService.createUserBanner(req)
+        .then(banner => banner ? res.status(200).json({ status: true, data: banner }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+
+function getBannersByUserId(req, res, next) {
+    userService.getBannersByUserId(req)
+        .then(banner => banner ? res.status(200).json({ status: true, data: banner }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function deleteBannerAdv(req, res, next) {
+    userService.deleteBanner(req)
+        .then(banner => banner ? res.json({ status: true, message: "Successfull Delete" }) : res.json({ status: false, message: "ERROR" }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function getBannerById(req, res, next) {
+    userService.getBannerById(req)
+        .then(banner => banner ? res.status(200).json({ status: true, data: banner }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function updateBanner(req, res, next) {
+    userService.updateBanner(req)
+        .then(banner => banner ? res.json({ status: true, message: "Banner Update Successfully...." }) : res.json({ status: false, message: "ERROR" }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+

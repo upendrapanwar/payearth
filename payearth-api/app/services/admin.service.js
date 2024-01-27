@@ -11,7 +11,7 @@ const db = require("../helpers/db");
 const msg = require('../helpers/messages.json');
 const fs = require('fs');
 
-const { Admin, User, Seller, Coupon, Product, Category, Brand, TodayDeal, BannerImage, TrendingProduct, PopularProduct, Color, OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline, ProductSales, cmsPost, cmsPage, cmsCategory, bonusProgram , howitwork} = require("../helpers/db");
+const { Admin, User, Seller, Coupon, Product, Category, Brand, TodayDeal, BannerImage, TrendingProduct, PopularProduct, Color, OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline, ProductSales, cmsPost, cmsPage, cmsCategory, } = require("../helpers/db");
 
 module.exports = {
     authenticate,
@@ -2240,7 +2240,6 @@ async function getproductData(productId) {
 /******************************************************************************/
 
 // Publish Posts through Admin.........   
-
 //POST API
 async function createCmsPost(req, res) {
     try {
@@ -2288,7 +2287,7 @@ async function getCmsPostData() {
         if (allPosts && allPosts.length > 0)
             return allPosts;
     } catch (error) {
-        console.log(error)
+        console.log(error) 
     }
 }
 // Delete post
@@ -2414,7 +2413,7 @@ async function cmsGetPageById(req) {
     } catch (error) {
         console.log(error);
     }
-}
+} 
 
 // Update Page
 async function cmsUpdatePage(req) {
@@ -2452,16 +2451,15 @@ async function getAllPageSlug() {
 }
 
 //*************************cms Category***************** */
-
 async function createCmsCategory(req, res) {
     try {
         var param = req.body;
         let input = {
-            names: param.names,
-            slug: param.slug,
-            description: param.description,
-            publishDate: param.publishDate,
-            author: param.author,
+            bannerText: param.bannerText,
+            // slug: param.slug,
+            // description: param.description,
+            // publishDate: param.publishDate,
+            // author: param.author,
         };
         const category = new cmsCategory(input);
         const data = await category.save();
@@ -2519,7 +2517,47 @@ async function categoryDelete(req) {
 }
 
 
+//******************************************* 
+//*******************************************
+//*******************************************
+//*******************************************
+// ******     BANNER START     *******//
 
+// async function createNewBanner(req, res) {
+//     try {
+//         var param = req.body;
+//         // const titleCount = await cmsPost.find({ title: param.title }).count()
+//         // let slug = "";
+//         // if (titleCount > 0) {
+//         //     slug = param.slug + titleCount;
+//         // } else {
+//         //     slug = param.slug
+//         // }
+//         // console.log("Slug", slug)
+//         let input = {
+//             image: param.image,
+//             video: param.video,
+//             bannerText: param.bannerText,
+//             bannerName: param.bannerName,
+//             bannerType: param.bannerType,
+//             siteUrl : param.siteUrl,
+//             category: param.category,
+//             startDate: param.startDate,
+//             endDate: param.endDate,
+//             status: param.status
+//         };
+//         const banners = new banner(input);
+//         const data = await banners.save();
+//         // console.log("RES data", data)
+//         if (data) {
+//             // console.log(data._id);
+//             return data;
+//         }
+//         return false;
+//     } catch (error) {
+//         console.log('Error', error);
+//     }
+// }
 
 
 

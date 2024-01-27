@@ -63,6 +63,7 @@ const Header = () => {
                             <ul className="side_menu_links">
                                 <li><Link to="/my-orders" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Orders</Link></li>
                                 <li><Link to="/my-payments" onClick={() => removeBackdrop()}><i className="icon"><img src={creditCardIcon} alt="credit-card" /></i> Payments</Link></li>
+                                <li><Link to="/my-banners" onClick={() => removeBackdrop()}><i className="icon"><img src={creditCardIcon} alt="credit-card" /></i> My Banners</Link></li>
                                 <li><Link to="#"><i className="icon"><img src={notificationBellIcon} alt="notification-bell" /></i> Notifications</Link></li>
                                 <li><Link to="#"><i className="icon"><img src={chatIcon} alt="chat" /></i> Chats</Link></li>
                                 <li><Link to="/my-coupons" onClick={() => removeBackdrop()}><i className="icon"><img src={couponIcon} alt="coupon" /></i> My Coupons</Link></li>

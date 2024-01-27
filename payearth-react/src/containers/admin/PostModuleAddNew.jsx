@@ -89,14 +89,38 @@ class AdminPostModuleAddNew extends Component {
     handleDescriptionChange = (description) => {
         this.setState({ description });
     }
+    // handleImageChange = (e) => {
+    //     var reader = new FileReader();
+    //     reader.readAsDataURL(e.target.files[0]);
+    //     reader.onload = () => { this.setState({ image: reader.result }) };
+    //     reader.onerror = error => {
+    //         console.log("error", error);
+    //     }
+    // }
+
     handleImageChange = (e) => {
-        var reader = new FileReader();
-        reader.readAsDataURL(e.target.files[0]);
-        reader.onload = () => { this.setState({ image: reader.result }) };
-        reader.onerror = error => {
-            console.log("error", error);
-        }
-    }
+        const file = e.target.files[0];
+        const data = new FormData()
+        data.append("file", file)
+        data.append("upload_preset", "pay-earth-images")
+        data.append("cloud_name", "pay-earth")
+
+        // https://api.cloudinary.com/v1_1/pay-earth/video/upload   <= video file example
+
+        fetch("https://api.cloudinary.com/v1_1/pay-earth/image/upload", {
+            method: "post",
+            body: data
+        }).then((res) => res.json())
+            .then((data) => {
+                // console.log(data.secure_url);
+                this.setState({ image: data.secure_url })
+            }).catch((err) => {
+                console.log(err)
+            })
+    };
+
+
+
     handleCheckboxChange = (event) => {
         const { value, checked } = event.target;
         // console.log("value", value)
@@ -259,7 +283,7 @@ class AdminPostModuleAddNew extends Component {
                                                 />
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> 
                                 </div>
                             </div>
                         </div>
@@ -268,7 +292,7 @@ class AdminPostModuleAddNew extends Component {
                                 <div className="cumm_title">Featured Image</div>
                                 <div className="filter_box">
                                     <div align="center">
-                                        {!image ? <img src={emptyImg} alt='...' style={{ maxWidth: "50%" }} /> : <img src={image} style={{ maxWidth: "70%" }} />}
+                                        {!image ? <img src={emptyImg} alt='...' style={{ maxWidth: "50%" }} /> : <img src={image} style={{ maxWidth: "50%" }} />}
                                     </div>
                                     <div className="form-check mb-3 mt-4">
                                         <input

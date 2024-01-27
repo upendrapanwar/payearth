@@ -24,6 +24,11 @@ import MyProfile from './containers/user/MyProfile';
 import OrderDetail from './containers/user/OrderDetail';
 import MyPayments from './containers/user/MyPayments';
 import UserContact from './containers/user/Contact';
+import MyBanner from './containers/user/MyBanners';
+import CreateNewBanner from './containers/user/CreateBanner';
+import MyBannerEdit from './containers/user/MyBannerEdit';
+
+
 
 import Notifications from './containers/user/Notifications';
 import Chat from './containers/user/Chat';
@@ -104,8 +109,12 @@ import PageDetail from './components/common/PageDetails';
 
 
 import ScrollToTopButton from './containers/user/ScrollToTopButton';
+import BannerCheckOut from './containers/user/BannerCheckOut';
 
- 
+
+
+
+
 function App() {
 	const userInfo = useSelector(state => state.auth.userInfo);
 
@@ -131,6 +140,11 @@ function App() {
 					<PrivateRoute path="/my-wishlist" component={MyWishlist} roles={[Role.user]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/savelater" component={SaveLaterlist} roles={[Role.user]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/my-orders" component={MyOrders} roles={[Role.user]} currentUserRole={userInfo.role} exact />
+					<PrivateRoute path="/my-banners" component={MyBanner} roles={[Role.user]} currentUserRole={userInfo.role} exact />
+					<PrivateRoute path="/create-banner" component={CreateNewBanner} roles={[Role.user]} currentUserRole={userInfo.role} exact />
+					<PublicRoute path="/bannerCheckout" restricted={false} component={BannerCheckOut} exact />
+					<PrivateRoute path="/user/banner-edit/:id" component={MyBannerEdit} roles={[Role.user]} currentUserRole={userInfo.role} exact />
+
 					<PrivateRoute path="/order-detail/:id" component={OrderDetail} roles={[Role.user]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/my-payments" component={MyPayments} roles={[Role.user]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/order-summary/:id" component={OrderSummary} roles={[Role.user]} currentUserRole={userInfo.role} exact />
@@ -176,7 +190,7 @@ function App() {
 					<PublicRoute path="/admin/category-module" restricted={false} component={AdminCategoryModel} exact />
 					<PublicRoute path="/admin/category-module-edit/:id" restricted={false} component={AdminCategoryModelEdit} exact />
 
-			
+
 					<PublicRoute path="/admin/manage-payment-details/:id" restricted={false} component={ManagePaymentDetails} exact />
 					<PublicRoute path="/admin/chat" restricted={false} component={AdminChat} exact />
 					<PublicRoute path="/admin/manage-order-details/:id" restricted={false} component={ManageOrderDetails} exact />
