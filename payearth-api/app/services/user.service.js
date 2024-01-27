@@ -8,6 +8,9 @@ const bcrypt = require("bcryptjs");
 const nodemailer = require('nodemailer');
 const msg = require('../helpers/messages.json');
 const Webhook = require('coinbase-commerce-node').Webhook;
+var ApiContracts = require('authorizenet').APIContracts;
+var ApiControllers = require('authorizenet').APIControllers;
+var SDKConstants = require('authorizenet').Constants;
 const { User, Seller, Coupon, Product, Wishlist, UserCoupon, Review, ProductComplaint, Order, OrderStatus, OrderTrackingTimeline, OrderCancel, OrderReturn, Payment, CryptoConversion, Savelater, Cart, OrderDetails, bannerAdvertisement } = require("../helpers/db");
 
 module.exports = {
@@ -60,7 +63,8 @@ module.exports = {
     getBannersByUserId,
     deleteBanner,
     getBannerById,
-    updateBanner
+    updateBanner,
+    bannerPayment
 };
 
 function sendMail(mailOptions) {
@@ -1923,9 +1927,129 @@ async function updateBanner(req) {
     const { image, video, bannerText, bannerName, bannerType, siteUrl, category, bannerPlacement, startDate } = req.body;
     try {
         const banner = await bannerAdvertisement.findByIdAndUpdate(bannerId, { image, video, bannerText, bannerName, bannerType, siteUrl, category, startDate, bannerPlacement }, { new: true });
-      //  console.log("update banner", banner)
+        //  console.log("update banner", banner)
         return banner;
     } catch (error) {
         console.log(error)
     }
 }
+
+// Authorize.net paymenet getway intrigation example........................
+
+const API_LOGIN_ID = '7e44GKHmR3b';
+const TRANSACTION_KEY = '9d3H2z8X27PeD6Sh';
+
+
+async function bannerPayment(req) {
+    const amount = req.body.amount;
+    const planName = req.body.planName;
+    const cardNumber = req.body.cardNumber;
+    const expiryDate = req.body.expiryDate;
+
+    const today = new Date();
+    const futureDate  = new Date(today);
+    futureDate.setDate(today.getDate()+30);
+    const startDate = futureDate.toISOString().substring(0, 10);
+    console.log("start Date 30 days after", startDate)
+
+
+    console.log("amount CHECK", amount)
+    console.log("cardNumber", cardNumber)
+
+    try {
+        var merchantAuthenticationType = new ApiContracts.MerchantAuthenticationType
+        merchantAuthenticationType.setName(API_LOGIN_ID);
+        merchantAuthenticationType.setTransactionKey(TRANSACTION_KEY);
+
+        var interval = new ApiContracts.PaymentScheduleType.Interval();
+        interval.setLength(1);
+        interval.setUnit(ApiContracts.ARBSubscriptionUnitEnum.MONTHS);
+
+        var paymentScheduleType = new ApiContracts.PaymentScheduleType();
+        paymentScheduleType.setInterval(interval);
+        paymentScheduleType.setStartDate(startDate);
+        paymentScheduleType.setTotalOccurrences(5);
+        paymentScheduleType.setTrialOccurrences(0);
+
+        var creditCard = new ApiContracts.CreditCardType();
+        creditCard.setExpirationDate(expiryDate);
+        creditCard.setCardNumber(cardNumber);
+
+        var payment = new ApiContracts.PaymentType();
+        payment.setCreditCard(creditCard);
+
+        var orderType = new ApiContracts.OrderType();
+        orderType.setInvoiceNumber("");
+        orderType.setDescription("");
+
+        var customer = new ApiContracts.CustomerType();
+        customer.setType(ApiContracts.CustomerTypeEnum.INDIVIDUAL);
+        customer.setId("");
+        customer.setEmail("");
+        customer.setPhoneNumber('1232122122');
+        customer.setFaxNumber('1232122122');
+        customer.setTaxId('911011011');
+
+        var nameAndAddressType = new ApiContracts.NameAndAddressType();
+        nameAndAddressType.setFirstName("");
+        nameAndAddressType.setLastName('LName');
+        nameAndAddressType.setCompany('Company');
+        nameAndAddressType.setAddress('Address');
+        nameAndAddressType.setCity('City');
+        nameAndAddressType.setState('State');
+        nameAndAddressType.setZip('98004');
+        nameAndAddressType.setCountry('USA');
+
+        var arbSubscription = new ApiContracts.ARBSubscriptionType();
+        arbSubscription.setName(planName);
+        arbSubscription.setPaymentSchedule(paymentScheduleType);
+        arbSubscription.setAmount(amount);
+        arbSubscription.setTrialAmount(0.00);
+        arbSubscription.setPayment(payment);
+        arbSubscription.setOrder(orderType);
+        arbSubscription.setCustomer(customer);
+        arbSubscription.setBillTo(nameAndAddressType);
+        arbSubscription.setShipTo(nameAndAddressType);
+
+        var createRequest = new ApiContracts.ARBCreateSubscriptionRequest();
+        createRequest.setMerchantAuthentication(merchantAuthenticationType);
+        createRequest.setSubscription(arbSubscription);
+
+        console.log(JSON.stringify(createRequest.getJSON(), null, 2));
+
+        var ctrl = new ApiControllers.ARBCreateSubscriptionController(createRequest.getJSON());
+        console.log("ctrl", ctrl)
+        ctrl.execute(function () {
+            var apiResponse = ctrl.getResponse();
+            console.log("api Response", apiResponse)
+            var response = new ApiContracts.ARBCreateSubscriptionResponse(apiResponse);
+            console.log("response ::::::;", JSON.stringify(response, null, 2));
+
+            if (response != null) {
+                if (response.getMessages().getResultCode() == ApiContracts.MessageTypeEnum.OK) {
+                    console.log('Subscription Id : ' + response.getSubscriptionId());
+                    console.log('Message Code : ' + response.getMessages().getMessage()[0].getCode());
+                    console.log('Message Text : ' + response.getMessages().getMessage()[0].getText());
+                }
+                else {
+                    console.log('Result Code: ' + response.getMessages().getResultCode());
+                    console.log('Error Code: ' + response.getMessages().getMessage()[0].getCode());
+                    console.log('Error message: ' + response.getMessages().getMessage()[0].getText());
+                }
+            }
+            else {
+                console.log('Null Response.');
+            }
+            // callback(response);
+            console.log("response", response)
+            return response
+        });
+    } catch (error) {
+
+        console.log("error")
+        conole.log("error", error)
+        //res.status(500).json({ success: false, error: error.message });
+    }
+}
+
+

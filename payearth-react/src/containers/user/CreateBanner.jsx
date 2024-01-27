@@ -495,8 +495,8 @@ class CreateNewBanner extends Component {
     render() {
         const subPlan = [
             { id: 1, planType: 'Basic', planPrice: "10", description: 'This is Basic content.' },
-            { id: 2, planType: 'Standerd', planPrice: "20", description: 'This is Standerd content.' },
-            { id: 3, planType: 'Premium', planPrice: "50", description: 'This is Premium content.' },
+            { id: 2, planType: 'Standerd', planPrice: "59", description: 'This is Standerd content.' },
+            { id: 3, planType: 'Premium', planPrice: "99", description: 'This is Premium content.' },
         ];
         return (
             <React.Fragment>
