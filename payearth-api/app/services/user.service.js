@@ -11,6 +11,7 @@ const Webhook = require('coinbase-commerce-node').Webhook;
 var ApiContracts = require('authorizenet').APIContracts;
 var ApiControllers = require('authorizenet').APIControllers;
 var SDKConstants = require('authorizenet').Constants;
+const fs = require('fs');
 const { User, Seller, Coupon, Product, Wishlist, UserCoupon, Review, ProductComplaint, Order, OrderStatus, OrderTrackingTimeline, OrderCancel, OrderReturn, Payment, CryptoConversion, Savelater, Cart, OrderDetails, bannerAdvertisement } = require("../helpers/db");
 
 module.exports = {
@@ -64,7 +65,8 @@ module.exports = {
     deleteBanner,
     getBannerById,
     updateBanner,
-    bannerPayment
+    bannerPayment,
+    customerAuthorizePayment
 };
 
 function sendMail(mailOptions) {
@@ -1947,16 +1949,27 @@ async function bannerPayment(req) {
     const expiryDate = req.body.expiryDate;
 
     const today = new Date();
-    const futureDate  = new Date(today);
-    futureDate.setDate(today.getDate()+30);
+    const futureDate = new Date(today);
+    futureDate.setDate(today.getDate() + 30);
     const startDate = futureDate.toISOString().substring(0, 10);
     console.log("start Date 30 days after", startDate)
-
-
     console.log("amount CHECK", amount)
     console.log("cardNumber", cardNumber)
 
+    const randomString = Math.floor((Math.random() * 100000) + 1)
+
+    // fs.readFile(filePath, 'utf8', (err, data) => {
+    //     if (err) {
+    //         console.error('Error reading from file:', err);
+    //     } else {
+    //         // Parse JSON data
+    //         const retrievedData = JSON.parse(data);
+    //         console.log('Retrieved data:', retrievedData);
+    //     }
+    // });
+
     try {
+
         var merchantAuthenticationType = new ApiContracts.MerchantAuthenticationType
         merchantAuthenticationType.setName(API_LOGIN_ID);
         merchantAuthenticationType.setTransactionKey(TRANSACTION_KEY);
@@ -1984,7 +1997,7 @@ async function bannerPayment(req) {
 
         var customer = new ApiContracts.CustomerType();
         customer.setType(ApiContracts.CustomerTypeEnum.INDIVIDUAL);
-        customer.setId("");
+        customer.setId(randomString);
         customer.setEmail("");
         customer.setPhoneNumber('1232122122');
         customer.setFaxNumber('1232122122');
@@ -2011,17 +2024,143 @@ async function bannerPayment(req) {
         arbSubscription.setBillTo(nameAndAddressType);
         arbSubscription.setShipTo(nameAndAddressType);
 
+        console.log("arbSubscription", arbSubscription)
+
         var createRequest = new ApiContracts.ARBCreateSubscriptionRequest();
         createRequest.setMerchantAuthentication(merchantAuthenticationType);
         createRequest.setSubscription(arbSubscription);
+        // createRequest.setValidationMode(ApiContracts.ValidationModeEnum.TESTMODE);
+        // console.log("createRequest Check :", JSON.stringify(createRequest.getJSON(), null, 2));
 
-        console.log(JSON.stringify(createRequest.getJSON(), null, 2));
+
 
         var ctrl = new ApiControllers.ARBCreateSubscriptionController(createRequest.getJSON());
         console.log("ctrl", ctrl)
         ctrl.execute(function () {
             var apiResponse = ctrl.getResponse();
             console.log("api Response", apiResponse)
+            var response = new ApiContracts.ARBCreateSubscriptionResponse(apiResponse);
+            console.log("response ::::::", JSON.stringify(response, null, 2));
+
+            if (response != null) {
+                if (response.getMessages().getResultCode() == ApiContracts.MessageTypeEnum.OK) {
+                    console.log('Subscription Id : ' + response.getSubscriptionId());
+                    console.log('Message Code : ' + response.getMessages().getMessage()[0].getCode());
+                    console.log('Message Text : ' + response.getMessages().getMessage()[0].getText());
+                }
+                else {
+                    console.log('Result Code: ' + response.getMessages().getResultCode());
+                    console.log('Error Code: ' + response.getMessages().getMessage()[0].getCode());
+                    console.log('Error message: ' + response.getMessages().getMessage()[0].getText());
+                }
+            }
+            else {
+                console.log('Null Response.');
+            }
+            // callback(response);
+            console.log("response", response)
+            return response
+        });
+    } catch (error) {
+
+        console.log("error :")
+        conole.log("error : ", error)
+        //res.status(500).json({ success: false, error: error.message });
+    }
+}
+
+
+// *******************************************************************************
+// *******************************************************************************
+// *******************************************************************************
+
+
+// To generate customer ID.....
+
+async function customerAuthorizePayment(req) {
+    const amount = req.body.amount;
+    const planName = req.body.planName;
+    const cardNumber = req.body.cardNumber;
+    const expiryDate = req.body.expiryDate;
+
+
+    const today = new Date();
+    const futureDate = new Date(today);
+    futureDate.setDate(today.getDate() + 30);
+    const startDate = futureDate.toISOString().substring(0, 10);
+    console.log("start Date 30 days after", startDate)
+
+
+    try {
+
+        var merchantAuthenticationType = new ApiContracts.MerchantAuthenticationType();
+        merchantAuthenticationType.setName(API_LOGIN_ID);
+        merchantAuthenticationType.setTransactionKey(TRANSACTION_KEY);
+
+        var creditCard = new ApiContracts.CreditCardType();
+        creditCard.setCardNumber('4242424242424242');
+        creditCard.setExpirationDate('1226');
+
+        var paymentType = new ApiContracts.PaymentType();
+        paymentType.setCreditCard(creditCard);
+
+        var customerPaymentProfileType = new ApiContracts.CustomerPaymentProfileType();
+        customerPaymentProfileType.setCustomerType(ApiContracts.CustomerTypeEnum.INDIVIDUAL);
+        customerPaymentProfileType.setPayment(paymentType);
+
+        var paymentProfilesList = [];
+        paymentProfilesList.push(customerPaymentProfileType);
+
+        var customerProfileType = new ApiContracts.CustomerProfileType();
+        customerProfileType.setMerchantCustomerId('M_' + Math.floor((Math.random() * 100000) + 1));
+        customerProfileType.setDescription('Profile description here');
+        customerProfileType.setEmail('@anet.net');
+        customerProfileType.setPaymentProfiles(paymentProfilesList);
+
+        var createRequest = new ApiContracts.CreateCustomerProfileRequest();
+        createRequest.setProfile(customerProfileType);
+        createRequest.setValidationMode(ApiContracts.ValidationModeEnum.TESTMODE);
+        createRequest.setMerchantAuthentication(merchantAuthenticationType);
+
+
+        var ctrl = new ApiControllers.ARBCreateSubscriptionController(createRequest.getJSON());
+        console.log("ctrl", ctrl)
+        ctrl.execute(function () {
+            var apiResponse = ctrl.getResponse();
+            console.log("api Response", apiResponse);
+            console.log("customerProfileId", apiResponse.customerProfileId);
+            console.log("customerPaymentProfileIdList", apiResponse.customerPaymentProfileIdList);
+
+            // const localStorage = new LocalStorage('./scratch');
+            // localStorage.setItem('customerProfileId', apiResponse.customerProfileId);
+
+            const dataToStore = {
+                key: 'customerProfileId',
+                anotherKey: apiResponse.customerProfileId,
+            };
+            const jsonData = JSON.stringify(dataToStore);
+            const filePath = 'localData.json';
+
+            fs.writeFile(filePath, jsonData, (err) => {
+                if (err) {
+                    console.error('Error writing to file:', err);
+                } else {
+                    console.log('Data successfully stored in local file.', jsonData);
+                }
+            });
+
+            //   fs.readFile(filePath, 'utf8', (err, data) => {
+            //     if (err) {
+            //       console.error('Error reading from file:', err);
+            //     } else {
+            //       // Parse JSON data
+            //       const retrievedData = JSON.parse(data);
+            //       console.log('Retrieved data:', retrievedData);
+            //     }
+            //   });
+
+
+
             var response = new ApiContracts.ARBCreateSubscriptionResponse(apiResponse);
             console.log("response ::::::;", JSON.stringify(response, null, 2));
 
@@ -2046,10 +2185,9 @@ async function bannerPayment(req) {
         });
     } catch (error) {
 
-        console.log("error")
-        conole.log("error", error)
+        console.log("error :")
+        conole.log("error : ", error)
         //res.status(500).json({ success: false, error: error.message });
     }
+
 }
-
-

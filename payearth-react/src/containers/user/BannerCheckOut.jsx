@@ -166,7 +166,8 @@ class BannerCheckOut extends Component {
             console.log(paymentId)
             console.log("Payment PAID or UNPAID check here: ", this.state.status)
 
-            //window.location.href('/OrderDetail')
+           
+            
         }
         // Process API response on your backend...
 
@@ -526,6 +527,7 @@ class BannerCheckOut extends Component {
                     console.log("response userSave order : ", response);
                     toast.dismiss();
                     toast.success('Order Placed Successfull', { autoClose: 3000 });
+                    this.props.history.push('/my-banners')
                     //  this.props.history.push('/order-summary/' + response.data.data);
                 }
                 //console.log(response.data.data.order)

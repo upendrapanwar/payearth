@@ -161,7 +161,13 @@ router.get("/getBannersByUserId/:id", getBannersByUserId);
 router.delete("/deleteBanner/:id", deleteBannerAdv);
 router.get("/getBannerById/:id", getBannerById);
 router.put("/updateBanner/:id", updateBanner);
+
+router.post('/createAuthorizeCustomer/payment', customerAuthorizePayment);
 router.post('/schedule/payment', bannerPayment);
+
+
+
+
 
 module.exports = router;
 
@@ -530,12 +536,38 @@ function updateBanner(req, res, next) {
 }
 
 
+function customerAuthorizePayment(req, res, next) {
+    console.log("banner payments")
+    userService.customerAuthorizePayment(req)
+        //.then(payment => payment ? res.status(200).json({ status: true, data: payment }) : res.json({ status: false, message: "ERROR" }))
+        .then(data => {
+            if (data) {
+                return res.status(200).json({ status: true, data: data });
+            } else {
+                return res.json({ status: false, message: "ERROR" });
+            }
+        })
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
 function bannerPayment(req, res, next) {
     console.log("banner payments")
     userService.bannerPayment(req)
-        .then(payment => payment ? res.status(200).json({ status: true, data: payment }) : res.json({ status: false, message: "ERROR" }))
+        //.then(payment => payment ? res.status(200).json({ status: true, data: payment }) : res.json({ status: false, message: "ERROR" }))
+        .then(payment => {
+            if (payment) {
+                return res.status(200).json({ status: true, data: payment });
+            } else {
+                return res.json({ status: false, message: "ERROR" });
+            }
+        })
         .catch(err => next(res.json({ status: false, message: err })));
 }
+
+
+
+
+
 
 
 

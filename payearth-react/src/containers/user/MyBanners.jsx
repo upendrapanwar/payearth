@@ -197,23 +197,27 @@ class MyBanner extends Component {
       name: " Banner Image/Video",
       selector: (row, i) => row.video === '' ? <img src={row.image} alt='' style={{ width: '250px', height: '150px' }} /> : <video width="250" height="150" src={row.video} autoPlay loop alt="" />,
       sortable: true,
+      width: '300px',
 
     },
     {
       name: "Banner Name",
       selector: (row, i) => row.bannerName,
       sortable: true,
+      width: '220px',
     },
     {
       name: "Banner Text",
       selector: (row, i) => row.bannerText,
       sortable: true,
+      width: '220px',
 
     },
     {
       name: "Category",
       selector: (row, i) => row.category,
       sortable: true,
+      width: '220px',
     },
     // {
     //   name: 'Subscription Plan',
@@ -230,12 +234,12 @@ class MyBanner extends Component {
     //   sortable: true,
 
     // },
-    {
-      name: "Status",
-      selector: (row, i) => row.status,
-      sortable: true,
+    // {
+    //   name: "Status",
+    //   selector: (row, i) => row.status,
+    //   sortable: true,
 
-    },
+    // },
     {
       name: 'Actions',
       cell: (row) => (
@@ -244,6 +248,8 @@ class MyBanner extends Component {
             type='submit'
             className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
             onClick={() => this.handlePreview(row)}
+           
+           
           >
             Preview
           </button>
@@ -259,12 +265,15 @@ class MyBanner extends Component {
           >
             Delete
           </button>
-
         </>
       ),
     },
   ]
 
+  handleIframeClick = () => {
+    // alert("handle selected")
+    window.open(this.state.selectedRowData.siteUrl)
+  }
 
 
   render() {
@@ -337,24 +346,36 @@ class MyBanner extends Component {
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-           
+
             {this.state.selectedRowData && (
               <div
                 className="banner-container"
               >
-            {/* <a href={this.state.selectedRowData.siteUrl} target="_blank" rel="noopener noreferrer">
+                <p>{this.state.selectedRowData.siteUrl}</p>
+                {/* <a href={this.state.selectedRowData.siteUrl} target="_blank" rel="noopener noreferrer">
 
                   <img
                     src={this.state.selectedRowData.image}
                     alt="Banner"
                     className="banner-image"
+                    // onClick={this.handleIframeClick}
                   />
                 </a>  */}
 
-                <a href={this.state.selectedRowData.siteUrl} target="_blank">
-                  <iframe src={!this.state.selectedRowData.image ? this.state.selectedRowData.video : this.state.selectedRowData.image } frameborder="0" allowfullscreen></iframe>
+                <a
+                  href={this.state.selectedRowData.siteUrl}
+                  target="_blank">
+                  <iframe
+                    src={!this.state.selectedRowData.image ? this.state.selectedRowData.video : this.state.selectedRowData.image}
+                    width='1100'
+                    height="315"
+                    // frameborder="0"
+                    allow="autoplay; encrypted-media"
+                    // allowfullscreen
+                  // onClick={this.handleIframeClick}
+                  ></iframe>
                 </a>
-
+                
                 <button
                   className="close-button"
                   onClick={this.handleClose}

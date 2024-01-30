@@ -3852,16 +3852,16 @@ body {
 }
 /*PERSONAL*/
 .personal .title{        
-    background: #78CFBF;    
+    background: #66abeb;    
 }
 .personal .content,.personal .pt-footer{
-    background: #82DACA;
+    background: #f7645f;
 }
 .personal .content:after{	
 	border-top-color: #82DACA;	
 }
 .personal .pt-footer:after{
-    border-top-color: #FFFFFF;
+    border-top-color: #202020;
 }
 /*PROFESSIONAL*/
 .professional .title{

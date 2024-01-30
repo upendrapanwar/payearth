@@ -251,6 +251,7 @@ class CreateNewBanner extends Component {
         const { subscriptionPlan } = this.state;
         // toast.success("Banner Create succesfully..", { autoClose: 3000 })
         this.saveBanner("pending");
+        this.customerAuthorizePayment();
         //    this.props.history.push('/bannerCheckout')
 
         this.props.history.push({
@@ -297,50 +298,25 @@ class CreateNewBanner extends Component {
         this.setState({ image: "", video: "", bannerText: "", bannerType: "", bannerName: "", siteUrl: "", category: "", startDate: "", endDate: "", subscriptionPlan: "", bannerPlacement: "", status: "", author: "", tag: "", keyword: "" })
 
     }
-    renderCardText = () => {
 
-        switch (this.state.subscriptionPlan) {
-            case '1 Month':
-                return < div className="card">
-                    <div className="card-header">
-                        PLAN A
-                    </div>
-                    <div className="card-body">
-                        <h5 className="card-title">Special title treatment</h5>
-                        <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                        {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
 
-                    </div>
-                </div>
-            // case 'value2':
-            //     return 'Card Text for Value 2';
-            case '3 Month':
-                return <div className="card">
-                    <div className="card-header">
-                        PLAN B
-                    </div>
-                    <div className="card-body">
-                        <h5 className="card-title">Special title treatment</h5>
-                        <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                        {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
-                    </div>
-                </div>
-            // Add more cases as needed
-            default:
-                return <div className="card">
-                    <div className="card-header">
-                        PLAN B
-                    </div>
-                    <div className="card-body">
-                        <h5 className="card-title">Special title treatment</h5>
-                        <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                        {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
-                    </div>
-                </div>
-
+    customerAuthorizePayment = async () => {
+        const url = 'user/createAuthorizeCustomer/payment';
+        const data = {
+            amount: "",
         }
-
-    };
+        axios.post(url, data, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${this.authInfo.token}`
+            }
+        }).then((response) => {
+            console.log("SUCCESS......", response.date);
+        }).catch((error) => {
+            console.log("error", error);
+        });
+    }
 
     handleSelectImageOrVideo = (e) => {
         console.log("select IMAGE OR VIDEO", e.target.value)
@@ -690,11 +666,15 @@ class CreateNewBanner extends Component {
                                                 {/* background-color: aliceblue */}
 
                                                 <div className="col-md-12 bg-body-tertiary">
+
                                                     <div className="wrapper">
+                                                        <div className='text-center'>
+                                                            <h4> Select your plan </h4>
+                                                        </div>
                                                         <div className="pricing-table group">
                                                             {subPlan.map((card) => <>
                                                                 <li key={card.id} onClick={() => this.handleSubscriptionPlan(card)}>
-                                                                    <div className="block personal fl" >
+                                                                    <div className="block personal fl">
                                                                         <h2 className="title" >{card.planType}</h2>
                                                                         <div className="content">
                                                                             <p className="price">
