@@ -14,6 +14,7 @@ import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 import CryptoJS from 'crypto-js';
 import Modal from "react-bootstrap/Modal";
+import noImg from './../../assets/images/noimage.png'
 import ModalBody from 'react-bootstrap/esm/ModalBody';
 
 
@@ -195,10 +196,9 @@ class MyBanner extends Component {
   banner_column = [
     {
       name: " Banner Image/Video",
-      selector: (row, i) => row.video === '' ? <img src={row.image} alt='' style={{ width: '250px', height: '150px' }} /> : <video width="250" height="150" src={row.video} autoPlay loop alt="" />,
+      selector: (row, i) => row.video === '' ? <img src={row.image} alt="No Image/video select" style={{ width: '250px', height: '150px' }} /> : <video width="250" height="150" src={row.video} autoPlay loop alt="No Image/video select" />,
       sortable: true,
       width: '300px',
-
     },
     {
       name: "Banner Name",

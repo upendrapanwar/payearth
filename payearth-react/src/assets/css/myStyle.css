@@ -2464,6 +2464,9 @@ input[type="search"] {
     padding-bottom: 10px;
     padding: 5px 20px;
 }
+.adv_banner_panel .crt_bnr_fieldRow.createbtn{
+    text-align: center;
+}
 
 .adv_banner_panel .crt_bnr_fieldRow label {
     font-weight: 700;

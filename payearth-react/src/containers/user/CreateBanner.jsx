@@ -44,6 +44,8 @@ class CreateNewBanner extends Component {
             author: this.authInfo.id,
             card: "",
             selectImageOrVideo: "",
+            isSelectplan : false
+
         };
     }
 
@@ -240,6 +242,7 @@ class CreateNewBanner extends Component {
     handleSubscriptionPlan = (card) => {
         console.log("card : ", card)
         this.setState({ subscriptionPlan: card });
+        this.setState({ isSelectplan : true})
     };
 
     handleBannerPlacement = (e) => {
@@ -469,6 +472,8 @@ class CreateNewBanner extends Component {
     }
 
     render() {
+
+        const {subscriptionPlan}  = this.state;
         const subPlan = [
             { id: 1, planType: 'Basic', planPrice: "10", description: 'This is Basic content.' },
             { id: 2, planType: 'Standerd', planPrice: "59", description: 'This is Standerd content.' },
@@ -665,7 +670,7 @@ class CreateNewBanner extends Component {
                                                 </div>
                                                 {/* background-color: aliceblue */}
 
-                                                <div className="col-md-12 bg-body-tertiary">
+                                                <div className="col-md-12 bg-body-tertiary plan-cart">
 
                                                     <div className="wrapper">
                                                         <div className='text-center'>
@@ -674,7 +679,8 @@ class CreateNewBanner extends Component {
                                                         <div className="pricing-table group">
                                                             {subPlan.map((card) => <>
                                                                 <li key={card.id} onClick={() => this.handleSubscriptionPlan(card)}>
-                                                                    <div className="block personal fl">
+                                                                    <div className={subscriptionPlan.id === card.id ? "block personal fl active" : "block personal fl"}>
+                                                                        <a className='inner-block'>
                                                                         <h2 className="title" >{card.planType}</h2>
                                                                         <div className="content">
                                                                             <p className="price">
@@ -690,6 +696,7 @@ class CreateNewBanner extends Component {
                                                                             <li><span className="fontawesome-dashboard"></span>Unlimited Data Transfer</li>
                                                                             <li><span className="fontawesome-cloud"></span>10GB Local Storage</li>
                                                                         </ul>
+                                                                        </a>
                                                                     </div>
                                                                 </li>
                                                             </>
@@ -698,9 +705,9 @@ class CreateNewBanner extends Component {
                                                     </div>
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
-                                                            <div className="field_item">
+                                                            <div className="field_item text-center">
                                                                 <button
-                                                                    className="btn custom_btn btn_yellow mx-auto"
+                                                                    className="btn custom_btn btn_yellow mx-auto createbtn"
                                                                     onClick={this.handleSave}
                                                                 >
                                                                     Create Banner

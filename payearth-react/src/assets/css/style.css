@@ -3891,8 +3891,26 @@ body {
 }
 
 /* TESTTTTTTTTTTTTTTTTTTTTTT@@@@@@@@@@@@@@@@@@@22222222*/
-
-
+.plan-cart .pricing-table .block.personal{
+    background-color: #9C9C9C;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    transition: transform .2s;
+    /* height: 100%;
+    width: 100%; */
+    cursor: pointer;
+}
+.plan-cart .pricing-table .block.personal.active{
+    /* border: 4px solid green; */
+    box-shadow: rgb(255, 238, 1) 0px 5px 15px;
+    transform: scale(1.09); 
+}
+.plan-cart .pricing-table .block.personal:hover{
+    /* transform: scale(1.05); 
+     */
+}
+a.inner-block:active {
+    font-size: 30px;
+}
 
 @media (max-width:991px) {
     /* .custom_btn{
@@ -3950,4 +3968,14 @@ body {
     .popular_products_sec .cards_wrapper {
         margin: 28px 15px 18px 15px;
     }
+    .pricing-table{
+        display: block;
+        margin: 50px 20px;
+    }
+    .plan-cart .pricing-table .block.personal{
+        width: 100%;
+        margin-bottom: 30px;
+    }
+   
+
 }
