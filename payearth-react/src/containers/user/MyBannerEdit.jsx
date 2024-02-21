@@ -214,7 +214,7 @@ class MyBannerEdit extends Component {
         const url = `/user/updateBanner/${id}`;
         const bannerData = {
             image,
-            imageId,
+            imageId, 
             video,
             videoId,
             bannerText,
@@ -737,13 +737,11 @@ class MyBannerEdit extends Component {
                                                 </div>
 
 
-                                                <div className="col-md-12 bg-body-tertiary">
+                                                <div className="col-md-12 bg-body-tertiary advBannerEditWrap">
                                                     <div className="row">
-                                                        <div className="col-md-2">
-
-                                                        </div>
-                                                        <div className="col-md-10">
-                                                            <h3>Your Selected plan : </h3>
+                                                        
+                                                        <div className="col-md-12">
+                                                            <h3 className="text-center selectPlanHeading">Your Selected plan : </h3>
                                                             <div className="wrapper">
                                                                 <div className="pricing-table group">
                                                                     <div className="block personal f2" >

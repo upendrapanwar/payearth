@@ -12,6 +12,8 @@ var ApiContracts = require('authorizenet').APIContracts;
 var ApiControllers = require('authorizenet').APIControllers;
 var SDKConstants = require('authorizenet').Constants;
 const fs = require('fs');
+const stripe = require('stripe')('sk_test_51OewZgD2za5c5GtO7jqYHLMoDerwvEM69zgVsie3FNLrO0LLSLwFJGzXv4VIIGqScWn6cfBKfGbMChza2fBIQhsv00D9XQRaOk');
+
 const { User, Seller, Coupon, Product, Wishlist, UserCoupon, Review, ProductComplaint, Order, OrderStatus, OrderTrackingTimeline, OrderCancel, OrderReturn, Payment, CryptoConversion, Savelater, Cart, OrderDetails, bannerAdvertisement } = require("../helpers/db");
 
 module.exports = {
@@ -66,7 +68,9 @@ module.exports = {
     getBannerById,
     updateBanner,
     bannerPayment,
-    customerAuthorizePayment
+    customerAuthorizePayment,
+    createSubscription
+
 };
 
 function sendMail(mailOptions) {
@@ -1265,7 +1269,7 @@ async function getOrderDetails(id) {
                         model: OrderStatus,
                         select: 'title'
                     })
-
+ 
                 })
             })
             .populate({
@@ -1911,7 +1915,7 @@ async function deleteBanner(req) {
     }
 }
 
-
+ 
 // ByID
 async function getBannerById(req) {
     const bannerId = req.params.id;
@@ -2191,3 +2195,56 @@ async function customerAuthorizePayment(req) {
     }
 
 }
+
+
+/**STRIPE>>>>>>>>>>>>>>>>>>>>>>> */
+
+
+async function createSubscription(req, res) {
+    const { paymentMethodId, email, plan_Id, authName } = req.body;
+    try {
+        const paymentMethod = await stripe.paymentMethods.create({
+            type: 'card',
+            card: {
+                token: paymentMethodId,
+            },
+        });
+        console.log("paymentMethod", paymentMethod.id)
+
+        const customer = await stripe.customers.create({
+            email: email,
+            payment_method: paymentMethod.id,
+            invoice_settings: {
+                default_payment_method: paymentMethod.id,
+            },
+            name: authName,
+        });
+
+        // Attach the payment method to the customer
+        await stripe.paymentMethods.attach(paymentMethod.id, {
+            customer: customer.id,
+        });
+
+        // Set the payment method as the default for invoices
+        await stripe.customers.update(customer.id, {
+            invoice_settings: {
+                default_payment_method: paymentMethod.id,
+            },
+        });
+
+        const subscription = await stripe.subscriptions.create({
+            customer: customer.id,
+            items: [{ price: plan_Id }], // Replace with your plan ID
+            expand: ['latest_invoice.payment_intent'],
+        });
+        
+        return subscription
+        // return session;
+        // res.status(200).json({ subscription });
+    } catch (error) {
+        console.error('Error creating subscription:', error);
+        // res.status(500).send({ error: 'Subscription creation failed' });
+    }
+
+}
+

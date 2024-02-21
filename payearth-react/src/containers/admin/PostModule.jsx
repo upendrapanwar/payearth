@@ -19,7 +19,6 @@ class AdminPostModule extends Component {
         this.authInfo = store.getState().auth.authInfo;
         // console.log("Auth", this.userInfo.name)
         this.state = {
-
             selectedRows: [],
             publish: [],
             draft: [],
@@ -238,7 +237,6 @@ class AdminPostModule extends Component {
             }
             this.setState({ selectedRows: "" })
             this.setState({ loading: true })
-
         }
     }
 
@@ -450,7 +448,6 @@ class AdminPostModule extends Component {
                     >
                         Delete
                     </button>
-
                 </>
             ),
         },
@@ -649,7 +646,6 @@ class AdminPostModule extends Component {
                         </div>
                     </div>
                 </section>
-
                 <Footer />
             </React.Fragment>
 

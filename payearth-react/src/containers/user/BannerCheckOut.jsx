@@ -9,11 +9,16 @@ import { Box, Text } from "rebass";
 import styled from "styled-components";
 import { toast } from 'react-toastify';
 import store from '../../store/index';
+import successImg from "../../assets/images/success_png.png"
 import { useHistory } from "react-router-dom";
+import { withRouter } from 'react-router-dom';
+import { Elements, CardElement, ElementsConsumer } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import Modal from "react-bootstrap/Modal";
 //coinbase inport
 //import CoinbaseCommerceButton from "react-coinbase-commerce";
 //import 'react-coinbase-commerce/dist/coinbase-commerce-button.css';
-import { FormComponent, FormContainer } from "react-authorize-net";
+// import { FormComponent, FormContainer } from "react-authorize-net";
 
 //let clientKey = process.env.REACT_APP_AUTHORIZENET_CLIENTKEY as string;
 //let clientKey;
@@ -23,6 +28,7 @@ import { FormComponent, FormContainer } from "react-authorize-net";
 type State = {
     status: "paid" | "unpaid" | ["failure", string[]];
 };*/
+
 const Button = styled.button({
     "&:hover": { cursor: "pointer" },
     padding: "10px",
@@ -54,20 +60,18 @@ const Header = props => (
   </Flex>
 );*/
 
-class BannerCheckOut extends Component {
 
+class BannerCheckOut extends Component {
     constructor(props) {
         super(props);
 
         this.buttonRef = React.createRef;
-        this.clientKey = "3q47VR4QY739gdggD4dP2JJsUNyd54bJJdDDpAdmktL59dA96SZMARZHtG2tDz6V";
-        this.apiLoginId = "7e44GKHmR3b";
+        // this.clientKey = "3q47VR4QY739gdggD4dP2JJsUNyd54bJJdDDpAdmktL59dA96SZMARZHtG2tDz6V";
+        // this.apiLoginId = "7e44GKHmR3b";
         this.authInfo = store.getState().auth.authInfo;
-        this.subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
+        this.userInfo = store.getState().auth.userInfo;
+
         this.state = {
-            cardNumber: "",
-            cvv: "",
-            expiryDate: "",
             formStatus: false,
             chargeData: '',
             checkoutData: '',
@@ -94,132 +98,202 @@ class BannerCheckOut extends Component {
             autherStatus: '',
             user_id: '',
             paymentType: '',
-            moneyComparision: false
+            moneyComparision: false,
+
+            // stripe
+            authName: this.userInfo.name,
+            email: this.userInfo.email,
+            paymentMethodId: null,
+            planId: "",
+            error: null,
+            selectCard: "",
+            stripeResponse: "",
+            allOrderStatus: "",
+            show: false,
+            showModal: false,
+            isLoading: false,
+
         };
     }
 
-    success = () => {
-        console.log("handle payment succes every 10 secound..")
+    // stripe function
+
+    componentWillMount() {
+        var storedDataset = sessionStorage.getItem('selectPlan');
+
+        // Parse the string back into an object
+        var retrievedDataset = JSON.parse(storedDataset);
+        console.log("data for session storage", retrievedDataset.stripPlanId)
+        this.setState({ plan_Id: retrievedDataset.stripPlanId })
+        this.setState({ selectCard: retrievedDataset })
     }
 
-    onErrorHandler = (response) => {
-
-        const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
-
-        console.log(response);
-        this.setState({
-            status: ["failure", response.messages.message.map(err => err.text)]
-        });
-        const paymentData = [{
-            'userId': this.authInfo.id,
-            'sellerId': this.state.productSku,
-            'amountPaid': subscriptionPlanData.planPrice,
-            'paymentMode': 'usd',
-            'paymentAccount': 'Authorize .Net',
-            'invoiceUrl': '',
-            'paymentStatus': 'failed',
-        }];
-        var paymentIds = this.managePaymentData(paymentData);
-        let paymentId;
-        paymentIds.then((result) => {
-            paymentId = result;
-        })
-        this.setState({ "paymentId": paymentId })
-
+    handleCheckOut = () => {
+        console.log("RUNNNNN>>>>>>handleCheckOut")
+        this.setState({ showModal: true });
     };
-    /**
-     * Called On successful payment
-     * 
-     * @param {*} response 
-     */
-    onSuccessHandler = (response) => {
 
-        const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
+    handleSubmit = async (event, elements, stripe) => {
+        this.setState({ isLoading: true });
+        event.preventDefault();
 
-        console.log("resp:", response);
-        console.log("resp:", response.isTrusted === true ? "TRUE" : "FALSE");
-        if (response.isTrusted === true) {
-            console.log("subscription trueeeeeee")
-            this.setState({ status: ["paid", []] });
-            toast.dismiss();
-            toast.success('Payment Successfull', { autoClose: 3000 });
-
-            const paymentData = [{
-                'userId': this.authInfo.id,
-                'sellerId': this.state.productSku,
-                'amountPaid': subscriptionPlanData.planPrice,
-                'paymentMode': 'usd',
-                'paymentAccount': 'Authorize .Net',
-                'invoiceUrl': '',
-                'paymentStatus': 'Paid',
-            }];
-            console.log("......", paymentData);
-            var paymentIds = this.managePaymentData(paymentData);
-            let paymentId;
-            paymentIds.then((result) => {
-                console.log(result);
-                paymentId = result;
-                this.setState({ "paymentId": result })
-                this.onSubmitHandler();
-                this.savePayData()
-            })
-            console.log(paymentId)
-            console.log("Payment PAID or UNPAID check here: ", this.state.status)
-
-           
-            
+        if (!stripe || !elements) {
+            return;
         }
-        // Process API response on your backend...
+        const cardElement = elements.getElement(CardElement);
+        const { token, error } = await stripe.createToken(cardElement);
 
-    };
+        if (error) {
+            console.error("card validation error : ", error);
+            toast.error(error.message);
+            this.setState({ isLoading: false });
 
-    /****************************************************************************************** */
-    handleCardNumber = (e) => {
-        this.setState({ cardNumber: e.target.value })
-    }
-    handleExpiry = (e) => {
-        const input = e.target.value.replace(/\D/g, '');
-        if (input.length > 2) {
-            this.setState({ expiryDate: input.slice(0, 2) + '/' + input.slice(2) });
         } else {
-            this.setState({ expiryDate: input })
+            // You can handle the token or payment method ID here
+            console.log('Token or Payment Method ID:', token.id);
+            this.setState({ paymentMethodId: token.id })
+            // Now, you can send the token or payment method ID to your server for further processing
         }
-    }
-    handleCvv = (e) => {
-        this.setState({ cvv: e.target.value })
-    }
 
+        this.handleSubscribeStripe();
+    };
 
+    handleSubscribeStripe = () => {
+        const { email, paymentMethodId, plan_Id, authName } = this.state;
+        const url = 'user/create-subscription';
 
-    savePayData = () => {
-
-        const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
-        const { cardNumber, cvv, expiryDate } = this.state;
-        const url = 'user/schedule/payment';
-        const payData = {
-            cardNumber,
-            cvv,
-            expiryDate,
-            amount: subscriptionPlanData.planPrice,
-            planName: subscriptionPlanData.planType
+        const subData = {
+            email,
+            paymentMethodId,
+            plan_Id,
+            authName
         };
-        console.log("payData", payData)
 
-        axios.post(url, payData, {
+        axios.post(url, subData, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
                 'Authorization': `Bearer ${this.authInfo.token}`
             }
         }).then((response) => {
-            console.log("SUCCESS", response.date);
+            console.log("Subscription created succesfully....", response.data);
+            console.log("payment status", response.data.data.status)
+            this.setState({ stripeResponse: response.data })
+
+            const paymentData = [{
+                'userId': this.authInfo.id,
+                'sellerId': this.state.productSku,
+                'amountPaid': "",
+                'paymentMode': 'usd',
+                'paymentAccount': 'Stripe',
+                'invoiceUrl': '',
+                'paymentStatus': response.data.data.status,
+            }];
+            console.log("paymentData", paymentData)
+            // this.onSubmitHandler();
+            var paymentIds = this.managePaymentData(paymentData);
+            let paymentId;
+            paymentIds.then((result) => {
+                paymentId = result;
+                this.setState({ "paymentId": paymentId })
+                this.onSubmitHandler();
+
+            })
         }).catch((error) => {
             console.log("error", error);
-        });
-
-        this.setState({ cardNumber: "", cvv: "", expiryDate: "" })
-
+        })
     }
+
+
+
+
+    // onErrorHandler = (response) => {
+
+    //     //  const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
+
+    //     console.log(response);
+    //     this.setState({
+    //         status: ["failure", response.messages.message.map(err => err.text)]
+    //     });
+    //     const paymentData = [{
+    //         'userId': this.authInfo.id,
+    //         'sellerId': this.state.productSku,
+    //         'amountPaid': "",
+    //         'paymentMode': 'usd',
+    //         'paymentAccount': 'Authorize .Net',
+    //         'invoiceUrl': '',
+    //         'paymentStatus': 'failed',
+    //     }];
+    //     console.log("......", paymentData);
+    //     var paymentIds = this.managePaymentData(paymentData);
+    //     let paymentId;
+    //     paymentIds.then((result) => {
+    //         paymentId = result;
+    //     })
+    //     this.setState({ "paymentId": paymentId })
+
+    // };
+    /**
+     * Called On successful payment
+     * 
+    //   @param {*} response 
+     */
+    // onSuccessHandler = (response) => {
+
+    //     //  const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
+
+    //     console.log("resp:", response);
+    //     console.log("resp:", response.isTrusted === true ? "TRUE" : "FALSE");
+    //     if (response.isTrusted === true) {
+    //         console.log("subscription trueeeeeee")
+    //         this.setState({ status: ["paid", []] });
+    //         toast.dismiss();
+    //         toast.success('Payment Successfull', { autoClose: 3000 });
+
+    //         const paymentData = [{
+    //             'userId': this.authInfo.id,
+    //             'sellerId': this.state.productSku,
+    //             'amountPaid': "subscriptionPlanData.planPrice",
+    //             'paymentMode': 'usd',
+    //             'paymentAccount': 'Authorize .Net',
+    //             'invoiceUrl': '',
+    //             'paymentStatus': 'Paid',
+    //         }];
+    //         console.log("......", paymentData);
+    //         var paymentIds = this.managePaymentData(paymentData);
+    //         let paymentId;
+    //         paymentIds.then((result) => {
+    //             console.log(result);
+    //             paymentId = result;
+    //             this.setState({ "paymentId": result })
+    //             // this.onSubmitHandler();
+    //             // this.savePayData()
+    //         })
+    //         console.log(paymentId)
+    //         console.log("Payment PAID or UNPAID check here: ", this.state.status)
+
+
+
+    //     }
+    //     // Process API response on your backend...
+
+    // };
+
+    /****************************************************************************************** */
+    // handleCardNumber = (e) => {
+    //     this.setState({ cardNumber: e.target.value })
+    // }
+    // handleExpiry = (e) => {
+    //     const input = e.target.value.replace(/\D/g, '');
+    //     if (input.length > 2) {
+    //         this.setState({ expiryDate: input.slice(0, 2) + '/' + input.slice(2) });
+    //     } else {
+    //         this.setState({ expiryDate: input })
+    //     }
+    // }
+    // handleCvv = (e) => {
+    //     this.setState({ cvv: e.target.value })
+    // }
 
     /**************************************************************************/
     /**************************************************************************/
@@ -258,14 +332,10 @@ class BannerCheckOut extends Component {
      * Initialize instance and function on did mount
      */
     componentDidMount() {
-
-
         this.getNewCouponCode();
         this.getOrderStaus();
         //this.getOrderTrackingTime();
         this.getProductSku();
-        //document.getElementsByClassName("sc-htpNat")[0].style.display = "none";
-        //document.getElementsByClassName("sc-htpNat")[0].closest("div").style.display = "none"; 
     }
     /**************************************************************************/
     /**************************************************************************/
@@ -445,16 +515,10 @@ class BannerCheckOut extends Component {
      * @param {*} event 
      */
     onSubmitHandler = event => {
+        const { selectCard, stripeResponse } = this.state;
+        const url = 'user/saveorder';
 
-        const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
-
-
-        //  event.preventDefault();
-        //  const orderData = []
-        //  const cart = this.props.cart
-        // console.log(this.state);
-
-        if (this.state.status[0] === "paid") {
+        if (stripeResponse.status === true) {
             let orderStatusData = this.state.orderStatus;
             let orderStatus = '6137423b2651fc157c545d50';//pending
             console.log(orderStatusData);
@@ -502,39 +566,37 @@ class BannerCheckOut extends Component {
                     taxPercent: 0,
                     taxAmount: 0,
                     discount: 0,
-                    price: subscriptionPlanData.planPrice,
-                    total: subscriptionPlanData.planPrice,
+                    price: selectCard.planPrice,
+                    total: selectCard.planPrice,
                     orderStatus: orderStatus,
                     isActive: true,
                     isService: false
                 },
                 user_id: this.authInfo.id
             }
-            console.log(reqBody);
+            console.log("submit handler: ", reqBody);
 
-            axios.post('user/saveorder', reqBody.data, {
+            axios.post(url, reqBody.data, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
                     'Authorization': `Bearer ${this.authInfo.token}`,
                 }
             }).then((response) => {
-                this.setState({ data: response.status })
-
-                if (response.status) {
+                // toast.success('Order Placed Successfull', { autoClose: 3000 });
+                console.log("response++++ : ", response);
+                console.log("response++++ : ", response.data.status);
+                if (response.data.status === true) {
                     this.addOrderTimeLine(response.data.data, orderStatus);
-                    this.saveOrderDetails(response.data.data, product_sku, orderStatus);
                     console.log("response userSave order : ", response);
-                    toast.dismiss();
-                    toast.success('Order Placed Successfull', { autoClose: 3000 });
-                    this.props.history.push('/my-banners')
-                    //  this.props.history.push('/order-summary/' + response.data.data);
+                    this.saveOrderDetails(response.data.data, product_sku, orderStatus);
+
                 }
-                //console.log(response.data.data.order)
             }).catch(error => {
                 console.log(error)
                 toast.error(error);
             });
+            // console.log("out of then .......", response.data)
         } else {
             toast.dismiss();
             toast.error('Order is not placed.Please try again.');
@@ -582,8 +644,7 @@ class BannerCheckOut extends Component {
      * @param {*} orderStatus 
      */
     saveOrderDetails = (orderId, orderStatus) => {
-
-        const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
+        console.log("selectCard", this.state.selectCard)
         let reqBody = {}
         var prodArray = [];
         // for (var i = 0; i < subscriptionPlanData.length; i++) {
@@ -591,7 +652,7 @@ class BannerCheckOut extends Component {
             orderId: orderId,
             //   productId: productData[i].productId,
             //  quantity: productData[i].quantity,
-            price: subscriptionPlanData.planPrice,
+            price: this.state.selectCard.planPrice,
             //  color: productData[i].color,
             //  size: productData[i].size,
             userId: this.authInfo.id,
@@ -610,8 +671,11 @@ class BannerCheckOut extends Component {
             }
         }).then((response) => {
             console.log("Save order details ", response.data.data);
+            this.setState({ allOrderStatus: response.data.data })
             console.log("ORDER ID CHECK", orderId);
             this.updateOrderStatus(orderId, response.data.data)
+
+            // toast.success('Payment successful!', 5000);
 
         }).catch(error => {
             console.log(error)
@@ -627,6 +691,7 @@ class BannerCheckOut extends Component {
      * @param {*} orderTrackingId 
      */
     updateOrderStatus = (orderId, orderTrackingId) => {
+
         let reqBody = {
             orderId: orderId,
             orderStatus: orderTrackingId,
@@ -639,6 +704,15 @@ class BannerCheckOut extends Component {
             }
         }).then((response) => {
             console.log("ORDER STATUS", response.data.data);
+            this.setState({ isLoading: false });
+            this.handleCheckOut();
+
+            // toast.success('Payment Successfull', { autoClose: 3000 });
+            // this.props.history.push('/my-banners')
+            // toast.dismiss();
+            // toast.success('Payment successful!', 2000, function () {
+            //     this.props.history.push('/my-banners')
+            // });
         }).catch(error => {
             console.log(error)
             toast.error(error);
@@ -659,15 +733,19 @@ class BannerCheckOut extends Component {
     //     // parent class change handler is always called with field name and value
     //     const value = evt.target.value;
     //     this.setState({ ...this.state, [evt.target.name]: value });
-
     // }
     /******************************************************************************/
     /******************************************************************************/
 
+    clearSessionStorage = () => {
+        sessionStorage.clear();
+    }
+
     render() {
 
-        const { expiryDate } = this.state;
-        const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
+        const { expiryDate, selectCard, isLoading, stripeResponse } = this.state;
+        // console.log("selectCard", selectCard)
+        //  const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
         //  console.log("Date form create banner pages", subscriptionPlanData)
 
 
@@ -734,42 +812,34 @@ class BannerCheckOut extends Component {
             }
         }
 
+
+
         return (
             <React.Fragment>
                 <Header />
                 <PageTitle title="Banner Payments" />
                 <section className="inr_wrap checkout_wrap">
                     <div className="container">
-                        <div className="row">
-                            <div className="col-md-12">
-                                <div className="cart my_cart">
-                                    <div className="row">
-                                        <div className="col-md-3">
-                                            <div style={{ "padding": "0px 0px 0px 25px" }} className="checkout_form_section">
-                                                <div className="items_incart">
-                                                    <h4></h4>
-                                                </div>
-
-                                            </div>
+                        <div className="cart my_cart">
+                            <div className="row">
+                                <div className="col-md-12">
+                                    <div className="payment_method_section">
+                                        <div className="payment_list">
+                                            <ul>
+                                                <li>Type of Plan : <b>{selectCard.planType}</b></li>
+                                                <li>Plan Detail : <b>{selectCard.description}</b></li>
+                                                <li>Price : <b>{selectCard.planPrice} $</b></li>
+                                                {/* <li>Tax(18%) : {this.getTotal().tax}$ </li> */}
+                                            </ul>
                                         </div>
-                                        <div className="col-md-6">
-                                            <div className="payment_method_section">
-                                                <div className="payment_list">
-                                                    <ul>
-                                                        <li>Type of Plan : <b>{subscriptionPlanData.planType}</b></li>
-                                                        <li>Plan Detail : <b>{subscriptionPlanData.description}</b></li>
-                                                        <li>Price : <b>{subscriptionPlanData.planPrice} $</b></li>
-                                                        <li>Tax(18%) : {this.getTotal().tax}$ </li>
-                                                    </ul>
-                                                </div>
-                                                <div className="subtotal_wrapper">
-                                                    <ul>
-                                                        <li>Subtotal : <b>{subscriptionPlanData.planPrice} $</b></li>
-                                                    </ul>
-                                                </div>
+                                        <div className="subtotal_wrapper">
+                                            <ul>
+                                                <li>Subtotal : <b>{selectCard.planPrice} $</b></li>
+                                            </ul>
+                                        </div>
 
 
-                                                {/* <div className="">
+                                        {/* <div className="">
                                                     <Box className="App" p={1}>
                                                         {this.state.status[0] === "paid" ? (
                                                             <Text fontWeight={"500"} fontSize={3} mb={4}>
@@ -799,7 +869,7 @@ class BannerCheckOut extends Component {
                                                 </div> */}
 
 
-                                                <div className="row">
+                                        {/* <div className="row">
                                                     <div className="col-6">
                                                         <input
                                                             type="text"
@@ -837,23 +907,71 @@ class BannerCheckOut extends Component {
 
                                                         />
                                                     </div>
+                                                </div> */}
+
+                                        {/* &nbsp; */}
+
+                                        {/* STRIPE FORM  */}
+                                        <div>
+                                            <form onSubmit={(e) => this.handleSubmit(e, this.props.elements, this.props.stripe)}>
+                                                {/* <input
+                                                            type="email"
+                                                            placeholder="Enter your email"
+                                                            value={this.state.email}
+                                                            onChange={(e) => this.setState({ email: e.target.value })}
+                                                        /> */}
+                                                <CardElement
+                                                    options={{
+                                                        style: {
+                                                            base: {
+                                                                fontSize: '18px',
+                                                                color: '#424770',
+                                                                backgroundColor: '#e6e6e6',
+                                                                padding: '4px 4px',
+                                                                '::placeholder': {
+                                                                    color: '#aab7c4',
+                                                                },
+                                                            },
+                                                            invalid: {
+                                                                color: '#9e2146',
+                                                            },
+                                                        },
+                                                    }}
+                                                />
+                                                <div className="text-center" >
+                                                    <button type="submit" className="btn btn-success" disabled={isLoading} >  {isLoading ? 'Please wait....' : `PAY ( $ ${selectCard.planPrice})`} </button>
                                                 </div>
-
-                                                &nbsp;
-
-                                                <div className="d-grid gap-2 col-6 mx-auto">
-                                                    <button type="submit" class="btn btn-success" onClick={this.onSuccessHandler}>PAY &nbsp;{subscriptionPlanData.planPrice} $</button>
-                                                </div>
-                                            </div>
-
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
-                            </div >
-
-                        </div >
-                    </div >
+                            </div>
+                        </div>
+                    </div>
                 </section >
+
+
+                <Modal
+                    show={this.state.showModal}
+                    size="md"
+                    aria-labelledby="contained-modal-title-vcenter"
+                    centered
+                >
+                    <Modal.Body>
+                        <div className="alert text-center" role="alert">
+                            <img src={successImg} alt="Success" style={{ width: '100px', height: '100px' }} />
+                            <h4 className="alert-heading text-success">Your payment was successfull!</h4>
+
+                            <p className="mb-0">Your invoice no is <b>{stripeResponse.status === true ? stripeResponse.data.latest_invoice.number : ""}</b></p>
+                            <div className="d-grid gap-2 col-6 mx-auto mt-3">
+                                {/* <div className="ctn_btn"><Link to="/my-banners" className="view_more">DONE</Link></div> */}
+                                <Link to="/my-banners">
+                                    <button onClick={this.clearSessionStorage} className="btn btn-primary btn-sm mt-2" type="button">Return</button>
+                                </Link>
+                            </div>
+                        </div>
+                    </Modal.Body>
+                </Modal>
                 <Footer />
             </React.Fragment >
         )

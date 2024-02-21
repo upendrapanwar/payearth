@@ -133,17 +133,7 @@ class MyBanner extends Component {
 
     if (selectedRows.length === 0) {
       toast.error("Please select row....", { autoClose: 3000 })
-      // axios.delete(`/user/deleteBanner/${id}`, {
-      //     headers: {
-      //         'Authorization': `Bearer ${this.authInfo.token}`
-      //     }
-      // }).then((res) => {
-      //     console.log(res)
-      // })
-      //     .catch((error) => {
-      //         console.log("error", error)
-      //     })
-      // this.setState({ loading: true })
+      
     } else {
       try {
         // const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/destroy`;
@@ -196,28 +186,24 @@ class MyBanner extends Component {
   banner_column = [
     {
       name: " Banner Image/Video",
-      selector: (row, i) => row.video === '' ? <img src={row.image} alt="No Image/video select" style={{ width: '250px', height: '150px' }} /> : <video width="250" height="150" src={row.video} autoPlay loop alt="No Image/video select" />,
+      selector: (row, i) => row.video === '' ? <img className='advBanner-Thumb' src={row.image} alt="No Image/video select" style={{ width: '150px', height: '120px' }} /> : <video width="150" height="120" src={row.video} autoPlay loop alt="No Image/video select" />,
       sortable: true,
-      width: '300px',
     },
     {
       name: "Banner Name",
       selector: (row, i) => row.bannerName,
       sortable: true,
-      width: '220px',
     },
     {
       name: "Banner Text",
       selector: (row, i) => row.bannerText,
       sortable: true,
-      width: '220px',
 
     },
     {
       name: "Category",
       selector: (row, i) => row.category,
       sortable: true,
-      width: '220px',
     },
     // {
     //   name: 'Subscription Plan',
@@ -234,12 +220,12 @@ class MyBanner extends Component {
     //   sortable: true,
 
     // },
-    // {
-    //   name: "Status",
-    //   selector: (row, i) => row.status,
-    //   sortable: true,
+    {
+      name: "Status",
+      selector: (row, i) => row.status,
+      sortable: true,
 
-    // },
+    },
     {
       name: 'Actions',
       cell: (row) => (
@@ -248,8 +234,8 @@ class MyBanner extends Component {
             type='submit'
             className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
             onClick={() => this.handlePreview(row)}
-           
-           
+
+
           >
             Preview
           </button>
@@ -296,13 +282,12 @@ class MyBanner extends Component {
               <div className="col-md-12">
                 <div className="cart adv_banner_wrapper">
                   <div className="noti_wrap">
-                    <div className=""><span>
-                      <Link className="btn custom_btn btn_yellow mx-auto" to="/create-banner">Banner Manager</Link>
-                    </span></div>
+                    <div className="">
+                      <span>
+                        <Link className="btn custom_btn btn_yellow mx-auto" to="/create-banner">Banner Manager</Link>
+                      </span>
+                    </div>
                   </div>
-
-
-
                   <div className="cart_list adv_banner_panel">
                     <div className="tab-pane fade show active" id="nav-draft-post" role="tabpanel" aria-labelledby="nav-draft-post-tab">
                       <div className="DT_ext_row">
@@ -371,11 +356,11 @@ class MyBanner extends Component {
                     height="315"
                     // frameborder="0"
                     allow="autoplay; encrypted-media"
-                    // allowfullscreen
+                  // allowfullscreen
                   // onClick={this.handleIframeClick}
                   ></iframe>
                 </a>
-                
+
                 <button
                   className="close-button"
                   onClick={this.handleClose}

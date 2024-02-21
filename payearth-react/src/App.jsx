@@ -10,6 +10,7 @@ import './assets/css/checkout.css';
 import './assets/css/myStyle.css';
 
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { Elements, StripeProvider } from 'react-stripe-elements';
 import Home from './containers/user/Home';
 import ProductListing from './containers/user/ProductListing';
 import ProductDetail from './containers/user/ProductDetail';
@@ -92,6 +93,7 @@ import ManageReports from './containers/admin/ManageReports';
 import ManageReportsServices from './containers/admin/ManageReportsServices';
 import ManageBannerAdvertisement from './containers/admin/ManageBannerAdvertisement';
 import ManageBannerList from './containers/admin/ManageBannerList';
+import ManageBannerListEdit from './containers/admin/ManageBannerListEdit';
 import ManageSupport from './containers/admin/ManageSupport';
 // import Services from './containers/seller/Services';
 import EditService from './containers/seller/EditService';
@@ -109,8 +111,8 @@ import PageDetail from './components/common/PageDetails';
 
 
 import ScrollToTopButton from './containers/user/ScrollToTopButton';
-import BannerCheckOut from './containers/user/BannerCheckOut';
-
+// import BannerCheckOut from './containers/user/BannerCheckOut';
+import StripePaymentForm from './containers/user/BannerCheckOutStripe';
 
 
 
@@ -142,7 +144,8 @@ function App() {
 					<PrivateRoute path="/my-orders" component={MyOrders} roles={[Role.user]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/my-banners" component={MyBanner} roles={[Role.user]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/create-banner" component={CreateNewBanner} roles={[Role.user]} currentUserRole={userInfo.role} exact />
-					<PublicRoute path="/bannerCheckout" restricted={false} component={BannerCheckOut} exact />
+					{/* <PublicRoute path="/bannerCheckout" restricted={false} component={BannerCheckOut} exact /> */}
+					<PublicRoute path="/bannerCheckout" restricted={false} component={StripePaymentForm} exact />
 					<PrivateRoute path="/user/banner-edit/:id" component={MyBannerEdit} roles={[Role.user]} currentUserRole={userInfo.role} exact />
 
 					<PrivateRoute path="/order-detail/:id" component={OrderDetail} roles={[Role.user]} currentUserRole={userInfo.role} exact />
@@ -213,7 +216,7 @@ function App() {
 					<PrivateRoute path="/admin/manage-banner-advertisement" component={ManageBannerAdvertisement} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/admin/manage-support" component={ManageSupport} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/admin/manage-banner-list" component={ManageBannerList} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
-
+					<PrivateRoute path="/admin/manage-banner-list-edit/:id" component={ManageBannerListEdit} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
 
 					<PublicRoute path="/community" restricted={false} component={Community} exact />
 					<PublicRoute path="/community-profile" restricted={false} component={CommunityProfile} exact />

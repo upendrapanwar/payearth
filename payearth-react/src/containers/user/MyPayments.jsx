@@ -28,7 +28,7 @@ class MyOrders extends Component {
     this.userInfo = store.getState().auth.userInfo;
     this.state = {
       data: [],
-      loading: true,
+      loading: false,
       error: null,
       show: false,
       showModal: false,

@@ -188,6 +188,11 @@ router.get("/getCmsAllCategory", getCmsCategoryData);
 router.get("/cmsGetCategoryById/:id", cmsGetCategoryById);
 router.put("/cmsUpdateCategory/:id", cmsUpdateCategory);
 router.delete("/categoryDelete/:id", categoryDelete);
+router.get("/banner-list", getAllBannersData);
+router.delete("/banner/:id", deleteBannerAdv);
+router.get("/getBannerById/:id", getBannerById);
+router.put("/updateBanner/:id", updateBanner);
+router.post("/createNewBanner", createNewBanner)
 
 
 module.exports = router;
@@ -760,4 +765,31 @@ function categoryDelete(req, res, next) {
         .catch(err => next(res.json({ status: false, message: err })));
 }
 
+//Banner
+function getAllBannersData(req, res, next) {
+    adminService.getAllBannersData(req)
+        .then(banner => banner ? res.status(200).json({ status: true, data: banner }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
 
+function deleteBannerAdv(req, res, next) {
+    adminService.deleteBannerAdv(req)
+        .then(banner => banner ? res.json({ status: true, message: "Successfull Delete" }) : res.json({ status: false, message: "ERROR" }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+function getBannerById(req, res, next) {
+    adminService.getBannerById(req)
+        .then(banner => banner ? res.status(200).json({ status: true, data: banner }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+function updateBanner(req, res, next) {
+    adminService.updateBanner(req)
+        .then(banner => banner ? res.json({ status: true, message: "Banner Update Successfully...." }) : res.json({ status: false, message: "ERROR" }))
+        .catch(err => next(res.json({ status: false, message: err })));
+} 
+
+function createNewBanner(req, res, next) {
+    adminService.createNewBanner(req)
+        .then(banner => banner ? res.status(200).json({ status: true, data: banner }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}

@@ -2795,6 +2795,7 @@ span.rate_sts {
     font-family: var(--font_montserrat);
 }
 
+.adv_banner_wrapper .btn.action_btn_new,
 .dash_inner_wrap .btn.action_btn_new {
     font-size: 13px;
     padding: 5px 5px;
@@ -2804,6 +2805,8 @@ span.rate_sts {
 .choose_img {
     width: 100%;
 }
+
+
 
 
 
@@ -3912,16 +3915,51 @@ a.inner-block:active {
     font-size: 30px;
 }
 
+.adv_banner_wrapper img.advBanner-Thumb { height: auto;}
+.advBannerEditWrap { padding-top: 25px;}
+.advBannerEditWrap .pricing-table {
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap; margin: 25px auto;
+}
+.advBannerEditWrap  .crt_bnr_fieldRow { text-align: center;}
+
+
+
+.inr_wrap .adv_banner_wrapper .rdrDateRangePickerWrapper{
+    display: inline ;
+}
+.DT_ext_row  .rdrDateRangePickerWrapper .rdrDateRangeWrapper{
+    margin-top: 30px;
+}
+.DT_ext_row {
+    display: flex;
+    gap: 10px;
+
+}
 @media (max-width:991px) {
     /* .custom_btn{
         width: 190px !important;
       } */
     /* .btn-width{
         width: 190px;
-      } */
+      } */ 
+      .DT_ext_row {
+        display: block;
+    }
+    .date-wrapper .rdrDateRangePickerWrapper {
+        display: inline-flex !important;
+        justify-content: space-between !important;
+        align-items: center;
+    }
+
+      
 }
 
 @media (max-width:768px) {
+    .DT_ext_row {
+        display: block;
+    }
     .btn-width {
         width: 400px;
     }
@@ -3929,9 +3967,19 @@ a.inner-block:active {
     .popular_products_sec .cards_wrapper {
         margin: 28px 15px 18px 15px;
     }
+    .advBannerEditWrap .pricing-table { width: 100%;}
+    .advBannerEditWrap .pricing-table .block { width: 100%;}
+
 }
 
 @media (max-width:767px) {
+    .date-wrapper .rdrDateRangePickerWrapper {
+        display: inline !important;
+       
+    }
+    .DT_ext_row {
+        display: block;
+    }
     .cl_head .cl-row {
         display: block;
     }

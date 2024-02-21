@@ -11,7 +11,7 @@ const db = require("../helpers/db");
 const msg = require('../helpers/messages.json');
 const fs = require('fs');
 
-const { Admin, User, Seller, Coupon, Product, Category, Brand, TodayDeal, BannerImage, TrendingProduct, PopularProduct, Color, OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline, ProductSales, cmsPost, cmsPage, cmsCategory, } = require("../helpers/db");
+const { Admin, User, Seller, Coupon, Product, Category, Brand, TodayDeal, BannerImage, TrendingProduct, PopularProduct, Color, OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline, ProductSales, cmsPost, cmsPage, cmsCategory, bannerAdvertisement } = require("../helpers/db");
 
 module.exports = {
     authenticate,
@@ -105,6 +105,12 @@ module.exports = {
     cmsGetCategoryById,
     cmsUpdateCategory,
     categoryDelete,
+
+    getAllBannersData,
+    deleteBannerAdv,
+    getBannerById,
+    updateBanner,
+    createNewBanner
 };
 
 // Validator function
@@ -2287,7 +2293,7 @@ async function getCmsPostData() {
         if (allPosts && allPosts.length > 0)
             return allPosts;
     } catch (error) {
-        console.log(error) 
+        console.log(error)
     }
 }
 // Delete post
@@ -2413,7 +2419,7 @@ async function cmsGetPageById(req) {
     } catch (error) {
         console.log(error);
     }
-} 
+}
 
 // Update Page
 async function cmsUpdatePage(req) {
@@ -2517,47 +2523,111 @@ async function categoryDelete(req) {
 }
 
 
-//******************************************* 
-//*******************************************
-//*******************************************
 //*******************************************
 // ******     BANNER START     *******//
 
-// async function createNewBanner(req, res) {
-//     try {
-//         var param = req.body;
-//         // const titleCount = await cmsPost.find({ title: param.title }).count()
-//         // let slug = "";
-//         // if (titleCount > 0) {
-//         //     slug = param.slug + titleCount;
-//         // } else {
-//         //     slug = param.slug
-//         // }
-//         // console.log("Slug", slug)
-//         let input = {
-//             image: param.image,
-//             video: param.video,
-//             bannerText: param.bannerText,
-//             bannerName: param.bannerName,
-//             bannerType: param.bannerType,
-//             siteUrl : param.siteUrl,
-//             category: param.category,
-//             startDate: param.startDate,
-//             endDate: param.endDate,
-//             status: param.status
-//         };
-//         const banners = new banner(input);
-//         const data = await banners.save();
-//         // console.log("RES data", data)
-//         if (data) {
-//             // console.log(data._id);
-//             return data;
-//         }
-//         return false;
-//     } catch (error) {
-//         console.log('Error', error);
-//     }
-// }
+async function createNewBanner(req, res) {
+    try {
+        var param = req.body;
+        // const titleCount = await cmsPost.find({ title: param.title }).count()
+        // let slug = "";
+        // if (titleCount > 0) {
+        //     slug = param.slug + titleCount;
+        // } else {
+        //     slug = param.slug
+        // } 
+        // console.log("Slug", slug)
+        let input = {
+            image: param.image,
+            imageId: param.imageId,
+            video: param.video,
+            videoId: param.videoId,
+            bannerText: param.bannerText,
+            bannerType: param.bannerType,
+            bannerName: param.bannerName,
+            siteUrl: param.siteUrl,
+            category: param.category,
+            startDate: param.startDate,
+            endDate: param.endDate,
+            subscriptionPlan: param.subscriptionPlan,
+            bannerPlacement: param.bannerPlacement,
+            status: param.status,
+            tag: param.tag,
+            keyword: param.keyword,
+            author: param.author
+        };
+        const banner = new bannerAdvertisement(input);
+        const data = await banner.save();
+        // console.log("RES data", data)
+        if (data) {
+            // console.log(data._id);
+            return data;
+        }
+        return false;
+    } catch (error) {
+        console.log('Error', error);
+    }
+}
+
+
+
+// Get all banner list from different users.........
+
+async function getAllBannersData() {
+    // console.log("getAllBannersData")
+    try {
+        const result = await bannerAdvertisement.find().sort({ createdAt: 'desc' }).populate(
+            {
+                path: "author",
+                model: User,
+                select: " name email"
+            },
+        )
+        if (result && result.length > 0) {
+            // console.log("banner list ", result)
+            return result
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// DELETE BANNER 
+async function deleteBannerAdv(req) {
+    const bannerId = req.params.id;
+    // console.log("delete banner", bannerId)
+    try {
+        const result = await bannerAdvertisement.deleteOne({ _id: bannerId })
+        return result
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+// ByID
+async function getBannerById(req) {
+    const bannerId = req.params.id;
+    try {
+        const result = await bannerAdvertisement.find({ _id: bannerId })
+        return result
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// Update Page
+async function updateBanner(req) {
+    const bannerId = req.params.id;
+    const { image, video, bannerText, bannerName, bannerType, siteUrl, category, bannerPlacement, startDate, status } = req.body;
+    try {
+        const banner = await bannerAdvertisement.findByIdAndUpdate(bannerId, { image, video, bannerText, bannerName, bannerType, siteUrl, category, startDate, bannerPlacement, status }, { new: true });
+        //  console.log("update banner", banner)
+        return banner;
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 
 

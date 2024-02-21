@@ -7,6 +7,7 @@ const { registerValidation, loginValidation, changePassValidation, forgotPassVal
 const msg = require('../helpers/messages.json');
 var utils = require('../helpers/utils.js');
 const multer = require('multer');
+const stripe = require('stripe')('sk_test_51OewZgD2za5c5GtO7jqYHLMoDerwvEM69zgVsie3FNLrO0LLSLwFJGzXv4VIIGqScWn6cfBKfGbMChza2fBIQhsv00D9XQRaOk');
 
 var ApiContracts = require('authorizenet').APIContracts;
 var ApiControllers = require('authorizenet').APIControllers;
@@ -164,6 +165,9 @@ router.put("/updateBanner/:id", updateBanner);
 
 router.post('/createAuthorizeCustomer/payment', customerAuthorizePayment);
 router.post('/schedule/payment', bannerPayment);
+router.post('/create-subscription', createSubscription)
+
+
 
 
 
@@ -550,7 +554,7 @@ function customerAuthorizePayment(req, res, next) {
         .catch(err => next(res.json({ status: false, message: err })));
 }
 
-function bannerPayment(req, res, next) {
+function bannerPayment(req, res, next) { 
     console.log("banner payments")
     userService.bannerPayment(req)
         //.then(payment => payment ? res.status(200).json({ status: true, data: payment }) : res.json({ status: false, message: "ERROR" }))
@@ -565,12 +569,10 @@ function bannerPayment(req, res, next) {
 }
 
 
+// stripePayment
 
-
-
-
-
-
-
-
-
+function createSubscription(req, res, next) {
+    userService.createSubscription(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}

@@ -1,19 +1,13 @@
 import React, { Component } from 'react';
 import Header from "./../../components/user/common/Header";
 import Footer from '../../components/common/Footer';
-import { Formik } from 'formik';
 import { toast } from 'react-toastify';
-import { setLoading } from '../../store/reducers/global-reducer';
-import { connect } from 'react-redux';
 import emptyImg from './../../assets/images/emptyimage.png'
 import emptyVid from './../../assets/images/emptyVid.png'
 import store from '../../store/index';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
-import { date } from 'yup';
-import { Check } from '@mui/icons-material';
-
 
 class CreateNewBanner extends Component {
 
@@ -24,6 +18,7 @@ class CreateNewBanner extends Component {
         this.apiSecret = "3rvc9PNRXy2YOeB9kuFNjrxI8FU";
         //      this.signature = "f878911eba6bc4737f78009826d5fb0683a7e538"
         this.authInfo = store.getState().auth.authInfo;
+        this.userInfo = store.getState().auth.userInfo;
 
         this.state = {
             image: "",
@@ -44,21 +39,25 @@ class CreateNewBanner extends Component {
             author: this.authInfo.id,
             card: "",
             selectImageOrVideo: "",
-            isSelectplan : false
+            isSelectplan: false,
+            customerId: "",
+            subscriptionId: "",
+            paymentMethodId: null,
+            cardNumber: '',
+            expMonth: '',
+            expYear: '',
+            cvc: '',
 
         };
     }
 
-
     componentDidMount() {
-
-
+        this.fetchStripePlans();
     }
-
 
     handleImageChange = (e) => {
         const file = e.target.files[0];
-        console.log(" image file size", file.size)
+        // console.log(" image file size", file.size)
         const fileSize = file.size
         // 5242880 = 5mb
         const maxSize = 5242880;
@@ -169,80 +168,14 @@ class CreateNewBanner extends Component {
         //     this.calculateDate();
         // })
         this.setState({ startDate: new Date(e.target.value) });
-        this.calculateDate();
+        // this.calculateDate();
     }
-
-
-    calculateDate = () => {
-        const { startDate, subscriptionPlan } = this.state;
-        if (startDate || subscriptionPlan === "") {
-            console.log("subscriptionPlan", subscriptionPlan)
-            if (subscriptionPlan === "1 Month plan") {
-                const days = 30
-                const selectedDateObj = new Date(startDate);
-                const calculatedDateObj = new Date(selectedDateObj);
-                calculatedDateObj.setDate(selectedDateObj.getDate() + days);
-                const options = { year: 'numeric', month: 'long', day: 'numeric' };
-                const calculatedDate = calculatedDateObj.toLocaleDateString('en-US', options);
-
-                console.log("endDate", calculatedDate)
-                this.setState({ endDate: calculatedDate });
-            }
-            if (subscriptionPlan === "3 Month plan") {
-                const days = 90
-                const selectedDateObj = new Date(startDate);
-                const calculatedDateObj = new Date(selectedDateObj);
-                calculatedDateObj.setDate(selectedDateObj.getDate() + days);
-                const options = { year: 'numeric', month: 'long', day: 'numeric' };
-                const calculatedDate = calculatedDateObj.toLocaleDateString('en-US', options);
-
-                console.log("endDate", calculatedDate)
-                this.setState({ endDate: calculatedDate });
-
-            }
-            if (subscriptionPlan === "6 Month plan") {
-                const days = 180
-                const selectedDateObj = new Date(startDate);
-                const calculatedDateObj = new Date(selectedDateObj);
-                calculatedDateObj.setDate(selectedDateObj.getDate() + days);
-                const options = { year: 'numeric', month: 'long', day: 'numeric' };
-                const calculatedDate = calculatedDateObj.toLocaleDateString('en-US', options);
-
-                console.log("endDate", calculatedDate)
-                this.setState({ endDate: calculatedDate });
-
-            }
-            if (subscriptionPlan === "12 Month plan") {
-                const days = 365
-                const selectedDateObj = new Date(startDate);
-                const calculatedDateObj = new Date(selectedDateObj);
-                calculatedDateObj.setDate(selectedDateObj.getDate() + days);
-                const options = { year: 'numeric', month: 'long', day: 'numeric' };
-                const calculatedDate = calculatedDateObj.toLocaleDateString('en-US', options);
-
-                console.log("endDate", calculatedDate)
-                this.setState({ endDate: calculatedDate });
-            }
-        } else {
-            toast.error("Select Subscription plan", { autoClose: 3000 })
-        }
-    }
-
-
-    // handleSubscriptionPlan = (e) => {
-    //     // const selectedText = e.target.options[e.target.selectedIndex].text;
-    //     // console.log("selected TEXT", selectedText)
-    //     this.setState({ subscriptionPlan: e.target.value });
-    //     // this.setState({ card: e.target.value });
-
-    //     // this.calculateDate();
-    // };
-
 
     handleSubscriptionPlan = (card) => {
         console.log("card : ", card)
         this.setState({ subscriptionPlan: card });
-        this.setState({ isSelectplan : true})
+        this.setState({ isSelectplan: true })
+        sessionStorage.setItem('selectPlan', JSON.stringify(card));
     };
 
     handleBannerPlacement = (e) => {
@@ -251,16 +184,27 @@ class CreateNewBanner extends Component {
         this.setState({ bannerPlacement: selectedText })
     }
     handleSave = () => {
-        const { subscriptionPlan } = this.state;
-        // toast.success("Banner Create succesfully..", { autoClose: 3000 })
-        this.saveBanner("pending");
-        this.customerAuthorizePayment();
-        //    this.props.history.push('/bannerCheckout')
+        const { subscriptionPlan, bannerName, category } = this.state;
+        console.log("subscription plan ", subscriptionPlan)
 
-        this.props.history.push({
-            pathname: '/bannerCheckout',
-            state: { subscriptionPlan: subscriptionPlan },
-        });
+        if (subscriptionPlan === "") {
+            toast.error("Select Subscription plan.....", { autoClose: 3000 })
+        }
+        if (bannerName === "") {
+            toast.error("Enter Banner Name.....", { autoClose: 3000 })
+        }
+        if (category === "") {
+            toast.error("Select Category.....", { autoClose: 3000 })
+        } else {
+            this.saveBanner("Publish")
+            // this.handlePayment();
+            this.props.history.push({
+                pathname: '/bannerCheckout',
+                state: { subscriptionPlan: subscriptionPlan },
+            });
+        }
+        // toast.success("Banner Create succesfully..", { autoClose: 3000 })
+
     }
     saveBanner = (status) => {
         const { image, imageId, video, videoId, bannerText, bannerType, bannerName, siteUrl, category, startDate, endDate, subscriptionPlan, bannerPlacement, signaturess, author, tag, keyword } = this.state;
@@ -302,32 +246,13 @@ class CreateNewBanner extends Component {
 
     }
 
-
-    customerAuthorizePayment = async () => {
-        const url = 'user/createAuthorizeCustomer/payment';
-        const data = {
-            amount: "",
-        }
-        axios.post(url, data, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Authorization': `Bearer ${this.authInfo.token}`
-            }
-        }).then((response) => {
-            console.log("SUCCESS......", response.date);
-        }).catch((error) => {
-            console.log("error", error);
-        });
-    }
-
     handleSelectImageOrVideo = (e) => {
         console.log("select IMAGE OR VIDEO", e.target.value)
         this.setState({ selectImageOrVideo: e.target.value });
 
     }
     selectImageOrVideo = () => {
-        const { image, video, videoSize } = this.state;
+        const { image, video } = this.state;
 
         switch (this.state.selectImageOrVideo) {
             case 'video':
@@ -347,16 +272,6 @@ class CreateNewBanner extends Component {
                                 {!video ? <div><img src={emptyVid} alt='...' style={{ maxWidth: "40%" }} /> <p className='text-danger'> Size must be less than 11 MB</p></div> : <div><video src={video} autoPlay loop alt="" /></div>}
                             </div>
                         </div>
-
-                        {/* {!video ? "" :
-                            <button
-                                type="button"
-                                className="btn btn-secondary btn-sm"
-                                onClick={this.handleDeleteCloudVideo}
-                            >
-                                CLEAR
-                            </button>
-                        } */}
                         <div className="field_item">
                             <input
                                 className="form-control"
@@ -381,20 +296,10 @@ class CreateNewBanner extends Component {
                         }</label>
                         <div className="adv_preview_thumb">
                             <div className="thumbPic">
-                                {!image ? <div><img src={emptyImg} alt='...' style={{ maxWidth: "40%" }} /><p className='text-danger'> Size must be less than 5 MB</p></div> : <img src={image} style={{ height: '50%', width: '100%' }} />}
+                                {!image ? <div><img src={emptyImg} alt='...' style={{ maxWidth: "40%" }} /><p className='text-danger'> Size must be less than 5 MB</p></div> : <img src={image} alt='...' style={{ height: '50%', width: '100%' }} />}
                                 {/* <img src={nicon} alt="" /> */}
                             </div>
                         </div>
-                        {/* {!image ? "" :
-                            <button
-                                type="button"
-                                className="btn btn-secondary btn-sm"
-                                onClick={this.handleDeleteCloudImage}
-                            >
-                                CLEAR
-                            </button>
-                        } */}
-
                         <div className="field_item">
                             <input
                                 className="form-control"
@@ -471,13 +376,32 @@ class CreateNewBanner extends Component {
         }
     }
 
+    fetchStripePlans = async () => {
+        console.log("fetchStrip plan function is run")
+        try {
+            const stripeSecretKey = 'sk_test_51OewZgD2za5c5GtO7jqYHLMoDerwvEM69zgVsie3FNLrO0LLSLwFJGzXv4VIIGqScWn6cfBKfGbMChza2fBIQhsv00D9XQRaOk';
+            const response = await axios.get(`https://api.stripe.com/v1/plans`, {
+                headers: {
+                    Authorization: `Bearer ${stripeSecretKey}`,
+                },
+            });
+
+            console.log("response.data", response.data.data)
+            console.log("response.data", response.data)
+            // setPlans(fetchedPlans);
+        } catch (error) {
+            console.error('Error fetching Stripe plans:', error);
+        }
+
+    };
+
     render() {
 
-        const {subscriptionPlan}  = this.state;
+        const { subscriptionPlan } = this.state;
         const subPlan = [
-            { id: 1, planType: 'Basic', planPrice: "10", description: 'This is Basic content.' },
-            { id: 2, planType: 'Standerd', planPrice: "59", description: 'This is Standerd content.' },
-            { id: 3, planType: 'Premium', planPrice: "99", description: 'This is Premium content.' },
+            { id: 1, planType: 'Basic', planPrice: "75", description: 'This is Basic content.', stripPlanId: "price_1OeyxnD2za5c5GtONkOM9pE2" },
+            { id: 2, planType: 'Standerd', planPrice: "160", description: 'This is Standerd content.', stripPlanId: "price_1Oez53D2za5c5GtOUVOTBw8V" },
+            { id: 3, planType: 'Premium', planPrice: "210", description: 'This is Premium content.', stripPlanId: "price_1Oez76D2za5c5GtOmd792hTQ" },
         ];
         return (
             <React.Fragment>
@@ -499,19 +423,6 @@ class CreateNewBanner extends Component {
                                         <div className="create_banner_form">
                                             <div className="row">
                                                 <div className="col-md-6">
-                                                    {/* <div className="crt_bnr_fieldRow">
-                                                        <div className="crt_bnr_field">
-                                                            <label htmlFor="">Type of Banner</label>
-                                                            <div className="field_item">
-                                                                <select onChange={this.handleBannerType} className="form-control" name="" id="">
-                                                                    <option value="default">Select an option</option>
-                                                                    <option value="Graphic Banner">Graphic Banner</option>
-                                                                    <option value="Text Banner">Text Banner</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div> */}
-
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
                                                             <label htmlFor="">Banner Name</label>
@@ -526,7 +437,6 @@ class CreateNewBanner extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
-
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
                                                             <label htmlFor="">Site Url</label>
@@ -681,21 +591,21 @@ class CreateNewBanner extends Component {
                                                                 <li key={card.id} onClick={() => this.handleSubscriptionPlan(card)}>
                                                                     <div className={subscriptionPlan.id === card.id ? "block personal fl active" : "block personal fl"}>
                                                                         <a className='inner-block'>
-                                                                        <h2 className="title" >{card.planType}</h2>
-                                                                        <div className="content">
-                                                                            <p className="price">
-                                                                                <sup>$</sup>
-                                                                                <span>{card.planPrice}</span>
-                                                                                <sub>/mo.</sub>
-                                                                            </p>
-                                                                            <p className="hint">Perfect for freelancers</p>
-                                                                        </div>
-                                                                        <ul className="features">
-                                                                            <li><span className="fontawesome-cog"></span>1 WordPress Install</li>
-                                                                            <li><span className="fontawesome-star"></span>25,000 visits/mo.</li>
-                                                                            <li><span className="fontawesome-dashboard"></span>Unlimited Data Transfer</li>
-                                                                            <li><span className="fontawesome-cloud"></span>10GB Local Storage</li>
-                                                                        </ul>
+                                                                            <h2 className="title" >{card.planType}</h2>
+                                                                            <div className="content">
+                                                                                <p className="price">
+                                                                                    <sup>$</sup>
+                                                                                    <span>{card.planPrice}</span>
+                                                                                    <sub>/mo.</sub>
+                                                                                </p>
+                                                                                <p className="hint">Perfect for freelancers</p>
+                                                                            </div>
+                                                                            <ul className="features">
+                                                                                <li><span className="fontawesome-cog"></span>1 WordPress Install</li>
+                                                                                <li><span className="fontawesome-star"></span>25,000 visits/mo.</li>
+                                                                                <li><span className="fontawesome-dashboard"></span>Unlimited Data Transfer</li>
+                                                                                <li><span className="fontawesome-cloud"></span>10GB Local Storage</li>
+                                                                            </ul>
                                                                         </a>
                                                                     </div>
                                                                 </li>
