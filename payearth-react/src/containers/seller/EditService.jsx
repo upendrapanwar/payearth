@@ -51,7 +51,7 @@ class EditService extends Component {
             parent: param
         };
 
-        axios.post('seller/categories/', reqBody, {
+        axios.post('seller/categories', reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -281,14 +281,8 @@ class EditService extends Component {
                                                                     console.log("SelectedOption", selectedOption)
                                                                     console.log("SelectedOption in state", this.state.defaultCatOption)
                                                                     this.setState({ serviceCategory: selectedOption.value, defaultCatOption: selectedOption });
-                                                                    this.getCategories(selectedOption.value);
+                                                                    // this.getCategories(selectedOption.value);
                                                                 }}
-                                                                // onChange={selectedOption => {
-                                                                //     values.category = selectedOption.value;
-                                                                //     this.setState({ serviceCategory: selectedOption });
-                                                                //     this.setState({ serviceCategory: selectedOption.value });
-                                                                //     this.getCategories(selectedOption.value);
-                                                                // }}
                                                                 onBlur={handleBlur}
                                                             />
                                                             {touched.category && errors.category ? (
