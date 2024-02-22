@@ -97,6 +97,7 @@ import ManageBannerListEdit from './containers/admin/ManageBannerListEdit';
 import ManageSupport from './containers/admin/ManageSupport';
 // import Services from './containers/seller/Services';
 import EditService from './containers/seller/EditService';
+import ServiceCheckoutStripe from './containers/seller/ServiceCheckoutStripe';
 import AddCoupon from './containers/admin/AddCoupon';
 import CouponsListing from './containers/admin/CouponsListing';
 import EditProduct from './containers/seller/EditProduct';
@@ -173,8 +174,8 @@ function App() {
 					<PrivateRoute path="/seller/service-detail/:id" component={SellerServiceDetail} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/seller/order-detail/:id" component={SellerOrderDetail} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/seller/add-service" component={AddService} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-					{/* <PrivateRoute path="/seller/add-service" component={addService} roles={[Role.seller]} currentUserRole={userInfo.role} exact /> */}
-					<PrivateRoute path="/seller/edit-service/:id" component={EditService} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
+                    <PrivateRoute path="/seller/service-checkout" component={ServiceCheckoutStripe} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
+                    <PrivateRoute path="/seller/edit-service/:id" component={EditService} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
 
 					{/* Admin routes */}
 					<PublicRoute path="/admin/login" restricted={false} component={AdminLogin} exact />

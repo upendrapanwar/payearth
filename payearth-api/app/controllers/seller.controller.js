@@ -57,10 +57,23 @@ const fileFilterVideo = function(req, file, cb) {
 
 var uploadVideo = multer({ storage: storageVideo, fileFilter: fileFilterVideo }).any();
 
-//Featured Image Upload
+//Featured Image Upload for products
 var storageFeaturedImage = multer.diskStorage({
     destination: function(req, file, cb) {
         cb(null, config.uploadDir + '/products/featured');
+    },
+    filename: function(req, file, cb) {
+        let extArray = file.mimetype.split("/");
+        let extension = extArray[extArray.length - 1];
+        let newName = "IMG-" + Math.floor(Math.random() * 1000000) + "-" + Date.now() + "." + extension;
+        cb(null, newName);
+    }
+});
+
+//Featured Image Upload for services
+var storageFeaturedImage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, config.uploadDir + '/services/featured');
     },
     filename: function(req, file, cb) {
         let extArray = file.mimetype.split("/");
@@ -101,13 +114,6 @@ router.get('/colors', getColors);
 router.post('/categories', getCategories);
 router.get('/brands', getBrands);
 
-
-//Service Routes
-router.post('/services', addService);
-router.put('/services/:id', uploadVideo, editServiceValidation, editService);
-router.post('/services/list/:id', getListedServices);
-router.get('/services/:id', getServiceById);
-
 //Stock Management
 router.post('/stock/items/:id', getStockItems); //product or service  - added / pending / reject
 router.put('/stock/items/status-update', productStatusUpdate);
@@ -115,10 +121,16 @@ router.put('/stock/items/status-update', productStatusUpdate);
 //Orders Management
 router.post('/orders/:id', getOrders);
 router.get('/orders/:id', getOrderById);
+router.post('/saveorder', saveOrder);
+router.post('/saveordertracking', saveOrdertrackingTime);
+router.post('/saveorderdetails', saveorderdetails);
+router.post('/updateorderstatus', updateOrderStatus); 
+router.get('/orderstatus', getOrderStatus);
+router.post('/coupons/new', getNewCoupons);
 
 //Payments
 router.post('/payments/:id', getPayments);
-
+router.post('/savepayment', savepaymentdata);
 router.post('/need-help', needHelpValidation, needHelp);
 router.post('/contact-us', contactUsValidation, contactUs);
 
@@ -127,6 +139,21 @@ router.get('/dashboard-counters/:id', getDashboardCounters);
 router.post('/product-sales/:id', getProductSales);
 router.post('/sales-line-chart/:id', getSalesLineChartData);
 router.get('/selling-category-donut-chart/:id', getTopSellingCategoryChartData);
+
+//Service Routes
+router.post('/services/list/:id', getListedServices);
+router.get('/services/:id', getServiceById);
+router.post('/create-subscription', createSubscription); 
+ 
+//Service Management
+router.post('/services', addService);
+router.get('/service/items/:id', getServiceItems); //Service  - added / pending / reject
+router.put('/service/items/status-update/:id', serviceStatusUpdate);
+router.put('/service/edit/:id', editService);
+router.get("/service/getServiceData", getServiceData)
+router.get("/service/getServiceStatus/:meetingStatus", getServiceStatus);
+
+
 
 module.exports = router;
 
@@ -219,39 +246,6 @@ function editProduct(req, res, next) {
         .catch(err => next(res.status(400).json({ status: false, message: err })));
 }
 
-//Services
-
-function addService(req, res, next) {
-    console.log('Hello there how are you....');
-    if (req.files && req.files.fileValidationError) { return res.status(400).json({ status: false, message: req.files.fileValidationError }) }
-
-    sellerService.addService(req)
-        .then(service => service ? res.status(201).json({ status: true, message: msg.service.add.success, data: service }) : res.status(400).json({ status: false, message: msg.service.add.error }))
-        .catch(err => next(res.status(400).json({ status: false, message: err })));
-}
-
-function editService(req, res, next) {
-
-    if (req.files && req.files.fileValidationError) { return res.status(400).json({ status: false, message: req.files.fileValidationError }) }
-
-    sellerService.editService(req)
-        .then(service => service ? res.status(201).json({ status: true, message: msg.service.edit.success, data: service }) : res.status(400).json({ status: false, message: msg.service.edit.error }))
-        .catch(err => next(res.status(400).json({ status: false, message: err })));
-}
-
-function getListedServices(req, res, next) {
-    sellerService.getListedServices(req)
-        .then(services => services ? res.status(200).json({ status: true, data: services }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
-        .catch(err => next(res.json({ status: false, message: err })));
-}
-
-function getServiceById(req, res, next) {
-    //console.log('iniside');
-    sellerService.getServiceById(req.params.id)
-        .then(service => service ? res.status(200).json({ status: true, data: service }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
-        .catch(err => next(res.json({ status: false, message: err })));
-}
-
 function getStockItems(req, res, next) {
     sellerService.getStockItems(req)
         .then(items => items ? res.status(200).json({ status: true, data: items }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
@@ -273,6 +267,48 @@ function getOrders(req, res, next) {
 function getPayments(req, res, next) {
     sellerService.getPayments(req)
         .then(payments => payments ? res.status(200).json({ status: true, data: payments }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function savepaymentdata(req, res, next) {
+    sellerService.savepaymentdata(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })))
+}
+
+function saveOrder(req, res, next) {
+    sellerService.saveOrder(req)
+        .then(order => order ? res.status(201).json({ status: true, message: msg.user.order.add.success, data: order }) : res.status(400).json({ status: false, message: msg.user.order.add.error }))
+        .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function saveOrdertrackingTime(req, res, next) {
+    sellerService.saveOrdertrackingTime(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })))
+}
+
+function saveorderdetails(req, res, next) {
+    sellerService.saveorderdetails(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })))
+}
+
+function updateOrderStatus(req, res, next) {
+    sellerService.updateOrderStatus(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })))
+}
+
+function getOrderStatus(req, res, next) {
+    sellerService.getOrderStatus()
+        .then(orderstatus => orderstatus ? res.status(200).json({ status: true, data: orderstatus }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function getNewCoupons(req, res, next) {
+    sellerService.getNewCoupons(req)
+        .then(coupons => coupons ? res.status(200).json({ status: true, data: coupons }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
 
@@ -337,4 +373,93 @@ function getTopSellingCategoryChartData(req, res, next) {
         .catch(err => next(res.json({ status: false, message: err })));
 }
 
+//Services
 
+// function addService(req, res, next) {
+//     console.log('Hello there how are you....'); 
+//     console.log('Req*********', req.body); 
+//     if (req.files && req.files.fileValidationError) {
+//         return res.status(400).json({ status: false, message: req.files.fileValidationError });
+//     }
+
+//     sellerService.addService(req)
+//         .then(service => {
+//             if (service) {
+//                 res.status(201).json({ status: true, message: msg.service.add.success, data: service });
+//             } else {
+//                 res.status(400).json({ status: false, message: msg.service.add.error });
+//             }
+//         })
+//         .catch(err => {
+//             console.error('Error in addService:', err);
+//             res.status(500).json({ status: false, message: 'Internal server error' });
+//         });
+// }
+
+
+function addService(req, res, next) {
+    console.log('Hello there how are you....'); 
+    if (req.files && req.files.fileValidationError) { return res.status(400).json({ status: false, message: req.files.fileValidationError }) }
+
+    sellerService.addService(req)
+        .then(service => service ? res.status(201).json({ status: true, data: service }) : res.status(400).json({ status: false, message: "Service data not found!" }))
+        .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+// function addServicesFeaturedImage(req, res, next) {
+//     sellerService.addFeaturedImage(req)
+//         .then(featuredImage => featuredImage ? res.status(200).json({ status: true, message: msg.featuredImage.success, data: featuredImage }) : res.status(400).json({ status: false, message: msg.featuredImage.error }))
+//         .catch(err => next(res.json({ status: false, message: err })));
+// }
+
+function editService(req, res, next) {
+    sellerService.editService(req)
+        .then(service => service ? res.status(201).json({ status: true, message: msg.service.edit.success, data: service }) : res.status(400).json({ status: false, message: msg.service.edit.error }))
+        .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function getListedServices(req, res, next) {
+    sellerService.getListedServices(req)
+        .then(services => services ? res.status(200).json({ status: true, data: services }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function getServiceItems(req, res, next) {
+    sellerService.getServiceItems(req)
+        .then(items => items ? res.status(200).json({ status: true, data: items }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function serviceStatusUpdate(req, res, next) {
+    sellerService.serviceStatusUpdate(req)
+        .then(product => product ? res.json({ status: true, message: msg.product.status.success }) : res.json({ status: false, message: msg.common.no_data_err }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function getServiceById(req, res, next) {
+    //console.log('iniside');
+    sellerService.getServiceById(req.params.id)
+        .then(service => service ? res.status(200).json({ status: true, data: service }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+// stripePayment
+function createSubscription(req, res, next) {
+    console.log("seller controller working")
+    sellerService.createSubscription(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+//getServiceData
+function getServiceData(req, res, next) {
+    sellerService.getServiceData(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function getServiceStatus(req, res, next) {
+    sellerService.getServiceStatus(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}

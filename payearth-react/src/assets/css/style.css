@@ -2786,6 +2786,7 @@ span.rate_sts {
     display: inline-block;
 }
 
+.seller_dash_wrap .btn,
 .cart_foot_price .btn,
 .inr_wrap .btn {
     font-size: 15px;
@@ -2795,6 +2796,8 @@ span.rate_sts {
     font-family: var(--font_montserrat);
 }
 
+
+.seller_dash_wrap  .btn.action_btn_new,
 .adv_banner_wrapper .btn.action_btn_new,
 .dash_inner_wrap .btn.action_btn_new {
     font-size: 13px;
@@ -4026,3 +4029,78 @@ a.inner-block:active {
    
 
 }
+
+
+.wrapper-class {
+    padding: 1rem;
+    border: 1px solid #ccc;
+  }
+  .editor-class {
+    background-color:lightgray;
+    padding: 1rem;
+    border: 1px solid #ccc;
+  }
+  .toolbar-class {
+    border: 1px solid #ccc;
+  }
+
+
+  .rich-editor .rdw-editor-main {
+    background-color: #fff;
+  }
+  
+  .rich-editor .DraftEditor-editorContainer {
+    padding: 1rem;
+  }
+  
+  .draft-editor-wrapper {
+    border: 1px solid #ccc;
+  }
+
+  .app .rich-editor {
+    padding: 10rem;
+  }
+  
+  .rich-editor .rdw-editor-main {
+    background-color: #fff;
+  }
+  
+  .rich-editor .DraftEditor-editorContainer {
+    padding: 1rem;
+  }
+  
+  .draft-editor-wrapper {
+    border: 1px solid #ccc;
+  }
+  
+  .html-view {
+    background-color: #fff;
+    color: #000;
+    margin: auto;
+    width: 70%;
+    margin-bottom: 2rem;
+  }
+  
+  h4 {
+    color: #fff;
+  }
+
+  .formImage-wrapper .formImage-pannel{
+    margin-bottom: 20px;
+  }
+
+   .formImage-pannel .formImage{
+    height: 270px;
+    width: 440px;
+    margin: 0 auto;
+  }
+
+  .formImage-wrapper .formImage img{
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+  .formImage-wrapper .formImageInput{
+    margin-top: 60px;
+  }

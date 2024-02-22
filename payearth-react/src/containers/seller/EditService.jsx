@@ -10,80 +10,40 @@ import { setLoading } from '../../store/reducers/global-reducer';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import axios from 'axios';
 import addServiceSchema from './../../validation-schemas/addServiceSchema';
-import config from './../../config.json';
-import { Link } from 'react-router-dom';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 class EditService extends Component {
     constructor(props) {
         super(props);
-        const { dispatch } = props;
+        const {dispatch} = props;
         this.dispatch = dispatch;
         this.authInfo = store.getState().auth.authInfo;
+        const { id } = this.props.match.params;
+        this.cloudName = "dv2zvw44y";
+        this.apiKey = "721681745331262";
+        this.apiSecret = "tkhKJYaH5TRMiQS3DNDeoqPh9Rc";
         this.state = {
-            serviceDetail: {},
             catOptions: [],
-            defaultCatOption: { label: 'Choose Category', value: '' },
-            subCatOptions: [],
-            defaultSubCatOption: { label: 'Choose Sub Category', value: '' },
-            files: {
-                videos: [],
-                previews: []
-            },
-            featuredImg: {image: '', preview: ''}
+            defaultCatOption: {label: 'Choose Category', value: ''},
+            serviceId: id,
+            serviceName: "",
+            serviceCategory: "",
+            description: "",
+            featuredImage: '',
+            imageId: '',
         };
-        toast.configure();
+                       
     }
 
     componentDidMount() {
         this.getCategories(null);
-        this.getServiceDetail();
+        this.getSelectedService();
     }
 
-    getServiceDetail = () => {
-        const { dispatch } = this.props;
-        const orderId = window.location.pathname.split('/')[3];
-
-        dispatch(setLoading({ loading: true }));
-        axios.get(`seller/services/${orderId}`, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Authorization': `Bearer ${this.authInfo.token}`
-            }
-        }).then(response => {
-            if (response.data.status) {
-                let data = response.data.data;
-                let category = { label: data.service.category.categoryName, value: data.service.category.id };
-                let subCategory = { label: data.service.sub_category.categoryName, value: data.service.sub_category.id };
-                let featuredImg = {};
-                featuredImg.image = data.service.featuredImage;
-                featuredImg.preview = config.apiURI + data.service.featuredImage;
-                let files = { ...this.state.files }
-                if (data.service.videos.length > 0) {
-                    data.service.videos.forEach((value) => {
-                        files.videos.push(value.video.thumb);
-                        files.previews.push(config.apiURI + value.video.thumb);
-                    })
-                }
-
-                this.setState({
-                    serviceDetail: data,
-                    defaultCatOption: category,
-                    defaultSubCatOption: subCategory,
-                    featuredImg,
-                    files
-                });
-            }
-        }).catch(error => {
-            if (error.response && error.response.data.status === false) {
-                toast.error(error.response.data.message);
-            }
-        }).finally(() => {
-            setTimeout(() => {
-                dispatch(setLoading({ loading: false }));
-            }, 300);
-        });
-    }
+    handleDescriptionChange = (description) => {
+        this.setState({ description });
+    };
 
     getCategories = param => {
         let reqBody = {
@@ -102,145 +62,164 @@ class EditService extends Component {
                 if (param === null) {
                     let catOptions = [];
                     response.data.data.forEach(value => {
-                        catOptions.push({ label: value.categoryName, value: value.id })
+                        catOptions.push({label: value.categoryName, value: value.id})
                     });
-                    this.setState({ catOptions });
+                    this.setState({catOptions});
                 } else {
                     let subCatOptions = [];
                     response.data.data.forEach(value => {
-                        subCatOptions.push({ label: value.categoryName, value: value.id })
+                        subCatOptions.push({label: value.categoryName, value: value.id})
                     });
-                    this.setState({ subCatOptions });
+                    this.setState({subCatOptions});
                 }
             }
         }).catch(error => {
             console.log(error);
         }).finally(() => {
             setTimeout(() => {
-                this.dispatch(setLoading({ loading: false }));
+                this.dispatch(setLoading({loading: false}));
             }, 300);
         });
     }
 
-    handleImages = event => {
-        let files = { ...this.state.files };
-        for (let i = 0; i < event.target.files.length; i++) {
-            files.videos.push(event.target.files[i]);
-            files.previews.push(URL.createObjectURL(event.target.files[i]));
-        }
-        this.setState({files});
-    }
-
-    removeImg = index => {
-        let files = {...this.state.files};
-        files.videos.splice(index, 1);
-        files.previews.splice(index, 1);
-    }
-
-    handleFeaturedImg = event => {
-        if (event.target.files.length > 0) {
-            let featuredImg = {
-                image: event.target.files[0],
-                preview: URL.createObjectURL(event.target.files[0])
-            };
-            this.setState({ featuredImg });
-        } else {
-            let featuredImg = {
-                image: '',
-                preview: ''
-            };
-            this.setState({ featuredImg });
-        }
-    }
-
-    saveFeaturedImg = (productId, successMsg) => {
-        let formData = new FormData();
-        formData.append('id', productId);
-        formData.append('file', this.state.featuredImg.image);
-
-        axios.post('seller/products/featured-image', formData, {
+    getSelectedService = () => {
+        console.log("ServiceId:", this.state.serviceId);
+        axios
+          .get(`seller/service/items/${this.state.serviceId}`, {
             headers: {
-                'Accept': 'application/form-data',
-                'Content-Type': 'application/json; charset=UTF-8',
-                'Authorization': `Bearer ${this.authInfo.token}`
+              Accept: "application/json",
+              "Content-Type": "application/json;charset=UTF-8",
+              Authorization: `Bearer ${this.authInfo.token}`,
+            },
+          })
+          .then((res) => {
+            console.log("Data", res.data.data);
+            const serviceData = res.data.data[0];
+            const defaultCatOption = {label: serviceData.category.categoryName, value: ''};
+            const description = serviceData.description;
+            const serviceName = serviceData.name;
+            const featuredImage = serviceData.featuredImage;
+            const imageId = serviceData.imageId;
+
+            this.setState({
+                defaultCatOption: defaultCatOption,
+                description: description,
+                serviceName: serviceName,
+                featuredImage: featuredImage,
+                imageId: imageId,
+            });
+          })
+          .catch((error) => {
+            console.log("Error of catch!")
+          });
+      };
+    
+
+
+    handleImageEdit = (e) => {
+        const file = e.target.files[0];
+        const fileSize = file.size;
+        const maxSize = 5242880; // 5MB
+    
+        if (fileSize <= maxSize) {
+            const data = new FormData();
+            data.append("file", file);
+            data.append("upload_preset", "pay-earth-images");
+            data.append("cloud_name", this.cloudName);
+
+            console.log("ImageID", this.state.imageId);
+            console.log("ImageID", this.cloudName);
+
+    
+            // Delete existing image if it exists
+            if (this.state.imageId) {
+                fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/image/destroy/${this.state.imageId}`, {
+                    method: "post",
+                    body: {
+                        "public_id": this.state.imageId,
+                        "api_key": this.apiKey,
+                        "api_secret": this.apiSecret,
+                    }
+                }).then(response => response.json())
+                .then(data => {
+                    console.log("Image deleted successfully:", data);
+                }).catch(error => {
+                    console.error("Error deleting image:", error);
+                });
             }
-        }).then(response => {
-            if (response.data.status) {
-                toast.dismiss();
-                toast.success(successMsg, { autoClose: 3000 });
-                this.dispatch(setLoading({ loading: true }));
-                this.props.history.push('/seller/service-stock-management');
-            }
-        }).catch(error => {
-            if (error.response && error.response.data.status === false) {
-                toast.error(error.response.data.message);
-            }
-        }).finally(() => {
-            setTimeout(() => {
-                this.dispatch(setLoading({ loading: false }));
-            }, 300);
-        });
-    }
+    
+            // Upload new image
+            fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`, {
+                method: "post",
+                body: data
+            }).then(response => response.json())
+            .then(data => {
+                console.log("New image uploaded:", data);
+                this.setState({
+                    featuredImage: data.secure_url,
+                    imageId: data.public_id
+                });
+            }).catch(error => {
+                console.error("Error uploading new image:", error);
+            });
+        } else {
+            toast.error("Image size must be less than 5 MB", { autoClose: 3000 });
+        }
+    };
+
 
     handleSubmit = values => {
-        let formData = new FormData();
-        const serviceId = window.location.pathname.split('/')[3];
-        console.log(serviceId)
-        formData.append('seller_id', this.authInfo.id);
-        formData.append('name', values.name);
-        formData.append('category', values.category);
-        formData.append('sub_category', values.subCategory);
-        formData.append('description', values.description);
-        formData.append('price', values.price);
-        formData.append('validity', values.validity);
-
-        // Bind images with color
-        for (let index = 0; index < this.state.files.videos.length; index++) {
-            this.state.files.videos.forEach(value => {
-                formData.append('videos', value);
-            });
+        const formData = {
+            seller_id: this.authInfo.id,
+            name: this.state.serviceName,
+            category: this.state.serviceCategory,
+            description: this.state.description,
+            featuredImage: this.state.featuredImage,
+            imageId : this.state.imageId,
         }
+        console.log("FormDataaaaa", formData)
 
-        this.dispatch(setLoading({ loading: true }));
-        axios.put(`seller/services/${serviceId}`, formData, {
+        this.dispatch(setLoading({loading: true}));
+        axios.put(`seller/service/edit/${this.state.serviceId}`, formData, {
             headers: {
                 'Accept': 'application/form-data',
                 'Content-Type': 'application/json; charset=UTF-8',
                 'Authorization': `Bearer ${this.authInfo.token}`
             }
-        }).then(response => {
-            if (response.data.status) {
-                this.saveFeaturedImg(response.data.data.id, response.data.message);
-                // if(typeof  this.state.featuredImg.image === 'string'){
-                //     toast.dismiss();
-                //     this.dispatch(setLoading({loading: true}));
-                //     toast.success(response.data.message, {autoClose: 3000});
-                //     this.props.history.push('/seller/service-stock-management');
-                // }
-                // else{this.saveFeaturedImg(response.data.data.id, response.data.message);}
+        }).then((response) => {
+        if (response.data.status) {
+            toast.success(response.data.message);
             }
+           
         }).catch(error => {
+            console.log('error =>', error)
             if (error.response) {
                 toast.error(error.response.data.message);
             }
         }).finally(() => {
+            console.log('inside the finally block')
             setTimeout(() => {
-                this.dispatch(setLoading({ loading: false }));
+                this.dispatch(setLoading({loading: false}));
             }, 300);
         });
     }
 
     render() {
-        const { loading } = store.getState().global;
+        const {loading} = store.getState().global;
         const {
-            serviceDetail,
             catOptions,
             defaultCatOption,
-            subCatOptions,
-            defaultSubCatOption,
-            files,
-            featuredImg
+            serviceName,
+            description,
+            featuredImage,
         } = this.state;
+
+        const styles = {
+            editor: {
+              border: '1px solid gray',
+              minHeight: '20em'
+            }
+          };
 
         return (
             <React.Fragment>
@@ -253,18 +232,13 @@ class EditService extends Component {
                                 <div className="dash_inner_wrap">
                                     <Formik
                                         initialValues={{
-                                            name: serviceDetail.service ? serviceDetail.service.name : '',
-                                            category: serviceDetail.service ? serviceDetail.service.category.id : defaultCatOption.value,
-                                            subCategory: serviceDetail.service ? serviceDetail.service.sub_category.id : defaultSubCatOption.value,
-                                            description: serviceDetail.service ? serviceDetail.service.description : '',
-                                            price: serviceDetail.service ? serviceDetail.service.price : '',
-                                            validity: serviceDetail.service ? serviceDetail.service.validity : '',
-                                            files: '',
-                                            featuredImg: '',
+                                            name: '',
+                                            category: defaultCatOption?.value,
+                                            description: '',
+                                            featuredImg: ''
                                         }}
                                         onSubmit={values => this.handleSubmit(values)}
-                                        validationSchema={addServiceSchema}
-                                        enableReinitialize={true}
+                                        // validationSchema={addServiceSchema}
                                     >
                                         {({ values,
                                             errors,
@@ -279,33 +253,42 @@ class EditService extends Component {
                                                     <div className="col-md-12 pt-4 pb-4">
                                                         <div className="dash_title">Edit Service</div>
                                                     </div>
-                                                    <div className="col-md-4">
+                                                    <div className="col-md-7">
                                                         <div className="mb-4">
-                                                            <label htmlFor="name" className="form-label"> Name of Services <small className="text-danger">*</small></label>
+                                                            <label htmlFor="name" className="form-label"> Name of Service <small className="text-danger">*</small></label>
                                                             <input type="text" className="form-control" id="name" aria-describedby="nameHelp"
                                                                 name="name"
-                                                                onChange={handleChange}
                                                                 onBlur={handleBlur}
-                                                                value={values.name}
+                                                                value={serviceName}
+                                                                onChange={event => {
+                                                                    this.setState({ serviceName: event.target.value });
+                                                                }}
                                                             />
                                                             {touched.name && errors.name ? (
                                                                 <small className="text-danger">{errors.name}</small>
                                                             ) : null}
                                                         </div>
                                                     </div>
-                                                    <div className="col-md-4">
+                                                    <div className="col-md-5">
                                                         <div className="mb-4">
-                                                            <label htmlFor="name" className="form-label"> Category <small className="text-danger">*</small></label>
+                                                            <label htmlFor="category" className="form-label"> Category <small className="text-danger">*</small></label>
                                                             <Select
                                                                 className="form-select category_select"
                                                                 name="category"
                                                                 options={catOptions}
                                                                 value={defaultCatOption}
-                                                                onChange={selectedOption => {
-                                                                    values.category = selectedOption.value;
-                                                                    this.setState({ defaultCatOption: selectedOption });
+                                                                onChange={(selectedOption) => {
+                                                                    console.log("SelectedOption", selectedOption)
+                                                                    console.log("SelectedOption in state", this.state.defaultCatOption)
+                                                                    this.setState({ serviceCategory: selectedOption.value, defaultCatOption: selectedOption });
                                                                     this.getCategories(selectedOption.value);
                                                                 }}
+                                                                // onChange={selectedOption => {
+                                                                //     values.category = selectedOption.value;
+                                                                //     this.setState({ serviceCategory: selectedOption });
+                                                                //     this.setState({ serviceCategory: selectedOption.value });
+                                                                //     this.getCategories(selectedOption.value);
+                                                                // }}
                                                                 onBlur={handleBlur}
                                                             />
                                                             {touched.category && errors.category ? (
@@ -313,116 +296,63 @@ class EditService extends Component {
                                                             ) : null}
                                                         </div>
                                                     </div>
-                                                    <div className="col-md-4">
-                                                        <div className="mb-4">
-                                                            <label className="form-label">Subcategory</label>
-                                                            <Select
-                                                                name=" subCategory"
-                                                                className="form-select category_select"
-                                                                options={subCatOptions}
-                                                                value={values.subCategory}
-                                                                onChange={selectedOption => {
-                                                                    values.subCategory = selectedOption.value;
-                                                                    this.setState({ defaultSubCatOption: selectedOption });
-                                                                }}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-8">
+                                                    <div className="col-md-7">
                                                         <div className="mb-4">
                                                             <label className="form-label">Description <small className="text-danger">*</small></label>
-                                                            <textarea className="form-control h-100" rows="5"
-                                                                name="description"
-                                                                onChange={handleChange}
-                                                                onBlur={handleBlur}
-                                                                value={values.description}
-                                                            ></textarea>
-                                                            {touched.description && errors.description ? (
-                                                                <small className="text-danger">{errors.description}</small>
-                                                            ) : null}
+                                                        <div style={styles.editor} onClick={this.focusEditor}>
+                                                        <ReactQuill
+                                                        //style={{ height: '250px' }}
+                                                        type="text"
+                                                        name="description"
+                                                        value={description}
+                                                        onChange={this.handleDescriptionChange}
+                                                        modules={{
+                                                            toolbar: [
+                                                                [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+                                                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                                ['bold', 'italic', 'underline'],
+                                                                ['link', 'image'],
+                                                                ['clean']
+                                                            ]
+                                                        }}
+                                                    />
+                                                       </div>
+                                                     
                                                         </div>
                                                     </div>
-                                                    <div className="col-md-4">
-                                                        <div className="mb-4">
-                                                            <label className="form-label">Price <small className="text-danger">*</small></label>
-                                                            <input type="text" className="form-control" id="" aria-describedby="nameHelp"
-                                                                name="price"
-                                                                onChange={handleChange}
-                                                                onBlur={handleBlur}
-                                                                value={values.price}
-                                                            />
-                                                            {touched.price && errors.price ? (
-                                                                <small className="text-danger">{errors.price}</small>
-                                                            ) : null}
-                                                        </div>
-                                                        <div className="mb-4">
-                                                            <label className="form-label"> Validity <small className="text-danger">*</small></label>
-                                                            <input type="text" className="form-control" aria-describedby="nameHelp"
-                                                                name="validity"
-                                                                onChange={handleChange}
-                                                                onBlur={handleBlur}
-                                                                value={values.validity}
-                                                            />
-                                                            {touched.validity && errors.validity ? (
-                                                                <small className="text-danger">{errors.validity}</small>
-                                                            ) : null}
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        <label className="form-label">Upload videos</label>
-                                                        <ul className="load_services service">
-                                                            <li>
-                                                                <input type="file" className="form-control" id="files" accept="video/*"
-                                                                    name="files"
-                                                                    onChange={event => {
-                                                                        handleChange("files")(event);
-                                                                        this.handleImages(event);
-                                                                    }}
-                                                                    multiple={true}
-                                                                    onBlur={handleBlur}
-                                                                // value={values.files}
-                                                                />
-                                                            </li>
-                                                        </ul>
-                                                        {files.previews.length > 0 &&
-                                                            <ul className="load_imgs">
-                                                                {files.previews.map((url, index) => {
-                                                                    return <li key={index}>
-                                                                        <Link to="#" className="delete_icon_btn" onClick={() => this.removeImg(index)}><i className="fa fa-trash"></i></Link>
-                                                                        <img src={url} alt="..." />
-                                                                    </li>
-                                                                })}
-                                                            </ul>
-                                                        }
-
-                                                        {touched.files && errors.files ? (
-                                                            <small className="text-danger">{errors.files}</small>
-                                                        ) : null}
-                                                    </div>
-                                                    <div className="col-md-4">
-                                                        <label className="form-label">Featured Image</label>
-                                                        <input
-                                                            className="form-control mb-2"
-                                                            type="file"
-                                                            name="featuredImg"
-                                                            accept="image/*"
-                                                            value={values.featuredImg}
-                                                            onChange={(event) => {
-                                                                handleChange("featuredImg")(event);
-                                                                this.handleFeaturedImg(event);
-                                                            }}
-                                                            onBlur={handleBlur}
-                                                        />
-                                                        {touched.featuredImg && errors.featuredImg ? (
-                                                            <small className="text-danger">{errors.featuredImg}</small>
-                                                        ) : null}
-                                                        {serviceDetail.service && serviceDetail.service.featuredImage !== '' ?
-                                                            <div>
-                                                                <img src={featuredImg.preview} alt="..." style={{maxWidth: '100%', maxHeight: '300px'}} />
+                                                  
+                                                    <div className="col-md-5">
+                                                            <div className='formImage-wrapper'>
+                                                            <label className="form-label">Featured Image</label>
+                                                            <div className='text-center formImage-pannel'>
+                                                            <div className='formImage'><img src={featuredImage} alt='...'/>
+                                                            <p className='text-danger'> Size must be less than 5 MB</p>
+                                                            </div> 
                                                             </div>
-                                                        : ''}
+                                                            </div>
+                                                            <div className='formImageInput'>
+                                                            <input 
+                                                                className="form-control mb-2"
+                                                                style={{ height: "60px" }}
+                                                                type="file"
+                                                                name="featuredImg"
+                                                                accept="image/*"
+                                                                // value={featuredImage}
+                                                                onChange={(event) => {
+                                                                    handleChange("featuredImg")(event);
+                                                                    this.handleImageEdit(event);
+                                                                }}
+                                                                onBlur={handleBlur}
+                                                            />
+                                                                </div> 
+                                                        </div>
+                                                        <div className="col-md-2"></div>
+                                                        <div className="col-md-6">
+                                                       
                                                     </div>
-                                                    <div className="col-md-12 pt-4 pb-4">
+                                                    <div>
+                                                    </div>
+                                                    <div className="col-md-4 pt-4 pb-4">
                                                         <button type="submit" className="btn  custom_btn btn_yellow w-auto" disabled={!isValid}>Save Service</button>
                                                     </div>
                                                 </div>
@@ -430,7 +360,6 @@ class EditService extends Component {
                                         )}
                                     </Formik>
                                 </div>
-
                             </div>
                         </div>
                     </div>
