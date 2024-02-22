@@ -269,7 +269,7 @@ class ManageBannerList extends Component {
         },
         {
             name: "User Details",
-            selector: (row, i) => row.subscriptionPlan === null ?  "" : <>
+            selector: (row, i) => row.subscriptionPlan === null ? "" : <>
                 <p>{row.author.name}</p>
                 <p>{row.author.email}</p>
 
@@ -378,7 +378,7 @@ class ManageBannerList extends Component {
 
                                     <div className="cart_list adv_banner_panel">
                                         <div className="tab-pane fade show active" id="nav-draft-post" role="tabpanel" aria-labelledby="nav-draft-post-tab">
-                                            <div className="DT_ext_row ">
+                                            <div className="DT_ext_row adv-banner-row ">
                                                 <div className=' date-wrapper col-md-3'>
                                                     <DateRangePicker
                                                         ranges={[dateRange]}
@@ -386,6 +386,13 @@ class ManageBannerList extends Component {
                                                     />
                                                 </div>
                                                 <div className='tablewrapper col-md-9'>
+                                                    <div className="cart_wrap">
+                                                        <div className="items_incart">
+                                                            <span className="text-uppercase">
+                                                                ({filteredBanner.length === 0 ? banner.length : filteredBanner.length}) ITEMS IN YOUR LIST
+                                                            </span>
+                                                        </div>
+                                                    </div>
                                                     <DataTableExtensions
                                                         columns={this.banner_column}
                                                         data={filteredBanner.length === 0 ? banner : filteredBanner}

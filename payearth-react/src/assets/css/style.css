@@ -3929,13 +3929,12 @@ a.inner-block:active {
 .inr_wrap .adv_banner_wrapper .rdrDateRangePickerWrapper{
     display: inline ;
 }
-.DT_ext_row  .rdrDateRangePickerWrapper .rdrDateRangeWrapper{
+.adv-banner-row  .rdrDateRangePickerWrapper .rdrDateRangeWrapper{
     margin-top: 30px;
 }
-.DT_ext_row {
+.adv-banner-row {
     display: flex;
     gap: 10px;
-
 }
 @media (max-width:991px) {
     /* .custom_btn{
@@ -3944,7 +3943,7 @@ a.inner-block:active {
     /* .btn-width{
         width: 190px;
       } */ 
-      .DT_ext_row {
+      .adv-banner-row {
         display: block;
     }
     .date-wrapper .rdrDateRangePickerWrapper {
@@ -3957,7 +3956,7 @@ a.inner-block:active {
 }
 
 @media (max-width:768px) {
-    .DT_ext_row {
+    .adv-banner-row {
         display: block;
     }
     .btn-width {
@@ -3977,7 +3976,7 @@ a.inner-block:active {
         display: inline !important;
        
     }
-    .DT_ext_row {
+    .adv-banner-row {
         display: block;
     }
     .cl_head .cl-row {

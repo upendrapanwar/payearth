@@ -13,10 +13,9 @@ class CreateNewBanner extends Component {
 
     constructor(props) {
         super(props);
-        this.cloudName = "pay-earth"
-        this.apiKey = "172845922361144";
-        this.apiSecret = "3rvc9PNRXy2YOeB9kuFNjrxI8FU";
-        //      this.signature = "f878911eba6bc4737f78009826d5fb0683a7e538"
+        this.cloudName = process.env.REACT_APP_CLOUD_NAME
+        this.apiKey = process.env.REACT_APP_API_KEY
+        this.apiSecret = process.env.REACT_APP_API_SECRET
         this.authInfo = store.getState().auth.authInfo;
         this.userInfo = store.getState().auth.userInfo;
 
@@ -68,9 +67,9 @@ class CreateNewBanner extends Component {
             data.append("cloud_name", "pay-earth")
 
             console.log("dataIMAge", data)
-            // https://api.cloudinary.com/v1_1/pay-earth/video/upload   <= video file example
+            // https://api.cloudinary.com/v1_1/${this.cloudName}/video/upload   <= video file example
 
-            fetch("https://api.cloudinary.com/v1_1/pay-earth/image/upload", {
+            fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`, {
                 method: "post",
                 body: data
             }).then((res) => res.json())
@@ -101,7 +100,7 @@ class CreateNewBanner extends Component {
             data.append("upload_preset", "pay-earth-images")
             data.append("cloud_name", "pay-earth")
 
-            fetch("https://api.cloudinary.com/v1_1/pay-earth/video/upload", {
+            fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/video/upload`, {
                 method: "post",
                 body: data
             }).then((res) => res.json())
@@ -142,7 +141,6 @@ class CreateNewBanner extends Component {
         this.setState({ bannerName: e.target.value })
     }
     handleSiteUrl = (e) => {
-        console.log("siteURL ::::::", e.target.value)
         this.setState({ siteUrl: e.target.value });
     }
     handleCategorySelect = (e) => {
@@ -172,7 +170,6 @@ class CreateNewBanner extends Component {
     }
 
     handleSubscriptionPlan = (card) => {
-        console.log("card : ", card)
         this.setState({ subscriptionPlan: card });
         this.setState({ isSelectplan: true })
         sessionStorage.setItem('selectPlan', JSON.stringify(card));
@@ -379,7 +376,7 @@ class CreateNewBanner extends Component {
     fetchStripePlans = async () => {
         console.log("fetchStrip plan function is run")
         try {
-            const stripeSecretKey = 'sk_test_51OewZgD2za5c5GtO7jqYHLMoDerwvEM69zgVsie3FNLrO0LLSLwFJGzXv4VIIGqScWn6cfBKfGbMChza2fBIQhsv00D9XQRaOk';
+            const stripeSecretKey = process.env.REACT_APP_SECRET_KEY;
             const response = await axios.get(`https://api.stripe.com/v1/plans`, {
                 headers: {
                     Authorization: `Bearer ${stripeSecretKey}`,

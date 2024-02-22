@@ -16,10 +16,9 @@ class ManageBannerAdvertisement extends Component {
 
     constructor(props) {
         super(props);
-        this.cloudName = "pay-earth"
-        this.apiKey = "172845922361144";
-        this.apiSecret = "3rvc9PNRXy2YOeB9kuFNjrxI8FU";
-        //      this.signature = "f878911eba6bc4737f78009826d5fb0683a7e538"
+        this.cloudName = process.env.REACT_APP_CLOUD_NAME
+        this.apiKey = process.env.REACT_APP_API_KEY
+        this.apiSecret = process.env.REACT_APP_API_SECRET
         this.authInfo = store.getState().auth.authInfo;
         this.userInfo = store.getState().auth.userInfo;
 
@@ -59,12 +58,12 @@ class ManageBannerAdvertisement extends Component {
             const data = new FormData()
             data.append("file", file)
             data.append("upload_preset", "pay-earth-images")
-            data.append("cloud_name", "pay-earth")
+            data.append("cloud_name", `${this.cloudName}`)
 
             console.log("dataIMAge", data)
-            // https://api.cloudinary.com/v1_1/pay-earth/video/upload   <= video file example
+            // https://api.cloudinary.com/v1_1/${this.cloudName}/video/upload   <= video file example
 
-            fetch("https://api.cloudinary.com/v1_1/pay-earth/image/upload", {
+            fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`, {
                 method: "post",
                 body: data
             }).then((res) => res.json())
@@ -93,9 +92,9 @@ class ManageBannerAdvertisement extends Component {
             const data = new FormData()
             data.append("file", file)
             data.append("upload_preset", "pay-earth-images")
-            data.append("cloud_name", "pay-earth")
+            data.append("cloud_name", `${this.cloudName}`)
 
-            fetch("https://api.cloudinary.com/v1_1/pay-earth/video/upload", {
+            fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/video/upload`, {
                 method: "post",
                 body: data
             }).then((res) => res.json())
@@ -350,24 +349,6 @@ class ManageBannerAdvertisement extends Component {
         }
     }
 
-    // fetchStripePlans = async () => {
-    //     console.log("fetchStrip plan function is run")
-    //     try {
-    //         const stripeSecretKey = 'sk_test_51OewZgD2za5c5GtO7jqYHLMoDerwvEM69zgVsie3FNLrO0LLSLwFJGzXv4VIIGqScWn6cfBKfGbMChza2fBIQhsv00D9XQRaOk';
-    //         const response = await axios.get(`https://api.stripe.com/v1/plans`, {
-    //             headers: {
-    //                 Authorization: `Bearer ${stripeSecretKey}`,
-    //             },
-    //         });
-
-    //         console.log("response.data", response.data.data)
-    //         console.log("response.data", response.data)
-    //         // setPlans(fetchedPlans);
-    //     } catch (error) {
-    //         console.error('Error fetching Stripe plans:', error);
-    //     }
-    // };
-
     render() {
         return (
             <React.Fragment>
@@ -376,10 +357,7 @@ class ManageBannerAdvertisement extends Component {
                     <h2>Create New Banner</h2>
                 </div>
                 <section className="inr_wrap">
-                    <Helmet>
-                        <title>{"Manage Banners - Pay Earth"}</title>
-                    </Helmet>
-
+                    <Helmet><title>{"Manage Banners - Pay Earth"}</title></Helmet>
                     <div className="container">
                         <div className="row">
                             <div className="col-md-12">
