@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 mongoose.connect(process.env.MONGODB_URI || config.connectionString, { useNewUrlParser: true,  useUnifiedTopology: true });
 mongoose.Promise = global.Promise;
+const stripe = require('stripe')('sk_test_51OewZgD2za5c5GtO7jqYHLMoDerwvEM69zgVsie3FNLrO0LLSLwFJGzXv4VIIGqScWn6cfBKfGbMChza2fBIQhsv00D9XQRaOk');
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -12,7 +13,8 @@ const ffmpeg = require('fluent-ffmpeg');
 const ffmpeg_static = require('ffmpeg-static');
 const LocationData = require('countrycitystatejson');
 
-const { User, Seller, Product, Brand, Category, ServiceVideo, CryptoConversion, OrderStatus, Payment, Order, OrderTrackingTimeline, Color, NeedHelp, SellerContactUs, ProductSales, Review } = require("../helpers/db");
+const { User, Seller, Product, Brand, Category, ServiceVideo, CryptoConversion, OrderStatus, Payment, Order, OrderTrackingTimeline, Color, NeedHelp, SellerContactUs, ProductSales, Review, Services, OrderDetails, Servicedetails } = require("../helpers/db");
+
 
 module.exports = {
     authenticate,
@@ -29,10 +31,6 @@ module.exports = {
     getProductById,
     addProduct,
     editProduct,
-    addService,
-    editService,
-    getListedServices,
-    getServiceById,
     addFeaturedImage,
     getStockItems,
     getOrders,
@@ -48,7 +46,23 @@ module.exports = {
     getProductSales,
     getSalesLineChartData,
     getTopSellingCategoryChartData,
-    
+    createSubscription,
+    savepaymentdata,
+    saveOrder,
+    saveOrdertrackingTime,
+    updateOrderStatus,
+    saveorderdetails,
+    getOrderStatus,
+    getNewCoupons,
+    addService,
+    editService,
+    getListedServices,
+    getServiceById,
+    addServicesFeaturedImage,
+    serviceStatusUpdate,
+    getServiceItems,
+    getServiceStatus,
+    getServiceData,
 };
 
 function sendMail(mailOptions) {
@@ -827,364 +841,6 @@ async function addFeaturedImage(req) {
 
 }
 
-//Services
-
-async function getListedServices(req) {
-    try {
-        var param = req.body;
-        var id = req.params.id; //seller id
-        var sortOption = { createdAt: 'desc' }; //default
-        var page = 0;
-        var limit = 5;
-        var skip = 0;
-        var whereCondition = { createdBy: id, isService: true };
-
-        if (param.count) {
-            page = parseInt(param.count.page);
-            limit = parseInt(param.count.limit);
-            skip = parseInt(param.count.skip);
-        }
-
-        if (param.sorting) {
-            sortOption = {};
-            let sort_type = param.sorting.sort_type;
-            let sort_val = param.sorting.sort_val;
-            if (sort_type == 'date') {
-                sortOption['createdAt'] = sort_val;
-            }
-        }
-
-        var options = {
-            select: "id name price featuredImage avgRating isService isActive quantity",
-            sort: sortOption,
-            populate: [{
-                path: "cryptoPrices",
-                model: CryptoConversion,
-                select: "name code cryptoPriceUSD",
-                match: { isActive: true, asCurrency: true }
-            }],
-            lean: true,
-            page: page,
-            offset: skip,
-            limit: limit,
-        };
-
-        const result = await Product.paginate(whereCondition, options)
-            .then((data) => {
-                let res = {
-                    services: data.docs,
-                    paginationData: {
-                        totalServices: data.totalDocs,
-                        totalPages: data.totalPages,
-                        currentPage: data.page,
-                        limit: data.limit,
-                        skip: data.offset,
-                        hasPrevPage: data.hasPrevPage,
-                        hasNextPage: data.hasNextPage,
-                        prevPage: data.prevPage,
-                        nextPage: data.nextPage
-                    }
-                };
-                return res;
-            });
-        if (result.services && result.services.length > 0) {
-            return result;
-        } else {
-            return false;
-        }
-    } catch (err) {
-        console.log('Error', err);
-        return false;
-    }
-}
-
-async function getServiceById(id) {
-    const service = await Product.findById(id)
-        .select('name category sub_category description validity price videoCount isActive isService quantity videos createdAt featuredImage')
-        .populate([{
-                path: "cryptoPrices",
-                model: CryptoConversion,
-                select: "name code cryptoPriceUSD",
-                match: { isActive: true, asCurrency: true }
-            },
-            {
-                path: "category",
-                model: Category,
-                select: "id categoryName"
-            },
-            {
-                path: "sub_category",
-                model: Category,
-                select: "id categoryName"
-            },
-            {
-                path: "videos",
-                model: ServiceVideo,
-                select: "video.title video.no video.thumb video.description"
-            }
-        ]);
-
-    if (!service) {
-
-        return false;
-    } else {
-
-        //get service sales data
-        const sales = await ProductSales.findOne({ productId: service.id }).select("totalSalesCount").exec();
-
-        let result = {
-            service: service,
-            sales: sales
-        };
-        return result;
-    }
-}
-
-async function addService(req) {
-    // try {
-    //console.log(req.files);
-    //return false;
-    console.log('request data value for the data section =>>', req)
-    console.log('hello there');
-    const param = req.body;
-    console.log('params =>>', param)
-    var lName = param.name.toLowerCase();
-
-    console.log('lname =>>', lName);
-    // if (await Product.findOne({ lname: lName })) {
-    //     throw 'Service Name "' + param.name + '" already exists.';
-    // }
-
-
-    let input = {
-        name: param.name,
-        lname: lName,
-        category: param.category,
-        description: param.description,
-        validity: param.validity,
-        price: param.price,
-        isActive: true,
-        isService: true,
-        createdBy: param.seller_id,
-        updatedBy: param.seller_id
-    };
-
-    console.log('input data =>', input);
-
-    if (param.sub_category !== "") {
-        input['sub_category'] = param.sub_category;
-    }
-    console.log('inputs =>>', input)
-
-    const service = new Product(input);
-
-    const data = await service.save();
-    console.log('data', data);
-
-    if (data) {
-
-        // const files = req.files;
-        // var videosArr = [];
-        // var videoCount = 0;
-
-        // if (files.length > 0) {
-
-        //     for (var i = 0; i < files.length; i++) {
-
-        //         //for thumb file
-        //         let upload_folder = 'uploads/video_thumbs';
-        //         let path = files[i].path;
-        //         let thumb_file_name = files[i].filename + '-' + Date.now() + '-thumb.png';
-        //         let thumb_full = upload_folder + '/' + thumb_file_name;
-
-        //         try {
-        //             //create thumb file
-        //             ffmpeg(path)
-        //                 .setFfmpegPath(ffmpeg_static)
-        //                 .screenshots({
-        //                     timestamps: [0.0],
-        //                     filename: thumb_file_name,
-        //                     folder: upload_folder
-        //                 }).on('end', function() {
-        //                     //
-        //                 });
-        //         } catch (err) {
-        //             console.log('Error', err);
-        //         }
-
-
-        //         let url = files[i].destination + "/" + files[i].filename;
-        //         let no = i + 1;
-        //         let vid_data = {
-        //             serviceId: data.id,
-        //             video: {
-        //                 no: no,
-        //                 title: "Ep-" + no,
-        //                 description: "Episode-" + no + " of " + param.name,
-        //                 url: url,
-        //                 thumb: thumb_full
-        //             },
-        //             isActive: true
-        //         };
-        //         videosArr.push(vid_data);
-        //         videoCount++;
-        //     }
-        // }
-
-        // if (videosArr && videosArr.length > 0) {
-        //     //insert multiple videos data at once
-        //     await ServiceVideo.insertMany(videosArr, async function(error, videos) {
-        //         if (error == null && videos.length > 0) {
-        //             videoIds = [];
-        //             for (var j = 0; j < videos.length; j++) {
-        //                 let videoId = mongoose.Types.ObjectId(videos[j]._id);
-        //                 videoIds.push(videoId);
-        //             }
-
-        //             if (videoIds.length > 0) {
-        //                 let update = { videoCount: videoCount, videos: videoIds };
-        //                 //update video data into service
-        //                 await Product.findByIdAndUpdate(data.id, update);
-        //             }
-        //         }
-        //     });
-        // }
-
-        // let res = await Product.findById(data.id).select('name category sub_category description validity price isActive isService');
-
-        // if (res) {
-        //     return res;
-        // } else {
-        //     return false;
-        // }
-        return data;
-    } else {
-        return false;
-    }
-
-    // } catch (err) {
-    //     console.log('Error', err);
-    //     return false;
-    // }
-}
-
-async function editService(req) {
-
-    //try {
-    const id = req.params.id;
-    const service = await Product.findById(id);
-    const param = req.body;
-    var lName = param.name.toLowerCase();
-
-    if (service.lname !== lName && (await Product.findOne({ lname: lName, isService: true }))) {
-        throw 'Service Name "' + param.name + '" already exists.';
-    }
-
-    let input = {
-        name: param.name,
-        lname: lName,
-        category: param.category,
-        description: param.description,
-        validity: param.validity,
-        price: param.price,
-        isActive: true,
-        isService: true,
-        updatedBy: param.seller_id
-    };
-
-    if (param.sub_category !== "") {
-        input['sub_category'] = param.sub_category;
-    }
-
-    Object.assign(service, input);
-
-    const data = await service.save();
-
-    if (data) {
-
-        const files = req.files;
-        var videosArr = [];
-        var videoCount = 0;
-
-        if (files.length > 0) {
-
-            for (var i = 0; i < files.length; i++) {
-
-                //for thumb file
-                let upload_folder = 'uploads/video_thumbs';
-                let path = files[i].path;
-                let thumb_file_name = files[i].filename + '-' + Date.now() + '-thumb.png';
-                let thumb_full = upload_folder + '/' + thumb_file_name;
-
-                try {
-                    //create thumb file
-                    ffmpeg(path)
-                        .setFfmpegPath(ffmpeg_static)
-                        .screenshots({
-                            timestamps: [0.0],
-                            filename: thumb_file_name,
-                            folder: upload_folder
-                        }).on('end', function() {
-                            //
-                        });
-                } catch (err) {
-                    console.log('Error', err);
-                }
-
-                let url = files[i].destination + "/" + files[i].filename;
-                let no = i + 1;
-                let vid_data = {
-                    serviceId: data.id,
-                    video: {
-                        no: no,
-                        title: "Ep-" + no,
-                        description: "Episode-" + no + " of " + param.name,
-                        url: url,
-                        thumb: thumb_full
-                    },
-                    isActive: true
-                };
-                videosArr.push(vid_data);
-                videoCount++;
-            }
-        }
-
-        if (videosArr && videosArr.length > 0) {
-            //insert multiple videos data at once
-            await ServiceVideo.insertMany(videosArr, async function(error, videos) {
-                if (error == null && videos.length > 0) {
-                    videoIds = [];
-                    for (var j = 0; j < videos.length; j++) {
-                        let videoId = mongoose.Types.ObjectId(videos[j]._id);
-                        videoIds.push(videoId);
-                    }
-
-                    if (videoIds.length > 0) {
-                        let update = { videoCount: videoCount, videos: videoIds };
-                        //update video data into service
-                        await Product.findByIdAndUpdate(data.id, update);
-                    }
-                }
-            });
-        }
-
-        let res = await Product.findById(data.id).select('name category sub_category description validity price isActive isService');
-
-        if (res) {
-            return res;
-        } else {
-            return false;
-        }
-    } else {
-        return false;
-    }
-
-    // } catch (err) {
-    //     console.log('Error', err);
-    //     return false;
-    // }
-
-}
 
 async function getStockItems(req) {
     //Product or  Service : added / pending / reject
@@ -1235,7 +891,7 @@ async function getStockItems(req) {
         };
 
         const result = await Product.paginate(whereCondition, options)
-            .then((data) => {
+            .then((data) => { 
                 let res = {
                     items: data.docs,
                     paginationData: {
@@ -2046,3 +1702,679 @@ async function getTopSellingCategoryChartData(req) {
         return false;
     }
 }
+
+
+//Services
+
+async function getListedServices(req) {
+    try {
+        var param = req.body;
+        var id = req.params.id; //seller id
+        var sortOption = { createdAt: 'desc' }; //default
+        var page = 0;
+        var limit = 5;
+        var skip = 0;
+        var whereCondition = { createdBy: id, isService: true };
+
+        if (param.count) {
+            page = parseInt(param.count.page);
+            limit = parseInt(param.count.limit);
+            skip = parseInt(param.count.skip);
+        }
+
+        if (param.sorting) {
+            sortOption = {};
+            let sort_type = param.sorting.sort_type;
+            let sort_val = param.sorting.sort_val;
+            if (sort_type == 'date') {
+                sortOption['createdAt'] = sort_val;
+            }
+        }
+
+        var options = {
+            select: "id name price featuredImage avgRating isService isActive quantity",
+            sort: sortOption,
+            populate: [{
+                path: "cryptoPrices",
+                model: CryptoConversion,
+                select: "name code cryptoPriceUSD",
+                match: { isActive: true, asCurrency: true }
+            }],
+            lean: true,
+            page: page,
+            offset: skip,
+            limit: limit,
+        };
+
+        const result = await Product.paginate(whereCondition, options)
+            .then((data) => {
+                let res = {
+                    services: data.docs,
+                    paginationData: {
+                        totalServices: data.totalDocs,
+                        totalPages: data.totalPages,
+                        currentPage: data.page,
+                        limit: data.limit,
+                        skip: data.offset,
+                        hasPrevPage: data.hasPrevPage,
+                        hasNextPage: data.hasNextPage,
+                        prevPage: data.prevPage,
+                        nextPage: data.nextPage
+                    }
+                };
+                return res;
+            });
+        if (result.services && result.services.length > 0) {
+            return result;
+        } else {
+            return false;
+        }
+    } catch (err) {
+        console.log('Error', err);
+        return false;
+    }
+}
+
+async function getServiceById(id) {
+    const service = await Product.findById(id)
+        .select('name category sub_category description validity price videoCount isActive isService quantity videos createdAt featuredImage')
+        .populate([{
+                path: "cryptoPrices",
+                model: CryptoConversion,
+                select: "name code cryptoPriceUSD",
+                match: { isActive: true, asCurrency: true }
+            },
+            {
+                path: "category",
+                model: Category,
+                select: "id categoryName"
+            },
+            {
+                path: "sub_category",
+                model: Category,
+                select: "id categoryName"
+            },
+            {
+                path: "videos",
+                model: ServiceVideo,
+                select: "video.title video.no video.thumb video.description"
+            }
+        ]);
+
+    if (!service) {
+
+        return false;
+    } else {
+
+        //get service sales data
+        const sales = await ProductSales.findOne({ productId: service.id }).select("totalSalesCount").exec();
+
+        let result = {
+            service: service,
+            sales: sales
+        };
+        return result;
+    }
+}   
+
+async function addService(req) {
+    console.log('hello there');
+    // console.log('Param', req.body);
+    // const files = req.files;
+    const param = req.body;
+    // var imagesArr = [];
+
+    var lName = param.name.toLowerCase();
+
+    if (await Services.findOne({ lname: lName })) {
+        throw 'Service Name "' + param.name + '" already exists.';
+    }
+
+    // if (files.length > 0) {
+
+    //     var fieldnames = {};
+    //     for (var i = 0; i < files.length; i++) {
+    //         var field = files[i].fieldname;
+    //         var url = files[i].destination + "/" + files[i].filename;
+    //         if (!fieldnames[field]) {
+    //             fieldnames[field] = [];
+    //         }
+    //         fieldnames[field].push(url);
+    //     }
+
+    //     for (var field in fieldnames) {
+    //         imagesArr.push({ color: field, paths: fieldnames[field] });
+    //     }
+    // }
+
+
+    let input = {
+        seller_id: param.seller_id,
+        name: param.name,
+        lname: lName,
+        slug: param.slug,
+        category: param.category,
+        description: param.description,
+        featuredImage: param.image,
+        imageId : param.imageId,
+        isActive: true,
+        isService: true,
+        createdBy: param.seller_id,
+        updatedBy: param.seller_id,
+    };
+
+    console.log('input data =>', input);
+
+    // if (param.sub_category !== "") {
+    //     input['sub_category'] = param.sub_category;
+    // }
+    
+
+    const serviceData = new Services(input);
+
+    const data = await serviceData.save();
+    console.log('data', data);
+
+    if (data) {
+
+        console.log("data id", data._id)
+        // const files = req.files;
+        // var videosArr = [];
+        // var videoCount = 0;
+
+        // if (files.length > 0) {
+
+        //     for (var i = 0; i < files.length; i++) {
+
+        //         //for thumb file
+        //         let upload_folder = 'uploads/video_thumbs';
+        //         let path = files[i].path;
+        //         let thumb_file_name = files[i].filename + '-' + Date.now() + '-thumb.png';
+        //         let thumb_full = upload_folder + '/' + thumb_file_name;
+
+        //         try {
+        //             //create thumb file
+        //             ffmpeg(path)
+        //                 .setFfmpegPath(ffmpeg_static)
+        //                 .screenshots({
+        //                     timestamps: [0.0],
+        //                     filename: thumb_file_name,
+        //                     folder: upload_folder
+        //                 }).on('end', function() {
+        //                     //
+        //                 });
+        //         } catch (err) {
+        //             console.log('Error', err);
+        //         }
+
+
+        //         let url = files[i].destination + "/" + files[i].filename;
+        //         let no = i + 1;
+        //         let vid_data = {
+        //             serviceId: data.id,
+        //             video: {
+        //                 no: no,
+        //                 title: "Ep-" + no,
+        //                 description: "Episode-" + no + " of " + param.name,
+        //                 url: url,
+        //                 thumb: thumb_full
+        //             },
+        //             isActive: true
+        //         };
+        //         videosArr.push(vid_data);
+        //         videoCount++;
+        //     }
+        // }
+
+        // if (videosArr && videosArr.length > 0) {
+        //     //insert multiple videos data at once
+        //     await ServiceVideo.insertMany(videosArr, async function(error, videos) {
+        //         if (error == null && videos.length > 0) {
+        //             videoIds = [];
+        //             for (var j = 0; j < videos.length; j++) {
+        //                 let videoId = mongoose.Types.ObjectId(videos[j]._id);
+        //                 videoIds.push(videoId);
+        //             }
+
+        //             if (videoIds.length > 0) {
+        //                 let update = { videoCount: videoCount, videos: videoIds };
+        //                 //update video data into service
+        //                 await Product.findByIdAndUpdate(data.id, update);
+        //             }
+        //         }
+        //     });
+        // }
+
+        let res = await Services.findById({_id: data._id}).select();
+        console.log("REsponse", res)
+        if (res) {
+            return res;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+
+    // } catch (err) {
+    //     console.log('Error', err);
+    //     return false;
+    // }
+}
+
+async function addServicesFeaturedImage(req) {
+
+    var file = req.file;
+    var param = req.body;
+    const id = param.id;
+    var imgUrl = '';
+
+    const data = await Services.findById(id);
+
+    if (!data) return false;
+
+    if (typeof file != "undefined") {
+
+        if (fs.existsSync(data.featuredImage)) {
+            fs.unlinkSync(data.featuredImage);
+        }
+
+        imgUrl = file.destination + "/" + file.filename;
+    } else {
+        imgUrl = data.featuredImage;
+    }
+
+    const input = {
+        "featuredImage": imgUrl,
+        "updatedAt": new Date().toISOString(),
+    };
+
+    Object.assign(data, input);
+
+    const result = await data.save();
+
+    if (result) {
+        return await Services.findById(id).select("id featuredImage isService");
+    } else {
+        return false;
+    }
+
+}
+
+/**STRIPE>>>>>>>>>>>>>>>>>>>>>>> */
+async function createSubscription(req, res) {
+    const { paymentMethodId, email, plan_Id, authName } = req.body;
+    try {
+        const paymentMethod = await stripe.paymentMethods.create({
+            type: 'card',
+            card: {
+                token: paymentMethodId,
+            },
+        });
+        console.log("paymentMethod", paymentMethod.id)
+
+        const customer = await stripe.customers.create({
+            email: email,
+            payment_method: paymentMethod.id,
+            invoice_settings: {
+                default_payment_method: paymentMethod.id,
+            },
+            name: authName,
+        });
+
+        // Attach the payment method to the customer
+        await stripe.paymentMethods.attach(paymentMethod.id, {
+            customer: customer.id,
+        });
+
+        // Set the payment method as the default for invoices
+        await stripe.customers.update(customer.id, {
+            invoice_settings: {
+                default_payment_method: paymentMethod.id,
+            },
+        });
+
+        const subscription = await stripe.subscriptions.create({
+            customer: customer.id,
+            items: [{ price: plan_Id }], // Replace with your plan ID
+            expand: ['latest_invoice.payment_intent'],
+        });
+        
+        return subscription
+        // return session;
+        // res.status(200).json({ subscription });
+    } catch (error) {
+        console.error('Error creating subscription:', error);
+        // res.status(500).send({ error: 'Subscription creation failed' });
+    }
+
+}
+
+
+async function savepaymentdata(req) {
+    try {
+        var param = req.body;
+
+        let input; 
+        param.map(result => {
+            input = {
+                userId: result.userId,
+                sellerId: result.sellerId,
+                amountPaid: result.amountPaid,
+                paymentMode: result.paymentMode,
+                paymentAccount: result.paymentAccount,
+                invoiceUrl: result.invoiceUrl,
+                paymentStatus: result.paymentStatus,
+                isActive: true
+            };
+        });
+        const payment = new Payment(input);
+
+        const data = await payment.save();
+        if (data) {
+            console.log(data._id);
+            return data._id;
+        } else {
+            return false;
+        }
+    } catch (err) {
+        console.log('Error', err);
+        return false;
+    }
+}
+
+async function saveOrder(req) {
+    try {
+        const param = req.body;
+
+        let input = {
+            userId: param.userId,
+            productId: param.productId,
+            paymentId: param.paymentId,
+            sellerId: param.sellerId,
+            price: param.price,
+            product_sku: param.product_sku,
+            billingFirstName: param.billingFirstName,
+            billingLastName: param.billingLastName,
+            billingCompanyName: param.billingCompanyName,
+            billingCounty: param.billingCounty,
+            billingStreetAddress: param.billingStreetAddress,
+            billingStreetAddress1: param.billingStreetAddress1,
+            billingCity: param.billingCity,
+            billingCountry: param.billingCountry,
+            billingPostCode: param.billingPostCode,
+            billingPhone: param.billingPhone,
+            billingEmail: param.billingEmail,
+            billingNote: param.billingNote,
+            deliveryCharge: param.deliveryCharge,
+            taxPercent: param.taxPercent,
+            taxAmount: param.taxAmount,
+            discount: param.discount,
+            total: param.total,
+            orderStatus: param.orderStatus,
+            isActive: param.isActive,
+            isService: param.isService
+        };
+
+        const orderItem = new Order(input);
+
+        const data = await orderItem.save();
+
+
+        if (data) {
+            //console.log(data);
+            return data._id;
+        } else {
+            return false;
+        }
+    } catch (err) {
+        console.log('Error', err);
+        return false;
+    }
+}
+
+async function saveOrdertrackingTime(req) {
+    try {
+        var param = req.body;
+
+        let input;
+        //console.log(param);
+        input = {
+            orderId: param.orderId,
+            orderStatusId: param.orderStatusId,
+            isActive: true
+        };
+
+        const orderTrackTimeLine = new OrderTrackingTimeline(input);
+
+        const data = await orderTrackTimeLine.save();
+        if (data) {
+            //console.log(data._id);
+            return data._id;
+        } else {
+            return false;
+        }
+    } catch (err) {
+        console.log('Error', err);
+        return false;
+    }
+}
+
+
+async function saveorderdetails(req) {
+    try {
+        var param = req.body;
+        const options = { ordered: true };
+        let input;
+
+        input = {
+            orderId: param.orderId,
+            productId: param.productId,
+            isActive: true
+        };
+
+        //const OrderDetails = new OrderDetails();
+        //const data = await OrderDetails.save();
+        const data = await OrderDetails.insertMany(param, options);
+        if (data) {
+            console.log('id=', data);
+            return true; 
+        } else {
+            return false;
+        }
+    } catch (err) {
+        console.log('Error', err);
+        return false;
+    }
+}
+
+
+async function updateOrderStatus(req) {
+    try {
+        var param = req.body;
+        console.log('_id=' + param.orderId);
+        console.log('order_status=' + param.orderStatus);
+        //update in order
+        await Order.findOneAndUpdate({ _id: param.orderId }, { orderStatus: param.orderStatus }, { new: true });
+        return true;
+    } catch (err) {
+        console.log('Error', err);
+        return false;
+    }
+}
+
+async function getOrderStatus() {
+    try {
+        const result = await OrderStatus.find({ isActive: true })
+            .sort({ createdAt: 'desc' });
+        if (result && result.length > 0) return result;
+        return false;
+    } catch (err) {
+        console.log('Error', err);
+        return false;
+    }
+}
+
+async function getNewCoupons(req) {
+    try {
+        let now = new Date();
+        var param = req.body;
+        var whereCondition = { end: { $gte: now } }; //default
+        const result = await Coupon.paginate(whereCondition)
+            .then((data) => {
+                let res = {
+                    coupons: data.docs
+                };
+                return res;
+            });
+        if (result.coupons && result.coupons.length > 0) {
+            return result;
+        } else {
+            return false;
+        }
+        console.log('its checking')
+    } catch (err) {
+        console.log('Error', err);
+        console.log('Cpouon is Expired or Code is not match')
+        return false;
+    }
+}
+
+async function serviceStatusUpdate(req) {
+    try {
+        const id = req.params.id;
+        const statusData = req.body;
+
+        const updatedOrder = await Services.findOneAndUpdate({ _id: id }, statusData, { new: true });
+        if (!updatedOrder) {
+            console.log("Service not found.");
+            return null;
+        }
+        
+        console.log("Service updated successfully:", updatedOrder);
+        return updatedOrder;
+    } catch (err) {
+        console.log('Error:', err);
+        throw err; 
+    }
+}
+
+
+async function getServiceItems(req) {
+    try {
+        let id = req.params.id;
+        let result = await Services.find({ $or: [{ createdBy: id }, { _id: id }] })
+            .select('serviceCode name featuredImage imageId description isActive createdAt')
+            .populate({
+                path: 'category',
+                model: Category,
+                select: 'categoryName',
+            })
+            .exec(); // Added exec() to execute the query
+
+        if (result.length > 0) { 
+            return result;
+        } else {
+            return [];
+        }
+    } catch (err) {
+        console.log('Error', err);
+        throw err;
+    }
+}
+
+async function editService(req) {
+    try {
+        const id = req.params.id;
+        const param = req.body;
+        const statusData = {
+            name: param.name,
+            category: param.category,
+            description: param.description,
+            featuredImage: param.featuredImage,
+            imageId: param.imageId,
+            updatedBy: param.seller_id
+        };
+
+        const updatedOrder = await Services.findOneAndUpdate({ _id: id }, statusData, { new: true });
+        if (!updatedOrder) {
+            console.log("Service not found.");
+            return null;
+        }
+        
+        console.log("Service updated successfully:", updatedOrder);
+        return updatedOrder;
+    } catch (err) {
+        console.log('Error:', err);
+        throw err; 
+    }
+    
+
+}
+
+
+// SELLER SERVICE
+async function getServiceData() {
+    try {
+        const allService = await Servicedetails.find().select().sort({ createdAt: 'desc' })
+        .populate(
+            {
+                path: "userId",
+                model: User,
+                select: "name email"
+            },
+        ).populate(
+                {
+                path: "service",
+                model: Services,
+                select: "name serviceCode",
+                populate : ({
+                    path : "category",
+                    model : Category,
+                    select : "categoryName"
+                })
+            }
+        )
+        if (allService && allService.length > 0)
+            return allService;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+
+// Get data by status;
+async function getServiceStatus(req) {
+    const status = req.params.meetingStatus;
+    // console.log("status", status)
+    try {
+        const allPost = await Servicedetails.find({}).select().sort({ createdAt: 'desc' })
+        .populate(
+            {
+                path: "userId",
+                model: User,
+                select: "name email"
+            },
+        ).populate(
+                {
+                path: "service",
+                model: Services,
+                select: "name serviceCode",
+                populate : ({
+                    path : "category",
+                    model : Category,
+                    select : "categoryName"
+                })
+            }
+        )
+        
+        const filteredStatus = allPost.filter(item => item.meetingStatus === status);
+        // console.log("filteredStatus", filteredStatus)
+        return filteredStatus;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+

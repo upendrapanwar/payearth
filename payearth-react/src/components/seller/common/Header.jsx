@@ -77,7 +77,7 @@ const Header = () => {
                                             </div>
                                             <div className="offcanvas-body d-block">
                                                 <ul className="seller_menu navbar-nav justify-content-end flex-grow-1 pe-0">
-                                                    <li className="nav-item"><Link to="/seller/add-product" className="btn custom_btn btn_yellow w-auto text-uppercase">add new product</Link></li>
+                                                    {/* <li className="nav-item"><Link to="/seller/add-product" className="btn custom_btn btn_yellow w-auto text-uppercase">add new product</Link></li> */}
                                                     <li className="nav-item">
                                                         <Link className="nav-link" to="/seller/chat">
                                                             <div className="sm_icon"><img src={smChatIcon} alt="" /></div>
