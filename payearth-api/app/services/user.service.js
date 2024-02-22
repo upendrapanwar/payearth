@@ -94,7 +94,6 @@ function sendMail(mailOptions) {
         } else {
             console.log('*** Success', info);
         }
-
     });
     return true;
 }
@@ -1765,7 +1764,7 @@ async function savepaymentdata(req) {
 
         const data = await payment.save();
         if (data) {
-            console.log(data._id);
+            // console.log(data._id);
             return data._id;
         } else {
             return false;
@@ -2209,7 +2208,7 @@ async function createSubscription(req, res) {
                 token: paymentMethodId,
             },
         });
-        console.log("paymentMethod", paymentMethod.id)
+        // console.log("paymentMethod", paymentMethod.id)
 
         const customer = await stripe.customers.create({
             email: email,
