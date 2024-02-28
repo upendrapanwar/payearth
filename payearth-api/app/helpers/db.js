@@ -42,4 +42,5 @@ module.exports = {
     bannerAdvertisement: require('../models/banner.model'),
     Services: require('../models/service.model'),
     Servicedetails: require('../models/servicedetail.model'),
+    Calendar: require('../models/calendar.model')
 };

@@ -152,6 +152,9 @@ router.put('/service/items/status-update/:id', serviceStatusUpdate);
 router.put('/service/edit/:id', editService);
 router.get("/service/getServiceData", getServiceData)
 router.get("/service/getServiceStatus/:meetingStatus", getServiceStatus);
+router.post("/service/save-calendar-events", saveCalendarEvents);
+router.get("/service/get-calendar-events", getCalendarEvents);
+
 
 
 
@@ -460,6 +463,20 @@ function getServiceData(req, res, next) {
 
 function getServiceStatus(req, res, next) {
     sellerService.getServiceStatus(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+
+function saveCalendarEvents(req, res, next) {
+    sellerService.saveCalendarEvents(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+
+function getCalendarEvents(req, res, next) {
+    sellerService.getCalendarEvents(req)
         .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }

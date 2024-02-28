@@ -13,7 +13,7 @@ const ffmpeg = require('fluent-ffmpeg');
 const ffmpeg_static = require('ffmpeg-static');
 const LocationData = require('countrycitystatejson');
 
-const { User, Seller, Product, Brand, Category, ServiceVideo, CryptoConversion, OrderStatus, Payment, Order, OrderTrackingTimeline, Color, NeedHelp, SellerContactUs, ProductSales, Review, Services, OrderDetails, Servicedetails } = require("../helpers/db");
+const { User, Seller, Product, Brand, Category, ServiceVideo, CryptoConversion, OrderStatus, Payment, Order, OrderTrackingTimeline, Color, NeedHelp, SellerContactUs, ProductSales, Review, Services, OrderDetails, Servicedetails, Calendar } = require("../helpers/db");
 
 
 module.exports = {
@@ -63,6 +63,8 @@ module.exports = {
     getServiceItems,
     getServiceStatus,
     getServiceData,
+    saveCalendarEvents,
+    getCalendarEvents,
 };
 
 function sendMail(mailOptions) {
@@ -2377,4 +2379,50 @@ async function getServiceStatus(req) {
     }
 }
 
+async function saveCalendarEvents(req) {
+    try {
+        const reqData = req.body;
+        let data = '';
+        for (const event of reqData) {
+            const existingEvent = await Calendar.findOne({
+                event_title: event.eventTitle,
+                start_datetime: event.startAt,
+                end_datetime: event.endAt
+            });
 
+            if (!existingEvent) {
+                const eventData = {
+                    event_title: event.eventTitle,
+                    event_description: '',
+                    user_id: '',
+                    // seller_id: event.sellerId, // You may uncomment this line if needed
+                    service_id: '',
+                    start_datetime: event.startAt,
+                    end_datetime: event.endAt,
+                    meeting_url: ''
+                };
+
+                data = await Calendar.create(eventData);
+            } else {
+                data = [];
+            }
+        }
+
+        return data;
+    } catch (err) {
+        console.error('Error saving calendar events:', err);
+        return false; // Indicate failure
+    }
+}
+
+
+
+async function getCalendarEvents() {
+    try {
+        const result = await Calendar.find().select('event_title event_description start_datetime end_datetime')
+        if (result && result.length > 0) return result;
+    } catch (err) {
+        console.log('Error', err);
+        return false;
+    }
+}
