@@ -479,7 +479,7 @@ class ServiceStockManagement extends Component {
               <div className="bg-white rounded-3 pt-3 pb-5">
                 <div className="dash_inner_wrap">
                   <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center flex_mob_none">
-                    <div className="dash_title">Service Stock Management</div>
+                    <div className="dash_title">Service Management</div>
                     <div className="search_customer_field">
                       <div className="noti_wrap">
                         <div className="">

@@ -14,7 +14,7 @@ import { Button, ButtonGroup, Dropdown, Form } from "react-bootstrap";
 const Calendar = ({authToken}) => {
   const [events, setEvents] = useState([]);
   const [selectedDates, setSelectedDates] = useState([]);
-  const [savedDates, setSavedDates] = useState([]);
+  const [dayCellDates, setDayCellDates] = useState([]);
   const [offDays, setOffDays] = useState([]);
   const [businessHours, setBusinessHours] = useState([
     {
@@ -23,12 +23,12 @@ const Calendar = ({authToken}) => {
       endTime: '17:00', // 5pm
     }
   ]);
+  const [calendarKey, setCalendarKey] = useState(0);
 
   useEffect(() => {
-    console.log("Calendar authToken useEffect:", authToken);
     getCalendarEvents(authToken);
-    console.log("Bussiness hours: ", businessHours);
-  }, [businessHours]);
+    console.log("calendarKey", calendarKey)
+  }, [businessHours, calendarKey]);
 
   const getCalendarEvents = async (authToken) => {
     console.log("Calendar authToken:", authToken);
@@ -52,14 +52,6 @@ const Calendar = ({authToken}) => {
       console.error('Error fetching events:', error);
     }
   };
-
-  // const businessHours = [
-  //   {
-  //     daysOfWeek: [0,1,2,3,4,5,6], // Sunday - Saturday
-  //     startTime: '09:00', // 9am
-  //     endTime: '17:00', // 5pm
-  //   }
-  // ];
   
 
   const eventDidMountHandler = (info) => {
@@ -74,6 +66,10 @@ const Calendar = ({authToken}) => {
     });
   };
 
+  const eventCellDidMountHandler = (info) => {
+    info.el.style.backgroundColor = '#338EF0';
+    info.el.style.color = 'white';
+  };
   
   // const highlightedDates = [
   //   '2024-02-03',
@@ -83,21 +79,15 @@ const Calendar = ({authToken}) => {
   const dayCellDidMountHandler = (info) => {
     const date = info.date;
     const dateString = date.toISOString().slice(0, 10); // Get the date string in 'YYYY-MM-DD' format
-    if (savedDates.includes(dateString)) {
+    if (dayCellDates.includes(dateString)) {
       info.el.style.backgroundColor = '#EEEFEE'; // Set background color for the specified dates
     }
   };
-
-  const eventCellDidMountHandler = (info) => {
-    info.el.style.backgroundColor = '#338EF0';
-    info.el.style.color = 'white';
-  };
-
   
   const handleSaveDate = () => {
     const formattedDates = selectedDates.map(date => date.format('YYYY-MM-DD'));
-    setSavedDates(formattedDates);
-    console.log("Unavailable Dates", formattedDates);
+    setDayCellDates(formattedDates);
+    setCalendarKey(key => key + 1);
   };
 
   const handleOffDaysChange = (id, checked) => {
@@ -140,12 +130,14 @@ const Calendar = ({authToken}) => {
 
   return (
     <div className="calendar-container">
-      <div className='row'>
-      <div className="col-6">
+      <div className='row mb-4'>
+      <div className="col-4 d-flex align-items-center">
         <label htmlFor="mySelect">Select off days:</label>
+        &nbsp;&nbsp;
         <CheckboxDropdown items={state.items} onChange={handleOffDaysChange}/>
           <button type="button" className="btn custom_btn btn_yellow mx-auto btn-sm" onClick={handleOffDays}>Save Days</button>
       </div>
+      <div className="col-2"></div>
     <div className="col-6">
     <label htmlFor="">Select Unavailable Days:  </label>
     &nbsp;&nbsp;
@@ -159,10 +151,11 @@ const Calendar = ({authToken}) => {
           plugins={[<DatePanel />]}
           placeholder={selectedDates.length === 0 ? "Choose Date" : null}
         />
+        &nbsp;&nbsp;&nbsp;
       <button type="button" className="btn custom_btn btn_yellow mx-auto btn-sm" onClick={handleSaveDate}>Save Date</button>
       </div>
-      
       </div>
+
       <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView="dayGridMonth"
@@ -183,6 +176,7 @@ const Calendar = ({authToken}) => {
         dayCellDidMount= {(info) => {
           dayCellDidMountHandler(info);
         }}
+        key={calendarKey}
       />
     </div>
   );
