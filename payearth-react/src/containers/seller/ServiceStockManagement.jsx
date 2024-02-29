@@ -17,6 +17,8 @@ import Calendar from "./Calendar";
 import Modal from "react-bootstrap/Modal";
 import emptyImg from './../../assets/images/emptyimage.png'
 import { CalendarLogout } from "./CalendarLogout";
+import DatePicker, { DateObject } from "react-multi-date-picker";
+import DatePanel from "react-multi-date-picker/plugins/date_panel";
 
 class ServiceStockManagement extends Component {
   constructor(props) {
@@ -580,8 +582,10 @@ class ServiceStockManagement extends Component {
                         {/* <div className="text-center mt-5">
                         <CalendarLogout onLogoutSuccess={this.handleCalendarLogout()}/>
                         </div> */}
+                          
                         <div style={{ width: "1000px", marginLeft: "150px", marginTop: "50px" }}>
-                        <Calendar authToken={token} />
+                        <Calendar authToken={token}/>
+                        
                     </div>
                       </>
                       )

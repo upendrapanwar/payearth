@@ -55,6 +55,7 @@ export const CalendarAuth = ({sellerId, authToken, onAuthSuccess}) => {
       console.log("Events data:", eventsData);
       saveCalendarEvents(eventsData, sellerId, authToken);
       onAuthSuccess();
+      
     } catch (error) {
       // localStorage.removeItem("accessToken");
       console.error('Error fetching events:', error);
