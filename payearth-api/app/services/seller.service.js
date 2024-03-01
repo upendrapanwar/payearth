@@ -2385,17 +2385,16 @@ async function saveCalendarEvents(req) {
         let data = '';
         for (const event of reqData) {
             const existingEvent = await Calendar.findOne({
-                event_title: event.eventTitle,
-                start_datetime: event.startAt,
-                end_datetime: event.endAt
+                event_id:event.eventId,
             });
 
             if (!existingEvent) {
                 const eventData = {
+                    event_id:event.eventId,
                     event_title: event.eventTitle,
                     event_description: '',
                     user_id: '',
-                    // seller_id: event.sellerId, // You may uncomment this line if needed
+                    // seller_id: event.sellerId,
                     service_id: '',
                     start_datetime: event.startAt,
                     end_datetime: event.endAt,
@@ -2407,7 +2406,7 @@ async function saveCalendarEvents(req) {
                 data = [];
             }
         }
-
+        console.log("Response of saved calendar:", data);
         return data;
     } catch (err) {
         console.error('Error saving calendar events:', err);

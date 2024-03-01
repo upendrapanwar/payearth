@@ -48,6 +48,7 @@ export const CalendarAuth = ({sellerId, authToken, onAuthSuccess}) => {
       console.log("Calendar response:", response.data);
       console.log("Response:", response.data);
       const eventsData = response.data.items.map(item => ({
+        eventId:item.id,
         title: item.summary,
         start: item.start.dateTime,
         end: item.end.dateTime
@@ -66,6 +67,7 @@ export const CalendarAuth = ({sellerId, authToken, onAuthSuccess}) => {
     try {
       const requestData = eventsData.map(event => ({
         // sellerId: sellerId,
+        eventId:event.eventId,
         eventTitle: event.title,
         startAt: event.start,
         endAt: event.end,
@@ -88,7 +90,9 @@ export const CalendarAuth = ({sellerId, authToken, onAuthSuccess}) => {
       console.error("Error saving calendar events:", error);
     }
   };
-  
+
+    
+   
   
 
   // const onSuccess = (res) => {
@@ -108,6 +112,7 @@ export const CalendarAuth = ({sellerId, authToken, onAuthSuccess}) => {
         accessType='offline'
         scope={SCOPES}
       />
+    
        {/* <GoogleLogout
         clientId={CLIENT_ID}
         buttonText="Logout"

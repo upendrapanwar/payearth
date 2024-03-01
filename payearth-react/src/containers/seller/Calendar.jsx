@@ -30,6 +30,7 @@ const Calendar = ({authToken}) => {
     console.log("calendarKey", calendarKey)
   }, [businessHours, calendarKey]);
 
+
   const getCalendarEvents = async (authToken) => {
     console.log("Calendar authToken:", authToken);
     try {
@@ -40,7 +41,7 @@ const Calendar = ({authToken}) => {
           Authorization: `Bearer ${authToken}`,
         },
       });
-      console.log("Calendar Events response", response.data.data);
+      console.log("Get Calendar Events response", response.data.data);
       const eventsData = response.data.data.map(item => ({
         title: item.event_title,
         start: item.start_datetime,
@@ -52,6 +53,63 @@ const Calendar = ({authToken}) => {
       console.error('Error fetching events:', error);
     }
   };
+
+//   const blockDates = async (dates) => {
+//     try {
+//         const accessToken = localStorage.getItem("accessToken");
+
+//         const events = dates.map(date => ({
+//             'summary': 'Blocked',
+//             'start': {
+//               'dateTime': `${date}T09:00:00-07:00`,
+//             },
+//             'end': {
+//               'dateTime': `${date}T17:00:00-07:00`,
+//             },
+//         }));
+
+//         const responses = await Promise.all(events.map(event => 
+//             axios.post(
+//                 'https://www.googleapis.com/calendar/v3/calendars/primary/events',
+//                 event,
+//                 {
+//                     headers: {
+//                         Authorization: `Bearer ${accessToken}`,
+//                         'Content-Type': 'application/json',
+//                     },
+//                 }
+//             )
+//         ));
+//         responses.forEach((response, index) => {
+//           console.log(`Event blocked for ${dates[index]}:`, response.data);
+//         });
+//         // fetchEvents();
+//     } catch (error) {
+//         console.error('Error creating events:', error);
+//         throw error;
+//     }
+// };
+
+
+//   const unblockDate = async (eventId) => {
+//     try {
+//       const accessToken = localStorage.getItem("accessToken");
+//       const response = await axios.delete(
+//         `https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventId}`,
+//         {
+//           headers: {
+//             Authorization: `Bearer ${accessToken}`,
+//           },
+//         }
+//       );
+//       console.log('Date unblocked');
+//       console.log('Event deleted:', response.data);
+//     } catch (error) {
+//       console.error('Error unblocking date:', error);
+//       throw error; // Handle error appropriately
+//     }
+//   };
+
   
 
   const eventDidMountHandler = (info) => {
@@ -61,7 +119,7 @@ const Calendar = ({authToken}) => {
       placement: "auto",
       trigger: "hover",
       customClass: "popoverStyle",
-      content: `<p><strong>Start Time: </strong>${events.start} </p><p><strong>End Time: </strong>${events.end} </p>`,
+      content: `<p><strong>Name: </strong>James Anderson</p><p><strong>Description: </strong>Meeting will be held for ${info.event.title} appointment.</p><p><strong>Scheduled Time: </strong>${events.start}</p><p><strong>Zoom Meeting url: </strong>https://zoom.com/appointment</p>`,
       html: true,
     });
   };
@@ -70,11 +128,6 @@ const Calendar = ({authToken}) => {
     info.el.style.backgroundColor = '#338EF0';
     info.el.style.color = 'white';
   };
-  
-  // const highlightedDates = [
-  //   '2024-02-03',
-  //   '2024-02-10'
-  // ];
 
   const dayCellDidMountHandler = (info) => {
     const date = info.date;
@@ -87,6 +140,8 @@ const Calendar = ({authToken}) => {
   const handleSaveDate = () => {
     const formattedDates = selectedDates.map(date => date.format('YYYY-MM-DD'));
     setDayCellDates(formattedDates);
+    console.log("formattedDates", formattedDates);
+    // blockDates(formattedDates);
     setCalendarKey(key => key + 1);
   };
 
@@ -130,7 +185,7 @@ const Calendar = ({authToken}) => {
 
   return (
     <div className="calendar-container">
-      <div className='row mb-4'>
+      {/* <div className='row mb-4'>
       <div className="col-4 d-flex align-items-center">
         <label htmlFor="mySelect">Select off days:</label>
         &nbsp;&nbsp;
@@ -154,7 +209,7 @@ const Calendar = ({authToken}) => {
         &nbsp;&nbsp;&nbsp;
       <button type="button" className="btn custom_btn btn_yellow mx-auto btn-sm" onClick={handleSaveDate}>Save Date</button>
       </div>
-      </div>
+      </div> */}
 
       <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -171,12 +226,12 @@ const Calendar = ({authToken}) => {
             dayMaxEventRows: 3
           }
         }}
-        businessHours={businessHours}
+        // businessHours={businessHours}
         timeZone="UTC"
-        dayCellDidMount= {(info) => {
-          dayCellDidMountHandler(info);
-        }}
-        key={calendarKey}
+        // dayCellDidMount= {(info) => {
+        //   dayCellDidMountHandler(info);
+        // }}
+        // key={calendarKey}
       />
     </div>
   );
