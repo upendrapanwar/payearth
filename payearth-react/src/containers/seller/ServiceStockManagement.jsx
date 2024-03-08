@@ -16,13 +16,18 @@ import { CalendarAuth } from "./CalendarAuth";
 import Calendar from "./Calendar";
 import Modal from "react-bootstrap/Modal";
 import emptyImg from './../../assets/images/emptyimage.png'
+import { CalendarLogout } from "./CalendarLogout";
+
 
 class ServiceStockManagement extends Component {
   constructor(props) {
     super(props);
     this.authInfo = store.getState().auth.authInfo;
     // console.log("Auth", this.userInfo.name)
+    const accessToken = localStorage.getItem('accessToken');
     this.state = {
+      sellerId: this.authInfo.id,
+      token: this.authInfo.token,
       selectedRows: [],
       service: [],
       subscriber: [],
@@ -33,6 +38,7 @@ class ServiceStockManagement extends Component {
       editModalOpen: false, // State to manage the edit modal
       editedData: {}, // State to store edited data
       emptyImg: emptyImg,
+      isCalendarAuthorized: accessToken ? true : false,
     };
   }
 
@@ -47,6 +53,16 @@ class ServiceStockManagement extends Component {
     this.getSubscriberList();
     this.getMeetingHistory();
   };
+
+  handleCalendarAuthorization = () => {
+    this.setState({ isCalendarAuthorized: true });
+  };
+
+
+  // handleCalendarLogout = () => {
+  //   this.setState({ isCalendarAuthorized: false });
+  //   localStorage.setItem('isCalendarAuthorized', 'false');
+  // }
 
   getAddedServices = () => {
     axios
@@ -424,8 +440,12 @@ class ServiceStockManagement extends Component {
     // },
   ];
 
+  
+
   render() {
     const {
+      sellerId,
+      token,
       service,
       subscriber,
       meeting,
@@ -434,7 +454,8 @@ class ServiceStockManagement extends Component {
       selectedRows,
       editModalOpen,
       editedData,
-      emptyImg
+      emptyImg,
+      isCalendarAuthorized,
     } = this.state;
 
     console.log("selected Rows", selectedRows);
@@ -539,12 +560,37 @@ class ServiceStockManagement extends Component {
                     role="tabpanel"
                     aria-labelledby="nav-appointment-tab"
                   >
-                    <div className="text-center mt-5">
-                      <CalendarAuth />
+                    {/* <div className="text-center mt-5">
+                      <CalendarAuth sellerId={sellerId} authToken={token}/>
                     </div>
-                    <div style={{ width: "1000px", marginLeft: "150px" }}>
-                      <Calendar />
+                        <div style={{ width: "1000px", marginLeft: "150px" }}>
+                      <Calendar authToken={token}/>
+                    </div> */}
+
+                    {
+                      !isCalendarAuthorized ? (
+                        <div className="text-center mt-5">
+                      <CalendarAuth onAuthSuccess={() => {
+                        this.handleCalendarAuthorization();
+                        }}
+                        sellerId={sellerId} authToken={token}
+                        />
                     </div>
+                      ) : (
+                        <>
+                        {/* <div className="text-center mt-5">
+                        <CalendarLogout onLogoutSuccess={this.handleCalendarLogout()}/>
+                        </div> */}
+                          
+                        <div style={{ width: "1000px", marginLeft: "150px", marginTop: "50px" }}>
+                        <Calendar authToken={token}/>
+                        
+                    </div>
+                      </>
+                      )
+                    }
+                    
+                    
                   </div>
 
                   {/* My Services */}

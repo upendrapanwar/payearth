@@ -1,16 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { GoogleLogin, GoogleLogout  } from 'react-google-login';
 import { gapi } from 'gapi-script';
-import { useEffect } from 'react';
 
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
-const CLIENT_SECRET = process.env.REACT_APP_CLIENT_SECRET;
-const API_KEY = process.env.REACT_APP_API_KEY;
-const DISCOVERY_DOC = process.env.REACT_APP_DISCOVERY_DOC;
 const SCOPES = process.env.REACT_APP_SCOPES;
+// const CLIENT_SECRET = process.env.REACT_APP_CLIENT_SECRET;
+// const API_KEY = process.env.REACT_APP_API_KEY;
+// const DISCOVERY_DOC = process.env.REACT_APP_DISCOVERY_DOC;
 
-export const CalendarAuth = () => {
+export const CalendarAuth = ({sellerId, authToken, onAuthSuccess}) => {
 
   const responseGoogle = async (response) => {
     console.log("Response Google:", response);
@@ -24,20 +23,82 @@ export const CalendarAuth = () => {
       const currentUser = authInstance.currentUser.get();
       const accessToken = currentUser.getAuthResponse().access_token;
       console.log("Access Token", accessToken);
+      localStorage.setItem("accessToken", accessToken);
+      fetchEvents();
     } catch (error) {
+      localStorage.removeItem("accessToken");
       console.error("Error getting access token:", error);
     }
   };
+  const responseError = (error) => {
+    localStorage.removeItem("accessToken");
+    console.error("Google authentication error:", error);
+  };
+
+  const fetchEvents = async () => {
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      console.log("Access token in fetchEvents", accessToken)
+      const response = await axios.get('https://www.googleapis.com/calendar/v3/calendars/primary/events', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        }
+      });
+      console.log("Calendar Events response:", response.data.items);
+      console.log("Calendar response:", response.data);
+      console.log("Response:", response.data);
+      const eventsData = response.data.items.map(item => ({
+        eventId:item.id,
+        title: item.summary,
+        start: item.start.dateTime,
+        end: item.end.dateTime
+      }));
+      console.log("Events data:", eventsData);
+      saveCalendarEvents(eventsData, sellerId, authToken);
+      onAuthSuccess();
+      
+    } catch (error) {
+      // localStorage.removeItem("accessToken");
+      console.error('Error fetching events:', error);
+    }
+  };
+
+  const saveCalendarEvents = async (eventsData, sellerId, authToken) => {
+    try {
+      const requestData = eventsData.map(event => ({
+        // sellerId: sellerId,
+        eventId:event.eventId,
+        eventTitle: event.title,
+        startAt: event.start,
+        endAt: event.end,
+      }));
+  
+      const response = await axios.post(
+        `seller/service/save-calendar-events`,
+        requestData,
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json;charset=UTF-8",
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+  
+      console.log("Response of save calendar events request", response.data);
+    } catch (error) {
+      console.error("Error saving calendar events:", error);
+    }
+  };
+
+    
+   
   
 
-  const responseError = (error) => {
-    console.log(error);
-  };
-
-  const onSuccess = (res) => {
-    console.log('Logout made successfully', res);
-    alert('Logout made successfully ✌');
-  };
+  // const onSuccess = (res) => {
+  //   console.log('Logout made successfully', res);
+  //   alert('Logout made successfully ✌');
+  // };
 
   return (
     <div style={{ marginTop: "30px", marginBottom: "50px" }}>
@@ -51,12 +112,12 @@ export const CalendarAuth = () => {
         accessType='offline'
         scope={SCOPES}
       />
-       <GoogleLogout
+    
+       {/* <GoogleLogout
         clientId={CLIENT_ID}
         buttonText="Logout"
         onLogoutSuccess={onSuccess}
-      ></GoogleLogout>
+      ></GoogleLogout> */}
     </div>
   );
-
 };
