@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 mongoose.connect(process.env.MONGODB_URI || config.connectionString, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.Promise = global.Promise;
 
-const { Category, Product, Review, User, Brand, TrendingProduct, TodayDeal, RecentSearchProduct, BannerImage, PopularProduct, Color, ServiceVideo, CryptoConversion, cmsPost, cmsPage } = require("../helpers/db");
+const { Category, Product, Review, User, Brand, TrendingProduct, TodayDeal, RecentSearchProduct, BannerImage, PopularProduct, Color, ServiceVideo, CryptoConversion, cmsPost, cmsPage, bannerAdvertisement } = require("../helpers/db");
 
 module.exports = {
     getReviews,
@@ -28,6 +28,7 @@ module.exports = {
     cmsBlogDetailBySlug,
     cmsPublishPage,
     cmsPageDetails,
+    getAllBannersData,
 };
 
 async function getReviews(id) {
@@ -357,12 +358,12 @@ async function getProductListing(req) {
             if (sort_type == 'price') {
                 sortOption[sort_type] = sort_val;
             } else
-            if (sort_type == 'new') {
-                sortOption['createdAt'] = "desc";
-            } else
-            if (sort_type == 'popular') {
-                sortOption['reviewCount'] = "desc";
-            }
+                if (sort_type == 'new') {
+                    sortOption['createdAt'] = "desc";
+                } else
+                    if (sort_type == 'popular') {
+                        sortOption['reviewCount'] = "desc";
+                    }
         }
 
         if (param.search_value && param.search_value != '') {
@@ -507,7 +508,7 @@ async function getColorsListByProducts(req) {
             }
 
             if (colors) {
-                colors = colors.filter(function(item, index, inputArray) {
+                colors = colors.filter(function (item, index, inputArray) {
                     return inputArray.indexOf(item) == index;
                 });
 
@@ -577,12 +578,12 @@ async function getServiceListing(req) {
             if (sort_type == 'price') {
                 sortOption[sort_type] = sort_val;
             } else
-            if (sort_type == 'new') {
-                sortOption['createdAt'] = "desc";
-            } else
-            if (sort_type == 'popular') {
-                sortOption['reviewCount'] = "desc";
-            }
+                if (sort_type == 'new') {
+                    sortOption['createdAt'] = "desc";
+                } else
+                    if (sort_type == 'popular') {
+                        sortOption['reviewCount'] = "desc";
+                    }
         }
 
         if (param.search_value && param.search_value != '') {
@@ -669,7 +670,7 @@ async function getServiceListing(req) {
 }
 
 
-var range = function(start, end, step) {
+var range = function (start, end, step) {
     var range = [];
     var typeofStart = typeof start;
     var typeofEnd = typeof end;
@@ -791,5 +792,26 @@ async function cmsPageDetails(req) {
         return filteredStatus;
     } catch (error) {
         console.log(error)
+    }
+}
+
+
+
+// BANNER DATA GET WITH KEYWORDS MATCH
+
+async function getAllBannersData(req) {
+    const keywordsData = req.params.keywords;
+    try {
+        // const result = await bannerAdvertisement.find({}).select().sort({ createdAt: 'desc' })
+        // const matchedBannerData = result.filter(item => item.keyword.toLowerCase().includes(keywordsData.toLowerCase()))
+
+        const query = { 'keyword': { '$regex': keywordsData, '$options': 'i' } };
+        const result = await bannerAdvertisement.find(query).sort({ createdAt: 'desc' });
+        if (result && result.length > 0) {
+            // console.log("banner list ", result)
+            return result
+        }
+    } catch (error) {
+        console.log(error);
     }
 }

@@ -27,6 +27,10 @@ function jwt() {
             /\/publishBlogDetail*/,
             /\/publishPage*/,
             /\/publishPageDetail*/,
+
+            /\/advBanner-list*/,
+
+         
             //admin
             '/admin/login',
             '/admin/signup',

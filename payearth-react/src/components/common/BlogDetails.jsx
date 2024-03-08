@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { Helmet } from 'react-helmet';
+import { BannerIframe, BannerIframe2 } from './BannerFrame';
 
 class BlogDetail extends Component {
     constructor(props) {
@@ -80,36 +81,45 @@ class BlogDetail extends Component {
                     <h2>Blog Detail</h2>
                 </div> */}
                 <section className="inr_wrap">
-                    {blogDetails.map(item =>
+                    {blogDetails.map(item => <>
+                        {/* <BannerIframe keywords={item.keywords}/> */}
+                        {/* <BannerIframe2/> */}
                         <div className="container">
+                            <BannerIframe keywords={item.keywords} />
                             {/* <h4><i>  Title :  <b>{item.title}</b></i></h4> */}
-                            <div className="col-md-12 cart-single-page-wrapper">
-                                <div className="cart my_cart">
-                                    <div className="cl_head ">
-                                        <Helmet>
-                                            <title>{item.seo}{" - Pay Earth"}</title>
-                                            <meta name="description" content={item.seodescription} />
-                                            <meta name="keywords" content={item.keywords} />
-                                        </Helmet>
-                                        <div className='cart-single-heading'>
-                                            <h1>{item.title}</h1>
-                                        </div>
-                                        <div className='blog-list-meta'>
-                                            <span class="post_cat_col">{item.category}</span>
-                                            <span class="post_date_col">{item.updatedAt}</span>
-                                        </div>
-                                        {item.image == '' ?'':
-                                            <div className="blog-page-image" >
-                                                <img src={item.image} height={680} width={1080} alt="" />
+                            <div className="row">
+                                <div className="col-md-10 cart-single-page-wrapper">
+                                    <div className="cart my_cart">
+                                        <div className="cl_head ">
+                                            <Helmet>
+                                                <title>{item.seo}{" - Pay Earth"}</title>
+                                                <meta name="description" content={item.seodescription} />
+                                                <meta name="keywords" content={item.keywords} />
+                                            </Helmet>
+                                            <div className='cart-single-heading'>
+                                                <h1>{item.title}</h1>
                                             </div>
-                                        }
-                                        <div className='blog-single-desc'>
-                                            {item.description}
+                                            <div className='blog-list-meta'>
+                                                <span className="post_cat_col">{item.category}</span>
+                                                <span className="post_date_col">{item.updatedAt}</span>
+                                            </div>
+                                            {item.image == '' ? '' :
+                                                <div className="blog-page-image" >
+                                                    <img src={item.image} height={680} width={1080} alt="" />
+                                                </div>
+                                            }
+                                            <div className='blog-single-desc'>
+                                                {item.description}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                <div className="col-lg-2">
+                                    <BannerIframe2 keywords={item.keywords}/>
+                                </div>
                             </div>
                         </div>
+                    </>
                     )}
                 </section>
                 <Footer />

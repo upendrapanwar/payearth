@@ -39,6 +39,11 @@ router.get('/blogDetail/:slug', cmsBlogDetailBySlug);
 router.get('/publishPage/:status', cmsPublishPage);
 router.get('/pageDetail/:slug', cmsPageDetails);
 
+
+// For banner data show through keywords..
+
+router.get('/advBanner-list/:keywords', getAllBannersData)
+
 module.exports = router;
 
 function getReviews(req, res, next) {
@@ -149,6 +154,7 @@ function getServiceById(req, res, next) {
         .then(service => service ? res.status(200).json({ status: true, data: service }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
+
 function cmsPublishBlog(req, res, next) {
     frontService.cmsPublishBlog(req.params.status)
         .then(blog => blog ? res.status(200).json({ status: true, data: blog }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
@@ -173,3 +179,13 @@ function cmsPageDetails(req, res, next) {
         .then(page => page ? res.status(200).json({ status: true, data: page }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
+
+// BANNER DATA GET WITH KEYWORDS MATCH
+function getAllBannersData(req, res, next) {
+    frontService.getAllBannersData(req)
+        .then(banner => banner ? res.status(200).json({ status: true, data: banner }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+
+
