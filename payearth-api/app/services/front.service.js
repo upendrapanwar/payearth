@@ -805,11 +805,18 @@ async function getAllBannersData(req) {
         // const result = await bannerAdvertisement.find({}).select().sort({ createdAt: 'desc' })
         // const matchedBannerData = result.filter(item => item.keyword.toLowerCase().includes(keywordsData.toLowerCase()))
 
-        const query = { 'keyword': { '$regex': keywordsData, '$options': 'i' } };
-        const result = await bannerAdvertisement.find(query).sort({ createdAt: 'desc' });
+        const query = {
+            'keyword': { '$regex': keywordsData, '$options': 'i' },
+            'status': 'Publish'
+        };
+        const fieldsToSelect = 'image video category keyword siteUrl';
+        const result = await bannerAdvertisement.find(query).sort({ createdAt: 'desc' }).select(fieldsToSelect);
+
         if (result && result.length > 0) {
             // console.log("banner list ", result)
             return result
+        } else {
+            return []
         }
     } catch (error) {
         console.log(error);

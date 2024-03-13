@@ -20,10 +20,10 @@ class ManageBannerListEdit extends Component {
         super(props);
         const { dispatch } = props;
         this.dispatch = dispatch;
-        this.cloudName = "pay-earth"
-        this.apiKey = "172845922361144";
-        this.apiSecret = "3rvc9PNRXy2YOeB9kuFNjrxI8FU";
-        //      this.signature = "f878911eba6bc4737f78009826d5fb0683a7e538"
+        this.cloudName = process.env.REACT_APP_CLOUD_NAME
+        this.apiKey = process.env.REACT_APP_API_KEY
+        this.apiSecret = process.env.REACT_APP_API_SECRET
+   
         this.authInfo = store.getState().auth.authInfo;
 
         this.state = {
@@ -102,9 +102,9 @@ class ManageBannerListEdit extends Component {
         data.append("cloud_name", "pay-earth")
 
         console.log("dataIMAge", data)
-        // https://api.cloudinary.com/v1_1/pay-earth/video/upload   <= video file example
+        // https://api.cloudinary.com/v1_1/${this.cloudName}/video/upload   <= video file example
 
-        fetch("https://api.cloudinary.com/v1_1/pay-earth/image/upload", {
+        fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`, {
             method: "post",
             body: data
         }).then((res) => res.json())
@@ -126,7 +126,7 @@ class ManageBannerListEdit extends Component {
         data.append("upload_preset", "pay-earth-images")
         data.append("cloud_name", "pay-earth")
 
-        fetch("https://api.cloudinary.com/v1_1/pay-earth/video/upload", {
+        fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/video/upload`, {
             method: "post",
             body: data
         }).then((res) => res.json())
@@ -360,7 +360,7 @@ class ManageBannerListEdit extends Component {
     createSignatureVideo = () => {
         const { videoId } = this.state
 
-        console.log("videoPUBLICK ID", videoId)
+        // console.log("videoPUBLICK ID", videoId)
         const timestamp = Math.round(new Date().getTime() / 1000);
         const signature = CryptoJS.SHA1(`public_id=${videoId}&timestamp=${timestamp}${this.apiSecret}`).toString(CryptoJS.enc.Hex);
         return { timestamp, signature };
@@ -392,15 +392,13 @@ class ManageBannerListEdit extends Component {
         }
     }
 
-
-
     render() {
 
         const { image, video, selectValueType, siteUrl, subscriptionPlan } = this.state;
 
-        console.log("subscriptionPlan : ", subscriptionPlan)
+        // console.log("subscriptionPlan : ", subscriptionPlan)
 
-        console.log("siteURL", siteUrl)
+        // console.log("siteURL", siteUrl)
         return (
             <React.Fragment>
                 <Header />
@@ -421,8 +419,8 @@ class ManageBannerListEdit extends Component {
                                         <div className="create_banner_form">
                                             <div className="row">
                                                 <div className="col-md-6">
-                                                    <div className="crt_bnr_fieldRow">
-                                                        {/* <div className="crt_bnr_field">
+                                                    {/* <div className="crt_bnr_fieldRow">
+                                                        <div className="crt_bnr_field">
                                                             <label htmlFor="">Type of Banner</label>
                                                             <div className="field_item">
                                                                 <select
@@ -435,8 +433,8 @@ class ManageBannerListEdit extends Component {
                                                                     <option value="Text Banner">Text Banner</option>
                                                                 </select>
                                                             </div>
-                                                        </div> */}
-                                                    </div>
+                                                        </div>
+                                                    </div> */}
 
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
@@ -516,7 +514,7 @@ class ManageBannerListEdit extends Component {
                                                         </div>
                                                     </div> */}
 
-                                                    <div className="crt_bnr_fieldRow">
+                                                    {/* <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
                                                             <label htmlFor="">Tag</label>
                                                             <div className="field_item">
@@ -530,7 +528,7 @@ class ManageBannerListEdit extends Component {
                                                                 />
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </div> */}
 
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">

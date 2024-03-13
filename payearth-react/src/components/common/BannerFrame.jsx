@@ -4,8 +4,7 @@ import axios from 'axios';
 
 
 
-export const BannerIframe = ({ width, height, keywords }) => {
-
+export const BannerTopIframe = ({ width, height, keywords }) => {
     const [advertisements, setAdvertisements] = useState([]);
     const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
     const [length, setLength] = useState();
@@ -22,15 +21,20 @@ export const BannerIframe = ({ width, height, keywords }) => {
     useEffect(() => {
         axios.get(`/front/advBanner-list/${keywords}`)
             .then((response) => {
-                // console.log("response.data.data", response.data.data.length)
+                // console.log("response.data.data", response.data.data)
                 const data = response.data.data;
-                // console.log("data", data)
+                console.log("data $$", data)
                 setAdvertisements(data)
                 const urls = data.map(item => !item.video ? item.image : item.video);
-                // console.log("urls", urls)
                 setUrlData(urls)
                 setLength(urls.length)
-                // setAdvertisements(response.data.data)
+                // console.log("urls length", urls.length)
+                if (urls.length > 0) {
+                    const timeoutId = setTimeout(() => {
+                        setIframeOpen(true);
+                    }, 5000);
+                    return () => clearTimeout(timeoutId);
+                }
             })
             .catch(error => {
                 console.log("error", error)
@@ -39,13 +43,11 @@ export const BannerIframe = ({ width, height, keywords }) => {
 
     useEffect(() => {
         const intervalId = setInterval(() => {
-            // Update the current URL index to the next one in the array
             setCurrentUrlIndex((prevIndex) => (prevIndex + 1) % advertisements.length);
-        }, 10000);
+        }, 7000);
 
-        // Clear the interval when the component is unmounted
         return () => clearInterval(intervalId);
-    }, [length]); // Empty dependency array ensures the effect runs only once on mount
+    }, [length]);
 
     const onWebsiteMove = (url) => {
         window.open(url, '_blank');
@@ -54,6 +56,8 @@ export const BannerIframe = ({ width, height, keywords }) => {
     const iframeStyles = {
         // border: '1px solid red',
         borderRadius: '5px',
+        objectFit: 'fill',
+        width: '100%',
 
         // boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
         // width: -webkit-fill-available
@@ -67,36 +71,17 @@ export const BannerIframe = ({ width, height, keywords }) => {
         setIframeOpen(false);
     };
 
-    useEffect(() => {
-        const timeoutId = setTimeout(() => {
-            setIframeOpen(true);
-        }, 5000);
-        return () => clearTimeout(timeoutId);
-    }, []);
-
-
-    // WORKING DONE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    const renderIframe2 = () => <>
-        {iframeOpen === false ? "" : <button onClick={closeIframe}>CLOSE</button>}
-        {iframeOpen === true ? <iframe
-            // src={urlData[currentUrlIndex]}
-            src={""}
-            width="10%"
-            height="500px"
-            scrolling="no"
-            style={iframeStyles}
-        ></iframe> : ""}
-    </>
-
     // WORKING DONE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     const renderCheckIframe = () => <>
         {iframeOpen === false ? "" : <button onClick={closeIframe}>CLOSE</button>}
-        {iframeOpen === true ? (<div><iframe
+        {iframeOpen === true ? (<div className='topHead_banner' key="iframeContainer"><iframe
             src={advertisements.map(item => !item.video ? item.image : item.video)[currentUrlIndex]}
             width="100%"
             height="150px"
             scrolling="no"
             style={iframeStyles}
+            allow="autoplay; encrypted-media"
+            allowFullScreen
             className="centeredIframe"
         ></iframe>
             <button onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}>
@@ -104,21 +89,6 @@ export const BannerIframe = ({ width, height, keywords }) => {
             </button>
         </div>) : ""}
     </>
-
-    // return <>
-    //     {iframeOpen === false ? "" : <button onClick={closeIframe}>CLOSE</button>}
-    //     { iframeOpen && advertisements.map((item, index) => <div key={index}>
-    //         <iframe
-    //             title={`iframe-${index}`}
-    //             src={!item.image ? item.video : item.image}
-    //             width="100%"
-    //             height="150px"
-    //             scrolling="no"
-    //             style={iframeStyles}
-    //         />
-    //     </div>
-    //     )}
-    // </>
 
     return <>
         {/* <div>
@@ -129,7 +99,6 @@ export const BannerIframe = ({ width, height, keywords }) => {
         </div>
 
     </>
-
 }
 
 export const BannerIframe2 = ({ width, height }) => {
@@ -141,7 +110,7 @@ export const BannerIframe2 = ({ width, height }) => {
     };
 
     const renderIframe2 = () => <>
-         <iframe
+        <iframe
             // src={urlData[currentUrlIndex]}
             src={"https://res.cloudinary.com/pay-earth/video/upload/v1709885889/bcy8rm5qgmgbouubfbwn.mp4"}
             width="100%"
@@ -149,13 +118,13 @@ export const BannerIframe2 = ({ width, height }) => {
             scrolling="no"
             style={iframeStyles}
             className='Video'
-        ></iframe> 
+        ></iframe>
     </>
 
     return <>
         <div>
-            { renderIframe2()}
-            { renderIframe2()}
+            {renderIframe2()}
+            {renderIframe2()}
         </div>
 
     </>

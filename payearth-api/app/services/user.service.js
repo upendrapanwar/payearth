@@ -1871,7 +1871,8 @@ async function createUserBanner(req, res) {
             status: param.status,
             tag: param.tag,
             keyword: param.keyword,
-            author: param.author
+            author: param.author,
+            authorDetails : param.authorDetails
         };
         const banner = new bannerAdvertisement(input);
         const data = await banner.save();
@@ -1929,9 +1930,9 @@ async function getBannerById(req) {
 // Update Page
 async function updateBanner(req) {
     const bannerId = req.params.id;
-    const { image, video, bannerText, bannerName, bannerType, siteUrl, category, bannerPlacement, startDate } = req.body;
+    const { image, video, bannerText, bannerName, bannerType, siteUrl, category, bannerPlacement, startDate, keyword } = req.body;
     try {
-        const banner = await bannerAdvertisement.findByIdAndUpdate(bannerId, { image, video, bannerText, bannerName, bannerType, siteUrl, category, startDate, bannerPlacement }, { new: true });
+        const banner = await bannerAdvertisement.findByIdAndUpdate(bannerId, { image, video, bannerText, bannerName, bannerType, siteUrl, category, startDate, bannerPlacement, keyword }, { new: true });
         //  console.log("update banner", banner)
         return banner;
     } catch (error) {

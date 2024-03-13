@@ -1,18 +1,15 @@
 import React, { Component } from 'react';
-import Header from '../../components/admin/common/Header';
+import Header from '../../components/seller/common/Header';
 import Footer from '../../components/common/Footer';
 import { toast } from 'react-toastify';
 import emptyImg from './../../assets/images/emptyimage.png'
 import emptyVid from './../../assets/images/emptyVid.png'
-import { setLoading } from '../../store/reducers/global-reducer';
-import { connect } from 'react-redux';
 import store from '../../store/index';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
-import { Helmet } from 'react-helmet';
 
-class ManageBannerAdvertisement extends Component {
+class SellerManageBannerAdvertisement extends Component {
 
     constructor(props) {
         super(props);
@@ -35,7 +32,7 @@ class ManageBannerAdvertisement extends Component {
             category: "",
             startDate: new Date(),
             endDate: "",
-            subscriptionPlan: null,
+            subscriptionPlan: "",
             bannerPlacement: "",
             status: "",
             author: this.authInfo.id,
@@ -50,7 +47,16 @@ class ManageBannerAdvertisement extends Component {
             customerId: "",
             subscriptionId: "",
             paymentMethodId: null,
+            cardNumber: '',
+            expMonth: '',
+            expYear: '',
+            cvc: '',
+
         };
+    }
+
+    componentDidMount() {
+        this.fetchStripePlans();
     }
 
     handleImageChange = (e) => {
@@ -63,7 +69,7 @@ class ManageBannerAdvertisement extends Component {
             const data = new FormData()
             data.append("file", file)
             data.append("upload_preset", "pay-earth-images")
-            data.append("cloud_name", `${this.cloudName}`)
+            data.append("cloud_name", "pay-earth")
 
             console.log("dataIMAge", data)
             // https://api.cloudinary.com/v1_1/${this.cloudName}/video/upload   <= video file example
@@ -97,7 +103,7 @@ class ManageBannerAdvertisement extends Component {
             const data = new FormData()
             data.append("file", file)
             data.append("upload_preset", "pay-earth-images")
-            data.append("cloud_name", `${this.cloudName}`)
+            data.append("cloud_name", "pay-earth")
 
             fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/video/upload`, {
                 method: "post",
@@ -140,7 +146,6 @@ class ManageBannerAdvertisement extends Component {
         this.setState({ bannerName: e.target.value })
     }
     handleSiteUrl = (e) => {
-        console.log("siteURL ::::::", e.target.value)
         this.setState({ siteUrl: e.target.value });
     }
     handleCategorySelect = (e) => {
@@ -157,9 +162,23 @@ class ManageBannerAdvertisement extends Component {
     }
 
     handleStartDate = (e) => {
+
+        //  const startDate = new Date(e.target.value);
+
+        // this.setState({ startDate: startDate })
+
+        // this.setState({ startDate }, () => {
+        //     this.calculateDate();
+        // })
         this.setState({ startDate: new Date(e.target.value) });
         // this.calculateDate();
     }
+
+    handleSubscriptionPlan = (card) => {
+        this.setState({ subscriptionPlan: card });
+        this.setState({ isSelectplan: true })
+        sessionStorage.setItem('selectPlan', JSON.stringify(card));
+    };
 
     handleBannerPlacement = (e) => {
         const selectedText = e.target.options[e.target.selectedIndex].text;
@@ -167,11 +186,12 @@ class ManageBannerAdvertisement extends Component {
         this.setState({ bannerPlacement: selectedText })
     }
     handleSave = () => {
-        const { bannerName, category } = this.state;
+        const { subscriptionPlan, bannerName, category } = this.state;
+        console.log("subscription plan ", subscriptionPlan)
 
-        // if (subscriptionPlan === "") {
-        //     toast.error("Select Subscription plan.....", { autoClose: 3000 })
-        // }
+        if (subscriptionPlan === "") {
+            toast.error("Select Subscription plan.....", { autoClose: 3000 })
+        }
         if (bannerName === "") {
             toast.error("Enter Banner Name.....", { autoClose: 3000 })
         }
@@ -180,13 +200,17 @@ class ManageBannerAdvertisement extends Component {
         } else {
             this.saveBanner("Publish")
             // this.handlePayment();
-            toast.success("Banner Create succesfully..", { autoClose: 3000 })
-            this.props.history.push('/admin/manage-banner-list')
+            this.props.history.push({
+                pathname: '/seller/service-checkout',
+                state: { subscriptionPlan: subscriptionPlan },
+            });
         }
+        // toast.success("Banner Create succesfully..", { autoClose: 3000 })
+
     }
     saveBanner = (status) => {
         const { image, imageId, video, videoId, bannerText, bannerType, bannerName, siteUrl, category, startDate, endDate, subscriptionPlan, bannerPlacement, signaturess, author, authorDetails,  tag, keyword } = this.state;
-        const url = '/admin/createNewBanner';
+        const url = '/seller/createSellerBanners';
         const bannerData = {
             image,
             imageId,
@@ -206,7 +230,7 @@ class ManageBannerAdvertisement extends Component {
             author,
             authorDetails,
             tag,
-            keyword,
+            keyword
         };
 
         axios.post(url, bannerData, {
@@ -355,7 +379,33 @@ class ManageBannerAdvertisement extends Component {
         }
     }
 
+    fetchStripePlans = async () => {
+        console.log("fetchStrip plan function is run")
+        try {
+            const stripeSecretKey = process.env.REACT_APP_SECRET_KEY;
+            const response = await axios.get(`https://api.stripe.com/v1/plans`, {
+                headers: {
+                    Authorization: `Bearer ${stripeSecretKey}`,
+                },
+            });
+
+            console.log("response.data", response.data.data)
+            console.log("response.data", response.data)
+            // setPlans(fetchedPlans);
+        } catch (error) {
+            console.error('Error fetching Stripe plans:', error);
+        }
+
+    };
+
     render() {
+
+        const { subscriptionPlan } = this.state;
+        const subPlan = [
+            { id: 1, planType: 'Basic', planPrice: "75", description: 'This is Basic content.', stripPlanId: "price_1OeyxnD2za5c5GtONkOM9pE2" },
+            { id: 2, planType: 'Standerd', planPrice: "160", description: 'This is Standerd content.', stripPlanId: "price_1Oez53D2za5c5GtOUVOTBw8V" },
+            { id: 3, planType: 'Premium', planPrice: "210", description: 'This is Premium content.', stripPlanId: "price_1Oez76D2za5c5GtOmd792hTQ" },
+        ];
         return (
             <React.Fragment>
                 <Header />
@@ -363,14 +413,13 @@ class ManageBannerAdvertisement extends Component {
                     <h2>Create New Banner</h2>
                 </div>
                 <section className="inr_wrap">
-                    <Helmet><title>{"Manage Banners - Pay Earth"}</title></Helmet>
                     <div className="container">
                         <div className="row">
                             <div className="col-md-12">
                                 <div className="cart adv_banner_wrapper">
                                     <div className="noti_wrap">
                                         <div className=""><span>
-                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-banner-list">My Banner</Link>
+                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/manage-banner-list">MY MANAGER</Link>
                                         </span></div>
                                     </div>
                                     <div className="cart_list adv_banner_panel">
@@ -452,7 +501,7 @@ class ManageBannerAdvertisement extends Component {
                                                         </div>
                                                     </div> */}
 
-                                                     {/* <div className="crt_bnr_fieldRow">
+                                                    {/* <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
                                                             <label htmlFor="">Tag</label>
                                                             <div className="field_item">
@@ -466,7 +515,7 @@ class ManageBannerAdvertisement extends Component {
                                                                 />
                                                             </div>
                                                         </div>
-                                                    </div>  */}
+                                                    </div> */}
 
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
@@ -534,7 +583,39 @@ class ManageBannerAdvertisement extends Component {
                                                 </div>
                                                 {/* background-color: aliceblue */}
 
-                                                <div className="col-md-12 bg-body-tertiary plan-cart mt-4">
+                                                <div className="col-md-12 bg-body-tertiary plan-cart">
+
+                                                    <div className="wrapper">
+                                                        <div className='text-center'>
+                                                            <h4> Select your plan </h4>
+                                                        </div>
+                                                        <div className="pricing-table group">
+                                                            {subPlan.map((card) => <>
+                                                                <li key={card.id} onClick={() => this.handleSubscriptionPlan(card)}>
+                                                                    <div className={subscriptionPlan.id === card.id ? "block personal fl active" : "block personal fl"}>
+                                                                        <a className='inner-block'>
+                                                                            <h2 className="title" >{card.planType}</h2>
+                                                                            <div className="content">
+                                                                                <p className="price">
+                                                                                    <sup>$</sup>
+                                                                                    <span>{card.planPrice}</span>
+                                                                                    <sub>/mo.</sub>
+                                                                                </p>
+                                                                                <p className="hint">Perfect for freelancers</p>
+                                                                            </div>
+                                                                            <ul className="features">
+                                                                                <li><span className="fontawesome-cog"></span>1 WordPress Install</li>
+                                                                                <li><span className="fontawesome-star"></span>25,000 visits/mo.</li>
+                                                                                <li><span className="fontawesome-dashboard"></span>Unlimited Data Transfer</li>
+                                                                                <li><span className="fontawesome-cloud"></span>10GB Local Storage</li>
+                                                                            </ul>
+                                                                        </a>
+                                                                    </div>
+                                                                </li>
+                                                            </>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
                                                             <div className="field_item text-center">
@@ -547,7 +628,10 @@ class ManageBannerAdvertisement extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
+
                                                 </div>
+
+
                                             </div>
 
                                         </div>
@@ -565,13 +649,4 @@ class ManageBannerAdvertisement extends Component {
     }
 }
 
-export default ManageBannerAdvertisement;
-
-
-
-
-
-
-
-
-
+export default SellerManageBannerAdvertisement;

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Header from "./../../components/user/common/Header";
+import Header from '../../components/seller/common/Header';
 import Footer from '../../components/common/Footer';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
@@ -14,7 +14,7 @@ import CryptoJS from 'crypto-js';
 import { date } from 'yup';
 
 
-class MyBannerEdit extends Component {
+class SellerBannerEdit extends Component {
 
     constructor(props) {
         super(props);
@@ -23,7 +23,6 @@ class MyBannerEdit extends Component {
         this.cloudName = process.env.REACT_APP_CLOUD_NAME
         this.apiKey = process.env.REACT_APP_API_KEY
         this.apiSecret = process.env.REACT_APP_API_SECRET
-
         this.authInfo = store.getState().auth.authInfo;
 
         this.state = {
@@ -50,15 +49,13 @@ class MyBannerEdit extends Component {
         };
     }
 
-
     componentDidMount() {
         this.getBannerById();
-
     }
 
     getBannerById = () => {
         const { id } = this.props.match.params;
-        axios.get(`/user/getBannerById/${id}`, {
+        axios.get(`/seller/getBannerById/${id}`, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -102,9 +99,9 @@ class MyBannerEdit extends Component {
         data.append("cloud_name", "pay-earth")
 
         console.log("dataIMAge", data)
-        // https://api.cloudinary.com/v1_1/${this.cloudName}/video/upload   <= video file example
+        // https://api.cloudinary.com/v1_1/pay-earth/video/upload   <= video file example
 
-        fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`, {
+        fetch("https://api.cloudinary.com/v1_1/pay-earth/image/upload", {
             method: "post",
             body: data
         }).then((res) => res.json())
@@ -177,9 +174,14 @@ class MyBannerEdit extends Component {
     handleKeywordChange = (e) => {
         this.setState({ keyword: e.target.value });
     }
+
     handleStartDate = (e) => {
         this.setState({ startDate: new Date(e.target.value) });
     }
+    // handleEndDate = () => {
+
+    // }
+
     handleSubscriptionPlan = (e) => {
         //  const selectedText = e.target.options[e.target.selectedIndex].text;
         //  console.log("selected TEXT", selectedText)
@@ -196,12 +198,13 @@ class MyBannerEdit extends Component {
         toast.success("Banner Update succesfully..", { autoClose: 3000 })
         // this.saveBanner("pending");
         this.updateBanner();
-        this.props.history.push('/my-banners')
+        this.props.history.push('/seller/manage-banner-list')
     }
     updateBanner = (status) => {
         const { id } = this.props.match.params;
+
         const { image, imageId, video, videoId, bannerText, bannerType, bannerName, siteUrl, category, startDate, endDate, subscriptionPlan, bannerPlacement, signaturess, author, tag, keyword } = this.state;
-        const url = `/user/updateBanner/${id}`;
+        const url = `/seller/updateBanner/${id}`;
         const bannerData = {
             image,
             imageId, 
@@ -238,46 +241,46 @@ class MyBannerEdit extends Component {
         this.setState({ image: "", video: "", bannerText: "", bannerType: "", bannerName: "", siteUrl: "", category: "", startDate: "", subscriptionPlan: "", bannerPlacement: "", status: "", author: "", keyword: "", tag: "" })
 
     }
-    // renderCardText = () => {
-    //     switch (this.state.subscriptionPlan) {
-    //         case '1 Month':
-    //             return < div className="card">
-    //                 <div className="card-header">
-    //                     PLAN A
-    //                 </div>
-    //                 <div className="card-body">
-    //                     <h5 className="card-title">Special title treatment</h5>
-    //                     <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-    //                     {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
-    //                 </div>
-    //             </div>
-    //         // case 'value2':
-    //         //     return 'Card Text for Value 2';
-    //         case '2 Month':
-    //             return <div className="card">
-    //                 <div className="card-header">
-    //                     PLAN B
-    //                 </div>
-    //                 <div className="card-body">
-    //                     <h5 className="card-title">Special title treatment</h5>
-    //                     <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-    //                     {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
-    //                 </div>
-    //             </div>
-    //         // Add more cases as needed
-    //         default:
-    //             return <div className="card">
-    //                 <div className="card-header">
-    //                     NO SUBSCRIPTION SELECTED
-    //                 </div>
-    //                 <div className="card-body">
-    //                     <h5 className="card-title">Special title treatment</h5>
-    //                     <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-    //                     {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
-    //                 </div>
-    //             </div>
-    //     }
-    // };
+    renderCardText = () => {
+        switch (this.state.subscriptionPlan) {
+            case '1 Month':
+                return < div className="card">
+                    <div className="card-header">
+                        PLAN A
+                    </div>
+                    <div className="card-body">
+                        <h5 className="card-title">Special title treatment</h5>
+                        <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
+                    </div>
+                </div>
+            // case 'value2':
+            //     return 'Card Text for Value 2';
+            case '2 Month':
+                return <div className="card">
+                    <div className="card-header">
+                        PLAN B
+                    </div>
+                    <div className="card-body">
+                        <h5 className="card-title">Special title treatment</h5>
+                        <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
+                    </div>
+                </div>
+            // Add more cases as needed
+            default:
+                return <div className="card">
+                    <div className="card-header">
+                        NO SUBSCRIPTION SELECTED
+                    </div>
+                    <div className="card-body">
+                        <h5 className="card-title">Special title treatment</h5>
+                        <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                        {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
+                    </div>
+                </div>
+        }
+    };
 
     handleSelectImageOrVideo = (e) => {
         const { image, video } = this.state;
@@ -290,6 +293,7 @@ class MyBannerEdit extends Component {
         else if (video) {
             toast.error("Delete Selected video....", { autoClose: 3000 })
         }
+
     }
     // selectImageOrVideo = () => {
     //     const { image, video, videoSize } = this.state;
@@ -400,7 +404,10 @@ class MyBannerEdit extends Component {
     handleDeleteCloudVideo = async () => {
         this.setState({ video: "" })
         const { videoId } = this.state;
+
+
         const { timestamp, signature } = this.createSignatureVideo();
+
         try {
             const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/video/destroy`;
             const response = await axios.delete(cloudinaryUrl, {
@@ -445,7 +452,7 @@ class MyBannerEdit extends Component {
                                 <div className="cart adv_banner_wrapper">
                                     <div className="noti_wrap">
                                         <div className=""><span>
-                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/my-banners">My Banner</Link>
+                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/manage-banner-advertisement">My Banner</Link>
                                         </span></div>
                                     </div>
                                     <div className="cart_list adv_banner_panel">
@@ -765,4 +772,4 @@ class MyBannerEdit extends Component {
     }
 }
 
-export default MyBannerEdit;
+export default SellerBannerEdit;

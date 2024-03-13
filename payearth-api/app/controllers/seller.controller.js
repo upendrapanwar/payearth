@@ -10,10 +10,10 @@ const multer = require('multer');
 
 //Product Images Upload
 var storageProduct = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, config.uploadDir + '/products');
     },
-    filename: function(req, file, cb) {
+    filename: function (req, file, cb) {
         let extArray = file.mimetype.split("/");
         let extension = extArray[extArray.length - 1];
         let newName = "IMG-" + Math.floor(Math.random() * 1000000) + "-" + Date.now() + "." + extension;
@@ -21,7 +21,7 @@ var storageProduct = multer.diskStorage({
     }
 });
 
-const fileFilterProduct = function(req, file, cb) {
+const fileFilterProduct = function (req, file, cb) {
     // Accept images only
     if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
         req.fileValidationError = 'Only image files are allowed!';
@@ -35,10 +35,10 @@ var uploadProduct = multer({ storage: storageProduct, fileFilter: fileFilterProd
 
 //Service Videos Upload
 var storageVideo = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, 'secure_files/product_videos');
     },
-    filename: function(req, file, cb) {
+    filename: function (req, file, cb) {
         let extArray = file.mimetype.split("/");
         let extension = extArray[extArray.length - 1];
         let newName = "VID-" + Math.floor(Math.random() * 10000000) + "-" + Date.now() + "." + extension;
@@ -46,7 +46,7 @@ var storageVideo = multer.diskStorage({
     }
 });
 
-const fileFilterVideo = function(req, file, cb) {
+const fileFilterVideo = function (req, file, cb) {
     // Accept videos only
     if (!file.originalname.match(/\.(MP4|MOV|WMV|AVI|MKV|MPEG|mp4|mov|wmv|avi|mkv|mpeg)$/)) {
         req.fileValidationError = 'Only video files are allowed!';
@@ -59,10 +59,10 @@ var uploadVideo = multer({ storage: storageVideo, fileFilter: fileFilterVideo })
 
 //Featured Image Upload for products
 var storageFeaturedImage = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, config.uploadDir + '/products/featured');
     },
-    filename: function(req, file, cb) {
+    filename: function (req, file, cb) {
         let extArray = file.mimetype.split("/");
         let extension = extArray[extArray.length - 1];
         let newName = "IMG-" + Math.floor(Math.random() * 1000000) + "-" + Date.now() + "." + extension;
@@ -72,10 +72,10 @@ var storageFeaturedImage = multer.diskStorage({
 
 //Featured Image Upload for services
 var storageFeaturedImage = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, config.uploadDir + '/services/featured');
     },
-    filename: function(req, file, cb) {
+    filename: function (req, file, cb) {
         let extArray = file.mimetype.split("/");
         let extension = extArray[extArray.length - 1];
         let newName = "IMG-" + Math.floor(Math.random() * 1000000) + "-" + Date.now() + "." + extension;
@@ -83,7 +83,7 @@ var storageFeaturedImage = multer.diskStorage({
     }
 });
 
-const imageFilterFeaturedImage = function(req, file, cb) {
+const imageFilterFeaturedImage = function (req, file, cb) {
     // Accept image only
     if (!file.originalname.match(/\.(jpg|JPG|jpeg|JPEG|png|PNG|gif|GIF)$/)) {
         req.fileValidationError = 'Only image file is allowed!';
@@ -124,7 +124,7 @@ router.get('/orders/:id', getOrderById);
 router.post('/saveorder', saveOrder);
 router.post('/saveordertracking', saveOrdertrackingTime);
 router.post('/saveorderdetails', saveorderdetails);
-router.post('/updateorderstatus', updateOrderStatus); 
+router.post('/updateorderstatus', updateOrderStatus);
 router.get('/orderstatus', getOrderStatus);
 router.post('/coupons/new', getNewCoupons);
 
@@ -143,18 +143,24 @@ router.get('/selling-category-donut-chart/:id', getTopSellingCategoryChartData);
 //Service Routes
 router.post('/services/list/:id', getListedServices);
 router.get('/services/:id', getServiceById);
-router.post('/create-subscription', createSubscription); 
- 
+router.post('/create-subscription', createSubscription);
+
 //Service Management
 router.post('/services', addService);
 router.get('/service/items/:id', getServiceItems); //Service  - added / pending / reject
 router.put('/service/items/status-update/:id', serviceStatusUpdate);
 router.put('/service/edit/:id', editService);
-router.get("/service/getServiceData", getServiceData)
+router.get("/service/getServiceData", getServiceData);
 router.get("/service/getServiceStatus/:meetingStatus", getServiceStatus);
 router.post("/service/save-calendar-events", saveCalendarEvents);
 router.get("/service/get-calendar-events", getCalendarEvents);
 
+// Banner
+router.post('/createSellerBanners', createSellerBanner);
+router.get("/getBannersBySellerId/:id", getBannersBySellerId);
+router.delete("/deleteBanner/:id", deleteBannerAdv);
+router.get("/getBannerById/:id", getBannerById);
+router.put("/updateBanner/:id", updateBanner);
 
 
 
@@ -401,7 +407,7 @@ function getTopSellingCategoryChartData(req, res, next) {
 
 
 function addService(req, res, next) {
-    console.log('Hello there how are you....'); 
+    console.log('Hello there how are you....');
     if (req.files && req.files.fileValidationError) { return res.status(400).json({ status: false, message: req.files.fileValidationError }) }
 
     sellerService.addService(req)
@@ -478,5 +484,37 @@ function saveCalendarEvents(req, res, next) {
 function getCalendarEvents(req, res, next) {
     sellerService.getCalendarEvents(req)
         .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+
+/********BANNER**********************/
+function createSellerBanner(req, res, next) {
+    sellerService.createSellerBanner(req)
+        .then(banner => banner ? res.status(200).json({ status: true, data: banner }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function getBannersBySellerId(req, res, next) {
+    sellerService.getBannersBySellerId(req)
+        .then(banner => banner ? res.status(200).json({ status: true, data: banner }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function deleteBannerAdv(req, res, next) {
+    sellerService.deleteBanner(req)
+        .then(banner => banner ? res.json({ status: true, message: "Successfull Delete" }) : res.json({ status: false, message: "ERROR" }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function getBannerById(req, res, next) {
+    sellerService.getBannerById(req)
+        .then(banner => banner ? res.status(200).json({ status: true, data: banner }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function updateBanner(req, res, next) {
+    sellerService.updateBanner(req)
+        .then(banner => banner ? res.json({ status: true, message: "Banner Update Successfully...." }) : res.json({ status: false, message: "ERROR" }))
         .catch(err => next(res.json({ status: false, message: err })));
 }

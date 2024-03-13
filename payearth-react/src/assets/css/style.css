@@ -4193,3 +4193,8 @@ h4 {
     display: block;
     margin: auto;
 }
+
+.topHead_banner iframe video {
+    object-fit: fill;
+    width: 100%;
+}

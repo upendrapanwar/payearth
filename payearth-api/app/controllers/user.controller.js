@@ -428,7 +428,7 @@ function getOrderTrackingTime(req, res, next) {
 /*****************************************************************************************/
 /**
  * Get the seller id by product id
- * 
+ *  
  * @param {*} req 
  * @param {*} res 
  * @param {*} next 

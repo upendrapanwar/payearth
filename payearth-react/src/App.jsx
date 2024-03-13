@@ -60,6 +60,10 @@ import ManagePaymentDetails from './containers/admin/ManagePaymentDetails';
 import SellerProductDetail from './containers/seller/ProductDetail';
 import SellerServiceDetail from './containers/seller/ServiceDetail';
 import SellerOrderDetail from './containers/seller/OrderDetail';
+import SellerManageBannerAdvertisement from './containers/seller/ManageBannerAdvertisement';
+import SellerBannerList from './containers/seller/ManageBannerList';
+import SellerBannerEdit from './containers/seller/ManageBannerListEdit';
+
 
 import AdminLogin from './containers/admin/Login';
 import AdminRegister from './containers/admin/Register';
@@ -160,6 +164,11 @@ function App() {
 					<PublicRoute path="/seller/forgot-password" restricted={false} component={SellerForgotPwd} exact />
 
 					<PrivateRoute path="/seller/dashboard" component={SellerDashboard} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
+
+					<PrivateRoute path="/seller/manage-banner-advertisement" component={SellerManageBannerAdvertisement} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
+					<PrivateRoute path="/seller/manage-banner-list" component={SellerBannerList} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
+					<PrivateRoute path="/seller/banner-edit/:id" component={SellerBannerEdit} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
+
 					<PrivateRoute path="/seller/product-stock-management" component={ProductStockManagement} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/seller/chat" component={SellerChat} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
 					<PrivateRoute path="/seller/service-stock-management" component={ServiceStockManagement} roles={[Role.seller]} currentUserRole={userInfo.role} exact />

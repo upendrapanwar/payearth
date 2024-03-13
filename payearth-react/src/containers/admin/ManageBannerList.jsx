@@ -29,12 +29,11 @@ class ManageBannerList extends Component {
 
     constructor(props) {
         super(props);
-        this.cloudName = "pay-earth"
-        this.apiKey = "172845922361144";
-        this.apiSecret = "3rvc9PNRXy2YOeB9kuFNjrxI8FU";
-        this.signature = "f878911eba6bc4737f78009826d5fb0683a7e538"
+        this.cloudName = process.env.REACT_APP_CLOUD_NAME
+        this.apiKey = process.env.REACT_APP_API_KEY
+        this.apiSecret = process.env.REACT_APP_API_SECRET
         this.authInfo = store.getState().auth.authInfo;
-        // console.log("Auth", this.userInfo.name)
+    
         this.itemsPerPage = 6;
         this.state = {
             selectedRows: [],
@@ -259,7 +258,7 @@ class ManageBannerList extends Component {
         },
         {
             name: 'Plan Type',
-            selector: (row, i) => row.subscriptionPlan === null ? "" : <p>{row.subscriptionPlan.planType}</p>,
+            selector: (row, i) => row.subscriptionPlan === null ? "N/A" : <p>{row.subscriptionPlan.planType}</p>,
             sortable: true,
         },
         {
@@ -268,10 +267,11 @@ class ManageBannerList extends Component {
             sortable: true,
         },
         {
-            name: "User Details",
-            selector: (row, i) => row.subscriptionPlan === null ? "" : <>
-                <p>{row.author.name}</p>
-                <p>{row.author.email}</p>
+            name: "Author Details",
+            selector: (row, i) => row.authorDetails === null ? "" : <>
+                <p>{row.authorDetails.name}</p>
+                <p>{row.authorDetails.email}</p>
+                {/* <p>{row.authorDetails.role}</p> */}
 
             </>,
             sortable: true,
@@ -347,7 +347,7 @@ class ManageBannerList extends Component {
 
         // console.log("selected Row status", selectedRows)
 
-        // console.log("banner Data", banner)
+        console.log("banner Data : ", banner)
 
         // console.log("filteredBanner", filteredBanner)
 
@@ -389,7 +389,7 @@ class ManageBannerList extends Component {
                                                     <div className="cart_wrap">
                                                         <div className="items_incart">
                                                             <span className="text-uppercase">
-                                                                ({filteredBanner.length === 0 ? banner.length : filteredBanner.length}) ITEMS IN YOUR LIST
+                                                                ({filteredBanner.length === 0 ? banner.length : filteredBanner.length}) BANNERS IN YOUR LIST
                                                             </span>
                                                         </div>
                                                     </div>

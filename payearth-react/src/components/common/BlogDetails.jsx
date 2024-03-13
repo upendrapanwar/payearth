@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { Helmet } from 'react-helmet';
-import { BannerIframe, BannerIframe2 } from './BannerFrame';
+import { BannerTopIframe, BannerIframe2 } from './BannerFrame';
 
 class BlogDetail extends Component {
     constructor(props) {
@@ -81,14 +81,12 @@ class BlogDetail extends Component {
                     <h2>Blog Detail</h2>
                 </div> */}
                 <section className="inr_wrap">
-                    {blogDetails.map(item => <>
-                        {/* <BannerIframe keywords={item.keywords}/> */}
-                        {/* <BannerIframe2/> */}
+                    {blogDetails.map(item => <>                 
                         <div className="container">
-                            <BannerIframe keywords={item.keywords} />
+                            <BannerTopIframe keywords={item.keywords} />
                             {/* <h4><i>  Title :  <b>{item.title}</b></i></h4> */}
                             <div className="row">
-                                <div className="col-md-10 cart-single-page-wrapper">
+                                <div className="col-md-12 cart-single-page-wrapper">
                                     <div className="cart my_cart">
                                         <div className="cl_head ">
                                             <Helmet>
@@ -114,9 +112,9 @@ class BlogDetail extends Component {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="col-lg-2">
+                                {/* <div className="col-lg-2">
                                     <BannerIframe2 keywords={item.keywords}/>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     </>

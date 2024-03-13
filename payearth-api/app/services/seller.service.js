@@ -13,7 +13,7 @@ const ffmpeg = require('fluent-ffmpeg');
 const ffmpeg_static = require('ffmpeg-static');
 const LocationData = require('countrycitystatejson');
 
-const { User, Seller, Product, Brand, Category, ServiceVideo, CryptoConversion, OrderStatus, Payment, Order, OrderTrackingTimeline, Color, NeedHelp, SellerContactUs, ProductSales, Review, Services, OrderDetails, Servicedetails, Calendar } = require("../helpers/db");
+const { User, Seller, Product, Brand, Category, ServiceVideo, CryptoConversion, OrderStatus, Payment, Order, OrderTrackingTimeline, Color, NeedHelp, SellerContactUs, ProductSales, Review, Services, OrderDetails, Servicedetails, Calendar, bannerAdvertisement } = require("../helpers/db");
 
 
 module.exports = {
@@ -65,6 +65,11 @@ module.exports = {
     getServiceData,
     saveCalendarEvents,
     getCalendarEvents,
+    createSellerBanner,
+    getBannersBySellerId,
+    deleteBanner,
+    getBannerById,
+    updateBanner
 };
 
 function sendMail(mailOptions) {
@@ -2414,8 +2419,6 @@ async function saveCalendarEvents(req) {
     }
 }
 
-
-
 async function getCalendarEvents() {
     try {
         const result = await Calendar.find().select('event_title event_description start_datetime end_datetime')
@@ -2423,5 +2426,91 @@ async function getCalendarEvents() {
     } catch (err) {
         console.log('Error', err);
         return false;
+    }
+}
+
+// POST API CREATE NEW BANNER....................................
+async function createSellerBanner(req, res) {
+    try {
+        var param = req.body;
+        let input = {
+            image: param.image,
+            imageId: param.imageId,
+            video: param.video,
+            videoId: param.videoId,
+            bannerText: param.bannerText,
+            bannerType: param.bannerType,
+            bannerName: param.bannerName,
+            siteUrl: param.siteUrl,
+            category: param.category,
+            startDate: param.startDate,
+            endDate: param.endDate,
+            subscriptionPlan: param.subscriptionPlan,
+            bannerPlacement: param.bannerPlacement,
+            status: param.status,
+            tag: param.tag,
+            keyword: param.keyword,
+            author: param.author,
+            authorDetails : param.authorDetails
+        };
+        const banner = new bannerAdvertisement(input);
+        const data = await banner.save();
+        // console.log("RES data", data)
+        if (data) {
+            // console.log(data._id);
+            return data;
+        }
+        return false;
+    } catch (error) {
+        console.log('Error', error);
+    }
+}
+
+
+// GET BANNER DATA BY USER id..........................
+async function getBannersBySellerId(req) {
+    const sellerId = req.params.id;
+    // console.log("userID Author", userId)
+    try {
+        const result = await bannerAdvertisement.find({ author: sellerId }).select().sort({ createdAt: 'desc' });
+        return result
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// DELETE BANNER 
+async function deleteBanner(req) {
+    const bannerId = req.params.id;
+    // console.log("delete banner", bannerId)
+    try {
+        const result = await bannerAdvertisement.deleteOne({ _id: bannerId })
+        return result
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// ByID
+async function getBannerById(req) {
+    const bannerId = req.params.id;
+    try {
+        const result = await bannerAdvertisement.find({ _id: bannerId })
+        return result
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+// Update Page
+async function updateBanner(req) {
+    const bannerId = req.params.id;
+    const { image, video, bannerText, bannerName, bannerType, siteUrl, category, bannerPlacement, startDate, keyword } = req.body;
+    try {
+        const banner = await bannerAdvertisement.findByIdAndUpdate(bannerId, { image, video, bannerText, bannerName, bannerType, siteUrl, category, startDate, bannerPlacement, keyword }, { new: true });
+        //  console.log("update banner", banner)
+        return banner;
+    } catch (error) {
+        console.log(error)
     }
 }

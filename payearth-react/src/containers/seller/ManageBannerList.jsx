@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Header from "./../../components/user/common/Header";
+import Header from '../../components/seller/common/Header';
 import Footer from '../../components/common/Footer';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
@@ -18,8 +18,7 @@ import noImg from './../../assets/images/noimage.png'
 import ModalBody from 'react-bootstrap/esm/ModalBody';
 
 
-class MyBanner extends Component {
-
+class SellerBannerList extends Component {
   constructor(props) {
     super(props);
     this.cloudName = process.env.REACT_APP_CLOUD_NAME
@@ -35,7 +34,6 @@ class MyBanner extends Component {
       selectedRowData: null,
       loading: true,
       error: null,
-
     };
   }
 
@@ -47,7 +45,6 @@ class MyBanner extends Component {
     this.setState({ selectedRowData: false });
   };
 
-
   handlePreview = (row) => {
     console.log("id", row)
     this.setState({ selectedRowData: row });
@@ -55,9 +52,9 @@ class MyBanner extends Component {
   };
 
   getBanner = () => {
-    let userId = this.authInfo.id
-    console.log("userId", userId)
-    axios.get(`/user/getBannersByUserId/${userId}`, {
+    let sellerId = this.authInfo.id
+    // console.log("sellerId", sellerId)
+    axios.get(`/seller/getBannersBySellerId/${sellerId}`, {
       headers: {
         'Authorization': `Bearer ${this.authInfo.token}`
       },
@@ -132,7 +129,6 @@ class MyBanner extends Component {
 
     if (selectedRows.length === 0) {
       toast.error("Please select row....", { autoClose: 3000 })
-      
     } else {
       try {
         // const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/destroy`;
@@ -154,13 +150,12 @@ class MyBanner extends Component {
         }
       } catch (error) {
         console.error('Error deleting image', error);
-
       }
 
       for (let i = 0; i < selectedRows.length; i++) {
         const ids = selectedRows[i].id
         console.log("selected id for delete", ids)
-        axios.delete(`/user/deleteBanner/${ids}`, {
+        axios.delete(`/seller/deleteBanner/${ids}`, {
           headers: {
             'Authorization': `Bearer ${this.authInfo.token}`
           }
@@ -178,7 +173,7 @@ class MyBanner extends Component {
   }
 
   handleEdit = (id) => {
-    this.props.history.push(`/user/banner-edit/${id}`);
+    this.props.history.push(`/seller/banner-edit/${id}`);
   }
 
 
@@ -223,7 +218,6 @@ class MyBanner extends Component {
       name: "Status",
       selector: (row, i) => row.status,
       sortable: true,
-
     },
     {
       name: 'Actions',
@@ -233,8 +227,6 @@ class MyBanner extends Component {
             type='submit'
             className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
             onClick={() => this.handlePreview(row)}
-
-
           >
             Preview
           </button>
@@ -262,13 +254,7 @@ class MyBanner extends Component {
 
 
   render() {
-
     const { banner, selectedRows } = this.state
-
-    console.log("selected Row status", selectedRows)
-
-    console.log("banner Data", banner)
-
     return (
       <React.Fragment>
         <Header />
@@ -283,7 +269,7 @@ class MyBanner extends Component {
                   <div className="noti_wrap">
                     <div className="">
                       <span>
-                        <Link className="btn custom_btn btn_yellow mx-auto" to="/create-banner">Banner Manager</Link>
+                        <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/manage-banner-advertisement">Banner Manager</Link>
                       </span>
                     </div>
                   </div>
@@ -321,7 +307,6 @@ class MyBanner extends Component {
           onHide={() => this.setState({ showModal: false })}
           // dialogClassName="modal-90w"
           dialogClassName="modal-fullscreen"
-
           aria-labelledby="example-custom-modal-styling-title"
         >
           <Modal.Header closeButton>
@@ -376,4 +361,4 @@ class MyBanner extends Component {
   }
 }
 
-export default MyBanner;
+export default SellerBannerList;

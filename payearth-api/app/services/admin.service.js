@@ -1867,8 +1867,6 @@ async function getOrderById(id) {
         if (!order) {
             return false;
         } else {
-
-            //get order tracking timeline data
             let orderTimeline = await OrderTrackingTimeline.find({ orderId: order.id })
                 .select("orderId orderStatusId updatedAt")
                 .populate("orderStatusId", "id lname title", { isActive: true });
@@ -2357,7 +2355,7 @@ async function getAllPostSlug() {
     } catch (error) {
         console.log(error)
     }
-}
+} 
 
 // ************************Cms page model******************************
 async function createCmsPage(req, res) {
@@ -2554,7 +2552,8 @@ async function createNewBanner(req, res) {
             status: param.status,
             tag: param.tag,
             keyword: param.keyword,
-            author: param.author
+            author: param.author,
+            authorDetails : param.authorDetails
         };
         const banner = new bannerAdvertisement(input);
         const data = await banner.save();
@@ -2572,6 +2571,7 @@ async function createNewBanner(req, res) {
 
 
 // Get all banner list from different users.........
+
 
 async function getAllBannersData() {
     // console.log("getAllBannersData")
@@ -2619,9 +2619,9 @@ async function getBannerById(req) {
 // Update Page
 async function updateBanner(req) {
     const bannerId = req.params.id;
-    const { image, video, bannerText, bannerName, bannerType, siteUrl, category, bannerPlacement, startDate, status } = req.body;
+    const { image, video, bannerText, bannerName, bannerType, siteUrl, category, bannerPlacement, startDate, status, keyword } = req.body;
     try {
-        const banner = await bannerAdvertisement.findByIdAndUpdate(bannerId, { image, video, bannerText, bannerName, bannerType, siteUrl, category, startDate, bannerPlacement, status }, { new: true });
+        const banner = await bannerAdvertisement.findByIdAndUpdate(bannerId, { image, video, bannerText, bannerName, bannerType, siteUrl, category, startDate, bannerPlacement, status, keyword }, { new: true });
         //  console.log("update banner", banner)
         return banner;
     } catch (error) {
