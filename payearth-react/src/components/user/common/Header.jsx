@@ -468,7 +468,7 @@ const Header = (props) => {
                                 <li><Link to="/my-orders" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Orders</Link></li>
                                 <li><Link to="/my-payments" onClick={() => removeBackdrop()}><i className="icon"><img src={creditCardIcon} alt="credit-card" /></i> Payments</Link></li>
 
-                                <li><Link to="/my-banners" onClick={() => removeBackdrop()}><i className="icon"><img src={creditCardIcon} alt="credit-card" /></i> My Banners</Link></li>
+                                {/* <li><Link to="/my-banners" onClick={() => removeBackdrop()}><i className="icon"><img src={creditCardIcon} alt="credit-card" /></i> My Banners</Link></li> */}
 
                                 <li><Link to="/notifications"><i className="icon"><img src={notificationBellIcon} alt="notification-bell" /></i> Notifications</Link></li>
                                 <li><Link to="/chat"><i className="icon"><img src={chatIcon} alt="chat" /></i> Chats</Link></li>

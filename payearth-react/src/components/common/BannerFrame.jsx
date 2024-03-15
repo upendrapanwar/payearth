@@ -73,22 +73,38 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
 
     // WORKING DONE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     const renderCheckIframe = () => <>
-        {iframeOpen === false ? "" : <button onClick={closeIframe}>CLOSE</button>}
-        {iframeOpen === true ? (<div className='topHead_banner' key="iframeContainer"><iframe
-            src={advertisements.map(item => !item.video ? item.image : item.video)[currentUrlIndex]}
-            width="100%"
-            height="150px"
-            scrolling="no"
-            style={iframeStyles}
-            allow="autoplay; encrypted-media"
-            allowFullScreen
-            className="centeredIframe"
-        ></iframe>
-            <button onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}>
-                Open Website
+        {/* {iframeOpen === false ? "" : <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>} */}
+        {iframeOpen === true ? (<div className='iframe-container' key="iframeContainer">
+            <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
+            <iframe
+                src={advertisements.map(item => !item.video ? item.image : item.video)[currentUrlIndex]}
+                width="100%"
+                // width="-webkit-fill-available"
+                height="150px"
+                scrolling="no"
+                style={iframeStyles}
+                allow="autoplay; encrypted-media"
+                allowFullScreen
+                className="centeredIframe"
+            // onLoad={handleIframeLoad}
+            ></iframe>
+            <button onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)} className="banner-click">
+                Click....!
             </button>
         </div>) : ""}
     </>
+
+    function handleIframeLoad() {
+        const iframe = document.querySelector('.centeredIframe');
+        const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
+        const iframeImage = iframeDocument.querySelector('img');
+        if (iframeImage) {
+            // Set width of the img tag inside the iframe
+            iframeImage.style.width = '100%';
+
+            // Set to whatever width you desire
+        }
+    }
 
     return <>
         {/* <div>

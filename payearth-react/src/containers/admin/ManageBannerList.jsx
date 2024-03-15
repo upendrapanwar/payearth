@@ -240,9 +240,9 @@ class ManageBannerList extends Component {
     banner_column = [
         {
             name: " Banner Image/Video",
-            selector: (row, i) => row.video === '' ? <img src={row.image} alt="No Image/video select" style={{ width: '150px', height: '100px' }} /> : <video width="150" height="100" src={row.video} autoPlay loop alt="No Image/video select" />,
+            selector: (row, i) => row.video === '' ? <img src={row.image} alt="No Image/video select" style={{ width: '350px', height: '90px' }} /> : <video width="350" height="90" src={row.video} autoPlay loop alt="No Image/video select" />,
             sortable: true,
-            width: '200px',
+            width: '350px',
         },
         {
             name: "Banner Name",

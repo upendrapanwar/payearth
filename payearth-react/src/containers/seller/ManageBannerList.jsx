@@ -180,8 +180,9 @@ class SellerBannerList extends Component {
   banner_column = [
     {
       name: " Banner Image/Video",
-      selector: (row, i) => row.video === '' ? <img className='advBanner-Thumb' src={row.image} alt="No Image/video select" style={{ width: '150px', height: '120px' }} /> : <video width="150" height="120" src={row.video} autoPlay loop alt="No Image/video select" />,
+      selector: (row, i) => row.video === '' ? <img className='advBanner-Thumb' src={row.image} alt="No Image/video select" style={{ width: '350px', height: '100px' }} /> : <video width="350" height="100" src={row.video} autoPlay loop alt="No Image/video select" />,
       sortable: true,
+      width : "350px"
     },
     {
       name: "Banner Name",
