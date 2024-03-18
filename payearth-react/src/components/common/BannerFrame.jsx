@@ -1,8 +1,7 @@
 import React from 'react'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-
-
+import Iframe from 'react-iframe-click';
 
 export const BannerTopIframe = ({ width, height, keywords }) => {
     const [advertisements, setAdvertisements] = useState([]);
@@ -51,6 +50,7 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
 
     const onWebsiteMove = (url) => {
         window.open(url, '_blank');
+        closeIframe();
     };
 
     const iframeStyles = {
@@ -71,49 +71,28 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
         setIframeOpen(false);
     };
 
-    // WORKING DONE>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    const renderCheckIframe = () => <>
-        {/* {iframeOpen === false ? "" : <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>} */}
+    const renderBannerTopIframe = () => <>
         {iframeOpen === true ? (<div className='iframe-container' key="iframeContainer">
             <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
-            <iframe
+            <Iframe
                 src={advertisements.map(item => !item.video ? item.image : item.video)[currentUrlIndex]}
                 width="100%"
-                // width="-webkit-fill-available"
                 height="150px"
                 scrolling="no"
                 style={iframeStyles}
                 allow="autoplay; encrypted-media"
                 allowFullScreen
                 className="centeredIframe"
-            // onLoad={handleIframeLoad}
-            ></iframe>
-            <button onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)} className="banner-click">
-                Click....!
-            </button>
+                onInferredClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
+                // onLoad={handleIframeLoad}
+            />
         </div>) : ""}
     </>
 
-    function handleIframeLoad() {
-        const iframe = document.querySelector('.centeredIframe');
-        const iframeDocument = iframe.contentDocument || iframe.contentWindow.document;
-        const iframeImage = iframeDocument.querySelector('img');
-        if (iframeImage) {
-            // Set width of the img tag inside the iframe
-            iframeImage.style.width = '100%';
-
-            // Set to whatever width you desire
-        }
-    }
-
     return <>
-        {/* <div>
-            {renderIframe()}
-        </div> */}
         <div>
-            {renderCheckIframe()}
+            {renderBannerTopIframe()}
         </div>
-
     </>
 }
 
@@ -145,12 +124,3 @@ export const BannerIframe2 = ({ width, height }) => {
 
     </>
 }
-
-
-{/* <iframe
-        src={src}
-        width="10%"
-        height="500px"
-        scrolling="no"
-        style={iframeStyles}
-    />; */}
