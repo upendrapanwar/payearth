@@ -5,10 +5,10 @@ const schema = {
     register: joi.object({
         name: joi.string().max(50).required(),
         email: joi.string().email().message('Email address must be valid.').required(),
-        seller_type: joi.string().required(),
         address: joi.string().max(100).required(),
         state: joi.string().max(50).required(),
         country: joi.string().max(50).required(),
+        seller_type: joi.string().required(),
         want_to_sell: joi.string().required(),
         password: joi.string().min(6).max(20).required().messages({
             "string.empty": "Password is required",
@@ -16,6 +16,7 @@ const schema = {
         }),
         password_confirmation: joi.any().equal(joi.ref('password')).required().label('Confirm password').messages({ 'any.only': '{{#label}} does not match.' })
     }),
+    
 
     login: joi.object({
         email: joi.string().email().message('Email address must be valid.').required(),
@@ -126,57 +127,59 @@ const schema = {
 };
 
 module.exports = {
-    registerValidation: async(req, res, next) => {
+    registerValidation: async (req, res, next) => {
+        console.log("req body", req.body)
         const value = await schema.register.validate(req.body);
+        console.log("value  registerValidation: ", value)
         getMessage(value, res, next);
     },
 
-    loginValidation: async(req, res, next) => {
+    loginValidation: async (req, res, next) => {
         const value = await schema.login.validate(req.body);
         getMessage(value, res, next);
     },
 
-    changePassValidation: async(req, res, next) => {
+    changePassValidation: async (req, res, next) => {
         const value = await schema.changepass.validate(req.body);
         getMessage(value, res, next);
     },
 
-    forgotPassValidation: async(req, res, next) => {
+    forgotPassValidation: async (req, res, next) => {
         const value = await schema.forgotpass.validate(req.body);
         getMessage(value, res, next);
     },
 
-    resetPassValidation: async(req, res, next) => {
+    resetPassValidation: async (req, res, next) => {
         const value = await schema.resetpass.validate(req.body);
         getMessage(value, res, next);
     },
 
-    addProductValidation: async(req, res, next) => {
+    addProductValidation: async (req, res, next) => {
         const value = await schema.addproduct.validate(req.body);
         getMessage(value, res, next);
     },
 
-    editProductValidation: async(req, res, next) => {
+    editProductValidation: async (req, res, next) => {
         const value = await schema.editproduct.validate(req.body);
         getMessage(value, res, next);
     },
 
-    addServiceValidation: async(req, res, next) => {
+    addServiceValidation: async (req, res, next) => {
         const value = await schema.addservice.validate(req.body);
         getMessage(value, res, next);
     },
 
-    editServiceValidation: async(req, res, next) => {
+    editServiceValidation: async (req, res, next) => {
         const value = await schema.editservice.validate(req.body);
         getMessage(value, res, next);
     },
 
-    needHelpValidation: async(req, res, next) => {
+    needHelpValidation: async (req, res, next) => {
         const value = await schema.needhelp.validate(req.body);
         getMessage(value, res, next);
     },
 
-    contactUsValidation: async(req, res, next) => {
+    contactUsValidation: async (req, res, next) => {
         const value = await schema.contactus.validate(req.body);
         getMessage(value, res, next);
     }

@@ -5,7 +5,7 @@ const router = express.Router();
 const sellerService = require('../services/seller.service');
 const { registerValidation, loginValidation, changePassValidation, forgotPassValidation, resetPassValidation, addProductValidation, editProductValidation, addServiceValidation, editServiceValidation, needHelpValidation, contactUsValidation } = require('../validations/seller.validation');
 const msg = require('../helpers/messages.json');
-const multer = require('multer');
+const multer = require('multer'); 
 
 
 //Product Images Upload
@@ -164,7 +164,7 @@ router.put("/updateBanner/:id", updateBanner);
 
 
 
-module.exports = router;
+module.exports = router; 
 
 
 function register(req, res, next) {
