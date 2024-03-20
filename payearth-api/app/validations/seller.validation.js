@@ -128,9 +128,7 @@ const schema = {
 
 module.exports = {
     registerValidation: async (req, res, next) => {
-        console.log("req body", req.body)
         const value = await schema.register.validate(req.body);
-        console.log("value  registerValidation: ", value)
         getMessage(value, res, next);
     },
 
