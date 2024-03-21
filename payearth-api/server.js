@@ -81,7 +81,7 @@ app.use(
 var certOptions = {
     key: fs.readFileSync(config.ssl_key, 'utf8'),
     cert: fs.readFileSync(config.ssl_cert, 'utf8')
-};
+};  
 
 // serve the API with HTTPS
 const httpsServer = https.createServer(certOptions, app);

@@ -204,6 +204,13 @@ router.get("/service/getServiceStatus/:meetingStatus", getServiceStatus);
 router.post("/service/save-calendar-events", saveCalendarEvents);
 router.get("/service/get-calendar-events", getCalendarEvents);
 
+// Banner
+router.post("/createSellerBanners", createSellerBanner);
+router.get("/getBannersBySellerId/:id", getBannersBySellerId);
+router.delete("/deleteBanner/:id", deleteBannerAdv);
+router.get("/getBannerById/:id", getBannerById);
+router.put("/updateBanner/:id", updateBanner);
+
 module.exports = router;
 
 function register(req, res, next) {
@@ -900,6 +907,62 @@ function getCalendarEvents(req, res, next) {
       data
         ? res.status(200).json({ status: true, data: data })
         : res.status(400).json({ status: false, message: "ERROR ", data: [] })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+/********BANNER**********************/
+function createSellerBanner(req, res, next) {
+  sellerService
+    .createSellerBanner(req)
+    .then((banner) =>
+      banner
+        ? res.status(200).json({ status: true, data: banner })
+        : res.status(400).json({ status: false, message: "ERROR ", data: [] })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function getBannersBySellerId(req, res, next) {
+  sellerService
+    .getBannersBySellerId(req)
+    .then((banner) =>
+      banner
+        ? res.status(200).json({ status: true, data: banner })
+        : res.status(400).json({ status: false, message: "ERROR ", data: [] })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function deleteBannerAdv(req, res, next) {
+  sellerService
+    .deleteBanner(req)
+    .then((banner) =>
+      banner
+        ? res.json({ status: true, message: "Successfull Delete" })
+        : res.json({ status: false, message: "ERROR" })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function getBannerById(req, res, next) {
+  sellerService
+    .getBannerById(req)
+    .then((banner) =>
+      banner
+        ? res.status(200).json({ status: true, data: banner })
+        : res.status(400).json({ status: false, message: "ERROR ", data: [] })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function updateBanner(req, res, next) {
+  sellerService
+    .updateBanner(req)
+    .then((banner) =>
+      banner
+        ? res.json({ status: true, message: "Banner Update Successfully...." })
+        : res.json({ status: false, message: "ERROR" })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }

@@ -22,6 +22,7 @@ const {
   CryptoConversion,
   cmsPost,
   cmsPage,
+  bannerAdvertisement,
 } = require("../helpers/db");
 
 module.exports = {
@@ -47,6 +48,7 @@ module.exports = {
   cmsBlogDetailBySlug,
   cmsPublishPage,
   cmsPageDetails,
+  getAllBannersData,
 };
 
 async function getReviews(id) {
@@ -819,6 +821,35 @@ async function cmsPageDetails(req) {
     const allPost = await cmsPage.find({}).select().sort({ createdAt: "desc" });
     const filteredStatus = allPost.filter((item) => item.slug === slug);
     return filteredStatus;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// BANNER DATA GET WITH KEYWORDS MATCH
+
+async function getAllBannersData(req) {
+  const keywordsData = req.params.keywords;
+  try {
+    // const result = await bannerAdvertisement.find({}).select().sort({ createdAt: 'desc' })
+    // const matchedBannerData = result.filter(item => item.keyword.toLowerCase().includes(keywordsData.toLowerCase()))
+
+    const query = {
+      keyword: { $regex: keywordsData, $options: "i" },
+      status: "Publish",
+    };
+    const fieldsToSelect = "image video category keyword siteUrl";
+    const result = await bannerAdvertisement
+      .find(query)
+      .sort({ createdAt: "desc" })
+      .select(fieldsToSelect);
+
+    if (result && result.length > 0) {
+      // console.log("banner list ", result)
+      return result;
+    } else {
+      return [];
+    }
   } catch (error) {
     console.log(error);
   }

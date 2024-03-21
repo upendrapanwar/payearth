@@ -109,6 +109,8 @@ class ServiceCheckout extends Component {
             email: this.userInfo.email,
             paymentMethodId: null,
             plan_Id: "",
+
+            selectCard: "",
             error: null,
             planPrice: "200",
             stripeResponse: "",
@@ -118,9 +120,28 @@ class ServiceCheckout extends Component {
 
         };
     }
-    
+
 
     // Stripe function
+
+    componentWillMount() {
+
+        var storedDataset = sessionStorage.getItem('selectPlan');
+
+        if (storedDataset) {
+            var retrievedDataset = JSON.parse(storedDataset);
+            console.log("data for session storage", retrievedDataset.stripPlanId)
+            this.setState({ plan_Id: retrievedDataset.stripPlanId })
+            this.setState({ selectCard: retrievedDataset })
+        } else {
+            this.setState({ selectCard: null })
+        }
+        // Parse the string back into an object
+        // var retrievedDataset = JSON.parse(storedDataset);
+        // console.log("data for session storage", retrievedDataset.stripPlanId)
+        // this.setState({ plan_Id: retrievedDataset.stripPlanId })
+        // this.setState({ selectCard: retrievedDataset })
+    }
 
     fetchStripePlans = async () => {
         console.log("fetchStrip plan function is run")
@@ -134,7 +155,13 @@ class ServiceCheckout extends Component {
 
             console.log("response.data", response.data.data)
             console.log("response.data", response.data)
-            this.setState({ plan_Id: 'price_1OhntbD2za5c5GtOpiypaDOt' })
+
+            var storedDataset = sessionStorage.getItem('selectPlan');
+
+            if (!storedDataset) {
+                this.setState({ plan_Id: 'price_1OhntbD2za5c5GtOpiypaDOt' })
+            }
+
             // setPlans(fetchedPlans);
         } catch (error) {
             console.error('Error fetching Stripe plans:', error);
@@ -146,9 +173,9 @@ class ServiceCheckout extends Component {
         console.log("RUNNNNN>>>>>>handleCheckOut")
         this.setState({ showModal: true });
     };
-    
+
     handleSubmit = async (event, elements, stripe) => {
-        this.setState({isLoading: true});
+        this.setState({ isLoading: true });
         event.preventDefault();
         console.log("Just to check handleSubmit")
         console.log("Elements", elements)
@@ -161,8 +188,8 @@ class ServiceCheckout extends Component {
         const { token, error } = await stripe.createToken(cardElement);
 
         if (error) {
-            console.error("Create Token Error:",error);
-            this.setState({isLoading: false});
+            console.error("Create Token Error:", error);
+            this.setState({ isLoading: false });
             toast.error(error.message);
         } else {
             // You can handle the token or payment method ID here
@@ -176,7 +203,7 @@ class ServiceCheckout extends Component {
 
     handleSubscribeStripe = () => {
         const { email, paymentMethodId, plan_Id, authName } = this.state;
-        console.log("Plan ID", plan_Id)
+        console.log("Plan ID :::::", plan_Id)
         const url = 'seller/create-subscription';
 
         const subData = {
@@ -194,18 +221,21 @@ class ServiceCheckout extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`
             }
         }).then((response) => {
-            console.log("Subscription created succesfully....", response.data);
-            console.log("payment status", response.data.data.status)
-            this.setState({ stripeResponse: response.data })
+            console.log("Subscription succesfully in seller....", response.data);
+            console.log("amountPaid : ", response.data.data.plan.amount/100)
+            console.log("paymentMode : ", response.data.data.plan.currency)
+            console.log("invoiceUrl : ", response.data.data.latest_invoice.invoice_pdf)
+            console.log("paymentStatus", response.data.data.latest_invoice.status)
 
+            this.setState({ stripeResponse: response.data })
             const paymentData = [{
                 'userId': this.authInfo.id,
                 'sellerId': "",
-                'amountPaid': "",
-                'paymentMode': 'usd',
+                'amountPaid': response.data.data.plan.amount/100,
+                'paymentMode': response.data.data.plan.currency,
                 'paymentAccount': 'Stripe',
-                'invoiceUrl': '',
-                'paymentStatus': response.data.data.status,
+                'invoiceUrl': response.data.data.latest_invoice.invoice_pdf,
+                'paymentStatus': response.data.data.latest_invoice.status,
             }];
             console.log("paymentData", paymentData)
             // this.onSubmitHandler();
@@ -454,7 +484,7 @@ class ServiceCheckout extends Component {
         }).catch(error => {
             console.log(error)
         });
-    }  
+    }
 
     /******************************************************************************/
     /******************************************************************************/
@@ -533,7 +563,10 @@ class ServiceCheckout extends Component {
      * @param {*} event 
      */
     onSubmitHandler = event => {
-        const { planPrice, stripeResponse } = this.state;
+        const { selectCard, planPrice, stripeResponse } = this.state;
+
+        console.log("price amount selected=> ", selectCard !== null ? selectCard.planPrice : planPrice,)
+
         const url = '/seller/saveorder';
 
         if (stripeResponse.status === true) {
@@ -584,8 +617,8 @@ class ServiceCheckout extends Component {
                     taxPercent: 0,
                     taxAmount: 0,
                     discount: 0,
-                    price: planPrice,
-                    total: planPrice,
+                    price: selectCard !== null ? selectCard.planPrice : planPrice,
+                    total: selectCard !== null ? selectCard.planPrice : planPrice,
                     orderStatus: orderStatus,
                     isActive: true,
                     isService: false
@@ -662,12 +695,18 @@ class ServiceCheckout extends Component {
      * @param {*} orderStatus 
      */
     saveOrderDetails = (orderId, orderStatus) => {
+
+        const { planPrice, selectCard } = this.state;
+
+        console.log("selectCard", selectCard)
+        console.log("planPrice", planPrice)
+
         let reqBody = {}
         let prodArray = [];
 
         prodArray.push({
             orderId: orderId,
-            price: this.state.planPrice,
+            price: selectCard !== null ? selectCard.planPrice : planPrice,
             userId: this.authInfo.id,
             isService: false,
         });
@@ -756,7 +795,7 @@ class ServiceCheckout extends Component {
 
     render() {
 
-        const { planPrice, serviceName, serviceCategory, isLoading, stripeResponse } = this.state;
+        const { selectCard, planPrice, serviceName, serviceCategory, isLoading, stripeResponse } = this.state;
 
         // submit Function
         this.onSubmit = () => {
@@ -813,8 +852,6 @@ class ServiceCheckout extends Component {
             }
         }
 
-
-
         return (
             <React.Fragment>
                 <Header />
@@ -822,7 +859,7 @@ class ServiceCheckout extends Component {
                     <div className="container">
                         <div className="cart my_cart">
                             <div className="row">
-                                <div className="col-md-12">
+                                {selectCard === null ? <div className="col-md-12">
                                     <div className="payment_method_section">
                                         <div className="payment_list">
                                             <ul>
@@ -837,7 +874,6 @@ class ServiceCheckout extends Component {
                                                 <li>Subtotal : <b>$ {planPrice}</b></li>
                                             </ul>
                                         </div>
-
 
                                         {/* STRIPE FORM  */}
                                         <div>
@@ -868,12 +904,61 @@ class ServiceCheckout extends Component {
 
                                                 />
                                                 <div className="d-grid col-6 mx-auto" >
-                                                    <button type="submit" className="btn btn-success" disabled= {isLoading} > {isLoading ? "Please wait..." : `PAY $ ${planPrice}`}</button>
+                                                    <button type="submit" className="btn btn-success" disabled={isLoading} > {isLoading ? "Please wait..." : `PAY $ ${planPrice}`}</button>
                                                 </div>
                                             </form>
                                         </div>
                                     </div>
-                                </div>
+                                </div> :
+
+                                    <div className="payment_method_section">
+                                        <div className="payment_list">
+                                            <ul>
+                                                <li>Type of Plan : <b>{selectCard.planType}</b></li>
+                                                <li>Plan Detail : <b>{selectCard.description}</b></li>
+                                                <li>Price : <b>{selectCard.planPrice} $</b></li>
+                                                {/* <li>Tax(18%) : {this.getTotal().tax}$ </li> */}
+                                            </ul>
+                                        </div>
+                                        <div className="subtotal_wrapper">
+                                            <ul>
+                                                <li>Subtotal : <b>{selectCard.planPrice} $</b></li>
+                                            </ul>
+                                        </div>
+                                        {/* STRIPE FORM  */}
+                                        <div>
+                                            <form onSubmit={(e) => this.handleSubmit(e, this.props.elements, this.props.stripe)}>
+                                                {/* <input
+                                                    type="email"
+                                                    placeholder="Enter your email"
+                                                    value={this.state.email}
+                                                    onChange={(e) => this.setState({ email: e.target.value })}
+                                                /> */}
+                                                <CardElement
+                                                    options={{
+                                                        style: {
+                                                            base: {
+                                                                fontSize: '18px',
+                                                                color: '#424770',
+                                                                backgroundColor: '#e6e6e6',
+                                                                padding: '4px 4px',
+                                                                '::placeholder': {
+                                                                    color: '#aab7c4',
+                                                                },
+                                                            },
+                                                            invalid: {
+                                                                color: '#9e2146',
+                                                            },
+                                                        },
+                                                    }}
+                                                />
+                                                <div className="text-center" >
+                                                    <button type="submit" className="btn btn-success" disabled={isLoading} >  {isLoading ? 'Please wait....' : `PAY ( $ ${selectCard.planPrice})`} </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div >
@@ -898,9 +983,18 @@ class ServiceCheckout extends Component {
 
                             <div className="d-grid gap-2 col-6 mx-auto mt-3">
                                 {/* <div className="ctn_btn"><Link to="/my-banners" className="view_more">DONE</Link></div> */}
-                                <Link to="/seller/service-stock-management">
+                                {selectCard === null ?
+                                    <Link to="/seller/service-stock-management">
+                                        <button onClick={this.clearSessionStorage} class="btn btn-primary btn-sm mt-2" type="button">Return</button>
+                                    </Link> :
+                                    <Link to="/seller/manage-banner-list">
+                                        <button onClick={this.clearSessionStorage} class="btn btn-primary btn-sm mt-2" type="button">Return</button>
+                                    </Link>
+                                }
+
+                                {/* <Link to="/seller/service-stock-management">
                                     <button onClick={this.clearSessionStorage} class="btn btn-primary btn-sm mt-2" type="button">Return</button>
-                                </Link>
+                                </Link> */}
                             </div>
                         </div>
 

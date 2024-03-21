@@ -13,6 +13,7 @@ class ServiceCheckoutStripe extends Component {
                 <ElementsConsumer>
                     {({ elements, stripe }) => (
                         <ServiceCheckout elements={elements} stripe={stripe} />
+                        
                     )}
                 </ElementsConsumer>
             </Elements>

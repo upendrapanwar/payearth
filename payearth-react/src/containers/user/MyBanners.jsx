@@ -22,10 +22,9 @@ class MyBanner extends Component {
 
   constructor(props) {
     super(props);
-    this.cloudName = "pay-earth"
-    this.apiKey = "172845922361144";
-    this.apiSecret = "3rvc9PNRXy2YOeB9kuFNjrxI8FU";
-    this.signature = "f878911eba6bc4737f78009826d5fb0683a7e538"
+    this.cloudName = process.env.REACT_APP_CLOUD_NAME
+    this.apiKey = process.env.REACT_APP_API_KEY
+    this.apiSecret = process.env.REACT_APP_API_SECRET
     this.authInfo = store.getState().auth.authInfo;
     // console.log("Auth", this.userInfo.name)
     this.state = {

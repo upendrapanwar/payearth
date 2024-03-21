@@ -18,6 +18,7 @@ import axios from 'axios';
 class AdminPostModuleAddNew extends Component {
     constructor(props) {
         super(props);
+        this.cloudName = process.env.REACT_APP_CLOUD_NAME
         const { dispatch } = props;
         this.dispatch = dispatch;
         this.authInfo = store.getState().auth.authInfo;
@@ -104,10 +105,8 @@ class AdminPostModuleAddNew extends Component {
         data.append("file", file)
         data.append("upload_preset", "pay-earth-images")
         data.append("cloud_name", "pay-earth")
-
         // https://api.cloudinary.com/v1_1/pay-earth/video/upload   <= video file example
-
-        fetch("https://api.cloudinary.com/v1_1/pay-earth/image/upload", {
+        fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`, {
             method: "post",
             body: data
         }).then((res) => res.json())

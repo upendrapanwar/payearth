@@ -10,6 +10,7 @@ import communityIcon from './../../../assets/icons/sm_community.svg'
 import contactIcon from './../../../assets/icons/sm_contact.svg'
 import smLogoutIcon from './../../../assets/icons/sm_logout.svg'
 import homeIcon from './../../../assets/icons/home-icon.svg'
+import bannerIcon from './../../../assets/icons/banners_icon.svg'
 import { useDispatch } from 'react-redux';
 import { setLoginStatus, setUserInfo } from './../../../store/reducers/auth-reducer';
 import { authVerification } from '../../../helpers/auth-verification';
@@ -46,6 +47,7 @@ const Header = () => {
                     <div className="side_menu_body">
                         <ul className="side_menu_links">
                             <li><Link to="/seller/dashboard" onClick={() => removeBackdrop()} ><i className="icon"><img src={homeIcon} alt="" /></i>Dashboard</Link></li>
+                            <li><Link to="/seller/manage-banner-advertisement" onClick={() => removeBackdrop()}><i className="icon"><img src={bannerIcon} alt="" /></i> Manage Banners</Link></li>
                             <li><Link to="/seller/listed-items" onClick={() => removeBackdrop()} ><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Listed Products</Link></li>
                             <li><Link to="/seller/product-stock-management" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Product Management</Link></li>
                             <li><Link to="/seller/service-stock-management" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Service Management</Link></li>

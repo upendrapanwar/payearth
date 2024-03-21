@@ -64,10 +64,19 @@ const schema = new Schema({
         type: String,
         required: false,
     },
+    authorDetails: {
+        type: {
+            email: String,
+            name: String,
+            role: String
+        }
+    }
 }, { timestamps: true });
 
 schema.set("toJSON", { virtuals: true, versionKey: false });
 
-module.exports = mongoose.model("bannerAdvertisement", schema);
+
+
+module.exports = mongoose.model("bannerAdvertisement", schema,);
 
 

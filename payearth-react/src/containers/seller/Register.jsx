@@ -18,12 +18,12 @@ import Select from 'react-select';
 class Register extends Component {
     constructor(props) {
         super(props)
-        const {dispatch} = props;
+        const { dispatch } = props;
         this.dispatch = dispatch;
         this.state = {
             seePassword: false,
             seeConfirmPassword: false,
-            reqBody: {country_code:''},
+            reqBody: { country_code: '' },
             countryOptions: [],
             defaultCountryOptions: { label: 'Choose Country', value: '' },
             stateOptions: [],
@@ -37,14 +37,14 @@ class Register extends Component {
     }
 
     getCounryName = () => {
-        this.dispatch(setLoading({loading: true}));
+        this.dispatch(setLoading({ loading: true }));
         axios.get(`seller/countries`).then(response => {
             if (response.data.status) {
                 let countryOptions = [];
                 response.data.data.forEach(value => {
-                    countryOptions.push({label: value.country, value: value.code})
+                    countryOptions.push({ label: value.country, value: value.code })
                 });
-                this.setState({countryOptions});
+                this.setState({ countryOptions });
             }
         }).catch(error => {
             if (error.response && error.response.data.status === false) {
@@ -52,23 +52,23 @@ class Register extends Component {
             }
         }).finally(() => {
             setTimeout(() => {
-                this.dispatch(setLoading({loading: false}));
+                this.dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
 
     getStates = param => {
-        let reqBody = {...this.state.reqBody}
+        let reqBody = { ...this.state.reqBody }
         reqBody['country_code'] = param;
-        this.setState({reqBody});
-        this.dispatch(setLoading({loading: true}));
+        this.setState({ reqBody });
+        this.dispatch(setLoading({ loading: true }));
         axios.post(`seller/states`, reqBody).then(response => {
             if (response.data.status) {
                 let stateOptions = [];
                 response.data.data.forEach(value => {
-                    stateOptions.push({label: value, value:value})
+                    stateOptions.push({ label: value, value: value })
                 });
-                this.setState({stateOptions});
+                this.setState({ stateOptions });
             }
         }).catch(error => {
             if (error.response && error.response.data.status === false) {
@@ -76,48 +76,53 @@ class Register extends Component {
             }
         }).finally(() => {
             setTimeout(() => {
-                this.dispatch(setLoading({loading: false}));
+                this.dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
 
-    handleSubmit = (values, {resetForm}) => {
-        this.dispatch(setLoading({loading: true}));
+    handleSubmit = (values, { resetForm }) => {
+
+        console.log("values", values)
+        this.dispatch(setLoading({ loading: true }));
         axios.post('seller/signup', values).then(response => {
+            console.log("response", response)
             toast.dismiss();
             if (response.data.status) {
-                toast.success(response.data.message, {autoClose: 3000});
+                toast.success(response.data.message, { autoClose: 3000 });
                 resetForm();
                 this.props.history.push('/seller/login');
             }
         }).catch(error => {
+            console.log("error", error)
             toast.dismiss();
             if (error.response) {
-                toast.error(error.response.data.message, {autoClose: 3000});
+                console.log("error response", error.response.data.message)
+                toast.error(error.response.data.message, { autoClose: 3000 });
             }
         }).finally(() => {
             setTimeout(() => {
-                this.dispatch(setLoading({loading: false}));
+                this.dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
 
     handlePassword = () => {
         let flag = this.state.seePassword ? false : true;
-        this.setState({seePassword: flag});
+        this.setState({ seePassword: flag });
     }
 
     handleConfirmPassword = () => {
         let flag = this.state.seeConfirmPassword ? false : true;
-        this.setState({seeConfirmPassword: flag});
+        this.setState({ seeConfirmPassword: flag });
     }
 
     handleConuntry = selectedOption => {
-        let reqBody = {...this.state.reqBody};
+        let reqBody = { ...this.state.reqBody };
         reqBody['country_code'] = selectedOption.value;
         this.setState({
             defaultCountryOptions: selectedOption,
-            defaultStateOptions: {label: 'Choose State', value: ''},
+            defaultStateOptions: { label: 'Choose State', value: '' },
             reqBody
         });
         this.getStates(reqBody.country_code);
@@ -126,7 +131,7 @@ class Register extends Component {
         this.props.history.push('/');
     }
     render() {
-        const {loading} = store.getState().global;
+        const { loading } = store.getState().global;
         const {
             countryOptions,
             defaultCountryOptions,
@@ -145,7 +150,7 @@ class Register extends Component {
                                     <Link to="/" className="navbar-brand py-0" ><img src={logo} alt="logo" className="img-fluid" /></Link>
                                     <div className="sel_register">
                                         <div className="form_wrapper">
-                                        <button onClick={this.handleClose} type="button" className="btn-close mo_btn" style={{float:"right"}} aria-label="Close"></button>
+                                            <button onClick={this.handleClose} type="button" className="btn-close mo_btn" style={{ float: "right" }} aria-label="Close"></button>
                                             <h4 className="form_title mb-4">Seller register</h4>
                                             <Formik
                                                 initialValues={{
@@ -159,8 +164,8 @@ class Register extends Component {
                                                     country: '',
                                                     state: ''
                                                 }}
-                                                onSubmit={(values, {resetForm}) => {
-                                                    this.handleSubmit(values, {resetForm});
+                                                onSubmit={(values, { resetForm }) => {
+                                                    this.handleSubmit(values, { resetForm });
                                                 }}
                                                 validationSchema={sellerRegistrationSchema}
                                             >
@@ -278,7 +283,7 @@ class Register extends Component {
                                                                                 value={defaultStateOptions}
                                                                                 onChange={selectedOption => {
                                                                                     values.state = selectedOption.value;
-                                                                                    this.setState({defaultStateOptions: selectedOption});
+                                                                                    this.setState({ defaultStateOptions: selectedOption });
                                                                                 }}
                                                                             />
                                                                             {touched.state && errors.state ? (
@@ -310,7 +315,7 @@ class Register extends Component {
                                                                                 value={values.seller_type}
                                                                             >
                                                                                 <option value="">Please select</option>
-                                                                                <option value="wholesaler">wholeseller</option>
+                                                                                <option value="wholeseller">wholeseller</option>
                                                                                 <option value="retailer">retailer</option>
                                                                             </select>
                                                                             {touched.seller_type && errors.seller_type ? (
@@ -326,7 +331,7 @@ class Register extends Component {
                                                                                 value={values.want_to_sell}
                                                                             >
                                                                                 <option value="">Please select</option>
-                                                                                <option value="wholesaler">wholeseller</option>
+                                                                                <option value="wholeseller">wholeseller</option>
                                                                                 <option value="retailer">retailer</option>
                                                                             </select>
                                                                             {touched.want_to_sell && errors.want_to_sell ? (

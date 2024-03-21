@@ -3,7 +3,7 @@ import Header from "./../../components/user/common/Header";
 import Footer from '../../components/common/Footer';
 import { toast } from 'react-toastify';
 import emptyImg from './../../assets/images/emptyimage.png'
-import emptyVid from './../../assets/images/emptyVid.png'
+import emptyVid from './../../assets/images/emptyVid.png' 
 import store from '../../store/index';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -36,6 +36,11 @@ class CreateNewBanner extends Component {
             bannerPlacement: "",
             status: "",
             author: this.authInfo.id,
+            authorDetails: {
+                email: this.userInfo.email,
+                name: this.userInfo.name,
+                role: this.userInfo.role,
+            },
             card: "",
             selectImageOrVideo: "",
             isSelectplan: false,
@@ -117,7 +122,6 @@ class CreateNewBanner extends Component {
         } else {
             toast.error("Banner size must be less than 11 MB", { autoClose: 3000 })
         }
-
     }
     // Function to format file size in a human-readable format
     formatBytes = (bytes) => {
@@ -204,7 +208,7 @@ class CreateNewBanner extends Component {
 
     }
     saveBanner = (status) => {
-        const { image, imageId, video, videoId, bannerText, bannerType, bannerName, siteUrl, category, startDate, endDate, subscriptionPlan, bannerPlacement, signaturess, author, tag, keyword } = this.state;
+        const { image, imageId, video, videoId, bannerText, bannerType, bannerName, siteUrl, category, startDate, endDate, subscriptionPlan, bannerPlacement, signaturess, author, authorDetails, tag, keyword } = this.state;
         const url = '/user/createUserbanners';
         const bannerData = {
             image,
@@ -223,6 +227,7 @@ class CreateNewBanner extends Component {
             status,
             signaturess,
             author,
+            authorDetails,
             tag,
             keyword
         };
@@ -389,7 +394,6 @@ class CreateNewBanner extends Component {
         } catch (error) {
             console.error('Error fetching Stripe plans:', error);
         }
-
     };
 
     render() {
@@ -495,7 +499,7 @@ class CreateNewBanner extends Component {
                                                         </div>
                                                     </div> */}
 
-                                                    <div className="crt_bnr_fieldRow">
+                                                    {/* <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
                                                             <label htmlFor="">Tag</label>
                                                             <div className="field_item">
@@ -509,7 +513,7 @@ class CreateNewBanner extends Component {
                                                                 />
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </div> */}
 
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">

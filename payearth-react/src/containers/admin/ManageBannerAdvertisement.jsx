@@ -39,6 +39,11 @@ class ManageBannerAdvertisement extends Component {
             bannerPlacement: "",
             status: "",
             author: this.authInfo.id,
+            authorDetails: {
+                email: this.userInfo.email,
+                name: this.userInfo.name,
+                role: this.userInfo.role,
+            },
             card: "",
             selectImageOrVideo: "",
             isSelectplan: false,
@@ -180,7 +185,7 @@ class ManageBannerAdvertisement extends Component {
         }
     }
     saveBanner = (status) => {
-        const { image, imageId, video, videoId, bannerText, bannerType, bannerName, siteUrl, category, startDate, endDate, subscriptionPlan, bannerPlacement, signaturess, author, tag, keyword } = this.state;
+        const { image, imageId, video, videoId, bannerText, bannerType, bannerName, siteUrl, category, startDate, endDate, subscriptionPlan, bannerPlacement, signaturess, author, authorDetails,  tag, keyword } = this.state;
         const url = '/admin/createNewBanner';
         const bannerData = {
             image,
@@ -199,8 +204,9 @@ class ManageBannerAdvertisement extends Component {
             status,
             signaturess,
             author,
+            authorDetails,
             tag,
-            keyword
+            keyword,
         };
 
         axios.post(url, bannerData, {
@@ -446,7 +452,7 @@ class ManageBannerAdvertisement extends Component {
                                                         </div>
                                                     </div> */}
 
-                                                    <div className="crt_bnr_fieldRow">
+                                                     {/* <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
                                                             <label htmlFor="">Tag</label>
                                                             <div className="field_item">
@@ -460,7 +466,7 @@ class ManageBannerAdvertisement extends Component {
                                                                 />
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </div>  */}
 
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
@@ -569,4 +575,3 @@ export default ManageBannerAdvertisement;
 
 
 
-// ManageBannerAdvertisement

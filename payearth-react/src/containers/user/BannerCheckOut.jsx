@@ -38,20 +38,20 @@ const Button = styled.button({
     borderRadius: "2px"
 });
 
-const ErrorComponent = (props: {
-    errors: [];
-    onBackButtonClick: () => void;
-}) => (
-    <div>
-        <Text fontSize={3} fontWeight={"500"} mb={3}>
-            Failed to process payment
-        </Text>
-        {props.errors.map(error => (
-            <Text py={2}>{error}</Text>
-        ))}
-        <Button onClick={props.onBackButtonClick}>Go Back</Button>
-    </div>
-);
+// const ErrorComponent = (props: {
+//     errors: [];
+//     onBackButtonClick: () => void;
+// }) => (
+//     <div>
+//         <Text fontSize={3} fontWeight={"500"} mb={3}>
+//             Failed to process payment
+//         </Text>
+//         {props.errors.map(error => (
+//             <Text py={2}>{error}</Text>
+//         ))}
+//         <Button onClick={props.onBackButtonClick}>Go Back</Button>
+//     </div>
+// );
 
 /*
 const Header = props => (
@@ -66,8 +66,7 @@ class BannerCheckOut extends Component {
         super(props);
 
         this.buttonRef = React.createRef;
-        // this.clientKey = "3q47VR4QY739gdggD4dP2JJsUNyd54bJJdDDpAdmktL59dA96SZMARZHtG2tDz6V";
-        // this.apiLoginId = "7e44GKHmR3b";
+
         this.authInfo = store.getState().auth.authInfo;
         this.userInfo = store.getState().auth.userInfo;
 
@@ -123,7 +122,7 @@ class BannerCheckOut extends Component {
 
         // Parse the string back into an object
         var retrievedDataset = JSON.parse(storedDataset);
-        console.log("data for session storage", retrievedDataset.stripPlanId)
+        // console.log("data for session storage", retrievedDataset.stripPlanId)
         this.setState({ plan_Id: retrievedDataset.stripPlanId })
         this.setState({ selectCard: retrievedDataset })
     }
@@ -177,17 +176,20 @@ class BannerCheckOut extends Component {
             }
         }).then((response) => {
             console.log("Subscription created succesfully....", response.data);
-            console.log("payment status", response.data.data.status)
+            console.log("response", response.data.data)
+            // console.log("invoice url : ",response.data.data.latest_invoice.invoice_pdf)
+            // console.log("currency", response.data.data.plan.currency)
+            console.log("paymentStatus", response.data.data.latest_invoice.status)
             this.setState({ stripeResponse: response.data })
 
             const paymentData = [{
                 'userId': this.authInfo.id,
                 'sellerId': this.state.productSku,
-                'amountPaid': "",
-                'paymentMode': 'usd',
+                'amountPaid': response.data.data.plan.amount/100,
+                'paymentMode': response.data.data.plan.currency,
                 'paymentAccount': 'Stripe',
-                'invoiceUrl': '',
-                'paymentStatus': response.data.data.status,
+                'invoiceUrl': response.data.data.latest_invoice.invoice_pdf,
+                'paymentStatus': response.data.data.latest_invoice.status,
             }];
             console.log("paymentData", paymentData)
             // this.onSubmitHandler();
@@ -410,7 +412,6 @@ class BannerCheckOut extends Component {
             } else {
                 this.setState({ orderStatus: '' })
             }
-
         }).catch(error => {
             console.log(error)
         });
@@ -510,7 +511,7 @@ class BannerCheckOut extends Component {
     /******************************************************************************/
 
     /**
-     * Submit form data when order is placed
+     * Submit form data when order is placed 
      * 
      * @param {*} event 
      */
@@ -837,80 +838,6 @@ class BannerCheckOut extends Component {
                                                 <li>Subtotal : <b>{selectCard.planPrice} $</b></li>
                                             </ul>
                                         </div>
-
-
-                                        {/* <div className="">
-                                                    <Box className="App" p={1}>
-                                                        {this.state.status[0] === "paid" ? (
-                                                            <Text fontWeight={"500"} fontSize={3} mb={4}>
-                                                                Thank you for your payment!
-
-                                                                <div className="ctn_btn"><Link to="/my-banners" className="view_more">My banner</Link></div>
-                                                            </Text>
-
-                                                        ) : this.state.status === "unpaid" ? (
-                                                            <FormContainer
-                                                                environment="sandbox"
-                                                                onError={this.onErrorHandler}
-                                                                onSuccess={this.onSuccessHandler}
-                                                                amount={subscriptionPlanData.planPrice}
-                                                                component={FormComponent}
-                                                                clientKey={this.clientKey}
-                                                                apiLoginId={this.apiLoginId}
-                                                            />
-                                                        ) : this.state.status[0] === "failure" ? (
-                                                            <ErrorComponent
-                                                                onBackButtonClick={() => this.setState({ status: "unpaid" })}
-                                                                errors={this.state.status[1]}
-                                                            />
-                                                        ) : null}
-                                                    </Box>
-                                                   
-                                                </div> */}
-
-
-                                        {/* <div className="row">
-                                                    <div className="col-6">
-                                                        <input
-                                                            type="text"
-                                                            name="cardNumber"
-                                                            className="form-control"
-                                                            placeholder="Enter 16-digit card number"
-                                                            maxlength="16" pattern="\d{16}"
-                                                            onChange={this.handleCardNumber}
-                                                            required
-                                                        />
-                                                    </div>
-                                                    <div className="col-3">
-                                                        <input
-                                                            type="text"
-                                                            id="expiryDate"
-                                                            name="expiryDate"
-                                                            className="form-control"
-                                                            placeholder="MM/YY"
-                                                            value={expiryDate}
-                                                            // pattern="(0[1-9]|1[0-2])\/\d{2}"
-                                                            onChange={this.handleExpiry}
-                                                            required
-                                                        />
-                                                    </div>
-                                                    &nbsp;
-                                                    <div className="col-2">
-                                                        <input
-                                                            type="text"
-                                                            name="cvv"
-                                                            className="form-control"
-                                                            placeholder="CVC"
-                                                            pattern="\d{3,4}"
-                                                            required
-                                                            onChange={this.handleCvv}
-
-                                                        />
-                                                    </div>
-                                                </div> */}
-
-                                        {/* &nbsp; */}
-
                                         {/* STRIPE FORM  */}
                                         <div>
                                             <form onSubmit={(e) => this.handleSubmit(e, this.props.elements, this.props.stripe)}>
