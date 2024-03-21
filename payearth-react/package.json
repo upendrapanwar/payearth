@@ -76,6 +76,7 @@
         "react-scroll-to-top": "^3.0.0",
         "react-select": "^4.3.1",
         "react-simple-image-slider": "^2.3.0",
+        "react-simple-star-rating": "^5.1.7",
         "react-stripe-elements": "^6.1.2",
         "react-time-ago": "^7.1.9",
         "react-toastify": "^8.0.2",
