@@ -15,16 +15,15 @@ import { Helmet } from "react-helmet";
 import { CalendarAuth } from "./CalendarAuth";
 import Calendar from "./Calendar";
 import Modal from "react-bootstrap/Modal";
-import emptyImg from './../../assets/images/emptyimage.png'
+import emptyImg from "./../../assets/images/emptyimage.png";
 import { CalendarLogout } from "./CalendarLogout";
-
 
 class ServiceStockManagement extends Component {
   constructor(props) {
     super(props);
     this.authInfo = store.getState().auth.authInfo;
     // console.log("Auth", this.userInfo.name)
-    const accessToken = localStorage.getItem('accessToken');
+    const accessToken = localStorage.getItem("accessToken");
     this.state = {
       sellerId: this.authInfo.id,
       token: this.authInfo.token,
@@ -57,7 +56,6 @@ class ServiceStockManagement extends Component {
   handleCalendarAuthorization = () => {
     this.setState({ isCalendarAuthorized: true });
   };
-
 
   // handleCalendarLogout = () => {
   //   this.setState({ isCalendarAuthorized: false });
@@ -116,15 +114,16 @@ class ServiceStockManagement extends Component {
   };
 
   getMeetingHistory = () => {
-    let status = "Completed"
+    let status = "Completed";
 
-    axios.get(`seller/service/getServiceStatus/${status}`, {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json;charset=UTF-8",
-        Authorization: `Bearer ${this.authInfo.token}`,
-      },
-    })
+    axios
+      .get(`seller/service/getServiceStatus/${status}`, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json;charset=UTF-8",
+          Authorization: `Bearer ${this.authInfo.token}`,
+        },
+      })
       .then((res) => {
         this.setState({
           meeting: res.data.data,
@@ -171,8 +170,6 @@ class ServiceStockManagement extends Component {
   handleEdit = (row) => {
     this.props.history.push(`/seller/edit-service/${row._id}`);
   };
-
-
 
   service_column = [
     {
@@ -283,17 +280,17 @@ class ServiceStockManagement extends Component {
     },
     {
       name: "Service ID",
-      selector: (row, i) => row.service.serviceCode,
+      selector: (row, i) => row.serviceId.serviceCode,
       sortable: true,
     },
     {
       name: "Service Name",
-      selector: (row, i) => row.service.name,
+      selector: (row, i) => row.serviceId.name,
       sortable: true,
     },
     {
       name: "Category",
-      selector: (row, i) => row.service.category.categoryName,
+      selector: (row, i) => row.serviceId.category.categoryName,
       sortable: true,
     },
     // author
@@ -378,17 +375,17 @@ class ServiceStockManagement extends Component {
     },
     {
       name: "Service ID",
-      selector: (row, i) => row.service.serviceCode,
+      selector: (row, i) => row.serviceId.serviceCode,
       sortable: true,
     },
     {
       name: "Service Name",
-      selector: (row, i) => row.service.name,
+      selector: (row, i) => row.serviceId.name,
       sortable: true,
     },
     {
       name: "Category",
-      selector: (row, i) => row.service.category.categoryName,
+      selector: (row, i) => row.serviceId.category.categoryName,
       sortable: true,
     },
     // author
@@ -409,7 +406,11 @@ class ServiceStockManagement extends Component {
     },
     {
       name: "Status",
-      selector: (row, i) => <p className="p-1 text-white bg-success  bg-opacity-6 border-info rounded">{row.meetingStatus}</p>,
+      selector: (row, i) => (
+        <p className="p-1 text-white bg-success  bg-opacity-6 border-info rounded">
+          {row.meetingStatus}
+        </p>
+      ),
       sortable: true,
     },
     // {
@@ -440,8 +441,6 @@ class ServiceStockManagement extends Component {
     // },
   ];
 
-  
-
   render() {
     const {
       sellerId,
@@ -459,7 +458,7 @@ class ServiceStockManagement extends Component {
     } = this.state;
 
     console.log("selected Rows", selectedRows);
-    console.log("meeting :->", meeting)
+    console.log("meeting :->", meeting);
 
     if (loading) {
       return <SpinnerLoader />;
@@ -567,30 +566,33 @@ class ServiceStockManagement extends Component {
                       <Calendar authToken={token}/>
                     </div> */}
 
-                    {
-                      !isCalendarAuthorized ? (
-                        <div className="text-center mt-5">
-                      <CalendarAuth onAuthSuccess={() => {
-                        this.handleCalendarAuthorization();
-                        }}
-                        sellerId={sellerId} authToken={token}
+                    {!isCalendarAuthorized ? (
+                      <div className="text-center mt-5">
+                        <CalendarAuth
+                          onAuthSuccess={() => {
+                            this.handleCalendarAuthorization();
+                          }}
+                          sellerId={sellerId}
+                          authToken={token}
                         />
-                    </div>
-                      ) : (
-                        <>
+                      </div>
+                    ) : (
+                      <>
                         {/* <div className="text-center mt-5">
                         <CalendarLogout onLogoutSuccess={this.handleCalendarLogout()}/>
                         </div> */}
-                          
-                        <div style={{ width: "1000px", marginLeft: "150px", marginTop: "50px" }}>
-                        <Calendar authToken={token}/>
-                        
-                    </div>
+
+                        <div
+                          style={{
+                            width: "1000px",
+                            marginLeft: "150px",
+                            marginTop: "50px",
+                          }}
+                        >
+                          <Calendar authToken={token} />
+                        </div>
                       </>
-                      )
-                    }
-                    
-                    
+                    )}
                   </div>
 
                   {/* My Services */}
@@ -638,21 +640,21 @@ class ServiceStockManagement extends Component {
                     aria-labelledby="nav-subscriber-tab"
                   >
                     {/* <div className="DT_ext_row"> */}
-                      <DataTableExtensions
-                        columns={this.subscriber_column}
-                        data={subscriber}
-                      >
-                        <DataTable
-                          pagination
-                          highlightOnHover
-                          noHeader
-                          defaultSortField="id"
-                          defaultSortAsc={false}
-                          selectableRows
-                          selectedRows={selectedRows}
-                          onSelectedRowsChange={this.handleRowSelected}
-                        />
-                      </DataTableExtensions>
+                    <DataTableExtensions
+                      columns={this.subscriber_column}
+                      data={subscriber}
+                    >
+                      <DataTable
+                        pagination
+                        highlightOnHover
+                        noHeader
+                        defaultSortField="id"
+                        defaultSortAsc={false}
+                        selectableRows
+                        selectedRows={selectedRows}
+                        onSelectedRowsChange={this.handleRowSelected}
+                      />
+                    </DataTableExtensions>
                     {/* </div> */}
                     {/* <button
                                                     className="custom_btn btn_yellow_bordered w-auto btn margin_right"
@@ -677,21 +679,21 @@ class ServiceStockManagement extends Component {
                     aria-labelledby="nav-meeting-tab"
                   >
                     {/* <div className="DT_ext_row"> */}
-                      <DataTableExtensions
-                        columns={this.meeting_column}
-                        data={meeting}
-                      >
-                        <DataTable
-                          pagination
-                          highlightOnHover
-                          noHeader
-                          defaultSortField="id"
-                          defaultSortAsc={false}
-                          selectableRows
-                          selectedRows={selectedRows}
-                          onSelectedRowsChange={this.handleRowSelected}
-                        />
-                      </DataTableExtensions>
+                    <DataTableExtensions
+                      columns={this.meeting_column}
+                      data={meeting}
+                    >
+                      <DataTable
+                        pagination
+                        highlightOnHover
+                        noHeader
+                        defaultSortField="id"
+                        defaultSortAsc={false}
+                        selectableRows
+                        selectedRows={selectedRows}
+                        onSelectedRowsChange={this.handleRowSelected}
+                      />
+                    </DataTableExtensions>
                     {/* </div> */}
                     {/* <button
                                                     className="custom_btn btn_yellow_bordered w-auto btn margin_right"
@@ -756,7 +758,11 @@ class ServiceStockManagement extends Component {
                       <br />
                       <h6 className="fw-bold text-secondary mb-1">
                         Service Description :
-                        <div dangerouslySetInnerHTML={{ __html: selectedRows.description || "" }} />
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: selectedRows.description || "",
+                          }}
+                        />
                       </h6>
                     </div>
                     <div className="col-6">

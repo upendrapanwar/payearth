@@ -2555,7 +2555,7 @@ async function getServiceData() {
         select: "name email",
       })
       .populate({
-        path: "service",
+        path: "serviceId",
         model: Services,
         select: "name serviceCode",
         populate: {

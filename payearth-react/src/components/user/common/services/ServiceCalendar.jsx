@@ -105,7 +105,7 @@ function ServiceCalendar() {
       console.log("Form submitted:", eventData);
       setFormOpen(false); //form close
       setEventDetails([...eventDetails, eventData]); // Add the new event to eventDetails
-      // fetchEvents(); //called fetch api
+      fetchEvents(); //called fetch api
       resetForm(); // Reset the form fields
     } catch (error) {
       console.error("Error submitting form:", error);
