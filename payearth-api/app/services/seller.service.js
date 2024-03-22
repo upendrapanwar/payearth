@@ -96,6 +96,7 @@ module.exports = {
   deleteBanner,
   getBannerById,
   updateBanner,
+  // getMeeting,
 };
 
 function sendMail(mailOptions) {
@@ -2764,3 +2765,24 @@ async function updateBanner(req) {
     console.log(error);
   }
 }
+
+//get meeting data in seller calendar
+// async function getMeeting(createdBy) {
+//   try {
+//     let result = await Servicedetails.find({ createdBy })
+//       .populate({
+//         path: "serviceId",
+//         model: Services,
+//         select: "name createdBy", //createdBy is sellerId
+//       })
+//       .populate({ path: "userId", model: User, select: "name" })
+//       .select()
+//       .sort({ createdAt: -1 })
+//       .exec();
+//     console.log("result", result);
+//     return result;
+//   } catch (err) {
+//     console.log("Error", err);
+//     throw err;
+//   }
+// }

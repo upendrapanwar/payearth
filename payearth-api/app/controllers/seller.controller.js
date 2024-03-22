@@ -211,6 +211,9 @@ router.delete("/deleteBanner/:id", deleteBannerAdv);
 router.get("/getBannerById/:id", getBannerById);
 router.put("/updateBanner/:id", updateBanner);
 
+//Seller appointment calendar
+// router.get("/getMeetingData/:id", getMeeting);
+
 module.exports = router;
 
 function register(req, res, next) {
@@ -966,3 +969,17 @@ function updateBanner(req, res, next) {
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
+
+//get meeting data and show into the calendar
+// function getMeeting(req, res, next) {
+//   sellerService
+//     .getMeeting(req.params.id)
+//     .then((reviews) =>
+//       reviews
+//         ? res.status(200).json({ status: true, data: reviews })
+//         : res
+//             .status(400)
+//             .json({ status: false, message: msg.common.no_data_err, data: [] })
+//     )
+//     .catch((err) => next(res.json({ status: false, message: err })));
+// }

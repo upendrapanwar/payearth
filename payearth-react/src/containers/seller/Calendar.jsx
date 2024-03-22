@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from "@fullcalendar/interaction"; 
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import axios from "axios";
 import * as bootstrap from "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DatePicker from "react-multi-date-picker";
@@ -11,30 +11,29 @@ import DatePanel from "react-multi-date-picker/plugins/date_panel";
 import { observer, useLocalStore } from "mobx-react-lite";
 import { Button, ButtonGroup, Dropdown, Form } from "react-bootstrap";
 
-const Calendar = ({authToken}) => {
+const Calendar = ({ authToken }) => {
   const [events, setEvents] = useState([]);
   const [selectedDates, setSelectedDates] = useState([]);
   const [dayCellDates, setDayCellDates] = useState([]);
   const [offDays, setOffDays] = useState([]);
   const [businessHours, setBusinessHours] = useState([
     {
-      daysOfWeek: [0,1,2,3,4,5,6], // Sunday - Saturday
-      startTime: '09:00', // 9am
-      endTime: '17:00', // 5pm
-    }
+      daysOfWeek: [0, 1, 2, 3, 4, 5, 6], // Sunday - Saturday
+      startTime: "09:00", // 9am
+      endTime: "17:00", // 5pm
+    },
   ]);
   const [calendarKey, setCalendarKey] = useState(0);
 
   useEffect(() => {
     getCalendarEvents(authToken);
-    console.log("calendarKey", calendarKey)
+    console.log("calendarKey", calendarKey);
   }, [businessHours, calendarKey]);
-
 
   const getCalendarEvents = async (authToken) => {
     console.log("Calendar authToken:", authToken);
     try {
-      const response = await axios.get('seller/service/get-calendar-events', {
+      const response = await axios.get("seller/service/get-calendar-events", {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json;charset=UTF-8",
@@ -42,7 +41,7 @@ const Calendar = ({authToken}) => {
         },
       });
       console.log("Get Calendar Events response", response.data.data);
-      const eventsData = response.data.data.map(item => ({
+      const eventsData = response.data.data.map((item) => ({
         title: item.event_title,
         start: item.start_datetime,
         end: item.end_datetime,
@@ -50,67 +49,64 @@ const Calendar = ({authToken}) => {
 
       setEvents(eventsData);
     } catch (error) {
-      console.error('Error fetching events:', error);
+      console.error("Error fetching events:", error);
     }
   };
 
-//   const blockDates = async (dates) => {
-//     try {
-//         const accessToken = localStorage.getItem("accessToken");
+  //   const blockDates = async (dates) => {
+  //     try {
+  //         const accessToken = localStorage.getItem("accessToken");
 
-//         const events = dates.map(date => ({
-//             'summary': 'Blocked',
-//             'start': {
-//               'dateTime': `${date}T09:00:00-07:00`,
-//             },
-//             'end': {
-//               'dateTime': `${date}T17:00:00-07:00`,
-//             },
-//         }));
+  //         const events = dates.map(date => ({
+  //             'summary': 'Blocked',
+  //             'start': {
+  //               'dateTime': `${date}T09:00:00-07:00`,
+  //             },
+  //             'end': {
+  //               'dateTime': `${date}T17:00:00-07:00`,
+  //             },
+  //         }));
 
-//         const responses = await Promise.all(events.map(event => 
-//             axios.post(
-//                 'https://www.googleapis.com/calendar/v3/calendars/primary/events',
-//                 event,
-//                 {
-//                     headers: {
-//                         Authorization: `Bearer ${accessToken}`,
-//                         'Content-Type': 'application/json',
-//                     },
-//                 }
-//             )
-//         ));
-//         responses.forEach((response, index) => {
-//           console.log(`Event blocked for ${dates[index]}:`, response.data);
-//         });
-//         // fetchEvents();
-//     } catch (error) {
-//         console.error('Error creating events:', error);
-//         throw error;
-//     }
-// };
+  //         const responses = await Promise.all(events.map(event =>
+  //             axios.post(
+  //                 'https://www.googleapis.com/calendar/v3/calendars/primary/events',
+  //                 event,
+  //                 {
+  //                     headers: {
+  //                         Authorization: `Bearer ${accessToken}`,
+  //                         'Content-Type': 'application/json',
+  //                     },
+  //                 }
+  //             )
+  //         ));
+  //         responses.forEach((response, index) => {
+  //           console.log(`Event blocked for ${dates[index]}:`, response.data);
+  //         });
+  //         // fetchEvents();
+  //     } catch (error) {
+  //         console.error('Error creating events:', error);
+  //         throw error;
+  //     }
+  // };
 
-
-//   const unblockDate = async (eventId) => {
-//     try {
-//       const accessToken = localStorage.getItem("accessToken");
-//       const response = await axios.delete(
-//         `https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventId}`,
-//         {
-//           headers: {
-//             Authorization: `Bearer ${accessToken}`,
-//           },
-//         }
-//       );
-//       console.log('Date unblocked');
-//       console.log('Event deleted:', response.data);
-//     } catch (error) {
-//       console.error('Error unblocking date:', error);
-//       throw error; // Handle error appropriately
-//     }
-//   };
-
-  
+  //   const unblockDate = async (eventId) => {
+  //     try {
+  //       const accessToken = localStorage.getItem("accessToken");
+  //       const response = await axios.delete(
+  //         `https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventId}`,
+  //         {
+  //           headers: {
+  //             Authorization: `Bearer ${accessToken}`,
+  //           },
+  //         }
+  //       );
+  //       console.log('Date unblocked');
+  //       console.log('Event deleted:', response.data);
+  //     } catch (error) {
+  //       console.error('Error unblocking date:', error);
+  //       throw error; // Handle error appropriately
+  //     }
+  //   };
 
   const eventDidMountHandler = (info) => {
     // Your logic for the popover
@@ -125,32 +121,36 @@ const Calendar = ({authToken}) => {
   };
 
   const eventCellDidMountHandler = (info) => {
-    info.el.style.backgroundColor = '#338EF0';
-    info.el.style.color = 'white';
+    info.el.style.backgroundColor = "#338EF0";
+    info.el.style.color = "white";
   };
 
   const dayCellDidMountHandler = (info) => {
     const date = info.date;
     const dateString = date.toISOString().slice(0, 10); // Get the date string in 'YYYY-MM-DD' format
     if (dayCellDates.includes(dateString)) {
-      info.el.style.backgroundColor = '#EEEFEE'; // Set background color for the specified dates
+      info.el.style.backgroundColor = "#EEEFEE"; // Set background color for the specified dates
     }
   };
-  
+
   const handleSaveDate = () => {
-    const formattedDates = selectedDates.map(date => date.format('YYYY-MM-DD'));
+    const formattedDates = selectedDates.map((date) =>
+      date.format("YYYY-MM-DD")
+    );
     setDayCellDates(formattedDates);
     console.log("formattedDates", formattedDates);
     // blockDates(formattedDates);
-    setCalendarKey(key => key + 1);
+    setCalendarKey((key) => key + 1);
   };
 
   const handleOffDaysChange = (id, checked) => {
-    const updatedOffDays = checked ? [...offDays, id] : offDays.filter(day => day !== id);
+    const updatedOffDays = checked
+      ? [...offDays, id]
+      : offDays.filter((day) => day !== id);
     setOffDays(updatedOffDays);
     console.log("Check off days: ", offDays);
   };
-  
+
   const handleOffDays = () => {
     const dayNameToIndex = {
       Sunday: 0,
@@ -159,12 +159,12 @@ const Calendar = ({authToken}) => {
       Wednesday: 3,
       Thursday: 4,
       Friday: 5,
-      Saturday: 6
+      Saturday: 6,
     };
-    const indices = offDays.map(day => dayNameToIndex[day]);
-    const updatedBusinessHours1 = businessHours.map(hours => ({
+    const indices = offDays.map((day) => dayNameToIndex[day]);
+    const updatedBusinessHours1 = businessHours.map((hours) => ({
       ...hours,
-      daysOfWeek: [0,1,2,3,4,5,6].filter(day => !indices.includes(day))
+      daysOfWeek: [0, 1, 2, 3, 4, 5, 6].filter((day) => !indices.includes(day)),
     }));
     setBusinessHours(updatedBusinessHours1);
   };
@@ -177,11 +177,9 @@ const Calendar = ({authToken}) => {
       { id: "Wednesday", label: "Wednesday", checked: false },
       { id: "Thursday", label: "Thursday", checked: false },
       { id: "Friday", label: "Friday", checked: false },
-      { id: "Saturday", label: "Saturday", checked: false }
-    ]
+      { id: "Saturday", label: "Saturday", checked: false },
+    ],
   }));
-
-
 
   return (
     <div className="calendar-container">
@@ -223,8 +221,8 @@ const Calendar = ({authToken}) => {
         dayMaxEventRows={true}
         views={{
           timeGrid: {
-            dayMaxEventRows: 3
-          }
+            dayMaxEventRows: 3,
+          },
         }}
         // businessHours={businessHours}
         timeZone="UTC"
@@ -239,7 +237,6 @@ const Calendar = ({authToken}) => {
 
 export default Calendar;
 
-
 const CheckboxMenu = React.forwardRef(
   (
     {
@@ -248,7 +245,7 @@ const CheckboxMenu = React.forwardRef(
       className,
       "aria-labelledby": labeledBy,
       onSelectAll,
-      onSelectNone
+      onSelectNone,
     },
     ref
   ) => {
@@ -300,12 +297,12 @@ const CheckDropdownItem = React.forwardRef(
 export const CheckboxDropdown = observer(({ items, onChange }) => {
   const handleChecked = (key, event) => {
     const checked = event.target.checked;
-    items.find(i => i.id === key).checked = checked;
+    items.find((i) => i.id === key).checked = checked;
     onChange(key, checked);
   };
 
   const handleSelectNone = () => {
-    items.forEach(i => (i.checked = false));
+    items.forEach((i) => (i.checked = false));
   };
 
   return (
@@ -314,11 +311,8 @@ export const CheckboxDropdown = observer(({ items, onChange }) => {
         days
       </Dropdown.Toggle>
 
-      <Dropdown.Menu
-        as={CheckboxMenu}
-        onSelectNone={handleSelectNone}
-      >
-        {items.map(i => (
+      <Dropdown.Menu as={CheckboxMenu} onSelectNone={handleSelectNone}>
+        {items.map((i) => (
           <Dropdown.Item
             key={i.id}
             as={CheckDropdownItem}
