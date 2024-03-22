@@ -12,7 +12,7 @@ const SCOPES = process.env.REACT_APP_SCOPES;
 export const CalendarAuth = ({sellerId, authToken, onAuthSuccess}) => {
 
   const responseGoogle = async (response) => {
-    console.log("Response Google:", response);
+    console.log("Response Google:", response); 
     const { code } = response;
   
     console.log("Google Response", response);
