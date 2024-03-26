@@ -43,6 +43,7 @@ const {
   Category,
   ServiceReview,
   Servicedetails,
+  Calendar,
 } = require("../helpers/db");
 
 module.exports = {
@@ -2599,24 +2600,65 @@ async function getServiceReviews(serviceId) {
 // *******************************************************************************
 // *******************************************************************************
 //add meeting created by user from service details calendar
+// async function addMeetByUser(req) {
+//   const param = req.body;
+//   try {
+//     const newMeeting = new Servicedetails({
+//       userId: param.userId,
+//       serviceId: param.serviceId,
+//       meetingDate: param.meetingDate,
+//       meetingTime: new Date(param.meetingTime),
+//       MeetingDescription: param.description,
+//       meetingStatus: param.meetingStatus,
+//     });
+//     console.log("Ckeck  Data", param);
+
+//     console.log("Ckeck meeting Data", newMeeting);
+//     // Save the meeting to the database
+//     return await newMeeting.save();
+//   } catch (err) {
+//     console.log("Error", err);
+//     throw err;
+//   }
+// }
+
 async function addMeetByUser(req) {
   const param = req.body;
   try {
-    const newMeeting = new Servicedetails({
-      userId: param.userId,
-      serviceId: param.serviceId,
-      meetingDate: param.meetingDate,
-      meetingTime: new Date(param.meetingTime),
-      MeetingDescription: param.description,
-      meetingStatus: param.meetingStatus,
+    // Check meeting is already exist or not
+    const existingMeeting = await Calendar.findOne({
+      event_title: param.event_title,
+      event_description: param.event_description,
+      user_id: param.user_id,
+      service_id: param.service_id,
+      start_datetime: param.start_datetime,
+      end_datetime: param.end_datetime,
+      meeting_url: param.meeting_url,
     });
-    console.log("Ckeck  Data", param);
 
-    console.log("Ckeck meeting Data", newMeeting);
-    // Save the meeting to the database
-    return await newMeeting.save();
+    // If a meeting already exists, return the existing meeting
+    if (!existingMeeting) {
+      // If a meeting doesn't exist, create a new one and save it to the database
+      const newMeeting = new Calendar({
+        event_title: param.event_title,
+        event_description: param.event_description,
+        user_id: param.user_id,
+        service_id: param.service_id,
+        start_datetime: param.start_datetime,
+        end_datetime: param.end_datetime,
+        meeting_url: param.meeting_url,
+      });
+
+      console.log("New meeting data:", newMeeting);
+
+      // Save the meeting to the database
+      return await newMeeting.save();
+    }
+
+    console.log("Meeting already exists:", existingMeeting);
+    return existingMeeting;
   } catch (err) {
-    console.log("Error", err);
+    console.log("Error:", err);
     throw err;
   }
 }
@@ -2625,13 +2667,17 @@ async function addMeetByUser(req) {
 // *******************************************************************************
 //get meeting by UserId
 
-async function getMeeting(userId) {
+async function getMeeting(req) {
+  const user_id = req.params.id;
   try {
-    let result = await Servicedetails.find({ userId })
-      .populate({ path: "serviceId", model: Services, select: "name " })
-      .populate({ path: "userId", model: User, select: "name" })
-      .select()
-      .sort({ createdAt: -1 })
+    let result = await Calendar.find({ user_id })
+      .populate({
+        path: "service_id",
+        model: Services,
+        select: "name createdBy ",
+      })
+      .populate({ path: "user_id", model: User, select: "name" })
+      .sort({ createdAt: "desc" })
       .exec();
     console.log("result", result);
     return result;
@@ -2649,7 +2695,7 @@ async function delMeetingByUser(req) {
   const id = req.params.id;
   console.log("delete meeting", id);
   try {
-    const result = await Servicedetails.deleteOne({ _id: id });
+    const result = await Calendar.deleteOne({ _id: id });
     return result;
   } catch (error) {
     console.log(error);
