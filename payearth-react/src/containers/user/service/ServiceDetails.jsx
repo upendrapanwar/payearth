@@ -54,6 +54,7 @@ const ServiceDetails = () => {
   return (
     <React.Fragment>
       {loading === true ? <SpinnerLoader /> : ""}
+
       <Header />
       <PageTitle title={"Service-Details"} />
       <section className="inr_wrap">
