@@ -70,7 +70,11 @@ const schema = new Schema({
             name: String,
             role: String
         }
-    }
+    },
+    blockByUser: [{
+        type: String,
+        required: false,
+    }]
 }, { timestamps: true });
 
 schema.set("toJSON", { virtuals: true, versionKey: false });

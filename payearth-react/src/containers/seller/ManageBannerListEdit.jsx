@@ -241,47 +241,7 @@ class SellerBannerEdit extends Component {
         this.setState({ image: "", video: "", bannerText: "", bannerType: "", bannerName: "", siteUrl: "", category: "", startDate: "", subscriptionPlan: "", bannerPlacement: "", status: "", author: "", keyword: "", tag: "" })
 
     }
-    renderCardText = () => {
-        switch (this.state.subscriptionPlan) {
-            case '1 Month':
-                return < div className="card">
-                    <div className="card-header">
-                        PLAN A
-                    </div>
-                    <div className="card-body">
-                        <h5 className="card-title">Special title treatment</h5>
-                        <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                        {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
-                    </div>
-                </div>
-            // case 'value2':
-            //     return 'Card Text for Value 2';
-            case '2 Month':
-                return <div className="card">
-                    <div className="card-header">
-                        PLAN B
-                    </div>
-                    <div className="card-body">
-                        <h5 className="card-title">Special title treatment</h5>
-                        <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                        {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
-                    </div>
-                </div>
-            // Add more cases as needed
-            default:
-                return <div className="card">
-                    <div className="card-header">
-                        NO SUBSCRIPTION SELECTED
-                    </div>
-                    <div className="card-body">
-                        <h5 className="card-title">Special title treatment</h5>
-                        <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                        {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
-                    </div>
-                </div>
-        }
-    };
-
+  
     handleSelectImageOrVideo = (e) => {
         const { image, video } = this.state;
         console.log("select type", e.target.value)
@@ -442,7 +402,7 @@ class SellerBannerEdit extends Component {
             <React.Fragment>
                 <Header />
                 <div className="inr_top_page_title">
-                    <h2>Edit Banner</h2>
+                    <h2>Edit Advertising</h2>
 
                 </div>
                 <section className="inr_wrap">
@@ -452,7 +412,7 @@ class SellerBannerEdit extends Component {
                                 <div className="cart adv_banner_wrapper">
                                     <div className="noti_wrap">
                                         <div className=""><span>
-                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/manage-banner-advertisement">My Banner</Link>
+                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/manage-banner-list">My Advertising</Link>
                                         </span></div>
                                     </div>
                                     <div className="cart_list adv_banner_panel">
@@ -461,7 +421,7 @@ class SellerBannerEdit extends Component {
                                                 <div className="col-md-6">
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
-                                                            <label htmlFor="">Banner Name</label>
+                                                            <label htmlFor="">Advertise Name</label>
                                                             <div className="field_item">
                                                                 <input
                                                                     className="form-control"
@@ -604,7 +564,7 @@ class SellerBannerEdit extends Component {
 
                                                 <div className="col-md-6">
                                                     <div className="crt_bnr_fieldRow">
-                                                        <label htmlFor="">Set Banner</label>
+                                                        <label htmlFor="">Select</label>
                                                         <div className="input-group mb-3">
                                                             {/* <label className="input-group-text" htmlFor="inputGroupSelect01">Set <br /> Banner</label> */}
                                                             <select onChange={this.handleSelectImageOrVideo} className="form-select" id="inputGroupSelect01">
@@ -638,7 +598,7 @@ class SellerBannerEdit extends Component {
                                                         {selectValueType === "video" || video ?
                                                             <div className="crt_bnr_fieldRow">
                                                                 <div className="crt_bnr_field">
-                                                                    <label htmlFor=""> Upload Banner Video &nbsp; {!video ? "" :
+                                                                    <label htmlFor=""> Upload Advertise Video &nbsp; {!video ? "" :
                                                                         <button
                                                                             type="button"
                                                                             className="btn btn-secondary btn-sm"
@@ -675,7 +635,7 @@ class SellerBannerEdit extends Component {
                                                             :
                                                             <div className="crt_bnr_fieldRow">
                                                                 <div className="crt_bnr_field">
-                                                                    <label htmlFor="">Upload Banner Image &nbsp; {!image ? "" :
+                                                                    <label htmlFor="">Upload Advertise Image &nbsp; {!image ? "" :
                                                                         <button
                                                                             type="button"
                                                                             className="btn btn-secondary btn-sm"
@@ -750,7 +710,7 @@ class SellerBannerEdit extends Component {
                                                                     className="btn custom_btn btn_yellow mx-auto"
                                                                     onClick={this.updateSave}
                                                                 >
-                                                                    Update Banner
+                                                                    Update
                                                                 </button>
                                                             </div>
                                                         </div>

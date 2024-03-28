@@ -55,8 +55,8 @@ function Header() {
                             <li><Link to="/admin/post-module" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Posts</Link></li>
                             <li><Link to="/admin/post-module-add-new" onClick={() => removeBackdrop()}><i className="icon"><img src={bannerIcon} alt="" /></i> Create Post</Link></li>
 
-                            <li><Link to="/admin/page-module" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Pages </Link></li>
-                            <li><Link to="/admin/page-module-add-new" onClick={() => removeBackdrop()}><i className="icon"><img src={bannerIcon} alt="" /></i> Create Page </Link></li>
+                            {/* <li><Link to="/admin/page-module" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Pages </Link></li>
+                            <li><Link to="/admin/page-module-add-new" onClick={() => removeBackdrop()}><i className="icon"><img src={bannerIcon} alt="" /></i> Create Page </Link></li> */}
                             
                             <li><Link to="/admin/category-module" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Create Category </Link></li>
 
@@ -71,7 +71,7 @@ function Header() {
                             <li><Link to="/admin/manage-vendors" onClick={() => removeBackdrop()}><i className="icon"><img src={vendorIcon} alt="" /></i> Manage Vendors</Link></li>
                             <li><Link to="/admin/manage-reports" onClick={() => removeBackdrop()}><i className="icon"><img src={reportIcon} alt="" /></i> Reports</Link></li>
                             <li><Link to="/admin/manage-community" onClick={() => removeBackdrop()}><i className="icon"><img src={communityIcon} alt="" /></i> Manage Community</Link></li>
-                            <li><Link to="/admin/manage-banner-advertisement" onClick={() => removeBackdrop()}><i className="icon"><img src={bannerIcon} alt="" /></i> Manage Banners</Link></li>
+                            <li><Link to="/admin/manage-banner-advertisement" onClick={() => removeBackdrop()}><i className="icon"><img src={bannerIcon} alt="" /></i> Manage Advertising</Link></li>
                             <li><Link to="/admin/manage-support" onClick={() => removeBackdrop()}><i className="icon"><img src={supportIcon} alt="" /></i>Support</Link></li>
                             <li><Link to="/admin/manage-notifications" onClick={() => removeBackdrop()}><i className="icon"><img src={notificationBellIcon} alt="" /></i> Notifications</Link></li>
                             <li><Link to="#" onClick={() => logout()}><i className="icon"><img src={logoutIcon} alt="" /></i>Logout</Link></li>

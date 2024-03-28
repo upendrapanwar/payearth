@@ -572,6 +572,11 @@ async function getProductById(id) {
           select: "name",
         },
       },
+      {
+        path: "category",
+        model: Category,
+        select: "categoryName lname"
+      }
     ])
     .populate([
       {
@@ -583,6 +588,7 @@ async function getProductById(id) {
     ])
     .populate("createdBy", "name");
   if (!product) return false;
+  // console.log("product Check", product)
   return product;
 }
 
@@ -811,7 +817,7 @@ async function cmsPublishPage(req) {
   } catch (error) {
     console.log(error);
   }
-}
+} 
 
 // pageDetailByID
 async function cmsPageDetails(req) {
@@ -838,7 +844,7 @@ async function getAllBannersData(req) {
       keyword: { $regex: keywordsData, $options: "i" },
       status: "Publish",
     };
-    const fieldsToSelect = "image video category keyword siteUrl";
+    const fieldsToSelect = "image video category keyword siteUrl bannerName";
     const result = await bannerAdvertisement
       .find(query)
       .sort({ createdAt: "desc" })

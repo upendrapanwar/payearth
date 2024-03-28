@@ -2,6 +2,9 @@ import React from 'react'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Iframe from 'react-iframe-click';
+import { isLogin } from '../../helpers/login';
+import ReactGA from "react-ga4";
+
 
 export const BannerTopIframe = ({ width, height, keywords }) => {
     const [advertisements, setAdvertisements] = useState([]);
@@ -9,6 +12,9 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
     const [length, setLength] = useState();
     const [urlData, setUrlData] = useState([]);
     const [iframeOpen, setIframeOpen] = useState(false);
+    const userData = localStorage.getItem("authInfo")
+
+
 
     // const urls = [
     //     'https://res.cloudinary.com/pay-earth/image/upload/v1709725194/i5rvjqqrnrm2eayud2bc.webp',
@@ -16,6 +22,14 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
     //     'https://res.cloudinary.com/pay-earth/image/upload/v1708689694/x91tiqgzrgrqwccs6j2n.jpg',
     //     'https://res.cloudinary.com/pay-earth/video/upload/v1708603407/s1bqdavozmfyoa1jenjt.mp4',
     // ];
+
+
+    // console.log("user imfo", userData.id)
+
+    useEffect(() => {
+        ReactGA.initialize(process.env.REACT_APP_MEASUREMENT_ID);
+    })
+
 
     useEffect(() => {
         axios.get(`/front/advBanner-list/${keywords}`)
@@ -48,10 +62,33 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
         return () => clearInterval(intervalId);
     }, [length]);
 
+
     const onWebsiteMove = (url) => {
         window.open(url, '_blank');
+
+
+        const urlWithUserId = `IframePath:${url} ,userId: 611bab8fed84c042781aec80`;
+
+        // const urlWithUserId = [
+        //     { iframePath: `${iframePath}`, user_id: `611bab8fed84c042781aec35` },
+        // ]
+
+        ReactGA.event({
+            category: 'Iframe Visit',
+            action: 'Click',
+            label: `${urlWithUserId}`,
+        });
+
         closeIframe();
     };
+
+    const block = (advertisementId) => {
+        console.log("advertisementId", advertisementId)
+
+        const advertisementToBlock = advertisements.find(advertisement => advertisement.id !== advertisementId);
+        console.log("advertisementToBlock", advertisementToBlock)
+
+    }
 
     const iframeStyles = {
         // border: '1px solid red',
@@ -84,8 +121,9 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
                 allowFullScreen
                 className="centeredIframe"
                 onInferredClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
-                // onLoad={handleIframeLoad}
+            // onLoad={handleIframeLoad}
             />
+            {/* <button className="btn btn-light btn-sm" onClick={() => block(advertisements[currentUrlIndex].id)}>Block Now...!</button> */}
         </div>) : ""}
     </>
 

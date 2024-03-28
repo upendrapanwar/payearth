@@ -96,6 +96,7 @@ module.exports = {
   deleteBanner,
   getBannerById,
   updateBanner,
+  blockBanner,
   bannerPayment,
   customerAuthorizePayment,
   createSubscription,
@@ -2079,7 +2080,7 @@ async function getBannerById(req) {
   }
 }
 
-// Update Page
+// Update banner
 async function updateBanner(req) {
   const bannerId = req.params.id;
   const {
@@ -2110,6 +2111,27 @@ async function updateBanner(req) {
       { new: true }
     );
     //  console.log("update banner", banner)
+    return banner;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// Block banner by id
+
+async function blockBanner(req) {
+  const bannerId = req.params.id;
+  const { blockByUser } = req.body;
+  console.log("blockByUser", blockByUser)
+  try {
+    const data = await bannerAdvertisement.findById(bannerId).select('blockByUser');
+    const user = data.blockByUser
+    user.push(blockByUser)
+    const banner = await bannerAdvertisement.findByIdAndUpdate(bannerId, {
+      blockByUser: user
+    },
+      { new: true }
+    );
     return banner;
   } catch (error) {
     console.log(error);

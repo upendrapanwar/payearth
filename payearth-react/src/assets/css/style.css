@@ -3,7 +3,7 @@
  *  Description: Main CSS File
  *  Version: CSS3
  */
-
+ 
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;600;700;800;900&family=Roboto:wght@400;500;700;900&family=Rubik:wght@400;500;600;700;800&display=swap");
 
 :root {
@@ -1618,7 +1618,7 @@ button.view_more img {
 /*----product-listing----*/
 
 .inr_wrap {
-  padding: 40px 0;
+  padding: 10px 0;
   position: relative;
 }
 
@@ -2565,7 +2565,7 @@ span.rate_sts {
 .cl_head {
   border-bottom: 1px solid #d7d7d7;
   padding: 25px;
-  margin-top: 30px;
+  margin-top: 5px;
 }
 
 .cl_head .cl-row {

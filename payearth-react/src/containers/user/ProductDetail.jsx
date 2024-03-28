@@ -23,6 +23,7 @@ import {
   decrementQuantity,
   removeItem,
 } from "../../store/reducers/cart-slice-reducer";
+import { BannerTopIframe } from "../../components/common/BannerFrame";
 import CartItem from "../../components/user/common/CartItem";
 
 class ProductDetail extends Component {
@@ -39,6 +40,7 @@ class ProductDetail extends Component {
       productId: "",
       sizes: [],
       sizeControlls: [],
+      category: ""
     };
   }
 
@@ -50,6 +52,8 @@ class ProductDetail extends Component {
       .get("front/product/detail/" + productId)
       .then((response) => {
         let resData = response.data.data;
+        this.setState({ category: resData.category.categoryName })
+        // console.log("resDate", resData.category.categoryName)
         if (response.data.status) {
           let colors = [];
           let sizes = [];
@@ -75,7 +79,7 @@ class ProductDetail extends Component {
             colors,
             sizes,
             sizeControlls,
-            featuredImg: resData.featuredImage,
+            featuredImg: config.apiURI + resData.featuredImage,
             thumbnails: resData.images.length ? resData.images[0].paths : [],
           });
           console.log(this.state.sizeControlls);
@@ -156,7 +160,10 @@ class ProductDetail extends Component {
   };
 
   render() {
-    const { sizeControlls } = this.state;
+    const { sizeControlls, productDetail, similarProducts } = this.state;
+    // console.log("productDetail check: ", productDetail)
+    // console.log("similarProducts check : ", similarProducts)
+
     var proQuantity = 0;
     const productID = this.state.id;
     //const dispatch = useDispatch();
@@ -175,8 +182,10 @@ class ProductDetail extends Component {
     const { dispatch } = this.props;
     return (
       <React.Fragment>
+        <BannerTopIframe keywords={this.state.category}/>
         <Header />
         <PageTitle title={this.state.productDetail.name} />
+        {/* <BannerTopIframe keywords={this.state.category} /> */}
         <section className="inr_wrap">
           <div className="container">
             <div className="row g-0 bg-white rounded">
@@ -206,7 +215,7 @@ class ProductDetail extends Component {
                     <div className="pdi_avblty">
                       Availability:{" "}
                       {this.state.productDetail.quantity &&
-                      parseInt(this.state.productDetail.quantity.stock_qty) >
+                        parseInt(this.state.productDetail.quantity.stock_qty) >
                         0 ? (
                         <span>In stock</span>
                       ) : (
@@ -222,6 +231,9 @@ class ProductDetail extends Component {
                           : ""}
                       </p>
                     </div>
+                    <div className="pdi_desc">
+                      <p>Category : {this.state.category}</p>
+                    </div>
                     <div className="pdi_fea">
                       {this.state.colors.length ? (
                         <div className="pdi_fea_box">
@@ -229,42 +241,42 @@ class ProductDetail extends Component {
                           <div className="colors_grid">
                             {this.state.colors
                               ? this.state.colors.map((value, index) => {
-                                  return (
-                                    <span
-                                      className="color_box"
-                                      style={{ backgroundColor: value }}
-                                      key={index}
-                                      onClick={() => this.handleColor(value)}
-                                    ></span>
-                                  );
-                                })
+                                return (
+                                  <span
+                                    className="color_box"
+                                    style={{ backgroundColor: value }}
+                                    key={index}
+                                    onClick={() => this.handleColor(value)}
+                                  ></span>
+                                );
+                              })
                               : ""}
                           </div>
+
                         </div>
                       ) : (
                         ""
                       )}
                       {this.state.sizes.length &&
-                      this.state.sizes[0] !== "none" ? (
+                        this.state.sizes[0] !== "none" ? (
                         <div className="pdi_fea_box">
                           <div className="heading">Size</div>
                           <div className="size_grid">
                             {this.state.sizes
                               ? this.state.sizes.map((value, index) => {
-                                  return (
-                                    <span
-                                      key={index}
-                                      className={`size_box text-uppercase ${
-                                        sizeControlls[index] ? "selected" : ""
+                                return (
+                                  <span
+                                    key={index}
+                                    className={`size_box text-uppercase ${sizeControlls[index] ? "selected" : ""
                                       }`}
-                                      onClick={() =>
-                                        this.handleSize(index, value)
-                                      }
-                                    >
-                                      {value}
-                                    </span>
-                                  );
-                                })
+                                    onClick={() =>
+                                      this.handleSize(index, value)
+                                    }
+                                  >
+                                    {value}
+                                  </span>
+                                );
+                              })
                               : ""}
                           </div>
                         </div>
@@ -382,7 +394,7 @@ class ProductDetail extends Component {
                       </div>
                     </div>
                     {this.state.productDetail.quantity &&
-                    this.state.productDetail.quantity.stock_qty > 0 ? (
+                      this.state.productDetail.quantity.stock_qty > 0 ? (
                       <div className="prod_foot">
                         <Link
                           className="btn custom_btn btn_yellow_bordered"

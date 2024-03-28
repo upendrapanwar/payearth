@@ -604,14 +604,14 @@ const Header = ({ props, handleIsToggle }) => {
                   </Link>
                 </li>
 
-                <li>
+                {/* <li>
                   <Link to="/my-banners" onClick={() => removeBackdrop()}>
                     <i className="icon">
                       <img src={creditCardIcon} alt="credit-card" />
                     </i>{" "}
                     My Banners
                   </Link>
-                </li>
+                </li> */}
 
                 <li>
                   <Link to="/notifications">
@@ -701,9 +701,9 @@ const Header = ({ props, handleIsToggle }) => {
                     <li>
                       <Link to="/blog">Blog</Link>
                     </li>
-                    <li>
+                    {/* <li>
                       <Link to="/page">Page</Link>
-                    </li>
+                    </li> */}
                   </ul>
                   <ul>
                     <li className="login_links_wrapper me-3">

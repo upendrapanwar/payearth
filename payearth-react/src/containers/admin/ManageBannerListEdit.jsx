@@ -403,7 +403,7 @@ class ManageBannerListEdit extends Component {
             <React.Fragment>
                 <Header />
                 <div className="inr_top_page_title">
-                    <h2>Edit Banner</h2>
+                    <h2>Edit Advertise</h2>
                 </div>
                 <section className="inr_wrap">
                     <div className="container">
@@ -412,7 +412,7 @@ class ManageBannerListEdit extends Component {
                                 <div className="cart adv_banner_wrapper">
                                     <div className="noti_wrap">
                                         <div className=""><span>
-                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-banner-list">My Banner</Link>
+                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-banner-list">My Advertising</Link>
                                         </span></div>
                                     </div>
                                     <div className="cart_list adv_banner_panel">
@@ -438,7 +438,7 @@ class ManageBannerListEdit extends Component {
 
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
-                                                            <label htmlFor="">Banner Name</label>
+                                                            <label htmlFor="">Advertise Name</label>
                                                             <div className="field_item">
                                                                 <input
                                                                     className="form-control"
@@ -580,7 +580,7 @@ class ManageBannerListEdit extends Component {
 
                                                 <div className="col-md-6">
                                                     <div className="crt_bnr_fieldRow">
-                                                        <label htmlFor="">Set Banner</label>
+                                                        <label htmlFor="">Select</label>
                                                         <div className="input-group mb-3">
                                                             {/* <label className="input-group-text" htmlFor="inputGroupSelect01">Set <br /> Banner</label> */}
                                                             <select onChange={this.handleSelectImageOrVideo} className="form-select" id="inputGroupSelect01">
@@ -614,7 +614,7 @@ class ManageBannerListEdit extends Component {
                                                         {selectValueType === "video" || video ?
                                                             <div className="crt_bnr_fieldRow">
                                                                 <div className="crt_bnr_field">
-                                                                    <label htmlFor=""> Upload Banner Video &nbsp; {!video ? "" :
+                                                                    <label htmlFor=""> Upload Advertise Video &nbsp; {!video ? "" :
                                                                         <button
                                                                             type="button"
                                                                             className="btn btn-secondary btn-sm"
@@ -651,7 +651,7 @@ class ManageBannerListEdit extends Component {
                                                             :
                                                             <div className="crt_bnr_fieldRow">
                                                                 <div className="crt_bnr_field">
-                                                                    <label htmlFor="">Upload Banner Image &nbsp; {!image ? "" :
+                                                                    <label htmlFor="">Upload Advertise Image &nbsp; {!image ? "" :
                                                                         <button
                                                                             type="button"
                                                                             className="btn btn-secondary btn-sm"
@@ -697,7 +697,7 @@ class ManageBannerListEdit extends Component {
                                                                     className="btn custom_btn btn_yellow mx-auto"
                                                                     onClick={this.updateSave}
                                                                 >
-                                                                    Update Banner
+                                                                    Update 
                                                                 </button>
                                                             </div>
                                                         </div>
