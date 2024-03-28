@@ -6,7 +6,7 @@ import { gapi } from "gapi-script";
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
 const SCOPES = process.env.REACT_APP_SCOPES;
 
-function ServiceCalendarAuth({ sellerId, authToken, onAuthSuccess }) {
+function ServiceCalendarAuth({ userId, authToken, onAuthSuccess }) {
   const responseGoogle = async (response) => {
     console.log("Response Google:", response);
     const { code } = response;
@@ -53,7 +53,7 @@ function ServiceCalendarAuth({ sellerId, authToken, onAuthSuccess }) {
         end: item.end.dateTime,
       }));
       console.log("Events data:", eventsData);
-      saveCalendarEvents(eventsData, sellerId, authToken);
+      saveCalendarEvents(eventsData, userId, authToken);
       onAuthSuccess();
     } catch (error) {
       // localStorage.removeItem("accessToken");
@@ -61,10 +61,10 @@ function ServiceCalendarAuth({ sellerId, authToken, onAuthSuccess }) {
     }
   };
 
-  const saveCalendarEvents = async (eventsData, sellerId, authToken) => {
+  const saveCalendarEvents = async (eventsData, userId, authToken) => {
     try {
       const requestData = eventsData.map((event) => ({
-        // sellerId: sellerId,
+        // userId: userId,
         eventId: event.eventId,
         eventTitle: event.title,
         startAt: event.start,
