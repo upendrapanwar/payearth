@@ -32,15 +32,17 @@ function ServiceCalendar() {
           Authorization: `Bearer ${authInfo.token}`,
         },
       });
+      console.log("responseData", response.data.data);
       // Format the data received from the API into an array of events
       const formattedEvents = response.data.data.map((event) => ({
-        id: event.id,
-        user_name: event.userId.name,
-        service_name: event.serviceId.name,
-        description: event.MeetingDescription,
-        title: event.serviceId.name,
-        start: event.meetingTime,
-        end: event.meetingDate,
+        id: event._id,
+        user_name: event.user_id.name,
+        service_name: event.service_id.name,
+        description: event.event_description,
+        meeting_url: event.meeting_url,
+        meetingTitle: event.event_title,
+        start: event.start_datetime,
+        end: event.end_datetime,
       }));
       //formattedEvents set in setEventDetails state
       setEventDetails(formattedEvents);
@@ -73,40 +75,42 @@ function ServiceCalendar() {
     });
   };
 
-  //handleFormSubmit for subumit form
   const handleFormSubmit = async (event) => {
     event.preventDefault();
 
-    //Date & Time formate For Calendar
-    const formattedMeetingDate = moment(newEvent.meetingDate).format(
-      "YYYY-MM-DD"
-    );
-    const formattedMeetingTime = moment(
+    // Calculate start_datetime
+    const start_datetime = moment(
       `${newEvent.meetingDate}T${newEvent.meetingTime}`
     ).format("YYYY-MM-DDTHH:mm:ss");
 
-    //Collected all data for form submit
+    // Calculate end_datetime by adding 1 hour to start_datetime
+    const end_datetime = moment(start_datetime)
+      .add(1, "hour")
+      .format("YYYY-MM-DDTHH:mm:ss");
+
     const eventData = {
-      serviceId: id,
-      userId: authInfo.id,
-      meetingDate: formattedMeetingDate,
-      meetingTime: formattedMeetingTime,
-      description: newEvent.description,
-      meetingStatus: "Active",
+      service_id: id,
+      user_id: authInfo.id,
+      event_title: newEvent.event_title,
+      start_datetime: start_datetime,
+      end_datetime: end_datetime,
+      event_description: newEvent.description,
+      meeting_url: "https://ZoomMeeting.com",
     };
+
     console.log("eventData", eventData);
+
     try {
-      //called Post Api to create meeting by user
       await axios.post(`/user/add-meeting-user/${authInfo.id}`, eventData, {
         headers: {
           Authorization: `Bearer ${authInfo.token}`,
         },
       });
       console.log("Form submitted:", eventData);
-      setFormOpen(false); //form close
-      setEventDetails([...eventDetails, eventData]); // Add the new event to eventDetails
-      fetchEvents(); //called fetch api
-      resetForm(); // Reset the form fields
+      setFormOpen(false);
+      setEventDetails([...eventDetails, eventData]);
+      fetchEvents();
+      resetForm();
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -115,18 +119,27 @@ function ServiceCalendar() {
   //show pop up after add event by user
   const eventDidMountHandler = (info) => {
     console.log("info", info);
-    const scheduledTime = moment(info.event.start).format("YYYY-MM-DD HH:mm");
-    return new bootstrap.Popover(info.el, {
-      title: info.event._def.extendedProps.service_name,
+    const startTime = moment(info.event.start).format("YYYY-MM-DD HH:mm");
+    const endTime = moment(info.event.end).format("YYYY-MM-DD HH:mm");
+
+    const popover = new bootstrap.Popover(info.el, {
+      title: info.event._def.extendedProps.meetingTitle,
       placement: "auto",
-      trigger: "click",
+      trigger: "hover",
       customClass: "popoverStyle",
       content: `<p><strong>Name: </strong>${info.event._def.extendedProps.user_name}</p>
-                <p><strong>Description: </strong>Meeting will be held for ${info.event._def.extendedProps.description} appointment.</p>
-                <p><strong>Scheduled Time: </strong>${scheduledTime}</p>
-                <p><strong>Zoom Meeting url: </strong>https://zoom.com/appointment</p>`,
+                    <p><strong>Description: </strong>Meeting will be held for ${info.event._def.extendedProps.description} appointment.</p>
+                    <p><strong>Start Time: </strong>${startTime}</p>
+                    <p><strong>End Time: </strong>${endTime}</p>
+                    <p><strong>Zoom Meeting url: </strong>${info.event._def.extendedProps.meeting_url}</p>`,
       html: true,
     });
+
+    // Set timeout to hide popover after 3 seconds
+    setTimeout(() => {
+      popover.hide();
+    }, 3000);
+    return popover;
   };
 
   //pop-up style
@@ -196,6 +209,17 @@ function ServiceCalendar() {
               <div className="modal-body">
                 <form onSubmit={handleFormSubmit}>
                   <div className="mb-3">
+                    <label className="form-label">Title:</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="event_title"
+                      value={newEvent.event_title}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
                     <label className="form-label">Meeting Date:</label>
                     <input
                       type="date"
@@ -261,12 +285,17 @@ function ServiceCalendar() {
         }}
         eventContent={(eventInfo) => {
           return (
-            <div>
-              <span>{eventInfo.timeText}</span>
-              <span>{eventInfo.event.title}</span>
-              <button onClick={() => handleDeleteEvent(eventInfo.event.id)}>
-                Delete
-              </button>
+            <div className="row">
+              <div className="col-8">
+                &nbsp;<span>{eventInfo.event.extendedProps.description}</span>
+              </div>
+              <div className="col-2">
+                <button
+                  class="btn-close btn-close-white ms-auto"
+                  aria-label="Close"
+                  onClick={() => handleDeleteEvent(eventInfo.event.id)}
+                ></button>
+              </div>
             </div>
           );
         }}

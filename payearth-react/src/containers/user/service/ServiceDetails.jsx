@@ -8,6 +8,7 @@ import Footer from "../../../components/common/Footer";
 import parse from "html-react-parser";
 import { Link } from "react-router-dom/cjs/react-router-dom";
 import ServiceDetailsTabbing from "../../../components/user/common/services/ServiceDetailsTabbing";
+import SpinnerLoader from "../../../components/common/SpinnerLoader";
 
 const ServiceDetails = () => {
   const { id } = useParams();
@@ -15,6 +16,7 @@ const ServiceDetails = () => {
   const [description, setDescription] = useState("");
   const [reviews, setReviews] = useState([]);
   const myRef = useRef(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchData();
@@ -30,8 +32,10 @@ const ServiceDetails = () => {
       setCommonServiceData(dataArray);
       setDescription(dataArray[0].description); // Set description
       setReviews(dataArray[0].reviews); // Set reviews
+      setLoading(false); // Set loading to false after fetching data
     } catch (error) {
       console.error("Error fetching data: ", error);
+      setLoading(false); // Set loading to false even if there's an error
     }
   };
 
@@ -49,6 +53,8 @@ const ServiceDetails = () => {
 
   return (
     <React.Fragment>
+      {loading === true ? <SpinnerLoader /> : ""}
+
       <Header />
       <PageTitle title={"Service-Details"} />
       <section className="inr_wrap">

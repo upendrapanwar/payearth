@@ -1159,6 +1159,7 @@ function addMeetByUser(req, res, next) {
 //get meeting data and show into the calendar
 function getMeeting(req, res, next) {
   userService
+<<<<<<< HEAD
     .getMeeting(req.params.id)
     .then((reviews) =>
       reviews
@@ -1168,7 +1169,39 @@ function getMeeting(req, res, next) {
           .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
+=======
+    .getMeeting(req)
+    .then((meetings) => {
+      if (meetings && meetings.length > 0) {
+        res.status(200).json({ status: true, data: meetings });
+      } else {
+        res.status(400).json({
+          status: false,
+          message: msg.common.no_data_err,
+          data: [],
+        });
+      }
+    })
+    .catch((err) => {
+      console.error(err); // Log the error for debugging purposes
+      res.status(500).json({ status: false, message: err.message });
+    });
+>>>>>>> 29590f0609a802b2eea9e2b4f52260144ddfc26f
 }
+// function getMeeting(req, res, next) {
+//   userService
+//     .getMeeting(req)
+//     .then((reviews) =>
+//       reviews
+//         ? res.status(200).json({ status: true, data: reviews })
+//         : res.status(400).json({
+//             status: false,
+//             message: msg.common.no_data_err,
+//             data: [],
+//           })
+//     )
+//     .catch((err) => next(res.json({ status: false, message: err })));
+// }
 
 //*****************************************************************************************/
 //*****************************************************************************************/

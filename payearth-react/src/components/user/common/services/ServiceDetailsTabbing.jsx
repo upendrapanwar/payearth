@@ -4,17 +4,20 @@ import parse from "html-react-parser";
 import ServiceModal from "../services/ServiceModel";
 import ServiceCalendar from "./ServiceCalendar";
 import { isLogin } from "./../../../../helpers/login";
+// import ServiceCalendarAuth from "./ServiceCalendarAuth";
 
 function ServiceDetailsTabbing(props) {
   const [reviews, setReviews] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [averageRating, setAverageRating] = useState(0);
+  // const isCalendarAuthorized = accessToken ? true : false;
 
   useEffect(() => {
     fetchApi();
   }, []);
 
   //called get api for user service review
+  // const accessToken = localStorage.getItem("accessToken");
   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
   const serviceId = props.serviceId;
 
@@ -154,6 +157,33 @@ function ServiceDetailsTabbing(props) {
                 </ul>
                 <div className="tab-content" id="myTabContent">
                   {/* Meeting Content */}
+                  {/* **************************** */}
+                  {/* changable code */}
+                  {/* **************************** */}
+                  {/* {!currentUser ? (
+                    ""
+                  ) : isCalendarAuthorized ? (
+                    <ServiceCalendarAuth  userId={}/>
+                  ) : (
+                    <div
+                      className="tab-pane fade show active"
+                      id="meeting"
+                      role="tabpanel"
+                      aria-labelledby="meeting-tab"
+                    >
+                      <p className="mb-0">
+                        <ServiceCalendar />
+                      </p>
+                    </div>
+                  )} */}
+                  {/* **************************** */}
+                  {/* changable code */}
+                  {/* **************************** */}
+
+                  {/* ######################## */}
+                  {/* ********************* */}
+                  {/* orignal code */}
+                  {/* ********************* */}
                   {!currentUser ? (
                     ""
                   ) : <ServiceCalendar /> ? (
@@ -170,6 +200,9 @@ function ServiceDetailsTabbing(props) {
                   ) : (
                     ""
                   )}
+                  {/* ********************* */}
+                  {/* orignal code */}
+                  {/* ********************* */}
 
                   {/* Description Content */}
                   {props.description ? (
@@ -228,25 +261,25 @@ function ServiceDetailsTabbing(props) {
                         <div className="reviews_comments_box">
                           <div className="reviews_comments_box">
                             {/* Display Reviews */}
-                            {reviews.length > 0 ? (
-                              reviews.map((review, index) => (
-                                <div className="user_comment_box" key={index}>
-                                  <p className="title">{review.review.title}</p>
-                                  <p className="rating">
-                                    {renderStarRating(review.rating)}
-                                  </p>
-                                  <p className="feedback">
-                                    {review.review.description}
-                                  </p>
-                                  <p className="date mb-0">
-                                    {review.userId.name} |{" "}
-                                    {formatDate(review.createdAt)}
-                                  </p>
-                                </div>
-                              ))
-                            ) : (
-                              <p>No reviews available</p>
-                            )}
+                            {reviews.length > 0
+                              ? reviews.map((review, index) => (
+                                  <div className="user_comment_box" key={index}>
+                                    <p className="title">
+                                      {review.review.title}
+                                    </p>
+                                    <p className="rating">
+                                      {renderStarRating(review.rating)}
+                                    </p>
+                                    <p className="feedback">
+                                      {review.review.description}
+                                    </p>
+                                    <p className="date mb-0">
+                                      {review.userId.name} |{" "}
+                                      {formatDate(review.createdAt)}
+                                    </p>
+                                  </div>
+                                ))
+                              : ""}
                           </div>
                         </div>
                       </div>
@@ -273,23 +306,28 @@ function ServiceDetailsTabbing(props) {
 
 export default ServiceDetailsTabbing;
 
-////////////////////////////////////
-////////////////////////////////////
+// ******************************************************************************
+//originCode
 
 // import React, { useEffect, useState } from "react";
 // import axios from "axios";
 // import parse from "html-react-parser";
 // import ServiceModal from "../services/ServiceModel";
+// import ServiceCalendar from "./ServiceCalendar";
+// import { isLogin } from "./../../../../helpers/login";
 
 // function ServiceDetailsTabbing(props) {
 //   const [reviews, setReviews] = useState([]);
 //   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [averageRating, setAverageRating] = useState(0);
+//   const isCalendarAuthorized = accessToken ? true : false;
 
 //   useEffect(() => {
 //     fetchApi();
 //   }, []);
 
 //   //called get api for user service review
+//   const accessToken = localStorage.getItem("accessToken");
 //   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
 //   const serviceId = props.serviceId;
 
@@ -299,6 +337,13 @@ export default ServiceDetailsTabbing;
 //       const response = await axios.get(`/user/get-service-review/${serviceId}`);
 //       const result = response.data.data;
 //       setReviews(result);
+
+//       // Calculate average rating
+//       if (result.length > 0) {
+//         const totalRating = result.reduce((acc, curr) => acc + curr.rating, 0);
+//         const average = totalRating / result.length;
+//         setAverageRating(average);
+//       }
 //     } catch (error) {
 //       console.log("Error fetching data:", error);
 //     }
@@ -341,6 +386,8 @@ export default ServiceDetailsTabbing;
 //     }-${new Date(date).getFullYear()}`;
 //   };
 
+//   const currentUser = isLogin();
+
 //   return (
 //     <React.Fragment>
 //       <section className="service_details_sec" ref={props.ref}>
@@ -349,26 +396,63 @@ export default ServiceDetailsTabbing;
 //             <div className="com-sm-12">
 //               <div className="detail_tab">
 //                 <ul className="nav nav-tabs border-0" id="myTab" role="tablist">
+//                   {/* Meeting Tab */}
+//                   {!currentUser ? (
+//                     ""
+//                   ) : (
+//                     <li className="nav-item" role="presentation">
+//                       <button
+//                         className="nav-link active"
+//                         id="meeting-tab"
+//                         data-bs-toggle="tab"
+//                         data-bs-target="#meeting"
+//                         type="button"
+//                         role="tab"
+//                         aria-controls="meeting"
+//                         aria-selected="false"
+//                       >
+//                         Meeting
+//                       </button>
+//                     </li>
+//                   )}
+
 //                   {/* Description Tab */}
-//                   <li className="nav-item" role="presentation">
-//                     <button
-//                       className="nav-link"
-//                       id="description-tab"
-//                       data-bs-toggle="tab"
-//                       data-bs-target="#description"
-//                       type="button"
-//                       role="tab"
-//                       aria-controls="description"
-//                       aria-selected="false"
-//                     >
-//                       Description
-//                     </button>
-//                   </li>
+//                   {!currentUser ? (
+//                     <li className="nav-item" role="presentation">
+//                       <button
+//                         className="nav-link active"
+//                         id="description-tab"
+//                         data-bs-toggle="tab"
+//                         data-bs-target="#description"
+//                         type="button"
+//                         role="tab"
+//                         aria-controls="description"
+//                         aria-selected="false"
+//                       >
+//                         Description
+//                       </button>
+//                     </li>
+//                   ) : (
+//                     <li className="nav-item" role="presentation">
+//                       <button
+//                         className="nav-link"
+//                         id="description-tab"
+//                         data-bs-toggle="tab"
+//                         data-bs-target="#description"
+//                         type="button"
+//                         role="tab"
+//                         aria-controls="description"
+//                         aria-selected="false"
+//                       >
+//                         Description
+//                       </button>
+//                     </li>
+//                   )}
 
 //                   {/* Reviews Tab */}
 //                   <li className="nav-item" role="presentation">
 //                     <button
-//                       className="nav-link active"
+//                       className="nav-link"
 //                       id="reviews-tab"
 //                       data-bs-toggle="tab"
 //                       data-bs-target="#reviews"
@@ -382,10 +466,28 @@ export default ServiceDetailsTabbing;
 //                   </li>
 //                 </ul>
 //                 <div className="tab-content" id="myTabContent">
+//                   {/* Meeting Content */}
+//                   {!currentUser ? (
+//                     ""
+//                   ) : <ServiceCalendar /> ? (
+//                     <div
+//                       className="tab-pane fade show active"
+//                       id="meeting"
+//                       role="tabpanel"
+//                       aria-labelledby="meeting-tab"
+//                     >
+//                       <p className="mb-0">
+//                         <ServiceCalendar />
+//                       </p>
+//                     </div>
+//                   ) : (
+//                     ""
+//                   )}
+
 //                   {/* Description Content */}
 //                   {props.description ? (
 //                     <div
-//                       className="tab-pane fade"
+//                       className="tab-pane fade show active"
 //                       id="description"
 //                       role="tabpanel"
 //                       aria-labelledby="description-tab"
@@ -397,7 +499,7 @@ export default ServiceDetailsTabbing;
 //                   )}
 //                   {/* Reviews Content */}
 //                   <div
-//                     className="tab-pane review fade show active"
+//                     className="tab-pane review "
 //                     id="reviews"
 //                     role="tabpanel"
 //                     aria-labelledby="reviews-tab"
@@ -408,21 +510,15 @@ export default ServiceDetailsTabbing;
 //                         <div className="box_wrapper">
 //                           <div className="reviews_box">
 //                             <p className="review_count">
-//                               {/* {props.reviewsCount} Reviews */}
+//                               {/* Display average rating */}
+//                               Average Rating: {averageRating.toFixed(1)}
 //                             </p>
+//                             {/* Render star rating for averageRating */}
 //                             <p className="rating_point d-inline-flex align-items-center">
-//                               {renderStarRating(reviews.rating)}
+//                               {renderStarRating(averageRating)}
 //                             </p>
-//                             <ul className="review_status">
-//                               Rating Distribution
-//                               <li>
-//                                 <span className="s_no"></span>
-//                                 <span className="progress_bar">
-//                                   <i className="progress"></i>
-//                                 </span>
-//                                 <span className="count"></span>
-//                               </li>
-//                             </ul>
+//                             {/* You can keep the rating distribution as it is */}
+
 //                             <button
 //                               className={`btn custom_btn btn_yellow_bordered w-auto d-inline-block ${
 //                                 !authInfo || authInfo.id === undefined
@@ -445,25 +541,25 @@ export default ServiceDetailsTabbing;
 //                         <div className="reviews_comments_box">
 //                           <div className="reviews_comments_box">
 //                             {/* Display Reviews */}
-//                             {reviews.length > 0 ? (
-//                               reviews.map((review, index) => (
-//                                 <div className="user_comment_box" key={index}>
-//                                   <p className="title">{review.review.title}</p>
-//                                   <p className="rating">
-//                                     {renderStarRating(review.rating)}
-//                                   </p>
-//                                   <p className="feedback">
-//                                     {review.review.description}
-//                                   </p>
-//                                   <p className="date mb-0">
-//                                     {review.userId.name} |{" "}
-//                                     {formatDate(review.createdAt)}
-//                                   </p>
-//                                 </div>
-//                               ))
-//                             ) : (
-//                               <p>No reviews available</p>
-//                             )}
+//                             {reviews.length > 0
+//                               ? reviews.map((review, index) => (
+//                                   <div className="user_comment_box" key={index}>
+//                                     <p className="title">
+//                                       {review.review.title}
+//                                     </p>
+//                                     <p className="rating">
+//                                       {renderStarRating(review.rating)}
+//                                     </p>
+//                                     <p className="feedback">
+//                                       {review.review.description}
+//                                     </p>
+//                                     <p className="date mb-0">
+//                                       {review.userId.name} |{" "}
+//                                       {formatDate(review.createdAt)}
+//                                     </p>
+//                                   </div>
+//                                 ))
+//                               : ""}
 //                           </div>
 //                         </div>
 //                       </div>
