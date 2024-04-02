@@ -4,20 +4,22 @@ import parse from "html-react-parser";
 import ServiceModal from "../services/ServiceModel";
 import ServiceCalendar from "./ServiceCalendar";
 import { isLogin } from "./../../../../helpers/login";
-// import ServiceCalendarAuth from "./ServiceCalendarAuth";
+import ServiceCalendarAuth from "./ServiceCalendarAuth";
 
 function ServiceDetailsTabbing(props) {
+  const accessToken = localStorage.getItem("accessToken");
   const [reviews, setReviews] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [averageRating, setAverageRating] = useState(0);
-  // const isCalendarAuthorized = accessToken ? true : false;
+  const [isCalendarAuthorized, setIsCalendarAuthorized] = useState(
+    accessToken ? true : false
+  );
 
   useEffect(() => {
     fetchApi();
   }, []);
 
   //called get api for user service review
-  // const accessToken = localStorage.getItem("accessToken");
   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
   const serviceId = props.serviceId;
 
@@ -77,6 +79,11 @@ function ServiceDetailsTabbing(props) {
   };
 
   const currentUser = isLogin();
+
+  // Function to handle calendar authorization
+  const handleCalendarAuthorization = () => {
+    setIsCalendarAuthorized(true);
+  };
 
   return (
     <React.Fragment>
@@ -157,13 +164,23 @@ function ServiceDetailsTabbing(props) {
                 </ul>
                 <div className="tab-content" id="myTabContent">
                   {/* Meeting Content */}
-                  {/* **************************** */}
-                  {/* changable code */}
-                  {/* **************************** */}
-                  {/* {!currentUser ? (
+                  {!currentUser ? (
                     ""
-                  ) : isCalendarAuthorized ? (
-                    <ServiceCalendarAuth  userId={}/>
+                  ) : !isCalendarAuthorized ? (
+                    <div
+                      className="tab-pane fade show active"
+                      id="meeting"
+                      role="tabpanel"
+                      aria-labelledby="meeting-tab"
+                    >
+                      <ServiceCalendarAuth
+                        onAuthSuccess={() => {
+                          handleCalendarAuthorization();
+                        }}
+                        userId={authInfo.id}
+                        authToken={authInfo.token}
+                      />
+                    </div>
                   ) : (
                     <div
                       className="tab-pane fade show active"
@@ -172,7 +189,33 @@ function ServiceDetailsTabbing(props) {
                       aria-labelledby="meeting-tab"
                     >
                       <p className="mb-0">
-                        <ServiceCalendar />
+                        <ServiceCalendar authToken={authInfo.token} />
+                      </p>
+                    </div>
+                  )}
+
+                  {/* **************************** */}
+                  {/* changable code */}
+                  {/* **************************** */}
+                  {/* {!currentUser ? (
+                    ""
+                  ) : !isCalendarAuthorized ? (
+                    <ServiceCalendarAuth
+                      onAuthSuccess={() => {
+                        handleCalendarAuthorization();
+                      }}
+                      userId={authInfo.id}
+                      authToken={authInfo.token}
+                    />
+                  ) : (
+                    <div
+                      className="tab-pane fade show active"
+                      id="meeting"
+                      role="tabpanel"
+                      aria-labelledby="meeting-tab"
+                    >
+                      <p className="mb-0">
+                        <ServiceCalendar authToken={authInfo.token} />
                       </p>
                     </div>
                   )} */}
@@ -184,7 +227,7 @@ function ServiceDetailsTabbing(props) {
                   {/* ********************* */}
                   {/* orignal code */}
                   {/* ********************* */}
-                  {!currentUser ? (
+                  {/* {!currentUser ? (
                     ""
                   ) : <ServiceCalendar /> ? (
                     <div
@@ -199,13 +242,43 @@ function ServiceDetailsTabbing(props) {
                     </div>
                   ) : (
                     ""
-                  )}
+                  )} */}
                   {/* ********************* */}
                   {/* orignal code */}
                   {/* ********************* */}
 
                   {/* Description Content */}
-                  {props.description ? (
+                  {/* Description Content */}
+
+                  {!currentUser ? (
+                    props.description ? (
+                      <div
+                        className="tab-pane fade show active"
+                        id="description"
+                        role="tabpanel"
+                        aria-labelledby="description-tab"
+                      >
+                        <p className="mb-0">{parse(props.description)}</p>
+                      </div>
+                    ) : (
+                      ""
+                    )
+                  ) : (
+                    <div
+                      className="tab-pane fade"
+                      id="description"
+                      role="tabpanel"
+                      aria-labelledby="description-tab"
+                    >
+                      <p className="mb-0">{parse(props.description)}</p>
+                    </div>
+                  )}
+
+                  {/* ********************************* */}
+                  {/* ***************Orignal code****************** */}
+                  {/* ********************************* */}
+
+                  {/* {props.description ? (
                     <div
                       className="tab-pane fade show active"
                       id="description"
@@ -216,7 +289,10 @@ function ServiceDetailsTabbing(props) {
                     </div>
                   ) : (
                     ""
-                  )}
+                  )} */}
+                  {/* ********************************* */}
+                  {/* ***************Orignal code****************** */}
+                  {/* ********************************* */}
                   {/* Reviews Content */}
                   <div
                     className="tab-pane review "

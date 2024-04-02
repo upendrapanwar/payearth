@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const schema = new Schema(
   {
     event_title: { type: String, required: false, default: "" },
-    // event_id: { type: String, required: false, default: '' },
+    event_id: { type: String, required: false, default: "" },
     event_description: { type: String, required: false, default: "" },
     user_id: { type: String, ref: "User", required: false, default: null },
     // seller_id: { type: Schema.Types.ObjectId, ref: 'Seller', required: false, default: null },

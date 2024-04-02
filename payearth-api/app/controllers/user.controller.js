@@ -254,13 +254,13 @@ function register(req, res, next) {
     .then((user) =>
       user
         ? res.status(201).json({
-          status: true,
-          message: msg.user.signup.success,
-          data: user,
-        })
+            status: true,
+            message: msg.user.signup.success,
+            data: user,
+          })
         : res
-          .status(400)
-          .json({ status: false, message: msg.user.signup.error })
+            .status(400)
+            .json({ status: false, message: msg.user.signup.error })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -274,13 +274,13 @@ function authenticate(req, res, next) {
       user
         ? user && user.isActive == true
           ? res.json({
-            status: true,
-            message: msg.user.login.success,
-            data: user,
-          })
+              status: true,
+              message: msg.user.login.success,
+              data: user,
+            })
           : res
-            .status(400)
-            .json({ status: false, message: msg.user.login.active })
+              .status(400)
+              .json({ status: false, message: msg.user.login.active })
         : res.status(400).json({ status: false, message: msg.user.login.error })
     )
     .catch((err) => next(err));
@@ -293,13 +293,13 @@ function socialLogin(req, res, next) {
       user
         ? user && user.isActive == true
           ? res.json({
-            status: true,
-            message: msg.user.login.success,
-            data: user,
-          })
+              status: true,
+              message: msg.user.login.success,
+              data: user,
+            })
           : res
-            .status(400)
-            .json({ status: false, message: msg.user.login.active })
+              .status(400)
+              .json({ status: false, message: msg.user.login.active })
         : res.status(400).json({ status: false, message: msg.user.login.error })
     )
     .catch((err) => next(err));
@@ -311,11 +311,11 @@ function forgotPass(req, res, next) {
     .then((user) =>
       user
         ? res
-          .status(200)
-          .json({ status: true, message: msg.user.password.verif_link })
+            .status(200)
+            .json({ status: true, message: msg.user.password.verif_link })
         : res
-          .status(400)
-          .json({ status: false, message: msg.user.password.email_exist })
+            .status(400)
+            .json({ status: false, message: msg.user.password.email_exist })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -326,11 +326,11 @@ function resetPass(req, res, next) {
     .then((user) =>
       user
         ? res
-          .status(200)
-          .json({ status: true, message: msg.user.password.reset_success })
+            .status(200)
+            .json({ status: true, message: msg.user.password.reset_success })
         : res
-          .status(400)
-          .json({ status: false, message: msg.user.password.verif_link_err })
+            .status(400)
+            .json({ status: false, message: msg.user.password.verif_link_err })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -342,8 +342,8 @@ function changePass(req, res, next) {
       user
         ? res.json({ status: true, message: msg.user.password.update_success })
         : res
-          .status(404)
-          .json({ status: false, message: msg.common.no_user_err })
+            .status(404)
+            .json({ status: false, message: msg.common.no_user_err })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -355,8 +355,8 @@ function getProducts(req, res, next) {
       products
         ? res.status(200).json({ status: true, data: products })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -368,8 +368,8 @@ function getProfileById(req, res, next) {
       user
         ? res.status(200).json({ status: true, data: user })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -380,13 +380,13 @@ function editProfile(req, res, next) {
     .then((user) =>
       user
         ? res.status(200).json({
-          status: true,
-          data: user,
-          message: msg.user.profile.update_success,
-        })
+            status: true,
+            data: user,
+            message: msg.user.profile.update_success,
+          })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_user_err })
+            .status(400)
+            .json({ status: false, message: msg.common.no_user_err })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -400,8 +400,8 @@ function getOrders(req, res, next) {
       orders
         ? res.status(200).json({ status: true, data: orders })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -413,8 +413,8 @@ function getWishList(req, res, next) {
       wishlist
         ? res.status(200).json({ status: true, data: wishlist })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -426,8 +426,8 @@ function getSaveLaterList(req, res, next) {
       savelater
         ? res.status(200).json({ status: true, data: savelater })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -471,8 +471,8 @@ function getMyCoupons(req, res, next) {
       coupons
         ? res.status(200).json({ status: true, data: coupons })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -484,8 +484,8 @@ function getNewCoupons(req, res, next) {
       coupons
         ? res.status(200).json({ status: true, data: coupons })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -497,8 +497,8 @@ function checkPayment(req, res, next) {
       coupons
         ? res.status(200).json({ status: true, data: coupons })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -510,8 +510,8 @@ function checkCoupon(req, res, next) {
       coupons
         ? res.status(200).json({ status: true, data: coupons })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -523,8 +523,8 @@ function couponStatus(req, res, next) {
       coupons
         ? res.status(200).json({ status: true, data: coupons })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -541,13 +541,13 @@ function addReview(req, res, next) {
     .then((review) =>
       review
         ? res.status(201).json({
-          status: true,
-          message: msg.user.review.add.success,
-          data: review,
-        })
+            status: true,
+            message: msg.user.review.add.success,
+            data: review,
+          })
         : res
-          .status(400)
-          .json({ status: false, message: msg.user.review.add.error })
+            .status(400)
+            .json({ status: false, message: msg.user.review.add.error })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -560,13 +560,13 @@ function addToWishlist(req, res, next) {
     .then((wishlist) =>
       wishlist
         ? res.status(201).json({
-          status: true,
-          message: msg.user.wishlist.add.success,
-          data: wishlist,
-        })
+            status: true,
+            message: msg.user.wishlist.add.success,
+            data: wishlist,
+          })
         : res
-          .status(400)
-          .json({ status: false, message: msg.user.wishlist.add.error })
+            .status(400)
+            .json({ status: false, message: msg.user.wishlist.add.error })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -579,13 +579,13 @@ function addToSaveLater(req, res, next) {
     .then((savelater) =>
       savelater
         ? res.status(201).json({
-          status: true,
-          message: msg.user.savelater.add.success,
-          data: savelater,
-        })
+            status: true,
+            message: msg.user.savelater.add.success,
+            data: savelater,
+          })
         : res
-          .status(400)
-          .json({ status: false, message: msg.user.savelater.add.error })
+            .status(400)
+            .json({ status: false, message: msg.user.savelater.add.error })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -598,13 +598,13 @@ function saveOrder(req, res, next) {
     .then((order) =>
       order
         ? res.status(201).json({
-          status: true,
-          message: msg.user.order.add.success,
-          data: order,
-        })
+            status: true,
+            message: msg.user.order.add.success,
+            data: order,
+          })
         : res
-          .status(400)
-          .json({ status: false, message: msg.user.order.add.error })
+            .status(400)
+            .json({ status: false, message: msg.user.order.add.error })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -618,8 +618,8 @@ function addToCart(req, res, next) {
       cart
         ? res.status(201).json({ status: true, data: cart })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: {} })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: {} })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -632,8 +632,8 @@ function updateToCart(req, res, next) {
       cart
         ? res.status(201).json({ status: true, data: cart })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: {} })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: {} })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -646,8 +646,8 @@ function deleteFromCart(req, res, next) {
       cart
         ? res.status(201).json({ status: true, data: cart })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: {} })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: {} })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -661,8 +661,8 @@ function getOrderById(req, res, next) {
       order
         ? res.status(200).json({ status: true, data: order })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: {} })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: {} })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -673,8 +673,8 @@ function getOrderDataById(req, res, next) {
       order
         ? res.status(200).json({ status: true, data: order })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: {} })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: {} })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -685,8 +685,8 @@ function getOrderDetails(req, res, next) {
       order
         ? res.status(200).json({ status: true, data: order })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: {} })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: {} })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -702,13 +702,13 @@ function addComplaint(req, res, next) {
     .then((complaint) =>
       complaint
         ? res.status(201).json({
-          status: true,
-          message: msg.user.complaint.add.success,
-          data: complaint,
-        })
+            status: true,
+            message: msg.user.complaint.add.success,
+            data: complaint,
+          })
         : res
-          .status(400)
-          .json({ status: false, message: msg.user.complaint.add.error })
+            .status(400)
+            .json({ status: false, message: msg.user.complaint.add.error })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -727,13 +727,13 @@ function addCancel(req, res, next) {
     .then((cancel) =>
       cancel
         ? res.status(201).json({
-          status: true,
-          message: msg.user.cancel.add.success,
-          data: cancel,
-        })
+            status: true,
+            message: msg.user.cancel.add.success,
+            data: cancel,
+          })
         : res
-          .status(400)
-          .json({ status: false, message: msg.user.cancel.add.error })
+            .status(400)
+            .json({ status: false, message: msg.user.cancel.add.error })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -752,13 +752,13 @@ function addReturn(req, res, next) {
     .then((returnOrder) =>
       returnOrder
         ? res.status(201).json({
-          status: true,
-          message: msg.user.returnOrder.add.success,
-          data: returnOrder,
-        })
+            status: true,
+            message: msg.user.returnOrder.add.success,
+            data: returnOrder,
+          })
         : res
-          .status(400)
-          .json({ status: false, message: msg.user.returnOrder.add.error })
+            .status(400)
+            .json({ status: false, message: msg.user.returnOrder.add.error })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -772,8 +772,8 @@ function getPayments(req, res, next) {
       payments
         ? res.status(200).json({ status: true, data: payments })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -784,8 +784,8 @@ function getPaymentsById(req, res, next) {
       payments
         ? res.status(200).json({ status: true, data: payments })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -805,8 +805,8 @@ function getOrderStatus(req, res, next) {
       orderstatus
         ? res.status(200).json({ status: true, data: orderstatus })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -828,8 +828,8 @@ function getOrderTrackingTime(req, res, next) {
       ordertrackingtime
         ? res.status(200).json({ status: true, data: ordertrackingtime })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -852,8 +852,8 @@ function getSellerByProductId(req, res, next) {
       data
         ? res.status(200).json({ status: true, data: data })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -874,8 +874,8 @@ function savepaymentdata(req, res, next) {
       data
         ? res.status(200).json({ status: true, data: data })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -897,8 +897,8 @@ function saveOrdertrackingTime(req, res, next) {
       data
         ? res.status(200).json({ status: true, data: data })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -920,8 +920,8 @@ function saveorderdetails(req, res, next) {
       data
         ? res.status(200).json({ status: true, data: data })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -943,8 +943,8 @@ function updateOrderStatus(req, res, next) {
       data
         ? res.status(200).json({ status: true, data: data })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -1009,7 +1009,13 @@ function updateBanner(req, res, next) {
 
 // blockBanner
 function blockBanner(req, res, next) {
-  userService.blockBanner(req).then((banner) => banner ? res.json({ status: true, message: "Banner blocked Successfully...." }) : res.json({ status: false, message: "ERROR" }))
+  userService
+    .blockBanner(req)
+    .then((banner) =>
+      banner
+        ? res.json({ status: true, message: "Banner blocked Successfully...." })
+        : res.json({ status: false, message: "ERROR" })
+    )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 
@@ -1067,8 +1073,8 @@ function getAllCommonService(req, res, next) {
       service
         ? res.status(200).json({ status: true, data: service })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -1085,8 +1091,8 @@ function getCommonServiceById(req, res, next) {
       service
         ? res.status(200).json({ status: true, data: service })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -1132,8 +1138,8 @@ function getServiceReviews(req, res, next) {
       reviews
         ? res.status(200).json({ status: true, data: reviews })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -1148,8 +1154,8 @@ function addMeetByUser(req, res, next) {
       meeting
         ? res.status(200).json({ status: true, data: meeting })
         : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
+            .status(400)
+            .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }

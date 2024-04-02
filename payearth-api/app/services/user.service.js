@@ -2123,14 +2123,18 @@ async function updateBanner(req) {
 async function blockBanner(req) {
   const bannerId = req.params.id;
   const { blockByUser } = req.body;
-  console.log("blockByUser", blockByUser)
+  console.log("blockByUser", blockByUser);
   try {
-    const data = await bannerAdvertisement.findById(bannerId).select('blockByUser');
-    const user = data.blockByUser
-    user.push(blockByUser)
-    const banner = await bannerAdvertisement.findByIdAndUpdate(bannerId, {
-      blockByUser: user
-    },
+    const data = await bannerAdvertisement
+      .findById(bannerId)
+      .select("blockByUser");
+    const user = data.blockByUser;
+    user.push(blockByUser);
+    const banner = await bannerAdvertisement.findByIdAndUpdate(
+      bannerId,
+      {
+        blockByUser: user,
+      },
       { new: true }
     );
     return banner;
@@ -2517,7 +2521,6 @@ async function CommonServiceById(req) {
 // AddService Review
 async function addServiceReview(req) {
   const param = req.body;
-  console.log("data3", param);
   try {
     // Parse rating as float to handle fractional values
     const rating = parseFloat(param.rating);
@@ -2548,7 +2551,8 @@ async function addServiceReview(req) {
 
     if (reviewData && reviewData.length > 0) {
       // Existing review
-      review = reviewData;
+      // review = reviewData;
+      review = reviewData[0];
 
       input["updatedAt"] = new Date().toISOString();
 
@@ -2621,67 +2625,38 @@ async function getServiceReviews(serviceId) {
 }
 // *******************************************************************************
 // *******************************************************************************
-//add meeting created by user from service details calendar
-// async function addMeetByUser(req) {
-//   const param = req.body;
-//   try {
-//     const newMeeting = new Servicedetails({
-//       userId: param.userId,
-//       serviceId: param.serviceId,
-//       meetingDate: param.meetingDate,
-//       meetingTime: new Date(param.meetingTime),
-//       MeetingDescription: param.description,
-//       meetingStatus: param.meetingStatus,
-//     });
-//     console.log("Ckeck  Data", param);
-
-//     console.log("Ckeck meeting Data", newMeeting);
-//     // Save the meeting to the database
-//     return await newMeeting.save();
-//   } catch (err) {
-//     console.log("Error", err);
-//     throw err;
-//   }
-// }
-
 async function addMeetByUser(req) {
-  const param = req.body;
   try {
-    // Check meeting is already exist or not
-    const existingMeeting = await Calendar.findOne({
-      event_title: param.event_title,
-      event_description: param.event_description,
-      user_id: param.user_id,
-      service_id: param.service_id,
-      start_datetime: param.start_datetime,
-      end_datetime: param.end_datetime,
-      meeting_url: param.meeting_url,
-    });
-
-    // If a meeting already exists, return the existing meeting
-    if (!existingMeeting) {
-      // If a meeting doesn't exist, create a new one and save it to the database
-      const newMeeting = new Calendar({
-        event_title: param.event_title,
-        event_description: param.event_description,
-        user_id: param.user_id,
-        service_id: param.service_id,
-        start_datetime: param.start_datetime,
-        end_datetime: param.end_datetime,
-        meeting_url: param.meeting_url,
+    const reqData = req.body;
+    console.log("reqData checks", reqData);
+    let data = "";
+    for (const event of reqData) {
+      const existingEvent = await Calendar.findOne({
+        event_id: event.event_id,
       });
 
-      console.log("New meeting data:", newMeeting);
+      if (!existingEvent) {
+        const eventData = {
+          event_id: event.event_id,
+          event_title: event.event_title,
+          event_description: event.event_description,
+          user_id: event.user_id,
+          service_id: event.service_id,
+          start_datetime: event.start_datetime,
+          end_datetime: event.end_datetime,
+          meeting_url: event.meeting_url,
+        };
 
-      // Save the meeting to the database
-      return await newMeeting.save();
+        data = await Calendar.create(eventData);
+      } else {
+        data = [];
+      }
     }
-
-    console.log("Meeting already exists:", existingMeeting);
-    return existingMeeting;
+    console.log("Response of saved calendar:", data);
+    return data;
   } catch (err) {
-    console.log("Error:", err);
-    throw err;
+    console.error("Error saving calendar events:", err);
+    return false; // Indicate failure
   }
 }
 
@@ -2723,3 +2698,14 @@ async function delMeetingByUser(req) {
     console.log(error);
   }
 }
+
+// async function delMeetingByUser(req) {
+//   const event_id = req.params.event_id;
+//   console.log("delete meeting", event_id);
+//   try {
+//     const result = await Calendar.deleteOne({ event_id: event_id });
+//     return result;
+//   } catch (error) {
+//     console.log(error);
+//   }
+// }

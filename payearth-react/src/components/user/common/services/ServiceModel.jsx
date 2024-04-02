@@ -18,6 +18,8 @@ function ServiceModel({ isOpen, onClose, serviceId, authInfo, fetchApi }) {
         userId: authInfo.id,
       };
 
+      console.log("reviewData", reviewData);
+
       await axios.post(`/user/service-review`, reviewData);
       console.log("Review submitted successfully!");
       //called get api for show updated data
