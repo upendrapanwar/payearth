@@ -2123,7 +2123,6 @@ async function updateBanner(req) {
 async function blockBanner(req) {
   const bannerId = req.params.id;
   const { blockByUser } = req.body;
-  console.log("blockByUser", blockByUser);
   try {
     const data = await bannerAdvertisement
       .findById(bannerId)

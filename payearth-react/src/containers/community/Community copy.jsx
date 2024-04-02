@@ -14,6 +14,7 @@ import { useSelector } from 'react-redux';
 import config from '../.././config.json'
 import { useDispatch } from 'react-redux';
 import NotFound from '../../components/common/NotFound';
+import { BannerIframe2 } from '../../components/common/BannerFrame';
 
 
 // var postData=[];
@@ -167,7 +168,7 @@ const Community = () => {
     }
     useEffect(() => {
         getPosts();
-        return () =>{
+        return () => {
             getPosts();
         }
     }, []);
@@ -320,6 +321,7 @@ const Community = () => {
                                             <Link to="#" className="btn custom_btn btn_yellow_bordered">Filter</Link>
                                         </div>
                                     </div>
+                                    {/* <BannerIframe2 /> */}          
                                 </div>
                             </div>
                         </div>

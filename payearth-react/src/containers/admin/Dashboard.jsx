@@ -7,13 +7,14 @@ import headphone from '../../assets/images/headphone.png'
 import menBrownShoes from '../../assets/images/men-brown-shoes.png'
 import Footer from '../../components/common/Footer';
 import Header from '../../components/admin/common/Header';
+// import GoogleAnalyticsEvents from './GoogleAnalyticsEvents';
 
-let data=[
-    {productImg:mensJacket,productId:'#BeqQ190',price:'$60',sales:693,reviews:118,profit:'$2690 / 09 BTC',revenue:'	$62690 / 8 BTC'},
-    {productImg:headphone,productId:'#BeqQ190',price:'$60',sales:693,reviews:118,profit:'$2690 / 09 BTC',revenue:'	$62690 / 8 BTC'},
-    {productImg:menBrownShoes,productId:'#BeqQ190',price:'$60',sales:693,reviews:118,profit:'$2690 / 09 BTC',revenue:'	$62690 / 8 BTC'},
-    {productImg:mensJacket,productId:'#BeqQ190',price:'$60',sales:693,reviews:118,profit:'$2690 / 09 BTC',revenue:'	$62690 / 8 BTC'},
-    {productImg:mensJacket,productId:'#BeqQ190',price:'$60',sales:693,reviews:118,profit:'$2690 / 09 BTC',revenue:'	$62690 / 8 BTC'},
+let data = [
+    { productImg: mensJacket, productId: '#BeqQ190', price: '$60', sales: 693, reviews: 118, profit: '$2690 / 09 BTC', revenue: '	$62690 / 8 BTC' },
+    { productImg: headphone, productId: '#BeqQ190', price: '$60', sales: 693, reviews: 118, profit: '$2690 / 09 BTC', revenue: '	$62690 / 8 BTC' },
+    { productImg: menBrownShoes, productId: '#BeqQ190', price: '$60', sales: 693, reviews: 118, profit: '$2690 / 09 BTC', revenue: '	$62690 / 8 BTC' },
+    { productImg: mensJacket, productId: '#BeqQ190', price: '$60', sales: 693, reviews: 118, profit: '$2690 / 09 BTC', revenue: '	$62690 / 8 BTC' },
+    { productImg: mensJacket, productId: '#BeqQ190', price: '$60', sales: 693, reviews: 118, profit: '$2690 / 09 BTC', revenue: '	$62690 / 8 BTC' },
 ];
 
 class Dashboard extends Component {
@@ -21,7 +22,7 @@ class Dashboard extends Component {
         return (
             <React.Fragment>
                 <div className="seller_body">
-                    <Header/>
+                    <Header />
                     <div className="seller_dash_wrap pt-5 pb-5">
                         <div className="container">
                             <div className="row">
@@ -117,19 +118,19 @@ class Dashboard extends Component {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {data.map((value,index)=>{
-                                                    return(
+                                                {data.map((value, index) => {
+                                                    return (
                                                         <tr key={index}>
-                                                        <td>
-                                                            <div className="odr_item_img"><img src={value.productImg} className="img-fluid" alt="" /></div>
-                                                            <span>{value.productId}</span>
-                                                        </td>
-                                                        <td>{value.price}</td>
-                                                        <td>{value.sales}</td>
-                                                        <td>{value.reviews}</td>
-                                                        <td>{value.profit}</td>
-                                                        <td>{value.revenue}</td>
-                                                    </tr>
+                                                            <td>
+                                                                <div className="odr_item_img"><img src={value.productImg} className="img-fluid" alt="" /></div>
+                                                                <span>{value.productId}</span>
+                                                            </td>
+                                                            <td>{value.price}</td>
+                                                            <td>{value.sales}</td>
+                                                            <td>{value.reviews}</td>
+                                                            <td>{value.profit}</td>
+                                                            <td>{value.revenue}</td>
+                                                        </tr>
                                                     )
                                                 })}
                                                 {/* <tr>
@@ -189,6 +190,10 @@ class Dashboard extends Component {
                                                 </tr> */}
                                             </tbody>
                                         </table>
+                                        <div>
+                                            {/* <GoogleAnalyticsEvents /> */}
+                                        </div>
+
                                         <div className="mpc_footer">
                                             <div className="dash_inner_wrap">
                                                 <nav aria-label="Page navigation">
@@ -218,7 +223,7 @@ class Dashboard extends Component {
                             </div>
                         </div>
                     </div>
-                    <Footer/>
+                    <Footer />
                 </div>
 
             </React.Fragment>

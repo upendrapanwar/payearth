@@ -16,6 +16,7 @@ import NotFound from '../../components/common/NotFound';
 import { getPostsData } from '../../helpers/post-listing';
 import Select from 'react-select';
 import Picker from 'emoji-picker-react';
+import { BannerIframe2 } from '../../components/common/BannerFrame';
 
 const Community = () => {
     const userInfo = useSelector(state => state.auth.userInfo);
@@ -442,6 +443,12 @@ const Community = () => {
                                             <Link to="#" className="btn custom_btn btn_yellow_bordered">Filter</Link>
                                         </div>
                                     </div>
+                                    &nbsp;
+                                    <BannerIframe2 />
+                                    {/* <div className='sideBanner'>
+                                        <BannerIframe2 />
+                                    </div> */}
+
                                 </div>
                             </div>
                         </div>
