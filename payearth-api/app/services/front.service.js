@@ -844,7 +844,7 @@ async function getAllBannersData(req) {
       keyword: { $regex: keywordsData, $options: "i" },
       status: "Publish",
     };
-    const fieldsToSelect = "image video category keyword siteUrl bannerName";
+    const fieldsToSelect = "image video category keyword siteUrl bannerName blockByUser";
     const result = await bannerAdvertisement
       .find(query)
       .sort({ createdAt: "desc" })

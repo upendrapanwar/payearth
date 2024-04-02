@@ -9,11 +9,13 @@ import parse from "html-react-parser";
 import { Link } from "react-router-dom/cjs/react-router-dom";
 import ServiceDetailsTabbing from "../../../components/user/common/services/ServiceDetailsTabbing";
 import SpinnerLoader from "../../../components/common/SpinnerLoader";
+import { BannerTopIframe } from "../../../components/common/BannerFrame";
 
 const ServiceDetails = () => {
   const { id } = useParams();
   const [commonServiceData, setCommonServiceData] = useState([]);
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
   const [reviews, setReviews] = useState([]);
   const myRef = useRef(null);
   const [loading, setLoading] = useState(true);
@@ -31,6 +33,7 @@ const ServiceDetails = () => {
         : [res.data.data];
       setCommonServiceData(dataArray);
       setDescription(dataArray[0].description); // Set description
+      setCategory(dataArray[0].category.categoryName) //Set category
       setReviews(dataArray[0].reviews); // Set reviews
       setLoading(false); // Set loading to false after fetching data
     } catch (error) {
@@ -54,7 +57,7 @@ const ServiceDetails = () => {
   return (
     <React.Fragment>
       {loading === true ? <SpinnerLoader /> : ""}
-
+      <BannerTopIframe keywords={category} />
       <Header />
       <PageTitle title={"Service-Details"} />
       <section className="inr_wrap">
