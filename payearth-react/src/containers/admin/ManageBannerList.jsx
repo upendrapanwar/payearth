@@ -239,13 +239,13 @@ class ManageBannerList extends Component {
 
     banner_column = [
         {
-            name: "Advertise Image/Video",
+            name: "Advertisement Image/Video",
             selector: (row, i) => row.video === '' ? <img src={row.image} alt="No Image/video select" style={{ width: '350px', height: '90px' }} /> : <video width="350" height="90" src={row.video} autoPlay loop alt="No Image/video select" />,
             sortable: true,
             width: '350px',
         },
         {
-            name: "Advertise Name",
+            name: "Advertisement Name",
             selector: (row, i) => row.bannerName,
             sortable: true,
             // width: 'auto',
@@ -278,7 +278,7 @@ class ManageBannerList extends Component {
             width: 'auto',
         },
         {
-            name: "Advertise Status",
+            name: "Advertisement Status",
             selector: (row, i) => row.status === "Unpublish" ? <p className='p-1 fw-bold text-white bg-danger bg-opacity-4 border-info rounded'>{row.status}</p> : <p className='p-1 fw-bold text-white bg-success  bg-opacity-4 border-info rounded'>{row.status}</p>,
             sortable: true,
         },
@@ -356,7 +356,7 @@ class ManageBannerList extends Component {
                 <Header />
                 <section className="inr_wrap">
                     <Helmet>
-                        <title>{"Manage Advertising - Pay Earth"}</title>
+                        <title>{"Manage Advertisement - Pay Earth"}</title>
                     </Helmet>
 
                     <div className="container">
@@ -365,11 +365,11 @@ class ManageBannerList extends Component {
                                 <div className="cart adv_banner_wrapper">
                                     <div className="dash_inner_wrap">
                                         <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center flex_mob_none">
-                                            <div className="dash_title">Manage Advertising</div>
+                                            <div className="dash_title">Manage Advertisement</div>
                                             <div className="search_customer_field">
                                                 <div className="noti_wrap">
                                                     <div className=""><span>
-                                                        <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-banner-advertisement">Create New Advertise</Link>
+                                                        <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-banner-advertisement">Create New Advertisement</Link>
                                                     </span></div>
                                                 </div>
                                             </div>
@@ -389,7 +389,7 @@ class ManageBannerList extends Component {
                                                     <div className="cart_wrap">
                                                         <div className="items_incart">
                                                             <span className="text-uppercase">
-                                                                ({filteredBanner.length === 0 ? banner.length : filteredBanner.length}) ADVERTISE IN YOUR LIST
+                                                                ({filteredBanner.length === 0 ? banner.length : filteredBanner.length}) ADVERTISEMENT IN YOUR LIST
                                                             </span>
                                                         </div>
                                                     </div>

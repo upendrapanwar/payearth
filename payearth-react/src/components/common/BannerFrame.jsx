@@ -4,6 +4,7 @@ import axios from 'axios';
 import Iframe from 'react-iframe-click';
 import { isLogin } from '../../helpers/login';
 import ReactGA from "react-ga4";
+import { toast } from 'react-toastify';
 
 export const BannerTopIframe = ({ width, height, keywords }) => {
     const [advertisements, setAdvertisements] = useState([]);
@@ -106,10 +107,11 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
                 }
             }).then((response) => {
                 closeIframe();
+                toast.success("Advertise Blocked successfully....", { autoClose: 2000 })
                 console.log("response", response)
                 setTimeout(() => {
                     fetchData();
-                }, 1000);
+                }, 2000);
             }).catch((error) => {
                 console.log("error", error)
             })

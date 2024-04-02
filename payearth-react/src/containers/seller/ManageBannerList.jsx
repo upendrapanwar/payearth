@@ -179,18 +179,18 @@ class SellerBannerList extends Component {
 
   banner_column = [
     {
-      name: " Advertise Image/Video",
+      name: " Advertisement Image/Video",
       selector: (row, i) => row.video === '' ? <img className='advBanner-Thumb' src={row.image} alt="No Image/video select" style={{ width: '350px', height: '100px' }} /> : <video width="350" height="100" src={row.video} autoPlay loop alt="No Image/video select" />,
       sortable: true,
       width : "350px"
     },
     {
-      name: "Advertise Name",
+      name: "Advertisement Name",
       selector: (row, i) => row.bannerName,
       sortable: true,
     },
     {
-      name: "Advertise Text",
+      name: "Advertisement Text",
       selector: (row, i) => row.bannerText,
       sortable: true,
 
@@ -260,7 +260,7 @@ class SellerBannerList extends Component {
       <React.Fragment>
         <Header />
         <div className="inr_top_page_title">
-          <h2>MANAGE ADVERTISING</h2>
+          <h2>Manage Advertisement</h2>
         </div>
         <section className="inr_wrap">
           <div className="container">
@@ -270,7 +270,7 @@ class SellerBannerList extends Component {
                   <div className="noti_wrap">
                     <div className="">
                       <span>
-                        <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/manage-banner-advertisement">Create New Advertise</Link>
+                        <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/manage-banner-advertisement">Create New Advertisement</Link>
                       </span>
                     </div>
                   </div>

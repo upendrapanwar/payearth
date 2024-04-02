@@ -402,7 +402,7 @@ class SellerBannerEdit extends Component {
             <React.Fragment>
                 <Header />
                 <div className="inr_top_page_title">
-                    <h2>Edit Advertising</h2>
+                    <h2>Edit Advertisement</h2>
 
                 </div>
                 <section className="inr_wrap">
@@ -412,7 +412,7 @@ class SellerBannerEdit extends Component {
                                 <div className="cart adv_banner_wrapper">
                                     <div className="noti_wrap">
                                         <div className=""><span>
-                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/manage-banner-list">My Advertising</Link>
+                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/manage-banner-list">My Advertisement</Link>
                                         </span></div>
                                     </div>
                                     <div className="cart_list adv_banner_panel">
@@ -421,7 +421,7 @@ class SellerBannerEdit extends Component {
                                                 <div className="col-md-6">
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
-                                                            <label htmlFor="">Advertise Name</label>
+                                                            <label htmlFor="">Advertisement Name</label>
                                                             <div className="field_item">
                                                                 <input
                                                                     className="form-control"
@@ -598,7 +598,7 @@ class SellerBannerEdit extends Component {
                                                         {selectValueType === "video" || video ?
                                                             <div className="crt_bnr_fieldRow">
                                                                 <div className="crt_bnr_field">
-                                                                    <label htmlFor=""> Upload Advertise Video &nbsp; {!video ? "" :
+                                                                    <label htmlFor=""> Upload Advertisement Video &nbsp; {!video ? "" :
                                                                         <button
                                                                             type="button"
                                                                             className="btn btn-secondary btn-sm"
@@ -635,7 +635,7 @@ class SellerBannerEdit extends Component {
                                                             :
                                                             <div className="crt_bnr_fieldRow">
                                                                 <div className="crt_bnr_field">
-                                                                    <label htmlFor="">Upload Advertise Image &nbsp; {!image ? "" :
+                                                                    <label htmlFor="">Upload Advertisement Image &nbsp; {!image ? "" :
                                                                         <button
                                                                             type="button"
                                                                             className="btn btn-secondary btn-sm"
