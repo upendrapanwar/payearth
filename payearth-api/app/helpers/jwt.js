@@ -26,6 +26,7 @@ function jwt() {
       /\/publishPageDetail*/,
 
       /\/advBanner-list*/,
+      /\/getAllAdvBanner-list*/,
 
       /\/get-common-service*/,
       /\/service-review*/,

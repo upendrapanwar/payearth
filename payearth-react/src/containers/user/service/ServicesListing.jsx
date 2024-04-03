@@ -201,28 +201,32 @@ function Services() {
           <section className="popular_products_sec">
             <div className="container">
               <div className="row">
-                <div className="col-sm-10 m-auto">
+                <div className="col-sm-12 m-auto">
                   <div className="cards_wrapper">
                     {userServiceData.length > 0 &&
                       userServiceData.map((service) => (
                         <div key={service._id} className="card">
-                          <img src={service.featuredImage} alt={service.name} />
-                          <h2 className="m-auto">{service.name}</h2>
-                          <p
-                            className="m-auto p-2"
-                            dangerouslySetInnerHTML={{
-                              __html: service.description,
-                            }}
-                          ></p>
-                          <div className="text-center">
-                            <Link
-                              type="button"
-                              className="btn custom_btn btn_yellow"
-                              to={`/service-detail/${service._id}`}
-                            >
-                              View More
-                            </Link>
+                          <div className="serviceListing-Image">
+                            <img src={service.featuredImage} alt={service.name} /></div>
+                          <div className="serviceListing-content text-center">
+                            <h3 className="m-auto">{service.name}</h3>
+                            <div className="service-desc m-auto p-2"
+                              dangerouslySetInnerHTML={{
+                                __html: service.description,
+                              }}
+                            ></div>
+                            <div className="text-center">
+                              <Link
+                                type="button"
+                                className="btn custom_btn btn_yellow"
+                                to={`/service-detail/${service._id}`}
+                              >
+                                View More
+                              </Link>
+                            </div>
                           </div>
+
+
                         </div>
                       ))}
                   </div>

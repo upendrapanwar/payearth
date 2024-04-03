@@ -10,6 +10,7 @@ import PopularBrands from "./../../components/user/home/PopularBrands";
 import RecentSearch from "./../../components/user/home/RecentSearch";
 import Footer from "./../../components/common/Footer";
 import ServiceListing from "./service/ServicesListing";
+import { GetAllBanner } from "../../components/common/BannerFrame";
 
 const Header = lazy(() => import("./../../components/user/common/Header"));
 
@@ -47,6 +48,7 @@ class Home extends Component {
     return (
       <React.Fragment>
         <InfoAlert />
+        <GetAllBanner />
         {/* Lazy load the Header component */}
         <Suspense fallback={<h1>Loading please wait...</h1>}>
           {/* Pass handleIsToggle function as props to Header */}

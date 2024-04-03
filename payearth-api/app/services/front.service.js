@@ -49,6 +49,7 @@ module.exports = {
   cmsPublishPage,
   cmsPageDetails,
   getAllBannersData,
+  getAllAdvBannerData,
 };
 
 async function getReviews(id) {
@@ -852,6 +853,29 @@ async function getAllBannersData(req) {
 
     if (result && result.length > 0) {
       // console.log("banner list ", result)
+      return result;
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function getAllAdvBannerData() {
+  try {
+    const query = {
+      status: "Publish",
+    };
+    const fieldsToSelect = "image video category keyword siteUrl bannerName blockByUser";
+    const result = await bannerAdvertisement
+      .find(query)
+      .sort({ createdAt: "desc" })
+      .select(fieldsToSelect)
+      .limit(1);
+
+    if (result && result.length > 0) {
+      // console.log("banner ALL list ", result)
       return result;
     } else {
       return [];
