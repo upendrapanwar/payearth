@@ -172,7 +172,8 @@
     .popular_products_sec .cards_wrapper,
         .trending_products_sec .cards_wrapper {
             /* justify-content: flex-start; */
-            justify-content: space-between;
+            /* justify-content: space-between; */
+            justify-content: space-evenly;
         }
           .btn-width{
             width: 350px !important;
@@ -193,6 +194,12 @@
       .dash_inner_wrap .btn.action_btn_new {
         width: auto !important;
     }
+    .popular_products_sec .cards_wrapper,
+        .trending_products_sec .cards_wrapper {
+            /* justify-content: flex-start; */
+            /* justify-content: space-between; */
+            justify-content: space-evenly;
+        }
 }
 
 @media only screen and (max-width: 668px) {
@@ -212,6 +219,12 @@
     .deals_sec .card-deal-wrap{
         width: 250px;
     }
+    .popular_products_sec .cards_wrapper,
+        .trending_products_sec .cards_wrapper {
+            /* justify-content: flex-start; */
+            /* justify-content: space-between; */
+            justify-content: space-evenly;
+        }
 }
 
 @media only screen and (max-width: 568px) {
@@ -279,6 +292,12 @@
     .footer .bottom .payment_methods {
         margin-top: 18px;
     }
+    .popular_products_sec .cards_wrapper,
+        .trending_products_sec .cards_wrapper {
+            /* justify-content: flex-start; */
+            /* justify-content: space-between; */
+            justify-content: space-evenly;
+        }
 }
 
 @media only screen and (max-width: 475px) {

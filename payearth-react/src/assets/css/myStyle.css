@@ -2846,13 +2846,14 @@ input[type="search"] {
 
 /* Side banner css */
 
-.sideBanner{
-  position: relative;
-  min-height:200px;
-}
-.sideBanner .BannerSide{
-position: fixed;
-width: 100%;
-height: 100%;
-top: 0;
+.iframe-containerSide{
+  position: fixed;
+  bottom: 40px;
+  right: 10px;
+  background-color: #fff;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 999; 
 }

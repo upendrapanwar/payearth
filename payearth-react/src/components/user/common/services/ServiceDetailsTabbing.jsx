@@ -334,7 +334,7 @@ function ServiceDetailsTabbing(props) {
                       </div>
                       {/* User Reviews */}
                       <div className="col-sm-12 col-md-9">
-                        <div className="reviews_comments_box">
+                        
                           <div className="reviews_comments_box">
                             {/* Display Reviews */}
                             {reviews.length > 0
@@ -357,7 +357,7 @@ function ServiceDetailsTabbing(props) {
                                 ))
                               : ""}
                           </div>
-                        </div>
+                        
                       </div>
                     </div>
                   </div>

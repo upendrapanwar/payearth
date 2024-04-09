@@ -121,9 +121,9 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
 
     const iframeStyles = {
         // border: '1px solid red',
-        borderRadius: '5px',
-        objectFit: 'fill',
-        width: '100%',
+        // borderRadius: '5px',
+        // objectFit: 'fill',
+        // width: '100%',
 
         // boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
         // width: -webkit-fill-available
@@ -139,19 +139,21 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
 
     const renderBannerTopIframe = () => <>
         {iframeOpen === true ? (<div className='iframe-container' key="iframeContainer">
-            <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
-            <Iframe
-                src={advertisements.map(item => !item.video ? item.image : item.video)[currentUrlIndex]}
-                width="100%"
-                height="150px"
-                scrolling="no"
-                style={iframeStyles}
-                allow="autoplay; encrypted-media"
-                allowFullScreen
-                className="centeredIframe"
-                onInferredClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
-            ></Iframe>
-            <button className="block_button" onClick={() => block(advertisements[currentUrlIndex].id)}>Click to Block this advertise..!</button>
+            <div className='iFrame-wrapper'>
+                <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
+                <Iframe
+                    src={advertisements.map(item => !item.video ? item.image : item.video)[currentUrlIndex]}
+                    // width="100%"
+                    // height="150px"
+                    scrolling="no"
+                    style={iframeStyles}
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
+                    className="centeredIframe"
+                    onInferredClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
+                ></Iframe>
+                <button className="block_button" onClick={() => block(advertisements[currentUrlIndex].id)}>Click to Block this advertise..!</button>
+            </div>
         </div>) : ""}
     </>
 
@@ -160,6 +162,159 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
             {renderBannerTopIframe()}
         </div>
     </>
+}
+
+export const GetAllBanner = () => {
+    const [advertisements, setAdvertisements] = useState([]);
+    const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
+    const [length, setLength] = useState();
+    const [urlData, setUrlData] = useState([]);
+    const [iframeOpen, setIframeOpen] = useState(false);
+    const authInfo = JSON.parse(localStorage.getItem("authInfo"));
+    const [ipAddress, setIpAddress] = useState('');
+    const isloginUser = isLogin();
+
+    useEffect(() => {
+        ReactGA.initialize(process.env.REACT_APP_MEASUREMENT_ID);
+    })
+    useEffect(() => {
+        fetchData();
+        fetchIpAddress();
+    }, [])
+
+    const fetchData = () => {
+        axios.get(`/front/getAllAdvBanner-list`)
+            .then((response) => {
+                // console.log("response.data.data", response.data.data)
+                const data = response.data.data;
+                // console.log("data", data)
+                const withoutBlockData = data.filter(item => !item.blockByUser.includes(isloginUser === true ? authInfo.id : ''))
+                // console.log("withoutBlockData", withoutBlockData)
+                // console.log("data $$", data)
+                setAdvertisements(isloginUser === true ? withoutBlockData : data)
+                const urls = isloginUser === true ? withoutBlockData : data.map(item => !item.video ? item.image : item.video);
+                setUrlData(urls)
+                setLength(urls.length)
+                // console.log("urls length", urls.length)
+                if (urls.length > 0) {
+                    const timeoutId = setTimeout(() => {
+                        setIframeOpen(true);
+                    }, 5000);
+                    return () => clearTimeout(timeoutId);
+                }
+            })
+            .catch(error => {
+                console.log("error", error)
+            })
+    };
+
+    const fetchIpAddress = async () => {
+        try {
+            const response = await axios.get('https://api.ipify.org?format=json');
+            // console.log("Ip address", response.data.ip)
+            setIpAddress(response.data.ip);
+        } catch (error) {
+            console.error('Error fetching IP address:', error);
+        }
+    };
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            setCurrentUrlIndex((prevIndex) => (prevIndex + 1) % advertisements.length);
+        }, 7000);
+        return () => clearInterval(intervalId);
+    }, [length]);
+
+    const onWebsiteMove = (url) => {
+        window.open(url, '_blank');
+        const urlWithUserId = `IframePath:${url} ,userId: ${isLogin === true ? authInfo.id : ipAddress}`;
+        // const urlWithUserId = [
+        //     { iframePath: `${iframePath}`, user_id: `611bab8fed84c042781aec35` },
+        // ]
+
+        ReactGA.event({
+            category: 'Iframe Visit',
+            action: 'Click',
+            label: `${urlWithUserId}`,
+        });
+
+        closeIframe();
+    };
+
+    const block = (advertisementId) => {
+        const user = isLogin();
+        if (user === true) {
+            const url = `https://localhost:7700/user/blockBanner/${advertisementId}`
+            const blockId = {
+                blockByUser: authInfo.id
+            }
+            // console.log("block ID user", blockId)
+            axios.put(url, blockId, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${authInfo.token}`
+                }
+            }).then((response) => {
+                closeIframe();
+                toast.success("Advertise Blocked successfully....", { autoClose: 2000 })
+                console.log("response", response)
+                setTimeout(() => {
+                    fetchData();
+                }, 2000);
+            }).catch((error) => {
+                console.log("error", error)
+            })
+        }
+    }
+
+    const iframeStyles = {
+        cursor: 'pointer'
+        // border: '1px solid red',
+        // borderRadius: '5px',
+        // objectFit: 'fill',
+        // width: '100%',
+
+        // boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
+        // width: -webkit-fill-available
+    };
+
+    const openIframe = () => {
+        setIframeOpen(true);
+    };
+
+    const closeIframe = () => {
+        setIframeOpen(false);
+    };
+
+    const renderAllBannerTopIframe = () => <>
+        {iframeOpen === true ? (<div className='iframe-container' key="iframeContainer">
+            <div className='iFrame-wrapper'>
+                <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
+                <Iframe
+                    src={advertisements.map(item => !item.video ? item.image : item.video)[currentUrlIndex]}
+                    // width="100%"
+                    // height="150px"
+                    cursor="pointer"
+                    scrolling="no"
+                    style={iframeStyles}
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
+                    className="centeredIframe"
+                    onInferredClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
+                ></Iframe>
+                <button className="block_button" onClick={() => block(advertisements[currentUrlIndex].id)}>Click to Block this advertise..!</button>
+            </div>
+        </div>) : ""}
+    </>
+
+    return <>
+
+        {renderAllBannerTopIframe()}
+
+    </>
+
+
 }
 
 export const BannerIframe2 = ({ width, height, }) => {
@@ -189,7 +344,7 @@ export const BannerIframe2 = ({ width, height, }) => {
             className='Video'
         ></iframe> */}
 
-        {iframeOpen === true ? (<div className='iframe-container' key="iframeContainer">
+        {iframeOpen === true ? (<div className='iframe-containerSide' key="iframeContainer">
             <button className="btn btn-light btn-sm" >Block Now...!</button>
             <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
             <iframe
