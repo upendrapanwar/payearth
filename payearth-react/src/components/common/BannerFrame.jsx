@@ -344,7 +344,7 @@ export const BannerIframe2 = ({ width, height, }) => {
             className='Video'
         ></iframe> */}
 
-        {iframeOpen === true ? (<div className='iframe-container' key="iframeContainer">
+        {iframeOpen === true ? (<div className='iframe-containerSide' key="iframeContainer">
             <button className="btn btn-light btn-sm" >Block Now...!</button>
             <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
             <iframe

@@ -2420,7 +2420,7 @@ async function customerAuthorizePayment(req) {
 }
 
 /**STRIPE>>>>>>>>>>>>>>>>>>>>>>> */
-
+        
 async function createSubscription(req, res) {
   const { paymentMethodId, email, plan_Id, authName } = req.body;
   try {
