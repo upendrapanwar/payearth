@@ -245,6 +245,8 @@ router.get("/get-service-review/:id", getServiceReviews);
 router.post("/add-meeting-user/:id", addMeetByUser);
 router.get("/get-meeting/:id", getMeeting);
 router.delete("/delete-meeting/:id", delMeetingByUser);
+//jwtToken form zoom
+router.post("/create-zoom-token", createZoomToken);
 
 module.exports = router;
 
@@ -1213,3 +1215,18 @@ function delMeetingByUser(req, res, next) {
 }
 //*****************************************************************************************/
 //*****************************************************************************************/
+
+function createZoomToken(req, res, next) {
+  userService
+    .createZoomToken(req)
+    .then((token) => {
+      if (token) {
+        res.json({ status: true, message: "Token generated successfully" });
+      } else {
+        res.json({ status: false, message: "ERROR" });
+      }
+    })
+    .catch((err) => {
+      next(res.status(500).json({ status: false, message: err }));
+    });
+}
