@@ -111,6 +111,7 @@ module.exports = {
   getMeeting,
   delMeetingByUser,
   createZoomToken,
+  getServiceOrder,
 };
 
 function sendMail(mailOptions) {
@@ -2423,7 +2424,7 @@ async function customerAuthorizePayment(req) {
 }
 
 /**STRIPE>>>>>>>>>>>>>>>>>>>>>>> */
-        
+
 async function createSubscription(req, res) {
   const { paymentMethodId, email, plan_Id, authName } = req.body;
   try {
@@ -2474,7 +2475,7 @@ async function createSubscription(req, res) {
 // *******************************************************************************
 // *******************************************************************************
 
-// GET Common All Services
+//GET Common All Services
 async function getCommonService(req) {
   try {
     let result = await Services.find({})
@@ -2700,6 +2701,27 @@ async function delMeetingByUser(req) {
     console.log(error);
   }
 }
+// *******************************************************************************
+// *******************************************************************************
+//service order completed order list & Failed list
+
+async function getServiceOrder(req) {
+  const userId = req.params.id;
+  try {
+    const serviceOrder = await Payment.find({ userId })
+      .select()
+      .sort({ createdAt: "desc" })
+      .populate({
+        path: "userId",
+        model: User,
+        select: "name",
+      });
+    if (serviceOrder && serviceOrder.length > 0) return serviceOrder;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 // *******************************************************************************
 // *******************************************************************************
 // const ZOOM_API_BASE_URL = "https://api.zoom.us/v2";

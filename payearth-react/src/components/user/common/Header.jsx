@@ -48,6 +48,7 @@ import chatIcon from "./../../../assets/icons/chat.svg";
 import couponIcon from "./../../../assets/icons/coupon.svg";
 import heartIcon from "./../../../assets/icons/heart.svg";
 import logoutIcon from "./../../../assets/icons/logout.svg";
+import serviceIcon from "./../../../assets/icons/services_icon.svg";
 import { authVerification } from "../../../helpers/auth-verification";
 
 const subCategories = (catId, data) => {
@@ -651,6 +652,14 @@ const Header = ({ props, handleIsToggle }) => {
                       <img src={heartIcon} alt="heart" />
                     </i>{" "}
                     Savelater List
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/service-order" onClick={() => removeBackdrop()}>
+                    <i className="icon">
+                      <img src={serviceIcon} alt="heart" />
+                    </i>{" "}
+                    Service Orders
                   </Link>
                 </li>
                 <li>

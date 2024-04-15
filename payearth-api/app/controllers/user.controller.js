@@ -245,6 +245,7 @@ router.get("/get-service-review/:id", getServiceReviews);
 router.post("/add-meeting-user/:id", addMeetByUser);
 router.get("/get-meeting/:id", getMeeting);
 router.delete("/delete-meeting/:id", delMeetingByUser);
+router.get("/service-orders/:id", getServiceOrder);
 //jwtToken form zoom
 router.post("/create-zoom-token", createZoomToken);
 
@@ -1215,7 +1216,22 @@ function delMeetingByUser(req, res, next) {
 }
 //*****************************************************************************************/
 //*****************************************************************************************/
+//Service Order completed list
 
+function getServiceOrder(req, res, next) {
+  userService
+    .getServiceOrder(req)
+    .then((data) =>
+      data
+        ? res.status(200).json({ status: true, data: data })
+        : res.status(400).json({ status: false, message: "ERROR ", data: [] })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+//*****************************************************************************************/
+//*****************************************************************************************/
+//Genrate Zoom Access Token
 function createZoomToken(req, res, next) {
   userService
     .createZoomToken(req)
