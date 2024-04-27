@@ -50,6 +50,7 @@ module.exports = {
   cmsPageDetails,
   getAllBannersData,
   getAllAdvBannerData,
+  advertismentBySlug,
 };
 
 async function getReviews(id) {
@@ -818,7 +819,7 @@ async function cmsPublishPage(req) {
   } catch (error) {
     console.log(error);
   }
-} 
+}
 
 // pageDetailByID
 async function cmsPageDetails(req) {
@@ -827,6 +828,29 @@ async function cmsPageDetails(req) {
   try {
     const allPost = await cmsPage.find({}).select().sort({ createdAt: "desc" });
     const filteredStatus = allPost.filter((item) => item.slug === slug);
+    return filteredStatus;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+
+// Get advertisment by url
+async function advertismentBySlug(req) {
+  const slug = req.params.slug;
+
+  // console.log("status", status)
+  try {
+    const query = {
+      status: "Publish",
+    };
+    const fieldsToSelect = "image video siteUrl slug"
+    const advertise = await bannerAdvertisement
+      .find(query)
+      .select(fieldsToSelect)
+      .sort({ createdAt: "desc" });
+    const filteredStatus = advertise.filter((item) => item.slug === slug);
     return filteredStatus;
   } catch (error) {
     console.log(error);
@@ -862,6 +886,8 @@ async function getAllBannersData(req) {
   }
 }
 
+
+// Without keyword match only latest banner show..
 async function getAllAdvBannerData() {
   try {
     const query = {

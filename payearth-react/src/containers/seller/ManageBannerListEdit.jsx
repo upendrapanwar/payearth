@@ -674,8 +674,7 @@ class SellerBannerEdit extends Component {
 
 
                                                 <div className="col-md-12 bg-body-tertiary advBannerEditWrap">
-                                                    <div className="row">
-                                                        
+                                                    {/* <div className="row">
                                                         <div className="col-md-12">
                                                             <h3 className="text-center selectPlanHeading">Your Selected plan : </h3>
                                                             <div className="wrapper">
@@ -699,9 +698,8 @@ class SellerBannerEdit extends Component {
                                                                     </div>
                                                                 </div>
                                                             </div>
-
                                                         </div>
-                                                    </div>
+                                                    </div> */}
 
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">

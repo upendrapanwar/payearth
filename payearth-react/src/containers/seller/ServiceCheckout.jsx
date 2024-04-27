@@ -14,50 +14,6 @@ import { withRouter } from 'react-router-dom';
 import { Elements, CardElement, ElementsConsumer } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import Modal from "react-bootstrap/Modal";
-//coinbase inport
-//import CoinbaseCommerceButton from "react-coinbase-commerce";
-//import 'react-coinbase-commerce/dist/coinbase-commerce-button.css';
-// import { FormComponent, FormContainer } from "react-authorize-net";
-
-//let clientKey = process.env.REACT_APP_AUTHORIZENET_CLIENTKEY as string;
-//let clientKey;
-//let apiLoginId = process.env.REACT_APP_AUTHORIZENET_LOGINID as string;
-//let apiLoginId;
-/*
-type State = {
-    status: "paid" | "unpaid" | ["failure", string[]];
-};*/
-
-// const Button = styled.button({
-//     "&:hover": { cursor: "pointer" },
-//     padding: "10px",
-//     backgroundColor: "white",
-//     border: "2px solid black",
-//     fontWeight: 600,
-//     borderRadius: "2px"
-// });
-
-// const ErrorComponent = (props: {
-//     errors: [];
-//     onBackButtonClick: () => void;
-// }) => (
-//     <div>
-//         <Text fontSize={3} fontWeight={"500"} mb={3}>
-//             Failed to process payment
-//         </Text>
-//         {props.errors.map(error => (
-//             <Text py={2}>{error}</Text>
-//         ))}
-//         <Button onClick={props.onBackButtonClick}>Go Back</Button>
-//     </div>
-// );
-
-/*
-const Header = props => (
-  <Flex py={4}>
-    <Heading>react-authorize-net-example</Heading>
-  </Flex>
-);*/
 
 
 class ServiceCheckout extends Component {
@@ -71,6 +27,8 @@ class ServiceCheckout extends Component {
         this.userInfo = store.getState().auth.userInfo;
         let serviceName = localStorage.getItem('serviceName');
         let serviceCategory = localStorage.getItem('serviceCategory');
+        let storedDataset = sessionStorage.getItem('selectPlan');
+
 
         this.state = {
             formStatus: false,
@@ -108,16 +66,26 @@ class ServiceCheckout extends Component {
             authName: this.userInfo.name,
             email: this.userInfo.email,
             paymentMethodId: null,
-            plan_Id: "",
-
             selectCard: "",
+            plan_Id: "price_1OhntbD2za5c5GtOpiypaDOt", // Default service plan it may be change when real time data will update.. 
+
+            id: '',
+            nickname: '',
+            amount: '',
+            interval: '',
+            interval_count: '',
+            active: '',
+            metadata: {},
+
+
+
             error: null,
             planPrice: "200",
             stripeResponse: "",
+            sub_id: "",
             allOrderStatus: "",
             show: false,
             showModal: false,
-
         };
     }
 
@@ -125,22 +93,16 @@ class ServiceCheckout extends Component {
     // Stripe function
 
     componentWillMount() {
-
         var storedDataset = sessionStorage.getItem('selectPlan');
-
         if (storedDataset) {
             var retrievedDataset = JSON.parse(storedDataset);
-            console.log("data for session storage", retrievedDataset.stripPlanId)
-            this.setState({ plan_Id: retrievedDataset.stripPlanId })
+            console.log("data for session storage", retrievedDataset.nickname)
+            console.log("selectCard", retrievedDataset)
+            this.setState({ plan_Id: retrievedDataset.id })
             this.setState({ selectCard: retrievedDataset })
         } else {
             this.setState({ selectCard: null })
         }
-        // Parse the string back into an object
-        // var retrievedDataset = JSON.parse(storedDataset);
-        // console.log("data for session storage", retrievedDataset.stripPlanId)
-        // this.setState({ plan_Id: retrievedDataset.stripPlanId })
-        // this.setState({ selectCard: retrievedDataset })
     }
 
     fetchStripePlans = async () => {
@@ -152,14 +114,15 @@ class ServiceCheckout extends Component {
                     Authorization: `Bearer ${stripeSecretKey}`,
                 },
             });
-
             console.log("response.data", response.data.data)
             console.log("response.data", response.data)
 
             var storedDataset = sessionStorage.getItem('selectPlan');
 
             if (!storedDataset) {
+                // this.setState({ plan_Id: 'plan_PtQDZnQWN42U7q' })
                 this.setState({ plan_Id: 'price_1OhntbD2za5c5GtOpiypaDOt' })
+                // service plan id is change when realtime time data will fetch..
             }
 
             // setPlans(fetchedPlans);
@@ -199,11 +162,13 @@ class ServiceCheckout extends Component {
         }
 
         this.handleSubscribeStripe();
+        // this.savePlan();
     };
 
     handleSubscribeStripe = () => {
-        const { email, paymentMethodId, plan_Id, authName } = this.state;
-        console.log("Plan ID :::::", plan_Id)
+        const { email, paymentMethodId, plan_Id, authName, selectCard } = this.state;
+        console.log("Plan ID :", plan_Id)
+
         const url = 'seller/create-subscription';
 
         const subData = {
@@ -212,8 +177,6 @@ class ServiceCheckout extends Component {
             plan_Id,
             authName
         };
-
-
         axios.post(url, subData, {
             headers: {
                 'Accept': 'application/json',
@@ -221,17 +184,18 @@ class ServiceCheckout extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`
             }
         }).then((response) => {
-            console.log("Subscription succesfully in seller....", response.data);
-            console.log("amountPaid : ", response.data.data.plan.amount/100)
-            console.log("paymentMode : ", response.data.data.plan.currency)
-            console.log("invoiceUrl : ", response.data.data.latest_invoice.invoice_pdf)
-            console.log("paymentStatus", response.data.data.latest_invoice.status)
+            console.log("subscription plan id", response.data.data.id)
 
             this.setState({ stripeResponse: response.data })
+            // this.setState({ sub_id: response.data.data.id })
+            if (selectCard !== null) {
+                this.savePlan(response.data.data.id);
+            }
+            // this is subscription_id plan id..
             const paymentData = [{
                 'userId': this.authInfo.id,
                 'sellerId': "",
-                'amountPaid': response.data.data.plan.amount/100,
+                'amountPaid': response.data.data.plan.amount / 100,
                 'paymentMode': response.data.data.plan.currency,
                 'paymentAccount': 'Stripe',
                 'invoiceUrl': response.data.data.latest_invoice.invoice_pdf,
@@ -247,104 +211,49 @@ class ServiceCheckout extends Component {
                 this.onSubmitHandler();
 
             })
+            // this.savePlan(response.data.data.id);
+
         }).catch((error) => {
             console.log("error", error);
         })
     }
 
+    // handle Plan save
 
+    savePlan = (sub_id) => {
+        const { selectCard } = this.state;
+        console.log("selecet Card", selectCard);
 
+        const url = '/seller/createSellerSubscriptionPlan';
+        const planData = {
+            id: selectCard.id,
+            nickname: selectCard.nickname,
+            amount: selectCard.amount / 100,
+            interval: selectCard.interval,
+            interval_count: selectCard.interval_count,
+            active: selectCard.active,
+            metadata: selectCard.metadata,
+            usageCount: [{
+                authorId: this.authInfo.id,
+                sub_id: sub_id,
+                count: 0,
+                isActive: true
+            }]
+        }
+        console.log("plan......>>>.", planData)
+        axios.post(url, planData, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${this.authInfo.token}`
+            }
+        }).then((response) => {
+            console.log(response)
+        }).catch((err) => {
+            console.log("error", err)
+        })
+    }
 
-    // onErrorHandler = (response) => {
-
-    //     //  const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
-
-    //     console.log(response);
-    //     this.setState({
-    //         status: ["failure", response.messages.message.map(err => err.text)]
-    //     });
-    //     const paymentData = [{
-    //         'userId': this.authInfo.id,
-    //         'sellerId': this.state.productSku,
-    //         'amountPaid': "",
-    //         'paymentMode': 'usd',
-    //         'paymentAccount': 'Authorize .Net',
-    //         'invoiceUrl': '',
-    //         'paymentStatus': 'failed',
-    //     }];
-    //     console.log("......", paymentData);
-    //     var paymentIds = this.managePaymentData(paymentData);
-    //     let paymentId;
-    //     paymentIds.then((result) => {
-    //         paymentId = result;
-    //     })
-    //     this.setState({ "paymentId": paymentId })
-
-    // };
-    /**
-     * Called On successful payment
-     * 
-    //   @param {*} response 
-     */
-    // onSuccessHandler = (response) => {
-
-    //     //  const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
-
-    //     console.log("resp:", response);
-    //     console.log("resp:", response.isTrusted === true ? "TRUE" : "FALSE");
-    //     if (response.isTrusted === true) {
-    //         console.log("subscription trueeeeeee")
-    //         this.setState({ status: ["paid", []] });
-    //         toast.dismiss();
-    //         toast.success('Payment Successfull', { autoClose: 3000 });
-
-    //         const paymentData = [{
-    //             'userId': this.authInfo.id,
-    //             'sellerId': this.state.productSku,
-    //             'amountPaid': "subscriptionPlanData.planPrice",
-    //             'paymentMode': 'usd',
-    //             'paymentAccount': 'Authorize .Net',
-    //             'invoiceUrl': '',
-    //             'paymentStatus': 'Paid',
-    //         }];
-    //         console.log("......", paymentData);
-    //         var paymentIds = this.managePaymentData(paymentData);
-    //         let paymentId;
-    //         paymentIds.then((result) => {
-    //             console.log(result);
-    //             paymentId = result;
-    //             this.setState({ "paymentId": result })
-    //             // this.onSubmitHandler();
-    //             // this.savePayData()
-    //         })
-    //         console.log(paymentId)
-    //         console.log("Payment PAID or UNPAID check here: ", this.state.status)
-
-
-
-    //     }
-    //     // Process API response on your backend...
-
-    // };
-
-    /****************************************************************************************** */
-    // handleCardNumber = (e) => {
-    //     this.setState({ cardNumber: e.target.value })
-    // }
-    // handleExpiry = (e) => {
-    //     const input = e.target.value.replace(/\D/g, '');
-    //     if (input.length > 2) {
-    //         this.setState({ expiryDate: input.slice(0, 2) + '/' + input.slice(2) });
-    //     } else {
-    //         this.setState({ expiryDate: input })
-    //     }
-    // }
-    // handleCvv = (e) => {
-    //     this.setState({ cvv: e.target.value })
-    // }
-
-    /**************************************************************************/
-    /**************************************************************************/
 
     /**
      * Manages payment Data
@@ -379,7 +288,6 @@ class ServiceCheckout extends Component {
      * Initialize instance and function on did mount
      */
     componentDidMount() {
-        this.getNewCouponCode();
         this.getOrderStaus();
         //this.getOrderTrackingTime();
         this.getProductSku();
@@ -416,7 +324,7 @@ class ServiceCheckout extends Component {
     /******************************************************************************/
     /******************************************************************************/
     /**
-     * Get order status data
+     * Get order status data update main data in this component..
      */
     getOrderStaus = () => {
         let reqBody = this.state.reqBody
@@ -464,27 +372,6 @@ class ServiceCheckout extends Component {
             console.log(error)
         });
     }
-    /******************************************************************************/
-    /******************************************************************************/
-
-    /**
-     *  get new Coupon code 
-     */
-    getNewCouponCode = () => {
-        let reqBody = this.state.reqBody
-        axios.post('/seller/coupons/new', reqBody, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Authorization': `Bearer ${this.authInfo.token}`,
-            }
-        }).then((response) => {
-            this.setState({ data: response.data.data.coupons })
-            console.log(response.data.data.coupons)
-        }).catch(error => {
-            console.log(error)
-        });
-    }
 
     /******************************************************************************/
     /******************************************************************************/
@@ -515,8 +402,6 @@ class ServiceCheckout extends Component {
         } else {
             return false
         }
-
-        //return product_sku;
     }
     /******************************************************************************/
     /******************************************************************************/
@@ -565,7 +450,7 @@ class ServiceCheckout extends Component {
     onSubmitHandler = event => {
         const { selectCard, planPrice, stripeResponse } = this.state;
 
-        console.log("price amount selected=> ", selectCard !== null ? selectCard.planPrice : planPrice,)
+        console.log("price amount selected=> ", selectCard !== null ? selectCard.amount / 100 : planPrice,)
 
         const url = '/seller/saveorder';
 
@@ -575,7 +460,7 @@ class ServiceCheckout extends Component {
             console.log(orderStatusData);
             if (typeof orderStatusData != 'undefined') {
                 orderStatusData && orderStatusData.map((d) => {
-                    if (d.title == "Completed") {
+                    if (d.title === "Completed") {
                         orderStatus = d._id;
                     }
                 })
@@ -617,8 +502,8 @@ class ServiceCheckout extends Component {
                     taxPercent: 0,
                     taxAmount: 0,
                     discount: 0,
-                    price: selectCard !== null ? selectCard.planPrice : planPrice,
-                    total: selectCard !== null ? selectCard.planPrice : planPrice,
+                    price: selectCard !== null ? selectCard.amount / 100 : planPrice,
+                    total: selectCard !== null ? selectCard.amount / 100 : planPrice,
                     orderStatus: orderStatus,
                     isActive: true,
                     isService: false
@@ -634,7 +519,6 @@ class ServiceCheckout extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`,
                 }
             }).then((response) => {
-                // toast.success('Order Placed Successfull', { autoClose: 3000 });
                 console.log("response++++ : ", response);
                 console.log("response++++ : ", response.data.status);
                 if (response.data.status === true) {
@@ -647,11 +531,9 @@ class ServiceCheckout extends Component {
                 console.log(error)
                 toast.error(error);
             });
-            // console.log("out of then .......", response.data)
         } else {
             toast.dismiss();
             toast.error('Order is not placed.Please try again.');
-
         }
     }
     /******************************************************************************/
@@ -670,7 +552,6 @@ class ServiceCheckout extends Component {
                 orderStatusId: orderStatus,
                 isActive: true
             },
-
         }
         axios.post('seller/saveordertracking', reqBody.data, {
             headers: {
@@ -706,7 +587,7 @@ class ServiceCheckout extends Component {
 
         prodArray.push({
             orderId: orderId,
-            price: selectCard !== null ? selectCard.planPrice : planPrice,
+            price: selectCard !== null ? selectCard.amount / 100 : planPrice,
             userId: this.authInfo.id,
             isService: false,
         });
@@ -794,6 +675,9 @@ class ServiceCheckout extends Component {
     }
 
     render() {
+        // const receivedData = this.props.location.state ? this.props.location.state.subscriptionPlan : null;
+        // console.log("receivedData select : ", receivedData)
+
 
         const { selectCard, planPrice, serviceName, serviceCategory, isLoading, stripeResponse } = this.state;
 
@@ -841,16 +725,16 @@ class ServiceCheckout extends Component {
 
         //getTotal();
 
-        this.onValueChange = (event) => {
-            this.setState({
-                paymentType: event.target.value
-            });
+        // this.onValueChange = (event) => {
+        //     this.setState({
+        //         paymentType: event.target.value
+        //     });
 
-            if (this.state.paymentType === 'cripto') {
-                this.setState({ moneyComparision: false })
-                this.setState({ formStatus: false })
-            }
-        }
+        //     if (this.state.paymentType === 'cripto') {
+        //         this.setState({ moneyComparision: false })
+        //         this.setState({ formStatus: false })
+        //     }
+        // }
 
         return (
             <React.Fragment>
@@ -878,12 +762,6 @@ class ServiceCheckout extends Component {
                                         {/* STRIPE FORM  */}
                                         <div>
                                             <form onSubmit={(e) => this.handleSubmit(e, this.props.elements, this.props.stripe)}>
-                                                {/* <input
-                                                            type="email"
-                                                            placeholder="Enter your email"
-                                                            value={this.state.email}
-                                                            onChange={(e) => this.setState({ email: e.target.value })}
-                                                        /> */}
                                                 <CardElement
                                                     options={{
                                                         style: {
@@ -914,26 +792,20 @@ class ServiceCheckout extends Component {
                                     <div className="payment_method_section">
                                         <div className="payment_list">
                                             <ul>
-                                                <li>Type of Plan : <b>{selectCard.planType}</b></li>
-                                                <li>Plan Detail : <b>{selectCard.description}</b></li>
-                                                <li>Price : <b>{selectCard.planPrice} $</b></li>
+                                                <li>Type of Plan : <b>{selectCard.nickname}</b></li>
+                                                <li>Plan Interval : <b>{selectCard.interval_count} {selectCard.interval}</b></li>
+                                                <li>Price : <b>{selectCard.amount / 100} $</b></li>
                                                 {/* <li>Tax(18%) : {this.getTotal().tax}$ </li> */}
                                             </ul>
                                         </div>
                                         <div className="subtotal_wrapper">
                                             <ul>
-                                                <li>Subtotal : <b>{selectCard.planPrice} $</b></li>
+                                                <li>Subtotal : <b>{selectCard.amount / 100} $</b></li>
                                             </ul>
                                         </div>
                                         {/* STRIPE FORM  */}
                                         <div>
                                             <form onSubmit={(e) => this.handleSubmit(e, this.props.elements, this.props.stripe)}>
-                                                {/* <input
-                                                    type="email"
-                                                    placeholder="Enter your email"
-                                                    value={this.state.email}
-                                                    onChange={(e) => this.setState({ email: e.target.value })}
-                                                /> */}
                                                 <CardElement
                                                     options={{
                                                         style: {
@@ -953,7 +825,7 @@ class ServiceCheckout extends Component {
                                                     }}
                                                 />
                                                 <div className="text-center" >
-                                                    <button type="submit" className="btn btn-success" disabled={isLoading} >  {isLoading ? 'Please wait....' : `PAY ( $ ${selectCard.planPrice})`} </button>
+                                                    <button type="submit" className="btn btn-success" disabled={isLoading} >  {isLoading ? 'Please wait....' : `PAY ( $ ${selectCard.amount / 100})`} </button>
                                                 </div>
                                             </form>
                                         </div>
@@ -971,7 +843,7 @@ class ServiceCheckout extends Component {
                     aria-labelledby="contained-modal-title-vcenter"
                     centered
 
-                // aria-labelledby="example-custom-modal-styling-title"
+                // Udpate model in with payment status...
                 >
 
                     <Modal.Body>
@@ -987,7 +859,7 @@ class ServiceCheckout extends Component {
                                     <Link to="/seller/service-stock-management">
                                         <button onClick={this.clearSessionStorage} class="btn btn-primary btn-sm mt-2" type="button">Return</button>
                                     </Link> :
-                                    <Link to="/seller/manage-banner-list">
+                                    <Link to="/seller/dashboard">
                                         <button onClick={this.clearSessionStorage} class="btn btn-primary btn-sm mt-2" type="button">Return</button>
                                     </Link>
                                 }

@@ -171,6 +171,10 @@ class ServiceStockManagement extends Component {
     this.props.history.push(`/seller/edit-service/${row._id}`);
   };
 
+  clearSessionStorage = () => {
+    sessionStorage.clear();
+  }
+
   service_column = [
     {
       name: "Image",
@@ -485,6 +489,7 @@ class ServiceStockManagement extends Component {
                             <Link
                               className="btn custom_btn btn_yellow mx-auto"
                               to="/seller/add-service"
+                              onClick={this.clearSessionStorage}
                             >
                               Add New Service
                             </Link>

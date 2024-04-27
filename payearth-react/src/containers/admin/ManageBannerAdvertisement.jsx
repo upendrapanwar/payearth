@@ -487,7 +487,7 @@ class ManageBannerAdvertisement extends Component {
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
                                                             <label htmlFor="">Meta information</label>
-                                                            <div className="field_item">
+                                                            <div className="text-area field_item">
                                                                 <textarea
                                                                     type="text"
                                                                     name="bannerText"

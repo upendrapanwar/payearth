@@ -42,6 +42,7 @@ router.get('/pageDetail/:slug', cmsPageDetails);
 
 // For banner data show through keywords..
 
+router.get('/advertisement/:slug', advertismentBySlug);
 router.get('/advBanner-list/:keywords', getAllBannersData)
 router.get('/getAllAdvBanner-list', getAllAdvBannerData)
 
@@ -178,6 +179,13 @@ function cmsPublishPage(req, res, next) {
 function cmsPageDetails(req, res, next) {
     frontService.cmsPageDetails(req)
         .then(page => page ? res.status(200).json({ status: true, data: page }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+// advertisment by slug
+function advertismentBySlug(req, res, next) {
+    frontService.advertismentBySlug(req)
+        .then(adv => adv ? res.status(200).json({ status: true, data: adv }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
 

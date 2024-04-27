@@ -15,9 +15,7 @@ var ApiContracts = require("authorizenet").APIContracts;
 var ApiControllers = require("authorizenet").APIControllers;
 var SDKConstants = require("authorizenet").Constants;
 const fs = require("fs");
-const stripe = require("stripe")(
-  "sk_test_51OewZgD2za5c5GtO7jqYHLMoDerwvEM69zgVsie3FNLrO0LLSLwFJGzXv4VIIGqScWn6cfBKfGbMChza2fBIQhsv00D9XQRaOk"
-);
+const stripe = require("stripe")("sk_test_51OewZgD2za5c5GtO7jqYHLMoDerwvEM69zgVsie3FNLrO0LLSLwFJGzXv4VIIGqScWn6cfBKfGbMChza2fBIQhsv00D9XQRaOk");
 
 const {
   User,
@@ -2420,7 +2418,7 @@ async function customerAuthorizePayment(req) {
 }
 
 /**STRIPE>>>>>>>>>>>>>>>>>>>>>>> */
-        
+
 async function createSubscription(req, res) {
   const { paymentMethodId, email, plan_Id, authName } = req.body;
   try {
@@ -2708,3 +2706,5 @@ async function delMeetingByUser(req) {
 //     console.log(error);
 //   }
 // }
+
+

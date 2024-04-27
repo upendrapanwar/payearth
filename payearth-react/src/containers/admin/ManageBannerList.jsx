@@ -256,11 +256,11 @@ class ManageBannerList extends Component {
             sortable: true,
             width: 'auto',
         },
-        {
-            name: 'Plan Type',
-            selector: (row, i) => row.subscriptionPlan === null ? "N/A" : <p>{row.subscriptionPlan.planType}</p>,
-            sortable: true,
-        },
+        // {
+        //     name: 'Plan Type',
+        //     selector: (row, i) => row.subscriptionPlan === null ? "N/A" : <p>{row.subscriptionPlan.planType}</p>,
+        //     sortable: true,
+        // },
         {
             name: "Created Date",
             selector: (row, i) => new Date(row.createdAt).toLocaleString(),
