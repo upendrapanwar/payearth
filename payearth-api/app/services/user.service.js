@@ -1,5 +1,7 @@
 ﻿const config = require("../config/index");
 const mongoose = require("mongoose");
+const axios = require("axios");
+const { Base64 } = require("js-base64");
 mongoose.connect(process.env.MONGODB_URI || config.connectionString, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -106,6 +108,8 @@ module.exports = {
   addMeetByUser,
   getMeeting,
   delMeetingByUser,
+  createZoomToken,
+  getServiceOrder,
 };
 
 function sendMail(mailOptions) {
@@ -2469,7 +2473,7 @@ async function createSubscription(req, res) {
 // *******************************************************************************
 // *******************************************************************************
 
-// GET Common All Services
+//GET Common All Services
 async function getCommonService(req) {
   try {
     let result = await Services.find({})
@@ -2695,7 +2699,11 @@ async function delMeetingByUser(req) {
     console.log(error);
   }
 }
+// *******************************************************************************
+// *******************************************************************************
+//service order completed order list & Failed list
 
+<<<<<<< HEAD
 // async function delMeetingByUser(req) {
 //   const event_id = req.params.event_id;
 //   console.log("delete meeting", event_id);
@@ -2708,3 +2716,62 @@ async function delMeetingByUser(req) {
 // }
 
 
+=======
+async function getServiceOrder(req) {
+  const userId = req.params.id;
+  try {
+    const serviceOrder = await Payment.find({ userId })
+      .select()
+      .sort({ createdAt: "desc" })
+      .populate({
+        path: "userId",
+        model: User,
+        select: "name",
+      });
+    if (serviceOrder && serviceOrder.length > 0) return serviceOrder;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// *******************************************************************************
+// *******************************************************************************
+// const ZOOM_API_BASE_URL = "https://api.zoom.us/v2";
+const ZOOM_ACCOUNT_ID = process.env.ZOOM_ACCOUNT_ID;
+const ZOOM_CLIENT_ID = process.env.ZOOM_CLIENT_ID;
+const ZOOM_CLIENT_SECRET = process.env.ZOOM_CLIENT_SECRET;
+
+async function createZoomToken() {
+  try {
+    // Encode client ID and client secret in base64
+    const credentials = `${ZOOM_CLIENT_ID}:${ZOOM_CLIENT_SECRET}`;
+    const encodedCredentials = Base64.encode(credentials);
+    const authorization = `Basic ${encodedCredentials}`;
+
+    // Set up API request header
+    const headers = {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: authorization,
+    };
+
+    // Set up body for access token request
+    const data = new URLSearchParams();
+    data.append("grant_type", "account_credentials");
+    data.append("account_id", ZOOM_ACCOUNT_ID);
+
+    // Make POST request to token API
+    axios
+      .post(`https://zoom.us/oauth/token`, data, { headers })
+      .then((response) => {
+        // Log the access token
+        console.log("Access token:", response.data.access_token);
+      })
+      .catch((error) => {
+        // Log and handle errors
+        console.error("Error generating access token:", error.response.data);
+      });
+  } catch (error) {
+    console.error("Error:", error.message);
+  }
+}
+>>>>>>> 01622818fcc9b1ef385752c41e70ada4d6db7a06
