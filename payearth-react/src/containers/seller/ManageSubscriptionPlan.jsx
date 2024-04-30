@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import Stripe from 'stripe';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
+import { Helmet } from 'react-helmet';
 
 const stripe = new Stripe(process.env.REACT_APP_STRIPE_SECRET_KEY);
 
@@ -141,6 +142,7 @@ class SellerManageSubscription extends Component {
 
     render() {
         const { subscriptionPlan, displaySubPlan, loading, sellerSubscriptionPlan } = this.state;
+        console.log("displaySubPlan", displaySubPlan)
         if (loading) {
             return <SpinnerLoader />
         }
@@ -151,6 +153,9 @@ class SellerManageSubscription extends Component {
                 <div className="inr_top_page_title">
                     <h2>Subscription Plan</h2>
                 </div>
+                <Helmet>
+                    <title>{"Manage Subscription - Pay Earth"}</title>
+                </Helmet>
                 {sellerSubscriptionPlan === "" ?
                     "" :
                     <div className="text-center alert alert-success" >
@@ -179,12 +184,7 @@ class SellerManageSubscription extends Component {
                                                                 <p className="hint">Payment Interval Per {card.interval_count} {card.interval}</p>
                                                                 <p className="hint">Advertisements Allowed {card.metadata.advertiseAllowed}</p>
                                                             </div>
-                                                            <ul className="features">
-                                                                <p><span className="fontawesome-cog"></span>
-                                                                    Advertisements displayed in rotation with other Basic Plan advertisers
-                                                                    Access to basic analytics (number of views, clicks, etc.)
-                                                                    Support available during business hours</p>
-                                                            </ul>
+                                                            <div className='features' dangerouslySetInnerHTML={{ __html: card.metadata.descriptions }}></div>
                                                         </a>
                                                     </div>
                                                 </li>

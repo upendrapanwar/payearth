@@ -108,7 +108,6 @@ module.exports = {
   addMeetByUser,
   getMeeting,
   delMeetingByUser,
-  createZoomToken,
   getServiceOrder,
 };
 
@@ -2703,20 +2702,6 @@ async function delMeetingByUser(req) {
 // *******************************************************************************
 //service order completed order list & Failed list
 
-<<<<<<< HEAD
-// async function delMeetingByUser(req) {
-//   const event_id = req.params.event_id;
-//   console.log("delete meeting", event_id);
-//   try {
-//     const result = await Calendar.deleteOne({ event_id: event_id });
-//     return result;
-//   } catch (error) {
-//     console.log(error);
-//   }
-// }
-
-
-=======
 async function getServiceOrder(req) {
   const userId = req.params.id;
   try {
@@ -2734,44 +2719,3 @@ async function getServiceOrder(req) {
   }
 }
 
-// *******************************************************************************
-// *******************************************************************************
-// const ZOOM_API_BASE_URL = "https://api.zoom.us/v2";
-const ZOOM_ACCOUNT_ID = process.env.ZOOM_ACCOUNT_ID;
-const ZOOM_CLIENT_ID = process.env.ZOOM_CLIENT_ID;
-const ZOOM_CLIENT_SECRET = process.env.ZOOM_CLIENT_SECRET;
-
-async function createZoomToken() {
-  try {
-    // Encode client ID and client secret in base64
-    const credentials = `${ZOOM_CLIENT_ID}:${ZOOM_CLIENT_SECRET}`;
-    const encodedCredentials = Base64.encode(credentials);
-    const authorization = `Basic ${encodedCredentials}`;
-
-    // Set up API request header
-    const headers = {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: authorization,
-    };
-
-    // Set up body for access token request
-    const data = new URLSearchParams();
-    data.append("grant_type", "account_credentials");
-    data.append("account_id", ZOOM_ACCOUNT_ID);
-
-    // Make POST request to token API
-    axios
-      .post(`https://zoom.us/oauth/token`, data, { headers })
-      .then((response) => {
-        // Log the access token
-        console.log("Access token:", response.data.access_token);
-      })
-      .catch((error) => {
-        // Log and handle errors
-        console.error("Error generating access token:", error.response.data);
-      });
-  } catch (error) {
-    console.error("Error:", error.message);
-  }
-}
->>>>>>> 01622818fcc9b1ef385752c41e70ada4d6db7a06

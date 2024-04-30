@@ -160,9 +160,14 @@ class AdminManageSubPlan extends Component {
         this.setState({ advertiseAllowed: e.target.value });
     };
 
-    handleDescription = (e) => {
-        console.log("Description", e.target.value)
-        this.setState({ description: e.target.value });
+    // handleDescription = (e) => {
+    //     console.log("Description", e.target.value)
+    //     this.setState({ description: e.target.value });
+    // };
+
+    handleDescription = (description) => {
+        console.log("Description", description)
+        this.setState({ description });
     };
 
   
@@ -278,7 +283,7 @@ class AdminManageSubPlan extends Component {
                 <Header />
                 <div className="container">
                     <Helmet>
-                        <title>{"Manage SubscriptionPlan - Pay Earth"}</title>
+                        <title>{"Manage Subscription - Pay Earth"}</title>
                     </Helmet>
                     <div className="row">
                         <div className="col-lg-4">
@@ -391,7 +396,7 @@ class AdminManageSubPlan extends Component {
                                     </div>
 
 
-                                    <div className="crt_bnr_fieldRow">
+                                    {/* <div className="crt_bnr_fieldRow">
                                         <div className="crt_bnr_field">
                                             <label htmlFor="">Description</label>
                                             <div className="field_item">
@@ -404,6 +409,30 @@ class AdminManageSubPlan extends Component {
                                                     rows="10"
                                                     className="form-control"
                                                 ></textarea>
+                                            </div>
+                                        </div>
+                                    </div> */}
+
+                                    <div className="crt_bnr_fieldRow">
+                                        <div className="crt_bnr_field">
+                                            <label>Description</label>
+                                            <div className="field_item">
+                                                <ReactQuill
+                                                    //style={{ height: '250px' }}
+                                                    type="text"
+                                                    name="description"
+                                                    value={this.state.description}
+                                                    onChange={this.handleDescription}
+                                                    modules={{
+                                                        toolbar: [
+                                                            [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+                                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                            ['bold', 'italic', 'underline'],
+                                                            ['link', 'image'],
+                                                            ['clean']
+                                                        ]
+                                                    }}
+                                                />
                                             </div>
                                         </div>
                                     </div>

@@ -39,7 +39,6 @@ import PageNotFound from "./components/common/PageNotFound";
 import Role from "./helpers/role";
 import { useSelector } from "react-redux";
 
-<<<<<<< HEAD
 import SellerLogin from './containers/seller/login';
 import SellerRegister from './containers/seller/Register';
 import SellerResetPwd from './containers/seller/ResetPassword';
@@ -65,30 +64,6 @@ import SellerBannerEdit from './containers/seller/ManageBannerListEdit';
 import AdvertiseShare from "./components/common/AdvertiseShare";
 import SellerManageSubscription from "./containers/seller/ManageSubscriptionPlan";
 
-=======
-import SellerLogin from "./containers/seller/login";
-import SellerRegister from "./containers/seller/Register";
-import SellerResetPwd from "./containers/seller/ResetPassword";
-import SellerForgotPwd from "./containers/seller/ForgotPassword";
-import ProductStockManagement from "./containers/seller/ProductStockManagement";
-import SellerChat from "./containers/seller/Chat";
-import ServiceStockManagement from "./containers/seller/ServiceStockManagement";
-import AddProduct from "./containers/seller/AddProduct";
-import AddService from "./containers/seller/AddService";
-import SellerDashboard from "./containers/seller/SellerDashboard";
-import ProductOrders from "./containers/seller/ProductOrders";
-import ServiceOrders from "./containers/seller/ServiceOrders";
-import ListedProducts from "./containers/seller/ListedProducts";
-import Contact from "./containers/seller/Contact";
-import Payments from "./containers/seller/Payments";
-import ManagePaymentDetails from "./containers/admin/ManagePaymentDetails";
-import SellerProductDetail from "./containers/seller/ProductDetail";
-import SellerServiceDetail from "./containers/seller/ServiceDetail";
-import SellerOrderDetail from "./containers/seller/OrderDetail";
-import SellerManageBannerAdvertisement from "./containers/seller/ManageBannerAdvertisement";
-import SellerBannerList from "./containers/seller/ManageBannerList";
-import SellerBannerEdit from "./containers/seller/ManageBannerListEdit";
->>>>>>> 01622818fcc9b1ef385752c41e70ada4d6db7a06
 
 import AdminLogin from "./containers/admin/Login";
 import AdminRegister from "./containers/admin/Register";
@@ -321,7 +296,6 @@ function App() {
             exact
           />
 
-<<<<<<< HEAD
           <PrivateRoute path="/seller/dashboard" component={SellerDashboard} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
 
           {/* SellerManageSubscription */}
@@ -347,150 +321,6 @@ function App() {
           <PrivateRoute path="/seller/add-service" component={AddService} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
           <PrivateRoute path="/seller/service-checkout" component={ServiceCheckoutStripe} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
           <PrivateRoute path="/seller/edit-service/:id" component={EditService} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-=======
-          <PrivateRoute
-            path="/seller/dashboard"
-            component={SellerDashboard}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-
-          <PrivateRoute
-            path="/seller/manage-banner-advertisement"
-            component={SellerManageBannerAdvertisement}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-          <PrivateRoute
-            path="/seller/manage-banner-list"
-            component={SellerBannerList}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-          <PrivateRoute
-            path="/seller/banner-edit/:id"
-            component={SellerBannerEdit}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-
-          <PrivateRoute
-            path="/seller/product-stock-management"
-            component={ProductStockManagement}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-          <PrivateRoute
-            path="/seller/chat"
-            component={SellerChat}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-          <PrivateRoute
-            path="/seller/service-stock-management"
-            component={ServiceStockManagement}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-          <PrivateRoute
-            path="/seller/add-product"
-            component={AddProduct}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-          <PrivateRoute
-            path="/seller/edit-product/:id"
-            component={EditProduct}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-          <PrivateRoute
-            path="/seller/product-orders"
-            component={ProductOrders}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-          <PrivateRoute
-            path="/seller/service-orders"
-            component={ServiceOrders}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-          <PrivateRoute
-            path="/seller/listed-items"
-            component={ListedProducts}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-          <PrivateRoute
-            path="/seller/contact"
-            component={Contact}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-          <PrivateRoute
-            path="/seller/payments"
-            component={Payments}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-          <PrivateRoute
-            path="/seller/product-detail/:id"
-            component={SellerProductDetail}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-          <PrivateRoute
-            path="/seller/service-detail/:id"
-            component={SellerServiceDetail}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-          <PrivateRoute
-            path="/seller/order-detail/:id"
-            component={SellerOrderDetail}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-          <PrivateRoute
-            path="/seller/add-service"
-            component={AddService}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-          <PrivateRoute
-            path="/seller/service-checkout"
-            component={ServiceCheckoutStripe}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-          <PrivateRoute
-            path="/seller/edit-service/:id"
-            component={EditService}
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
-            exact
-          />
->>>>>>> 01622818fcc9b1ef385752c41e70ada4d6db7a06
 
           {/* Admin routes */}
           <PublicRoute

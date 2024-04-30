@@ -132,10 +132,10 @@ class ServiceCheckout extends Component {
 
     };
 
-    handleCheckOut = () => {
-        console.log("RUNNNNN>>>>>>handleCheckOut")
-        this.setState({ showModal: true });
-    };
+    // handleCheckOut = () => {
+    //     console.log("RUNNNNN>>>>>>handleCheckOut")
+    //     this.setState({ showModal: true });
+    // };
 
     handleSubmit = async (event, elements, stripe) => {
         this.setState({ isLoading: true });
@@ -290,8 +290,8 @@ class ServiceCheckout extends Component {
     componentDidMount() {
         this.getOrderStaus();
         //this.getOrderTrackingTime();
-        this.getProductSku();
-        this.fetchStripePlans();
+        // this.getProductSku();
+        // this.fetchStripePlans();
     }
     /**************************************************************************/
     /**************************************************************************/
@@ -302,6 +302,8 @@ class ServiceCheckout extends Component {
      * @returns sellerid|null 
      */
     getSellerId = async (productId) => {
+
+        console.log("productId : ", productId)
         let reqBody = this.state.reqBody
         //console.log(this.authInfo)
         let res = await axios.get('user/sellerid/' + productId, {
@@ -339,7 +341,7 @@ class ServiceCheckout extends Component {
             if (typeof response.data.data != 'undefined') {
                 const orderStatus = response.data.data;
                 this.setState({ orderStatus: orderStatus });
-                console.log("get order status", response.data.data);
+                // console.log("get order status", response.data.data);
                 this.setState({ isLoading: false });
             } else {
                 this.setState({ orderStatus: '' })
@@ -381,9 +383,11 @@ class ServiceCheckout extends Component {
      * @returns Array|null
      */
     getProductSku = () => {
+        console.log("getProductSku is run")
         const cart = this.props.cart
         let product_sku = [];
         cart.forEach(items => {
+            console.log("items", items)
             let sellerdata = this.getSellerId(items.id);
             sellerdata.then((result) => {
                 product_sku.push({
@@ -637,7 +641,8 @@ class ServiceCheckout extends Component {
             }
         }).then((response) => {
             console.log("ORDER STATUS", response.data.data);
-            this.handleCheckOut();
+            // this.handleCheckOut();
+            this.setState({ showModal: true });
 
             // toast.success('Payment Successfull', { autoClose: 3000 });
             // this.props.history.push('/my-banners')

@@ -2810,7 +2810,7 @@ async function updateBanner(req) {
 async function createSellerSubscriptionPlan(req, res) {
 
   var param = req.body;
-  console.log("param:::;", param)
+  // console.log("param:::;", param)
   var authorId = param.usageCount[0].authorId;
   var subscription_Id = param.usageCount[0].sub_id
   // console.log("author ID :::", authorId)
@@ -2818,7 +2818,7 @@ async function createSellerSubscriptionPlan(req, res) {
   try {
 
     let existingPlan = await subscriptionPlan.findOne({ id: param.id });
-    console.log("existingPlan", existingPlan)
+    // console.log("existingPlan", existingPlan)
 
     if (existingPlan) {
       existingPlan.usageCount.push({
@@ -2829,7 +2829,7 @@ async function createSellerSubscriptionPlan(req, res) {
       });
 
       const updatedPlan = await existingPlan.save();
-      console.log("Updated plan", updatedPlan);
+      // console.log("Updated plan", updatedPlan);
       return updatedPlan;
 
     } else {
@@ -2844,9 +2844,9 @@ async function createSellerSubscriptionPlan(req, res) {
         usageCount: param.usageCount
       };
 
-      console.log("input", input)
+      // console.log("input", input)
       const plan = new subscriptionPlan(input);
-      console.log("plan", plan)
+      // console.log("plan", plan)
       const data = await plan.save();
 
       // console.log("RES data", data)
@@ -2865,17 +2865,17 @@ async function createSellerSubscriptionPlan(req, res) {
 
 async function sellerAddPlan(req) {
   const data = req.params
-  console.log("data check", data)
+  // console.log("data check", data)
   const dbPlanId = req.params.id;
-  console.log("planID in backend", dbPlanId)
+  // console.log("planID in backend", dbPlanId)
   const { usageCount, metadata } = req.body;
-  console.log("metadata advertiseAllowed:::::>>>>>>>>>>>>>", metadata.advertiseAllowed)
-  console.log("usageCount : ", usageCount.authorId)
+  // console.log("metadata advertiseAllowed:::::>>>>>>>>>>>>>", metadata.advertiseAllowed)
+  // console.log("usageCount : ", usageCount.authorId)
   const authorId = usageCount.authorId;
   const MAX_COUNT = metadata.advertiseAllowed;
   try {
     const plan = await subscriptionPlan.findById(dbPlanId);
-    console.log("plan", plan);
+    // console.log("plan", plan);
 
     const usageCountIndex = plan.usageCount.findIndex(item => item.authorId === authorId);
     if (usageCountIndex !== -1) {
@@ -2899,7 +2899,7 @@ async function sellerAddPlan(req) {
       { usageCount: plan.usageCount },
       { new: true }
     );
-    console.log("subPlan", subPlan);
+    // console.log("subPlan", subPlan);
     return subPlan;
 
   } catch (error) {

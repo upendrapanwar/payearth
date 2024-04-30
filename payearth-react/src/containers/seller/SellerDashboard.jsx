@@ -11,11 +11,12 @@ import NotFound from '../../components/common/NotFound';
 import Select from 'react-select';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { Chart } from "react-google-charts";
+import { Helmet } from 'react-helmet';
 
 class SellerDashboard extends Component {
     constructor(props) {
         super(props);
-        const {dispatch} = props;
+        const { dispatch } = props;
         this.dispatch = dispatch;
         this.authInfo = store.getState().auth.authInfo;
         this.currentDate = new Date();
@@ -47,16 +48,16 @@ class SellerDashboard extends Component {
             },
             pagination: {},
             sortingOptions: [
-                {label: 'New to Old', value: 'desc'},
-                {label: "Old to New ", value: 'asc'},
+                { label: 'New to Old', value: 'desc' },
+                { label: "Old to New ", value: 'asc' },
             ],
-            defaultSelectedOption: {label: 'New to Old', value: 'desc'},
+            defaultSelectedOption: { label: 'New to Old', value: 'desc' },
             chartOptions: [
-                {label: 'Monthly Graph', value: 'monthly'},
-                {label: 'Weekly Graph', value: 'weekly'},
-                {label: 'Yearly Graph', value: 'yearly'}
+                { label: 'Monthly Graph', value: 'monthly' },
+                { label: 'Weekly Graph', value: 'weekly' },
+                { label: 'Yearly Graph', value: 'yearly' }
             ],
-            defaultSelectedOptionChart: {label: 'Monthly', value: 'monthly'},
+            defaultSelectedOptionChart: { label: 'Monthly', value: 'monthly' },
             topSellingCategoriesData: [['category', 'Sale']]
         }
     }
@@ -71,7 +72,7 @@ class SellerDashboard extends Component {
     }
 
     getCounters = () => {
-        this.dispatch(setLoading({loading: true}));
+        this.dispatch(setLoading({ loading: true }));
         axios.get(`seller/dashboard-counters/${this.authInfo.id}`, {
             headers: {
                 'Accept': 'application/json',
@@ -115,7 +116,7 @@ class SellerDashboard extends Component {
             reqBody = this.state.reqBody;
         }
 
-        this.dispatch(setLoading({loading: true}));
+        this.dispatch(setLoading({ loading: true }));
         axios.post(`seller/product-sales/${this.authInfo.id}`, reqBody, {
             headers: {
                 'Accept': 'application/json',
@@ -182,7 +183,7 @@ class SellerDashboard extends Component {
             chartReqBody = this.state.chartReqBody
         }
 
-        this.dispatch(setLoading({loading: true}));
+        this.dispatch(setLoading({ loading: true }));
         axios.post(`seller/sales-line-chart/${this.authInfo.id}`, chartReqBody, {
             headers: {
                 'Accept': 'application/json',
@@ -213,7 +214,7 @@ class SellerDashboard extends Component {
                     weekChartData.push([value._id, value.count])
                 })
                 weekChartData.unshift(['week', 'sale'])
-                this.setState({weekChartData});
+                this.setState({ weekChartData });
             }
         }).catch(error => {
             // if (error.response && error.response.data.status === false) {
@@ -228,7 +229,7 @@ class SellerDashboard extends Component {
     }
 
     getTopSellingCatData = () => {
-        this.dispatch(setLoading({loading: true}));
+        this.dispatch(setLoading({ loading: true }));
         axios.get(`seller/selling-category-donut-chart/${this.authInfo.id}`, {
             headers: {
                 'Accept': 'application/json',
@@ -242,14 +243,14 @@ class SellerDashboard extends Component {
                     response.data.data.forEach(value => {
                         data.push([value.name, value.count]);
                     })
-                    this.setState({topSellingCategoriesData: data});
+                    this.setState({ topSellingCategoriesData: data });
                 }
             }
         }).catch(error => {
             console.log(error);
         }).finally(() => {
             setTimeout(() => {
-                this.dispatch(setLoading({loading: false}));
+                this.dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
@@ -257,19 +258,19 @@ class SellerDashboard extends Component {
     handleChart = (selectedOption) => {
         this.setState({ defaultSelectedOptionChart: selectedOption });
         if (selectedOption.value === 'monthly') {
-            this.setState({charData: this.state.monthChartData, hAxisTitle: 'MONTHS', chartTitle: 'MONTHLY'});
+            this.setState({ charData: this.state.monthChartData, hAxisTitle: 'MONTHS', chartTitle: 'MONTHLY' });
             this.getChartsData('month');
         } else if (selectedOption.value === 'weekly') {
-            this.setState({charData: this.state.weekChartData, hAxisTitle: 'WEEKS', chartTitle: 'WEEKLY'});
+            this.setState({ charData: this.state.weekChartData, hAxisTitle: 'WEEKS', chartTitle: 'WEEKLY' });
             this.getChartsData('week');
         } else if (selectedOption.value === 'yearly') {
-            this.setState({charData: this.state.yearChartData, hAxisTitle: 'YEARS', chartTitle: 'YEARLY'});
+            this.setState({ charData: this.state.yearChartData, hAxisTitle: 'YEARS', chartTitle: 'YEARLY' });
             this.getChartsData('year');
         }
     }
 
     render() {
-        const {loading} = store.getState().global;
+        const { loading } = store.getState().global;
         const {
             data,
             salesData,
@@ -290,6 +291,9 @@ class SellerDashboard extends Component {
                 {loading === true ? <SpinnerLoader /> : ''}
                 <div className="seller_body">
                     <Header />
+                    <Helmet>
+                        <title>{"Seller Dashboard - Pay Earth"}</title>
+                    </Helmet>
                     <div className="seller_dash_wrap pt-5 pb-5">
                         <div className="container">
                             <div className="row">
@@ -349,7 +353,7 @@ class SellerDashboard extends Component {
                                                         },
                                                         curveType: "function",
                                                     }}
-                                                    rootProps={{'data-testid': '1'}}
+                                                    rootProps={{ 'data-testid': '1' }}
                                                 /> :
                                                 <NotFound msg="Data not found." />
                                             }
@@ -368,12 +372,12 @@ class SellerDashboard extends Component {
                                                 data={topSellingCategoriesData}
                                                 options={{
                                                     // title: 'My Daily Activities',
-                                                    legend: {position: "bottom", alignment: "center"},
+                                                    legend: { position: "bottom", alignment: "center" },
                                                     pieHole: 0.4,
                                                     slices: [
-                                                        {color: "#43D2FF"},
-                                                        {color: "#222327"},
-                                                        {color: "#4358FF"}
+                                                        { color: "#43D2FF" },
+                                                        { color: "#222327" },
+                                                        { color: "#4358FF" }
                                                     ]
                                                 }}
                                                 rootProps={{ 'data-testid': '3' }}

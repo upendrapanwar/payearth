@@ -2355,7 +2355,7 @@ async function getAllPostSlug() {
     } catch (error) {
         console.log(error)
     }
-} 
+}
 
 // ************************Cms page model******************************
 async function createCmsPage(req, res) {
@@ -2527,14 +2527,13 @@ async function categoryDelete(req) {
 async function createNewBanner(req, res) {
     try {
         var param = req.body;
-        // const titleCount = await cmsPost.find({ title: param.title }).count()
-        // let slug = "";
-        // if (titleCount > 0) {
-        //     slug = param.slug + titleCount;
-        // } else {
-        //     slug = param.slug
-        // } 
-        // console.log("Slug", slug)
+        const titleCount = await bannerAdvertisement.find({ bannerName: param.bannerName }).count()
+        let slug = "";
+        if (titleCount > 0) {
+            slug = param.slug + titleCount;
+        } else {
+            slug = param.slug
+        }
         let input = {
             image: param.image,
             imageId: param.imageId,
@@ -2543,6 +2542,7 @@ async function createNewBanner(req, res) {
             bannerText: param.bannerText,
             bannerType: param.bannerType,
             bannerName: param.bannerName,
+            slug: slug,
             siteUrl: param.siteUrl,
             category: param.category,
             startDate: param.startDate,
@@ -2553,7 +2553,7 @@ async function createNewBanner(req, res) {
             tag: param.tag,
             keyword: param.keyword,
             author: param.author,
-            authorDetails : param.authorDetails
+            authorDetails: param.authorDetails
         };
         const banner = new bannerAdvertisement(input);
         const data = await banner.save();

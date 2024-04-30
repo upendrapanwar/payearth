@@ -25,6 +25,7 @@ import linkedinIcon from './../../assets/icons/linkedin.svg';
 import twitterIcon from './../../assets/icons/twitter.svg';
 import facebook from './../../assets/icons/facebook.svg';
 import instagram from './../../assets/icons/instagram.svg'
+import { Helmet } from 'react-helmet';
 
 
 
@@ -351,6 +352,9 @@ class SellerBannerList extends Component {
         <div className="inr_top_page_title">
           <h2>Manage Advertisement</h2>
         </div>
+        <Helmet>
+          <title>{"Manage Advertisement - Pay Earth"}</title>
+        </Helmet>
         <section className="inr_wrap">
           <div className="container">
             <div className="row">

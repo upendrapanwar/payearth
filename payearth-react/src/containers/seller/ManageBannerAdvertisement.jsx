@@ -9,6 +9,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
+import { Helmet } from 'react-helmet';
 
 class SellerManageBannerAdvertisement extends Component {
 
@@ -523,36 +524,36 @@ class SellerManageBannerAdvertisement extends Component {
                     // console.log("res>>>>.", response.data.data)
                     if (Array.isArray(response.data.data) && response.data.data.length > 0) {
                         const latest = response.data.data[0];
-                        const previousPlan = response.data.data[1]
+                        // const previousPlan = response.data.data[1]
                         // console.log("latest", latest)
                         // console.log("previousPlan", previousPlan)
-                        if (previousPlan !== undefined) {
-                            const { usageCount } = previousPlan;
-                            for (const usage of usageCount) {
-                                if (usage.authorId === this.authInfo.id) {
-                                    // console.log("sub_id with author", usage.sub_id)
-                                    // console.log("previous data", usage._id)
-                                    try {
-                                        const response = axios.delete(`https://api.stripe.com/v1/subscriptions/${usage.sub_id}`, {
-                                            headers: {
-                                                Authorization: `Bearer ${process.env.REACT_APP_STRIPE_SECRET_KEY}`, // Replace with your actual Stripe secret key
-                                                'Content-Type': 'application/x-www-form-urlencoded',
-                                            },
-                                        });
-                                        console.log("response", response.data)
-                                    } catch (error) {
-                                        if (error.response && error.response.status === 404) {
-                                            // Subscription not found in Stripe, handle accordingly
-                                            console.log("Subscription not found in Stripe:", error.response.data);
-                                        } else {
-                                            // Handle other errors
-                                            console.error("Error deleting subscription:", error);
-                                        }
-                                    }
+                        // if (previousPlan !== undefined) {
+                        //     const { usageCount } = previousPlan;
+                        //     for (const usage of usageCount) {
+                        //         if (usage.authorId === this.authInfo.id) {
+                        //             // console.log("sub_id with author", usage.sub_id)
+                        //             // console.log("previous data", usage._id)
+                        //             try {
+                        //                 const response = axios.delete(`https://api.stripe.com/v1/subscriptions/${usage.sub_id}`, {
+                        //                     headers: {
+                        //                         Authorization: `Bearer ${process.env.REACT_APP_STRIPE_SECRET_KEY}`, // Replace with your actual Stripe secret key
+                        //                         'Content-Type': 'application/x-www-form-urlencoded',
+                        //                     },
+                        //                 });
+                        //                 console.log("response", response.data)
+                        //             } catch (error) {
+                        //                 if (error.response && error.response.status === 404) {
+                        //                     // Subscription not found in Stripe, handle accordingly
+                        //                     console.log("Subscription not found in Stripe:", error.response.data);
+                        //                 } else {
+                        //                     // Handle other errors
+                        //                     console.error("Error deleting subscription:", error);
+                        //                 }
+                        //             }
 
-                                }
-                            }
-                        }
+                        //         }
+                        //     }
+                        // }
                         this.setState({
                             sellerSubscriptionPlan: latest,
                             loading: false,
@@ -598,7 +599,7 @@ class SellerManageBannerAdvertisement extends Component {
         if (loading) {
             return <SpinnerLoader />
         }
-
+ 
         const count = this.getCountForAuthor(sellerSubscriptionPlan)
         // console.log("count", count)
 
@@ -609,6 +610,9 @@ class SellerManageBannerAdvertisement extends Component {
                 <div className="inr_top_page_title">
                     <h2>Create New Advertisement</h2>
                 </div>
+                <Helmet>
+                    <title>{"Manage Advertisement - Pay Earth"}</title>
+                </Helmet>
                 <section className="inr_wrap">
                     <div className="container">
                         <div className="row">
@@ -774,7 +778,6 @@ class SellerManageBannerAdvertisement extends Component {
                                                 <div className="col-md-12 bg-body-tertiary advBannerEditWrap">
                                                     <div className="row">
                                                         {sellerSubscriptionPlan !== "" ? <>
-
                                                             <div className="col-md-12" key={sellerSubscriptionPlan.id}>
                                                                 <h3 className="text-center selectPlanHeading text-bg-success p-3">Your Subscription Plan Is Active With Remaining {sellerSubscriptionPlan.metadata.advertiseAllowed - count} Advertise Allowed....! </h3>
                                                                 {advertiseAllowed === count ? <p className="text-center text-danger">Advertisement Limit is Completed...!</p> : ''}
@@ -792,29 +795,38 @@ class SellerManageBannerAdvertisement extends Component {
                                                                                 <p className="hint"> Total advertisements allowed <b>{sellerSubscriptionPlan.metadata.advertiseAllowed}</b></p>
                                                                             </div>
                                                                             <ul className="features">
-                                                                                <p><span className="fontawesome-cog"></span>Maximum number of advertisements allowed {sellerSubscriptionPlan.metadata.advertiseAllowed}
+                                                                                {/* <p><span className="fontawesome-cog"></span>Maximum number of advertisements allowed {sellerSubscriptionPlan.metadata.advertiseAllowed}
                                                                                     Advertisements displayed in rotation with other Basic Plan advertisers
                                                                                     Access to basic analytics (number of views, clicks, etc.)
                                                                                     Support available during business hours
                                                                                 </p>
-                                                                                <div>
-                                                                                    <input
-                                                                                        className="form-check-input"
-                                                                                        type="checkbox"
-                                                                                        id="checkboxNoLabel"
-                                                                                        value=""
-                                                                                        aria-label="..."
-                                                                                        onChange={this.handleCheckboxChange}
-                                                                                        // onClick={() => this.handleCheck(sellerSubscriptionPlan)}
-                                                                                        checked={this.state.isChecked}
-                                                                                    />
+                                                                                <p>Maximum number of advertisements allowed <b>{sellerSubscriptionPlan.metadata.advertiseAllowed}</b>.</p>
+                                                                                <p>Payment Interval Per <b>{sellerSubscriptionPlan.interval_count} {sellerSubscriptionPlan.interval}</b>.</p> */}
+                                                                                <div className='features' dangerouslySetInnerHTML={{ __html: sellerSubscriptionPlan.metadata.descriptions }}></div>
+
+                                                                                <div className="custom-control custom-checkbox">
+                                                                                    <div class="row align-items-center">
+                                                                                        <div class="col-auto">
+                                                                                            <input
+                                                                                                type="checkbox"
+                                                                                                className="custom-control-input"
+                                                                                                id="checkboxNoLabel"
+                                                                                                checked={this.state.isChecked}
+                                                                                                onChange={this.handleCheckboxChange}
+                                                                                            />
+                                                                                        </div>
+                                                                                        <div class="col-auto">
+                                                                                            <label className="custom-control-label right-align">
+                                                                                                {this.state.isChecked === false ? "Checkbox is not checked" : "Checkbox is checked"}
+                                                                                            </label>
+                                                                                        </div>
+                                                                                    </div>
                                                                                 </div>
                                                                             </ul>
                                                                         </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
-
                                                         </> : <>
                                                             <h2 class="text-center text-bg-danger p-3 position-relative">No Any Subscription Plan Is Active
                                                                 <Link to="/seller/manage-subscription-plan" class="position-absolute top-1 end-0">
