@@ -171,6 +171,10 @@ class ServiceStockManagement extends Component {
     this.props.history.push(`/seller/edit-service/${row._id}`);
   };
 
+  clearSessionStorage = () => {
+    sessionStorage.clear();
+  }
+
   service_column = [
     {
       name: "Image",
@@ -280,17 +284,17 @@ class ServiceStockManagement extends Component {
     },
     {
       name: "Service ID",
-      selector: (row, i) => row.serviceId.serviceCode,
+      selector: (row, i) => row.serviceId === null ? "" : row.serviceId.serviceCode,
       sortable: true,
     },
     {
       name: "Service Name",
-      selector: (row, i) => row.serviceId.name,
+      selector: (row, i) => row.serviceId === null ? "" : row.serviceId.name,
       sortable: true,
     },
     {
       name: "Category",
-      selector: (row, i) => row.serviceId.category.categoryName,
+      selector: (row, i) => row.serviceId === null ? "" : row.serviceId.category.categoryName,
       sortable: true,
     },
     // author
@@ -459,6 +463,7 @@ class ServiceStockManagement extends Component {
 
     console.log("selected Rows", selectedRows);
     console.log("meeting :->", meeting);
+    console.log("subscriber :", subscriber)
 
     if (loading) {
       return <SpinnerLoader />;
@@ -485,6 +490,7 @@ class ServiceStockManagement extends Component {
                             <Link
                               className="btn custom_btn btn_yellow mx-auto"
                               to="/seller/add-service"
+                              onClick={this.clearSessionStorage}
                             >
                               Add New Service
                             </Link>

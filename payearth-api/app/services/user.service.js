@@ -115,11 +115,9 @@ module.exports = {
   deleteReviews,
   zoomRefreshToken,
   zoomAccessToken,
-  // callBackZoom,
-  // authZoom,
   createZoomMeeting,
-  // JoinZoomMeeting,
   getZoomSignature,
+  getAllUser,
 };
 
 function sendMail(mailOptions) {
@@ -2740,7 +2738,6 @@ async function getServiceOrder(req) {
 }
 // *******************************************************************************
 // *******************************************************************************
-
 //create zoom access token
 async function zoomAccessToken(req) {
   const code = req.params.id;
@@ -2762,6 +2759,47 @@ async function zoomAccessToken(req) {
   } catch (error) {
     console.error("Error:", error);
   }
+}
+
+// *******************************************************************************
+// *******************************************************************************
+//getAllUser
+
+async function getAllUser(req) {
+  const keyword = req.query.search
+    ? {
+        $or: [
+          { name: { $regex: req.query.search, $options: "i" } },
+          { email: { $regex: req.query.search, $options: "i" } },
+        ],
+      }
+    : {};
+
+  const [users, sellers] = await Promise.all([
+    User.find(keyword).select("name email role"),
+    Seller.find(keyword).select("name email role"),
+  ]);
+
+  let result = [];
+  users.forEach((user) => {
+    const correspondingSeller = sellers.find(
+      (seller) => seller.email === user.email
+    );
+    result.push({
+      user: user,
+      seller: correspondingSeller || null,
+    });
+  });
+
+  sellers.forEach((seller) => {
+    if (!users.find((user) => user.email === seller.email)) {
+      result.push({
+        user: null,
+        seller: seller,
+      });
+    }
+  });
+  return result;
 }
 
 // *******************************************************************************

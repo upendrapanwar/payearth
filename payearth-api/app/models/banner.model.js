@@ -16,6 +16,12 @@ const schema = new Schema({
         type: String,
         required: false,
     },
+    slug: {
+        type: String,
+        unique: true,
+        trim: true,
+        default: 0
+    },
     bannerType: {
         type: String,
         required: false,
@@ -40,12 +46,8 @@ const schema = new Schema({
         type: String,
         default: 'pending',
     },
-    subscriptionPlan: {
-        type: {
-            id: Number,
-            planPrice: String,
-            planType: String
-        },
+    subPlanId: {
+        type: String,
         required: false,
     },
     bannerPlacement: {

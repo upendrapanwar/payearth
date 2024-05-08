@@ -53,6 +53,7 @@ const Header = () => {
                             <li><Link to="/seller/service-stock-management" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Service Management</Link></li>
                             <li><Link to="/seller/product-orders" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Product Orders</Link></li>
                             <li><Link to="/seller/service-orders" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Service Orders</Link></li>
+                            <li><Link to="/seller/manage-subscription-plan" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Subscription Plans</Link></li>
                             <li><Link to="/seller/payments" onClick={() => removeBackdrop()}><i className="icon"><img src={creditCardIcon} alt="" /></i> Payments</Link></li>
                             <li><Link to="#" onClick={() => logout()}><i className="icon"><img src={logoutIcon} alt="" /></i> Logout</Link></li>
                         </ul>

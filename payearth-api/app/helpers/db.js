@@ -40,6 +40,7 @@ module.exports = {
   cmsPage: require("../models/cmspage.model"),
   cmsCategory: require("../models/cmscategory.model"),
   bannerAdvertisement: require("../models/banner.model"),
+  subscriptionPlan: require("../models/subscriptionplan.model"),
   Services: require("../models/service.model"),
   Servicedetails: require("../models/servicedetail.model"),
   ServiceReview: require("../models/servicereview.model"),

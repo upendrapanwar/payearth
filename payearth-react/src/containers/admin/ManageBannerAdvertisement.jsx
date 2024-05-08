@@ -53,6 +53,15 @@ class ManageBannerAdvertisement extends Component {
         };
     }
 
+    generateUniqueSlug = (bannerName) => {
+        return bannerName
+            .toLowerCase()
+            .replace(/[^a-z0-9 -]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim();
+    }
+
     handleImageChange = (e) => {
         const file = e.target.files[0];
         // console.log(" image file size", file.size)
@@ -179,34 +188,19 @@ class ManageBannerAdvertisement extends Component {
             toast.error("Select Category.....", { autoClose: 3000 })
         } else {
             this.saveBanner("Publish")
+
             // this.handlePayment();
             toast.success("Banner Create succesfully..", { autoClose: 3000 })
-            this.props.history.push('/admin/manage-banner-list')
+
+
         }
     }
     saveBanner = (status) => {
-        const { image, imageId, video, videoId, bannerText, bannerType, bannerName, siteUrl, category, startDate, endDate, subscriptionPlan, bannerPlacement, signaturess, author, authorDetails,  tag, keyword } = this.state;
+        const { image, imageId, video, videoId, bannerText, bannerType, bannerName, siteUrl, category, startDate, endDate, subscriptionPlan, bannerPlacement, signaturess, author, authorDetails, tag, keyword } = this.state;
+        const slug = this.generateUniqueSlug(bannerName);
         const url = '/admin/createNewBanner';
         const bannerData = {
-            image,
-            imageId,
-            video,
-            videoId,
-            bannerText,
-            bannerType,
-            bannerName,
-            siteUrl,
-            category,
-            startDate,
-            endDate,
-            subscriptionPlan,
-            bannerPlacement,
-            status,
-            signaturess,
-            author,
-            authorDetails,
-            tag,
-            keyword,
+            image, imageId, video, videoId, bannerText, bannerType, bannerName, slug, siteUrl, category, startDate, endDate, subscriptionPlan, bannerPlacement, status, signaturess, author, authorDetails, tag, keyword,
         };
 
         axios.post(url, bannerData, {
@@ -217,6 +211,7 @@ class ManageBannerAdvertisement extends Component {
             }
         }).then((response) => {
             console.log("SUCCESS BANNER POST", response.date);
+            this.props.history.push('/admin/manage-banner-list')
         }).catch((error) => {
             console.log("error in save banner date", error);
         });
@@ -452,7 +447,7 @@ class ManageBannerAdvertisement extends Component {
                                                         </div>
                                                     </div> */}
 
-                                                     {/* <div className="crt_bnr_fieldRow">
+                                                    {/* <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
                                                             <label htmlFor="">Tag</label>
                                                             <div className="field_item">
@@ -487,7 +482,7 @@ class ManageBannerAdvertisement extends Component {
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
                                                             <label htmlFor="">Meta information</label>
-                                                            <div className="field_item">
+                                                            <div className="text-area field_item">
                                                                 <textarea
                                                                     type="text"
                                                                     name="bannerText"

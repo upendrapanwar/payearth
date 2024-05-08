@@ -1,22 +1,29 @@
 var mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-
 const schema = new Schema({
     chatName: {
         type: String,
-        trim : true,
+        trim: true,
     },
     isGroupChat: {
         type: Boolean,
-        default : false,
+        default: false,
     },
-    description: {
-        type: String,
-        required: false,
+    users: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }],
+    latestMessage: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "chatMessage"
+    },
+    groupAdmin: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
     },
 }, { timestamps: true });
 
 schema.set("toJSON", { virtuals: true, versionKey: false });
 
-module.exports = mongoose.model("cmsCategory", schema);
+module.exports = mongoose.model("Chat", schema);

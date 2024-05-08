@@ -14,8 +14,19 @@ import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 import CryptoJS from 'crypto-js';
 import Modal from "react-bootstrap/Modal";
+import SpinnerLoader from '../../components/common/SpinnerLoader';
 import noImg from './../../assets/images/noimage.png'
 import ModalBody from 'react-bootstrap/esm/ModalBody';
+import { Dropdown } from 'bootstrap';
+import { DropdownButton } from 'react-bootstrap';
+import Iframe from 'react-iframe-click';
+import whatsapp from './../../assets/icons/whatsapp.svg'
+import linkedinIcon from './../../assets/icons/linkedin.svg';
+import twitterIcon from './../../assets/icons/twitter.svg';
+import facebook from './../../assets/icons/facebook.svg';
+import instagram from './../../assets/icons/instagram.svg'
+import { Helmet } from 'react-helmet';
+
 
 
 class SellerBannerList extends Component {
@@ -34,6 +45,9 @@ class SellerBannerList extends Component {
       selectedRowData: null,
       loading: true,
       error: null,
+      show: false,
+      isShareOpen: false,
+      shareAdvertise: ""
     };
   }
 
@@ -46,7 +60,6 @@ class SellerBannerList extends Component {
   };
 
   handlePreview = (row) => {
-    console.log("id", row)
     this.setState({ selectedRowData: row });
     this.setState({ showModal: true });
   };
@@ -59,12 +72,21 @@ class SellerBannerList extends Component {
         'Authorization': `Bearer ${this.authInfo.token}`
       },
     })
-      .then(res => {
-        this.setState({
-          banner: res.data.data,
-          loading: false,
-          error: null
-        })
+      .then((response) => {
+        if (response.data.status === true) {
+          this.setState({
+            banner: response.data.data,
+            loading: false,
+            error: null
+          })
+        } else {
+          this.setState({
+            banner: [],
+            loading: false,
+            error: { message: "Status is not true" }
+          });
+        }
+
       })
       .catch(error => {
         this.setState({
@@ -76,7 +98,7 @@ class SellerBannerList extends Component {
   }
 
   handleRowSelected = (state) => {
-    console.log("stelectedROW", state.selectedRows)
+    console.log("selected Row : ", state.selectedRows)
     this.setState({ selectedRows: state.selectedRows });
   };
 
@@ -119,11 +141,12 @@ class SellerBannerList extends Component {
 
   // ********************************************************
 
-  handleDeleteSeletedData = async (id) => {
+  handleDeleteSeletedData = async () => {
     // const { timestamp, signature } = this.createSignature();
     const imgDelUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/destroy`;
     const vidDelUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/video/destroy`;
     const { selectedRows } = this.state;
+
     const cloudPublicId = selectedRows.map(item => item.imageId === "" ? item.videoId : item.imageId);
     console.log("cloudPublicId", cloudPublicId)
 
@@ -160,6 +183,33 @@ class SellerBannerList extends Component {
             'Authorization': `Bearer ${this.authInfo.token}`
           }
         }).then((res) => {
+          if (res.data.status === true) {
+            const subPlanId = selectedRows[i].subPlanId;
+            try {
+              const url = `/seller/sellerReduceCount/${subPlanId}`
+              const data = {
+                usageCount: {
+                  authorId: this.authInfo.id
+                },
+              }
+              console.log("Count reduse...", data)
+              axios.put(url, data, {
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json;charset=UTF-8',
+                  'Authorization': `Bearer ${this.authInfo.token}`
+                }
+              }).then((response) => {
+                console.log("response", response)
+                toast.success("Your Subscription count is update ..", { autoClose: 3000 })
+                // this.setState({ subscriptionChecked: response.data.status })
+              }).catch((error) => {
+                console.log("Error", error)
+              })
+            } catch (error) {
+              console.log("error", error)
+            }
+          }
           this.getBanner()
           console.log('Row Data', res.data)
         })
@@ -176,13 +226,51 @@ class SellerBannerList extends Component {
     this.props.history.push(`/seller/banner-edit/${id}`);
   }
 
+  onWebsiteMove = (url) => {
+    window.open(url, '_blank');
+  };
+
+  shareDropdown = (row) => {
+    this.setState({ shareAdvertise: row.slug })
+    this.setState({ isShareOpen: true });
+    // this.props.history.push(`/advertisement/${row.slug}`);
+  };
+
+  handleFacebookShare = () => {
+    const { shareAdvertise } = this.state;
+    const url = `https://pay.earth/advertisement/${shareAdvertise}`
+    const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    window.open(facebookShareUrl, '_blank');
+  };
+
+  handleTwitterShare = () => {
+    const { shareAdvertise } = this.state;
+    const url = `https://pay.earth/advertisement/${shareAdvertise}`
+    const twitterShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`;
+    window.open(twitterShareUrl, '_blank');
+  };
+
+  handleInstagramShare = () => {
+    const { shareAdvertise } = this.state;
+    const url = `https://pay.earth/advertisement/${shareAdvertise}`
+    const instagramShareUrl = `https://www.instagram.com/?url=${url}`
+    window.open(instagramShareUrl, '_blank');
+  };
+
+  handleWhatsappShareUrl = () => {
+    const { shareAdvertise } = this.state;
+    const caption = encodeURIComponent(`https://pay.earth/advertisement/${shareAdvertise}`);
+    const whatsappShareUrl = `https://api.whatsapp.com/send?text=${caption}`;
+    window.open(whatsappShareUrl, '_blank');
+  }
+
 
   banner_column = [
     {
       name: " Advertisement Image/Video",
       selector: (row, i) => row.video === '' ? <img className='advBanner-Thumb' src={row.image} alt="No Image/video select" style={{ width: '350px', height: '100px' }} /> : <video width="350" height="100" src={row.video} autoPlay loop alt="No Image/video select" />,
       sortable: true,
-      width : "350px"
+      width: "350px"
     },
     {
       name: "Advertisement Name",
@@ -200,30 +288,24 @@ class SellerBannerList extends Component {
       selector: (row, i) => row.category,
       sortable: true,
     },
-    // {
-    //   name: 'Subscription Plan',
-    //   selector: (row, i) => row.subscriptionPlan,
-    //   sortable: true,
-    //   // cell: row => {
-    //   //     const date = new Date(row.createdAt).toLocaleString();
-    //   //     return <div>{date}</div>;
-    //   // },
-    // },
-    // {
-    //   name: "Banner Placement",
-    //   selector: (row, i) => row.bannerPlacement,
-    //   sortable: true,
-
-    // },
     {
       name: "Status",
-      selector: (row, i) => row.status,
+      // selector: (row, i) => row.status,
+      selector: (row, i) => row.status === "Unpublish" ? <p className='p-1 fw-bold text-white bg-danger bg-opacity-4 border-info rounded'>{row.status}</p> : <p className='p-1 fw-bold text-white bg-success  bg-opacity-4 border-info rounded'>{row.status}</p>,
       sortable: true,
     },
     {
       name: 'Actions',
       cell: (row) => (
         <>
+          <button
+            type='submit'
+            className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+            onClick={() => this.shareDropdown(row)}
+            disabled={row.status === "Unpublish" ? true : false}
+          >
+            Share
+          </button>
           <button
             type='submit'
             className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
@@ -255,13 +337,23 @@ class SellerBannerList extends Component {
 
 
   render() {
-    const { banner, selectedRows } = this.state
+    const { banner, selectedRows, loading } = this.state;
+
+
+    if (loading) {
+      return <SpinnerLoader />
+    }
+
     return (
       <React.Fragment>
+        {loading === true ? <SpinnerLoader /> : ""}
         <Header />
         <div className="inr_top_page_title">
           <h2>Manage Advertisement</h2>
         </div>
+        <Helmet>
+          <title>{"Manage Advertisement - Pay Earth"}</title>
+        </Helmet>
         <section className="inr_wrap">
           <div className="container">
             <div className="row">
@@ -302,11 +394,9 @@ class SellerBannerList extends Component {
         </section>
         <Footer />
 
-
         <Modal
           show={this.state.showModal}
           onHide={() => this.setState({ showModal: false })}
-          // dialogClassName="modal-90w"
           dialogClassName="modal-fullscreen"
           aria-labelledby="example-custom-modal-styling-title"
         >
@@ -318,43 +408,44 @@ class SellerBannerList extends Component {
           <Modal.Body>
 
             {this.state.selectedRowData && (
-              <div
-                className="banner-container"
-              >
-                <p>{this.state.selectedRowData.siteUrl}</p>
-                {/* <a href={this.state.selectedRowData.siteUrl} target="_blank" rel="noopener noreferrer">
-
-                  <img
-                    src={this.state.selectedRowData.image}
-                    alt="Banner"
-                    className="banner-image"
-                    // onClick={this.handleIframeClick}
-                  />
-                </a>  */}
-
-                <a
-                  href={this.state.selectedRowData.siteUrl}
-                  target="_blank">
-                  <iframe
+              <div className='iframe-container'>
+                <div className='iFrame-wrapper'>
+                  <Iframe
                     src={!this.state.selectedRowData.image ? this.state.selectedRowData.video : this.state.selectedRowData.image}
-                    width='1100'
-                    height="315"
-                    // frameborder="0"
                     allow="autoplay; encrypted-media"
-                  // allowfullscreen
-                  // onClick={this.handleIframeClick}
-                  ></iframe>
-                </a>
-
-                <button
-                  className="close-button"
-                  onClick={this.handleClose}
-                >
-                  Close
-                </button>
+                    scrolling="no"
+                    onInferredClick={() => this.onWebsiteMove(this.state.selectedRowData.siteUrl)}
+                  >
+                  </Iframe>
+                </div>
               </div>
             )}
           </Modal.Body>
+        </Modal>
+
+        <Modal
+          show={this.state.isShareOpen}
+          onHide={() => this.setState({ isShareOpen: false })}
+          size="md"
+          aria-labelledby="contained-modal-title-vcenter"
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>
+              Share
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <div className="share alert text-center" role="alert">
+              <div className="social_links">
+                <Link to="#" target="_blank" onClick={this.handleWhatsappShareUrl}><img src={whatsapp} alt="linked-in" /></Link>
+                <Link to="#" target="_blank" onClick={this.handleInstagramShare}><img src={instagram} alt="twitter" /></Link>
+                <Link to="#" target="_blank" onClick={this.handleTwitterShare}><img src={twitterIcon} alt="twitter" /></Link>
+                <Link to="#" target="_blank" onClick={this.handleFacebookShare}><img src={facebook} alt="facebook" /></Link>
+              </div>
+            </div>
+          </Modal.Body>
+
         </Modal>
 
       </React.Fragment>

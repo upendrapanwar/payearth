@@ -303,7 +303,7 @@ export const GetAllBanner = () => {
                     className="centeredIframe"
                     onInferredClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
                 ></Iframe>
-                <button className="block_button" onClick={() => block(advertisements[currentUrlIndex].id)}>Click to Block this advertise..!</button>
+                {/* <button className="block_button" onClick={() => block(advertisements[currentUrlIndex].id)}>Click to Block this advertise..!</button> */}
             </div>
         </div>) : ""}
     </>

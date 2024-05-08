@@ -105,6 +105,7 @@
         "stream": "^0.0.2",
         "stream-browserify": "^3.0.0",
         "stream-http": "^3.2.0",
+        "stripe": "^14.24.0",
         "styled-components": "^6.1.0",
         "vm-browserify": "^1.1.2",
         "web-vitals": "^3.5.2",
