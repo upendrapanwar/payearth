@@ -1354,6 +1354,14 @@ ul {
   display: none;
 }
 
+.subPlan>.data-table-extensions>.data-table-extensions-filter {
+  display: none;
+}
+
+.subPlan .dash_title {
+  margin-left: 15px;
+}
+
 .scroll-to-top-button {
   position: fixed;
   bottom: 20px;
@@ -4051,6 +4059,7 @@ a.inner-block:active {
   margin-top: 30px;
   /* width: 280px; */
 }
+
 /* .rdrDefinedRangesWrapper {
   font-size: 12px;
   width: 280px !important;
@@ -4413,4 +4422,3 @@ h4 {
     opacity: 0;
   }
 }
-

@@ -1018,7 +1018,6 @@ function deleteSubPlan(req, res, next) {
 // updateSubscriptionStatus
 
 function updateSubscriptionStatus(req, res, next) {
-  console.log("updateSubscriptionStatus is RUN")
   sellerService.updateSubscriptionStatus(req).then((plan) => plan ? res.status(200).json({ status: true, data: plan }) : res.status(400).json({ status: false, message: "Error", data: [] }))
     .catch((err) => next(res.json({ status: false, message: err })));
 }

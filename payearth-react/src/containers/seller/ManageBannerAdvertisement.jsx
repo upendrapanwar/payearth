@@ -7,9 +7,13 @@ import emptyVid from './../../assets/images/emptyVid.png'
 import store from '../../store/index';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import DataTable from 'react-data-table-component';
+import DataTableExtensions from "react-data-table-component-extensions";
+import 'react-data-table-component-extensions/dist/index.css';
 import CryptoJS from 'crypto-js';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { Helmet } from 'react-helmet';
+import arrow_back from './../../assets/icons/arrow-back.svg'
 
 class SellerManageBannerAdvertisement extends Component {
 
@@ -249,8 +253,7 @@ class SellerManageBannerAdvertisement extends Component {
     };
 
 
-    handleCheckboxChange = () => {
-        const { sellerSubscriptionPlan, subPlanId } = this.state;
+    handleCheckboxChange = (row) => {
         this.setState(prevState => ({
             isChecked: !prevState.isChecked
         }), () => {
@@ -259,14 +262,11 @@ class SellerManageBannerAdvertisement extends Component {
                 // console.log("sellerSubscriptionPlan : ", sellerSubscriptionPlan)
                 // console.log("sellerSubscriptionPlan _id : ", sellerSubscriptionPlan._id)
                 // console.log('Checkbox is checked', sellerSubscriptionPlan._id);
-                this.setState({ subPlanId: sellerSubscriptionPlan._id })
-                this.setState({ advertiseAllowed: sellerSubscriptionPlan.metadata.advertiseAllowed })
+                this.setState({ subPlanId: row._id })
+                this.setState({ advertiseAllowed: row.metadata.advertiseAllowed })
                 // Add your logic to add data here
             } else {
                 this.setState({ subPlanId: "" })
-                console.log('Checkbox is unchecked ', subPlanId);
-
-                // Add your logic to remove data here
             }
         });
     }
@@ -310,7 +310,7 @@ class SellerManageBannerAdvertisement extends Component {
         console.log("subPlanId check : ", subPlanId)
 
         if (subPlanId === "") {
-            alert("Validation failed")
+            toast.error("Validation failed", { autoClose: 3000 })
         } else {
             const url = '/seller/createSellerBanners';
             const bannerData = { image, imageId, video, videoId, bannerText, bannerType, bannerName, slug, siteUrl, category, startDate, endDate, bannerPlacement, status, signaturess, author, authorDetails, tag, keyword, subPlanId };
@@ -520,60 +520,25 @@ class SellerManageBannerAdvertisement extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 },
             })
-                .then(response => {
-                    // console.log("res>>>>.", response.data.data)
+                .then((response) => {
                     if (Array.isArray(response.data.data) && response.data.data.length > 0) {
-                        const latest = response.data.data[0];
-                        // const previousPlan = response.data.data[1]
-                        // console.log("latest", latest)
-                        // console.log("previousPlan", previousPlan)
-                        // if (previousPlan !== undefined) {
-                        //     const { usageCount } = previousPlan;
-                        //     for (const usage of usageCount) {
-                        //         if (usage.authorId === this.authInfo.id) {
-                        //             // console.log("sub_id with author", usage.sub_id)
-                        //             // console.log("previous data", usage._id)
-                        //             try {
-                        //                 const response = axios.delete(`https://api.stripe.com/v1/subscriptions/${usage.sub_id}`, {
-                        //                     headers: {
-                        //                         Authorization: `Bearer ${process.env.REACT_APP_STRIPE_SECRET_KEY}`, // Replace with your actual Stripe secret key
-                        //                         'Content-Type': 'application/x-www-form-urlencoded',
-                        //                     },
-                        //                 });
-                        //                 console.log("response", response.data)
-                        //             } catch (error) {
-                        //                 if (error.response && error.response.status === 404) {
-                        //                     // Subscription not found in Stripe, handle accordingly
-                        //                     console.log("Subscription not found in Stripe:", error.response.data);
-                        //                 } else {
-                        //                     // Handle other errors
-                        //                     console.error("Error deleting subscription:", error);
-                        //                 }
-                        //             }
-
-                        //         }
-                        //     }
-                        // }
                         this.setState({
-                            sellerSubscriptionPlan: latest,
+                            sellerSubscriptionPlan: response.data.data,
                             loading: false,
-                        });
-
+                        })
                     } else {
                         this.setState({
                             sellerSubscriptionPlan: "",
                             loading: false,
-                        });
+                        })
                     }
-                    // this.setState({
-                    //     sellerSubscriptionPlan: res.data.data[0],
-                    // })
                 })
                 .catch(error => {
                     console.log("Error in fetching plan", error)
-                    // this.setState({
-                    //     sellerSubscriptionPlan: "",
-                    // })
+                    this.setState({
+                        sellerSubscriptionPlan: "",
+
+                    })
                 })
 
         } catch (error) {
@@ -593,13 +558,132 @@ class SellerManageBannerAdvertisement extends Component {
         return usageCount ? usageCount.count : 0; // Return count if found, otherwise return 0
     }
 
+    subPlan_column = [
+        // {
+        //     name: "Plan Id",
+        //     selector: (row, i) => row.id,
+        //     sortable: true,
+        //     width: "350px"
+        // },
+        {
+            name: "Subscription Plan Name",
+            selector: (row, i) => row.nickname,
+            sortable: true,
+        },
+        {
+            name: "Billing period",
+            selector: (row, i) => {
+                const result = `Every  ${row.interval_count}-${row.interval}`
+                return result
+            },
+            sortable: true,
+        },
+        {
+            name: "Remaining Advertise Allowed",
+            // selector: (row, i) => row.metadata.advertiseAllowed,
+            selector: (row, i) => {
+                const data = row.usageCount;
+                const matching = data.find(item => item.authorId === this.authInfo.id)
+                const result = `${row.metadata.advertiseAllowed - matching.count}  in this plan.`
+                return result;
+            },
+            sortable: true,
+        },
+        {
+            name: "Amount",
+            selector: (row, i) => {
+                const amount = `$ ${row.amount}`
+                return amount;
+            },
+            sortable: true,
+
+        },
+        // {
+        //     name: "Status",
+        //     selector: (row, i) => row.status === "Unpublish" ? <p className='p-1 fw-bold text-white bg-danger bg-opacity-4 border-info rounded'>{row.status}</p> : <p className='p-1 fw-bold text-white bg-success  bg-opacity-4 border-info rounded'>{row.status}</p>,
+        //     sortable: true,
+        // },
+        {
+            name: 'Actions',
+            cell: (row) => (
+                <>
+                    <button
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+                        onClick={() => this.stripeCanclePayment(row)}
+                    >
+                        Cancle plan
+                    </button>
+                </>
+            ),
+        },
+        {
+            name: '',
+            cell: (row) => (
+                <>
+                    <input
+                        type="radio"
+                        name="selectedRow"
+                        value={row._id}
+                        onChange={() => this.handleCheckboxChange(row)}
+                    />
+                </>
+            ),
+        },
+    ]
+
+    stripeCanclePayment = async (row) => {
+        try {
+            console.log('row :', row.usageCount)
+            const data = row.usageCount;
+            const matching = data.find(item => item.authorId === this.authInfo.id && item.isActive === true)
+            // console.log("matching", matching.sub_id)
+            const sub_id = matching.sub_id
+            const response = await axios.delete(`https://api.stripe.com/v1/subscriptions/${sub_id}`, {
+                headers: {
+                    Authorization: `Bearer ${process.env.REACT_APP_STRIPE_SECRET_KEY}`, // Replace with your actual Stripe secret key
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            });
+            console.log("Subscription successfully canceled: ", response);
+            if (response.status === 200) {
+                try {
+                    const url = `/seller/updateSubscriptionStatus/${row._id}`
+                    const data = {
+                        usageCount: {
+                            sub_id: sub_id
+                        },
+                    }
+                    axios.put(url, data, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json;charset=UTF-8',
+                            'Authorization': `Bearer ${this.authInfo.token}`
+                        }
+                    }).then((response) => {
+                        console.log("response", response)
+                        this.getSubscriptionPlanBySeller();
+                        toast.success("Your Subscription Cancled Successfully.....", { autoClose: 3000 })
+                    }).catch((error) => {
+                        console.log("error", error)
+                    })
+
+                } catch (error) {
+                    console.log("error")
+                }
+            }
+        } catch (error) {
+            alert("Error canceling subscription")
+            console.log("Error", error)
+        }
+    }
+
     render() {
         const { sellerSubscriptionPlan, advertiseAllowed, previousSubscription, loading } = this.state;
-
+        console.log("sellerSubscriptionPlan", sellerSubscriptionPlan)
         if (loading) {
             return <SpinnerLoader />
         }
- 
+
         const count = this.getCountForAuthor(sellerSubscriptionPlan)
         // console.log("count", count)
 
@@ -617,10 +701,24 @@ class SellerManageBannerAdvertisement extends Component {
                     <div className="container">
                         <div className="row">
                             <div className="col-md-12">
+                                <div className="row m-2">
+                                    {sellerSubscriptionPlan !== "" ? <>
+                                        <h3 className="text-center selectPlanHeading text-bg-success p-3">Your Subscription Plan Is Active </h3> </> : <>
+                                        <h2 className="text-center text-bg-danger p-3 position-relative">No Any Subscription Plan Is Active
+                                            <Link to="/seller/manage-subscription-plan" className="position-absolute top-1 end-0">
+                                                <span className="text-bg-primary">Buy Subscription....</span>
+                                            </Link>
+                                        </h2>
+                                    </>
+                                    }
+                                </div>
                                 <div className="cart adv_banner_wrapper">
                                     <div className="noti_wrap">
                                         <div className=""><span>
-                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/manage-banner-list">My Advertisement</Link>
+                                            <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/manage-banner-list">
+                                                <img src={arrow_back} alt="linked-in" />&nbsp;
+                                                Back
+                                            </Link>
                                         </span></div>
                                     </div>
                                     <div className="cart_list adv_banner_panel">
@@ -778,62 +876,20 @@ class SellerManageBannerAdvertisement extends Component {
                                                 <div className="col-md-12 bg-body-tertiary advBannerEditWrap">
                                                     <div className="row">
                                                         {sellerSubscriptionPlan !== "" ? <>
-                                                            <div className="col-md-12" key={sellerSubscriptionPlan.id}>
-                                                                <h3 className="text-center selectPlanHeading text-bg-success p-3">Your Subscription Plan Is Active With Remaining {sellerSubscriptionPlan.metadata.advertiseAllowed - count} Advertise Allowed....! </h3>
-                                                                {advertiseAllowed === count ? <p className="text-center text-danger">Advertisement Limit is Completed...!</p> : ''}
-                                                                <div className="wrapper">
-                                                                    <div className="pricing-table group">
-                                                                        <div className="block personal f2" >
-                                                                            <h2 className="title" > {sellerSubscriptionPlan.nickname}</h2>
-                                                                            <div className="content">
-                                                                                <p className="price">
-                                                                                    <sup>$</sup>
-                                                                                    <span>{sellerSubscriptionPlan.amount}</span>
-                                                                                </p>
-                                                                                <p className="hint">Payment Interval Per <b>{sellerSubscriptionPlan.interval_count} {sellerSubscriptionPlan.interval}</b></p>
-                                                                                {/* <p> Count is {this.getCountForAuthor(sellerSubscriptionPlan)}</p> */}
-                                                                                <p className="hint"> Total advertisements allowed <b>{sellerSubscriptionPlan.metadata.advertiseAllowed}</b></p>
-                                                                            </div>
-                                                                            <ul className="features">
-                                                                                {/* <p><span className="fontawesome-cog"></span>Maximum number of advertisements allowed {sellerSubscriptionPlan.metadata.advertiseAllowed}
-                                                                                    Advertisements displayed in rotation with other Basic Plan advertisers
-                                                                                    Access to basic analytics (number of views, clicks, etc.)
-                                                                                    Support available during business hours
-                                                                                </p>
-                                                                                <p>Maximum number of advertisements allowed <b>{sellerSubscriptionPlan.metadata.advertiseAllowed}</b>.</p>
-                                                                                <p>Payment Interval Per <b>{sellerSubscriptionPlan.interval_count} {sellerSubscriptionPlan.interval}</b>.</p> */}
-                                                                                <div className='features' dangerouslySetInnerHTML={{ __html: sellerSubscriptionPlan.metadata.descriptions }}></div>
-
-                                                                                <div className="custom-control custom-checkbox">
-                                                                                    <div class="row align-items-center">
-                                                                                        <div class="col-auto">
-                                                                                            <input
-                                                                                                type="checkbox"
-                                                                                                className="custom-control-input"
-                                                                                                id="checkboxNoLabel"
-                                                                                                checked={this.state.isChecked}
-                                                                                                onChange={this.handleCheckboxChange}
-                                                                                            />
-                                                                                        </div>
-                                                                                        <div class="col-auto">
-                                                                                            <label className="custom-control-label right-align">
-                                                                                                {this.state.isChecked === false ? "Checkbox is not checked" : "Checkbox is checked"}
-                                                                                            </label>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </ul>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
+                                                            <div className='subPlan'>
+                                                                <div className="dash_title">My Subscriptions</div>
+                                                                <DataTableExtensions
+                                                                    columns={this.subPlan_column}
+                                                                    data={sellerSubscriptionPlan}
+                                                                    noHeader
+                                                                >
+                                                                    <DataTable
+                                                                        pagination
+                                                                        highlightOnHover
+                                                                    />
+                                                                </DataTableExtensions>
                                                             </div>
-                                                        </> : <>
-                                                            <h2 class="text-center text-bg-danger p-3 position-relative">No Any Subscription Plan Is Active
-                                                                <Link to="/seller/manage-subscription-plan" class="position-absolute top-1 end-0">
-                                                                    <span class="text-bg-primary">Buy Subscription....</span>
-                                                                </Link>
-                                                            </h2>
-                                                        </>
+                                                        </> : <> </>
                                                         }
                                                     </div>
                                                     {/* {previousSubscription === "" ? "" : <>
@@ -855,12 +911,7 @@ class SellerManageBannerAdvertisement extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
-
-
-
                                                 </div>
-
-
                                             </div>
 
                                         </div>

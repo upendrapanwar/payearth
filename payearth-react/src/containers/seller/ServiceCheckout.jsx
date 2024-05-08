@@ -27,8 +27,6 @@ class ServiceCheckout extends Component {
         this.userInfo = store.getState().auth.userInfo;
         let serviceName = localStorage.getItem('serviceName');
         let serviceCategory = localStorage.getItem('serviceCategory');
-        let storedDataset = sessionStorage.getItem('selectPlan');
-
 
         this.state = {
             formStatus: false,
@@ -138,6 +136,22 @@ class ServiceCheckout extends Component {
     // };
 
     handleSubmit = async (event, elements, stripe) => {
+        // var currrent_Sub_Id = sessionStorage.getItem('currrent_Sub_Id');
+        // if (currrent_Sub_Id) {
+        //     try {
+        //         const response = await axios.delete(`https://api.stripe.com/v1/subscriptions/${currrent_Sub_Id}`, {
+        //             headers: {
+        //                 Authorization: `Bearer ${process.env.REACT_APP_SECRET_KEY}`, // Replace with your actual Stripe secret key
+        //                 'Content-Type': 'application/x-www-form-urlencoded',
+        //             },
+        //         });
+        //         alert("Subscription successfully canceled")
+        //         console.log("Subscription successfully canceled: ", response.data);
+        //     } catch (error) {
+        //         alert("Error canceling subscription")
+        //         console.log("Error", error)
+        //     }
+        // }
         this.setState({ isLoading: true });
         event.preventDefault();
         console.log("Just to check handleSubmit")
@@ -222,6 +236,7 @@ class ServiceCheckout extends Component {
 
     savePlan = (sub_id) => {
         const { selectCard } = this.state;
+        // var currrent_Sub_Id = sessionStorage.getItem('currrent_Sub_Id');
         console.log("selecet Card", selectCard);
 
         const url = '/seller/createSellerSubscriptionPlan';
@@ -249,9 +264,33 @@ class ServiceCheckout extends Component {
             }
         }).then((response) => {
             console.log(response)
+            // if (currrent_Sub_Id) {
+            //     this.stripeCanclePayment(currrent_Sub_Id);
+            // }
+
         }).catch((err) => {
             console.log("error", err)
         })
+    }
+
+    // If client want to cancele previous reccuring payment then use this function.
+
+    stripeCanclePayment = async (currrent_Sub_Id) => {
+        try {
+            // const sub_id = parseFloat(currrent_Sub_Id);
+            const sub_id = currrent_Sub_Id
+            const response = await axios.delete(`https://api.stripe.com/v1/subscriptions/${sub_id}`, {
+                headers: {
+                    Authorization: `Bearer ${process.env.REACT_APP_STRIPE_SECRET_KEY}`, // Replace with your actual Stripe secret key
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            });
+            alert("Subscription successfully canceled")
+            console.log("Subscription successfully canceled: ", response.data);
+        } catch (error) {
+            alert("Error canceling subscription")
+            console.log("Error", error)
+        }
     }
 
 
@@ -680,13 +719,7 @@ class ServiceCheckout extends Component {
     }
 
     render() {
-        // const receivedData = this.props.location.state ? this.props.location.state.subscriptionPlan : null;
-        // console.log("receivedData select : ", receivedData)
-
-
         const { selectCard, planPrice, serviceName, serviceCategory, isLoading, stripeResponse } = this.state;
-
-        // submit Function
         this.onSubmit = () => {
             let disCode = document.getElementById('myCoupon').value
             console.log(disCode)
@@ -726,20 +759,6 @@ class ServiceCheckout extends Component {
                 });//check isActive is true
             }
         }    //onSubmit() 
-
-
-        //getTotal();
-
-        // this.onValueChange = (event) => {
-        //     this.setState({
-        //         paymentType: event.target.value
-        //     });
-
-        //     if (this.state.paymentType === 'cripto') {
-        //         this.setState({ moneyComparision: false })
-        //         this.setState({ formStatus: false })
-        //     }
-        // }
 
         return (
             <React.Fragment>
@@ -784,7 +803,6 @@ class ServiceCheckout extends Component {
                                                             },
                                                         },
                                                     }}
-
                                                 />
                                                 <div className="d-grid col-6 mx-auto" >
                                                     <button type="submit" className="btn btn-success" disabled={isLoading} > {isLoading ? "Please wait..." : `PAY $ ${planPrice}`}</button>
@@ -841,16 +859,12 @@ class ServiceCheckout extends Component {
                     </div >
                 </section >
 
-
                 <Modal
                     show={this.state.showModal}
                     size="md"
                     aria-labelledby="contained-modal-title-vcenter"
                     centered
-
-                // Udpate model in with payment status...
                 >
-
                     <Modal.Body>
                         <div className="alert text-center" role="alert">
                             <img src={successImg} alt="Success" style={{ width: '100px', height: '100px' }} />
@@ -859,25 +873,18 @@ class ServiceCheckout extends Component {
                             <p className="mb-0">Your invoice no is <b>{stripeResponse.status === true ? stripeResponse.data.latest_invoice.number : ""}</b></p>
 
                             <div className="d-grid gap-2 col-6 mx-auto mt-3">
-                                {/* <div className="ctn_btn"><Link to="/my-banners" className="view_more">DONE</Link></div> */}
                                 {selectCard === null ?
                                     <Link to="/seller/service-stock-management">
-                                        <button onClick={this.clearSessionStorage} class="btn btn-primary btn-sm mt-2" type="button">Return</button>
+                                        <button onClick={this.clearSessionStorage} className="btn btn-primary btn-sm mt-2" type="button">Return</button>
                                     </Link> :
                                     <Link to="/seller/dashboard">
-                                        <button onClick={this.clearSessionStorage} class="btn btn-primary btn-sm mt-2" type="button">Return</button>
+                                        <button onClick={this.clearSessionStorage} className="btn btn-primary btn-sm mt-2" type="button">Return</button>
                                     </Link>
                                 }
-
-                                {/* <Link to="/seller/service-stock-management">
-                                    <button onClick={this.clearSessionStorage} class="btn btn-primary btn-sm mt-2" type="button">Return</button>
-                                </Link> */}
                             </div>
                         </div>
-
                     </Modal.Body>
                 </Modal>
-
                 <Footer />
             </React.Fragment >
         )

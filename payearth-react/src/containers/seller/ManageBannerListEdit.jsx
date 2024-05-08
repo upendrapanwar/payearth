@@ -11,6 +11,7 @@ import store from '../../store/index';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
+import arrow_back from './../../assets/icons/arrow-back.svg'
 import { date } from 'yup';
 
 
@@ -207,7 +208,7 @@ class SellerBannerEdit extends Component {
         const url = `/seller/updateBanner/${id}`;
         const bannerData = {
             image,
-            imageId, 
+            imageId,
             video,
             videoId,
             bannerText,
@@ -241,7 +242,7 @@ class SellerBannerEdit extends Component {
         this.setState({ image: "", video: "", bannerText: "", bannerType: "", bannerName: "", siteUrl: "", category: "", startDate: "", subscriptionPlan: "", bannerPlacement: "", status: "", author: "", keyword: "", tag: "" })
 
     }
-  
+
     handleSelectImageOrVideo = (e) => {
         const { image, video } = this.state;
         console.log("select type", e.target.value)
@@ -412,7 +413,10 @@ class SellerBannerEdit extends Component {
                                 <div className="cart adv_banner_wrapper">
                                     <div className="noti_wrap">
                                         <div className=""><span>
-                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/manage-banner-list">My Advertisement</Link>
+                                            <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/manage-banner-list">
+                                                <img src={arrow_back} alt="linked-in" />&nbsp;
+                                                Back
+                                            </Link>
                                         </span></div>
                                     </div>
                                     <div className="cart_list adv_banner_panel">

@@ -35,52 +35,56 @@ class SellerManageSubscription extends Component {
             card: "",
             selectImageOrVideo: "",
             isSelectplan: false,
-            customerId: "",
-            subscriptionId: "",
-            sellerSubscriptionPlan: "",
-            previousPlan: "",
-            paymentMethodId: null,
+
             loading: true,
         };
     }
 
     componentDidMount() {
         // this.fetchStripePlans();
-        this.fetchProducts();
         this.getSubscriptionPlanBySeller();
+        // this.fetchProducts();
     }
 
-    fetchProducts = async () => {
+    fetchProducts = async (data) => {
+        console.log("Sub plan already selected: ", data)
         try {
-            // const productList = await stripe.products.list();
-            const plans = await stripe.plans.list();
-            // console.log("plan Data", plans.data)
-            const AdvertisePlan = plans.data.filter(item => item.metadata.planType === 'Advertisement')
-            // console.log("planes", plans.data.filter(item => item.metadata.planType === 'Advertisement'))
-            this.setState({
-                displaySubPlan: AdvertisePlan,
-                loading: false,
-            })
-            //   setProducts(plans.data);
+            if (data) {
+                const plans = await stripe.plans.list();
+                const result = plans.data.filter(item => item.metadata.planType === 'Advertisement')
+
+                const notSelectedPlan = result.filter(obj1 =>
+                    !data.some(obj2 => obj2.id === obj1.id)
+                );
+                this.setState({
+                    displaySubPlan: notSelectedPlan,
+                    loading: false,
+                })
+            } else {
+                const plans = await stripe.plans.list();
+                const result = plans.data.filter(item => item.metadata.planType === 'Advertisement')
+                this.setState({
+                    displaySubPlan: result,
+                    loading: false,
+                })
+            }
         } catch (error) {
             console.error('Error fetching products: ', error);
         }
     };
 
 
-
     handleSave = () => {
-        const { subscriptionPlan } = this.state;
         // console.log("subscription plan ", subscriptionPlan)
         this.props.history.push({
             pathname: '/seller/service-checkout',
-            state: { subscriptionPlan: subscriptionPlan },
+            // state: { subscriptionPlan: subscriptionPlan },
         });
     }
 
 
     handleSubscriptionPlan = (card) => {
-        // console.log("card", card)
+        console.log("card", card)
         this.setState({ subscriptionPlan: card });
         this.setState({ isSelectplan: true })
         sessionStorage.setItem('selectPlan', JSON.stringify(card));
@@ -94,46 +98,32 @@ class SellerManageSubscription extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 },
             })
-                .then(response => {
-                    // console.log("res>>>>.", response.data.data)
-                    if (Array.isArray(response.data.data) && response.data.data.length > 0) {
-                        const latest = response.data.data;
-                        const previousPlan = response.data.data[1]
-                        // console.log("latest", latest)
-                        // console.log("previousPlan", previousPlan)
-                        if (previousPlan !== "") {
-                            const { usageCount } = previousPlan;
-                            for (const usage of usageCount) {
-                                if (usage.authorId === this.authInfo.id && usage.isActive === true) {
-                                    // console.log("sub_id with author", usage.sub_id)
-                                    // console.log("previous data", usage._id)
-                                }
-                            }
-                        }
-                        this.setState({
-                            sellerSubscriptionPlan: latest,
-                            previousPlan: previousPlan,
-                            loading: false,
-                        });
+                .then((response) => {
+                    // console.log("res>>>>.", response.data)
+                    if (response.data.status === true) {
+                        const data = response.data.data;
+                        console.log("data", data)
+                        if (data.length === 0) {
+                            this.fetchProducts();
+                        } else {
+                            // const res = data[0].usageCount
+                            // const res = data.map(item => item.usageCount)
+                            // console.log("res else:  ", res)
+                            // const sub = res.filter(item => item.authorId === this.authInfo.id)
+                            // console.log("result filteredddd>>>.", sub.sub_id)
 
-                    } else {
-                        this.setState({
-                            sellerSubscriptionPlan: "",
-                            previousPlan: "",
-                            loading: false,
-                        });
+                            this.fetchProducts(data);
+                        }
+                        // console.log("data", data[0].usageCount)
+
                     }
-                    // this.setState({
-                    //     sellerSubscriptionPlan: res.data.data[0],
-                    // })
                 })
                 .catch(error => {
                     console.log("Error in fetching plan", error)
-                    // this.setState({
-                    //     sellerSubscriptionPlan: "",
-                    // })
+                    this.setState({
+                        loading: false,
+                    })
                 })
-
         } catch (error) {
             console.error('No plan Selected', error);
         }
@@ -141,7 +131,7 @@ class SellerManageSubscription extends Component {
 
 
     render() {
-        const { subscriptionPlan, displaySubPlan, loading, sellerSubscriptionPlan } = this.state;
+        const { subscriptionPlan, displaySubPlan, loading } = this.state;
         console.log("displaySubPlan", displaySubPlan)
         if (loading) {
             return <SpinnerLoader />
@@ -156,13 +146,6 @@ class SellerManageSubscription extends Component {
                 <Helmet>
                     <title>{"Manage Subscription - Pay Earth"}</title>
                 </Helmet>
-                {sellerSubscriptionPlan === "" ?
-                    "" :
-                    <div className="text-center alert alert-success" >
-                        Plan is selected
-                    </div>
-                }
-
                 <section className="inr_wrap">
                     <div className="container">
                         <div className="row">
@@ -192,7 +175,6 @@ class SellerManageSubscription extends Component {
                                         </> : <>
                                             <h1>NO PLAN FOUND</h1>
                                         </>}
-
                                     </div>
                                 </div>
                                 <div className="crt_bnr_fieldRow">
@@ -207,12 +189,8 @@ class SellerManageSubscription extends Component {
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
-
-
                         </div>
-
                     </div>
                 </section>
 

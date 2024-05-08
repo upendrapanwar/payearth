@@ -9,7 +9,10 @@ const config = require("./app/config/index");
 const package = require("package.json");
 const app = express();
 const https = require("https");
+const socketIo = require('socket.io');
 const fs = require("fs");
+// const {} = require("../helpers/db")
+const { ChatMessage } = require("../payearth-api/app/helpers/db")
 //const log = require('node-file-logger');
 
 const ENV = config.app_env;
@@ -85,6 +88,28 @@ var certOptions = {
   key: fs.readFileSync(config.ssl_key, "utf8"),
   cert: fs.readFileSync(config.ssl_cert, "utf8"),
 };
+
+//socket.io connected...
+// io.on('connection', (socket) => {
+//   console.log('A user connected');
+//   console.log(`User connected: ${socket.id}`);
+
+//   // Listen for chat messages
+//   socket.on('chat message', (msg) => {
+//     console.log('message: ', msg);
+//     const newMessage = new ChatMessage(msg);
+//     newMessage.save();
+//     io.emit('chat message', msg);
+//   });
+
+
+//   // Disconnect event
+//   socket.on('disconnect', () => {
+//     console.log('user disconnected');
+//   });
+
+// });
+
 
 // serve the API with HTTPS
 const httpsServer = https.createServer(certOptions, app);

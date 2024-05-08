@@ -18,9 +18,7 @@ const {
 const msg = require("../helpers/messages.json");
 var utils = require("../helpers/utils.js");
 const multer = require("multer");
-const stripe = require("stripe")(
-  "sk_test_51OewZgD2za5c5GtO7jqYHLMoDerwvEM69zgVsie3FNLrO0LLSLwFJGzXv4VIIGqScWn6cfBKfGbMChza2fBIQhsv00D9XQRaOk"
-);
+
 
 var ApiContracts = require("authorizenet").APIContracts;
 var ApiControllers = require("authorizenet").APIControllers;
@@ -247,6 +245,10 @@ router.post("/add-meeting-user/:id", addMeetByUser);
 router.get("/get-meeting/:id", getMeeting);
 router.delete("/delete-meeting/:id", delMeetingByUser);
 router.get("/service-orders/:id", getServiceOrder);
+
+
+//chat getAllUser
+router.get("/getAllUser", getAllUser);
 
 
 module.exports = router;
@@ -1225,5 +1227,13 @@ function getServiceOrder(req, res, next) {
         ? res.status(200).json({ status: true, data: data })
         : res.status(400).json({ status: false, message: "ERROR ", data: [] })
     )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+
+// chat getAllUser
+
+function getAllUser(req, res, next) {
+  userService.getAllUser(req).then((user) => user ? res.status(200).json({ status: true, data: user }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
     .catch((err) => next(res.json({ status: false, message: err })));
 }

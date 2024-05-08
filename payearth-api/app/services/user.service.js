@@ -109,6 +109,7 @@ module.exports = {
   getMeeting,
   delMeetingByUser,
   getServiceOrder,
+  getAllUser
 };
 
 function sendMail(mailOptions) {
@@ -2719,3 +2720,49 @@ async function getServiceOrder(req) {
   }
 }
 
+async function getAllUser(req) {
+  const keyword = req.query.search ? {
+    $or: [
+      { name: { $regex: req.query.search, $options: "i" } },
+      { email: { $regex: req.query.search, $options: "i" } },
+    ]
+  } : {};
+
+
+  const [users, sellers] = await Promise.all([
+    User.find(keyword).select("name email role"),
+    Seller.find(keyword).select("name email role")
+  ]);
+
+  let result = [];
+
+  // users.forEach((user, index) => {
+  //   let mergedData = {
+  //     user: user,
+  //     seller: sellers[index] || null // If no corresponding seller found, set to null
+  //   };
+  //   result.push(mergedData);
+  // });
+
+
+  users.forEach(user => {
+    const correspondingSeller = sellers.find(seller => seller.email === user.email);
+    result.push({
+      user: user,
+      seller: correspondingSeller || null
+    });
+  });
+
+  sellers.forEach(seller => {
+    if (!users.find(user => user.email === seller.email)) {
+      result.push({
+        user: null,
+        seller: seller
+      });
+    }
+  });
+
+
+  // console.log("Merged data:", result);
+  return result;
+}

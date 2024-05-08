@@ -2941,7 +2941,6 @@ async function getSubscriptionPlanBySeller(req) {
       .select(fieldsToSelect);
 
     if (result && result.length > 0) {
-      console.log("result", result)
       return result;
     } else {
       return [];
@@ -2994,7 +2993,7 @@ async function reduseCount(req) {
       { usageCount: plan.usageCount },
       { new: true }
     );
-    console.log("subPlan", subPlan);
+
     return subPlan;
 
   } catch (error) {
@@ -3004,16 +3003,12 @@ async function reduseCount(req) {
 
 // Reduse Count.
 async function sellerReduceCount(req) {
-  console.log("Seller service is run RECUSE COUNT")
   const subPlanId = req.params.id
   const { usageCount } = req.body;
   const authorId = usageCount.authorId;
-  console.log("subPlanId", subPlanId)
 
   try {
     const plan = await subscriptionPlan.findById(subPlanId);
-    console.log("plan", plan);
-
     const usageCountIndex = plan.usageCount.findIndex(item => item.authorId === authorId);
 
     // plan.usageCount[usageCountIndex].count--;
@@ -3039,7 +3034,6 @@ async function sellerReduceCount(req) {
       { usageCount: plan.usageCount },
       { new: true }
     );
-    console.log("subPlan", subPlan);
     return subPlan;
 
   } catch (error) {
@@ -3051,9 +3045,27 @@ async function sellerReduceCount(req) {
 async function updateSubscriptionStatus(req) {
 
   const subPlan_id = req.params.id;
+  const { usageCount } = req.body;
+  const sub_id = usageCount.sub_id
+  // console.log("sub_id", sub_id)
 
   try {
     const plan = await subscriptionPlan.findById(subPlan_id);
+
+    const matchingUsageCount = plan.usageCount.find(item => item.sub_id === sub_id);
+    // console.log("matchingUsageCount", matchingUsageCount)
+    if (matchingUsageCount) {
+      // Update the status of the matching usageCount to false
+      matchingUsageCount.isActive = false;
+
+      // Save the changes
+      const subPlan = await plan.save();
+      // console.log("Updated subscription plan:", subPlan);
+      return subPlan
+    } else {
+      console.log("Subscription plan_id not found in subscription plan");
+      // Handle the case where authorId is not found
+    }
   } catch (error) {
     console.log(error);
   }

@@ -72,8 +72,7 @@ class SellerBannerList extends Component {
         'Authorization': `Bearer ${this.authInfo.token}`
       },
     })
-      .then(response => {
-        console.log("response", response.data.status)
+      .then((response) => {
         if (response.data.status === true) {
           this.setState({
             banner: response.data.data,
