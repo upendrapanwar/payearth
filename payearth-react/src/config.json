@@ -1,5 +1,5 @@
 {
-    "apiURI": "https://localhost:7700/",
+    "apiURI": "https://pay.earth:7700/",
     "googleClientId": "404452827874-lt6ip8te4r7ufhs2gocnppg31atkjtpd.apps.googleusercontent.com",
     "facebookAppId": "998024414330848"
 }

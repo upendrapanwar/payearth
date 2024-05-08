@@ -95,9 +95,7 @@ class SellerManageBannerAdvertisement extends Component {
                 method: "post",
                 body: data
             }).then((res) => res.json())
-                .then((data) => {
-                    // console.log(data.secure_url);
-                    // console.log("data.............................................", data)
+                .then((data) => {       
                     this.setState({ image: data.secure_url })
                     this.setState({ imageId: data.public_id })
                 }).catch((err) => {
@@ -633,7 +631,6 @@ class SellerManageBannerAdvertisement extends Component {
 
     stripeCanclePayment = async (row) => {
         try {
-            console.log('row :', row.usageCount)
             const data = row.usageCount;
             const matching = data.find(item => item.authorId === this.authInfo.id && item.isActive === true)
             // console.log("matching", matching.sub_id)
@@ -644,7 +641,7 @@ class SellerManageBannerAdvertisement extends Component {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
             });
-            console.log("Subscription successfully canceled: ", response);
+          
             if (response.status === 200) {
                 try {
                     const url = `/seller/updateSubscriptionStatus/${row._id}`
@@ -660,7 +657,6 @@ class SellerManageBannerAdvertisement extends Component {
                             'Authorization': `Bearer ${this.authInfo.token}`
                         }
                     }).then((response) => {
-                        console.log("response", response)
                         this.getSubscriptionPlanBySeller();
                         toast.success("Your Subscription Cancled Successfully.....", { autoClose: 3000 })
                     }).catch((error) => {
@@ -679,7 +675,6 @@ class SellerManageBannerAdvertisement extends Component {
 
     render() {
         const { sellerSubscriptionPlan, advertiseAllowed, previousSubscription, loading } = this.state;
-        console.log("sellerSubscriptionPlan", sellerSubscriptionPlan)
         if (loading) {
             return <SpinnerLoader />
         }
