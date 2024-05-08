@@ -3,7 +3,7 @@
  *  Description: Main CSS File
  *  Version: CSS3
  */
- 
+
 @import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;500;600;700;800;900&family=Roboto:wght@400;500;700;900&family=Rubik:wght@400;500;600;700;800&display=swap");
 
 :root {
@@ -438,6 +438,34 @@ ul {
 
 .login_links_wrapper {
   position: relative;
+}
+.login_links_wrapper .notification_head {
+  position: relative;
+  display: inline-block;
+  margin-right: 10px;
+  padding-right: 13px;
+  top: 0px;
+}
+.login_links_wrapper .notification_head > a {
+  position: relative;
+}
+.header .top_bar ul > li:first-child .notification_head a {
+  border-right: 0px;
+}
+.login_links_wrapper .notification_head span.not_count {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: rgb(251 245 0);
+  border-radius: 50%;
+  padding: 0;
+  color: black;
+  font-size: 12px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .header .main_nav {
@@ -3850,23 +3878,22 @@ span.rate_sts {
   margin-top: 10px;
 }
 
-
 /* Service listing */
 
-.popular_products_sec .card .serviceListing-Image{
+.popular_products_sec .card .serviceListing-Image {
   width: 100%;
   height: 320px;
 }
-.popular_products_sec .card .serviceListing-Image img{
+.popular_products_sec .card .serviceListing-Image img {
   object-fit: cover;
   object-position: center;
   width: 100%;
   height: 100%;
 }
-.popular_products_sec .card .serviceListing-content{
+.popular_products_sec .card .serviceListing-content {
   padding: 20px;
 }
-.popular_products_sec .card .service-desc p{
+.popular_products_sec .card .service-desc p {
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -4144,22 +4171,23 @@ a.inner-block:active {
   .advBannerEditWrap .pricing-table .block {
     width: 100%;
   }
-  .popular_products_sec .cards_wrapper>.card, .trending_products_sec .cards_wrapper>.card {
+  .popular_products_sec .cards_wrapper > .card,
+  .trending_products_sec .cards_wrapper > .card {
     margin-right: 0 !important ;
- }
- .detail_tab .nav-link {
-  font-size: 18px;
-  padding: 12px 30px;
-}
-.service_details_sec .tab-content{
- padding-left: 0 !important;
-}
-.service_details_sec .reviews_comments_box {
-  padding: 20px 25px;
-}
-.header .top_bar > .btn{
-  float: right;
-}
+  }
+  .detail_tab .nav-link {
+    font-size: 18px;
+    padding: 12px 30px;
+  }
+  .service_details_sec .tab-content {
+    padding-left: 0 !important;
+  }
+  .service_details_sec .reviews_comments_box {
+    padding: 20px 25px;
+  }
+  .header .top_bar > .btn {
+    float: right;
+  }
 }
 
 @media (max-width: 767px) {
@@ -4213,29 +4241,30 @@ a.inner-block:active {
     width: 100%;
     margin-bottom: 30px;
   }
-    .iframe-container .iFrame-wrapper {
-      max-width: 380px !important;
+  .iframe-container .iFrame-wrapper {
+    max-width: 380px !important;
     height: 82px !important;
     margin: 0 auto;
-     }
-     .prod_details_sec .detail_tab .nav-link{
-      font-size: 12px;
-      font-weight: 600;
-      padding: 12px 14px;
-     }
-     .inr_wrap .pdi_share .pdi_seller{
-       margin-bottom: 15px;
-     }
-     .tab-pane.review .box_wrapper {
-      padding: 43px 0px;
   }
-  .prod_details_sec .tab-content{
+  .prod_details_sec .detail_tab .nav-link {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 12px 14px;
+  }
+  .inr_wrap .pdi_share .pdi_seller {
+    margin-bottom: 15px;
+  }
+  .tab-pane.review .box_wrapper {
+    padding: 43px 0px;
+  }
+  .prod_details_sec .tab-content {
     padding-left: 0 !important;
   }
-  .popular_products_sec .cards_wrapper>.card, .trending_products_sec .cards_wrapper>.card {
-     margin-right: 0 !important ;
+  .popular_products_sec .cards_wrapper > .card,
+  .trending_products_sec .cards_wrapper > .card {
+    margin-right: 0 !important ;
   }
-  .header .top_bar .nav_wrapper{
+  .header .top_bar .nav_wrapper {
     width: 0 !important;
   }
 }
@@ -4325,7 +4354,7 @@ h4 {
   width: 100%;
 }
 
-.iframe-container .iFrame-wrapper{
+.iframe-container .iFrame-wrapper {
   position: relative;
   cursor: pointer;
 }
@@ -4341,7 +4370,7 @@ h4 {
   object-position: center;
 }
 
-.block_button{
+.block_button {
   position: absolute;
   bottom: 0;
   left: 20px;
@@ -4433,8 +4462,7 @@ h4 {
   }
 }
 
-.block_button{
+.block_button {
   /* float: right; */
   /* position: absolute; */
-
 }

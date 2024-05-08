@@ -32,7 +32,11 @@ function jwt() {
       /\/service-review*/,
       /\/get-service-review*/,
       /\/service-detail*/,
-      /\/create-zoom-token*/,
+      /\/zoomAccessToken*/,
+      /\/createZoomMeeting*/,
+      /\/zoomRefreshToken*/,
+      /\/joinZoomMeeting*/,
+      /\/getSignature*/,
 
       //admin
       "/admin/login",

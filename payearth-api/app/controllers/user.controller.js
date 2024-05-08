@@ -242,12 +242,17 @@ router.get("/get-common-service", getAllCommonService);
 router.get("/get-common-service/:id", getCommonServiceById);
 router.post("/service-review", addServiceReview);
 router.get("/get-service-review/:id", getServiceReviews);
+router.delete("/delete-review/:id", deleteReviews);
 router.post("/add-meeting-user/:id", addMeetByUser);
 router.get("/get-meeting/:id", getMeeting);
 router.delete("/delete-meeting/:id", delMeetingByUser);
 router.get("/service-orders/:id", getServiceOrder);
-//jwtToken form zoom
-router.post("/create-zoom-token", createZoomToken);
+router.get("/zoomAccessToken/:id", zoomAccessToken);
+router.get("/zoomRefreshToken", zoomRefreshToken);
+router.post("/createZoomMeeting", createZoomMeeting);
+// router.post("/joinZoomMeeting", JoinZoomMeeting);
+router.post("/getSignature", getZoomSignature);
+router.get("/getData", getData);
 
 module.exports = router;
 
@@ -1147,6 +1152,19 @@ function getServiceReviews(req, res, next) {
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 
+//deleteReviews
+
+function deleteReviews(req, res, next) {
+  userService
+    .deleteReviews(req)
+    .then((review) =>
+      review
+        ? res.json({ status: true, message: "Successfull Delete" })
+        : res.json({ status: false, message: "ERROR" })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
 //*****************************************************************************************/
 //*****************************************************************************************/
 //Add meeting by user for service with seller
@@ -1185,21 +1203,6 @@ function getMeeting(req, res, next) {
       res.status(500).json({ status: false, message: err.message });
     });
 }
-// function getMeeting(req, res, next) {
-//   userService
-//     .getMeeting(req)
-//     .then((reviews) =>
-//       reviews
-//         ? res.status(200).json({ status: true, data: reviews })
-//         : res.status(400).json({
-//             status: false,
-//             message: msg.common.no_data_err,
-//             data: [],
-//           })
-//     )
-//     .catch((err) => next(res.json({ status: false, message: err })));
-// }
-
 //*****************************************************************************************/
 //*****************************************************************************************/
 //delete meeting By user
@@ -1228,16 +1231,33 @@ function getServiceOrder(req, res, next) {
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
-
 //*****************************************************************************************/
 //*****************************************************************************************/
 //Genrate Zoom Access Token
-function createZoomToken(req, res, next) {
+function zoomAccessToken(req, res, next) {
   userService
-    .createZoomToken(req)
-    .then((token) => {
-      if (token) {
-        res.json({ status: true, message: "Token generated successfully" });
+    .zoomAccessToken(req)
+    .then((data1) =>
+      data1
+        ? res.status(200).json({ status: true, data: data1 })
+        : res.status(400).json({ status: false, message: "ERROR ", data: [] })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+// *******************************************************************************
+// *******************************************************************************
+//zoomRefreshToken
+function zoomRefreshToken(req, res, next) {
+  userService
+    .zoomRefreshToken(req)
+    .then((result) => {
+      if (result) {
+        res.json({
+          status: true,
+          message: "Zoom new Refresh token generated successfully",
+          data: result,
+        });
       } else {
         res.json({ status: false, message: "ERROR" });
       }
@@ -1245,4 +1265,84 @@ function createZoomToken(req, res, next) {
     .catch((err) => {
       next(res.status(500).json({ status: false, message: err }));
     });
+}
+
+// *******************************************************************************
+// *******************************************************************************
+//create zoom meeting
+function createZoomMeeting(req, res, next) {
+  userService
+    .createZoomMeeting(req)
+    .then((result) => {
+      if (result) {
+        res.json({
+          status: true,
+          message: "Zoom Meeting Created successfully",
+          data: result,
+        });
+      } else {
+        res.json({ status: false, message: "ERROR" });
+      }
+    })
+    .catch((err) => {
+      next(res.status(500).json({ status: false, message: err }));
+    });
+}
+
+//*****************************************************************************************/
+//*****************************************************************************************/
+//get(Join) Zoom Meeting
+// function JoinZoomMeeting(req, res, next) {
+//   userService
+//     .JoinZoomMeeting(req)
+//     .then((result) => {
+//       if (result) {
+//         res.json({
+//           status: true,
+//           message: "Join Zoom Meeting successfully",
+//           data: result,
+//         });
+//       } else {
+//         res.json({ status: false, message: "ERROR" });
+//       }
+//     })
+//     .catch((err) => {
+//       next(res.status(500).json({ status: false, message: err }));
+//     });
+// }
+
+//*****************************************************************************************/
+//*****************************************************************************************/
+//Genrate Zoom Signature
+function getZoomSignature(req, res, next) {
+  console.log("getZoomSignature Controller run");
+  userService
+    .getZoomSignature(req)
+    .then((signature) => {
+      if (signature) {
+        res.json({
+          status: true,
+          message: "Signature generated successfully",
+          signature: signature,
+        });
+      } else {
+        res.json({ status: false, message: "ERROR" });
+      }
+    })
+    .catch((err) => {
+      next(res.status(500).json({ status: false, message: err }));
+    });
+}
+
+//*****************************************************************************************/
+//*****************************************************************************************/
+function getData(req, res, next) {
+  userService
+    .getData(req)
+    .then((banner) =>
+      banner
+        ? res.status(200).json({ status: true, data: banner })
+        : res.status(400).json({ status: false, message: "ERROR ", data: [] })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
 }

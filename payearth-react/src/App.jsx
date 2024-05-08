@@ -111,6 +111,7 @@ import BlogDetail from "./components/common/BlogDetails";
 import PageModel from "./components/common/PageModel";
 import PageDetail from "./components/common/PageDetails";
 
+import Zoom from "./components/user/common/services/zoom/Zoom";
 import ScrollToTopButton from "./containers/user/ScrollToTopButton";
 // import BannerCheckOut from './containers/user/BannerCheckOut';
 import StripePaymentForm from "./containers/user/BannerCheckOutStripe";
@@ -696,7 +697,13 @@ function App() {
             component={PageDetail}
             exact
           />
-
+          <PrivateRoute
+            path="/zoom-authentication"
+            component={Zoom}
+            roles={[Role.user]}
+            currentUserRole={userInfo.role}
+            exact
+          />
           {/* Not found */}
           <Route component={PageNotFound} />
         </Switch>

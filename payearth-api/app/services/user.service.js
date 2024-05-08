@@ -2,6 +2,7 @@
 const mongoose = require("mongoose");
 const axios = require("axios");
 const { Base64 } = require("js-base64");
+const request = require("request");
 mongoose.connect(process.env.MONGODB_URI || config.connectionString, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -110,8 +111,15 @@ module.exports = {
   addMeetByUser,
   getMeeting,
   delMeetingByUser,
-  createZoomToken,
   getServiceOrder,
+  deleteReviews,
+  zoomRefreshToken,
+  zoomAccessToken,
+  // callBackZoom,
+  // authZoom,
+  createZoomMeeting,
+  // JoinZoomMeeting,
+  getZoomSignature,
 };
 
 function sendMail(mailOptions) {
@@ -787,7 +795,6 @@ async function getNewCoupons(req) {
     } else {
       return false;
     }
-    console.log("its checking");
   } catch (err) {
     console.log("Error", err);
     console.log("Cpouon is Expired or Code is not match");
@@ -859,7 +866,6 @@ async function checkCoupon(req) {
         return result;
       } else {
         return false;
-        console.log("data is not found");
       }
     } else {
       console.log("this coupon has already used by user");
@@ -2626,12 +2632,26 @@ async function getServiceReviews(serviceId) {
     throw err;
   }
 }
+
+// *******************************************************************************
+// *******************************************************************************
+//Delete review
+
+async function deleteReviews(req) {
+  const _id = req.params.id;
+  try {
+    const result = await ServiceReview.findByIdAndDelete(_id);
+    return result;
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+}
 // *******************************************************************************
 // *******************************************************************************
 async function addMeetByUser(req) {
   try {
     const reqData = req.body;
-    console.log("reqData checks", reqData);
     let data = "";
     for (const event of reqData) {
       const existingEvent = await Calendar.findOne({
@@ -2655,7 +2675,6 @@ async function addMeetByUser(req) {
         data = [];
       }
     }
-    console.log("Response of saved calendar:", data);
     return data;
   } catch (err) {
     console.error("Error saving calendar events:", err);
@@ -2679,7 +2698,6 @@ async function getMeeting(req) {
       .populate({ path: "user_id", model: User, select: "name" })
       .sort({ createdAt: "desc" })
       .exec();
-    console.log("result", result);
     return result;
   } catch (err) {
     console.log("Error", err);
@@ -2693,7 +2711,6 @@ async function getMeeting(req) {
 
 async function delMeetingByUser(req) {
   const id = req.params.id;
-  console.log("delete meeting", id);
   try {
     const result = await Calendar.deleteOne({ _id: id });
     return result;
@@ -2721,44 +2738,125 @@ async function getServiceOrder(req) {
     console.log(error);
   }
 }
-
 // *******************************************************************************
 // *******************************************************************************
-// const ZOOM_API_BASE_URL = "https://api.zoom.us/v2";
-const ZOOM_ACCOUNT_ID = process.env.ZOOM_ACCOUNT_ID;
-const ZOOM_CLIENT_ID = process.env.ZOOM_CLIENT_ID;
-const ZOOM_CLIENT_SECRET = process.env.ZOOM_CLIENT_SECRET;
 
-async function createZoomToken() {
+//create zoom access token
+async function zoomAccessToken(req) {
+  const code = req.params.id;
   try {
-    // Encode client ID and client secret in base64
-    const credentials = `${ZOOM_CLIENT_ID}:${ZOOM_CLIENT_SECRET}`;
-    const encodedCredentials = Base64.encode(credentials);
-    const authorization = `Basic ${encodedCredentials}`;
-
-    // Set up API request header
-    const headers = {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: authorization,
-    };
-
-    // Set up body for access token request
-    const data = new URLSearchParams();
-    data.append("grant_type", "account_credentials");
-    data.append("account_id", ZOOM_ACCOUNT_ID);
-
-    // Make POST request to token API
-    axios
-      .post(`https://zoom.us/oauth/token`, data, { headers })
-      .then((response) => {
-        // Log the access token
-        console.log("Access token:", response.data.access_token);
-      })
-      .catch((error) => {
-        // Log and handle errors
-        console.error("Error generating access token:", error.response.data);
+    if (code) {
+      const redirectURL = "https://localhost:3000/zoom-authentication";
+      const b = Buffer.from(
+        process.env.ZOOM_API_KEY + ":" + process.env.ZOOM_API_SECRET
+      );
+      const url = `https://zoom.us/oauth/token?grant_type=authorization_code&code=${code}&redirect_uri=${redirectURL}`;
+      const response = await axios.post(url, null, {
+        headers: {
+          Authorization: `Basic ${b.toString("base64")}`,
+        },
       });
+      const data = response.data;
+      return data;
+    }
   } catch (error) {
-    console.error("Error:", error.message);
+    console.error("Error:", error);
   }
 }
+
+// *******************************************************************************
+// *******************************************************************************
+//Zoom Refresh Token
+async function zoomRefreshToken(req) {
+  const refresh_token = req.query.refresh_token;
+  try {
+    const response = await axios.post("https://zoom.us/oauth/token", null, {
+      params: {
+        grant_type: "refresh_token",
+        refresh_token,
+      },
+      headers: {
+        Authorization: `Basic ${Buffer.from(
+          `${process.env.ZOOM_API_KEY}:${process.env.ZOOM_API_SECRET}`
+        ).toString("base64")}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+
+    const result = response.data;
+    return result;
+  } catch (err) {
+    console.log("Err", err);
+  }
+}
+// *******************************************************************************
+// *******************************************************************************
+//create zoom meeting
+async function createZoomMeeting(req) {
+  const { topic, start_time, agenda, zoomaccesstoken } = req.body;
+  try {
+    const response = await axios.post(
+      "https://api.zoom.us/v2/users/me/meetings",
+      {
+        topic,
+        type: 2,
+        start_time,
+        duration: 45,
+        timezone: "UTC",
+        agenda,
+        settings: {
+          host_video: true,
+          participant_video: true,
+          join_before_host: false,
+          mute_upon_entry: true,
+          watermark: false,
+          use_pmi: false,
+          approval_type: 0,
+          audio: "both",
+          auto_recording: "none",
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${zoomaccesstoken}`,
+        },
+      }
+    );
+    const result = response.data;
+    return result;
+  } catch (err) {
+    console.log("Err", err);
+  }
+}
+// *******************************************************************************
+// *******************************************************************************
+//create zoom signature
+
+async function getZoomSignature(req) {
+  console.log("getZoomSignature function run");
+  try {
+    const appKey = process.env.ZOOM_APPKEY;
+    const appSecret = process.env.ZOOM_SDKKEY;
+    const meetingNumber = 88587573306;
+    const role = 0;
+
+    const iat = Math.floor(Date.now() / 1000);
+    const exp = iat + 2 * 60 * 60; // 2 hours expiration
+
+    const payload = {
+      appKey: appKey,
+      sdkKey: appSecret,
+      mn: meetingNumber,
+      role: role,
+      iat: iat,
+      exp: exp,
+      tokenExp: exp,
+    };
+    const signature = jwt.sign(payload, appSecret, { algorithm: "HS256" });
+    return signature;
+  } catch (err) {
+    console.log("Error", err);
+  }
+}
+// *******************************************************************************
+// *******************************************************************************

@@ -5,6 +5,7 @@ import { FaTrash } from "react-icons/fa"; // Import the trash icon
 import ServiceModal from "../services/ServiceModel";
 import ServiceCalendar from "./ServiceCalendar";
 import { isLogin } from "./../../../../helpers/login";
+import { toast } from "react-toastify";
 import ServiceCalendarAuth from "./ServiceCalendarAuth";
 
 function ServiceDetailsTabbing(props) {
@@ -34,6 +35,7 @@ function ServiceDetailsTabbing(props) {
       const response = await axios.get(`/user/get-service-review/${serviceId}`);
       const result = response.data.data;
       setReviews(result);
+      console.log("review data", result);
 
       // Calculate average rating
       if (result.length > 0) {
@@ -56,13 +58,18 @@ function ServiceDetailsTabbing(props) {
     setIsModalOpen(false);
   };
 
-  // Delete a review
   const deleteReview = async (reviewId) => {
     try {
-      await axios.delete(`/user/delete-review/${reviewId}`);
+      const headers = {
+        Authorization: `Bearer ${authInfo.token}`,
+      };
+
+      await axios.delete(`/user/delete-review/${reviewId}`, { headers });
       // After deleting the review, fetch updated reviews
       fetchApi();
+      toast.success("Review Deleted Successfully");
     } catch (error) {
+      toast.error("Review hasn't been deleted");
       console.log("Error deleting review:", error);
     }
   };
@@ -102,6 +109,11 @@ function ServiceDetailsTabbing(props) {
   };
 
   // Pagination controls
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  //handle pagination next page
   const nextPage = () => {
     const totalPages = Math.ceil(reviews.length / itemsPerPage);
     if (currentPage < totalPages) {
@@ -109,50 +121,91 @@ function ServiceDetailsTabbing(props) {
     }
   };
 
+  //handle pagination next prevPage
   const prevPage = () => {
     if (currentPage > 1) {
       setCurrentPage((prevPage) => prevPage - 1);
     }
   };
 
-  // Calculate current reviews to display based on pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentReviews = reviews.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Generate page numbers
-  const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(reviews.length / itemsPerPage); i++) {
-    pageNumbers.push(i);
-  }
+  const authZoom = async () => {
+    try {
+      const clientId = process.env.REACT_APP_ZOOM_API_KEY;
+      const encodedRedirectUri = encodeURIComponent(
+        process.env.REACT_APP_REDIRECT_URI
+      );
+      const redirect_uri = decodeURIComponent(encodedRedirectUri);
+      const responseType = "code";
+      const authorizationUrl = `https://zoom.us/oauth/authorize?response_type=${responseType}&client_id=${clientId}&redirect_uri=${redirect_uri}`;
+      window.location.href = authorizationUrl;
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleNo = async () => {
+    const appointmentTab = document.getElementById("appointment-tab");
+    appointmentTab.click();
+  };
 
   return (
     <React.Fragment>
       <section className="service_details_sec" ref={props.ref}>
         <div className="container">
           <div className="row">
-            <div className="com-sm-12">
+            <div
+              className="com-sm-12"
+              style={{
+                marginTop: "50px",
+              }}
+            >
               <div className="detail_tab">
                 <ul className="nav nav-tabs border-0" id="myTab" role="tablist">
-                  {/* Meeting Tab */}
+                  {/* Appointment Tab */}
                   {!currentUser ? (
                     ""
                   ) : (
                     <li className="nav-item" role="presentation">
                       <button
                         className="nav-link active"
-                        id="meeting-tab"
+                        id="appointment-tab"
                         data-bs-toggle="tab"
-                        data-bs-target="#meeting"
+                        data-bs-target="#appointment"
                         type="button"
                         role="tab"
-                        aria-controls="meeting"
+                        aria-controls="appointment"
                         aria-selected="false"
+                      >
+                        Appointment
+                      </button>
+                    </li>
+                  )}
+                  {/* ****************zoom meeting************* */}
+                  {/* Zoom Meeting Tab */}
+                  {!currentUser ? (
+                    ""
+                  ) : (
+                    <li className="nav-item" role="presentation">
+                      <button
+                        className="nav-link"
+                        id="zoommeeting-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#zoommeeting"
+                        type="button"
+                        role="tab"
+                        aria-controls="zoommeeting"
+                        aria-selected="false"
+                        // onClick={authZoom}
                       >
                         Meeting
                       </button>
                     </li>
                   )}
+                  {/* ****************zoom meeting************* */}
 
                   {/* Description Tab */}
                   {!currentUser ? (
@@ -204,15 +257,16 @@ function ServiceDetailsTabbing(props) {
                   </li>
                 </ul>
                 <div className="tab-content" id="myTabContent">
-                  {/* Meeting Content */}
-                  {!currentUser ? (
+                  {/* Appontment Content */}
+                  {/* {!currentUser ? (
                     ""
                   ) : !isCalendarAuthorized ? (
                     <div
                       className="tab-pane fade show active"
-                      id="meeting"
+                      // id="meeting"
+                      id="appointment"
                       role="tabpanel"
-                      aria-labelledby="meeting-tab"
+                      aria-labelledby="appointment-tab"
                     >
                       <ServiceCalendarAuth
                         onAuthSuccess={() => {
@@ -225,15 +279,97 @@ function ServiceDetailsTabbing(props) {
                   ) : (
                     <div
                       className="tab-pane fade show active"
-                      id="meeting"
+                      id="appointment"
                       role="tabpanel"
-                      aria-labelledby="meeting-tab"
+                      aria-labelledby="appointment-tab"
+                    >
+                      <p className="mb-0">
+                        <ServiceCalendar authToken={authInfo.token} />
+                      </p>
+                    </div>
+                  )} */}
+                  {/* ********************zoom meeting content************************* */}
+                  {/* {!currentUser ? (
+                    ""
+                  ) : (
+                    <div
+                      className="tab-pane fade show active"
+                      // id="meeting"
+                      id="zoommeeting"
+                      role="tabpanel"
+                      aria-labelledby="zoommeeting-tab"
+                    >
+                      <h1>Do you want to create a Zoom meeting?</h1>
+                      <button
+                        className="btn custom_btn btn_yellow"
+                        onClick={authZoom}
+                      >
+                        Yes
+                      </button>
+                      <button
+                        className="btn custom_btn btn_dark"
+                        onClick={handleNo}
+                      >
+                        No
+                      </button>
+                    </div>
+                  )} */}
+                  {/* ********************zoom meeting content************************* */}
+                  {!currentUser ? (
+                    ""
+                  ) : !isCalendarAuthorized ? (
+                    <div
+                      className="tab-pane fade show active"
+                      id="appointment"
+                      role="tabpanel"
+                      aria-labelledby="appointment-tab"
+                    >
+                      <ServiceCalendarAuth
+                        onAuthSuccess={() => {
+                          handleCalendarAuthorization();
+                        }}
+                        userId={authInfo.id}
+                        authToken={authInfo.token}
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className="tab-pane fade show active"
+                      id="appointment"
+                      role="tabpanel"
+                      aria-labelledby="appointment-tab"
                     >
                       <p className="mb-0">
                         <ServiceCalendar authToken={authInfo.token} />
                       </p>
                     </div>
                   )}
+
+                  {!currentUser ? (
+                    ""
+                  ) : (
+                    <div
+                      className="tab-pane fade"
+                      id="zoommeeting"
+                      role="tabpanel"
+                      aria-labelledby="zoommeeting-tab"
+                    >
+                      <h1>Do you want to create a Zoom meeting?</h1>
+                      <button
+                        className="btn custom_btn btn_yellow"
+                        onClick={authZoom}
+                      >
+                        Yes
+                      </button>
+                      <button
+                        className="btn custom_btn btn_dark"
+                        onClick={handleNo}
+                      >
+                        No
+                      </button>
+                    </div>
+                  )}
+
                   {!currentUser ? (
                     props.description ? (
                       <div
@@ -278,6 +414,20 @@ function ServiceDetailsTabbing(props) {
                               {renderStarRating(averageRating)}
                             </p>
                             {/* You can keep the rating distribution as it is */}
+                            <button
+                              className={`btn custom_btn btn_yellow_bordered w-auto d-inline-block ${
+                                !authInfo || authInfo.id === undefined
+                                  ? "disabled"
+                                  : ""
+                              }`}
+                              onClick={() =>
+                                authInfo &&
+                                authInfo.id !== undefined &&
+                                openModal()
+                              }
+                            >
+                              Write a review
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -293,20 +443,28 @@ function ServiceDetailsTabbing(props) {
                                       {review.review.title}
                                     </p>
                                     {/* Add delete icon here */}
-                                    <button
-                                      className="btn btn-link text-danger" // Set text color to red
-                                      onClick={() =>
-                                        deleteReview(review.review._id)
-                                      }
-                                    >
-                                      <FaTrash />
-                                    </button>
+                                    {currentUser &&
+                                      review.userId._id === authInfo.id && (
+                                        <button
+                                          style={{
+                                            marginTop: "-14px",
+                                            float: "right",
+                                          }}
+                                          className="btn btn-link text-danger"
+                                          onClick={() =>
+                                            deleteReview(review._id)
+                                          }
+                                        >
+                                          <FaTrash />
+                                        </button>
+                                      )}
                                   </div>
-                                  <p className="rating">
-                                    {renderStarRating(review.rating)}
-                                  </p>
+
                                   <p className="feedback">
                                     {review.review.description}
+                                  </p>
+                                  <p className="rating">
+                                    {renderStarRating(review.rating)}
                                   </p>
                                   <p className="date mb-0">
                                     {review.userId.name} |{" "}
@@ -317,38 +475,36 @@ function ServiceDetailsTabbing(props) {
                             : ""}
 
                           {/* Pagination buttons */}
-                          {reviews.length > itemsPerPage && (
-                            <div className="text-center mt-4">
-                              <button
-                                className="btn"
-                                onClick={prevPage}
-                                disabled={currentPage === 1}
-                              >
-                                Prev
-                              </button>
-                              {pageNumbers.map((number) => (
-                                <button
-                                  key={number}
-                                  className={`btn ${
-                                    number === currentPage ? "btn " : "btn"
-                                  }`}
-                                  onClick={() => setCurrentPage(number)}
-                                >
-                                  {number}
-                                </button>
-                              ))}
-                              <button
-                                className="btn "
-                                onClick={nextPage}
-                                disabled={
-                                  currentPage ===
-                                  Math.ceil(reviews.length / itemsPerPage)
-                                }
-                              >
-                                Next
-                              </button>
-                            </div>
-                          )}
+                          <div className="cart-pagination">
+                            {reviews.length > itemsPerPage && (
+                              <ul className="pagination-wrapper">
+                                <li>
+                                  <button onClick={prevPage}>Prev</button>
+                                </li>
+                                {Array(Math.ceil(reviews.length / itemsPerPage))
+                                  .fill()
+                                  .map((_, index) => (
+                                    <li key={index}>
+                                      <button
+                                        onClick={() =>
+                                          handlePageChange(index + 1)
+                                        }
+                                        className={
+                                          currentPage === index + 1
+                                            ? "active"
+                                            : ""
+                                        }
+                                      >
+                                        {index + 1}
+                                      </button>
+                                    </li>
+                                  ))}
+                                <li>
+                                  <button onClick={nextPage}>Next</button>
+                                </li>
+                              </ul>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>

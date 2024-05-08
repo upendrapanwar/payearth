@@ -6,8 +6,11 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import { toast } from "react-toastify";
 import moment from "moment";
-import ZoomTokenGenerator from "./zoom/ZoomTokenGenrator";
+// import io from "socket.io-client";
+
+const SOCKET_SERVER_URL = process.env.REACT_APP_SOCKET_SERVER_URL;
 
 function ServiceCalendar() {
   //get global authInfo for userId
@@ -16,6 +19,8 @@ function ServiceCalendar() {
   //get accessToken from google calendar auth
   const accessToken = localStorage.getItem("accessToken");
   //get serviceId with help of useParams
+  // Create a socket instance
+  const socket = useRef(null);
   const { id } = useParams();
   const service_id = id;
 
@@ -27,9 +32,8 @@ function ServiceCalendar() {
     description: "",
   });
 
-  //******************create Zoom meeting start************************ */
-
-  //******************create Zoom meeting end************************ */
+  // const [notification, setNotification] = useState([]);
+  const [zoomAuth, setZoomAuth] = useState([]);
 
   const calendarRef = useRef(null);
 
@@ -67,6 +71,7 @@ function ServiceCalendar() {
     } else {
       fetchEvents();
       fetchGoogleEvents();
+      toast.success("New event added!");
     }
   }, [id]);
 
@@ -85,7 +90,6 @@ function ServiceCalendar() {
     });
   };
 
-  //Saved evnt on google
   const handleFormSubmit = async (event) => {
     event.preventDefault();
 
@@ -93,6 +97,13 @@ function ServiceCalendar() {
     const start_datetime = moment(
       `${newEvent.meetingDate}T${newEvent.meetingTime}`
     ).toISOString(); // Convert to ISO string format
+
+    // Check if the selected date is after the current date
+    if (moment(start_datetime).isBefore(moment(), "day")) {
+      // If the selected date is before the current date, show an error toast
+      toast.error("Please select the current date or a future date.");
+      return; // Stop further execution
+    }
 
     // Calculate end_datetime by adding 1 hour to start_datetime
     const end_datetime = moment(start_datetime).add(1, "hour").toISOString(); // Convert to ISO string format
@@ -110,8 +121,6 @@ function ServiceCalendar() {
       description: newEvent.description,
       location: "https://ZoomMeeting.com", // Update with your meeting URL
     };
-
-    console.log("eventData", eventData);
     try {
       await axios.post(
         `https://www.googleapis.com/calendar/v3/calendars/primary/events`,
@@ -123,7 +132,7 @@ function ServiceCalendar() {
           },
         }
       );
-      console.log("Form submitted:", eventData);
+      toast.success("Event added succesfully");
       setFormOpen(false);
       // Optionally, you can update state or perform other actions after successful submission
       setNewEvent({
@@ -135,6 +144,8 @@ function ServiceCalendar() {
 
       fetchGoogleEvents();
     } catch (error) {
+      toast.error("Event hasn't added");
+
       console.error("Error submitting form:", error);
     }
   };
@@ -283,17 +294,6 @@ function ServiceCalendar() {
     }
   };
 
-  //***************************************************************************************** */
-
-  //show and hide pop up
-  // const hidePopover = () => {
-  //   const popoverInstance = new bootstrap.Popover(
-  //     document.querySelector(".fc-event-container"),
-  //     {}
-  //   );
-  //   popoverInstance.destroy();
-  // };
-
   return (
     <React.Fragment>
       {formOpen && (
@@ -362,13 +362,6 @@ function ServiceCalendar() {
                     >
                       Submit
                     </button>
-
-                    {/* <button
-                      className="btn btn-primary"
-                      onClick={createZoomToken}
-                    >
-                      Zoom meeting
-                    </button> */}
                     <button
                       type="button"
                       className="btn btn-secondary"
@@ -416,7 +409,6 @@ function ServiceCalendar() {
         }}
         ref={handleCalendarInit}
       />
-      {/* <ZoomTokenGenerator /> */}
     </React.Fragment>
   );
 }

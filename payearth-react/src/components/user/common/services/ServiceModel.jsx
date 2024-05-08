@@ -24,6 +24,9 @@ function ServiceModel({ isOpen, onClose, serviceId, authInfo, fetchApi }) {
       console.log("Review submitted successfully!");
       //called get api for show updated data
       fetchApi();
+      // Clear the form fields after successful submission
+      setRating(0);
+      setReview({ title: "", description: "" });
     } catch (error) {
       console.error("Error submitting review:", error);
     }
@@ -57,7 +60,7 @@ function ServiceModel({ isOpen, onClose, serviceId, authInfo, fetchApi }) {
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label htmlFor="reviewTitle" className="form-label">
-                    Title
+                    Add a headline
                   </label>
                   <input
                     type="text"
@@ -71,7 +74,7 @@ function ServiceModel({ isOpen, onClose, serviceId, authInfo, fetchApi }) {
                 </div>
                 <div className="mb-3">
                   <label htmlFor="reviewDescription" className="form-label">
-                    Description
+                    Add a written review
                   </label>
                   <textarea
                     className="form-control"
