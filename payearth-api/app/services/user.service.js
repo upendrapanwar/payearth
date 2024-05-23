@@ -47,6 +47,7 @@ const {
   ServiceReview,
   Servicedetails,
   Calendar,
+  Notification,
 } = require("../helpers/db");
 
 module.exports = {
@@ -116,8 +117,11 @@ module.exports = {
   zoomRefreshToken,
   zoomAccessToken,
   createZoomMeeting,
-  getZoomSignature,
   getAllUser,
+  addNotification,
+  getNotification,
+  updateNotification,
+  deleteNotification,
 };
 
 function sendMail(mailOptions) {
@@ -2736,35 +2740,10 @@ async function getServiceOrder(req) {
     console.log(error);
   }
 }
-// *******************************************************************************
-// *******************************************************************************
-//create zoom access token
-async function zoomAccessToken(req) {
-  const code = req.params.id;
-  try {
-    if (code) {
-      const redirectURL = "https://localhost:3000/zoom-authentication";
-      const b = Buffer.from(
-        process.env.ZOOM_API_KEY + ":" + process.env.ZOOM_API_SECRET
-      );
-      const url = `https://zoom.us/oauth/token?grant_type=authorization_code&code=${code}&redirect_uri=${redirectURL}`;
-      const response = await axios.post(url, null, {
-        headers: {
-          Authorization: `Basic ${b.toString("base64")}`,
-        },
-      });
-      const data = response.data;
-      return data;
-    }
-  } catch (error) {
-    console.error("Error:", error);
-  }
-}
 
 // *******************************************************************************
 // *******************************************************************************
 //getAllUser
-
 async function getAllUser(req) {
   const keyword = req.query.search
     ? {
@@ -2801,7 +2780,52 @@ async function getAllUser(req) {
   });
   return result;
 }
+// *******************************************************************************
+// *******************************************************************************
+//create zoom access token
+// async function zoomAccessToken(req) {
+//   const code = req.params.id;
+//   try {
+//     if (code) {
+//       const redirectURL = "https://localhost:3000/zoom-authentication";
+//       const b = Buffer.from(
+//         process.env.ZOOM_API_KEY + ":" + process.env.ZOOM_API_SECRET
+//       );
+//       const url = `https://zoom.us/oauth/token?grant_type=authorization_code&code=${code}&redirect_uri=${redirectURL}`;
+//       const response = await axios.post(url, null, {
+//         headers: {
+//           Authorization: `Basic ${b.toString("base64")}`,
+//         },
+//       });
+//       const data = response.data;
+//       return data;
+//     }
+//   } catch (error) {
+//     console.error("Error:", error);
+//   }
+// }
 
+async function zoomAccessToken(req) {
+  const code = req.params.id;
+  try {
+    if (code) {
+      const redirectURL = "https://localhost:3000/zoom-authentication";
+      const b = Buffer.from(
+        process.env.ZOOM_API_KEY + ":" + process.env.ZOOM_API_SECRET
+      );
+      const url = `https://zoom.us/oauth/token?grant_type=authorization_code&code=${code}&redirect_uri=${redirectURL}`;
+      const response = await axios.post(url, null, {
+        headers: {
+          Authorization: `Basic ${b.toString("base64")}`,
+        },
+      });
+      const data = response.data;
+      return data;
+    }
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
 // *******************************************************************************
 // *******************************************************************************
 //Zoom Refresh Token
@@ -2868,32 +2892,69 @@ async function createZoomMeeting(req) {
 }
 // *******************************************************************************
 // *******************************************************************************
-//create zoom signature
-
-async function getZoomSignature(req) {
-  console.log("getZoomSignature function run");
+//add notification
+async function addNotification(req) {
+  const requestData = req.body;
   try {
-    const appKey = process.env.ZOOM_APPKEY;
-    const appSecret = process.env.ZOOM_SDKKEY;
-    const meetingNumber = 88587573306;
-    const role = 0;
-
-    const iat = Math.floor(Date.now() / 1000);
-    const exp = iat + 2 * 60 * 60; // 2 hours expiration
-
-    const payload = {
-      appKey: appKey,
-      sdkKey: appSecret,
-      mn: meetingNumber,
-      role: role,
-      iat: iat,
-      exp: exp,
-      tokenExp: exp,
+    const notificationData = {
+      userId: requestData.userId,
+      serviceId: requestData.serviceId,
+      message: requestData.message,
     };
-    const signature = jwt.sign(payload, appSecret, { algorithm: "HS256" });
-    return signature;
-  } catch (err) {
-    console.log("Error", err);
+    const data = await Notification.create(notificationData);
+    const result = data;
+    return result;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+// *******************************************************************************
+// *******************************************************************************
+//get notification
+async function getNotification(req) {
+  const userId = req.params.userId;
+  try {
+    const result = await Notification.find(userId)
+      .populate({
+        path: "serviceId",
+        model: Services,
+        select: "name createdBy ",
+      })
+      .populate({ path: "userId", model: User, select: "name" })
+      .sort({ createdAt: "desc" })
+      .exec();
+    return result;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+// *******************************************************************************
+// *******************************************************************************
+//update Notification
+async function updateNotification(req) {
+  const _id = req.params.id;
+  try {
+    const result = await Notification.findOneAndUpdate(
+      { _id },
+      { read: true },
+      { new: true }
+    );
+    return result;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+// *******************************************************************************
+// *******************************************************************************
+//deleteNotification
+async function deleteNotification(req) {
+  // const id = req.params.id;
+  try {
+    // const result = await Calendar.deleteOne({ _id: id });
+    // return result;
+  } catch (error) {
+    console.log(error);
   }
 }
 // *******************************************************************************

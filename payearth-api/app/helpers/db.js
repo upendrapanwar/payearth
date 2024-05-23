@@ -45,4 +45,5 @@ module.exports = {
   Servicedetails: require("../models/servicedetail.model"),
   ServiceReview: require("../models/servicereview.model"),
   Calendar: require("../models/calendar.model"),
+  Notification: require("../models/notification.model"),
 };

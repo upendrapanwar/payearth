@@ -36,8 +36,6 @@ function jwt() {
       /\/zoomAccessToken*/,
       /\/createZoomMeeting*/,
       /\/zoomRefreshToken*/,
-      /\/joinZoomMeeting*/,
-      /\/getSignature*/,
 
       //admin
       "/admin/login",

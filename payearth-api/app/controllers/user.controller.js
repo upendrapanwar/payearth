@@ -248,9 +248,12 @@ router.get("/service-orders/:id", getServiceOrder);
 router.get("/zoomAccessToken/:id", zoomAccessToken);
 router.get("/zoomRefreshToken", zoomRefreshToken);
 router.post("/createZoomMeeting", createZoomMeeting);
-router.post("/getSignature", getZoomSignature);
 router.get("/getData", getData);
 router.get("/getAllUser", getAllUser);
+router.post("/add-notification", addNotification);
+router.get("/get-notification/:id", getNotification);
+router.patch("/update-notification/:id", updateNotification);
+router.delete("/delete-notification/:id", deleteNotification);
 
 module.exports = router;
 
@@ -1304,51 +1307,6 @@ function createZoomMeeting(req, res, next) {
 
 //*****************************************************************************************/
 //*****************************************************************************************/
-//get(Join) Zoom Meeting
-// function JoinZoomMeeting(req, res, next) {
-//   userService
-//     .JoinZoomMeeting(req)
-//     .then((result) => {
-//       if (result) {
-//         res.json({
-//           status: true,
-//           message: "Join Zoom Meeting successfully",
-//           data: result,
-//         });
-//       } else {
-//         res.json({ status: false, message: "ERROR" });
-//       }
-//     })
-//     .catch((err) => {
-//       next(res.status(500).json({ status: false, message: err }));
-//     });
-// }
-
-//*****************************************************************************************/
-//*****************************************************************************************/
-//Genrate Zoom Signature
-function getZoomSignature(req, res, next) {
-  console.log("getZoomSignature Controller run");
-  userService
-    .getZoomSignature(req)
-    .then((signature) => {
-      if (signature) {
-        res.json({
-          status: true,
-          message: "Signature generated successfully",
-          signature: signature,
-        });
-      } else {
-        res.json({ status: false, message: "ERROR" });
-      }
-    })
-    .catch((err) => {
-      next(res.status(500).json({ status: false, message: err }));
-    });
-}
-
-//*****************************************************************************************/
-//*****************************************************************************************/
 function getData(req, res, next) {
   userService
     .getData(req)
@@ -1359,3 +1317,72 @@ function getData(req, res, next) {
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
+//*****************************************************************************************/
+//*****************************************************************************************/
+function addNotification(req, res, next) {
+  userService
+    .addNotification(req)
+    .then((result) =>
+      result
+        ? res.status(200).json({
+            status: true,
+            data: result,
+            message: "Notification Created successfully",
+          })
+        : res.status(400).json({ status: false, message: "ERROR ", data: [] })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+//*****************************************************************************************/
+//*****************************************************************************************/
+//get Notification
+function getNotification(req, res, next) {
+  userService
+    .getNotification(req)
+    .then((result) =>
+      result
+        ? res.status(200).json({
+            status: true,
+            data: result,
+            message: "Get Notification Successfully",
+          })
+        : res.status(400).json({ status: false, message: "ERROR ", data: [] })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+//*****************************************************************************************/
+//*****************************************************************************************/
+//updated Notification
+function updateNotification(req, res, next) {
+  userService
+    .updateNotification(req)
+    .then((result) =>
+      result
+        ? res.status(200).json({
+            status: true,
+            data: result,
+            message: "Notification updated Successfully",
+          })
+        : res.status(400).json({ status: false, message: "ERROR ", data: [] })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+//*****************************************************************************************/
+//*****************************************************************************************/
+//deleteNotification
+function deleteNotification(req, res, next) {
+  userService
+    .deleteNotification(req)
+    .then((result) =>
+      result
+        ? res.status(200).json({
+            status: true,
+            data: result,
+            message: "Delete Notification Successfully",
+          })
+        : res.status(400).json({ status: false, message: "ERROR ", data: [] })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+//*****************************************************************************************/
+//*****************************************************************************************/

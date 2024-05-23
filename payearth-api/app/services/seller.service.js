@@ -41,7 +41,7 @@ const {
   Calendar,
   bannerAdvertisement,
   subscriptionPlan,
-
+  Notification,
 } = require("../helpers/db");
 
 module.exports = {
@@ -104,7 +104,10 @@ module.exports = {
   getSubscriptionPlanBySeller,
   reduseCount,
   sellerReduceCount,
-  updateSubscriptionStatus
+  updateSubscriptionStatus,
+  addNotification,
+  getNotification,
+  deleteNotification,
 };
 
 function sendMail(mailOptions) {
@@ -2664,15 +2667,17 @@ async function getCalendarEvents() {
 async function createSellerBanner(req, res) {
   try {
     var param = req.body;
-    const titleCount = await bannerAdvertisement.find({ bannerName: param.bannerName }).count()
+    const titleCount = await bannerAdvertisement
+      .find({ bannerName: param.bannerName })
+      .count();
     let slug = "";
     if (titleCount > 0) {
       slug = param.slug + titleCount;
     } else {
-      slug = param.slug
+      slug = param.slug;
     }
 
-    console.log("slug", slug)
+    console.log("slug", slug);
     let input = {
       image: param.image,
       imageId: param.imageId,
@@ -2808,15 +2813,13 @@ async function updateBanner(req) {
 // Create seller subscription
 
 async function createSellerSubscriptionPlan(req, res) {
-
   var param = req.body;
   // console.log("param:::;", param)
   var authorId = param.usageCount[0].authorId;
-  var subscription_Id = param.usageCount[0].sub_id
+  var subscription_Id = param.usageCount[0].sub_id;
   // console.log("author ID :::", authorId)
 
   try {
-
     let existingPlan = await subscriptionPlan.findOne({ id: param.id });
     // console.log("existingPlan", existingPlan)
 
@@ -2825,13 +2828,12 @@ async function createSellerSubscriptionPlan(req, res) {
         authorId: authorId,
         sub_id: subscription_Id,
         count: 0,
-        isActive: true
+        isActive: true,
       });
 
       const updatedPlan = await existingPlan.save();
       // console.log("Updated plan", updatedPlan);
       return updatedPlan;
-
     } else {
       let input = {
         id: param.id,
@@ -2841,7 +2843,7 @@ async function createSellerSubscriptionPlan(req, res) {
         interval_count: param.interval_count,
         metadata: param.metadata,
         active: param.active,
-        usageCount: param.usageCount
+        usageCount: param.usageCount,
       };
 
       // console.log("input", input)
@@ -2860,11 +2862,10 @@ async function createSellerSubscriptionPlan(req, res) {
   }
 }
 
-
 // Purchase plan by seller...
 
 async function sellerAddPlan(req) {
-  const data = req.params
+  const data = req.params;
   // console.log("data check", data)
   const dbPlanId = req.params.id;
   // console.log("planID in backend", dbPlanId)
@@ -2877,9 +2878,10 @@ async function sellerAddPlan(req) {
     const plan = await subscriptionPlan.findById(dbPlanId);
     // console.log("plan", plan);
 
-    const usageCountIndex = plan.usageCount.findIndex(item => item.authorId === authorId);
+    const usageCountIndex = plan.usageCount.findIndex(
+      (item) => item.authorId === authorId
+    );
     if (usageCountIndex !== -1) {
-
       if (plan.usageCount[usageCountIndex].count < MAX_COUNT) {
         plan.usageCount[usageCountIndex].count++;
       } else {
@@ -2891,7 +2893,7 @@ async function sellerAddPlan(req) {
       // If authorId is not found, add a new entry
       plan.usageCount.push({
         authorId: authorId,
-        count: 1
+        count: 1,
       });
     }
     const subPlan = await subscriptionPlan.findByIdAndUpdate(
@@ -2901,12 +2903,10 @@ async function sellerAddPlan(req) {
     );
     // console.log("subPlan", subPlan);
     return subPlan;
-
   } catch (error) {
     console.log(error);
   }
 }
-
 
 // SELECTED PLAN SHOW IN SELLER DISPLAY
 
@@ -2921,20 +2921,18 @@ async function getSubscriptionPlanBySeller(req) {
       usageCount: {
         $elemMatch: {
           authorId: authorId,
-          isActive: true
+          isActive: true,
         },
-      }
+      },
     };
-
 
     // const query = {
     //   keyword: { $regex: keywordsData, $options: "i" },
     //   status: "Publish",
     // };
 
-
-
-    const fieldsToSelect = "id _id nickname amount interval interval_count active usageCount metadata";
+    const fieldsToSelect =
+      "id _id nickname amount interval interval_count active usageCount metadata";
     const result = await subscriptionPlan
       .find(query)
       .sort({ createdAt: "desc" })
@@ -2950,25 +2948,27 @@ async function getSubscriptionPlanBySeller(req) {
   }
 }
 
-
-
 // Reduse Count by delete
 
 async function reduseCount(req) {
-
-  console.log("Function is run reduseCount.<<<<<>>><<>><>><><><><><>")
+  console.log("Function is run reduseCount.<<<<<>>><<>><>><><><><><>");
   const subId = req.params.id; // subscription plan id select in list..
-  console.log("subscription plan id", subId)
+  console.log("subscription plan id", subId);
   const { usageCount, metadata } = req.body;
-  console.log("metadata advertiseAllowed:::::>>>>>>>>>>>>>", metadata.advertiseAllowed)
-  console.log("usageCount : ", usageCount.authorId)
+  console.log(
+    "metadata advertiseAllowed:::::>>>>>>>>>>>>>",
+    metadata.advertiseAllowed
+  );
+  console.log("usageCount : ", usageCount.authorId);
   const authorId = usageCount.authorId;
   const MAX_COUNT = metadata.advertiseAllowed;
   try {
     const plan = await subscriptionPlan.findById(subId);
     console.log("plan", plan);
 
-    const usageCountIndex = plan.usageCount.findIndex(item => item.authorId === authorId);
+    const usageCountIndex = plan.usageCount.findIndex(
+      (item) => item.authorId === authorId
+    );
 
     // plan.usageCount[usageCountIndex].count--;
 
@@ -2980,12 +2980,11 @@ async function reduseCount(req) {
       //   console.log("Count exceeds maximum limit.");
       //   // Handle the case where the count exceeds the maximum limit
       // }
-
     } else {
       // If authorId is not found, add a new entry
       plan.usageCount.push({
         authorId: authorId,
-        count: 1
+        count: 1,
       });
     }
     const subPlan = await subscriptionPlan.findByIdAndUpdate(
@@ -2995,7 +2994,6 @@ async function reduseCount(req) {
     );
 
     return subPlan;
-
   } catch (error) {
     console.log(error);
   }
@@ -3003,13 +3001,15 @@ async function reduseCount(req) {
 
 // Reduse Count.
 async function sellerReduceCount(req) {
-  const subPlanId = req.params.id
+  const subPlanId = req.params.id;
   const { usageCount } = req.body;
   const authorId = usageCount.authorId;
 
   try {
     const plan = await subscriptionPlan.findById(subPlanId);
-    const usageCountIndex = plan.usageCount.findIndex(item => item.authorId === authorId);
+    const usageCountIndex = plan.usageCount.findIndex(
+      (item) => item.authorId === authorId
+    );
 
     // plan.usageCount[usageCountIndex].count--;
 
@@ -3021,12 +3021,11 @@ async function sellerReduceCount(req) {
       //   console.log("Count exceeds maximum limit.");
       //   // Handle the case where the count exceeds the maximum limit
       // }
-
     } else {
       // If authorId is not found, add a new entry
       plan.usageCount.push({
         authorId: authorId,
-        count: 1
+        count: 1,
       });
     }
     const subPlan = await subscriptionPlan.findByIdAndUpdate(
@@ -3035,7 +3034,6 @@ async function sellerReduceCount(req) {
       { new: true }
     );
     return subPlan;
-
   } catch (error) {
     console.log(error);
   }
@@ -3043,16 +3041,16 @@ async function sellerReduceCount(req) {
 
 // activeStatusChange
 async function updateSubscriptionStatus(req) {
-
   const subPlan_id = req.params.id;
   const { usageCount } = req.body;
-  const sub_id = usageCount.sub_id
-  // console.log("sub_id", sub_id)
+  const sub_id = usageCount.sub_id;
 
   try {
     const plan = await subscriptionPlan.findById(subPlan_id);
 
-    const matchingUsageCount = plan.usageCount.find(item => item.sub_id === sub_id);
+    const matchingUsageCount = plan.usageCount.find(
+      (item) => item.sub_id === sub_id
+    );
     // console.log("matchingUsageCount", matchingUsageCount)
     if (matchingUsageCount) {
       // Update the status of the matching usageCount to false
@@ -3061,7 +3059,7 @@ async function updateSubscriptionStatus(req) {
       // Save the changes
       const subPlan = await plan.save();
       // console.log("Updated subscription plan:", subPlan);
-      return subPlan
+      return subPlan;
     } else {
       console.log("Subscription plan_id not found in subscription plan");
       // Handle the case where authorId is not found
@@ -3069,10 +3067,50 @@ async function updateSubscriptionStatus(req) {
   } catch (error) {
     console.log(error);
   }
-
 }
-
-
-
-
-
+// *******************************************************************************
+// *******************************************************************************
+//add notification
+async function addNotification(req) {
+  try {
+    const result = response.data;
+    return result;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+  addNotification;
+}
+// *******************************************************************************
+// *******************************************************************************
+//get notification
+async function getNotification(req) {
+  const sellerId = req.params.sellerId;
+  try {
+    const result = await Notification.find()
+      .populate({
+        path: "serviceId",
+        model: Services,
+        select: "name createdBy",
+        match: { createdBy: sellerId },
+      })
+      .populate({ path: "userId", model: User, select: "name" })
+      .sort({ createdAt: "desc" })
+      .exec();
+    return result;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+// *******************************************************************************
+// *******************************************************************************
+//deleteNotification
+async function deleteNotification(req) {
+  // const id = req.params.id;
+  try {
+    // const result = await Calendar.deleteOne({ _id: id });
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+}
+// *******************************************************************************

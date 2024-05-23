@@ -9,11 +9,10 @@ const config = require("./app/config/index");
 const package = require("package.json");
 const app = express();
 const https = require("https");
-const socketIo = require('socket.io');
 const fs = require("fs");
-// const {} = require("../helpers/db")
-const { ChatMessage } = require("../payearth-api/app/helpers/db")
-//const log = require('node-file-logger');
+const { ChatMessage } = require("../payearth-api/app/helpers/db");
+// const setupSocket1 = require("./app/helpers/socket-io");
+const socketIo = require("socket.io");
 
 const ENV = config.app_env;
 console.log("env=" + config.app_env);
@@ -89,30 +88,43 @@ var certOptions = {
   cert: fs.readFileSync(config.ssl_cert, "utf8"),
 };
 
-//socket.io connected...
-// io.on('connection', (socket) => {
-//   console.log('A user connected');
-//   console.log(`User connected: ${socket.id}`);
-
-//   // Listen for chat messages
-//   socket.on('chat message', (msg) => {
-//     console.log('message: ', msg);
-//     const newMessage = new ChatMessage(msg);
-//     newMessage.save();
-//     io.emit('chat message', msg);
-//   });
-
-
-//   // Disconnect event
-//   socket.on('disconnect', () => {
-//     console.log('user disconnected');
-//   });
-
-// });
-
-
 // serve the API with HTTPS
 const httpsServer = https.createServer(certOptions, app);
+
+//socket io connection
+// const io = require("socket.io")(httpsServer, {
+//   cors: {
+//     origin: config.allowed_origin || "*",
+//   },
+// });
+
+// setupSocket1(io);
+
+// Socket.IO setup
+const io = socketIo(httpsServer, {
+  cors: {
+    origin: "*",
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("A user connected");
+
+  // Handle chat messages
+  socket.on("chat message", (msg) => {
+    io.emit("chat message", msg);
+  });
+
+  // Handle notifications
+  socket.on("notification", (notification) => {
+    io.emit("notification", notification);
+  });
+
+  // Handle disconnection
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
+  });
+});
 
 httpsServer.listen(PORT, () => {
   console.log("HTTPS Server running on port " + PORT);
