@@ -1,7 +1,7 @@
 import React from 'react';
 
-const NotFound = (props) => {
+export const NotFound = (props) => {
     return <div className="no_data_found">{props.msg}</div>;
 }
 
-export default NotFound;
+// export default NotFound;

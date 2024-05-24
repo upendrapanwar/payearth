@@ -12,7 +12,7 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import config from '../.././config.json'
 import { useDispatch } from 'react-redux';
-import NotFound from '../../components/common/NotFound';
+import { NotFound } from '../../components/common/NotFound';
 import { getPostsData } from '../../helpers/post-listing';
 import Select from 'react-select';
 import Picker from 'emoji-picker-react';

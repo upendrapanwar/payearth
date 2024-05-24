@@ -11,6 +11,7 @@ import RecentSearch from "./../../components/user/home/RecentSearch";
 import Footer from "./../../components/common/Footer";
 import ServiceListing from "./service/ServicesListing";
 import { GetAllBanner } from "../../components/common/BannerFrame";
+// import io from 'socket.io-client'
 
 const Header = lazy(() => import("./../../components/user/common/Header"));
 
@@ -20,6 +21,11 @@ class Home extends Component {
     this.state = {
       isToggle: true,
     };
+
+    // this.socket = io.connect('https://localhost:7700');
+    // this.socket.on('receive_notification', (notification) => {
+    //   console.log("receive_notification", notification)
+    // })
   }
 
   componentDidMount() {

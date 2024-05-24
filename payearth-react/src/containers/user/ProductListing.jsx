@@ -5,7 +5,7 @@ import Sidebar from './../../components/user/common/Sidebar';
 import Footer from './../../components/common/Footer';
 import ListingHead from './../../components/user/common/ListingHead';
 import ProductCard from './../../components/common/ProductCard';
-import NotFound from './../../components/common/NotFound';
+import {NotFound} from './../../components/common/NotFound';
 import SpinnerLoader from './../../components/common/SpinnerLoader';
 import config from './../../config.json';
 import axios from 'axios';

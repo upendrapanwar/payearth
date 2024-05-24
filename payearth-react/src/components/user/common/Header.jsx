@@ -1758,49 +1758,49 @@ const Header = ({ props, handleIsToggle }) => {
                         <ul className="navbar-nav justify-content-end flex-grow-1 pe-0">
                           {data && data.length
                             ? data.map((value, index) => {
-                                if (isService === 0) {
-                                  return (
-                                    <li
-                                      className="nav-item dropdown"
-                                      key={index}
+                              if (isService === 0) {
+                                return (
+                                  <li
+                                    className="nav-item dropdown"
+                                    key={index}
+                                  >
+                                    <Link
+                                      className="nav-link dropdown-toggle"
+                                      to={`product-listing?cat=${value._id}`}
+                                      id="offcanvasNavbarDropdown"
+                                      aria-expanded="false"
                                     >
-                                      <Link
-                                        className="nav-link dropdown-toggle"
-                                        to={`product-listing?cat=${value._id}`}
-                                        id="offcanvasNavbarDropdown"
-                                        aria-expanded="false"
-                                      >
-                                        {value.name}
-                                      </Link>
-                                      {subCategories(
-                                        value["_id"],
-                                        value.subCategories
-                                      )}
-                                    </li>
-                                  );
-                                } else {
-                                  return (
-                                    <li
-                                      className="nav-item dropdown"
-                                      key={index}
+                                      {value.name}
+                                    </Link>
+                                    {subCategories(
+                                      value["_id"],
+                                      value.subCategories
+                                    )}
+                                  </li>
+                                );
+                              } else {
+                                return (
+                                  <li
+                                    className="nav-item dropdown"
+                                    key={index}
+                                  >
+                                    {/* `service-listing?cat=${value._id}` */}
+                                    <Link
+                                      className="nav-link dropdown-toggle"
+                                      to="#"
+                                      id="offcanvasNavbarDropdown"
+                                      aria-expanded="false"
                                     >
-                                      {/* `service-listing?cat=${value._id}` */}
-                                      <Link
-                                        className="nav-link dropdown-toggle"
-                                        to="#"
-                                        id="offcanvasNavbarDropdown"
-                                        aria-expanded="false"
-                                      >
-                                        {value.name}
-                                      </Link>
-                                      {subCategories(
-                                        value["_id"],
-                                        value.subCategories
-                                      )}
-                                    </li>
-                                  );
-                                }
-                              })
+                                      {value.name}
+                                    </Link>
+                                    {subCategories(
+                                      value["_id"],
+                                      value.subCategories
+                                    )}
+                                  </li>
+                                );
+                              }
+                            })
                             : ""}
                         </ul>
                       </div>

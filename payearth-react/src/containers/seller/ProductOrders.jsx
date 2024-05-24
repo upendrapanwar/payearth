@@ -6,14 +6,14 @@ import store from '../../store/index';
 import { setLoading } from '../../store/reducers/global-reducer';
 import axios from 'axios';
 import { connect } from 'react-redux';
-import NotFound from '../../components/common/NotFound';
+import { NotFound } from '../../components/common/NotFound';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import Select from 'react-select';
 
 class ProductOrders extends Component {
     constructor(props) {
         super(props)
-        const {dispatch} = props;
+        const { dispatch } = props;
         this.dispatch = dispatch;
         this.authInfo = store.getState().auth.authInfo;
         this.state = {
@@ -78,13 +78,13 @@ class ProductOrders extends Component {
                 }
             },
             sortingOptions: [
-                {label: 'New to Old', value: 'desc'},
-                {label: "Old to New ", value: 'asc'},
+                { label: 'New to Old', value: 'desc' },
+                { label: "Old to New ", value: 'asc' },
             ],
-            defaultSelectedOptionPending: {label: 'New to Old', value: 'desc'},
-            defaultSelectedOptionOngoing: {label: 'New to Old', value: 'desc'},
-            defaultSelectedOptionCanceled: {label: 'New to Old', value: 'desc'},
-            defaultSelectedOptionCompleted: {label: 'New to Old', value: 'desc'},
+            defaultSelectedOptionPending: { label: 'New to Old', value: 'desc' },
+            defaultSelectedOptionOngoing: { label: 'New to Old', value: 'desc' },
+            defaultSelectedOptionCanceled: { label: 'New to Old', value: 'desc' },
+            defaultSelectedOptionCompleted: { label: 'New to Old', value: 'desc' },
             pendingProducts: [],
             ongoingProducts: [],
             canceledProducts: [],
@@ -103,7 +103,7 @@ class ProductOrders extends Component {
     }
 
     getProductOrders = (pagination, param, type) => {
-        const {dispatch} = this.props;
+        const { dispatch } = this.props;
         let reqBody = {};
 
         if (pagination === true) {
@@ -111,11 +111,11 @@ class ProductOrders extends Component {
 
             if (type === 'pending') {
                 sort_val = this.state.defaultSelectedOptionPending.value;
-            } else if(type==='ongoing') {
+            } else if (type === 'ongoing') {
                 sort_val = this.state.defaultSelectedOptionOngoing.value;
-            } else if(type==='cancel_refund') {
+            } else if (type === 'cancel_refund') {
                 sort_val = this.state.defaultSelectedOptionCanceled.value;
-            } else if(type==='complete') {
+            } else if (type === 'complete') {
                 sort_val = this.state.defaultSelectedOptionCompleted.value;
             }
 
@@ -137,26 +137,26 @@ class ProductOrders extends Component {
         } else {
             if (type === 'pending') {
                 reqBody = this.state.reqBody;
-            } else if(type==='ongoing') {
+            } else if (type === 'ongoing') {
                 reqBody = this.state.reqBody2;
-            } else if(type==='cancel_refund') {
+            } else if (type === 'cancel_refund') {
                 reqBody = this.state.reqBody3;
-            } else if(type==='complete') {
+            } else if (type === 'complete') {
                 reqBody = this.state.reqBody4;
             }
         }
 
         if (type === 'pending') {
-            this.setState({reqBody});
-        } else if(type==='ongoing') {
-            this.setState({reqBody2: reqBody});
-        } else if(type==='cancel_refund') {
-            this.setState({reqBody3: reqBody});
-        } else if(type==='complete') {
-            this.setState({reqBody4: reqBody});
+            this.setState({ reqBody });
+        } else if (type === 'ongoing') {
+            this.setState({ reqBody2: reqBody });
+        } else if (type === 'cancel_refund') {
+            this.setState({ reqBody3: reqBody });
+        } else if (type === 'complete') {
+            this.setState({ reqBody4: reqBody });
         }
 
-        dispatch(setLoading({loading: true}));
+        dispatch(setLoading({ loading: true }));
         axios.post(`seller/orders/${this.authInfo.id}`, reqBody, {
             headers: {
                 'Accept': 'application/json',
@@ -190,7 +190,7 @@ class ProductOrders extends Component {
             }
         }).finally(() => {
             setTimeout(() => {
-                dispatch(setLoading({loading: false}));
+                dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
@@ -270,7 +270,7 @@ class ProductOrders extends Component {
     }
 
     render() {
-        const {loading} = store.getState().global;
+        const { loading } = store.getState().global;
         const {
             sortingOptions,
             defaultSelectedOptionPending,
@@ -319,7 +319,7 @@ class ProductOrders extends Component {
                                             <Select
                                                 className="sort_select text-normal ms-auto"
                                                 options={sortingOptions}
-                                                value={ defaultSelectedOptionCanceled}
+                                                value={defaultSelectedOptionCanceled}
                                                 onChange={this.handleChangeCanceled}
                                             />
                                         }
@@ -346,11 +346,15 @@ class ProductOrders extends Component {
                                                 this.handleItemType('ongoing')
                                             }}>Ongoing Orders</button>
                                         <button className="nav-link" id="nav-cancelled-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-cancelled-orders" type="button" role="tab" aria-controls="nav-cancelled-orders" aria-selected="true"
-                                            onClick={() => { this.getProductOrders(false, null, 'cancel_refund')
-                                            this.handleItemType('cancel_refund')}}>Cancelled and Refunded Orders</button>
+                                            onClick={() => {
+                                                this.getProductOrders(false, null, 'cancel_refund')
+                                                this.handleItemType('cancel_refund')
+                                            }}>Cancelled and Refunded Orders</button>
                                         <button className="nav-link" id="nav-completed-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-completed-orders" type="button" role="tab" aria-controls="nav-completed-orders" aria-selected="true"
-                                            onClick={() => { this.getProductOrders(false, null, 'complete')
-                                            this.handleItemType('complete') }}>Completed Orders</button>
+                                            onClick={() => {
+                                                this.getProductOrders(false, null, 'complete')
+                                                this.handleItemType('complete')
+                                            }}>Completed Orders</button>
                                     </div>
                                 </nav>
                                 <div className="orders_table tab-content pt-0 pb-0" id="nav-tabContent">
@@ -361,10 +365,10 @@ class ProductOrders extends Component {
                                                     <tr>
                                                         <th>Order ID</th>
                                                         <th>Product ID</th>
-                                                        <th>Product<br/>Name</th>
-                                                        <th>Product<br/>Color</th>
-                                                        <th>Product<br/>Size</th>
-                                                        <th>Vendor’s<br/>Share</th>
+                                                        <th>Product<br />Name</th>
+                                                        <th>Product<br />Color</th>
+                                                        <th>Product<br />Size</th>
+                                                        <th>Vendor’s<br />Share</th>
                                                         <th>Status</th>
                                                         <th colSpan="2">Mode of<br />Payment</th>
                                                     </tr>
@@ -406,10 +410,10 @@ class ProductOrders extends Component {
                                                     <tr>
                                                         <th>Order ID</th>
                                                         <th>Product ID</th>
-                                                        <th>Product<br/>Name</th>
-                                                        <th>Product<br/>Color</th>
-                                                        <th>Product<br/>Size</th>
-                                                        <th>Vendor’s<br/>Share</th>
+                                                        <th>Product<br />Name</th>
+                                                        <th>Product<br />Color</th>
+                                                        <th>Product<br />Size</th>
+                                                        <th>Vendor’s<br />Share</th>
                                                         <th>Status</th>
                                                         <th colSpan="2">Mode of<br />Payment</th>
                                                     </tr>
@@ -452,10 +456,10 @@ class ProductOrders extends Component {
                                                     <tr>
                                                         <th>Order ID</th>
                                                         <th>Product ID</th>
-                                                        <th>Product<br/>Name</th>
-                                                        <th>Product<br/>Color</th>
-                                                        <th>Product<br/>Size</th>
-                                                        <th>Vendor’s<br/>Share</th>
+                                                        <th>Product<br />Name</th>
+                                                        <th>Product<br />Color</th>
+                                                        <th>Product<br />Size</th>
+                                                        <th>Vendor’s<br />Share</th>
                                                         <th>Status</th>
                                                         <th colSpan="2">Mode of<br />Payment</th>
                                                     </tr>
@@ -497,10 +501,10 @@ class ProductOrders extends Component {
                                                     <tr>
                                                         <th>Order ID</th>
                                                         <th>Product ID</th>
-                                                        <th>Product<br/>Name</th>
-                                                        <th>Product<br/>Color</th>
-                                                        <th>Product<br/>Size</th>
-                                                        <th>Vendor’s<br/>Share</th>
+                                                        <th>Product<br />Name</th>
+                                                        <th>Product<br />Color</th>
+                                                        <th>Product<br />Size</th>
+                                                        <th>Vendor’s<br />Share</th>
                                                         <th>Status</th>
                                                         <th colSpan="2">Mode of<br />Payment</th>
                                                     </tr>

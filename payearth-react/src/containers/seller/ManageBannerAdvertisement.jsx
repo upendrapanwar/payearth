@@ -41,6 +41,7 @@ class SellerManageBannerAdvertisement extends Component {
             isChecked: false,
             selectedPlan: '',
             subPlanId: "",
+            pay_sub_id: "",
             advertiseAllowed: "",
             sellerSubscriptionPlan: "",
             previousSubscription: "",
@@ -95,7 +96,7 @@ class SellerManageBannerAdvertisement extends Component {
                 method: "post",
                 body: data
             }).then((res) => res.json())
-                .then((data) => {       
+                .then((data) => {
                     this.setState({ image: data.secure_url })
                     this.setState({ imageId: data.public_id })
                 }).catch((err) => {
@@ -252,6 +253,11 @@ class SellerManageBannerAdvertisement extends Component {
 
 
     handleCheckboxChange = (row) => {
+        console.log("row :-", row)
+        const data = row.usageCount
+        const result = data.filter(item => item.authorId === this.authInfo.id && item.isActive === true);
+        console.log('result', result[0].sub_id);
+
         this.setState(prevState => ({
             isChecked: !prevState.isChecked
         }), () => {
@@ -260,6 +266,7 @@ class SellerManageBannerAdvertisement extends Component {
                 // console.log("sellerSubscriptionPlan : ", sellerSubscriptionPlan)
                 // console.log("sellerSubscriptionPlan _id : ", sellerSubscriptionPlan._id)
                 // console.log('Checkbox is checked', sellerSubscriptionPlan._id);
+                this.setState({ pay_sub_id: result[0].sub_id })
                 this.setState({ subPlanId: row._id })
                 this.setState({ advertiseAllowed: row.metadata.advertiseAllowed })
                 // Add your logic to add data here
@@ -303,7 +310,7 @@ class SellerManageBannerAdvertisement extends Component {
 
     }
     saveBanner = (status) => {
-        const { image, imageId, video, videoId, bannerText, bannerType, bannerName, siteUrl, category, startDate, endDate, bannerPlacement, signaturess, author, authorDetails, tag, keyword, subPlanId, advertiseAllowed } = this.state;
+        const { image, imageId, video, videoId, bannerText, bannerType, bannerName, siteUrl, category, startDate, endDate, bannerPlacement, signaturess, author, authorDetails, tag, keyword, subPlanId,pay_sub_id,  advertiseAllowed } = this.state;
         const slug = this.generateUniqueSlug(bannerName);
         console.log("subPlanId check : ", subPlanId)
 
@@ -311,7 +318,7 @@ class SellerManageBannerAdvertisement extends Component {
             toast.error("Validation failed", { autoClose: 3000 })
         } else {
             const url = '/seller/createSellerBanners';
-            const bannerData = { image, imageId, video, videoId, bannerText, bannerType, bannerName, slug, siteUrl, category, startDate, endDate, bannerPlacement, status, signaturess, author, authorDetails, tag, keyword, subPlanId };
+            const bannerData = { image, imageId, video, videoId, bannerText, bannerType, bannerName, slug, siteUrl, category, startDate, endDate, bannerPlacement, status, signaturess, author, authorDetails, tag, keyword, subPlanId, pay_sub_id };
             axios.post(url, bannerData, {
                 headers: {
                     'Accept': 'application/json',
@@ -609,7 +616,7 @@ class SellerManageBannerAdvertisement extends Component {
                         className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
                         onClick={() => this.stripeCanclePayment(row)}
                     >
-                        Cancle plan
+                        Cancel plan
                     </button>
                 </>
             ),
@@ -641,7 +648,7 @@ class SellerManageBannerAdvertisement extends Component {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
             });
-          
+
             if (response.status === 200) {
                 try {
                     const url = `/seller/updateSubscriptionStatus/${row._id}`
@@ -675,6 +682,7 @@ class SellerManageBannerAdvertisement extends Component {
 
     render() {
         const { sellerSubscriptionPlan, advertiseAllowed, previousSubscription, loading } = this.state;
+        console.log("sellerSubscriptionPlan : ", sellerSubscriptionPlan)
         if (loading) {
             return <SpinnerLoader />
         }

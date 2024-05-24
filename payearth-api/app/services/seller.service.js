@@ -2685,6 +2685,7 @@ async function createSellerBanner(req, res) {
       siteUrl: param.siteUrl,
       category: param.category,
       subPlanId: param.subPlanId,
+      pay_sub_id : param.pay_sub_id,
       startDate: param.startDate,
       endDate: param.endDate,
       bannerPlacement: param.bannerPlacement,
@@ -2860,7 +2861,7 @@ async function createSellerSubscriptionPlan(req, res) {
   }
 }
 
-
+ 
 // Purchase plan by seller...
 
 async function sellerAddPlan(req) {

@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import store from '../../store/index';
 import axios from 'axios';
 import Select from 'react-select';
-import NotFound from '../../components/common/NotFound';
+import { NotFound } from '../../components/common/NotFound';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 
 class CouponsListing extends Component {

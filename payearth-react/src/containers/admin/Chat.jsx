@@ -80,9 +80,7 @@ class Chat extends Component {
                                                 <a className="add" href="#"><img className="img-fluid" src={addIcon} alt="add"/></a>
                                             </div>
                                         </div>
-                                        <div className="chat_user_list">
-
-                                            
+                                        <div className="chat_user_list">                      
                                             <div className="chat_user_item">
                                                 <a href="#" className="d-flex align-items-center chatUser_info">
                                                     <div className="userInfo-col userThumb">

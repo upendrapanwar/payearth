@@ -9,7 +9,7 @@ import { setLoading } from '../../store/reducers/global-reducer';
 import config from '../../config.json';
 import { Link } from 'react-router-dom';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
-import NotFound from '../../components/common/NotFound';
+import { NotFound } from '../../components/common/NotFound';
 import { Formik } from 'formik';
 import Select from 'react-select';
 import sellerHelpSchema from '../../validation-schemas/sellerHelpSchema';

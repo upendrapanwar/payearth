@@ -45,4 +45,6 @@ module.exports = {
   Servicedetails: require("../models/servicedetail.model"),
   ServiceReview: require("../models/servicereview.model"),
   Calendar: require("../models/calendar.model"),
+  Chat : require("../models/chat.model"),
+  ChatMessage : require("../models/chatmessage.model")
 };

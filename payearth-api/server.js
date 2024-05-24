@@ -9,10 +9,9 @@ const config = require("./app/config/index");
 const package = require("package.json");
 const app = express();
 const https = require("https");
-const socketIo = require('socket.io');
 const fs = require("fs");
 // const {} = require("../helpers/db")
-const { ChatMessage } = require("../payearth-api/app/helpers/db")
+
 //const log = require('node-file-logger');
 
 const ENV = config.app_env;
@@ -89,27 +88,6 @@ var certOptions = {
   cert: fs.readFileSync(config.ssl_cert, "utf8"),
 };
 
-//socket.io connected...
-// io.on('connection', (socket) => {
-//   console.log('A user connected');
-//   console.log(`User connected: ${socket.id}`);
-
-//   // Listen for chat messages
-//   socket.on('chat message', (msg) => {
-//     console.log('message: ', msg);
-//     const newMessage = new ChatMessage(msg);
-//     newMessage.save();
-//     io.emit('chat message', msg);
-//   });
-
-
-//   // Disconnect event
-//   socket.on('disconnect', () => {
-//     console.log('user disconnected');
-//   });
-
-// });
-
 
 // serve the API with HTTPS
 const httpsServer = https.createServer(certOptions, app);
@@ -117,4 +95,70 @@ const httpsServer = https.createServer(certOptions, app);
 httpsServer.listen(PORT, () => {
   console.log("HTTPS Server running on port " + PORT);
   //log.Info(`Server Running at ${PORT} on ${process.env.NODE_ENV}...`)
+});
+
+const io = require('socket.io')(httpsServer, {
+  pingTimeout: 60000,
+  // cors: {
+  //   origin: "*",
+  // }
+
+  cors: {
+    origin: ["http://localhost:3000", "https://localhost:3000", "*"],
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  }
+});
+
+
+
+io.on("connection", function (socket) {
+  // console.log("Connected to socket.io");
+
+  socket.on('setup', function (userID) {
+    socket.join(userID);
+    // console.log("userID setup", userID)
+    socket.emit("connected");
+  });
+
+  socket.on('join chat', function (room) {
+    socket.join(room)
+    // console.log("User join room " + room);
+  });
+
+  socket.on('send_notification', function (notification) {
+    // console.log("receive_notification", notification)
+    io.emit('receive_notification', notification);
+
+    // io.in(id).emit("message_recieved", message);
+  })
+
+  socket.on('new message', function (msg) {
+    var chat = msg.chat;
+    // console.log("chat", chat)
+    // console.log("recieve msg", msg)
+
+    if (!chat.chatUsers) {
+      return console.log("Chat user not defined");
+    }
+
+    chat.chatUsers.forEach((user) => {
+      // console.log("user", user)
+      if (user.id === msg.sender.id) {
+        socket.in(user.id).emit("message_recieved", msg);
+        // console.log("message_recieved", msg)
+      }
+    });
+  });
+
+  socket.off("setup", function () {
+    // console.log("USER DISCONECT");
+    socket.leave(userID)
+  })
+
+  // Disconnect event
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
 });

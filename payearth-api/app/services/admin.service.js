@@ -2630,4 +2630,21 @@ async function updateBanner(req) {
 }
 
 
+// cron.schedule('0 0 * * *', async () => {
+//     console.log('Running cron job to update status at midnight');
+//     try {
+//       const data = await Data.find({ status: 'pending' });
+//       data.forEach(async (item) => {
+//         item.status = 'completed';
+//         await item.save();
+//       });
+//       console.log('Status updated successfully');
+//     } catch (error) {
+//       console.error('Error updating status:', error);
+//     }
+//   });
+
+
+
+
 

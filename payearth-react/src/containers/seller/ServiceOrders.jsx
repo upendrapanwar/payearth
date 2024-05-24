@@ -7,7 +7,7 @@ import { setLoading } from "../../store/reducers/global-reducer";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { connect } from "react-redux";
-import NotFound from "../../components/common/NotFound";
+import {NotFound} from "../../components/common/NotFound";
 import SpinnerLoader from "../../components/common/SpinnerLoader";
 import Select from "react-select";
 

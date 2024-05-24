@@ -12,7 +12,7 @@ import { setLoading } from '../../store/reducers/global-reducer';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import NotFound from '../../components/common/NotFound';
+import {NotFound} from '../../components/common/NotFound';
 import axios from 'axios';
 
 const CommunityProfile = () => {

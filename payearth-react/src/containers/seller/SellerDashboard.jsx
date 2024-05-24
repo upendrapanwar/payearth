@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import store from '../../store/index';
 import config from '../../config.json';
 import { setLoading } from '../../store/reducers/global-reducer';
-import NotFound from '../../components/common/NotFound';
+import {NotFound} from '../../components/common/NotFound';
 import Select from 'react-select';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { Chart } from "react-google-charts";

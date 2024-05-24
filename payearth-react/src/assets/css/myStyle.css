@@ -157,12 +157,13 @@
   display: flex;
   justify-content: space-between;
   gap: 15px;
-  padding: 15px 0px 25px 0px;
+  padding: 15px 50px 20px 0px;
   border-bottom: 1px solid rgb(0 0 0 / 0.1);
 }
 
 .chatUser_wrapper .chat_user_search .msg-search input.form-control {
   height: 38px;
+  width: 180px;
 }
 
 .chatUser_wrapper .chat_user_search .msg-search img {
@@ -517,6 +518,125 @@
 
 .chatUser_wrapper .send-box button i {
   margin-right: 5px;
+}
+
+
+/*search_chat_modal*/
+.chat_fieldRow .chat_field {
+  margin-inline: auto;
+  /* width: 450px; */
+}
+
+.chat_fieldRow .chat_field {
+  margin-top: 20px;
+  /* padding: 20px; */
+}
+
+.chat_fieldRow {
+  /* margin-bottom: 20px; */
+  padding: 20px;
+}
+
+.user-list-container .chatGrpSelect {
+  margin-bottom: 20px;
+}
+
+
+.modal-content .chat_user_item {
+  padding: 10px 10px 1px;
+  border-bottom: 1px solid rgb(0 0 0 / 0.1);
+}
+
+.modal-content .user_thumb img {
+  object-fit: cover;
+  width: 100px;
+  object-position: center center;
+}
+
+.modal-content .userInfo-col.chatTime {
+  font-size: 13px;
+  color: rgb(0 0 0 / 70%);
+  text-align: right;
+}
+
+.modal-content .userInfo-col h3 {
+  font-size: 16px;
+  margin-bottom: 2px;
+  padding-left: 20px;
+}
+
+.modal-content .userInfo-col p {
+  margin-bottom: 0px;
+  color: rgb(0 0 0 / 50%);
+}
+
+.modal-content .userInfo-col.userThumb {
+  width: 100%;
+  max-width: 40px;
+}
+
+.modal-content .userInfo-col.userInfo {
+  width: 100%;
+  max-width: 280px;
+}
+
+.modal-content .userInfo-col.chatTime {
+  width: 100%;
+  max-width: 80px;
+}
+
+.modal-content .userInfo-col.userThumb {
+  position: relative;
+}
+
+.modal-content .userInfo-col.userThumb .user_thumb {
+  overflow: hidden;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  position: relative;
+}
+
+.modal-content .userInfo-col.userThumb .user_thumb img {
+  object-fit: cover;
+  width: 100%;
+  object-position: center center;
+}
+
+.modal-content .userInfo-col.userThumb .user-inactive {
+  background-color: #bcbcbc;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 30%);
+  display: inline-block;
+  margin-right: 5px;
+  position: absolute;
+  bottom: -1px;
+  right: -7px;
+}
+
+.modal-content .userInfo-col.userThumb .user-inactive.user-active {
+  background-color: #27de24;
+}
+
+.modal-content .userInfo-col.chatTime {
+  font-size: 13px;
+  color: rgb(0 0 0 / 70%);
+  text-align: right;
+}
+
+.modal-content .userInfo-col.chatTime .chatNoti-info {
+  display: inline-block;
+  clear: both;
+  padding: 0px 5px;
+  background-color: #4358ff;
+  color: #fff;
+  border-radius: 5px;
+  min-width: 20px;
+  text-align: center;
+  margin-top: 3px;
 }
 
 /* Manage page style */

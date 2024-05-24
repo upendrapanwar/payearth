@@ -10,7 +10,7 @@ import SpinnerLoader from './../../components/common/SpinnerLoader';
 import store from '../../store/index';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
-import NotFound from './../../components/common/NotFound';
+import { NotFound } from './../../components/common/NotFound';
 
 class MyCoupons extends Component {
     constructor(props) {
@@ -48,7 +48,7 @@ class MyCoupons extends Component {
             reqBody = this.state.reqBody;
         }
 
-        dispatch(setLoading({loading: true}));
+        dispatch(setLoading({ loading: true }));
         axios.post('user/my-coupons/' + this.authInfo.id, reqBody, {
             headers: {
                 'Accept': 'application/json',
@@ -57,15 +57,15 @@ class MyCoupons extends Component {
             }
         }).then((response) => {
             if (response.data.status) {
-                this.setState({data: response.data.data, reqBody});
+                this.setState({ data: response.data.data, reqBody });
             }
         }).catch(error => {
-            if(error.response && error.response.data.status === false) {
+            if (error.response && error.response.data.status === false) {
                 toast.error(error.response.data.message);
             }
         }).finally(() => {
             setTimeout(() => {
-                dispatch(setLoading({loading: false}));
+                dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
@@ -76,7 +76,7 @@ class MyCoupons extends Component {
 
         return (
             <React.Fragment>
-                { loading === true ? <SpinnerLoader /> : '' }
+                {loading === true ? <SpinnerLoader /> : ''}
                 <Header />
                 <PageTitle title="My Coupons" />
                 <section className="inr_wrap">
@@ -94,31 +94,31 @@ class MyCoupons extends Component {
                                                 if (value.isActive && value.couponId !== null) {
                                                     let date = new Date(value.couponId.end)
                                                     return <div className="col-md-4" key={index}>
-                                                                <div className="voucher">
-                                                                    <div className="vhr_offer">
-                                                                        <div className="vhr_img"><img src={voucherIcon} alt="voucher_icon" /></div>
-                                                                        <div className="vhr_off">{value.couponId.discount_per}%</div>
-                                                                    </div>
-                                                                    <div className="vhr_coupon">
-                                                                        <div className="vhr_code">{value.couponId.code}</div>
-                                                                        <div className="vhr_date">Expiry on {`${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`}</div>
-                                                                    </div>
-                                                                </div>
+                                                        <div className="voucher">
+                                                            <div className="vhr_offer">
+                                                                <div className="vhr_img"><img src={voucherIcon} alt="voucher_icon" /></div>
+                                                                <div className="vhr_off">{value.couponId.discount_per}%</div>
                                                             </div>
+                                                            <div className="vhr_coupon">
+                                                                <div className="vhr_code">{value.couponId.code}</div>
+                                                                <div className="vhr_date">Expiry on {`${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`}</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 } else {
                                                     if (value.isActive === false && value.couponId !== null) {
                                                         return <div className="col-md-4" key={index}>
-                                                                    <div className="voucher expired">
-                                                                        <div className="vhr_offer">
-                                                                            <div className="vhr_img"><img src={voucherIcon} alt="voucher_icon" /></div>
-                                                                            <div className="vhr_off">{value.couponId.discount_per}%</div>
-                                                                        </div>
-                                                                        <div className="vhr_coupon">
-                                                                            <div className="vhr_code">{value.couponId.code}</div>
-                                                                            <div className="vhr_date">Expired</div>
-                                                                        </div>
-                                                                    </div>
+                                                            <div className="voucher expired">
+                                                                <div className="vhr_offer">
+                                                                    <div className="vhr_img"><img src={voucherIcon} alt="voucher_icon" /></div>
+                                                                    <div className="vhr_off">{value.couponId.discount_per}%</div>
                                                                 </div>
+                                                                <div className="vhr_coupon">
+                                                                    <div className="vhr_code">{value.couponId.code}</div>
+                                                                    <div className="vhr_date">Expired</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     } else {
                                                         return '';
                                                     }
@@ -129,7 +129,7 @@ class MyCoupons extends Component {
                                                 <div className="col-md-12 more_pord_load_btn">
                                                     <Link to="#" onClick={() => this.getCoupons('viewMore')} className="view_more">View More</Link>
                                                 </div>
-                                            : ''}
+                                                : ''}
 
                                             {coupons !== undefined && coupons.length === 0 ? <NotFound msg="Coupon not found." /> : ''}
                                         </div>
@@ -145,4 +145,4 @@ class MyCoupons extends Component {
     }
 }
 
-export default connect(setLoading) (MyCoupons);
+export default connect(setLoading)(MyCoupons);

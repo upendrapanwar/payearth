@@ -8,7 +8,7 @@ import store from '../../store/index';
 import axios from 'axios';
 import Footer from '../../components/common/Footer';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
-import NotFound from '../../components/common/NotFound';
+import {NotFound} from '../../components/common/NotFound';
 import { Autocomplete, Checkbox } from '@mui/material';
 import { TextField } from '@material-ui/core';
 

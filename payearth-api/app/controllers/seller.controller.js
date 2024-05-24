@@ -1013,7 +1013,7 @@ function deleteSubPlan(req, res, next) {
   sellerService.deleteSubPlan(req).then((banner) => banner ? res.json({ status: true, message: "Successfull Delete" }) : res.json({ status: false, message: "ERROR" }))
     .catch((err) => next(res.json({ status: false, message: err })));
 }
-
+ 
 
 // updateSubscriptionStatus
 

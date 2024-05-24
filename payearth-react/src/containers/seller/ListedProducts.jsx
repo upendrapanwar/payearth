@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import config from '../../config.json';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
-import NotFound from '../../components/common/NotFound';
+import {NotFound} from '../../components/common/NotFound';
 import Select from 'react-select';
 
 class ListedProducts extends Component {

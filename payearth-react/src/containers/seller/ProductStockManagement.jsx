@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import { setLoading } from '../../store/reducers/global-reducer';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
-import NotFound from '../../components/common/NotFound';
+import {NotFound} from '../../components/common/NotFound';
 
 class ProductStockManagement extends Component {
     constructor(props) {

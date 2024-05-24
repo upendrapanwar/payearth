@@ -9,7 +9,7 @@ import SpinnerLoader from "../../../components/common/SpinnerLoader";
 import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import Select from "react-select";
-import NotFound from "../../../components/common/NotFound";
+import { NotFound } from "../../../components/common/NotFound";
 
 function ServiceOrder() {
   const authInfo = localStorage.getItem("authInfo");

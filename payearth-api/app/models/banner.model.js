@@ -41,6 +41,7 @@ const schema = new Schema({
     endDate: {
         type: String,
         required: false,
+        default: false,
     },
     status: {
         type: String,
@@ -49,6 +50,12 @@ const schema = new Schema({
     subPlanId: {
         type: String,
         required: false,
+        default: false,
+    },
+    pay_sub_id: {
+        type: String,
+        required: false,
+        default: false,
     },
     bannerPlacement: {
         type: String,

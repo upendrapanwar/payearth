@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import store from '../../store/index';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import NotFound from '../../components/common/NotFound';
+import {NotFound} from '../../components/common/NotFound';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import Select from 'react-select';
 
