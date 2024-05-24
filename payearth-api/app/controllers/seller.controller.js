@@ -1051,13 +1051,8 @@ function deleteSubPlan(req, res, next) {
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
-<<<<<<< HEAD
- 
-=======
->>>>>>> e972650f0a0208134ec8b0cf04cbafd3431a1a0b
 
 // updateSubscriptionStatus
-
 function updateSubscriptionStatus(req, res, next) {
   sellerService
     .updateSubscriptionStatus(req)

@@ -2863,10 +2863,6 @@ async function createSellerSubscriptionPlan(req, res) {
   }
 }
 
-<<<<<<< HEAD
- 
-=======
->>>>>>> e972650f0a0208134ec8b0cf04cbafd3431a1a0b
 // Purchase plan by seller...
 
 async function sellerAddPlan(req) {

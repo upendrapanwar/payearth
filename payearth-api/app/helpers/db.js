@@ -45,10 +45,10 @@ module.exports = {
   Servicedetails: require("../models/servicedetail.model"),
   ServiceReview: require("../models/servicereview.model"),
   Calendar: require("../models/calendar.model"),
-<<<<<<< HEAD
+
   Chat : require("../models/chat.model"),
-  ChatMessage : require("../models/chatmessage.model")
-=======
+  ChatMessage : require("../models/chatmessage.model"),
+
   Notification: require("../models/notification.model"),
->>>>>>> e972650f0a0208134ec8b0cf04cbafd3431a1a0b
+
 };

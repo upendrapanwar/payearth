@@ -47,12 +47,9 @@ const {
   ServiceReview,
   Servicedetails,
   Calendar,
-<<<<<<< HEAD
   Chat,
   ChatMessage,
-=======
   Notification,
->>>>>>> e972650f0a0208134ec8b0cf04cbafd3431a1a0b
 } = require("../helpers/db");
 
 module.exports = {
@@ -123,7 +120,7 @@ module.exports = {
   zoomAccessToken,
   createZoomMeeting,
   getAllUser,
-<<<<<<< HEAD
+
   accessChat,
   fetchChat,
   fetchBlockChat,
@@ -134,12 +131,12 @@ module.exports = {
   userUnblockChat,
   addGroupMember,
 
-=======
+
   addNotification,
   getNotification,
   updateNotification,
   deleteNotification,
->>>>>>> e972650f0a0208134ec8b0cf04cbafd3431a1a0b
+
 };
 
 function sendMail(mailOptions) {
@@ -2823,8 +2820,6 @@ async function getAllUser(req) {
 //   }
 // }
 
-<<<<<<< HEAD
-
 //*********************************************
 //*********************************************
 async function accessChat(req) {
@@ -3100,7 +3095,6 @@ async function addGroupMember(req) {
 }
 
 
-=======
 async function zoomAccessToken(req) {
   const code = req.params.id;
   try {
@@ -3122,7 +3116,7 @@ async function zoomAccessToken(req) {
     console.error("Error:", error);
   }
 }
->>>>>>> e972650f0a0208134ec8b0cf04cbafd3431a1a0b
+
 // *******************************************************************************
 // *******************************************************************************
 //Zoom Refresh Token

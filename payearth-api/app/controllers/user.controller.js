@@ -250,7 +250,7 @@ router.get("/zoomRefreshToken", zoomRefreshToken);
 router.post("/createZoomMeeting", createZoomMeeting);
 router.get("/getData", getData);
 router.get("/getAllUser", getAllUser);
-<<<<<<< HEAD
+
 router.post("/accessChat", accessChat);
 router.post("/createGroupChat", createGroupChat);
 router.get("/fetchChat/:id", fetchChat);
@@ -260,12 +260,12 @@ router.get("/allMessages/:id", allMessages);
 router.put("/userChatBlock/:id", userChatBlock);
 router.put("/userUnblockChat/:id", userUnblockChat)
 router.put("/addGroupMember/:id", addGroupMember);
-=======
+
 router.post("/add-notification", addNotification);
 router.get("/get-notification/:id", getNotification);
 router.patch("/update-notification/:id", updateNotification);
 router.delete("/delete-notification/:id", deleteNotification);
->>>>>>> e972650f0a0208134ec8b0cf04cbafd3431a1a0b
+
 
 module.exports = router;
 
