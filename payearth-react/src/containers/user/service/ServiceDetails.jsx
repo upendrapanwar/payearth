@@ -20,6 +20,10 @@ const ServiceDetails = () => {
   const myRef = useRef(null);
   const [loading, setLoading] = useState(true);
 
+  //Service Id save in session For zoom Notification
+  const serviceId = id;
+  sessionStorage.setItem("serviceId", serviceId);
+
   useEffect(() => {
     fetchData();
     scrollToMyRef();
@@ -33,7 +37,7 @@ const ServiceDetails = () => {
         : [res.data.data];
       setCommonServiceData(dataArray);
       setDescription(dataArray[0].description); // Set description
-      setCategory(dataArray[0].category.categoryName) //Set category
+      setCategory(dataArray[0].category.categoryName); //Set category
       setReviews(dataArray[0].reviews); // Set reviews
       setLoading(false); // Set loading to false after fetching data
     } catch (error) {
