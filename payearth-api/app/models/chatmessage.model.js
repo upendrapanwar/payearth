@@ -16,7 +16,11 @@ const schema = new Schema({
     // },
     messageContent: {
         type: String,
-        trim: true
+        default: null,
+    },
+    mediaContent : {
+        type: String,
+        default: null,
     },
     chat: {
         type: mongoose.Schema.Types.ObjectId,

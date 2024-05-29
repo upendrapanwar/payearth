@@ -112,6 +112,17 @@
 
 /* CHAT SYSTEM HTML VIEW */
 
+.form-media[type="file"]:not(:disabled):not([readonly]) {
+  background-image: url("../images/add_media.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: white;
+  text-indent: -1000px;
+  height: 100px;
+  width: 100px;
+  background-size: 50px auto;
+}
+
 .chatUser_wrapper {
   background-color: white;
   border-radius: 10px;

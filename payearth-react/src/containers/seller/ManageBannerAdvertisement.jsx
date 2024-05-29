@@ -709,7 +709,7 @@ class SellerManageBannerAdvertisement extends Component {
                                         <h3 className="text-center selectPlanHeading text-bg-success p-3">Your Subscription Plan Is Active </h3> </> : <>
                                         <h2 className="text-center text-bg-danger p-3 position-relative">No Any Subscription Plan Is Active
                                             <Link to="/seller/manage-subscription-plan" className="position-absolute top-1 end-0">
-                                                <span className="text-bg-primary">Buy Subscription....</span>
+                                                <span className="text-bg-success">Buy Subscription....</span>
                                             </Link>
                                         </h2>
                                     </>

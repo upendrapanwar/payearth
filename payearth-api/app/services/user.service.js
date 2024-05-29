@@ -2990,23 +2990,23 @@ async function fetchBlockChat(req) {
 //**********************Send Message */
 
 async function sendMessage(req) {
-  const { authorId, messageContent, chatId } = req.body;
+  const { authorId, messageContent, chatId, mediaContent } = req.body;
 
   // const chatId = '6645cdaf9ef46fb594be747c';
   // const messageContent = "hii Robert"
 
-  if (!messageContent || !chatId || !authorId) {
+  if (!chatId || !authorId) {
     console.log("Invalid Data pass")
   }
 
   var newMessage = {
     sender: authorId,
     messageContent: messageContent,
+    mediaContent: mediaContent,
     chat: chatId
   }
 
   try {
-
     var message = await ChatMessage.create(newMessage);
     message = await message.populate({
       path: "chat",
@@ -3020,7 +3020,6 @@ async function sendMessage(req) {
     await Chat.findByIdAndUpdate(chatId, {
       latestMessage: message,
     });
-
     // console.log("message", message)
     return message
 
@@ -3074,18 +3073,14 @@ async function userUnblockChat(req) {
   }
 }
 
-
-
-
 // add Group User
 async function addGroupMember(req) {
   const chatId = req.params.id;
-  const { newUser } = req.body;
-
+  const { id, name, image_url, isGroupAdmin } = req.body;
   try {
     const addUser = await Chat.findByIdAndUpdate(
       chatId,
-      { $push: { chatUsers: newUser } },
+      { $push: { chatUsers: { id, name, image_url, isGroupAdmin } } },
       { new: true });
     //  console.log("update banner", banner)
     return addUser;

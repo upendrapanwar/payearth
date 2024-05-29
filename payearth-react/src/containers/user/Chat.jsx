@@ -3,7 +3,8 @@ import Header from '../../components/user/common/Header';
 import PageTitle from '../../components/user/common/PageTitle';
 import Footer from '../../components/common/Footer';
 import { Link } from 'react-router-dom';
-import addIcon from './../../assets/icons/add.svg';
+import add_user_icon from './../../assets/icons/add_user_icon.svg';
+import defaultPdf_icon from './../../assets/icons/document_icon.svg'
 import chatThumb from './../../assets/images/chat-thumb.jpg';
 import { setLoading } from '../../store/reducers/global-reducer';
 import SpinnerLoader from './../../components/common/SpinnerLoader';
@@ -22,6 +23,7 @@ import { NotFound } from './../../components/common/NotFound';
 class Chat extends Component {
     constructor(props) {
         super(props);
+        this.cloudName = process.env.REACT_APP_CLOUD_NAME
         this.userInfo = store.getState().auth.userInfo;
         this.authInfo = JSON.parse(localStorage.getItem('authInfo'));
         this.state = {
@@ -42,14 +44,13 @@ class Chat extends Component {
             notAddedUser: "",
             notification: [],
             showChatUsers: true,
+            selectedFile: null,
         };
 
         this.socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
         this.handleMessageContent = this.handleMessageContent.bind(this)
         // this.accessChat = this.accessChat.bind(this)
         this.sendMessage = this.sendMessage.bind(this)
-
-        const userId = this.authInfo.id
 
 
 
@@ -98,8 +99,9 @@ class Chat extends Component {
     componentDidMount() {
         this.fetchAllUserData();
     }
-    // componentDidUpdate() {
 
+
+    // componentDidUpdate() {
     //     const {allChatUsers} = this.setState;
     //     console.log("allChatUsers in component did mount...", allChatUsers)
     //     this.socket.on('message_recieved', (data) => {
@@ -391,51 +393,119 @@ class Chat extends Component {
         }).catch((error) => {
             console.log("Error", error)
         })
-
-    }
-
-    sendMessage = () => {
-        const { sendChatData, messageContent } = this.state;
-        try {
-            const url = '/user/sendMessage';
-            // const data = { receiverId, authorId }
-            axios.post(url, {
-                authorId: {
-                    id: this.authInfo.id,
-                    name: this.userInfo.name,
-                    image_url: this.userInfo.imgUrl,
-                },
-                chatId: sendChatData.chatId,
-                messageContent: messageContent
-
-            }, {
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json;charset=UTF-8',
-                    'Authorization': `Bearer ${this.authInfo.token}`
-                }
-            }).then((response) => {
-                // console.log("send Message", response.data.data)
-                const data = response.data.data;
-                // console.log("data", data)
-                if (response.data.status === true) {
-                    this.socket.emit("new message", data)
-                    // console.log("SendChatData under send msg>>>", sendChatData)
-                    this.getAllMessage(sendChatData.chatId)
-
-                }
-            }).catch((error) => {
-                console.log("error", error);
-            });
-            this.setState({ messageContent: "" })
-        } catch (error) {
-            console.log("error", error)
-        }
     }
 
     handleMessageContent = (e) => {
         this.setState({ messageContent: e.target.value })
     }
+
+    handleFileChange = async (event) => {
+        // const files = Array.from(event.target.files);
+        const files = event.target.files;
+        console.log("files", files)
+        this.setState({ selectedFile: files })
+    };
+
+    sendMessage = async () => {
+        const { sendChatData, messageContent, selectedFile } = this.state;
+        if (selectedFile !== null) {
+            const formData = new FormData();
+            for (let i = 0; i < selectedFile.length; i++) {
+                const file = selectedFile[i];
+                formData.append('file', file);
+                formData.append("upload_preset", "pay-earth-images")
+                formData.append("cloud_name", "pay-earth")
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    const sendData = {
+                        authorId: {
+                            id: this.authInfo.id,
+                            name: this.userInfo.name,
+                            image_url: this.userInfo.imgUrl,
+                        },
+                        chatId: sendChatData.chatId,
+                        messageContent: !messageContent ? null : messageContent,
+                        mediaContent: !data.secure_url ? null : data.secure_url,
+                    };
+
+                    try {
+                        const url = '/user/sendMessage';
+                        // const data = { receiverId, authorId }
+                        axios.post(url, sendData, {
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json;charset=UTF-8',
+                                'Authorization': `Bearer ${this.authInfo.token}`
+                            }
+                        }).then((response) => {
+                            // console.log("send Message", response.data.data)
+                            const data = response.data.data;
+
+                            // console.log("data", data)
+                            if (response.data.status === true) {
+                                this.socket.emit("new message", data)
+                                // console.log("SendChatData under send msg>>>", sendChatData)
+                                this.getAllMessage(sendChatData.chatId)
+
+                            }
+                        }).catch((error) => {
+                            console.log("error", error);
+                        });
+
+                    } catch (error) {
+                        console.log("error", error)
+                    }
+                } else {
+                    console.error('Failed to upload to Cloudinary');
+                }
+            }
+            this.setState({ messageContent: "" })
+            this.setState({ selectedFile: null })
+            this.setState({ mediaContent: null })
+        } else {
+            try {
+                const sendData = {
+                    authorId: {
+                        id: this.authInfo.id,
+                        name: this.userInfo.name,
+                        image_url: this.userInfo.imgUrl,
+                    },
+                    chatId: sendChatData.chatId,
+                    messageContent: !messageContent ? null : messageContent,
+                    mediaContent: null,
+                };
+                const url = '/user/sendMessage';
+                axios.post(url, sendData, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': `Bearer ${this.authInfo.token}`
+                    }
+                }).then((response) => {
+                    const data = response.data.data;
+
+                    if (response.data.status === true) {
+                        this.socket.emit("new message", data)
+                        // console.log("SendChatData under send msg>>>", sendChatData)
+                        this.getAllMessage(sendChatData.chatId)
+
+                    }
+                }).catch((error) => {
+                    console.log("error", error);
+                });
+
+            } catch (error) {
+                console.log("error", error)
+            }
+            this.setState({ messageContent: "" })
+        }
+    }
+
+
 
     handleSearchText = async (e) => {
         this.setState({ search: e.target.value })
@@ -483,10 +553,10 @@ class Chat extends Component {
         }
     };
 
-    addGroupUsers = async (data) => {
-        // console.log("Add Group Users", data)
+    notAddedUsers = async (data) => {
+        this.setState({ showAddUserModal: true });
         const groupData = data.groupData;
-        // console.log("groupData", groupData)
+        console.log("groupData", groupData)
         try {
             const response = await axios.get('/user/getAllUser', {
                 headers: {
@@ -494,11 +564,34 @@ class Chat extends Component {
                 },
             });
             const allUsers = response.data.data;
-            const data = allUsers.map(item => item.seller === null ? item.user : item.seller)
-            // console.log("All user without filter", data)
+            const data = allUsers.map(item => item.seller === null ? item.user : item.seller);
             const notAddedUser = data.filter(obj1 => !groupData.some(obj2 => obj2.id === obj1.id));
+
+            console.log("notAddedUser", notAddedUser)
             this.setState({ notAddedUser: notAddedUser })
-            this.setState({ showAddUserModal: true });
+
+        } catch (error) {
+            console.log("error", error)
+        }
+    }
+
+    clickToAddUser = async (data) => {
+        const { sendChatData } = this.state;
+        console.log("data", data)
+        try {
+            const url = `user/addGroupMember/${sendChatData.chatId}`;
+            await axios.put(url, data, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            }).then((response) => {
+                toast.success(`Add User Successfully`, { autoClose: 3000 })
+                // this.setState({ subscriptionChecked: response.data.status })
+            }).catch((error) => {
+                console.log("Error", error)
+            })
         } catch (error) {
             console.log("error", error)
         }
@@ -578,13 +671,59 @@ class Chat extends Component {
         this.setState((prevState) => ({ showChatUsers: !prevState.showChatUsers }));
     }
 
+    media = (url) => {
+        const extension = url.split('.').pop().toLowerCase();
+        if (['jpg', 'jpeg', 'png', 'gif'].includes(extension)) {
+            return 'image';
+        } else if (['mp4', 'webm', 'ogg'].includes(extension)) {
+            return 'video';
+        } else if (['pdf', 'docx'].includes(extension)) {
+            return 'document';
+        } else {
+            return 'unknown';
+        }
+    }
+
+    renderMedia = (url) => {
+        const fileType = this.media(url);
+        switch (fileType) {
+            case 'image':
+                return <img src={url} alt="Media content" width={"auto"} height={"300px"} />;
+            case 'video':
+                return (
+                    <video width="300" controls>
+                        <source src={url} type="video/mp4" />
+                        Your browser does not support the video tag.
+                    </video>
+                );
+            case 'document':
+                return (
+                    <embed
+                        src={url} type="application/pdf"
+                        width="300px"
+                        height="300px"
+                        // alt={defaultPdf_icon}
+
+                        onError={(e) => {
+                            e.target.style.display = 'none';
+                            <img src={defaultPdf_icon} alt="Failed to load PDF" />
+                        }}
+                    />
+                );
+            default:
+                return <p>Unsupported media type</p>;
+        }
+    }
+
+
     render() {
-        const { showChatUsers, users, allChatUsers, sendChatData, userChat, notification, selectedUsers } = this.state
-        // console.log("notification", notification)
+        const { showChatUsers, users, allChatUsers, sendChatData, userChat, notAddedUser, selectedUsers, selectedFile } = this.state;
         // console.log("allChatUsers in render() :-", allChatUsers)
-        // console.log(" Searching users", users)
-        // console.log("sendChatData group data : ", sendChatData)
-        // console.log("userChat : ", userChat)
+        console.log(" sendChatData", sendChatData)
+
+        console.log("notAddedUser : ", notAddedUser)
+
+        console.log("showChatUsers", showChatUsers)
 
 
         const { loading } = store.getState().global;
@@ -602,41 +741,33 @@ class Chat extends Component {
                                 <div className="chatUser_wrapper">
                                     <div className="chatlist_panel">
                                         <div className="chat-lists">
-                                            <div className="chat_left-head">
-                                                <div className="chat_head_panel">
-                                                    <div className="chat-heading">
-                                                        <h3>Inbox</h3>
-                                                    </div>
-                                                    <div className="chat-filter">
-                                                        <a href="#" onClick={this.fetchAllUserData}>All</a>
-
-                                                        {/* <a href="#">Unread Chats</a> */}
-                                                        <a href="#" onClick={() => { this.fetchAllBlockChat() }}>Blocked Users </a>
+                                            {showChatUsers === true ? <>
+                                                <div className="chat_left-head">
+                                                    <div className="chat_head_panel">
+                                                        <div className="chat-heading">
+                                                            <h3>Inbox</h3>
+                                                        </div>
+                                                        <div className="chat-filter">
+                                                            <a href="#" onClick={this.fetchAllUserData}>All</a>
+                                                            <a href="#" onClick={() => { this.fetchAllBlockChat() }}>Blocked Users </a>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
 
-                                            <div className="chat_user_search">
-                                                <div className="msg-search">
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        id="inlineFormInputGroup"
-                                                        placeholder="Search"
-                                                        value={this.state.search}
-                                                        onChange={this.handleSearchText}
-                                                    />
-                                                    {/* <Link to="#" onClick={this.handleSearch}><img src={searchIcon} alt="linked-in" /></Link> */}
-                                                    {/* <button type='button' className='btn btn-info btn-sm' onClick={this.handleSearch}>Search</button> */}
-                                                    {/* <button type='button' className='btn btn-info btn-sm'>Search</button> */}
-
-                                                    {/* <img src={addIcon} alt="linked-in" /> */}
-                                                    <button type="button" className="btn" onClick={this.handleCreateGroup}>Create Group</button>
-
-                                                    {/* <a className="add" href="#"><img className="img-fluid" src={addIcon} alt="add" /></a> */}
+                                                <div className="chat_user_search">
+                                                    <div className="msg-search">
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            id="inlineFormInputGroup"
+                                                            placeholder="Search"
+                                                            value={this.state.search}
+                                                            onChange={this.handleSearchText}
+                                                        />
+                                                        <button type="button" className="btn" onClick={this.handleCreateGroup}>Create Group</button>
+                                                    </div>
                                                 </div>
-                                            </div>
-
+                                            </> : <></>}
                                             <div className="chat_user_list">
                                                 {users.length > 0 ? <>
                                                     All Search result
@@ -664,65 +795,81 @@ class Chat extends Component {
                                                             </a>
                                                         </div>
                                                     )}
-                                                </> : <>
-                                                    {showChatUsers ? (
-                                                        allChatUsers.length > 0 ? (
-                                                            allChatUsers.map((item, index) => (
-                                                                <div className="chat_user_item"
-                                                                    onClick={() => {
-                                                                        this.fetchAllMessage(item);
-                                                                        // this.setState({ showChatUsers: false }); // Hide the component on click
-                                                                    }}
-                                                                    key={item.id || index}
-                                                                >
-                                                                    <a href="#" className="d-flex align-items-center chatUser_info">
-                                                                        <div className="userInfo-col userThumb">
-                                                                            <div className="user_thumb">
-                                                                                <img className="img-fluid" src={item.chatUsers[0].id !== this.authInfo.id ? item.chatUsers[0].image_url : item.chatUsers[1].image_url} alt="user img" />
-                                                                            </div>
-                                                                            <span className="user-inactive user-active"></span>
-                                                                        </div>
-                                                                        <div className="userInfo-col userInfo">
-                                                                            {item.chatName !== 'sender' ? <h3>{item.chatName} <span className="badge text-bg-info">Group</span></h3> : item.chatUsers[0].id !== this.authInfo.id ? <h3>{item.chatUsers[0].name}</h3> : <h3>{item.chatUsers[1].name}</h3>}
-                                                                        </div>
-                                                                        {item.isBlock === false ? (
-                                                                            <div className="userInfo-col chatTime">
-                                                                                <div className="chatTime">
-                                                                                    1 min ago
-                                                                                    <span className="chatNoti-info">3</span>
+                                                </>
+                                                    :
+                                                    <>
+                                                        {showChatUsers ? (
+                                                            allChatUsers.length > 0 ? (
+                                                                allChatUsers.map((item, index) => (
+                                                                    <div className="chat_user_item"
+                                                                        onClick={() => {
+                                                                            this.fetchAllMessage(item);
+                                                                            // this.setState({ showChatUsers: false }); // Hide the component on click
+                                                                        }}
+                                                                        key={item.id || index}
+                                                                    >
+                                                                        <a href="#" className="d-flex align-items-center chatUser_info">
+                                                                            <div className="userInfo-col userThumb">
+                                                                                <div className="user_thumb">
+                                                                                    <img className="img-fluid" src={item.chatUsers[0].id !== this.authInfo.id ? item.chatUsers[0].image_url : item.chatUsers[1].image_url} alt="user img" />
                                                                                 </div>
+                                                                                <span className="user-inactive user-active"></span>
                                                                             </div>
-                                                                        ) : (
-                                                                            <button onClick={(e) => { e.stopPropagation(); this.handleUnblockChat(item.id); }}>Unblock</button>
-                                                                        )}
-                                                                    </a>
-                                                                </div>
-                                                            ))
-                                                        ) : (
-                                                            <NotFound msg="No user found" />
-                                                        )
-                                                    ) :
-                                                        <div className="chat_user_list">
-                                                            <h3>All Group Members</h3>
-                                                            {sendChatData.groupData.map(item => <>
-                                                                <div className="chat_user_item">
-                                                                    <a href="#" className="d-flex align-items-center chatUser_info">
-                                                                        <div className="userInfo-col userThumb">
-                                                                            <div className="user_thumb">
-                                                                                <img className="img-fluid" src={chatThumb} alt="user img" />
+                                                                            <div className="userInfo-col userInfo">
+                                                                                {item.chatName !== 'sender' ? <h3>{item.chatName} <span className="badge text-bg-info">Group</span></h3> : item.chatUsers[0].id !== this.authInfo.id ? <h3>{item.chatUsers[0].name}</h3> : <h3>{item.chatUsers[1].name}</h3>}
                                                                             </div>
-                                                                            <span className="user-inactive user-active"></span>
+                                                                            {item.isBlock === false ? (
+                                                                                <div className="userInfo-col chatTime">
+                                                                                    <div className="chatTime">
+                                                                                        1 min ago
+                                                                                        <span className="chatNoti-info">3</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            ) : (
+                                                                                <button onClick={(e) => { e.stopPropagation(); this.handleUnblockChat(item.id); }}>Unblock</button>
+                                                                            )}
+                                                                        </a>
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                <NotFound msg="No user found" />
+                                                            )
+                                                        ) :
+                                                            <>
+                                                                <div className="chat_left-head">
+                                                                    <div className="chat_head_panel">
+                                                                        <div className="chat-heading">
+                                                                            <h3>All Group Members</h3>
                                                                         </div>
-                                                                        <div className="userInfo-col userInfo">
-                                                                            {item.id === this.authInfo.id ? <h3>{item.name} <span className="badge text-bg-success">You</span></h3> : <h3>{item.name}</h3>}
-                                                                            {item.isGroupAdmin === false ? <></> : <p>Admin</p>}
+                                                                        <div className="chat-filter">
+                                                                            {/* <a href="#" onClick={() => { this.notAddedUsers(sendChatData) }} ><img src={add_user_icon} alt="add" width={"30px"} height={"30px"} /></a> */}
+                                                                            <a href="#"
+                                                                                onClick={() => { this.notAddedUsers(sendChatData) }}
+                                                                            >Add Users</a>
                                                                         </div>
-                                                                    </a>
+                                                                    </div>
                                                                 </div>
-                                                            </>)}
-                                                        </div>
-                                                    }
-                                                </>}
+                                                                {sendChatData.groupData.map(item => <>
+                                                                    <div className="chat_user_item">
+                                                                        <a href="#" className="d-flex align-items-center chatUser_info">
+                                                                            <div className="userInfo-col userThumb">
+                                                                                <div className="user_thumb">
+                                                                                    <img className="img-fluid" src={chatThumb} alt="user img" />
+                                                                                </div>
+                                                                                <span className="user-inactive user-active"></span>
+                                                                            </div>
+                                                                            <div className="userInfo-col userInfo">
+                                                                                {item.id === this.authInfo.id ? <h3>{item.name} <span className="badge text-bg-success">You</span></h3> : <h3>{item.name}</h3>}
+                                                                                {item.isGroupAdmin === false ? <></> : <p>Admin</p>}
+                                                                            </div>
+                                                                        </a>
+                                                                    </div>
+                                                                </>)}
+
+                                                            </>
+                                                        }
+                                                    </>
+                                                }
                                             </div>
                                         </div>
                                         {sendChatData !== '' ? <>
@@ -757,21 +904,25 @@ class Chat extends Component {
                                                                     {item.sender.id !== this.authInfo.id ? (
                                                                         <ul>
                                                                             <li className="sender">
-                                                                                <div class="userThumb">
-                                                                                    <div class="user_thumb">
-                                                                                        <img class="img-fluid" src={item.sender.image_url} alt="user img" />
+                                                                                <div className="userThumb">
+                                                                                    <div className="user_thumb">
+                                                                                        <img className="img-fluid" src={item.sender.image_url} alt="user img" />
                                                                                     </div>
-                                                                                    <span class="user-inactive user-active"></span>
+                                                                                    <span className="user-inactive user-active"></span>
                                                                                 </div>
-                                                                                <p>{item.messageContent}</p>
-
+                                                                                {item.mediaContent === null ? (item.messageContent === null ? <></> : <p>{item.messageContent}</p>) :
+                                                                                    this.renderMedia(item.mediaContent)
+                                                                                }
+                                                                                <br />
                                                                                 <span className="time">10:32 am</span>
                                                                             </li>
                                                                         </ul>
                                                                     ) : (
                                                                         <ul>
                                                                             <li className="repaly">
-                                                                                <p>{item.messageContent}</p>
+                                                                                {item.mediaContent === null ? <p>{item.messageContent}</p> : this.renderMedia(item.mediaContent)}
+                                                                                {/* <p>{item.messageContent}</p>
+                                                                                <p>{item.mediaContent}</p> */}
                                                                                 <span className="time">just now</span>
                                                                             </li>
                                                                         </ul>
@@ -787,7 +938,18 @@ class Chat extends Component {
                                                 </div>
                                                 {sendChatData.isBlock === false ? <>
                                                     <div className="send-box">
+                                                        {/* <p>SELECTED FILE</p> */}
+                                                        {selectedFile !== null ? `Total Selected File is ${selectedFile.length}` : <></>}
                                                         <form action="">
+                                                            <div className="field_item">
+                                                                <input
+                                                                    className='form-media'
+                                                                    type="file"
+                                                                    accept="image/*,video/*,.pdf,.doc,.docx,.xlsx,.xls,.txt"
+                                                                    multiple
+                                                                    onChange={this.handleFileChange}
+                                                                />
+                                                            </div>
                                                             <input
                                                                 type="text"
                                                                 className="form-control"
@@ -811,7 +973,6 @@ class Chat extends Component {
                                             <div className="chat_board_view">
                                                 <NotFound msg="Chat not selected" />
                                             </div>
-
                                         </>}
                                     </div>
                                 </div>
@@ -819,6 +980,56 @@ class Chat extends Component {
                         </div>
                     </div>
                 </section>
+
+
+                {/* Add group users */}
+
+                <Modal
+                    show={this.state.showAddUserModal}
+                    onHide={() => this.setState({ showAddUserModal: false })}
+                    size="md"
+                    // dialogClassName="modal-90h"
+                    aria-labelledby="contained-modal-title-vcenter"
+                    className='modal-dialog-scrollable'
+                >
+
+                    <div className="chat_fieldRow">
+                        <h3>Add Users</h3>
+
+                        {notAddedUser.length > 0 ? <>
+                            {notAddedUser.map((item, index) => (
+                                <div className="chat_user_item" key={index}>
+                                    <a href="#" className="d-flex align-items-center chatUser_info">
+                                        <div className="userInfo-col userThumb">
+                                            <div className="user_thumb">
+                                                <img className="img-fluid" src={chatThumb} alt="user img" />
+                                            </div>
+                                            <span className="user-inactive user-active"></span>
+                                        </div>
+                                        <div className="userInfo-col userInfo">
+                                            <h3>{item.name}</h3>
+                                            {/* {item.seller === null ? <h3>{item.user.name} <span className="badge text-bg-success">{item.user.id === this.authInfo.id ? "YOU" : ""}</span></h3> : <h3>{item.seller.name}  <span className="badge text-bg-primary">{item.seller.role}</span></h3>} */}
+                                        </div>
+                                        <button onClick={() => this.clickToAddUser(item)}>ADD</button>
+
+                                        {/* <div className="input-group-text">
+                                            <input
+                                                className="form-check-input mt-0"
+                                                type="checkbox"
+                                                value=""
+                                                aria-label="Checkbox for following text input"
+                                                onClick={() => this.clickToAddUser(item)}
+
+                                            />
+                                        </div> */}
+                                    </a>
+                                </div>
+                            ))}
+                        </> :
+                            <></>
+                        }
+                    </div>
+                </Modal>
 
                 {/* search modal */}
 
@@ -861,8 +1072,8 @@ class Chat extends Component {
                                 <button className="btn btn-primary" type="button" onClick={this.selectAllUsers}>Add Users</button>
                             </div>
                         ) :
-                            (users.map((item) => (
-                                <div className="chat_user_item" key={item.id}>
+                            (users.map((item, index) => (
+                                <div className="chat_user_item" key={index}>
                                     <a href="#" className="d-flex align-items-center chatUser_info">
                                         <div className="userInfo-col userThumb">
                                             <div className="user_thumb">
