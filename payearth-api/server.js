@@ -104,7 +104,7 @@ const io = require('socket.io')(httpsServer, {
   // }
 
   cors: {
-    origin: ["*", "http://pay.earth:7700", 'https://pay.earth:7700'],
+    origin: ["*"],
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
