@@ -25,7 +25,8 @@ const schema = new Schema({
     chat: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Chat"
-    }
+    },
+    timestamp: { type: Date, default: Date.now },
 }, { timestamps: true });
 
 schema.set("toJSON", { virtuals: true, versionKey: false });

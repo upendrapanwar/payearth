@@ -99,19 +99,15 @@ httpsServer.listen(PORT, () => {
 
 const io = require('socket.io')(httpsServer, {
   pingTimeout: 60000,
-  // cors: {
-  //   origin: "*",
-  // }
 
   cors: {
-    origin: ["*"],
+    // origin: ["*", "http://localhost:3000", "https://localhost:3000"], // for local
+    origin: ["*", "http://pay.earth:7700", "https://pay.earth"], // for Live
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   }
 });
-
-
 
 io.on("connection", function (socket) {
   console.log("Connected to socket.io");
@@ -120,7 +116,13 @@ io.on("connection", function (socket) {
     socket.join(userID);
     // console.log("userID setup", userID)
     socket.emit("connected");
+
+    // io.emit('user_online', userID)
   });
+
+  socket.on('active', function (userID) {
+    io.emit('user_online', userID)
+  })
 
   socket.on('join chat', function (room) {
     socket.join(room)
@@ -135,6 +137,7 @@ io.on("connection", function (socket) {
   })
 
   socket.on('new message', function (msg) {
+    // console.log("msg", msg)
     var chat = msg.chat;
     // console.log("chat", chat)
     // console.log("recieve msg", msg)
@@ -160,5 +163,7 @@ io.on("connection", function (socket) {
   // Disconnect event
   socket.on('disconnect', () => {
     console.log('Client disconnected');
+    io.emit('user_offline', socket.id);
   });
+
 });

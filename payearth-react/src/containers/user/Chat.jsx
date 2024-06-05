@@ -3,7 +3,7 @@ import Header from '../../components/user/common/Header';
 import PageTitle from '../../components/user/common/PageTitle';
 import Footer from '../../components/common/Footer';
 import { Link } from 'react-router-dom';
-import add_user_icon from './../../assets/icons/add_user_icon.svg';
+import chat_icon from './../../assets/icons/chat_icon.svg';
 import defaultPdf_icon from './../../assets/icons/document_icon.svg'
 import chatThumb from './../../assets/images/chat-thumb.jpg';
 import { setLoading } from '../../store/reducers/global-reducer';
@@ -14,10 +14,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { connect } from 'react-redux';
 import store from '../../store/index';
 import axios from 'axios';
-import searchIcon from './../../assets/icons/search.svg'
+import group_icon from './../../assets/icons/group_icon.svg';
+// import searchIcon from './../../assets/icons/search.svg'
 import Modal from "react-bootstrap/Modal";
 import io from 'socket.io-client'
 import { NotFound } from './../../components/common/NotFound';
+import { iteratee } from 'lodash';
+import moment from 'moment';
+import Picker from '@emoji-mart/react';
+import data from '@emoji-mart/data';
 
 
 class Chat extends Component {
@@ -26,6 +31,7 @@ class Chat extends Component {
         this.cloudName = process.env.REACT_APP_CLOUD_NAME
         this.userInfo = store.getState().auth.userInfo;
         this.authInfo = JSON.parse(localStorage.getItem('authInfo'));
+
         this.state = {
 
             search: "",
@@ -45,13 +51,15 @@ class Chat extends Component {
             notification: [],
             showChatUsers: true,
             selectedFile: null,
+            onlineUsers: [],
+            showEmojiPicker: false,
         };
 
         this.socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
         this.handleMessageContent = this.handleMessageContent.bind(this)
         // this.accessChat = this.accessChat.bind(this)
         this.sendMessage = this.sendMessage.bind(this)
-
+        this.onEmojiClick = this.onEmojiClick.bind(this);
 
 
         this.socket.on('receive_notification', (notification) => {
@@ -62,12 +70,42 @@ class Chat extends Component {
                     notification: notification
                 })
             }
-        })
+        });
+
+
+
+
+        this.socket.on('user_online', (userID) => {
+            // console.log("userId", userID)
+            this.setState(prevState => ({
+                onlineUsers: [...prevState.onlineUsers, userID]
+            }));
+            // setOnlineUsers(prevUsers => ({ ...prevUsers, [userID]: true }));
+        });
+
+        // this.socket.on('user_offline', (userID) => {
+        //     this.setState(prevState => {
+        //       const updatedUsers = { ...prevState.onlineUsers };
+        //       delete updatedUsers[userID];
+        //       return { onlineUsers: updatedUsers };
+        //     });
+        //   });
 
         this.socket.on('message_recieved', (data) => {
-            // console.log("message_recieved from server..", data)
 
-            // { data.chat._id !== this.allChatUsers._id ? <> No NOTIFICATION </> : <> YES NOTIFICATION</> }
+            // console.log("chat select id ", this.state.sendChatData.chatId);
+            // console.log(" msg reciving chat id", data.chat._id);
+
+            if (data.chat._id === this.state.sendChatData.chatId) {
+                this.fetchAllUserData();
+
+                this.setState(prevState => ({
+                    userChat: [...prevState.userChat, data]
+                }));
+            }
+            this.fetchAllUserData();
+
+            // if (data) { data.chat._id !== this.state.allChatUsers._id ? <> No NOTIFICATION </> : <> YES NOTIFICATION</> }
 
 
 
@@ -89,15 +127,22 @@ class Chat extends Component {
             //     console.log(`chatID is match ${this.allChatUsers._id} or ${data.chat._id}`)
             // }
 
-            this.setState(prevState => ({
-                userChat: [...prevState.userChat, data]
-            }));
+            // this.setState(prevState => ({
+            //     userChat: [...prevState.userChat, data]
+            // }));
         })
     }
-    // this will run
+
 
     componentDidMount() {
         this.fetchAllUserData();
+        this.socket.emit("active", this.authInfo.id);
+    }
+
+    onEmojiClick(event, emojiObject) {
+        this.setState({
+            chosenEmoji: emojiObject,
+        });
     }
 
 
@@ -119,16 +164,6 @@ class Chat extends Component {
     //     this.socket.close();
     // }
 
-    // connectSocket = () => {
-    //     const { selectUserId } = this.state;
-    //     console.log("connectSocket : : ", selectUserId)
-    //     this.socket = io("https://localhost:7700");
-    //     this.socket.emit("setup", selectUserId);
-    //     this.socket.on('connection', () => {
-    //         console.log("hdgfshfgshgsdhgshdgh")
-    //         this.setState({ socketConnected: true })
-    //     })
-    // }
 
     fetchAllUserData = () => {
         this.setState({ users: "" })
@@ -144,8 +179,8 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             }).then((response) => {
-                const users = response.data.data
-                // console.log("users from reciving notification.....", users)
+                const users = response.data.data;
+
                 // const isGroupchat = users.filter(item => item.isGroupChat === true && item.chatUsers.length > 2)
 
 
@@ -161,7 +196,6 @@ class Chat extends Component {
         } catch (error) {
             console.log("error")
         }
-
     }
 
     fetchAllBlockChat = () => {
@@ -324,6 +358,8 @@ class Chat extends Component {
     sendNotification = (id, datas) => {
         this.socket.emit('send_notification', { id, message: datas });
     };
+
+
     // // send test notification 
 
     // sendTestNotification = () => {
@@ -402,9 +438,18 @@ class Chat extends Component {
     handleFileChange = async (event) => {
         // const files = Array.from(event.target.files);
         const files = event.target.files;
-        console.log("files", files)
+        // console.log("files", files)
         this.setState({ selectedFile: files })
     };
+
+    onEmojiClick = (emoji) => {
+        this.setState({ messageContent: this.state.messageContent + emoji.native });
+    };
+
+    toggleEmojiPicker = () => {
+        this.setState((prevState) => ({ showEmojiPicker: !prevState.showEmojiPicker }));
+    };
+
 
     sendMessage = async () => {
         const { sendChatData, messageContent, selectedFile } = this.state;
@@ -450,12 +495,11 @@ class Chat extends Component {
                                 this.socket.emit("new message", data)
                                 // console.log("SendChatData under send msg>>>", sendChatData)
                                 this.getAllMessage(sendChatData.chatId)
-
+                                this.fetchAllUserData();
                             }
                         }).catch((error) => {
                             console.log("error", error);
                         });
-
                     } catch (error) {
                         console.log("error", error)
                     }
@@ -492,7 +536,7 @@ class Chat extends Component {
                         this.socket.emit("new message", data)
                         // console.log("SendChatData under send msg>>>", sendChatData)
                         this.getAllMessage(sendChatData.chatId)
-
+                        this.fetchAllUserData();
                     }
                 }).catch((error) => {
                     console.log("error", error);
@@ -503,13 +547,11 @@ class Chat extends Component {
             }
             this.setState({ messageContent: "" })
         }
+        this.setState({ showEmojiPicker: false })
     }
-
-
 
     handleSearchText = async (e) => {
         this.setState({ search: e.target.value })
-
         try {
             const search = e.target.value;
             const response = await axios.get(`/user/getAllUser?search=${search}`, {
@@ -532,21 +574,19 @@ class Chat extends Component {
     }
 
     handleCheckboxClick = (itemId) => {
-
         const { selectedUsers } = this.state;
         const index = selectedUsers.indexOf(itemId);
-
         if (index === -1) {
-            // If item not found, add to selectedItems
-            const result = [...selectedUsers, itemId]
-            // console.log("result:>", result)
-            this.setState({
-                selectedUsers: result
-            });
+            if (selectedUsers.length < 20) {
+                const result = [...selectedUsers, itemId]
+                this.setState({
+                    selectedUsers: result
+                });
+            } else {
+                alert("Not Select more then 20 users")
+            }
         } else {
-            // If item found, remove from selectedItems
             const result = selectedUsers.filter(item => item !== itemId);
-            // console.log("result:>", result)
             this.setState({
                 selectedUsers: result
             });
@@ -556,7 +596,6 @@ class Chat extends Component {
     notAddedUsers = async (data) => {
         this.setState({ showAddUserModal: true });
         const groupData = data.groupData;
-        console.log("groupData", groupData)
         try {
             const response = await axios.get('/user/getAllUser', {
                 headers: {
@@ -567,7 +606,6 @@ class Chat extends Component {
             const data = allUsers.map(item => item.seller === null ? item.user : item.seller);
             const notAddedUser = data.filter(obj1 => !groupData.some(obj2 => obj2.id === obj1.id));
 
-            console.log("notAddedUser", notAddedUser)
             this.setState({ notAddedUser: notAddedUser })
 
         } catch (error) {
@@ -577,7 +615,6 @@ class Chat extends Component {
 
     clickToAddUser = async (data) => {
         const { sendChatData } = this.state;
-        console.log("data", data)
         try {
             const url = `user/addGroupMember/${sendChatData.chatId}`;
             await axios.put(url, data, {
@@ -587,7 +624,7 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             }).then((response) => {
-                toast.success(`Add User Successfully`, { autoClose: 3000 })
+                toast.error(response.data.message, { autoClose: 3000 })
                 // this.setState({ subscriptionChecked: response.data.status })
             }).catch((error) => {
                 console.log("Error", error)
@@ -598,7 +635,6 @@ class Chat extends Component {
     }
 
     handleChatBlock = (data) => {
-        // console.log("USER BLOCK DATA", data)
         {
             data.isBlock === false ?
                 axios.put(`/user/userChatBlock/${data.chatId}`, { isBlock: true, blockByUser: this.authInfo.id }, {
@@ -630,10 +666,8 @@ class Chat extends Component {
                         this.setState({ sendChatData: "" });
                         this.fetchAllUserData();
                         toast.success(`You Unblock ${data.name} Successfully`, { autoClose: 3000 })
-
                         // this.props.history.push('/chat')
                     }
-
                 }).catch((error) => {
                     console.log("error", error);
                 })
@@ -641,7 +675,6 @@ class Chat extends Component {
     }
 
     handleUnblockChat = (chatId) => {
-        // console.log("handle Unblock Chat", chatId)
         try {
             axios.put(`/user/userChatBlock/${chatId}`, { isBlock: false, blockByUser: null }, {
                 headers: {
@@ -653,15 +686,11 @@ class Chat extends Component {
                 if (response.data.status === true) {
                     this.setState({ sendChatData: "" });
                     this.fetchAllUserData();
-                    toast.success(`Chat Unblock Successfully`, { autoClose: 3000 })
-
-                    // this.props.history.push('/chat')
+                    toast.success(`Chat Unblock Successfully`, { autoClose: 3000 });
                 }
-
             }).catch((error) => {
                 console.log("error", error);
             })
-
         } catch (error) {
             console.log("error", error)
         }
@@ -715,19 +744,20 @@ class Chat extends Component {
         }
     }
 
+    notify = () => toast.error("Only Admin can add new users", {
+        position: "bottom-center",
+        theme: "colored",
+    });
+
 
     render() {
-        const { showChatUsers, users, allChatUsers, sendChatData, userChat, notAddedUser, selectedUsers, selectedFile } = this.state;
-        // console.log("allChatUsers in render() :-", allChatUsers)
-        console.log(" sendChatData", sendChatData)
-
-        console.log("notAddedUser : ", notAddedUser)
-
-        console.log("showChatUsers", showChatUsers)
-
-
+        const { showChatUsers, users, allChatUsers, sendChatData, userChat, notAddedUser, selectedUsers, selectedFile, onlineUsers, showEmojiPicker } = this.state;
         const { loading } = store.getState().global;
-
+        // console.log("allChatUsers in render() :-", allChatUsers)
+        // console.log(" sendChatData", sendChatData)
+        // console.log("notAddedUser : ", notAddedUser)
+        // console.log("userChat :", userChat);
+        // console.log("onlineUsers Active :>>>>", onlineUsers)
 
         return (
             <React.Fragment>
@@ -781,16 +811,10 @@ class Chat extends Component {
                                                                     <div className="user_thumb">
                                                                         <img className="img-fluid" src={item.seller === null ? item.user.image_url : item.seller.image_url} alt="user img" />
                                                                     </div>
-                                                                    <span className="user-inactive user-active"></span>
+                                                                    {/* <span className="user-inactive user-active"></span> */}
                                                                 </div>
                                                                 <div className="userInfo-col userInfo">
                                                                     {item.seller === null ? <h3>{item.user.name} <span className="badge text-bg-success">{item.user.id === this.authInfo.id ? "YOU" : ""}</span></h3> : <h3>{item.seller.name}  <span className="badge text-bg-primary">{item.seller.role}</span></h3>}
-                                                                </div>
-                                                                <div className="userInfo-col chatTime">
-                                                                    <div className="chatTime">
-                                                                        1 mint ago
-                                                                        <span className="chatNoti-info">3</span>
-                                                                    </div>
                                                                 </div>
                                                             </a>
                                                         </div>
@@ -813,16 +837,20 @@ class Chat extends Component {
                                                                                 <div className="user_thumb">
                                                                                     <img className="img-fluid" src={item.chatUsers[0].id !== this.authInfo.id ? item.chatUsers[0].image_url : item.chatUsers[1].image_url} alt="user img" />
                                                                                 </div>
-                                                                                <span className="user-inactive user-active"></span>
+                                                                                {/* <p>{onlineUsers.includes(item.chatUsers[0].id !== this.authInfo.id ? item.chatUsers[0].id : item.chatUsers[1].id) ? "true" : "false"}</p> */}
+                                                                                {onlineUsers.includes(item.chatUsers[1].id) ? <span className="user-inactive user-active"></span> : <span className="user-inactive"></span>}
                                                                             </div>
                                                                             <div className="userInfo-col userInfo">
                                                                                 {item.chatName !== 'sender' ? <h3>{item.chatName} <span className="badge text-bg-info">Group</span></h3> : item.chatUsers[0].id !== this.authInfo.id ? <h3>{item.chatUsers[0].name}</h3> : <h3>{item.chatUsers[1].name}</h3>}
+                                                                                {item.isBlock === true ? <></> : (item.latestMessage === null ? <></> : (item.latestMessage.mediaContent === null ? <p>{item.latestMessage.messageContent}</p> : <p><i><b>Media File</b></i></p>))}
+                                                                                {/* {item.latestMessage === null ? <></> : (item.latestMessage.mediaContent === null ? <p>{item.latestMessage.messageContent}</p> : <p><i><b>Media File</b></i></p>)} */}
+
                                                                             </div>
                                                                             {item.isBlock === false ? (
                                                                                 <div className="userInfo-col chatTime">
                                                                                     <div className="chatTime">
-                                                                                        1 min ago
-                                                                                        <span className="chatNoti-info">3</span>
+                                                                                        {item.latestMessage === null ? <></> : (moment(item.latestMessage.timestamp).fromNow())}
+                                                                                        {/* {moment(item.latestMessage.timestamp).fromNow()} */}
                                                                                     </div>
                                                                                 </div>
                                                                             ) : (
@@ -841,12 +869,12 @@ class Chat extends Component {
                                                                         <div className="chat-heading">
                                                                             <h3>All Group Members</h3>
                                                                         </div>
-                                                                        <div className="chat-filter">
-                                                                            {/* <a href="#" onClick={() => { this.notAddedUsers(sendChatData) }} ><img src={add_user_icon} alt="add" width={"30px"} height={"30px"} /></a> */}
+                                                                        <a className="add" href="#"><img src={group_icon} alt="add" width={"30px"} height={"30px"} /><small>{sendChatData.groupData.length}</small></a>
+                                                                        {sendChatData.groupData.filter(item => item.isGroupAdmin === true && item.id === this.authInfo.id).map(item => <div className="chat-filter" key={item.id}>
                                                                             <a href="#"
                                                                                 onClick={() => { this.notAddedUsers(sendChatData) }}
                                                                             >Add Users</a>
-                                                                        </div>
+                                                                        </div>)}
                                                                     </div>
                                                                 </div>
                                                                 {sendChatData.groupData.map(item => <>
@@ -856,16 +884,18 @@ class Chat extends Component {
                                                                                 <div className="user_thumb">
                                                                                     <img className="img-fluid" src={chatThumb} alt="user img" />
                                                                                 </div>
-                                                                                <span className="user-inactive user-active"></span>
+                                                                                {/* <span className="user-inactive user-active"></span> */}
                                                                             </div>
                                                                             <div className="userInfo-col userInfo">
                                                                                 {item.id === this.authInfo.id ? <h3>{item.name} <span className="badge text-bg-success">You</span></h3> : <h3>{item.name}</h3>}
                                                                                 {item.isGroupAdmin === false ? <></> : <p>Admin</p>}
                                                                             </div>
+                                                                            <div className="userInfo-col chatTime">
+                                                                                {item.id === this.authInfo.id ? <button>Exit group</button> : (item.isGroupAdmin === true ? <></> : <button>Remove</button>)}
+                                                                            </div>
                                                                         </a>
                                                                     </div>
                                                                 </>)}
-
                                                             </>
                                                         }
                                                     </>
@@ -879,10 +909,8 @@ class Chat extends Component {
                                                         <div className="user_thumb">
                                                             <img className="img-fluid" src={sendChatData.image_url} alt="user img" />
                                                         </div>
-                                                        <span className="user-inactive user-active"></span>
-
+                                                        {/* <span className="user-inactive user-active"></span> */}
                                                     </div>
-
                                                     <div className="userInfo-col userInfo">
                                                         <h3>{sendChatData.name}</h3>
                                                     </div>
@@ -892,10 +920,16 @@ class Chat extends Component {
                                                         </div>
                                                     </> :
                                                         <>
-                                                            {showChatUsers === false ? <button onClick={this.toggleChatGroupUsers}>Back</button> : <button onClick={this.toggleChatGroupUsers}>Group Members</button>}
+                                                            {showChatUsers === false ?
+                                                                <div className="justify-content-md-end">
+                                                                    <button className="btn btn-warning me-md-2 btn-sm" type="button" onClick={this.toggleChatGroupUsers}>Back</button>
+                                                                </div>
+                                                                // <button onClick={this.toggleChatGroupUsers}>Back</button>
+                                                                :
+                                                                (sendChatData.isGroup === true ? <a class="add" href="#"><img src={group_icon} alt="add" onClick={this.toggleChatGroupUsers} width={"40px"} height={"40px"} /><small>{sendChatData.groupData.length}</small></a> : <></>)
+                                                            }
                                                         </>}
                                                 </div>
-
                                                 <div className="msg-body">
                                                     {userChat.length !== 0 ? (
                                                         <>
@@ -914,16 +948,14 @@ class Chat extends Component {
                                                                                     this.renderMedia(item.mediaContent)
                                                                                 }
                                                                                 <br />
-                                                                                <span className="time">10:32 am</span>
+                                                                                <span className='time'>{moment(item.timestamp).format('hh:mm A')}</span>
                                                                             </li>
                                                                         </ul>
                                                                     ) : (
                                                                         <ul>
                                                                             <li className="repaly">
                                                                                 {item.mediaContent === null ? <p>{item.messageContent}</p> : this.renderMedia(item.mediaContent)}
-                                                                                {/* <p>{item.messageContent}</p>
-                                                                                <p>{item.mediaContent}</p> */}
-                                                                                <span className="time">just now</span>
+                                                                                <span className='time'>{moment(item.timestamp).fromNow()}</span>
                                                                             </li>
                                                                         </ul>
                                                                     )}
@@ -958,6 +990,11 @@ class Chat extends Component {
                                                                 value={this.state.messageContent}
                                                                 onChange={this.handleMessageContent}
                                                             />
+                                                            <div className="emoji" onClick={this.toggleEmojiPicker}>😊</div>
+                                                            {/* <button type="button" className="emoji btn btn-light" onClick={this.toggleEmojiPicker}>
+                                                                😊
+                                                            </button> */}
+                                                            {showEmojiPicker && <Picker data={data} onEmojiSelect={this.onEmojiClick} />}
 
                                                             <button type="button" onClick={this.sendMessage}>
                                                                 <i className="fa fa-paper-plane" aria-hidden="true"></i>
@@ -1011,17 +1048,6 @@ class Chat extends Component {
                                             {/* {item.seller === null ? <h3>{item.user.name} <span className="badge text-bg-success">{item.user.id === this.authInfo.id ? "YOU" : ""}</span></h3> : <h3>{item.seller.name}  <span className="badge text-bg-primary">{item.seller.role}</span></h3>} */}
                                         </div>
                                         <button onClick={() => this.clickToAddUser(item)}>ADD</button>
-
-                                        {/* <div className="input-group-text">
-                                            <input
-                                                className="form-check-input mt-0"
-                                                type="checkbox"
-                                                value=""
-                                                aria-label="Checkbox for following text input"
-                                                onClick={() => this.clickToAddUser(item)}
-
-                                            />
-                                        </div> */}
                                     </a>
                                 </div>
                             ))}
@@ -1058,15 +1084,11 @@ class Chat extends Component {
                         </div>
                     </div>
                     <div className='user-list-container'>
-                        {selectedUsers.length > 1 ? <>
+                        {selectedUsers.length < 20 && selectedUsers.length > 1 ?
                             <div className="d-grid gap-2 col-6 mx-auto">
                                 <button className="btn btn-primary" type="button" onClick={this.createGroupChat}>Create Group</button>
-                            </div>
-
-                        </> : <>
-
-                        </>}
-
+                            </div> : <><p className="text-center">Min 3 & Max 20 members allowed to join this group</p></>
+                        }
                         {users.length === 0 ? (
                             <div className="chatGrpSelect d-grid gap-2 col-6 mx-auto">
                                 <button className="btn btn-primary" type="button" onClick={this.selectAllUsers}>Add Users</button>
@@ -1102,7 +1124,6 @@ class Chat extends Component {
                                                 onClick={() => this.handleCheckboxClick(item.seller === null ? item.user : item.seller)}
                                             />
                                         </div>
-
                                     </a>
                                 </div>
                             )))}

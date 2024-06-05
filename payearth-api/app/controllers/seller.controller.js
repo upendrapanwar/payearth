@@ -220,6 +220,19 @@ router.post("/addNotification/:id", addNotification);
 router.get("/getNotification/:id", getNotification);
 router.delete("/deleteNotification/:id", deleteNotification);
 
+// Chat
+
+router.get("/getAllUser", getAllUser);
+router.post("/accessChat", accessChat);
+router.post("/createGroupChat", createGroupChat);
+router.get("/fetchChat/:id", fetchChat);
+router.get("/fetchBlockChat/:id", fetchBlockChat);
+router.post("/sendMessage", sendMessage)
+router.get("/allMessages/:id", allMessages);
+router.put("/userChatBlock/:id", userChatBlock);
+router.put("/userUnblockChat/:id", userUnblockChat)
+router.put("/addGroupMember/:id", addGroupMember);
+
 //Seller appointment calendar
 // router.get("/getMeetingData/:id", getMeeting);
 
@@ -231,13 +244,13 @@ function register(req, res, next) {
     .then((seller) =>
       seller
         ? res.status(201).json({
-            status: true,
-            message: msg.seller.signup.success,
-            data: seller,
-          })
+          status: true,
+          message: msg.seller.signup.success,
+          data: seller,
+        })
         : res
-            .status(400)
-            .json({ status: false, message: msg.seller.signup.error })
+          .status(400)
+          .json({ status: false, message: msg.seller.signup.error })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -251,16 +264,16 @@ function authenticate(req, res, next) {
       seller
         ? seller && seller.isActive == true
           ? res.json({
-              status: true,
-              message: msg.seller.login.success,
-              data: seller,
-            })
+            status: true,
+            message: msg.seller.login.success,
+            data: seller,
+          })
           : res
-              .status(401)
-              .json({ status: false, message: msg.seller.login.active })
-        : res
             .status(401)
-            .json({ status: false, message: msg.seller.login.error })
+            .json({ status: false, message: msg.seller.login.active })
+        : res
+          .status(401)
+          .json({ status: false, message: msg.seller.login.error })
     )
     .catch((err) => next(err));
 }
@@ -272,8 +285,8 @@ function getCountries(req, res, next) {
       countries
         ? res.status(200).json({ status: true, data: countries })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: {} })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: {} })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -285,8 +298,8 @@ function getStatesByCountry(req, res, next) {
       states
         ? res.status(200).json({ status: true, data: states })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: {} })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: {} })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -298,16 +311,16 @@ function socialLogin(req, res, next) {
       seller
         ? seller && seller.isActive == true
           ? res.json({
-              status: true,
-              message: msg.seller.login.success,
-              data: seller,
-            })
+            status: true,
+            message: msg.seller.login.success,
+            data: seller,
+          })
           : res
-              .status(400)
-              .json({ status: false, message: msg.seller.login.active })
-        : res
             .status(400)
-            .json({ status: false, message: msg.seller.login.error })
+            .json({ status: false, message: msg.seller.login.active })
+        : res
+          .status(400)
+          .json({ status: false, message: msg.seller.login.error })
     )
     .catch((err) => next(err));
 }
@@ -318,11 +331,11 @@ function forgotPass(req, res, next) {
     .then((seller) =>
       seller
         ? res
-            .status(200)
-            .json({ status: true, message: msg.seller.password.verif_link })
+          .status(200)
+          .json({ status: true, message: msg.seller.password.verif_link })
         : res
-            .status(400)
-            .json({ status: false, message: msg.seller.password.email_exist })
+          .status(400)
+          .json({ status: false, message: msg.seller.password.email_exist })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -333,12 +346,12 @@ function resetPass(req, res, next) {
     .then((seller) =>
       seller
         ? res
-            .status(200)
-            .json({ status: true, message: msg.seller.password.reset_success })
+          .status(200)
+          .json({ status: true, message: msg.seller.password.reset_success })
         : res.status(400).json({
-            status: false,
-            message: msg.seller.password.verif_link_err,
-          })
+          status: false,
+          message: msg.seller.password.verif_link_err,
+        })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -350,12 +363,12 @@ function changePass(req, res, next) {
     .then((seller) =>
       seller
         ? res.json({
-            status: true,
-            message: msg.seller.password.update_success,
-          })
+          status: true,
+          message: msg.seller.password.update_success,
+        })
         : res
-            .status(404)
-            .json({ status: false, message: msg.common.no_seller_err })
+          .status(404)
+          .json({ status: false, message: msg.common.no_seller_err })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -369,8 +382,8 @@ function getListedProducts(req, res, next) {
       products
         ? res.status(200).json({ status: true, data: products })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -382,8 +395,8 @@ function getProductById(req, res, next) {
       product
         ? res.status(200).json({ status: true, data: product })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -394,13 +407,13 @@ function addFeaturedImage(req, res, next) {
     .then((featuredImage) =>
       featuredImage
         ? res.status(200).json({
-            status: true,
-            message: msg.featuredImage.success,
-            data: featuredImage,
-          })
+          status: true,
+          message: msg.featuredImage.success,
+          data: featuredImage,
+        })
         : res
-            .status(400)
-            .json({ status: false, message: msg.featuredImage.error })
+          .status(400)
+          .json({ status: false, message: msg.featuredImage.error })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -417,13 +430,13 @@ function addProduct(req, res, next) {
     .then((product) =>
       product
         ? res.status(201).json({
-            status: true,
-            message: msg.product.add.success,
-            data: product,
-          })
+          status: true,
+          message: msg.product.add.success,
+          data: product,
+        })
         : res
-            .status(400)
-            .json({ status: false, message: msg.product.add.error })
+          .status(400)
+          .json({ status: false, message: msg.product.add.error })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -442,13 +455,13 @@ function editProduct(req, res, next) {
     .then((product) =>
       product
         ? res.status(201).json({
-            status: true,
-            message: msg.product.edit.success,
-            data: product,
-          })
+          status: true,
+          message: msg.product.edit.success,
+          data: product,
+        })
         : res
-            .status(400)
-            .json({ status: false, message: msg.product.edit.error })
+          .status(400)
+          .json({ status: false, message: msg.product.edit.error })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -462,8 +475,8 @@ function getStockItems(req, res, next) {
       items
         ? res.status(200).json({ status: true, data: items })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -486,8 +499,8 @@ function getOrders(req, res, next) {
       orders
         ? res.status(200).json({ status: true, data: orders })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -499,8 +512,8 @@ function getPayments(req, res, next) {
       payments
         ? res.status(200).json({ status: true, data: payments })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -512,8 +525,8 @@ function savepaymentdata(req, res, next) {
       data
         ? res.status(200).json({ status: true, data: data })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -524,13 +537,13 @@ function saveOrder(req, res, next) {
     .then((order) =>
       order
         ? res.status(201).json({
-            status: true,
-            message: msg.user.order.add.success,
-            data: order,
-          })
+          status: true,
+          message: msg.user.order.add.success,
+          data: order,
+        })
         : res
-            .status(400)
-            .json({ status: false, message: msg.user.order.add.error })
+          .status(400)
+          .json({ status: false, message: msg.user.order.add.error })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -544,8 +557,8 @@ function saveOrdertrackingTime(req, res, next) {
       data
         ? res.status(200).json({ status: true, data: data })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -557,8 +570,8 @@ function saveorderdetails(req, res, next) {
       data
         ? res.status(200).json({ status: true, data: data })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -570,8 +583,8 @@ function updateOrderStatus(req, res, next) {
       data
         ? res.status(200).json({ status: true, data: data })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -583,8 +596,8 @@ function getOrderStatus(req, res, next) {
       orderstatus
         ? res.status(200).json({ status: true, data: orderstatus })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -596,8 +609,8 @@ function getNewCoupons(req, res, next) {
       coupons
         ? res.status(200).json({ status: true, data: coupons })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -609,8 +622,8 @@ function getOrderById(req, res, next) {
       order
         ? res.status(200).json({ status: true, data: order })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: {} })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: {} })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -622,8 +635,8 @@ function getColors(req, res, next) {
       colors
         ? res.status(200).json({ status: true, data: colors })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -635,8 +648,8 @@ function getCategories(req, res, next) {
       categories
         ? res.status(200).json({ status: true, data: categories })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -648,8 +661,8 @@ function getBrands(req, res, next) {
       brands
         ? res.status(200).json({ status: true, data: brands })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -660,13 +673,13 @@ function needHelp(req, res, next) {
     .then((result) =>
       result
         ? res.status(201).json({
-            status: true,
-            message: msg.seller.needhelp.success,
-            data: result,
-          })
+          status: true,
+          message: msg.seller.needhelp.success,
+          data: result,
+        })
         : res
-            .status(400)
-            .json({ status: false, message: msg.seller.needhelp.error })
+          .status(400)
+          .json({ status: false, message: msg.seller.needhelp.error })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -679,13 +692,13 @@ function contactUs(req, res, next) {
     .then((result) =>
       result
         ? res.status(201).json({
-            status: true,
-            message: msg.seller.contactus.success,
-            data: result,
-          })
+          status: true,
+          message: msg.seller.contactus.success,
+          data: result,
+        })
         : res
-            .status(400)
-            .json({ status: false, message: msg.seller.contactus.error })
+          .status(400)
+          .json({ status: false, message: msg.seller.contactus.error })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -699,8 +712,8 @@ function getDashboardCounters(req, res, next) {
       counters
         ? res.status(200).json({ status: true, data: counters })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -712,8 +725,8 @@ function getProductSales(req, res, next) {
       sales
         ? res.status(200).json({ status: true, data: sales })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -725,8 +738,8 @@ function getSalesLineChartData(req, res, next) {
       data
         ? res.status(200).json({ status: true, data: data })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -738,8 +751,8 @@ function getTopSellingCategoryChartData(req, res, next) {
       data
         ? res.status(200).json({ status: true, data: data })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -781,8 +794,8 @@ function addService(req, res, next) {
       service
         ? res.status(201).json({ status: true, data: service })
         : res
-            .status(400)
-            .json({ status: false, message: "Service data not found!" })
+          .status(400)
+          .json({ status: false, message: "Service data not found!" })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -801,13 +814,13 @@ function editService(req, res, next) {
     .then((service) =>
       service
         ? res.status(201).json({
-            status: true,
-            message: msg.service.edit.success,
-            data: service,
-          })
+          status: true,
+          message: msg.service.edit.success,
+          data: service,
+        })
         : res
-            .status(400)
-            .json({ status: false, message: msg.service.edit.error })
+          .status(400)
+          .json({ status: false, message: msg.service.edit.error })
     )
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
@@ -821,8 +834,8 @@ function getListedServices(req, res, next) {
       services
         ? res.status(200).json({ status: true, data: services })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -834,8 +847,8 @@ function getServiceItems(req, res, next) {
       items
         ? res.status(200).json({ status: true, data: items })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -859,8 +872,8 @@ function getServiceById(req, res, next) {
       service
         ? res.status(200).json({ status: true, data: service })
         : res
-            .status(400)
-            .json({ status: false, message: msg.common.no_data_err, data: [] })
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -932,10 +945,10 @@ function createSellerSubscriptionPlan(req, res, next) {
       plan
         ? res.status(200).json({ status: true, data: plan })
         : res.status(400).json({
-            status: false,
-            message: "Error in purchasing plan.... ",
-            data: [],
-          })
+          status: false,
+          message: "Error in purchasing plan.... ",
+          data: [],
+        })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
@@ -958,10 +971,10 @@ function getSubscriptionPlanBySeller(req, res, next) {
     .then((plan) =>
       plan
         ? res.json({
-            status: true,
-            data: plan,
-            message: "Get Plan Data Successfully....",
-          })
+          status: true,
+          data: plan,
+          message: "Get Plan Data Successfully....",
+        })
         : res.json({ status: false, message: "ERROR" })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
@@ -1063,6 +1076,90 @@ function updateSubscriptionStatus(req, res, next) {
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
+
+//*****************************************************************************************/
+//*****************************************************************************************/
+
+// chat getAllUser
+function getAllUser(req, res, next) {
+  sellerService
+    .getAllUser(req)
+    .then((user) =>
+      user
+        ? res.status(200).json({ status: true, data: user })
+        : res
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+
+function accessChat(req, res, next) {
+  sellerService.accessChat(req)
+    .then((chat) => chat ? res.status(201).json({ status: true, data: chat }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
+    .catch((err) =>
+      next(res.status(400).json({ status: false, message: err }))
+    );
+}
+
+function createGroupChat(req, res, next) {
+  sellerService.createGroupChat(req)
+    .then((chat) => chat ? res.status(201).json({ status: true, data: chat }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
+    .catch((err) =>
+      next(res.status(400).json({ status: false, message: err }))
+    );
+}
+
+function fetchChat(req, res, next) {
+  sellerService.fetchChat(req).then((chat) => chat ? res.status(200).json({ status: true, data: chat })
+    : res.status(400).json({ status: false, message: "ERROR ", data: [] })
+  )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function fetchBlockChat(req, res, next) {
+  sellerService.fetchBlockChat(req)
+    .then((chat) => chat ? res.status(200).json({ status: true, data: chat }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function sendMessage(req, res, next) {
+  sellerService.sendMessage(req)
+    .then((sendChat) => sendChat ? res.status(201).json({ status: true, data: sendChat }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
+    .catch((err) =>
+      next(res.status(400).json({ status: false, message: err }))
+    );
+}
+
+function allMessages(req, res, next) {
+  sellerService.allMessages(req)
+    .then((allChat) => allChat ? res.status(200).json({ status: true, data: allChat }) : res.status(400).json({ status: false, message: "ERROR ", data: [] })).catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function userChatBlock(req, res, next) {
+  sellerService.userChatBlock(req)
+    .then((chatBlock) => chatBlock ? res.json({ status: true, message: "User Block Successfully...." }) : res.json({ status: false, message: "ERROR" }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function userUnblockChat(req, res, next) {
+  sellerService.userUnblockChat(req)
+    .then((chatUnblock) => chatUnblock ? res.json({ status: true, message: "User Unblock Successfully...." }) : res.json({ status: false, message: "ERROR" }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function addGroupMember(req, res, next) {
+  sellerService.addGroupMember(req)
+    .then((addMember) => addMember ? res.json({ status: true, message: "Add Successfully...." }) : res.json({ status: false, message: "ERROR" }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+
+
+
+
+
 //*****************************************************************************************/
 //*****************************************************************************************/
 function addNotification(req, res, next) {
@@ -1071,10 +1168,10 @@ function addNotification(req, res, next) {
     .then((result) =>
       result
         ? res.status(200).json({
-            status: true,
-            data: result,
-            message: "Notification Created successfully",
-          })
+          status: true,
+          data: result,
+          message: "Notification Created successfully",
+        })
         : res.status(400).json({ status: false, message: "ERROR ", data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
@@ -1088,10 +1185,10 @@ function getNotification(req, res, next) {
     .then((result) =>
       result
         ? res.status(200).json({
-            status: true,
-            data: result,
-            message: "Get Notification Successfully",
-          })
+          status: true,
+          data: result,
+          message: "Get Notification Successfully",
+        })
         : res.status(400).json({ status: false, message: "ERROR ", data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
@@ -1105,10 +1202,10 @@ function deleteNotification(req, res, next) {
     .then((result) =>
       result
         ? res.status(200).json({
-            status: true,
-            data: result,
-            message: "Delete Notification Successfully",
-          })
+          status: true,
+          data: result,
+          message: "Delete Notification Successfully",
+        })
         : res.status(400).json({ status: false, message: "ERROR ", data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));

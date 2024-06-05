@@ -41,6 +41,8 @@ const {
   Calendar,
   bannerAdvertisement,
   subscriptionPlan,
+  Chat,
+  ChatMessage,
   Notification,
 } = require("../helpers/db");
 
@@ -105,6 +107,20 @@ module.exports = {
   reduseCount,
   sellerReduceCount,
   updateSubscriptionStatus,
+
+  getAllUser,
+  accessChat,
+  fetchChat,
+  fetchBlockChat,
+  createGroupChat,
+  sendMessage,
+  allMessages,
+  userChatBlock,
+  userUnblockChat,
+  addGroupMember,
+
+
+
   addNotification,
   getNotification,
   deleteNotification,
@@ -3069,6 +3085,292 @@ async function updateSubscriptionStatus(req) {
     console.log(error);
   }
 }
+
+
+
+//**********CHAT*****************/
+
+
+//getAllUser
+async function getAllUser(req) {
+  const keyword = req.query.search
+    ? {
+      $or: [
+        { name: { $regex: req.query.search, $options: "i" } },
+        { email: { $regex: req.query.search, $options: "i" } },
+      ],
+    }
+    : {};
+
+  const [users, sellers] = await Promise.all([
+    User.find(keyword).select("name email role image_url"),
+    Seller.find(keyword).select("name email role image_url"),
+  ]);
+
+  let result = [];
+  users.forEach((user) => {
+    const correspondingSeller = sellers.find(
+      (seller) => seller.email === user.email
+    );
+    result.push({
+      user: user,
+      seller: correspondingSeller || null,
+    });
+  });
+
+  sellers.forEach((seller) => {
+    if (!users.find((user) => user.email === seller.email)) {
+      result.push({
+        user: null,
+        seller: seller,
+      });
+    }
+  });
+  return result;
+}
+
+
+
+async function accessChat(req) {
+  const { receiverId, authorId } = req.body;
+  if (!receiverId) {
+    console.log("receiverId not send in request")
+  }
+  // const finalChatdata = await Chat.findOne({ authorId: authorId.name, receiverId: receiverId.name });
+  var isChat = await Chat.find({
+    isGroupChat: false,
+    $or: [
+      {
+        $and: [
+          { 'chatUsers.id': authorId.id },
+          { 'chatUsers.id': receiverId.id }
+        ]
+      },
+      {
+        $and: [
+          { 'chatUsers.id': receiverId.id },
+          { 'chatUsers.id': authorId.id }
+        ]
+      }
+    ]
+  }).sort({ createdAt: "desc" }).populate("latestMessage");
+  // console.log("isChat", isChat.length)
+
+  if (isChat.length > 0) {
+    return isChat[0];
+  } else {
+    const newReceiverIds = [authorId, receiverId];
+    // console.log("newReceiverIds", newReceiverIds)
+    var chatData = {
+      chatName: "sender",
+      isGroupChat: false,
+      chatUsers: newReceiverIds,
+    };
+    try {
+      // console.log("chatData :  ", chatData)
+      const createdChat = await Chat.create(chatData);
+      const fullChat = await Chat.findOne({ _id: createdChat._id })
+      // console.log("fullChatData", fullChat)
+      return fullChat;
+    } catch (error) {
+      console.log("error", error)
+    }
+  }
+}
+
+
+async function createGroupChat(req) {
+  const { authorId, receiverId, groupName } = req.body;
+
+  if (!receiverId || !Array.isArray(receiverId) || receiverId.length === 0) {
+    console.log("Please field add details....")
+  }
+
+
+  // const finalChatdata = await Chat.findOne({ authorId: authorId.name, receiverId: receiverId.name });
+
+  var isChat = await Chat.find({
+    isGroupChat: true,
+    chatName: groupName,
+  }).sort({ createdAt: "desc" });
+
+  // console.log("isChat", isChat.length)
+
+  if (isChat.length > 0) {
+    return isChat[0];
+  } else {
+
+    const receiverData = receiverId.map(receiver => ({
+      id: receiver.id,
+      name: receiver.name,
+      image_url: receiver.image_url
+    }));
+
+    receiverData.push(authorId)
+
+
+
+    // console.log("receiverData", receiverData);
+
+    var chatData = {
+      chatName: groupName,
+      isGroupChat: true,
+      chatUsers: receiverData,
+
+      // usersAll: [{
+      //   authorId: authorId,
+      //   users: receiverData
+      // }],
+    };
+    try {
+      // console.log("chatData :  ", chatData)
+      const createdChat = await Chat.create(chatData);
+      const fullChat = await Chat.findOne({ _id: createdChat._id })
+      // console.log("fullChatData", fullChat)
+      return fullChat;
+    } catch (error) {
+      console.log("error", error)
+    }
+  }
+}
+
+
+async function fetchChat(req) {
+  const authorId = req.params.id;
+  try {
+    const query = {
+      isBlock: false,
+      'chatUsers.id': authorId
+    };
+
+    const fieldsToSelect = "id chatName isGroupChat isBlock chatUsers latestMessage";
+    const result = await Chat.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect)
+    .populate({
+      path: 'latestMessage',
+      select: 'messageContent mediaContent timestamp'
+    });
+    // console.log("result", result)
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function fetchBlockChat(req) {
+  const authorId = req.params.id;
+  try {
+    const query = {
+      isBlock: true,
+      'chatUsers.id': authorId
+    };
+
+    const fieldsToSelect = "id chatName isGroupChat isBlock blockByUser chatUsers";
+    const result = await Chat.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect);
+    // console.log("result", result)
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+async function sendMessage(req) {
+  const { authorId, messageContent, chatId, mediaContent } = req.body;
+
+  // const chatId = '6645cdaf9ef46fb594be747c';
+  // const messageContent = "hii Robert"
+
+  if (!chatId || !authorId) {
+    console.log("Invalid Data pass")
+  }
+
+  var newMessage = {
+    sender: authorId,
+    messageContent: messageContent,
+    mediaContent: mediaContent,
+    chat: chatId
+  }
+
+  try {
+    var message = await ChatMessage.create(newMessage);
+    message = await message.populate({
+      path: "chat",
+      model: Chat,
+    })
+    // .populate({
+    //   path: "latestMessage",
+    //   model: ChatMessage,
+    // })
+
+    await Chat.findByIdAndUpdate(chatId, {
+      latestMessage: message,
+    });
+    // console.log("message", message)
+    return message
+
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function allMessages(req) {
+  const chatId = req.params.id;
+
+  try {
+    const message = await ChatMessage.find({ chat: chatId })
+      .populate({
+        path: "chat",
+        model: Chat,
+      })
+    // console.log("All message", message)
+    return message
+
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function userChatBlock(req) {
+  const chatId = req.params.id;
+  const { isBlock, blockByUser } = req.body;
+  try {
+    const chat = await Chat.findByIdAndUpdate(chatId, { isBlock, blockByUser }, { new: true });
+    //  console.log("update banner", banner)
+    return chat;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function userUnblockChat(req) {
+  const chatId = req.params.id;
+  const { isBlock, blockByUser } = req.body;
+  try {
+    const chat = await Chat.findByIdAndUpdate(chatId, { isBlock, blockByUser }, { new: true });
+    //  console.log("update banner", banner)
+    return chat;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function addGroupMember(req) {
+  const chatId = req.params.id;
+  const { id, name, image_url, isGroupAdmin } = req.body;
+  try {
+    const addUser = await Chat.findByIdAndUpdate(
+      chatId,
+      { $push: { chatUsers: { id, name, image_url, isGroupAdmin } } },
+      { new: true });
+    //  console.log("update banner", banner)
+    return addUser;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
+
 // *******************************************************************************
 // *******************************************************************************
 //add notification

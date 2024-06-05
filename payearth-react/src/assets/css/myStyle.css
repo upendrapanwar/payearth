@@ -531,6 +531,11 @@
   margin-right: 5px;
 }
 
+.chatUser_wrapper .send-box .emoji {
+  font-size: xx-large;
+  cursor: pointer;
+}
+
 
 /*search_chat_modal*/
 .chat_fieldRow .chat_field {

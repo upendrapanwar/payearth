@@ -119,8 +119,8 @@ module.exports = {
   zoomRefreshToken,
   zoomAccessToken,
   createZoomMeeting,
-  getAllUser,
 
+  getAllUser,
   accessChat,
   fetchChat,
   fetchBlockChat,
@@ -2824,10 +2824,6 @@ async function getAllUser(req) {
 //*********************************************
 async function accessChat(req) {
   const { receiverId, authorId } = req.body;
-
-  // console.log("receiverId", receiverId)
-  // console.log("authorId", authorId)
-
   if (!receiverId) {
     console.log("receiverId not send in request")
   }
@@ -2860,18 +2856,6 @@ async function accessChat(req) {
       chatName: "sender",
       isGroupChat: false,
       chatUsers: newReceiverIds,
-      // usersAll: [
-      //   {
-      //     authorId: authorId,
-      //     users: receiverId,
-      //   }
-      // ],
-      // usersAll: [{
-      //   authorId: authorId,
-      //   users: receiverId,
-      // }],
-
-
     };
     try {
       // console.log("chatData :  ", chatData)
@@ -2950,7 +2934,7 @@ async function createGroupChat(req) {
 
 //***************************** */
 
-async function fetchChat(req) {
+async function fetchChat(req) { 
   const authorId = req.params.id;
   try {
     const query = {
@@ -2958,9 +2942,14 @@ async function fetchChat(req) {
       'chatUsers.id': authorId
     };
 
-    const fieldsToSelect = "id chatName isGroupChat isBlock chatUsers";
-    const result = await Chat.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect);
-    // console.log("result", result)
+    const fieldsToSelect = "id chatName isGroupChat isBlock chatUsers latestMessage";
+    const result = await Chat.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect)
+      // .populate("latestMessage");
+      .populate({
+        path: 'latestMessage',
+        select: 'messageContent mediaContent timestamp'
+      });
+    
     return result;
   } catch (error) {
     console.log(error);
@@ -2977,7 +2966,7 @@ async function fetchBlockChat(req) {
       'chatUsers.id': authorId
     };
 
-    const fieldsToSelect = "id chatName isGroupChat isBlock blockByUser chatUsers";
+    const fieldsToSelect = "id chatName isGroupChat isBlock blockByUser chatUsers latestMessage";
     const result = await Chat.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect);
     // console.log("result", result)
     return result;
@@ -3078,12 +3067,18 @@ async function addGroupMember(req) {
   const chatId = req.params.id;
   const { id, name, image_url, isGroupAdmin } = req.body;
   try {
+    const chat = await Chat.findById(chatId);
+
+    if (chat.chatUsers.length >= 20) {
+      return "Cannot add more then 20 members to the chat.."
+    }
+
     const addUser = await Chat.findByIdAndUpdate(
       chatId,
       { $push: { chatUsers: { id, name, image_url, isGroupAdmin } } },
       { new: true });
     //  console.log("update banner", banner)
-    return addUser;
+    return addUser
   } catch (error) {
     console.log(error)
   }

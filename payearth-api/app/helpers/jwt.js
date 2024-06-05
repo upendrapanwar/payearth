@@ -94,7 +94,7 @@ async function isRevoked(req, payload) {
   else if (url.includes("seller/") == true) {
     // let param = { id: payload.id, role: "seller" };
     let param = { id: payload.payload.id, role: "seller" };
-    console.log("payload", payload);
+    // console.log("payload", payload);
     const seller = await sellerService.getUserByRole(param);
     if (!seller) {
       //return done(null, true);

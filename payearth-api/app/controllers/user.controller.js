@@ -249,8 +249,8 @@ router.get("/zoomAccessToken/:id", zoomAccessToken);
 router.get("/zoomRefreshToken", zoomRefreshToken);
 router.post("/createZoomMeeting", createZoomMeeting);
 router.get("/getData", getData);
-router.get("/getAllUser", getAllUser);
 
+router.get("/getAllUser", getAllUser);
 router.post("/accessChat", accessChat);
 router.post("/createGroupChat", createGroupChat);
 router.get("/fetchChat/:id", fetchChat);
@@ -1353,7 +1353,7 @@ function userUnblockChat(req, res, next) {
 
 function addGroupMember(req, res, next) {
   userService.addGroupMember(req)
-    .then((addMember) => addMember ? res.json({ status: true, message: "Add Successfully...." }) : res.json({ status: false, message: "ERROR" }))
+    .then((addMember) => addMember ? res.json({ status: true, message: addMember }) : res.json({ status: false, message: "ERROR" }))
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 

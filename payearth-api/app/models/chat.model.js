@@ -65,7 +65,8 @@ const schema = new Schema({
 
     latestMessage: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "ChatMessage"
+        ref: "ChatMessage",
+        default: null,
     },
     // groupUsers: [{
     //     type: String,
