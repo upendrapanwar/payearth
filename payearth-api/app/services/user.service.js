@@ -119,6 +119,9 @@ module.exports = {
   zoomRefreshToken,
   zoomAccessToken,
   createZoomMeeting,
+  //Test 
+  zoomCreateUserToken,
+  createZoomUser,
 
   getAllUser,
   accessChat,
@@ -129,6 +132,8 @@ module.exports = {
   allMessages,
   userChatBlock,
   userUnblockChat,
+  chatMessageDelete,
+  removeFromGroup,
   addGroupMember,
 
 
@@ -2934,7 +2939,7 @@ async function createGroupChat(req) {
 
 //***************************** */
 
-async function fetchChat(req) { 
+async function fetchChat(req) {
   const authorId = req.params.id;
   try {
     const query = {
@@ -2947,9 +2952,10 @@ async function fetchChat(req) {
       // .populate("latestMessage");
       .populate({
         path: 'latestMessage',
-        select: 'messageContent mediaContent timestamp'
+        match: { isVisible: true },
+        select: 'messageContent mediaContent timestamp isVisible'
       });
-    
+
     return result;
   } catch (error) {
     console.log(error);
@@ -2992,7 +2998,8 @@ async function sendMessage(req) {
     sender: authorId,
     messageContent: messageContent,
     mediaContent: mediaContent,
-    chat: chatId
+    chat: chatId,
+    isVisible: true
   }
 
   try {
@@ -3062,6 +3069,37 @@ async function userUnblockChat(req) {
   }
 }
 
+// delete chat status
+
+// User Block chat..
+async function chatMessageDelete(req) {
+  const id = req.params.id;
+  const { isVisible } = req.body;
+  try {
+    const chatMessage = await ChatMessage.findByIdAndUpdate(id, { isVisible }, { new: true });
+    //  console.log("update banner", banner)
+    return chatMessage;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// remove from group
+async function removeFromGroup(req) {
+  const { chatId, userId } = req.body;
+  try {
+    const updatedChat = await Chat.findByIdAndUpdate(
+      chatId,
+      { $pull: { chatUsers: { id: userId } } },
+      { new: true }
+    );
+    return updatedChat;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+
 // add Group User
 async function addGroupMember(req) {
   const chatId = req.params.id;
@@ -3084,6 +3122,37 @@ async function addGroupMember(req) {
   }
 }
 
+// Create user token test..SATRT @@@@
+async function zoomCreateUserToken(req) {
+  const { clientId, clientSecret, account_id } = req.body
+  const zoom_clientId = clientId.replace(/^"(.*)"[,]*$/, '$1');
+  const zoom_clientSecret = clientSecret.replace(/^"(.*)"[,]*$/, '$1');
+
+  var zoomCreateTokenUrl = `https://zoom.us/oauth/token?grant_type=account_credentials&account_id=${account_id}`;
+  const authHeader = Buffer.from(`${zoom_clientId}:${zoom_clientSecret}`).toString('base64');
+  console.log('authHeader=', authHeader);
+  try {
+    const response = await axios.post(zoomCreateTokenUrl, null, {
+      headers: {
+        'Authorization': `Basic ${authHeader}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      }
+    });
+    // console.log("response", response.data)
+    return response.data.access_token;
+  } catch (err) {
+    console.log("Error", err);
+    return false;
+    //if (!res.headersSent) {
+    //  res.status(500).send(error.response ? error.response.data : error.message);
+    //}
+  }
+}
+
+
+
+
+// Create user token test..END @@@@
 
 async function zoomAccessToken(req) {
   const code = req.params.id;
@@ -3132,45 +3201,159 @@ async function zoomRefreshToken(req) {
     console.log("Err", err);
   }
 }
+
+// Create zoom user
+
+async function createZoomUser(req) {
+
+  console.log("createZoomUser function run")
+  const { zoomAccessToken, email, first_name, last_name, display_name, password } = req.body;
+
+  try {
+    const url = 'https://api.zoom.us/v2/users';
+    const config = {
+      action: "autoCreate",
+      user_info: {
+        email: email,
+        type: 1,
+        first_name: first_name,
+        last_name: last_name,
+        display_name: display_name,
+        password: password,
+        // feature: {
+        //   zoom_phone: true,
+        //   zoom_one_type: 16
+        // },
+        // plan_united_type: "1"
+      }
+    };
+
+    const user = await axios.post(url, config, {
+      headers: {
+        Authorization: `Bearer ${zoomAccessToken}`,
+      },
+    });
+    console.log('Zoom User created successfully:', user.data);
+
+    // if (user.data) {
+    //   try {
+    //     const response = await axios.get('https://api.zoom.us/v2/users', {
+    //       headers: {
+    //         'Authorization': `Bearer ${zoomAccessToken}`,
+    //         'Content-Type': 'application/json',
+    //       },
+    //     });
+
+    //     const users = response.data.users;
+    //     console.log('List of users:', users);
+
+    //     // const userExists = users.some(user => user.email === 'User@gmail.com');
+    //     // if (userExists) {
+    //     //     console.log('User exists');
+    //     // } else {
+    //     //     console.log('User does not exist');
+    //     // }
+    //   } catch (error) {
+    //     console.error('Error listing users:', error.response.data);
+    //   }
+    // }
+    return user.data;
+
+  } catch (error) {
+    console.error('Error creating Zoom user:', error.message);
+  }
+
+
+}
 // *******************************************************************************
 // *******************************************************************************
 //create zoom meeting
+
 async function createZoomMeeting(req) {
-  const { topic, start_time, agenda, zoomaccesstoken } = req.body;
+  const { zoom_userId, zoomAccessToken } = req.body;
+
+  console.log("zoomAccessToken", zoomAccessToken)
+  console.log("zoom_userId", zoom_userId)
+  const url = `https://api.zoom.us/v2/users/${zoom_userId}/meetings`;
+
   try {
-    const response = await axios.post(
-      "https://api.zoom.us/v2/users/me/meetings",
-      {
-        topic,
-        type: 2,
-        start_time,
-        duration: 45,
-        timezone: "UTC",
-        agenda,
-        settings: {
-          host_video: true,
-          participant_video: true,
-          join_before_host: false,
-          mute_upon_entry: true,
-          watermark: false,
-          use_pmi: false,
-          approval_type: 0,
-          audio: "both",
-          auto_recording: "none",
-        },
-      },
+    const meetingConfig = {
+      topic: 'Test meeting',
+      type: 1,
+      // start_time: '2024-06-11T12:00:00Z',
+      start_time: new Date().toISOString(),
+      duration: 30,
+      timezone: 'UTC',
+      settings: {
+        host_video: true,
+        participant_video: true,
+        join_before_host: true,
+      }
+    }
+    const response = axios.post(url,
+      meetingConfig,
       {
         headers: {
-          Authorization: `Bearer ${zoomaccesstoken}`,
+          Authorization: `Bearer ${zoomAccessToken}`,
         },
       }
     );
-    const result = response.data;
-    return result;
-  } catch (err) {
-    console.log("Err", err);
+    const result = response.data.data;
+    console.log("result", result);
+
+  } catch (error) {
+    console.log("Error", error);
   }
+
+  // try {
+  //   const meetingConfig = {
+  //     topic: 'Test meeting',
+  //     type: 1,  // Scheduled meeting
+  //     start_time: '2024-06-11T12:00:00Z',
+  //     // duration: 30,
+  //     // timezone: 'UTC',
+  //     settings: {
+  //       host_video: true,
+  //       participant_video: true,
+  //       join_before_host: true,
+  //       // host_key: '714884',
+  //       // 714884
+  //       // alternative_hosts: 'eynoashish@gmail.com',
+  //       // host_email: "eynoapoorv@gmail.com"
+  //     }
+  //   };
+
+  //   // const url = `https://api.zoom.us/v2/users/${zoom_userId}/meetings`;
+  //   const url = 'https://api.zoom.us/v2/users/me/meetings';
+  //   const response = await axios.post(url,
+  //     meetingConfig,
+  //     {
+  //       headers: {
+  //         Authorization: `Bearer ${zoomAccessToken}`,
+  //       },
+  //     }
+  //   );
+  //   const result = response.data;
+  //   const meetingId = response.data.id
+
+
+  //   console.log("meetingId", meetingId)
+
+  //   const startMeetingResponse = await axios.post(`https://api.zoom.us/v2/meetings/${meetingId}/start`, null, {
+  //     headers: {
+  //       'Authorization': `Bearer ${zoomAccessToken}`,
+  //       'Content-Type': 'application/json',
+  //     },
+  //   });
+
+  //   console.log("startMeetingResponse", startMeetingResponse)
+  //   console.log("result : ", result)
+  //   return result;
+  // } catch (err) {
+  //   console.log("Err", err);
+  // }
 }
+
 // *******************************************************************************
 // *******************************************************************************
 //add notification

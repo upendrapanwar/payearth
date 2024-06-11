@@ -483,9 +483,14 @@ import ServiceCalendar from "./ServiceCalendar";
 import { isLogin } from "./../../../../helpers/login";
 import { toast } from "react-toastify";
 import ServiceCalendarAuth from "./ServiceCalendarAuth";
+import { useHistory } from 'react-router-dom';
+
 
 function ServiceDetailsTabbing(props) {
+  const history = useHistory();
   const accessToken = localStorage.getItem("accessToken");
+  const [zoomAccessToken, setZoomAccessToken] = useState(null);
+  const [zoom_userId, setZoom_userId] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [averageRating, setAverageRating] = useState(0);
@@ -495,15 +500,46 @@ function ServiceDetailsTabbing(props) {
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(3); // Change the number of items per page here
+  const [itemsPerPage] = useState(3);
+
 
   useEffect(() => {
     fetchApi();
+    fetchAcces_token();
+    // listUsers();
   }, []);
 
   //called get api for user service review
   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const serviceId = props.serviceId;
+
+  //Zoom Token fetch
+
+  const fetchAcces_token = () => {
+    const clientId = process.env.REACT_APP_ZOOM_CLIENT_ID
+    const clientSecret = process.env.REACT_APP_ZOOM_CLIENT_SECRET
+    const account_id = process.env.REACT_APP_ZOOM_ACCOUNT_ID
+    try {
+      const url = '/user/zoomCreateUserToken';
+      axios.post(url, { clientId, clientSecret, account_id }, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Authorization': `Bearer ${authInfo.token}`
+        }
+      }).then((response) => {
+        // console.log("response", response)
+        console.log("access_token", response.data.data)
+        setZoomAccessToken(response.data.data)
+      }).catch((error) => {
+        console.log("error", error)
+      })
+    } catch (error) {
+      console.log("error", error)
+    }
+  }
+
 
   //called get api for user service review
   const fetchApi = async () => {
@@ -572,9 +608,8 @@ function ServiceDetailsTabbing(props) {
 
   // Function to format the date
   const formatDate = (date) => {
-    return `${new Date(date).getDate()}-${
-      new Date(date).getMonth() + 1
-    }-${new Date(date).getFullYear()}`;
+    return `${new Date(date).getDate()}-${new Date(date).getMonth() + 1
+      }-${new Date(date).getFullYear()}`;
   };
 
   const currentUser = isLogin();
@@ -627,6 +662,129 @@ function ServiceDetailsTabbing(props) {
     const appointmentTab = document.getElementById("appointment-tab");
     appointmentTab.click();
   };
+
+  // const zoomCreateUserToken = () => {
+  //   history.push('/zoom-authentication');
+  // }
+
+  // test @@@
+
+  // Zoom user exist
+
+  const listUsers = async () => {
+    try {
+        const response = await axios.get('https://api.zoom.us/v2/users', {
+            headers: {
+                'Authorization': `Bearer ${zoomAccessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const users = response.data.users;
+        console.log('List of users:', users);
+
+        // const userExists = users.some(user => user.email === 'User@gmail.com');
+        // if (userExists) {
+        //     console.log('User exists');
+        // } else {
+        //     console.log('User does not exist');
+        // }
+    } catch (error) {
+        console.error('Error listing users:', error.response.data);
+    }
+};
+
+  //Create Zoom Meeting
+  const combineDateTime = (date, time) => {
+    return `${date}T${time}:00`;
+  };
+
+  const createZoomUser = async () => {
+
+    const requestData = {
+      zoomAccessToken: zoomAccessToken,
+      email: userInfo.email,
+      first_name: userInfo.email,
+      last_name: userInfo.name,
+      display_name: userInfo.name,
+      password: "eyno123",
+    };
+
+    const headers = {
+      Accept: "application/json",
+      "Content-Type": "application/json;charset=UTF-8",
+      Authorization: `Bearer ${authInfo.token}`,
+    };
+
+    try {
+      await axios.post("/user/createZoomUser", requestData, { headers })
+        .then((response) => {
+          console.log("response", response.data.data);
+          setZoom_userId(response.data.data.id);
+        })
+        .catch((error) => {
+          console.log("Error :>", error);
+        });
+
+    } catch (error) {
+      console.log("Error", error);
+    }
+  }
+
+
+  async function createZoomMeeting() {
+
+    console.log("zoomAccessToken", zoomAccessToken)
+    // // e.preventDefault();
+    // const currentDateTime = new Date();
+    // // Current Date
+    // const currentDate = currentDateTime.toISOString().split("T")[0];
+    // // Current Time
+    // let currentHours = currentDateTime.getHours();
+    // let currentMinutes = currentDateTime.getMinutes();
+    // // Pad single digit hours and minutes with leading zeros
+    // currentHours = currentHours < 10 ? "0" + currentHours : currentHours;
+    // currentMinutes =
+    //   currentMinutes < 10 ? "0" + currentMinutes : currentMinutes;
+    // const currentTime = `${currentHours}:${currentMinutes}`;
+
+
+
+    const requestData = {
+      // start_time: combineDateTime(currentDate, currentTime),
+      zoomAccessToken: zoomAccessToken,
+      zoom_userId: zoom_userId
+    };
+
+    console.log("requestData", requestData)
+
+    const headers = {
+      Accept: "application/json",
+      "Content-Type": "application/json;charset=UTF-8",
+      Authorization: `Bearer ${authInfo.token}`,
+    };
+
+    try {
+      console.log("run under create Zoom Meeting")
+      await axios.post("/user/createZoomMeeting", requestData, { headers })
+        .then((response) => {
+          console.log("response", response)
+          // const meetingData = response.data.data;
+          // const join_url = meetingData.join_url;
+          // console.log("join_url", join_url)
+          // localStorage.setItem("ZoomMeetingUrl", join_url);
+          // saveNotification(join_url);
+          // getNotification();
+          // window.open(join_url, "_blank");
+          // history.push("/");
+        })
+        .catch((error) => {
+          console.log("Error :>", error);
+        });
+    } catch (error) {
+      console.log("Error", error);
+    }
+  }
 
   return (
     <React.Fragment>
@@ -774,7 +932,10 @@ function ServiceDetailsTabbing(props) {
                       <h1>Do you want to create a Zoom meeting?</h1>
                       <button
                         className="btn custom_btn btn_yellow"
-                        onClick={authZoom}
+                        // onClick={authZoom}
+                        //test
+                        // onClick={createZoomMeeting}
+                        onClick={createZoomUser}
                       >
                         Yes
                       </button>
@@ -783,6 +944,10 @@ function ServiceDetailsTabbing(props) {
                         onClick={handleNo}
                       >
                         No
+                      </button>
+
+                      <button onClick={createZoomMeeting}>
+                        create meeting
                       </button>
                     </div>
                   )}
@@ -832,11 +997,10 @@ function ServiceDetailsTabbing(props) {
                             </p>
                             {/* You can keep the rating distribution as it is */}
                             <button
-                              className={`btn custom_btn btn_yellow_bordered w-auto d-inline-block ${
-                                !authInfo || authInfo.id === undefined
-                                  ? "disabled"
-                                  : ""
-                              }`}
+                              className={`btn custom_btn btn_yellow_bordered w-auto d-inline-block ${!authInfo || authInfo.id === undefined
+                                ? "disabled"
+                                : ""
+                                }`}
                               onClick={() =>
                                 authInfo &&
                                 authInfo.id !== undefined &&
@@ -854,41 +1018,41 @@ function ServiceDetailsTabbing(props) {
                           {/* Display Reviews */}
                           {currentReviews.length > 0
                             ? currentReviews.map((review, index) => (
-                                <div className="user_comment_box" key={index}>
-                                  <div className="d-flex align-items-center">
-                                    <p className="title mr-auto">
-                                      {review.review.title}
-                                    </p>
-                                    {/* Add delete icon here */}
-                                    {currentUser &&
-                                      review.userId._id === authInfo.id && (
-                                        <button
-                                          style={{
-                                            marginTop: "-14px",
-                                            float: "right",
-                                          }}
-                                          className="btn btn-link text-danger"
-                                          onClick={() =>
-                                            deleteReview(review._id)
-                                          }
-                                        >
-                                          <FaTrash />
-                                        </button>
-                                      )}
-                                  </div>
-
-                                  <p className="feedback">
-                                    {review.review.description}
+                              <div className="user_comment_box" key={index}>
+                                <div className="d-flex align-items-center">
+                                  <p className="title mr-auto">
+                                    {review.review.title}
                                   </p>
-                                  <p className="rating">
-                                    {renderStarRating(review.rating)}
-                                  </p>
-                                  <p className="date mb-0">
-                                    {review.userId.name} |{" "}
-                                    {formatDate(review.createdAt)}
-                                  </p>
+                                  {/* Add delete icon here */}
+                                  {currentUser &&
+                                    review.userId._id === authInfo.id && (
+                                      <button
+                                        style={{
+                                          marginTop: "-14px",
+                                          float: "right",
+                                        }}
+                                        className="btn btn-link text-danger"
+                                        onClick={() =>
+                                          deleteReview(review._id)
+                                        }
+                                      >
+                                        <FaTrash />
+                                      </button>
+                                    )}
                                 </div>
-                              ))
+
+                                <p className="feedback">
+                                  {review.review.description}
+                                </p>
+                                <p className="rating">
+                                  {renderStarRating(review.rating)}
+                                </p>
+                                <p className="date mb-0">
+                                  {review.userId.name} |{" "}
+                                  {formatDate(review.createdAt)}
+                                </p>
+                              </div>
+                            ))
                             : ""}
 
                           {/* Pagination buttons */}

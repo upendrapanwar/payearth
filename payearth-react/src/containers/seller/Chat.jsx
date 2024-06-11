@@ -4,7 +4,8 @@ import PageTitle from '../../components/user/common/PageTitle';
 import Footer from '../../components/common/Footer';
 import { Link } from 'react-router-dom';
 import add_user_icon from './../../assets/icons/add_user_icon.svg';
-import defaultPdf_icon from './../../assets/icons/document_icon.svg'
+import defaultPdf_icon from './../../assets/icons/document_icon.svg';
+import delete_icone from './../../assets/icons/delete_icone.svg';
 import chatThumb from './../../assets/images/chat-thumb.jpg';
 import { setLoading } from '../../store/reducers/global-reducer';
 import SpinnerLoader from './../../components/common/SpinnerLoader';
@@ -29,7 +30,6 @@ class Chat extends Component {
         this.userInfo = store.getState().auth.userInfo;
         this.authInfo = JSON.parse(localStorage.getItem('authInfo'));
         this.state = {
-
             search: "",
             users: "",
             allChatUsers: "",
@@ -572,6 +572,8 @@ class Chat extends Component {
     }
 
     clickToAddUser = async (data) => {
+
+
         const { sendChatData } = this.state;
         try {
             const url = `seller/addGroupMember/${sendChatData.chatId}`;
@@ -582,6 +584,7 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             }).then((response) => {
+                console.log("response", response)
                 toast.error(response.data.message, { autoClose: 3000 })
                 // this.setState({ subscriptionChecked: response.data.status })
             }).catch((error) => {
@@ -590,6 +593,26 @@ class Chat extends Component {
         } catch (error) {
             console.log("error", error)
         }
+    }
+
+    handleMessageDelete = (id) => {
+        const { sendChatData } = this.state;
+        console.log("selected chat message id", id)
+        axios.put(`/seller/messageDelete/${id}`, { isVisible: false }, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${this.authInfo.token}`
+            }
+        }).then((response) => {
+            if (response.data.status === true) {
+                toast.success(`Chat Delete Successfully`, { autoClose: 1000 })
+                this.getAllMessage(sendChatData.chatId);
+                this.fetchAllUserData();
+            }
+        }).catch((error) => {
+            console.log("error", error);
+        })
     }
 
     handleChatBlock = (data) => {
@@ -698,6 +721,32 @@ class Chat extends Component {
                 );
             default:
                 return <p>Unsupported media type</p>;
+        }
+    }
+
+    handleRemoveFromGroup = (chatId, userId) => {
+        console.log("chatId", chatId);
+        console.log("userId", userId)
+
+        try {
+            const url = "/seller/removeFromGroup/";
+            axios.put(url, { chatId, userId }, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            }).then((response) => {
+                console.log("response remove from group..", response)
+                // this.getAllMessage(sendChatData.chatId);
+                this.fetchAllUserData();
+                this.setState({ sendChatData: "" });
+            }).catch((error) => {
+                console.log("error", error)
+            })
+
+        } catch (error) {
+            console.log("error", error)
         }
     }
 
@@ -838,7 +887,11 @@ class Chat extends Component {
                                                                                 {item.isGroupAdmin === false ? <></> : <p>Admin</p>}
                                                                             </div>
                                                                             <div className="userInfo-col chatTime">
-                                                                                {item.id === this.authInfo.id ? <button>Exit group</button> : (item.isGroupAdmin === true ? <></> : <button>Remove</button>)}
+                                                                                {item.id === this.authInfo.id ? <button onClick={() => { this.handleRemoveFromGroup(sendChatData.chatId, item.id) }}>Exit group</button> :
+                                                                                    // (item.isGroupAdmin === true ? <></> : 
+                                                                                    // <button onClick={() => { this.handleRemoveFromGroup(sendChatData.chatId, item.id) }}>Remove</button>)
+                                                                                    <></>
+                                                                                }
                                                                             </div>
                                                                         </a>
                                                                     </div>
@@ -887,24 +940,35 @@ class Chat extends Component {
                                                                     {item.sender.id !== this.authInfo.id ? (
                                                                         <ul>
                                                                             <li className="sender">
-                                                                                <div className="userThumb">
-                                                                                    <div className="user_thumb">
-                                                                                        <img className="img-fluid" src={item.sender.image_url} alt="user img" />
+                                                                                {item.isVisible === true ? <>
+                                                                                    <div className="userThumb">
+                                                                                        <div className="user_thumb">
+                                                                                            <img className="img-fluid" src={item.sender.image_url} alt="user img" />
+                                                                                        </div>
+                                                                                        <span className="user-inactive user-active"></span>
                                                                                     </div>
-                                                                                    <span className="user-inactive user-active"></span>
-                                                                                </div>
-                                                                                {item.mediaContent === null ? (item.messageContent === null ? <></> : <p>{item.messageContent}</p>) :
-                                                                                    this.renderMedia(item.mediaContent)
-                                                                                }
-                                                                                <br />
-                                                                                <span className='time'>{moment(item.timestamp).format('hh:mm A')}</span>
+                                                                                    {item.mediaContent === null ? (item.messageContent === null ? <></> : <p>{item.messageContent}</p>) :
+                                                                                        this.renderMedia(item.mediaContent)
+                                                                                    }
+                                                                                    <a href="#"><img src={delete_icone} alt="add" width={"20px"} height={"20px"} onClick={() => { this.handleMessageDelete(item._id) }} /></a>
+                                                                                    <br />
+                                                                                    <span className='time'>{moment(item.timestamp).format('hh:mm A')}</span>
+                                                                                </> : <p className="bg-light text-danger">
+                                                                                    <i>This message was deleted..!</i>
+                                                                                </p>}
                                                                             </li>
                                                                         </ul>
                                                                     ) : (
                                                                         <ul>
                                                                             <li className="repaly">
-                                                                                {item.mediaContent === null ? <p>{item.messageContent}</p> : this.renderMedia(item.mediaContent)}
-                                                                                <span className='time'>{moment(item.timestamp).fromNow()}</span>
+                                                                                {item.isVisible === true ? <>
+                                                                                    <a href="#"><img src={delete_icone} alt="add" width={"20px"} height={"20px"} onClick={() => { this.handleMessageDelete(item._id) }} /></a>
+                                                                                    {item.mediaContent === null ? <p>{item.messageContent}</p> : this.renderMedia(item.mediaContent)}
+                                                                                    <span className='time'>{moment(item.timestamp).fromNow()}</span>
+                                                                                </> :
+                                                                                    <p className="bg-light text-danger">
+                                                                                        <i>This message was deleted..!</i>
+                                                                                    </p>}
                                                                             </li>
                                                                         </ul>
                                                                     )}

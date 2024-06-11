@@ -117,6 +117,8 @@ module.exports = {
   allMessages,
   userChatBlock,
   userUnblockChat,
+  chatMessageDelete,
+  removeFromGroup,
   addGroupMember,
 
 
@@ -2706,7 +2708,7 @@ async function createSellerBanner(req, res) {
       siteUrl: param.siteUrl,
       category: param.category,
       subPlanId: param.subPlanId,
-      pay_sub_id : param.pay_sub_id,
+      pay_sub_id: param.pay_sub_id,
       startDate: param.startDate,
       endDate: param.endDate,
       bannerPlacement: param.bannerPlacement,
@@ -3245,10 +3247,11 @@ async function fetchChat(req) {
 
     const fieldsToSelect = "id chatName isGroupChat isBlock chatUsers latestMessage";
     const result = await Chat.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect)
-    .populate({
-      path: 'latestMessage',
-      select: 'messageContent mediaContent timestamp'
-    });
+      .populate({
+        path: 'latestMessage',
+        match: { isVisible: true },
+        select: 'messageContent mediaContent timestamp'
+      });
     // console.log("result", result)
     return result;
   } catch (error) {
@@ -3349,6 +3352,34 @@ async function userUnblockChat(req) {
     const chat = await Chat.findByIdAndUpdate(chatId, { isBlock, blockByUser }, { new: true });
     //  console.log("update banner", banner)
     return chat;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// User Block chat..
+async function chatMessageDelete(req) {
+  const id = req.params.id;
+  const { isVisible } = req.body;
+  try {
+    const chatMessage = await ChatMessage.findByIdAndUpdate(id, { isVisible }, { new: true });
+    //  console.log("update banner", banner)
+    return chatMessage;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// remove from group
+async function removeFromGroup(req) {
+  const { chatId, userId } = req.body;
+  try {
+    const updatedChat = await Chat.findByIdAndUpdate(
+      chatId,
+      { $pull: { chatUsers: { id: userId } } },
+      { new: true }
+    );
+    return updatedChat;
   } catch (error) {
     console.log(error)
   }

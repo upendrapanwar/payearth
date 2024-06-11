@@ -247,7 +247,15 @@ router.delete("/delete-meeting/:id", delMeetingByUser);
 router.get("/service-orders/:id", getServiceOrder);
 router.get("/zoomAccessToken/:id", zoomAccessToken);
 router.get("/zoomRefreshToken", zoomRefreshToken);
+
 router.post("/createZoomMeeting", createZoomMeeting);
+
+
+// TEST 
+router.post("/zoomCreateUserToken", zoomCreateUserToken);
+
+router.post("/createZoomUser", createZoomUser)
+
 router.get("/getData", getData);
 
 router.get("/getAllUser", getAllUser);
@@ -259,6 +267,8 @@ router.post("/sendMessage", sendMessage)
 router.get("/allMessages/:id", allMessages);
 router.put("/userChatBlock/:id", userChatBlock);
 router.put("/userUnblockChat/:id", userUnblockChat)
+router.put("/messageDelete/:id", chatMessageDelete)
+router.put("/removeFromGroup", removeFromGroup)
 router.put("/addGroupMember/:id", addGroupMember);
 
 router.post("/add-notification", addNotification);
@@ -1279,6 +1289,21 @@ function zoomRefreshToken(req, res, next) {
     });
 }
 
+
+// zoomCreateUserToken  test @@@@@@
+
+function zoomCreateUserToken(req, res, next) {
+  userService.zoomCreateUserToken(req).then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function createZoomUser(req, res, next) {
+  userService.createZoomUser(req).then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+
+
 // *******************************************************************************
 // *******************************************************************************
 // chat getAllUser
@@ -1351,6 +1376,18 @@ function userUnblockChat(req, res, next) {
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 
+function chatMessageDelete(req, res, next) {
+  userService.chatMessageDelete(req)
+    .then((chatMessage) => chatMessage ? res.json({ status: true, message: "Status Change Successfully...." }) : res.json({ status: false, message: "ERROR" }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function removeFromGroup(req, res, next) {
+  userService.removeFromGroup(req)
+    .then((removeMember) => removeMember ? res.json({ status: true, message: removeMember }) : res.json({ status: false, message: "ERROR" }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
 function addGroupMember(req, res, next) {
   userService.addGroupMember(req)
     .then((addMember) => addMember ? res.json({ status: true, message: addMember }) : res.json({ status: false, message: "ERROR" }))
@@ -1399,10 +1436,10 @@ function addNotification(req, res, next) {
     .then((result) =>
       result
         ? res.status(200).json({
-            status: true,
-            data: result,
-            message: "Notification Created successfully",
-          })
+          status: true,
+          data: result,
+          message: "Notification Created successfully",
+        })
         : res.status(400).json({ status: false, message: "ERROR ", data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
@@ -1416,10 +1453,10 @@ function getNotification(req, res, next) {
     .then((result) =>
       result
         ? res.status(200).json({
-            status: true,
-            data: result,
-            message: "Get Notification Successfully",
-          })
+          status: true,
+          data: result,
+          message: "Get Notification Successfully",
+        })
         : res.status(400).json({ status: false, message: "ERROR ", data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
@@ -1433,10 +1470,10 @@ function updateNotification(req, res, next) {
     .then((result) =>
       result
         ? res.status(200).json({
-            status: true,
-            data: result,
-            message: "Notification updated Successfully",
-          })
+          status: true,
+          data: result,
+          message: "Notification updated Successfully",
+        })
         : res.status(400).json({ status: false, message: "ERROR ", data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
@@ -1450,10 +1487,10 @@ function deleteNotification(req, res, next) {
     .then((result) =>
       result
         ? res.status(200).json({
-            status: true,
-            data: result,
-            message: "Delete Notification Successfully",
-          })
+          status: true,
+          data: result,
+          message: "Delete Notification Successfully",
+        })
         : res.status(400).json({ status: false, message: "ERROR ", data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));

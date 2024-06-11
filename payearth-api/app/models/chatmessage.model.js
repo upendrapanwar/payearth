@@ -10,17 +10,17 @@ const schema = new Schema({
             image_url: String,
         }
     },
-    // sender: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "User"
-    // },
     messageContent: {
         type: String,
         default: null,
     },
-    mediaContent : {
+    mediaContent: {
         type: String,
         default: null,
+    },
+    isVisible: {
+        type: Boolean,
+        default: true,
     },
     chat: {
         type: mongoose.Schema.Types.ObjectId,

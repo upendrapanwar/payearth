@@ -230,7 +230,9 @@ router.get("/fetchBlockChat/:id", fetchBlockChat);
 router.post("/sendMessage", sendMessage)
 router.get("/allMessages/:id", allMessages);
 router.put("/userChatBlock/:id", userChatBlock);
-router.put("/userUnblockChat/:id", userUnblockChat)
+router.put("/userUnblockChat/:id", userUnblockChat);
+router.put("/messageDelete/:id", chatMessageDelete);
+router.put("/removeFromGroup", removeFromGroup)
 router.put("/addGroupMember/:id", addGroupMember);
 
 //Seller appointment calendar
@@ -1146,6 +1148,18 @@ function userChatBlock(req, res, next) {
 function userUnblockChat(req, res, next) {
   sellerService.userUnblockChat(req)
     .then((chatUnblock) => chatUnblock ? res.json({ status: true, message: "User Unblock Successfully...." }) : res.json({ status: false, message: "ERROR" }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function chatMessageDelete(req, res, next) {
+  sellerService.chatMessageDelete(req)
+    .then((chatMessage) => chatMessage ? res.json({ status: true, message: "Status Change Successfully...." }) : res.json({ status: false, message: "ERROR" }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function removeFromGroup(req, res, next) {
+  sellerService.removeFromGroup(req)
+    .then((removeMember) => removeMember ? res.json({ status: true, message: removeMember }) : res.json({ status: false, message: "ERROR" }))
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 
