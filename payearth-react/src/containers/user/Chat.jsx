@@ -6,7 +6,12 @@ import { Link } from 'react-router-dom';
 import chat_icon from './../../assets/icons/chat_icon.svg';
 import defaultPdf_icon from './../../assets/icons/document_icon.svg'
 import delete_icone from './../../assets/icons/delete_icone.svg'
-import msg_deleted from './../../assets/icons/msg_deleted.svg'
+import edit_icon from './../../assets/icons/edit_icon.svg'
+import group_profile from './../../assets/icons/grp_icone.svg'
+import block_icon from './../../assets/icons/block_icon.svg'
+import back_icon_circle from './../../assets/icons/back_icon_circle.svg'
+import lets_chats from './../../assets/icons/Chats.svg';
+import chat_not_found from './../../assets/icons/lets_chats.svg';
 import chatThumb from './../../assets/images/chat-thumb.jpg';
 import { setLoading } from '../../store/reducers/global-reducer';
 import SpinnerLoader from './../../components/common/SpinnerLoader';
@@ -42,7 +47,9 @@ class Chat extends Component {
             showModal: false,
             showAddUser: false,
             showAddUserModal: false,
+            showEdit: false,
             groupName: "",
+            groupEditData: "",
             selectedUsers: [],
             sendChatData: '',
             userChat: '',
@@ -181,6 +188,7 @@ class Chat extends Component {
                 }
             }).then((response) => {
                 const users = response.data.data;
+                // console.log("fetchChat", users)
 
                 // const isGroupchat = users.filter(item => item.isGroupChat === true && item.chatUsers.length > 2)
 
@@ -214,7 +222,7 @@ class Chat extends Component {
                 // console.log("blockChat", blockChat)
 
                 const userBlockData = blockChat.filter(item => item.blockByUser === this.authInfo.id)
-                // console.log("userBlockData", userBlockData);
+                console.log("userBlockData", userBlockData);
                 this.setState({ allChatUsers: userBlockData })
 
             }).catch((error) => {
@@ -306,6 +314,8 @@ class Chat extends Component {
                 console.log("error", error)
             }
         }
+        this.setState({ groupName: "" });
+        this.setState({ selectedUsers: "" });
     }
 
     accessChat = (data) => {
@@ -370,7 +380,7 @@ class Chat extends Component {
     // };
 
     fetchAllMessage = (data) => {
-        // console.log("fetchAllMessage function ", data)
+        console.log("fetchAllMessage function ", data)
         if (data.isGroupChat === false) {
             const userID = data.chatUsers[0].id !== this.authInfo.id ? data.chatUsers[0].id : data.chatUsers[1].id;
             this.setState({ selectUserId: userID });
@@ -570,9 +580,46 @@ class Chat extends Component {
     handleCreateGroup = () => {
         this.setState({ showModal: true });
     };
+    handleEditGroupName = (data) => {
+        console.log("ChatID", data)
+        this.setState({ showEdit: true });
+        this.setState({ groupEditData: data })
+        this.setState({ groupName: data.name });
+    };
+
+    handleUpdateGroupName = () => {
+        const { groupEditData, groupName } = this.state;
+        console.log("groupName", groupName);
+        console.log("groupEditData", groupEditData.chatId);
+
+        try {
+            const url = "/user/updateGroupName/";
+            const chatId = groupEditData.chatId
+            axios.put(url, { chatId, groupName }, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            }).then((response) => {
+                console.log("Update successfully.....", response)
+                this.fetchAllUserData();
+                this.setState({ sendChatData: "" });
+                this.setState({ groupName: "" });
+                this.setState({ showEdit: false });
+                // this.setState({ sendChatData: "" });
+            }).catch((error) => {
+                console.log("error", error)
+            })
+
+        } catch (error) {
+            console.log("error", error)
+        }
+
+    };
     handleGroupName = (e) => {
         this.setState({ groupName: e.target.value });
-    }
+    };
 
     handleCheckboxClick = (itemId) => {
         const { selectedUsers } = this.state;
@@ -641,7 +688,6 @@ class Chat extends Component {
 
     handleMessageDelete = (id) => {
         const { sendChatData } = this.state;
-        console.log("selected chat message id", id)
         axios.put(`/user/messageDelete/${id}`, { isVisible: false }, {
             headers: {
                 'Accept': 'application/json',
@@ -804,7 +850,7 @@ class Chat extends Component {
         const { showChatUsers, users, allChatUsers, sendChatData, userChat, notAddedUser, selectedUsers, selectedFile, onlineUsers, showEmojiPicker } = this.state;
         const { loading } = store.getState().global;
         // console.log("allChatUsers in render() :-", allChatUsers)
-        console.log(" sendChatData", sendChatData)
+        // console.log(" sendChatData", sendChatData)
         // console.log("notAddedUser : ", notAddedUser)
         // console.log("userChat :", userChat);
         // console.log("onlineUsers Active :>>>>", onlineUsers)
@@ -884,17 +930,22 @@ class Chat extends Component {
                                                                     >
                                                                         <a href="#" className="d-flex align-items-center chatUser_info">
                                                                             <div className="userInfo-col userThumb">
-                                                                                <div className="user_thumb">
-                                                                                    <img className="img-fluid" src={item.chatUsers[0].id !== this.authInfo.id ? item.chatUsers[0].image_url : item.chatUsers[1].image_url} alt="user img" />
-                                                                                </div>
-                                                                                {/* <p>{onlineUsers.includes(item.chatUsers[0].id !== this.authInfo.id ? item.chatUsers[0].id : item.chatUsers[1].id) ? "true" : "false"}</p> */}
-                                                                                {onlineUsers.includes(item.chatUsers[1].id) ? <span className="user-inactive user-active"></span> : <span className="user-inactive"></span>}
+                                                                                {item.isGroupChat === true ?
+                                                                                    <div className="user_thumb">
+                                                                                        <img className="img-fluid" src={group_profile} alt="group icon" />
+                                                                                    </div>
+                                                                                    :
+                                                                                    <div className="user_thumb">
+                                                                                        <img className="img-fluid" src={item.chatUsers[0].id !== this.authInfo.id ? item.chatUsers[0].image_url : item.chatUsers[1].image_url} alt="user img" />
+                                                                                    </div>
+                                                                                }
+                                                                                {item.isGroupChat === true ? <></> : <>
+                                                                                    {onlineUsers.includes(item.chatUsers[1].id) ? <span className="user-inactive user-active"></span> : <span className="user-inactive"></span>}
+                                                                                </>}
                                                                             </div>
                                                                             <div className="userInfo-col userInfo">
                                                                                 {item.chatName !== 'sender' ? <h3>{item.chatName} <span className="badge text-bg-info">Group</span></h3> : item.chatUsers[0].id !== this.authInfo.id ? <h3>{item.chatUsers[0].name}</h3> : <h3>{item.chatUsers[1].name}</h3>}
-                                                                                {item.isBlock === true && item.latestMessage.isVisible === false ? <></> : (item.latestMessage === null ? <></> : (item.latestMessage.mediaContent === null ? <p>{item.latestMessage.messageContent}</p> : <p><i><b>Media File</b></i></p>))}
-                                                                                {/* {item.latestMessage === null ? <></> : (item.latestMessage.mediaContent === null ? <p>{item.latestMessage.messageContent}</p> : <p><i><b>Media File</b></i></p>)} */}
-
+                                                                                {item.isBlock === true && item.latestMessage === false ? <></> : (item.latestMessage === null ? <></> : (item.latestMessage.mediaContent === null ? <p>{item.latestMessage.messageContent}</p> : <p><i><b>Media File</b></i></p>))}                                                 
                                                                             </div>
                                                                             {item.isBlock === false ? (
                                                                                 <div className="userInfo-col chatTime">
@@ -934,7 +985,7 @@ class Chat extends Component {
                                                                         <a href="#" className="d-flex align-items-center chatUser_info">
                                                                             <div className="userInfo-col userThumb">
                                                                                 <div className="user_thumb">
-                                                                                    <img className="img-fluid" src={chatThumb} alt="user img" />
+                                                                                    <img className="img-fluid" src={item.image_url} alt="user img" />
                                                                                 </div>
                                                                                 {/* <span className="user-inactive user-active"></span> */}
                                                                             </div>
@@ -943,10 +994,9 @@ class Chat extends Component {
                                                                                 {item.isGroupAdmin === false ? <></> : <p>Admin</p>}
                                                                             </div>
                                                                             <div className="userInfo-col chatTime">
-                                                                                {item.id === this.authInfo.id ? <button onClick={() => { this.handleRemoveFromGroup(sendChatData.chatId, item.id) }}> Exit group </button> :
-                                                                                    //  (item.isGroupAdmin === true ? <></> : 
-                                                                                    // <button onClick={() => { this.handleRemoveFromGroup(sendChatData.chatId, item.id) }}>Remove</button>)
-                                                                                    <></>
+                                                                                {item.id === this.authInfo.id ? <button onClick={() => { this.handleRemoveFromGroup(sendChatData.chatId, item.id) }}> Exit Group </button>
+                                                                                    :
+                                                                                    <button onClick={() => { this.handleRemoveFromGroup(sendChatData.chatId, item.id) }}>Remove</button>
                                                                                 }
                                                                             </div>
                                                                         </a>
@@ -962,27 +1012,40 @@ class Chat extends Component {
                                             <div className="chat_board_view">
                                                 <div className="d-flex align-items-center message-user-head">
                                                     <div className="userInfo-col userThumb">
-                                                        <div className="user_thumb">
-                                                            <img className="img-fluid" src={sendChatData.image_url} alt="user img" />
-                                                        </div>
-                                                        {/* <span className="user-inactive user-active"></span> */}
+                                                        {sendChatData.isGroup === true ?
+                                                            <div className="user_thumb">
+                                                                <img className="img-fluid" src={group_profile} alt="Group_icon" />
+                                                            </div>
+                                                            :
+                                                            <div className="user_thumb">
+                                                                <img className="img-fluid" src={sendChatData.image_url} alt="user img" />
+                                                            </div>
+                                                        }
                                                     </div>
                                                     <div className="userInfo-col userInfo">
                                                         <h3>{sendChatData.name}</h3>
                                                     </div>
+                                                    {sendChatData.isGroup === true ?
+                                                        <div>
+                                                            <a href="#"><img src={edit_icon} alt="add" width={"15px"} height={"15px"} onClick={() => this.handleEditGroupName(sendChatData)} /></a>
+                                                        </div>
+                                                        :
+                                                        <>
+                                                        </>
+                                                    }
+
                                                     {sendChatData.isBlock === false && sendChatData.isGroup !== true ? <>
                                                         <div className="mr-auto">
-                                                            <button className="mr-20" onClick={() => { this.handleChatBlock(sendChatData) }}>Block</button>
+                                                            <a href="#"><img src={block_icon} alt="add" width={"20px"} height={"20px"} onClick={() => this.handleChatBlock(sendChatData)} /></a>
                                                         </div>
                                                     </> :
                                                         <>
                                                             {showChatUsers === false ?
                                                                 <div className="justify-content-md-end">
-                                                                    <button className="btn btn-warning me-md-2 btn-sm" type="button" onClick={this.toggleChatGroupUsers}>Back</button>
+                                                                    <a href="#"><img src={back_icon_circle} alt="add" width={"25px"} height={"25px"} onClick={this.toggleChatGroupUsers} /></a>
                                                                 </div>
-                                                                // <button onClick={this.toggleChatGroupUsers}>Back</button>
                                                                 :
-                                                                (sendChatData.isGroup === true ? <a className="add" href="#"><img src={group_icon} alt="add" onClick={this.toggleChatGroupUsers} width={"40px"} height={"40px"} /><small>{sendChatData.groupData.length}</small></a> : <></>)
+                                                                (sendChatData.isGroup === true ? <a className="add" href="#"><img src={group_icon} alt="add" onClick={this.toggleChatGroupUsers} width={"25px"} height={"25px"} /><small>{sendChatData.groupData.length}</small></a> : <></>)
                                                             }
                                                         </>}
                                                 </div>
@@ -1007,9 +1070,11 @@ class Chat extends Component {
                                                                                     <a href="#"><img src={delete_icone} alt="add" width={"20px"} height={"20px"} onClick={() => { this.handleMessageDelete(item._id) }} /></a>
                                                                                     <br />
                                                                                     <span className='time'>{moment(item.timestamp).format('hh:mm A')}</span>
-                                                                                </> : <p className="bg-light text-danger">
-                                                                                    <i>This message was deleted..!</i>
-                                                                                </p>}
+                                                                                </> :
+                                                                                    <p className="bg-light text-danger">
+                                                                                        <i>This message was deleted..!</i>
+                                                                                    </p>
+                                                                                }
                                                                             </li>
                                                                         </ul>
                                                                     ) : (
@@ -1022,7 +1087,8 @@ class Chat extends Component {
                                                                                 </> :
                                                                                     <p className="bg-light text-danger">
                                                                                         <i>This message was deleted..!</i>
-                                                                                    </p>}
+                                                                                    </p>
+                                                                                }
                                                                             </li>
                                                                         </ul>
                                                                     )}
@@ -1031,7 +1097,15 @@ class Chat extends Component {
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <NotFound msg="No chat found" />
+                                                            {/* <NotFound msg="No chat found" /> */}
+                                                            <div className="chat_board_view d-flex flex-column align-items-center justify-content-center">
+                                                                {/* <NotFound msg="Chat not selected" /> */}
+                                                                <div className="text-center chat_notfound">
+                                                                    <img src={chat_not_found} alt='...' width="200px" height="200px" />
+                                                                    &nbsp;
+                                                                    <h1 className="text-center">Chat not found..!</h1>
+                                                                </div>
+                                                            </div>
                                                         </>
                                                     )}
                                                 </div>
@@ -1070,12 +1144,23 @@ class Chat extends Component {
                                                         </form>
                                                     </div>
                                                 </> : <>
-                                                    <NotFound msg="Chat blocked" />
+                                                    <div class="alert alert-danger text-center" role="alert">
+                                                        Chat was blocked..!
+                                                    </div>
+
+                                                    <div className='text-center'>
+                                                        <a href='#' className='fw-bold text-primary' onClick={() => { this.handleUnblockChat(sendChatData.chatId) }}>Click to Unblock</a>
+                                                    </div>
                                                 </>}
                                             </div>
                                         </> : <>
-                                            <div className="chat_board_view">
-                                                <NotFound msg="Chat not selected" />
+                                            <div className="chat_board_view d-flex flex-column align-items-center justify-content-center">
+                                                {/* <NotFound msg="Chat not selected" /> */}
+                                                <div className="text-center chat_letstalk">
+                                                    <img src={lets_chats} alt='...' width="200px" height="200px" />
+                                                    &nbsp;
+                                                    <h1 className="text-center">Let's Talk..!</h1>
+                                                </div>
                                             </div>
                                         </>}
                                     </div>
@@ -1112,7 +1197,6 @@ class Chat extends Component {
                                         </div>
                                         <div className="userInfo-col userInfo">
                                             <h3>{item.name}</h3>
-                                            {/* {item.seller === null ? <h3>{item.user.name} <span className="badge text-bg-success">{item.user.id === this.authInfo.id ? "YOU" : ""}</span></h3> : <h3>{item.seller.name}  <span className="badge text-bg-primary">{item.seller.role}</span></h3>} */}
                                         </div>
                                         <button onClick={() => this.clickToAddUser(item)}>ADD</button>
                                     </a>
@@ -1121,6 +1205,39 @@ class Chat extends Component {
                         </> :
                             <></>
                         }
+                    </div>
+                </Modal>
+
+                {/* Edit */}
+                <Modal
+                    show={this.state.showEdit}
+                    onHide={() => this.setState({ showEdit: false })}
+                    size="md"
+                    // dialogClassName="modal-90h"
+                    aria-labelledby="contained-modal-title-vcenter"
+                    className='modal-dialog-scrollable'
+                >
+
+                    <div className="chat_fieldRow">
+                        <h3>Edit Group Name</h3>
+                        <div className="chat_field">
+                            <label htmlFor="">Group name</label>
+                            <div className="field_item">
+                                <input
+                                    className="form-control"
+                                    type="text"
+                                    name="siteUrl"
+                                    value={this.state.groupName}
+                                    placeholder="Enter Group Name"
+                                    onChange={this.handleGroupName}
+                                />
+                            </div>
+                        </div>
+                        <div className='user-list-container'>
+                            <div className="d-grid gap-2 col-6 mx-auto mt-4">
+                                <button className="btn btn-primary" type="button" onClick={this.handleUpdateGroupName}>Update</button>
+                            </div>
+                        </div>
                     </div>
                 </Modal>
 
@@ -1171,15 +1288,15 @@ class Chat extends Component {
                                             <span className="user-inactive user-active"></span>
                                         </div>
                                         <div className="userInfo-col userInfo">
-                                            {item.seller === null ? <h3>{item.user.name} <span className="badge text-bg-success">{item.user.id === this.authInfo.id ? "YOU" : ""}</span></h3> : <h3>{item.seller.name}  <span className="badge text-bg-primary">{item.seller.role}</span></h3>}
+                                            {item.seller === null ? <h3>{item.user.name} <span className="badge text-bg-success">{item.user.id === this.authInfo.id ? "YOU" : ""}</span> </h3> : <h3>{item.seller.name}  <span className="badge text-bg-primary">{item.seller.role}</span></h3>}
                                         </div>
-                                        <div className="userInfo-col chatTime">
+                                        {/* <div className="userInfo-col chatTime">
                                             <div className="chatTime">
                                                 1 mint ago
                                                 {item.id}
                                                 <span className="chatNoti-info">3</span>
                                             </div>
-                                        </div>
+                                        </div> */}
 
                                         <div className="input-group-text">
                                             <input

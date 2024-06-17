@@ -17,7 +17,13 @@ function ServiceCalendar() {
   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
   const user_id = authInfo.id;
   //get accessToken from google calendar auth
+
+
   const accessToken = localStorage.getItem("accessToken");
+
+  //myChange>>>>>>>   refreshToken
+  // const accessToken = localStorage.getItem("refreshToken");
+
   //get serviceId with help of useParams
   // Create a socket instance
   const socket = useRef(null);
@@ -121,6 +127,10 @@ function ServiceCalendar() {
       description: newEvent.description,
       location: "https://ZoomMeeting.com", // Update with your meeting URL
     };
+
+    console.log("eventData : ", eventData)
+
+    console.log("accessToken for calnder", accessToken)
     try {
       await axios.post(
         `https://www.googleapis.com/calendar/v3/calendars/primary/events`,
@@ -135,12 +145,7 @@ function ServiceCalendar() {
       toast.success("Event added succesfully");
       setFormOpen(false);
       // Optionally, you can update state or perform other actions after successful submission
-      setNewEvent({
-        meetingDate: "",
-        meetingTime: "",
-        description: "",
-        event_title: "",
-      });
+      setNewEvent({ meetingDate: "", meetingTime: "", description: "", event_title: "" });
 
       fetchGoogleEvents();
     } catch (error) {

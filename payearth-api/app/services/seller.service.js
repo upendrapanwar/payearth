@@ -3246,13 +3246,26 @@ async function fetchChat(req) {
     };
 
     const fieldsToSelect = "id chatName isGroupChat isBlock chatUsers latestMessage";
-    const result = await Chat.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect)
+    let result = await Chat.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect)
       .populate({
         path: 'latestMessage',
         match: { isVisible: true },
         select: 'messageContent mediaContent timestamp'
       });
     // console.log("result", result)
+
+    result = result.sort((a, b) => {
+      if (a.latestMessage && b.latestMessage) {
+        return new Date(b.latestMessage.timestamp) - new Date(a.latestMessage.timestamp);
+      } else if (a.latestMessage) {
+        return -1;
+      } else if (b.latestMessage) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+    
     return result;
   } catch (error) {
     console.log(error);

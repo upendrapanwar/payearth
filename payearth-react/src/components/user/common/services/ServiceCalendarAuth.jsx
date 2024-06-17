@@ -158,6 +158,7 @@ import React, { useEffect, useState } from "react";
 import { GoogleLogin } from "react-google-login";
 import { gapi } from "gapi-script";
 import ServiceCalendar from "./ServiceCalendar";
+import axios from "axios";
 
 //Google calendar client secret from .env
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
@@ -173,10 +174,16 @@ function ServiceCalendarAuth({ userId, authToken, onAuthSuccess }) {
 
   // Google Auth 2.0 authentication for generate refresh token
   const responseGoogle = async (response) => {
+
     //generated refresh token
     const { code } = response;
     //set refresh token in localStorage
+
+
+    console.log("access_token check..........#######################", code)
     localStorage.setItem("refreshToken", code);
+
+
 
     //use gapi for generate access token for authentication purpose
     try {

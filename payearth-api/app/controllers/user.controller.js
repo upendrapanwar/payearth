@@ -266,10 +266,11 @@ router.get("/fetchBlockChat/:id", fetchBlockChat);
 router.post("/sendMessage", sendMessage)
 router.get("/allMessages/:id", allMessages);
 router.put("/userChatBlock/:id", userChatBlock);
-router.put("/userUnblockChat/:id", userUnblockChat)
-router.put("/messageDelete/:id", chatMessageDelete)
-router.put("/removeFromGroup", removeFromGroup)
+router.put("/userUnblockChat/:id", userUnblockChat);
+router.put("/messageDelete/:id", chatMessageDelete);
+router.put("/removeFromGroup", removeFromGroup);
 router.put("/addGroupMember/:id", addGroupMember);
+router.put("/updateGroupName", updateGroupName);
 
 router.post("/add-notification", addNotification);
 router.get("/get-notification/:id", getNotification);
@@ -1391,6 +1392,12 @@ function removeFromGroup(req, res, next) {
 function addGroupMember(req, res, next) {
   userService.addGroupMember(req)
     .then((addMember) => addMember ? res.json({ status: true, message: addMember }) : res.json({ status: false, message: "ERROR" }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function updateGroupName(req, res, next) {
+  userService.updateGroupName(req)
+    .then((name) => name ? res.json({ status: true, data: name }) : res.json({ status: false, message: "ERROR" }))
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 

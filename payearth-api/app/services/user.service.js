@@ -135,6 +135,7 @@ module.exports = {
   chatMessageDelete,
   removeFromGroup,
   addGroupMember,
+  updateGroupName,
 
 
   addNotification,
@@ -2948,13 +2949,25 @@ async function fetchChat(req) {
     };
 
     const fieldsToSelect = "id chatName isGroupChat isBlock chatUsers latestMessage";
-    const result = await Chat.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect)
+    let result = await Chat.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect)
       // .populate("latestMessage");
       .populate({
         path: 'latestMessage',
         match: { isVisible: true },
         select: 'messageContent mediaContent timestamp isVisible'
       });
+
+    result = result.sort((a, b) => {
+      if (a.latestMessage && b.latestMessage) {
+        return new Date(b.latestMessage.timestamp) - new Date(a.latestMessage.timestamp);
+      } else if (a.latestMessage) {
+        return -1;
+      } else if (b.latestMessage) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
 
     return result;
   } catch (error) {
@@ -3122,6 +3135,25 @@ async function addGroupMember(req) {
   }
 }
 
+// Edit group name
+
+async function updateGroupName(req) {
+  // const chatId = req.params.id;
+  const { chatId, groupName } = req.body;
+
+  console.log("chatId", chatId);
+  console.log("groupName", groupName);
+  try {
+    const chatData = await Chat.findByIdAndUpdate(chatId,
+      { $set: { chatName: groupName } },
+      { new: true }
+    );
+    return chatData;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 // Create user token test..SATRT @@@@
 async function zoomCreateUserToken(req) {
   const { clientId, clientSecret, account_id } = req.body
@@ -3209,10 +3241,12 @@ async function createZoomUser(req) {
   console.log("createZoomUser function run")
   const { zoomAccessToken, email, first_name, last_name, display_name, password } = req.body;
 
+  console.log("password", password)
+
   try {
     const url = 'https://api.zoom.us/v2/users';
     const config = {
-      action: "autoCreate",
+      action: "custCreate", // "create" "autoCreate", "custCreate", and "ssoCreate".
       user_info: {
         email: email,
         type: 1,
@@ -3228,14 +3262,34 @@ async function createZoomUser(req) {
       }
     };
 
-    const user = await axios.post(url, config, {
+    const response = await axios.post(url, config, {
       headers: {
         Authorization: `Bearer ${zoomAccessToken}`,
       },
     });
-    console.log('Zoom User created successfully:', user.data);
+    console.log('Zoom User created successfully:', response.data);
 
-    // if (user.data) {
+
+    if (response) {
+      try {
+        const responseUser = await axios.get('https://api.zoom.us/v2/users', {
+          headers: {
+            'Authorization': `Bearer ${zoomAccessToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        console.log("List of users", responseUser.data.users)
+
+      } catch (error) {
+        console.log("error", error)
+      }
+    }
+
+    // if (response) {
+
+    //   // const url = `https://api.zoom.us/v2/users/${response.data.id}/meetings`
+
+    //   // Lists of users is run....&&&&&
     //   try {
     //     const response = await axios.get('https://api.zoom.us/v2/users', {
     //       headers: {
@@ -3245,22 +3299,82 @@ async function createZoomUser(req) {
     //     });
 
     //     const users = response.data.users;
-    //     console.log('List of users:', users);
+    //     const id =  users.map(item => item.id);
+    //     console.log('List of users:', users.map(item => item.id));
 
-    //     // const userExists = users.some(user => user.email === 'User@gmail.com');
-    //     // if (userExists) {
-    //     //     console.log('User exists');
-    //     // } else {
-    //     //     console.log('User does not exist');
+    //     // if (id) {
+    //     //   try {
+    //     //     const url = `https://api.zoom.us/v2/users/${id}/meetings`
+    //     //     const meetingConfig = {
+    //     //       topic: 'Test meeting',
+    //     //       type: 1,
+    //     //       // start_time: '2024-06-11T12:00:00Z',
+    //     //       start_time: new Date().toISOString(),
+    //     //       duration: 30,
+    //     //       timezone: 'UTC',
+    //     //       settings: {
+    //     //         host_video: true,
+    //     //         participant_video: true,
+    //     //         join_before_host: true,
+    //     //       }
+    //     //     }
+    //     //     const response = axios.post(url,
+    //     //       meetingConfig,
+    //     //       {
+    //     //         headers: {
+    //     //           Authorization: `Bearer ${zoomAccessToken}`,
+    //     //         },
+    //     //       }
+    //     //     );
+    //     //     // const result = response.data.data;
+    //     //     console.log("result", response);
+    //     //   } catch (error) {
+    //     //     console.log("Error");
+    //     //   }
     //     // }
     //   } catch (error) {
     //     console.error('Error listing users:', error.response.data);
     //   }
+
+
+    //   // create meeting......
+
+    //   // try {
+    //   //   const meetingConfig = {
+    //   //     topic: 'Test meeting',
+    //   //     type: 1,
+    //   //     // start_time: '2024-06-11T12:00:00Z',
+    //   //     start_time: new Date().toISOString(),
+    //   //     duration: 30,
+    //   //     timezone: 'UTC',
+    //   //     settings: {
+    //   //       host_video: true,
+    //   //       participant_video: true,
+    //   //       join_before_host: true,
+    //   //     }
+    //   //   }
+    //   //   const response = axios.post(url,
+    //   //     meetingConfig,
+    //   //     {
+    //   //       headers: {
+    //   //         Authorization: `Bearer ${zoomAccessToken}`,
+    //   //       },
+    //   //     }
+    //   //   );
+    //   //   // const result = response.data.data;
+    //   //   console.log("result", response);
+
+    //   // } catch (error) {
+    //   //   console.log("Error");
+    //   // }
+
+
     // }
-    return user.data;
+
+    // return response
 
   } catch (error) {
-    console.error('Error creating Zoom user:', error.message);
+    console.error('Error creating Zoom user:', error);
   }
 
 

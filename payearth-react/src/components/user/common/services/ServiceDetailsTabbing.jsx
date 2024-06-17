@@ -673,26 +673,26 @@ function ServiceDetailsTabbing(props) {
 
   const listUsers = async () => {
     try {
-        const response = await axios.get('https://api.zoom.us/v2/users', {
-            headers: {
-                'Authorization': `Bearer ${zoomAccessToken}`,
-                'Content-Type': 'application/json',
-            },
-        });
+      const response = await axios.get('https://api.zoom.us/v2/users', {
+        headers: {
+          'Authorization': `Bearer ${zoomAccessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-        const users = response.data.users;
-        console.log('List of users:', users);
+      const users = response.data.users;
+      console.log('List of users:', users);
 
-        // const userExists = users.some(user => user.email === 'User@gmail.com');
-        // if (userExists) {
-        //     console.log('User exists');
-        // } else {
-        //     console.log('User does not exist');
-        // }
+      // const userExists = users.some(user => user.email === 'User@gmail.com');
+      // if (userExists) {
+      //     console.log('User exists');
+      // } else {
+      //     console.log('User does not exist');
+      // }
     } catch (error) {
-        console.error('Error listing users:', error.response.data);
+      console.error('Error listing users:', error.response.data);
     }
-};
+  };
 
   //Create Zoom Meeting
   const combineDateTime = (date, time) => {
@@ -703,11 +703,11 @@ function ServiceDetailsTabbing(props) {
 
     const requestData = {
       zoomAccessToken: zoomAccessToken,
-      email: userInfo.email,
+      email: "test1eyno@gmail.com",
       first_name: userInfo.email,
       last_name: userInfo.name,
       display_name: userInfo.name,
-      password: "eyno123",
+      password: "Eynosoft1",
     };
 
     const headers = {
@@ -719,8 +719,8 @@ function ServiceDetailsTabbing(props) {
     try {
       await axios.post("/user/createZoomUser", requestData, { headers })
         .then((response) => {
-          console.log("response", response.data.data);
-          setZoom_userId(response.data.data.id);
+          console.log("response foom zooom pending ", response);
+          // setZoom_userId(response.data.data.id);
         })
         .catch((error) => {
           console.log("Error :>", error);

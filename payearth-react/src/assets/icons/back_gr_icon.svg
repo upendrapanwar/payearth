@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="256" height="256" viewBox="0 0 256 256" xml:space="preserve">
+
+<defs>
+</defs>
+<g style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: none; fill-rule: nonzero; opacity: 1;" transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)" >
+	<linearGradient id="SVGID_2" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-1 0 0 1 90 0)"  x1="34.5269" y1="33.94" x2="62.7893" y2="54.8751">
+<stop offset="0%" style="stop-color:rgb(99,231,114);stop-opacity: 1"/>
+<stop offset="99.51%" style="stop-color:rgb(67,159,78);stop-opacity: 1"/>
+</linearGradient>
+<path d="M 3.672 38.568 L 38.474 3.767 c 2.526 -2.526 6.62 -2.526 9.146 0 l 4.187 4.187 c 2.526 2.526 2.526 6.62 0 9.146 L 33.335 35.572 h 0.981 h 35.182 h 14.035 c 3.572 0 6.467 2.895 6.467 6.467 v 5.922 c 0 3.572 -2.895 6.467 -6.467 6.467 H 69.498 H 44.076 h -31.03 V 45 h -6.71 C 2.979 45 1.298 40.942 3.672 38.568 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: url(#SVGID_2); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+	<linearGradient id="SVGID_3" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-1 0 0 1 90 0)"  x1="73.4354" y1="39.2442" x2="38.3172" y2="73.1749">
+<stop offset="0%" style="stop-color:rgb(99,231,114);stop-opacity: 1"/>
+<stop offset="99.51%" style="stop-color:rgb(67,159,78);stop-opacity: 1"/>
+</linearGradient>
+<path d="M 1.952 49.711 l 36.522 36.522 c 2.526 2.526 6.62 2.526 9.146 0 l 4.187 -4.187 c 2.526 -2.526 2.526 -6.62 0 -9.146 L 23.907 45 c -5.593 -5.593 -9.622 -17.044 -1.11 -25.557 L 1.952 40.289 C -0.651 42.891 -0.651 47.109 1.952 49.711 z" style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-linejoin: miter; stroke-miterlimit: 10; fill: url(#SVGID_3); fill-rule: nonzero; opacity: 1;" transform=" matrix(1 0 0 1 0 0) " stroke-linecap="round" />
+</g>
+</svg>
