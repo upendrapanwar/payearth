@@ -308,7 +308,7 @@ class Chat extends Component {
 
                 // this.socket.emit("notification_send", data);
 
-                this.sendNotification(data.id, datas)
+                // this.sendNotification(data.id, datas)
                 if (response.data.status === true) {
                     // toast.success("New Chat Created.....", { autoClose: 3000 })
                     this.fetchAllMessage(datas)
@@ -422,59 +422,61 @@ class Chat extends Component {
             const formData = new FormData();
             for (let i = 0; i < selectedFile.length; i++) {
                 const file = selectedFile[i];
-                formData.append('file', file);
-                formData.append("upload_preset", "pay-earth-images")
-                formData.append("cloud_name", "pay-earth")
-                const response = await fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/upload`, {
-                    method: 'POST',
-                    body: formData
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    const sendData = {
-                        authorId: {
-                            id: this.authInfo.id,
-                            name: this.userInfo.name,
-                            image_url: this.userInfo.imgUrl,
-                        },
-                        chatId: sendChatData.chatId,
-                        messageContent: !messageContent ? null : messageContent,
-                        mediaContent: !data.secure_url ? null : data.secure_url,
-                    };
+                if (file.size <= 5 * 1024 * 1024) { // Check if file size is less than or equal to 5MB
+                    formData.append('file', file);
+                    formData.append("upload_preset", "pay-earth-images");
+                    formData.append("cloud_name", "pay-earth");
 
-                    try {
-                        const url = '/seller/sendMessage';
-                        // const data = { receiverId, authorId }
-                        axios.post(url, sendData, {
-                            headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json;charset=UTF-8',
-                                'Authorization': `Bearer ${this.authInfo.token}`
-                            }
-                        }).then((response) => {
-                            // console.log("send Message", response.data.data)
-                            const data = response.data.data;
+                    const response = await fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
 
-                            // console.log("data", data)
-                            if (response.data.status === true) {
-                                this.socket.emit("new message", data)
-                                // console.log("SendChatData under send msg>>>", sendChatData)
-                                this.getAllMessage(sendChatData.chatId);
-                                this.fetchAllUserData();
-                            }
-                        }).catch((error) => {
+                    if (response.ok) {
+                        const data = await response.json();
+                        const sendData = {
+                            authorId: {
+                                id: this.authInfo.id,
+                                name: this.userInfo.name,
+                                image_url: this.userInfo.imgUrl,
+                            },
+                            chatId: sendChatData.chatId,
+                            messageContent: messageContent || null,
+                            mediaContent: data.secure_url || null,
+                        };
+
+                        try {
+                            const url = '/seller/sendMessage';
+                            axios.post(url, sendData, {
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json;charset=UTF-8',
+                                    'Authorization': `Bearer ${this.authInfo.token}`
+                                }
+                            }).then((response) => {
+                                const data = response.data.data;
+                                if (response.data.status === true) {
+                                    this.socket.emit("new message", data);
+                                    this.getAllMessage(sendChatData.chatId);
+                                    this.fetchAllUserData();
+                                }
+                            }).catch((error) => {
+                                console.log("error", error);
+                            });
+                        } catch (error) {
                             console.log("error", error);
-                        });
-                    } catch (error) {
-                        console.log("error", error)
+                        }
+                    } else {
+                        console.error('Failed to upload to Cloudinary');
                     }
                 } else {
-                    console.error('Failed to upload to Cloudinary');
+                    // console.error(`File ${file.name} exceeds the 5MB size limit.`);
+                    toast.error(`File ${file.name} exceeds the 5MB size limit.`, { autoClose: 3000 })
                 }
             }
-            this.setState({ messageContent: "" })
-            this.setState({ selectedFile: null })
-            this.setState({ mediaContent: null })
+            this.setState({ messageContent: "" });
+            this.setState({ selectedFile: null });
+            this.setState({ mediaContent: null });
         } else {
             try {
                 const sendData = {
@@ -1092,10 +1094,9 @@ class Chat extends Component {
                                                     <div class="alert alert-danger text-center" role="alert">
                                                         Chat was blocked..!
                                                     </div>
-
-                                                    <div className='text-center'>
+                                                    {/*<div className='text-center'>
                                                         <a href='#' className='fw-bold text-primary' onClick={() => { this.handleUnblockChat(sendChatData.chatId) }}>Click to Unblock</a>
-                                                    </div>
+                                                    </div> */}
                                                 </>}
                                             </div>
                                         </> : <>

@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.b98b5d6d.css",
-    "main.js": "/static/js/main.88e6aae1.js",
+    "main.css": "/static/css/main.c49c8bce.css",
+    "main.js": "/static/js/main.c6e0028c.js",
     "static/js/644.0b0a3c15.chunk.js": "/static/js/644.0b0a3c15.chunk.js",
     "static/js/833.d290f3f5.chunk.js": "/static/js/833.d290f3f5.chunk.js",
     "static/js/488.416db58a.chunk.js": "/static/js/488.416db58a.chunk.js",
@@ -33,6 +33,9 @@
     "static/media/community_icon.svg": "/static/media/community_icon.750579a06a359c6836f23c532f015816.svg",
     "static/media/american-express.svg": "/static/media/american-express.d34a1f201b22500a5ac03fb775bb6ccf.svg",
     "static/media/support_icon.svg": "/static/media/support_icon.cfba52ea65a4c98472861b45ed408d27.svg",
+    "static/media/Chats.svg": "/static/media/Chats.de660beb1932f40cd30fb110eae48368.svg",
+    "static/media/grp_icone.svg": "/static/media/grp_icone.ee72f44699b02604b42ac320c4197d2c.svg",
+    "static/media/lets_chats.svg": "/static/media/lets_chats.bd29df5dfd47fd4e5a67367a156614a3.svg",
     "static/media/document_icon.svg": "/static/media/document_icon.a08004e23c25b9c3533238811f24a329.svg",
     "static/media/citi.svg": "/static/media/citi.577587259cff2d5ee6529ec02cfd4dc5.svg",
     "static/media/contact_mail.svg": "/static/media/contact_mail.b68278c42e599e942b8f.svg",
@@ -53,6 +56,7 @@
     "static/media/invisible-icon.svg": "/static/media/invisible-icon.2dfc9e625093dd5dd810bc0da6a60b8f.svg",
     "static/media/reports_icon.svg": "/static/media/reports_icon.5f6a6ea6427b2ec5252e7f444d54a176.svg",
     "static/media/cloud-upload.svg": "/static/media/cloud-upload.23567e6f74897538a1d0.svg",
+    "static/media/edit_icon.svg": "/static/media/edit_icon.1e0c74e7bc6f61da6e0a1c7808ae2f73.svg",
     "static/media/group_icon.svg": "/static/media/group_icon.3eb3e12592192b6522bf1923c4957028.svg",
     "static/media/shopping-bag.svg": "/static/media/shopping-bag.b035633dcd68dfe05a6c0fc7aa469cff.svg",
     "static/media/processing-icon.svg": "/static/media/processing-icon.209ca8f1795378727e5a68030be9dbe9.svg",
@@ -62,11 +66,13 @@
     "static/media/notification-black-bell-icon.svg": "/static/media/notification-black-bell-icon.9135dcb02e1350850080b661697afaf8.svg",
     "static/media/vendors_icon.svg": "/static/media/vendors_icon.59dd81a53ab54f413117151a2d170ada.svg",
     "static/media/odr_plced_icon.svg": "/static/media/odr_plced_icon.5f4987ded756f32443c9a21d90bcc719.svg",
+    "static/media/back_icon_circle.svg": "/static/media/back_icon_circle.8c3be7b3349316f6d09404aee5fd3e0a.svg",
     "static/media/heart.svg": "/static/media/heart.bae8c6c35bfe8e3724b8791c712dc582.svg",
     "static/media/twitter.svg": "/static/media/twitter.5fd20ca3e85724ac06057d56d1635d6f.svg",
     "static/media/notification-bell.svg": "/static/media/notification-bell.31edb26b21ebe1b57c854c211bf9f75a.svg",
     "static/media/envelope-icon.svg": "/static/media/envelope-icon.e0df981a154695e2cb8d3f4d1606d14a.svg",
     "static/media/sm_logout.svg": "/static/media/sm_logout.2178f11341f7b25e5c7ce159ded2fe82.svg",
+    "static/media/block_icon.svg": "/static/media/block_icon.070696420d3bea79b5aad8442f4e1a63.svg",
     "static/media/return.svg": "/static/media/return.1d087ae069c813471242.svg",
     "static/media/products_icon.svg": "/static/media/products_icon.fa84f8a13c307fad11361e340b2963b8.svg",
     "static/media/instagram.svg": "/static/media/instagram.6948ea4bbc157936009c100ce4e6e678.svg",
@@ -80,7 +86,6 @@
     "static/media/add.svg": "/static/media/add.edcc8f612829033fd25d0e86b0a5983e.svg",
     "static/media/shipped-icon.svg": "/static/media/shipped-icon.8d788a9d4a662ebe4d6a1ebafc98f58d.svg",
     "static/media/packed-icon.svg": "/static/media/packed-icon.cdc55f37a9eb26d631747182fc9f55f6.svg",
-    "static/media/msg_deleted.svg": "/static/media/msg_deleted.6ab3c30fc9aae916d9f63794c5f6a7d3.svg",
     "static/media/heart-icon-bordered.svg": "/static/media/heart-icon-bordered.d3a5fac6d5030e88982c3ec321784cb1.svg",
     "static/media/user-icon.svg": "/static/media/user-icon.19a209f13f04c3f1af4e.svg",
     "static/media/close_icon.svg": "/static/media/close_icon.7a06fe00961657d6b045f177ebbca435.svg",
@@ -101,14 +106,14 @@
     "static/media/star.svg": "/static/media/star.79373802e3719ff9ee75.svg",
     "static/media/yellow-star.svg": "/static/media/yellow-star.a3b559c5c5abcf0b5e9e6c97432c4b24.svg",
     "static/media/black-star-icon.svg": "/static/media/black-star-icon.2fcdf5f55f004e693297.svg",
-    "main.b98b5d6d.css.map": "/static/css/main.b98b5d6d.css.map",
-    "main.88e6aae1.js.map": "/static/js/main.88e6aae1.js.map",
+    "main.c49c8bce.css.map": "/static/css/main.c49c8bce.css.map",
+    "main.c6e0028c.js.map": "/static/js/main.c6e0028c.js.map",
     "644.0b0a3c15.chunk.js.map": "/static/js/644.0b0a3c15.chunk.js.map",
     "833.d290f3f5.chunk.js.map": "/static/js/833.d290f3f5.chunk.js.map",
     "488.416db58a.chunk.js.map": "/static/js/488.416db58a.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.b98b5d6d.css",
-    "static/js/main.88e6aae1.js"
+    "static/css/main.c49c8bce.css",
+    "static/js/main.c6e0028c.js"
   ]
 }

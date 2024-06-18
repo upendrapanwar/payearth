@@ -130,7 +130,10 @@ io.on("connection", function (socket) {
   });
 
   socket.on('send_notification', function (notification) {
-    // console.log("receive_notification", notification)
+    console.log("notification", notification);
+    // console.log("receive_notification", notification.data.chat.chatUsers[1].id)
+    // const data = notification.data.chat.chatUsers[1].id;
+    // console.log("Notification send to this id : ", data)
     io.emit('receive_notification', notification);
 
     // io.in(id).emit("message_recieved", message);

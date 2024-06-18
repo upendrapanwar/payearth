@@ -3141,8 +3141,8 @@ async function updateGroupName(req) {
   // const chatId = req.params.id;
   const { chatId, groupName } = req.body;
 
-  console.log("chatId", chatId);
-  console.log("groupName", groupName);
+  // console.log("chatId", chatId);
+  // console.log("groupName", groupName);
   try {
     const chatData = await Chat.findByIdAndUpdate(chatId,
       { $set: { chatName: groupName } },

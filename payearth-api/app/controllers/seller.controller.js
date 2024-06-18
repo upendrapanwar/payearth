@@ -234,6 +234,7 @@ router.put("/userUnblockChat/:id", userUnblockChat);
 router.put("/messageDelete/:id", chatMessageDelete);
 router.put("/removeFromGroup", removeFromGroup)
 router.put("/addGroupMember/:id", addGroupMember);
+router.put("/updateGroupName", updateGroupName);
 
 //Seller appointment calendar
 // router.get("/getMeetingData/:id", getMeeting);
@@ -1166,6 +1167,12 @@ function removeFromGroup(req, res, next) {
 function addGroupMember(req, res, next) {
   sellerService.addGroupMember(req)
     .then((addMember) => addMember ? res.json({ status: true, message: "Add Successfully...." }) : res.json({ status: false, message: "ERROR" }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function updateGroupName(req, res, next) {
+  sellerService.updateGroupName(req)
+    .then((name) => name ? res.json({ status: true, data: name }) : res.json({ status: false, message: "ERROR" }))
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 

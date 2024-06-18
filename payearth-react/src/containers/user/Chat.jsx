@@ -70,21 +70,15 @@ class Chat extends Component {
         this.onEmojiClick = this.onEmojiClick.bind(this);
 
 
-        this.socket.on('receive_notification', (notification) => {
-            // console.log("receive_notification", notification)
-
-            if (notification.id === this.authInfo.id) {
-                this.setState({
-                    notification: notification
-                })
-            }
-        });
-
-
+        // this.socket.on('receive_notification', (notification) => {
+        //     if (notification === this.authInfo.id) {
+        //         // this.notify();
+        //     }
+        // });
 
 
         this.socket.on('user_online', (userID) => {
-            // console.log("userId", userID)
+            console.log("userId", userID)
             this.setState(prevState => ({
                 onlineUsers: [...prevState.onlineUsers, userID]
             }));
@@ -106,7 +100,7 @@ class Chat extends Component {
 
             if (data.chat._id === this.state.sendChatData.chatId) {
                 this.fetchAllUserData();
-
+                // this.notify();   Waiting for notification task..
                 this.setState(prevState => ({
                     userChat: [...prevState.userChat, data]
                 }));
@@ -151,6 +145,15 @@ class Chat extends Component {
         this.setState({
             chosenEmoji: emojiObject,
         });
+    }
+
+    notificationFromSender = () => {
+        return <>
+            < div class="alert alert-info" role="alert" >
+                This is a info alert—check it out!
+            </div >
+        </>
+
     }
 
 
@@ -222,7 +225,7 @@ class Chat extends Component {
                 // console.log("blockChat", blockChat)
 
                 const userBlockData = blockChat.filter(item => item.blockByUser === this.authInfo.id)
-                console.log("userBlockData", userBlockData);
+                // console.log("userBlockData", userBlockData);
                 this.setState({ allChatUsers: userBlockData })
 
             }).catch((error) => {
@@ -342,7 +345,7 @@ class Chat extends Component {
                 }
             }).then((response) => {
                 const datas = response.data.data
-                // console.log("accessChat function ", data.id);
+                console.log("accessChat function", datas);
                 // console.log("Join room ", datas._id)
                 this.socket.emit('join chat', datas._id);
                 // this.socket.emit("setup", data.id);
@@ -351,7 +354,7 @@ class Chat extends Component {
 
                 // this.socket.emit("notification_send", data);
 
-                this.sendNotification(data.id, datas)
+                // this.sendNotification(data.id, datas)
                 if (response.data.status === true) {
                     // toast.success("New Chat Created.....", { autoClose: 3000 })
                     this.fetchAllMessage(datas)
@@ -367,6 +370,7 @@ class Chat extends Component {
 
 
     sendNotification = (id, datas) => {
+        console.log("Send Notification function is run.....");
         this.socket.emit('send_notification', { id, message: datas });
     };
 
@@ -380,7 +384,7 @@ class Chat extends Component {
     // };
 
     fetchAllMessage = (data) => {
-        console.log("fetchAllMessage function ", data)
+        // console.log("fetchAllMessage function ", data)
         if (data.isGroupChat === false) {
             const userID = data.chatUsers[0].id !== this.authInfo.id ? data.chatUsers[0].id : data.chatUsers[1].id;
             this.setState({ selectUserId: userID });
@@ -427,6 +431,7 @@ class Chat extends Component {
         }).then((response) => {
             if (response.data.status === true) {
                 const data = response.data.data;
+
                 // console.log("getAllMessage function ", data)
                 this.setState({
                     userChat: data
@@ -468,59 +473,61 @@ class Chat extends Component {
             const formData = new FormData();
             for (let i = 0; i < selectedFile.length; i++) {
                 const file = selectedFile[i];
-                formData.append('file', file);
-                formData.append("upload_preset", "pay-earth-images")
-                formData.append("cloud_name", "pay-earth")
-                const response = await fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/upload`, {
-                    method: 'POST',
-                    body: formData
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    const sendData = {
-                        authorId: {
-                            id: this.authInfo.id,
-                            name: this.userInfo.name,
-                            image_url: this.userInfo.imgUrl,
-                        },
-                        chatId: sendChatData.chatId,
-                        messageContent: !messageContent ? null : messageContent,
-                        mediaContent: !data.secure_url ? null : data.secure_url,
-                    };
+                if (file.size <= 5 * 1024 * 1024) { // Check if file size is less than or equal to 5MB
+                    formData.append('file', file);
+                    formData.append("upload_preset", "pay-earth-images");
+                    formData.append("cloud_name", "pay-earth");
 
-                    try {
-                        const url = '/user/sendMessage';
-                        // const data = { receiverId, authorId }
-                        axios.post(url, sendData, {
-                            headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json;charset=UTF-8',
-                                'Authorization': `Bearer ${this.authInfo.token}`
-                            }
-                        }).then((response) => {
-                            // console.log("send Message", response.data.data)
-                            const data = response.data.data;
+                    const response = await fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/upload`, {
+                        method: 'POST',
+                        body: formData
+                    });
 
-                            // console.log("data", data)
-                            if (response.data.status === true) {
-                                this.socket.emit("new message", data)
-                                // console.log("SendChatData under send msg>>>", sendChatData)
-                                this.getAllMessage(sendChatData.chatId)
-                                this.fetchAllUserData();
-                            }
-                        }).catch((error) => {
+                    if (response.ok) {
+                        const data = await response.json();
+                        const sendData = {
+                            authorId: {
+                                id: this.authInfo.id,
+                                name: this.userInfo.name,
+                                image_url: this.userInfo.imgUrl,
+                            },
+                            chatId: sendChatData.chatId,
+                            messageContent: messageContent || null,
+                            mediaContent: data.secure_url || null,
+                        };
+
+                        try {
+                            const url = '/user/sendMessage';
+                            axios.post(url, sendData, {
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json;charset=UTF-8',
+                                    'Authorization': `Bearer ${this.authInfo.token}`
+                                }
+                            }).then((response) => {
+                                const data = response.data.data;
+                                if (response.data.status === true) {
+                                    this.socket.emit("new message", data);
+                                    this.getAllMessage(sendChatData.chatId);
+                                    this.fetchAllUserData();
+                                }
+                            }).catch((error) => {
+                                console.log("error", error);
+                            });
+                        } catch (error) {
                             console.log("error", error);
-                        });
-                    } catch (error) {
-                        console.log("error", error)
+                        }
+                    } else {
+                        console.error('Failed to upload to Cloudinary');
                     }
                 } else {
-                    console.error('Failed to upload to Cloudinary');
+                    // console.error(`File ${file.name} exceeds the 5MB size limit.`);
+                    toast.error(`File ${file.name} exceeds the 5MB size limit.`, { autoClose: 3000 })
                 }
             }
-            this.setState({ messageContent: "" })
-            this.setState({ selectedFile: null })
-            this.setState({ mediaContent: null })
+            this.setState({ messageContent: "" });
+            this.setState({ selectedFile: null });
+            this.setState({ mediaContent: null });
         } else {
             try {
                 const sendData = {
@@ -544,8 +551,11 @@ class Chat extends Component {
                     const data = response.data.data;
 
                     if (response.data.status === true) {
+                        // console.log("Under sendMessage function send notification also...", data)
                         this.socket.emit("new message", data)
                         // console.log("SendChatData under send msg>>>", sendChatData)
+
+                        // this.socket.emit('send_notification', { data });
                         this.getAllMessage(sendChatData.chatId)
                         this.fetchAllUserData();
                     }
@@ -815,7 +825,7 @@ class Chat extends Component {
         }
     }
 
-    notify = () => toast.error("Only Admin can add new users", {
+    notify = () => toast.error("NEW NOTIFICATION RECIEVED", {
         position: "bottom-center",
         theme: "colored",
     });
@@ -945,7 +955,7 @@ class Chat extends Component {
                                                                             </div>
                                                                             <div className="userInfo-col userInfo">
                                                                                 {item.chatName !== 'sender' ? <h3>{item.chatName} <span className="badge text-bg-info">Group</span></h3> : item.chatUsers[0].id !== this.authInfo.id ? <h3>{item.chatUsers[0].name}</h3> : <h3>{item.chatUsers[1].name}</h3>}
-                                                                                {item.isBlock === true && item.latestMessage === false ? <></> : (item.latestMessage === null ? <></> : (item.latestMessage.mediaContent === null ? <p>{item.latestMessage.messageContent}</p> : <p><i><b>Media File</b></i></p>))}                                                 
+                                                                                {item.isBlock === true && item.latestMessage === false ? <></> : (item.latestMessage === null ? <></> : (item.latestMessage.mediaContent === null ? <p>{item.latestMessage.messageContent}</p> : <p><i><b>Media File</b></i></p>))}
                                                                             </div>
                                                                             {item.isBlock === false ? (
                                                                                 <div className="userInfo-col chatTime">
@@ -1148,9 +1158,9 @@ class Chat extends Component {
                                                         Chat was blocked..!
                                                     </div>
 
-                                                    <div className='text-center'>
+                                                    {/* <div className='text-center'>
                                                         <a href='#' className='fw-bold text-primary' onClick={() => { this.handleUnblockChat(sendChatData.chatId) }}>Click to Unblock</a>
-                                                    </div>
+                                                    </div> */}
                                                 </>}
                                             </div>
                                         </> : <>

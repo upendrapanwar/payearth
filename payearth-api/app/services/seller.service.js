@@ -120,6 +120,7 @@ module.exports = {
   chatMessageDelete,
   removeFromGroup,
   addGroupMember,
+  updateGroupName,
 
 
 
@@ -3265,7 +3266,7 @@ async function fetchChat(req) {
         return 0;
       }
     });
-    
+
     return result;
   } catch (error) {
     console.log(error);
@@ -3410,6 +3411,26 @@ async function addGroupMember(req) {
     return addUser;
   } catch (error) {
     console.log(error)
+  }
+}
+
+
+// Edit group name
+
+async function updateGroupName(req) {
+  // const chatId = req.params.id;
+  const { chatId, groupName } = req.body;
+
+  // console.log("chatId", chatId);
+  // console.log("groupName", groupName);
+  try {
+    const chatData = await Chat.findByIdAndUpdate(chatId,
+      { $set: { chatName: groupName } },
+      { new: true }
+    );
+    return chatData;
+  } catch (error) {
+    console.log(error);
   }
 }
 
