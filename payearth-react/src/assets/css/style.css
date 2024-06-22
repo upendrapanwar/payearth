@@ -4376,6 +4376,8 @@ h4 {
   margin: 0 auto;
 }
 
+.iframe-container .iFrame-wrapper .banner-close{z-index: 9;}    
+
 .iframe-container iframe {
   width: 100% !important;
   height: 100%;
