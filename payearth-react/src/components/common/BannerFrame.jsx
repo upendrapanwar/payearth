@@ -16,6 +16,7 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
     const [ipAddress, setIpAddress] = useState('');
     const isloginUser = isLogin();
 
+
     useEffect(() => {
         ReactGA.initialize(process.env.REACT_APP_MEASUREMENT_ID);
     })
@@ -42,6 +43,7 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
                     if (urls.length > 0) {
                         const timeoutId = setTimeout(() => {
                             setIframeOpen(true);
+                            // frameloaded();
                         }, 5000);
                         return () => clearTimeout(timeoutId);
                     }
@@ -81,7 +83,6 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
         // const urlWithUserId = [
         //     { iframePath: `${iframePath}`, user_id: `611bab8fed84c042781aec35` },
         // ]
-
         ReactGA.event({
             category: 'Iframe Visit',
             action: 'Click',
@@ -108,26 +109,15 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
             }).then((response) => {
                 closeIframe();
                 toast.success("Advertise Blocked successfully....", { autoClose: 2000 })
-                console.log("response", response)
+                // console.log("response", response)
                 setTimeout(() => {
                     fetchData();
-                }, 2000);
+                }, 3000);
             }).catch((error) => {
                 console.log("error", error)
             })
         }
     }
-
-
-    const iframeStyles = {
-        // border: '1px solid red',
-        // borderRadius: '5px',
-        // objectFit: 'fill',
-        // width: '100%',
-
-        // boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
-        // width: -webkit-fill-available
-    };
 
     const openIframe = () => {
         setIframeOpen(true);
@@ -137,25 +127,60 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
         setIframeOpen(false);
     };
 
-    const renderBannerTopIframe = () => <>
-        {iframeOpen === true ? (<div className='iframe-container' key="iframeContainer">
-            <div className='iFrame-wrapper'>
-                <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
-                <Iframe
-                    src={advertisements.map(item => !item.video ? item.image : item.video)[currentUrlIndex]}
-                    // width="100%"
-                    // height="150px"
-                    scrolling="no"
-                    style={iframeStyles}
-                    allow="autoplay; encrypted-media"
-                    allowFullScreen
-                    className="centeredIframe"
-                    onInferredClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
-                ></Iframe>
-                <button className="block_button" onClick={() => block(advertisements[currentUrlIndex].id)}>Click to Block this advertise..!</button>
-            </div>
-        </div>) : ""}
-    </>
+    // const renderBannerTopIframe = () => <>
+    //     {iframeOpen === true ? (<div className='iframe-container' key="iframeContainer">
+    //         <div className='iFrame-wrapper'>
+    //             <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
+    //             <Iframe
+    //                 id='portfoliosrc'
+    //                 // onLoad={frameloaded}
+    //                 src={advertisements.map(item => !item.video ? item.image : item.video)[currentUrlIndex]}
+    //                 // width="100%"
+    //                 // height="150px"
+    //                 scrolling="no"
+    //                 style={iframeStyles}
+    //                 allow="autoplay; encrypted-media"
+    //                 allowFullScreen
+    //                 className="centeredIframe"
+    //                 onInferredClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
+    //             ></Iframe>
+    //             <button className="block_button" onClick={() => block(advertisements[currentUrlIndex].id)}>Click to Block this advertise..!</button>
+    //         </div>
+    //     </div>) : ""}
+    // </>
+
+    const renderBannerTopIframe = () => {
+        if (iframeOpen === true) {
+            const advertiseData = advertisements[currentUrlIndex];
+            // console.log("advertiseData", advertiseData)
+            const videoKey = `${advertiseData.video}-${Date.now()}`;
+            return (
+                <div className="iframe-container">
+                    <div className='iFrame-wrapper'>
+                        <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
+                        {advertiseData.video ? (
+                            <video key={videoKey} autoPlay loop onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)} className='advertisement-media'>
+                                <source
+                                    src={advertiseData.video}
+                                    type="video/mp4"
+                                // onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
+                                />
+                                Your browser does not support the video tag.
+                            </video>
+                        ) : (
+                            <img
+                                src={advertiseData.image}
+                                alt="advertisement"
+                                className='advertisement-media'
+                                onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
+                            />
+                        )}
+                        <button className="block_button" onClick={() => block(advertisements[currentUrlIndex].id)}>Click to Block this advertise..!</button>
+                    </div>
+                </div>
+            );
+        }
+    }
 
     return <>
         <div>
@@ -258,7 +283,7 @@ export const GetAllBanner = () => {
             }).then((response) => {
                 closeIframe();
                 toast.success("Advertise Blocked successfully....", { autoClose: 2000 })
-                console.log("response", response)
+                // console.log("response", response)
                 setTimeout(() => {
                     fetchData();
                 }, 2000);
@@ -268,16 +293,6 @@ export const GetAllBanner = () => {
         }
     }
 
-    const iframeStyles = {
-        cursor: 'pointer'
-        // border: '1px solid red',
-        // borderRadius: '5px',
-        // objectFit: 'fill',
-        // width: '100%',
-
-        // boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
-        // width: -webkit-fill-available
-    };
 
     const openIframe = () => {
         setIframeOpen(true);
@@ -287,26 +302,61 @@ export const GetAllBanner = () => {
         setIframeOpen(false);
     };
 
-    const renderAllBannerTopIframe = () => <>
-        {iframeOpen === true ? (<div className='iframe-container' key="iframeContainer">
-            <div className='iFrame-wrapper'>
-                <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
-                <Iframe
-                    src={advertisements.map(item => !item.video ? item.image : item.video)[currentUrlIndex]}
-                    // width="100%"
-                    // height="150px"
-                    cursor="pointer"
-                    scrolling="no"
-                    style={iframeStyles}
-                    allow="autoplay; encrypted-media"
-                    allowFullScreen
-                    className="centeredIframe"
-                    onInferredClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
-                ></Iframe>
-                {/* <button className="block_button" onClick={() => block(advertisements[currentUrlIndex].id)}>Click to Block this advertise..!</button> */}
-            </div>
-        </div>) : ""}
-    </>
+
+    // const renderAllBannerTopIframe = () => <>
+    //     {iframeOpen === true ? (<div className='iframe-container' key="iframeContainer">
+    //         <div className='iFrame-wrapper'>
+    //             <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
+
+    //             <Iframe
+    //                 id='portfoliosrc'
+
+    //                 src={advertisements.map(item => !item.video ? item.image : item.video)[currentUrlIndex]}
+
+    //                 cursor="pointer"
+    //                 scrolling="no"
+    //                 allow="autoplay; encrypted-media"
+    //                 allowFullScreen
+    //                 className="centeredIframe"
+    //                 onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
+    //             // onInferredClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
+    //             ></Iframe>
+    //         </div>
+    //     </div>) : ""}
+    // </>
+
+    const renderAllBannerTopIframe = () => {
+        if (iframeOpen === true) {
+            const advertiseData = advertisements[currentUrlIndex];
+            // console.log("advertiseData", advertiseData)
+            const videoKey = `${advertiseData.video}-${Date.now()}`;
+            return (
+                <div className="iframe-container">
+                    <div className='iFrame-wrapper'>
+                        <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
+                        {advertiseData.video ? (
+                            <video key={videoKey} autoPlay loop onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)} className='advertisement-media'>
+                                <source
+                                    src={advertiseData.video}
+                                    type="video/mp4"
+                                // onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
+                                />
+                                Your browser does not support the video tag.
+                            </video>
+                        ) : (
+                            <img
+                                className='advertisement-media'
+                                src={advertiseData.image}
+                                alt="advertisement"
+                                onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
+                            />
+                        )}
+                        {/* <button className="block_button" onClick={() => block(advertisements[currentUrlIndex].id)}>Click to Block this advertise..!</button> */}
+                    </div>
+                </div>
+            );
+        }
+    }
 
     return <>
 

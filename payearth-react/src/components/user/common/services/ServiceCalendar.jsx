@@ -82,7 +82,14 @@ function ServiceCalendar() {
   }, [id]);
 
   //handleDateClick for open form to add new event
-  const handleDateClick = () => {
+  const handleDateClick = (arg) => {
+
+    console.log("arg.dateStr", arg.dateStr)
+
+    setNewEvent((prevEvent) => ({
+      ...prevEvent,
+      meetingDate: arg.dateStr,
+    }));
     // fetchEvents();
     setFormOpen(true);
   };

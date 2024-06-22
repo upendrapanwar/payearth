@@ -28,6 +28,7 @@ import { NotFound } from './../../components/common/NotFound';
 import moment from 'moment';
 import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data';
+import { Helmet } from 'react-helmet';
 
 class Chat extends Component {
     constructor(props) {
@@ -813,6 +814,7 @@ class Chat extends Component {
                 <Header />
                 <PageTitle title="Chat" />
                 <section className="inr_wrap">
+                    <Helmet><title>{"Chat - Pay Earth"}</title></Helmet>
                     <div className="container">
                         <div className="row">
                             <div className="col-md-12">

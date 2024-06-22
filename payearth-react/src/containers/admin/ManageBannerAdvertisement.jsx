@@ -529,7 +529,7 @@ class ManageBannerAdvertisement extends Component {
                                                 </div>
                                                 {/* background-color: aliceblue */}
 
-                                                <div className="col-md-12 bg-body-tertiary plan-cart mt-4">
+                                                <div className="col-md-12 plan-cart mt-4">
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
                                                             <div className="field_item text-center">

@@ -2459,9 +2459,9 @@ async function createCmsCategory(req, res) {
     try {
         var param = req.body;
         let input = {
-            bannerText: param.bannerText,
-            // slug: param.slug,
-            // description: param.description,
+            names: param.names,
+            slug: param.slug,
+            description: param.description,
             // publishDate: param.publishDate,
             // author: param.author,
         };

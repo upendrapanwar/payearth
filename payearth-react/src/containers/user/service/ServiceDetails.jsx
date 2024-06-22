@@ -85,7 +85,7 @@ const ServiceDetails = () => {
                       <p>{data.category.categoryName}</p>
                       <p>{data.description ? parse(data.description) : ""}</p>
                       <div className="pdi_fea">
-                        <Link className="btn custom_btn btn_yellow" to="/">
+                        <Link className="btn custom_btn btn_yellow" to="#">
                           Buy Now
                         </Link>
                         <br />

@@ -63,10 +63,8 @@ class SellerBannerEdit extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`
             }
         }).then((response) => {
-            console.log("Banner Edit response : ", response.data.data)
             let result = response.data.data
             for (var i = 0; i < result.length; i++) {
-                console.log("result", result)
                 this.setState({
                     image: result[i].image,
                     imageId: result[i].imageId,
@@ -98,17 +96,9 @@ class SellerBannerEdit extends Component {
         data.append("file", file)
         data.append("upload_preset", "pay-earth-images")
         data.append("cloud_name", "pay-earth")
-
-        console.log("dataIMAge", data)
-        // https://api.cloudinary.com/v1_1/pay-earth/video/upload   <= video file example
-
-        fetch("https://api.cloudinary.com/v1_1/pay-earth/image/upload", {
-            method: "post",
-            body: data
-        }).then((res) => res.json())
+        fetch("https://api.cloudinary.com/v1_1/pay-earth/image/upload", { method: "post", body: data })
+            .then((res) => res.json())
             .then((data) => {
-                // console.log(data.secure_url);
-                console.log("data.............................................", data)
                 this.setState({ image: data.secure_url })
                 this.setState({ imageId: data.public_id })
             }).catch((err) => {
@@ -123,14 +113,11 @@ class SellerBannerEdit extends Component {
         data.append("file", file)
         data.append("upload_preset", "pay-earth-images")
         data.append("cloud_name", "pay-earth")
-
         fetch("https://api.cloudinary.com/v1_1/pay-earth/video/upload", {
             method: "post",
             body: data
         }).then((res) => res.json())
             .then((data) => {
-                // console.log(data.secure_url);
-                console.log("dataIMAge", data)
                 this.setState({ video: data.secure_url })
                 this.setState({ videoSize: this.formatBytes(file.size) });
                 this.setState({ videoId: data.public_id })
@@ -149,13 +136,9 @@ class SellerBannerEdit extends Component {
     };
 
     handleBannerText = (e) => {
-        // console.log("target value", e.target.value)
         this.setState({ bannerText: e.target.value });
     }
     handleBannerType = (e) => {
-        // const selectedText = e.target.options[e.target.selectedIndex].text;
-        // console.log("select TYPE", selectedText)
-        console.log("bannerType : ", e.target.value)
         this.setState({ bannerType: e.target.value });
     }
     handleBannerName = (e) => {
@@ -166,7 +149,6 @@ class SellerBannerEdit extends Component {
     }
     handleCategorySelect = (e) => {
         const selectedText = e.target.options[e.target.selectedIndex].text;
-        console.log("select Category", selectedText)
         this.setState({ category: selectedText });
     }
     handleTagChange = (e) => {
@@ -179,31 +161,23 @@ class SellerBannerEdit extends Component {
     handleStartDate = (e) => {
         this.setState({ startDate: new Date(e.target.value) });
     }
-    // handleEndDate = () => {
-
-    // }
 
     handleSubscriptionPlan = (e) => {
-        //  const selectedText = e.target.options[e.target.selectedIndex].text;
-        //  console.log("selected TEXT", selectedText)
         this.setState({ subscriptionPlan: e.target.value });
-        //  this.setState({ card: e.target.value });
     };
+
     handleBannerPlacement = (e) => {
-        //const selectedText = e.target.options[e.target.selectedIndex].text;
-        // console.log("selected PLACEMENT", selectedText)
         this.setState({ bannerPlacement: e.target.value })
     }
 
     updateSave = () => {
         toast.success("Banner Update succesfully..", { autoClose: 3000 })
-        // this.saveBanner("pending");
         this.updateBanner();
         this.props.history.push('/seller/manage-banner-list')
     }
+
     updateBanner = (status) => {
         const { id } = this.props.match.params;
-
         const { image, imageId, video, videoId, bannerText, bannerType, bannerName, siteUrl, category, startDate, endDate, subscriptionPlan, bannerPlacement, signaturess, author, tag, keyword } = this.state;
         const url = `/seller/updateBanner/${id}`;
         const bannerData = {
@@ -356,8 +330,6 @@ class SellerBannerEdit extends Component {
 
     createSignatureVideo = () => {
         const { videoId } = this.state
-
-        console.log("videoPUBLICK ID", videoId)
         const timestamp = Math.round(new Date().getTime() / 1000);
         const signature = CryptoJS.SHA1(`public_id=${videoId}&timestamp=${timestamp}${this.apiSecret}`).toString(CryptoJS.enc.Hex);
         return { timestamp, signature };
@@ -365,10 +337,7 @@ class SellerBannerEdit extends Component {
     handleDeleteCloudVideo = async () => {
         this.setState({ video: "" })
         const { videoId } = this.state;
-
-
         const { timestamp, signature } = this.createSignatureVideo();
-
         try {
             const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/video/destroy`;
             const response = await axios.delete(cloudinaryUrl, {
@@ -393,18 +362,12 @@ class SellerBannerEdit extends Component {
 
 
     render() {
-
         const { image, video, selectValueType, siteUrl, subscriptionPlan } = this.state;
-
-        console.log("subscriptionPlan : ", subscriptionPlan)
-
-        console.log("siteURL", siteUrl)
         return (
             <React.Fragment>
                 <Header />
                 <div className="inr_top_page_title">
                     <h2>Edit Advertisement</h2>
-
                 </div>
                 <section className="inr_wrap">
                     <div className="container">
@@ -650,7 +613,7 @@ class SellerBannerEdit extends Component {
                                                                     }</label>
                                                                     <div className="adv_preview_thumb">
                                                                         <div className="thumbPic">
-                                                                            {!image ? <img src={emptyImg} alt='...' style={{ maxWidth: "50%" }} /> : <img src={image} style={{ maxWidth: "50%" }} />}
+                                                                            {!image ? <img src={emptyImg} alt='...' style={{ maxWidth: "50%" }} /> : <img src={image} alt='...' />}
                                                                             {/* <img src={nicon} alt="" /> */}
                                                                         </div>
                                                                     </div>
@@ -675,36 +638,7 @@ class SellerBannerEdit extends Component {
                                                             </div>}
                                                     </div>
                                                 </div>
-
-
-                                                <div className="col-md-12 bg-body-tertiary advBannerEditWrap">
-                                                    {/* <div className="row">
-                                                        <div className="col-md-12">
-                                                            <h3 className="text-center selectPlanHeading">Your Selected plan : </h3>
-                                                            <div className="wrapper">
-                                                                <div className="pricing-table group">
-                                                                    <div className="block personal f2" >
-                                                                        <h2 className="title" > {subscriptionPlan.planType}</h2>
-                                                                        <div className="content">
-                                                                            <p className="price">
-                                                                                <sup>$</sup>
-                                                                                <span>{subscriptionPlan.planPrice}</span>
-                                                                                <sub>/mo.</sub>
-                                                                            </p>
-                                                                            <p className="hint">Perfect for freelancers</p>
-                                                                        </div>
-                                                                        <ul className="features">
-                                                                            <li><span className="fontawesome-cog"></span>1 WordPress Install</li>
-                                                                            <li><span className="fontawesome-star"></span>25,000 visits/mo.</li>
-                                                                            <li><span className="fontawesome-dashboard"></span>Unlimited Data Transfer</li>
-                                                                            <li><span className="fontawesome-cloud"></span>10GB Local Storage</li>
-                                                                        </ul>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div> */}
-
+                                                <div className="col-md-12 advBannerEditWrap">
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
                                                             <div className="field_item">
@@ -717,7 +651,6 @@ class SellerBannerEdit extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
-
                                                 </div>
                                             </div>
                                         </div>
@@ -727,7 +660,6 @@ class SellerBannerEdit extends Component {
                         </div>
                     </div>
                 </section>
-
                 <Footer />
             </React.Fragment>
         );

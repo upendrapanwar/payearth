@@ -662,7 +662,7 @@ class ManageBannerListEdit extends Component {
                                                                     }</label>
                                                                     <div className="adv_preview_thumb">
                                                                         <div className="thumbPic">
-                                                                            {!image ? <img src={emptyImg} alt='...' style={{ maxWidth: "50%" }} /> : <img src={image} style={{ maxWidth: "50%" }} />}
+                                                                            {!image ? <img src={emptyImg} alt='...' style={{ maxWidth: "50%" }} /> : <img src={image} alt='...' />}
                                                                             {/* <img src={nicon} alt="" /> */}
                                                                         </div>
                                                                     </div>
@@ -689,7 +689,7 @@ class ManageBannerListEdit extends Component {
                                                 </div>
 
 
-                                                <div className="col-md-12 bg-body-tertiary advBannerEditWrap">
+                                                <div className="col-md-12 advBannerEditWrap">
                                                     <div className="crt_bnr_fieldRow">
                                                         <div className="crt_bnr_field">
                                                             <div className="field_item">

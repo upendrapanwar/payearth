@@ -876,7 +876,7 @@ class SellerManageBannerAdvertisement extends Component {
                                                 </div>
                                                 {/* background-color: aliceblue */}
 
-                                                <div className="col-md-12 bg-body-tertiary advBannerEditWrap">
+                                                <div className="col-md-12 advBannerEditWrap">
                                                     <div className="row">
                                                         {sellerSubscriptionPlan !== "" ? <>
                                                             <div className='subPlan'>
