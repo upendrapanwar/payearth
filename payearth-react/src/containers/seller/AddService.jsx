@@ -11,23 +11,26 @@ import SpinnerLoader from '../../components/common/SpinnerLoader';
 import axios from 'axios';
 import addServiceSchema from './../../validation-schemas/addServiceSchema';
 import ReactQuill from 'react-quill';
+import { Link } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 // import { Editor } from 'react-draft-wysiwyg';
 // import { EditorState, convertToRaw  } from 'draft-js';
 import emptyImg from './../../assets/images/emptyimage.png'
+import arrow_back from './../../assets/icons/arrow-back.svg'
+import { bottom } from '@popperjs/core';
 
 class AddService extends Component {
     constructor(props) {
         super(props);
-        const {dispatch} = props;
+        const { dispatch } = props;
         this.dispatch = dispatch;
         this.authInfo = store.getState().auth.authInfo;
         this.cloudName = process.env.REACT_APP_CLOUD_NAME;
-        this.apiKey = process.env.REACT_APP_API_KEY;
-        this.apiSecret = process.env.REACT_APP_API_SECRET;
+        this.apiKey = process.env.REACT_APP_CLOUD_API_KEY;
+        this.apiSecret = process.env.REACT_APP_CLOUD_API_SECRET;
         this.state = {
             catOptions: [],
-            defaultCatOption: {label: 'Choose Category', value: ''},
+            defaultCatOption: { label: 'Choose Category', value: '' },
             // subCatOptions: [],
             // defaultSubCatOption: {label: 'Choose Sub Category', value: ''},
             // files: {
@@ -43,7 +46,7 @@ class AddService extends Component {
             image: "",
             emptyImg: emptyImg,
         };
-                       
+
         // this.setEditor = (editor) => {
         //   this.editor = editor;
         // };
@@ -97,22 +100,22 @@ class AddService extends Component {
                 if (param === null) {
                     let catOptions = [];
                     response.data.data.forEach(value => {
-                        catOptions.push({label: value.categoryName, value: value.id})
+                        catOptions.push({ label: value.categoryName, value: value.id })
                     });
-                    this.setState({catOptions});
+                    this.setState({ catOptions });
                 } else {
                     let subCatOptions = [];
                     response.data.data.forEach(value => {
-                        subCatOptions.push({label: value.categoryName, value: value.id})
+                        subCatOptions.push({ label: value.categoryName, value: value.id })
                     });
-                    this.setState({subCatOptions});
+                    this.setState({ subCatOptions });
                 }
             }
         }).catch(error => {
             console.log(error);
         }).finally(() => {
             setTimeout(() => {
-                this.dispatch(setLoading({loading: false}));
+                this.dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
@@ -218,7 +221,6 @@ class AddService extends Component {
         } else {
             toast.error("Image size must be less than 5 MB", { autoClose: 3000 })
         }
-
     };
 
 
@@ -230,20 +232,21 @@ class AddService extends Component {
         const formData = {
             seller_id: this.authInfo.id,
             name: values.name,
+            charges: values.charges,
             category: values.category,
             // description: contentStateJSON,
             description: this.state.description,
             image: this.state.featuredImg,
-            imageId : this.state.imageId,
+            imageId: this.state.imageId,
             slug: slug,
         }
         console.log("formData:", formData);
-       this.setState({serviceName: values.name});
-    //    this.setState({serviceCategory: values.category});
-       localStorage.setItem('serviceName', this.state.serviceName);
-       localStorage.setItem('serviceCategory', this.state.serviceCategory);
+        this.setState({ serviceName: values.name });
+        //    this.setState({serviceCategory: values.category});
+        localStorage.setItem('serviceName', this.state.serviceName);
+        localStorage.setItem('serviceCategory', this.state.serviceCategory);
 
-        this.dispatch(setLoading({loading: true}));
+        this.dispatch(setLoading({ loading: true }));
         axios.post('seller/services', formData, {
             headers: {
                 'Accept': 'application/form-data',
@@ -251,10 +254,10 @@ class AddService extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`
             }
         }).then((response) => {
-        if (response.data.status) {
+            if (response.data.status) {
                 this.props.history.push('/seller/service-checkout');
             }
-           
+            console.log('its ressssss', response)
         }).catch(error => {
             console.log('error =>', error)
             if (error.response) {
@@ -263,13 +266,13 @@ class AddService extends Component {
         }).finally(() => {
             console.log('inside the finally block')
             setTimeout(() => {
-                this.dispatch(setLoading({loading: false}));
+                this.dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
 
     render() {
-        const {loading} = store.getState().global;
+        const { loading } = store.getState().global;
         const {
             catOptions,
             defaultCatOption,
@@ -279,10 +282,11 @@ class AddService extends Component {
 
         const styles = {
             editor: {
-              border: '1px solid gray',
-              minHeight: '20em'
-            }
-          };
+                // border: '1px solid grey',
+                height: '18em',
+                // marginBottom:'5em',
+            },
+        };
 
         return (
             <React.Fragment>
@@ -296,6 +300,7 @@ class AddService extends Component {
                                     <Formik
                                         initialValues={{
                                             name: '',
+                                            charges: '',
                                             category: defaultCatOption?.value,
                                             description: '',
                                             price: '',
@@ -303,7 +308,7 @@ class AddService extends Component {
                                             featuredImg: ''
                                         }}
                                         onSubmit={values => this.handleSubmit(values)}
-                                        // validationSchema={addServiceSchema}
+                                    // validationSchema={addServiceSchema}
                                     >
                                         {({ values,
                                             errors,
@@ -315,8 +320,18 @@ class AddService extends Component {
                                         }) => (
                                             <form onSubmit={handleSubmit} encType="multipart/form-data" >
                                                 <div className="row">
-                                                    <div className="col-md-12 pt-4 pb-4">
+                                                    <div className="col-md-12 pt-4 pb-4  d-flex justify-content-between align-items-center">
                                                         <div className="dash_title">Add Service</div>
+
+                                                        {/* <div className="col-md-4 pt-4 pb-4"> */}
+                                                        {/* <button type="submit" className="btn  custom_btn btn_yellow w-auto" onClick={() => window.history.back()}>Back</button> */}
+                                                        {/* </div> */}
+                                                        <div className=""><span>
+                                                            <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/service-stock-management">
+                                                                <img src={arrow_back} alt="linked-in" />&nbsp;
+                                                                Back
+                                                            </Link>
+                                                        </span></div>
                                                     </div>
                                                     <div className="col-md-7">
                                                         <div className="mb-4">
@@ -326,13 +341,29 @@ class AddService extends Component {
                                                                 onBlur={handleBlur}
                                                                 value={values.name}
                                                                 onChange={handleChange}
+                                                                placeholder={"Service Name"}
                                                             />
                                                             {touched.name && errors.name ? (
                                                                 <small className="text-danger">{errors.name}</small>
                                                             ) : null}
                                                         </div>
                                                     </div>
-                                                    <div className="col-md-5">
+                                                    <div className="col-md-2">
+                                                        <div className="mb-4">
+                                                            <label htmlFor="charges" className="form-label"> Charges <small className="text-danger">*</small></label>
+                                                            <input type="text" className="form-control" id="charges" aria-describedby="chargesHelp"
+                                                                name="charges"
+                                                                onBlur={handleBlur}
+                                                                value={values.charges}
+                                                                onChange={handleChange}
+                                                                placeholder={"$ USD"}
+                                                            />
+                                                            {touched.charges && errors.charges ? (
+                                                                <small className="text-danger">{errors.charges}</small>
+                                                            ) : null}
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-md-3">
                                                         <div className="mb-4">
                                                             <label htmlFor="category" className="form-label"> Category <small className="text-danger">*</small></label>
                                                             <Select
@@ -353,7 +384,7 @@ class AddService extends Component {
                                                             ) : null}
                                                         </div>
                                                     </div>
-                                                   {/* <div className="col-md-4">
+                                                    {/* <div className="col-md-4">
                                                         <div className="mb-4">
                                                             <label className="form-label">Subcategory</label>
                                                             <Select
@@ -371,7 +402,7 @@ class AddService extends Component {
                                                     <div className="col-md-7">
                                                         <div className="mb-4">
                                                             <label className="form-label">Description <small className="text-danger">*</small></label>
-                                                        { /*   <textarea id="editor" className="form-control h-100" rows="5"
+                                                            { /*   <textarea id="editor" className="form-control h-100" rows="5"
                                                                 name="description"
                                                                 onChange={handleChange}
                                                                 onBlur={handleBlur}
@@ -381,7 +412,7 @@ class AddService extends Component {
                                                                 <small className="text-danger">{errors.description}</small>
                                                             ) : null}
                                                          */ }
-                                                        {/* <div style={styles.editor} onClick={this.focusEditor}>
+                                                            {/* <div style={styles.editor} onClick={this.focusEditor}>
                                                         <Editor
                                                          editorState={this.state.editorState}
                                                          wrapperClassName="rich-editor demo-wrapper"
@@ -390,9 +421,11 @@ class AddService extends Component {
                                                          placeholder="The message goes here..."
                                                        />
                                                        </div> */}
-                                                        <div className="field_item">
+                                                            <div className="field_item" onClick={this.focusEditor}>
                                                                 <ReactQuill
-                                                                    //style={{ height: '250px' }}
+                                                                    className='discr_reactquill'
+                                                                    // style={{height:"18em"}}
+                                                                    style={styles.editor}
                                                                     type="text"
                                                                     name="description"
                                                                     value={this.state.description}
@@ -407,21 +440,21 @@ class AddService extends Component {
                                                                         ]
                                                                     }}
                                                                 />
-                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                  
+
                                                     <div className="col-md-5">
-                                                            <div className='formImage-wrapper'>
+                                                        <div className='formImage-wrapper'>
                                                             <label className="form-label">Featured Image</label>
                                                             <div className='text-center formImage-pannel'>
-                                                            {!image ? 
-                                                            <div className='formImage'><img src={emptyImg} alt='...'  /><p className='text-danger'> Size must be less than 5 MB</p></div> 
-                                                            :<div className='formImage'> <img src={image} alt='...'  /></div>}
+                                                                {!image ?
+                                                                    <div className='formImage'><img src={emptyImg} alt='...' /><p className='text-danger'> Size must be less than 5 MB</p></div>
+                                                                    : <div className='formImage'> <img src={image} alt='...' /></div>}
                                                             </div>
-                                                            </div>
-                                                            <div className='formImageInput'>
-                                                            <input 
+                                                        </div>
+                                                        <div className='formImageInput'>
+                                                            <input
                                                                 className="form-control mb-2"
                                                                 style={{ height: "60px" }}
                                                                 type="file"
@@ -436,9 +469,9 @@ class AddService extends Component {
                                                                 // onChange={this.handleImageChange}
                                                                 onBlur={handleBlur}
                                                             />
-                                                                </div> 
-                                                           
-                                                            {/* {touched.featuredImg && errors.featuredImg ? (
+                                                        </div>
+
+                                                        {/* {touched.featuredImg && errors.featuredImg ? (
                                                                 <small className="text-danger">{errors.featuredImg}</small>
                                                             ) : null}
                                                             {this.state.featuredImg !== '' &&
@@ -446,15 +479,15 @@ class AddService extends Component {
                                                                     <img src={this.state.featuredImg} alt="..." style={{maxWidth: '100%', maxHeight: '300px'}} />
                                                                 </div>
                                                             } */}
-                                                            
-                                                        </div>
-                                                        <div className="col-md-2"></div>
-                                                        <div className="col-md-6">
-                                                       
+
+                                                    </div>
+                                                    <div className="col-md-2"></div>
+                                                    <div className="col-md-6">
+
                                                     </div>
                                                     <div>
                                                     </div>
-                                                    <div className="col-md-4 pt-4 pb-4">
+                                                    <div className="cre_ser_pay col-md-12 pt-4 pb-4">
                                                         <button type="submit" className="btn  custom_btn btn_yellow w-auto" disabled={!isValid}>Create Service & Pay</button>
                                                     </div>
                                                 </div>

@@ -14,8 +14,8 @@ class CreateNewBanner extends Component {
     constructor(props) {
         super(props);
         this.cloudName = process.env.REACT_APP_CLOUD_NAME
-        this.apiKey = process.env.REACT_APP_API_KEY
-        this.apiSecret = process.env.REACT_APP_API_SECRET
+        this.apiKey = process.env.REACT_APP_CLOUD_API_KEY
+        this.apiSecret = process.env.REACT_APP_CLOUD_API_SECRET
         this.authInfo = store.getState().auth.authInfo;
         this.userInfo = store.getState().auth.userInfo;
 

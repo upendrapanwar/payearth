@@ -221,7 +221,6 @@ router.get("/getNotification/:id", getNotification);
 router.delete("/deleteNotification/:id", deleteNotification);
 
 // Chat
-
 router.get("/getAllUser", getAllUser);
 router.post("/accessChat", accessChat);
 router.post("/createGroupChat", createGroupChat);
@@ -784,7 +783,6 @@ function getTopSellingCategoryChartData(req, res, next) {
 // }
 
 function addService(req, res, next) {
-  console.log("Hello there how are you....");
   if (req.files && req.files.fileValidationError) {
     return res
       .status(400)

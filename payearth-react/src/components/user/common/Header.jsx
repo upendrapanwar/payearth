@@ -69,7 +69,7 @@ const subCategories = (catId, data) => {
   }
 };
 //readStatus are comming from notification component
-const Header = ({ props, handleIsToggle, readStatus }) => {
+const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
   toast.configure();
   const loginStatus = useSelector((state) => state.auth.isLoggedIn);
   const userInfo = useSelector((state) => state.auth.userInfo);
@@ -415,6 +415,8 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
     }
   };
 
+
+
   useEffect(() => {
     authVerification(dispatch);
     if (flag === false) {
@@ -566,6 +568,37 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
       return `${truncatedMessage} ...`;
     }
   };
+
+  const handleSearchFilter = async () => {
+    console.log("searchOption", searchOption);
+    console.log("catSelectedOption", catSelectedOption);
+
+    try {
+      const query = new URLSearchParams();
+      if (catSelectedOption.label !== 'All') query.append('category', catSelectedOption.label);
+      if (searchOption) query.append('name', searchOption);
+
+      const response = await axios.get(`/front/searchFilterServices?${query.toString()}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+      });
+      console.log("response form searching..:", response.data.data);
+      sendServiceData(response.data.data);
+      // const response = await axios.get(`/front/searchFilterServices?category=${catSelectedOption.label}&name=${searchOption}`, {
+      //   headers: {
+      //     'Accept': 'application/json',
+      //     'Content-Type': 'application/json;charset=UTF-8',
+      //   },
+      // });
+      // console.log("response form searching..:", response.data.data)
+      // sendServiceData(response.data.data)
+    } catch (error) {
+      toast.error("Data Not Found", { autoClose: 3000 })
+      console.error('Error fetching users:', error);
+    }
+  }
 
   return (
     <React.Fragment>
@@ -894,7 +927,8 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
                             <button
                               className="btn btn_dark"
                               type="button"
-                              onClick={handleSearch}
+                              // onClick={handleSearch}
+                              onClick={handleSearchFilter}
                             >
                               Search
                             </button>
@@ -961,17 +995,17 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
                                   >
                                     {/* `service-listing?cat=${value._id}` */}
                                     <Link
-                                      className="nav-link dropdown-toggle"
-                                      to="#"
-                                      id="offcanvasNavbarDropdown"
+                                      className="nav-link gap-2"
+                                      to={`/service-listing?cat=${value._id}`}
+                                      // id="offcanvasNavbarDropdown"
                                       aria-expanded="false"
                                     >
                                       {value.name}
                                     </Link>
-                                    {subCategories(
+                                    {/* {subCategories(
                                       value["_id"],
                                       value.subCategories
-                                    )}
+                                    )} */}
                                   </li>
                                 );
                               }

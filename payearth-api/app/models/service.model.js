@@ -7,6 +7,7 @@ const schema = new Schema({
     name: { type: String, required: true },
     lname: { type: String, required: false, default: "", index: true },
     slug: { type: String, required: false, default: "" },
+    charges: { type: Number, required: true },
     category: { type: mongoose.Schema.ObjectId, ref: "Category" },
     description: { type: String, required: true, default: "" },
     featuredImage: { type: String, required: false, default: "" },

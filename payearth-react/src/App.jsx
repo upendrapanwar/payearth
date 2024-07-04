@@ -14,7 +14,8 @@ import { Elements, StripeProvider } from "react-stripe-elements";
 import Home from "./containers/user/Home";
 import ProductListing from "./containers/user/ProductListing";
 import ProductDetail from "./containers/user/ProductDetail";
-import ServiceListing from "./containers/user/service/ServicesListing";
+import ServicesDisplay from "./containers/user/service/ServicesDisplay";
+import ServiceListing from "./containers/user/service/ServiceListing";
 import ServiceDetail from "./containers/user/service/ServiceDetails";
 import MyOrders from "./containers/user/MyOrders";
 import MyCart from "./containers/user/MyCart";
@@ -101,7 +102,10 @@ import ManageBannerListEdit from "./containers/admin/ManageBannerListEdit";
 
 import AdminManageSubPlan from "./containers/admin/ManageSubscriptionPlan";
 
+import AdminEditService from "./containers/admin/EditService";
+
 import ManageSupport from "./containers/admin/ManageSupport";
+
 // import Services from './containers/seller/Services';
 import EditService from "./containers/seller/EditService";
 import ServiceCheckoutStripe from "./containers/seller/ServiceCheckoutStripe";
@@ -133,24 +137,15 @@ function App() {
         <ScrollToTopButton />
         <Switch>
           <PublicRoute path="/" restricted={false} component={Home} exact />
-          <PublicRoute
-            path="/product-listing"
-            restricted={false}
-            component={ProductListing}
-            exact
-          />
+          <PublicRoute path="/product-listing" restricted={false} component={ProductListing} exact />
           <PublicRoute
             path="/product-detail/:id"
             restricted={false}
             component={ProductDetail}
             exact
           />
-          <PublicRoute
-            path="/service-listing"
-            restricted={false}
-            component={ServiceListing}
-            exact
-          />
+          <PublicRoute path="/service-display" restricted={false} component={ServicesDisplay} exact />
+          <PublicRoute path="/service-listing" restricted={false} component={ServiceListing} exact />
           <PublicRoute
             path="/service-detail/:id"
             restricted={false}
@@ -547,6 +542,12 @@ function App() {
           />
           <PrivateRoute path="/admin/admin-manage-subscriptionplan" component={AdminManageSubPlan} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
           {/* AdminManageSubPlan */}
+
+          <PrivateRoute path="/admin/edit-service/:id"
+            component={AdminEditService}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
+            exact />
 
           <PublicRoute
             path="/community"

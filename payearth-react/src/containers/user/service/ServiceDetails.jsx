@@ -10,6 +10,7 @@ import { Link } from "react-router-dom/cjs/react-router-dom";
 import ServiceDetailsTabbing from "../../../components/user/common/services/ServiceDetailsTabbing";
 import SpinnerLoader from "../../../components/common/SpinnerLoader";
 import { BannerTopIframe } from "../../../components/common/BannerFrame";
+import arrow_back from '../../../assets/icons/arrow-back.svg'
 
 const ServiceDetails = () => {
   const { id } = useParams();
@@ -69,6 +70,11 @@ const ServiceDetails = () => {
           {commonServiceData.length > 0 &&
             commonServiceData.map((data, index) => (
               <div className="row g-0 bg-white rounded" key={index}>
+                <div className="d-flex justify-content-end">
+                  <Link className="btn custom_btn btn_yellow mx-2" to="/">
+                    <img src={arrow_back} alt="Back" />&nbsp;Back
+                  </Link>
+                </div>
                 <div className="col-md-6">
                   <div className="ser_thumb_div">
                     <img src={data.featuredImage} alt="Service Details Image" />
@@ -86,7 +92,7 @@ const ServiceDetails = () => {
                       <p>{data.description ? parse(data.description) : ""}</p>
                       <div className="pdi_fea">
                         <Link className="btn custom_btn btn_yellow" to="#">
-                          Buy Now
+                          {<b>{`$${data.charges}`}</b>}&nbsp; Pay Now
                         </Link>
                         <br />
                       </div>

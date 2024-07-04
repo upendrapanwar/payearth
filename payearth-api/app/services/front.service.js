@@ -23,6 +23,7 @@ const {
   cmsPost,
   cmsPage,
   bannerAdvertisement,
+  Services,
 } = require("../helpers/db");
 
 module.exports = {
@@ -51,6 +52,9 @@ module.exports = {
   getAllBannersData,
   getAllAdvBannerData,
   advertismentBySlug,
+  searchFilterServices,
+  getServiceCategory,
+  getServicesByCategory,
 };
 
 async function getReviews(id) {
@@ -908,5 +912,91 @@ async function getAllAdvBannerData() {
     }
   } catch (error) {
     console.log(error);
+  }
+}
+
+// Searching with category in services..
+
+async function searchFilterServices(req, res) {
+  const { category, name } = req.query;
+
+  // console.log("category", category);
+  // console.log("name", name);
+  // try {
+  //   const categoryData = await Category.findOne({ categoryName: new RegExp(category, 'i') });
+  //   if (!categoryData) {
+  //     return
+  //   }
+  //   const result = await Services.find({
+  //     category: categoryData._id,
+  //     categoryName: new RegExp(name, 'i')
+  //   }).populate('category');
+  //   return result;
+  // } catch (error) {
+  //   console.log(error);
+  // }
+  try {
+    let items;
+
+    if (category) {
+      // Find the category by categoryName
+      const categoryData = await Category.findOne({ categoryName: new RegExp(category, 'i') });
+
+      if (!categoryData) {
+        return
+      }
+
+      // Find items that match the category and name
+      items = await Services.find({
+        category: categoryData._id,
+        categoryName: new RegExp(name, 'i'), // Case-insensitive match
+      }).populate('category');
+    } else if (name) {
+      // Find items that match the name only
+      // console.log("This esle is run")
+      items = await Services.find({
+        name: new RegExp(name, 'i'), // Case-insensitive match
+      }).populate('category');
+    }
+    else {
+      items = await Services.find({})
+    }
+    // console.log("Services filter data", items);
+    return items;
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// get service catgeory
+
+async function getServiceCategory() {
+  try {
+    const categories = await Category.find({ isService: true, parent: null });
+    return categories;
+  } catch (err) {
+    console.log("Error", err)
+  }
+}
+
+async function getServicesByCategory(req) {
+  try {
+    const categoryId = req.params.categoryId;
+    const categories = req.query.categories;
+    let services
+    if (categories) {
+      // console.log("categories", categories)
+      const selectedCategories = categories.split(',');
+      services = await Services.find({ category: { $in: selectedCategories } });
+      // console.log("services with checkbox select..", services)
+      return services
+    } else {
+      services = await Services.find({ category: mongoose.Types.ObjectId(categoryId) });
+      // console.log("services with only id select", services)
+      return services
+    }
+  } catch (err) {
+    console.log("Error", err)
   }
 }

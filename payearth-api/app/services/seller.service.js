@@ -21,6 +21,7 @@ const LocationData = require("countrycitystatejson");
 const {
   User,
   Seller,
+  Admin,
   Product,
   Brand,
   Category,
@@ -2080,7 +2081,6 @@ async function getServiceById(id) {
 }
 
 async function addService(req) {
-  console.log("hello there");
   // console.log('Param', req.body);
   // const files = req.files;
   const param = req.body;
@@ -2114,6 +2114,7 @@ async function addService(req) {
     name: param.name,
     lname: lName,
     slug: param.slug,
+    charges: param.charges,
     category: param.category,
     description: param.description,
     featuredImage: param.image,
@@ -2124,7 +2125,7 @@ async function addService(req) {
     updatedBy: param.seller_id,
   };
 
-  console.log("input data =>", input);
+
 
   // if (param.sub_category !== "") {
   //     input['sub_category'] = param.sub_category;
@@ -2133,10 +2134,10 @@ async function addService(req) {
   const serviceData = new Services(input);
 
   const data = await serviceData.save();
-  console.log("data", data);
+
 
   if (data) {
-    console.log("data id", data._id);
+    // console.log("data id", data._id);
     // const files = req.files;
     // var videosArr = [];
     // var videoCount = 0;
@@ -2522,8 +2523,9 @@ async function getServiceItems(req) {
     let id = req.params.id;
     let result = await Services.find({ $or: [{ createdBy: id }, { _id: id }] })
       .select(
-        "serviceCode name featuredImage imageId description isActive createdAt"
+        "serviceCode name charges featuredImage imageId description isActive createdAt"
       )
+      .sort({ createdAt: "desc" })
       .populate({
         path: "category",
         model: Category,
@@ -2548,6 +2550,7 @@ async function editService(req) {
     const param = req.body;
     const statusData = {
       name: param.name,
+      charges: param.charges,
       category: param.category,
       description: param.description,
       featuredImage: param.featuredImage,
@@ -3095,6 +3098,44 @@ async function updateSubscriptionStatus(req) {
 
 
 //getAllUser
+// async function getAllUser(req) {
+//   const keyword = req.query.search
+//     ? {
+//       $or: [
+//         { name: { $regex: req.query.search, $options: "i" } },
+//         { email: { $regex: req.query.search, $options: "i" } },
+//       ],
+//     }
+//     : {};
+
+//   const [users, sellers] = await Promise.all([
+//     User.find(keyword).select("name email role image_url"),
+//     Seller.find(keyword).select("name email role image_url"),
+
+//   ]);
+
+//   let result = [];
+//   users.forEach((user) => {
+//     const correspondingSeller = sellers.find(
+//       (seller) => seller.email === user.email
+//     );
+//     result.push({
+//       user: user,
+//       seller: correspondingSeller || null,
+//     });
+//   });
+
+//   sellers.forEach((seller) => {
+//     if (!users.find((user) => user.email === seller.email)) {
+//       result.push({
+//         user: null,
+//         seller: seller,
+//       });
+//     }
+//   });
+//   return result;
+// }
+
 async function getAllUser(req) {
   const keyword = req.query.search
     ? {
@@ -3105,9 +3146,10 @@ async function getAllUser(req) {
     }
     : {};
 
-  const [users, sellers] = await Promise.all([
+  const [users, sellers, admins] = await Promise.all([
     User.find(keyword).select("name email role image_url"),
     Seller.find(keyword).select("name email role image_url"),
+    Admin.find(keyword).select("name email role image_url"),
   ]);
 
   let result = [];
@@ -3115,20 +3157,40 @@ async function getAllUser(req) {
     const correspondingSeller = sellers.find(
       (seller) => seller.email === user.email
     );
+    const correspondingAdmin = admins.find(
+      (admin) => admin.email === user.email
+    );
     result.push({
       user: user,
       seller: correspondingSeller || null,
+      admin: correspondingAdmin || null,
     });
   });
 
   sellers.forEach((seller) => {
     if (!users.find((user) => user.email === seller.email)) {
+      const correspondingAdmin = admins.find(
+        (admin) => admin.email === seller.email
+      );
       result.push({
         user: null,
         seller: seller,
+        admin: correspondingAdmin || null,
       });
     }
   });
+
+  admins.forEach((admin) => {
+    if (!users.find((user) => user.email === admin.email) &&
+      !sellers.find((seller) => seller.email === admin.email)) {
+      result.push({
+        user: null,
+        seller: null,
+        admin: admin,
+      });
+    }
+  });
+
   return result;
 }
 
@@ -3294,9 +3356,6 @@ async function fetchBlockChat(req) {
 async function sendMessage(req) {
   const { authorId, messageContent, chatId, mediaContent } = req.body;
 
-  // const chatId = '6645cdaf9ef46fb594be747c';
-  // const messageContent = "hii Robert"
-
   if (!chatId || !authorId) {
     console.log("Invalid Data pass")
   }
@@ -3334,7 +3393,7 @@ async function allMessages(req) {
   const chatId = req.params.id;
 
   try {
-    const message = await ChatMessage.find({ chat: chatId })
+    const message = await ChatMessage.find({ chat: chatId, isVisible: true })
       .populate({
         path: "chat",
         model: Chat,
@@ -3371,7 +3430,7 @@ async function userUnblockChat(req) {
   }
 }
 
-// User Block chat..
+
 async function chatMessageDelete(req) {
   const id = req.params.id;
   const { isVisible } = req.body;
@@ -3433,7 +3492,6 @@ async function updateGroupName(req) {
     console.log(error);
   }
 }
-
 
 
 // *******************************************************************************

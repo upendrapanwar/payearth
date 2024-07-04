@@ -38,6 +38,7 @@ class ServiceStockManagement extends Component {
       editedData: {}, // State to store edited data
       emptyImg: emptyImg,
       isCalendarAuthorized: accessToken ? true : false,
+      paginationPerPage: 5
     };
   }
 
@@ -200,6 +201,11 @@ class ServiceStockManagement extends Component {
     {
       name: "Category",
       selector: (row, i) => row.category.categoryName,
+      sortable: true,
+    },
+    {
+      name: "Charges",
+      selector: (row, i) => `$ ${row.charges}`,
       sortable: true,
     },
     // author
@@ -459,6 +465,7 @@ class ServiceStockManagement extends Component {
       editedData,
       emptyImg,
       isCalendarAuthorized,
+      paginationPerPage
     } = this.state;
 
     console.log("selected Rows", selectedRows);
@@ -621,6 +628,8 @@ class ServiceStockManagement extends Component {
                         selectableRows
                         selectedRows={selectedRows}
                         onSelectedRowsChange={this.handleRowSelected}
+                        paginationRowsPerPageOptions={[5, 8, 12, 16]}
+                        paginationPerPage={paginationPerPage}
                       />
                     </DataTableExtensions>
                     {/* <button

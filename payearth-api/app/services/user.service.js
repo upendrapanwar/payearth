@@ -25,6 +25,7 @@ const stripe = require("stripe")(
 const {
   User,
   Seller,
+  Admin,
   Coupon,
   Product,
   Wishlist,
@@ -2511,6 +2512,7 @@ async function getCommonService(req) {
       .select(
         "serviceCode name featuredImage imageId description isActive createdAt"
       )
+      .sort({ createdAt: "desc" })
       .populate({
         path: "category",
         model: Category,
@@ -2533,7 +2535,7 @@ async function CommonServiceById(req) {
   try {
     let result = await Services.findById({ _id: id })
       .select(
-        "serviceCode name featuredImage imageId description isActive createdAt"
+        "serviceCode name charges featuredImage imageId description isActive createdAt"
       )
       .populate({
         path: "category",
@@ -2775,30 +2777,70 @@ async function getAllUser(req) {
     }
     : {};
 
-  const [users, sellers] = await Promise.all([
+  const [users, sellers, admins] = await Promise.all([
     User.find(keyword).select("name email role image_url"),
     Seller.find(keyword).select("name email role image_url"),
+    Admin.find(keyword).select("name email role image_url"),
   ]);
 
   let result = [];
+  // users.forEach((user) => {
+  //   const correspondingSeller = sellers.find(
+  //     (seller) => seller.email === user.email
+  //   );
+  //   result.push({
+  //     user: user,
+  //     seller: correspondingSeller || null,
+  //   });
+  // });
+
   users.forEach((user) => {
     const correspondingSeller = sellers.find(
       (seller) => seller.email === user.email
     );
+    const correspondingAdmin = admins.find(
+      (admin) => admin.email === user.email
+    );
     result.push({
       user: user,
       seller: correspondingSeller || null,
+      admin: correspondingAdmin || null,
     });
   });
 
+  // sellers.forEach((seller) => {
+  //   if (!users.find((user) => user.email === seller.email)) {
+  //     result.push({
+  //       user: null,
+  //       seller: seller,
+  //     });
+  //   }
+  // });
+
   sellers.forEach((seller) => {
     if (!users.find((user) => user.email === seller.email)) {
+      const correspondingAdmin = admins.find(
+        (admin) => admin.email === seller.email
+      );
       result.push({
         user: null,
         seller: seller,
+        admin: correspondingAdmin || null,
       });
     }
   });
+
+  admins.forEach((admin) => {
+    if (!users.find((user) => user.email === admin.email) &&
+      !sellers.find((seller) => seller.email === admin.email)) {
+      result.push({
+        user: null,
+        seller: null,
+        admin: admin,
+      });
+    }
+  });
+
   return result;
 }
 // *******************************************************************************
@@ -3035,14 +3077,13 @@ async function sendMessage(req) {
   } catch (error) {
     console.log(error)
   }
-
 }
 
 async function allMessages(req) {
   const chatId = req.params.id;
 
   try {
-    const message = await ChatMessage.find({ chat: chatId })
+    const message = await ChatMessage.find({ chat: chatId, isVisible: true })
       .populate({
         path: "chat",
         model: Chat,

@@ -43,8 +43,14 @@ router.get('/pageDetail/:slug', cmsPageDetails);
 // For banner data show through keywords..
 
 router.get('/advertisement/:slug', advertismentBySlug);
-router.get('/advBanner-list/:keywords', getAllBannersData)
-router.get('/getAllAdvBanner-list', getAllAdvBannerData)
+router.get('/advBanner-list/:keywords', getAllBannersData);
+router.get('/getAllAdvBanner-list', getAllAdvBannerData);
+
+router.get("/searchFilterServices", searchFilterServices);
+router.get("/getServiceCategory", getServiceCategory);
+router.get("/getServicesByCategory/:categoryId", getServicesByCategory);
+
+// /seller/searchFilterServices?search=${this.state.search}
 
 module.exports = router;
 
@@ -203,7 +209,24 @@ function getAllAdvBannerData(req, res, next) {
         .catch(err => next(res.json({ status: false, message: err })));
 }
 
+// filter & search searchFilterServices
+function searchFilterServices(req, res, next) {
+    frontService.searchFilterServices(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
 
+//getServiceCategory
+function getServiceCategory(req, res, next) {
+    frontService.getServiceCategory(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
 
+function getServicesByCategory(req, res, next) {
+    frontService.getServicesByCategory(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
 
 

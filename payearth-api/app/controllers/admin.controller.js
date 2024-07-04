@@ -192,7 +192,28 @@ router.get("/banner-list", getAllBannersData);
 router.delete("/banner/:id", deleteBannerAdv);
 router.get("/getBannerById/:id", getBannerById);
 router.put("/updateBanner/:id", updateBanner);
-router.post("/createNewBanner", createNewBanner)
+router.post("/createNewBanner", createNewBanner);
+
+router.get("/services", allServiceData);
+router.get("/service/items/:id", getServiceItems);
+router.get("/categories", getAdminCategories);
+router.put('/service/edit/:id', editService);
+router.delete("/services/delete/:id", deleteService);
+router.put("/service/status/:id", statusChange);
+
+router.get("/getAllUser", getAllUser);
+router.post("/accessChat", accessChat);
+router.post("/createGroupChat", createGroupChat);
+router.get("/fetchChat/:id", fetchChat);
+router.get("/fetchBlockChat/:id", fetchBlockChat);
+router.post("/sendMessage", sendMessage)
+router.get("/allMessages/:id", allMessages);
+router.put("/userChatBlock/:id", userChatBlock);
+router.put("/userUnblockChat/:id", userUnblockChat);
+router.put("/messageDelete/:id", chatMessageDelete);
+router.put("/removeFromGroup", removeFromGroup)
+router.put("/addGroupMember/:id", addGroupMember);
+router.put("/updateGroupName", updateGroupName);
 
 
 module.exports = router;
@@ -248,7 +269,6 @@ function getSellers(req, res, next) {
 }
 
 function createCoupon(req, res, next) {
-    //console.log(req.body);
     adminService.createCoupon(req.body)
         .then(coupon => coupon ? res.status(200).json({ status: true, message: msg.admin.coupon.success, data: coupon }) : res.status(400).json({ status: false, message: msg.admin.coupon.error }))
         .catch(err => next(res.json({ status: false, message: err })));
@@ -617,7 +637,7 @@ function getProductSales(req, res, next) {
         .then(sales => sales ? res.status(200).json({ status: true, data: sales }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
- 
+
 // CMS..................
 function createCmsPost(req, res, next) {
     adminService.createCmsPost(req)
@@ -651,7 +671,7 @@ function cmsGetByStatus(req, res, next) {
         .then(posts => posts ? res.status(200).json({ status: true, data: posts }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
- 
+
 // CMS POST..................
 function createCmsPost(req, res, next) {
     adminService.createCmsPost(req)
@@ -786,10 +806,136 @@ function updateBanner(req, res, next) {
     adminService.updateBanner(req)
         .then(banner => banner ? res.json({ status: true, message: "Banner Update Successfully...." }) : res.json({ status: false, message: "ERROR" }))
         .catch(err => next(res.json({ status: false, message: err })));
-} 
+}
 
 function createNewBanner(req, res, next) {
     adminService.createNewBanner(req)
         .then(banner => banner ? res.status(200).json({ status: true, data: banner }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
+}
+
+//Services
+function allServiceData(req, res, next) {
+    adminService.allServiceData(req)
+        .then((Service => Service ? res.status(200).json({ status: true, data: Service }) : res.status(400).json({ status: false, message: "ERROR ", data: [] })))
+        .catch(err => next(res.json({ status: false, message: err })))
+}
+
+function getServiceItems(req, res, next) {
+    adminService.getServiceItems(req)
+        .then((items) => items
+            ? res.status(200).json({ status: true, data: items })
+            : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function getAdminCategories(req, res, next) {
+    adminService.getAdminCategories(req)
+        .then((categories) => categories
+            ? res.status(200).json({ status: true, data: categories })
+            : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function editService(req, res, next) {
+    adminService.editService(req)
+        .then((service) => service
+            ? res.status(201).json({ status: true, message: msg.service.edit.success, data: service, })
+            : res.status(400).json({ status: false, message: msg.service.edit.error }))
+        .catch((err) => next(res.status(400).json({ status: false, message: err })));
+}
+
+function deleteService(req, res, next) {
+    adminService.deleteService(req)
+        .then((deleted) => deleted
+            ? res.json({ status: true, message: "Successful Delete" })
+            : res.json({ status: false, message: "ERROR" }))
+        .catch(err => next(res.json({ status: false, message: err.message })));
+}
+
+function statusChange(req, res, next) {
+    adminService.statusChange(req)
+        .then((status) => status
+            ? res.json({ status: true, message: "Successful Changed" })
+            : res.json({ status: false, message: "ERROR" }))
+        .catch(err => next(res.json({ status: false, message: err.message })));
+}
+
+// Chat
+function getAllUser(req, res, next) {
+    adminService.getAllUser(req)
+        .then((user) => user ? res.status(200).json({ status: true, data: user }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function accessChat(req, res, next) {
+    adminService.accessChat(req)
+        .then((chat) => chat ? res.status(201).json({ status: true, data: chat }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
+        .catch((err) => next(res.status(400).json({ status: false, message: err })));
+}
+
+function createGroupChat(req, res, next) {
+    adminService.createGroupChat(req)
+        .then((chat) => chat ? res.status(201).json({ status: true, data: chat }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
+        .catch((err) => next(res.status(400).json({ status: false, message: err })));
+}
+
+function fetchChat(req, res, next) {
+    adminService.fetchChat(req)
+        .then((chat) => chat ? res.status(200).json({ status: true, data: chat }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function fetchBlockChat(req, res, next) {
+    adminService.fetchBlockChat(req)
+        .then((chat) => chat ? res.status(200).json({ status: true, data: chat }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function sendMessage(req, res, next) {
+    adminService.sendMessage(req)
+        .then((sendChat) => sendChat ? res.status(201).json({ status: true, data: sendChat }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
+        .catch((err) => next(res.status(400).json({ status: false, message: err })));
+}
+
+function allMessages(req, res, next) {
+    adminService.allMessages(req)
+        .then((allChat) => allChat ? res.status(200).json({ status: true, data: allChat }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function userChatBlock(req, res, next) {
+    adminService.userChatBlock(req)
+        .then((chatBlock) => chatBlock ? res.json({ status: true, message: "User Block Successfully...." }) : res.json({ status: false, message: "ERROR" }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function userUnblockChat(req, res, next) {
+    adminService.userUnblockChat(req)
+        .then((chatUnblock) => chatUnblock ? res.json({ status: true, message: "User Unblock Successfully...." }) : res.json({ status: false, message: "ERROR" }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function chatMessageDelete(req, res, next) {
+    adminService.chatMessageDelete(req)
+        .then((chatMessage) => chatMessage ? res.json({ status: true, message: "Status Change Successfully...." }) : res.json({ status: false, message: "ERROR" }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function removeFromGroup(req, res, next) {
+    adminService.removeFromGroup(req)
+        .then((removeMember) => removeMember ? res.json({ status: true, message: removeMember }) : res.json({ status: false, message: "ERROR" }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function addGroupMember(req, res, next) {
+    adminService.addGroupMember(req)
+        .then((addMember) => addMember ? res.json({ status: true, message: "Add Successfully...." }) : res.json({ status: false, message: "ERROR" }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function updateGroupName(req, res, next) {
+    adminService.updateGroupName(req)
+        .then((name) => name ? res.json({ status: true, data: name }) : res.json({ status: false, message: "ERROR" }))
+        .catch((err) => next(res.json({ status: false, message: err })));
 }

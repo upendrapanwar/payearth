@@ -200,7 +200,7 @@ class Chat extends Component {
                 // const data = res.map(item => item.usersAll[0].users)
                 // // const data = users.map(item => item.usersAll[0].users)
                 // console.log("chatName", res.map(item => item.chatName))
-                this.setState({ allChatUsers: users })
+                this.setState({ allChatUsers: users });
 
             }).catch((error) => {
                 console.log("error", error)
@@ -208,7 +208,7 @@ class Chat extends Component {
         } catch (error) {
             console.log("error")
         }
-    }
+    };
 
     fetchAllBlockChat = () => {
         try {
@@ -226,7 +226,7 @@ class Chat extends Component {
 
                 const userBlockData = blockChat.filter(item => item.blockByUser === this.authInfo.id)
                 // console.log("userBlockData", userBlockData);
-                this.setState({ allChatUsers: userBlockData })
+                this.setState({ allChatUsers: userBlockData });
 
             }).catch((error) => {
                 console.log("error", error)
@@ -234,7 +234,7 @@ class Chat extends Component {
         } catch (error) {
             console.log("error")
         }
-    }
+    };
 
     handleSearch = async () => {
         if (!this.state.search) {
@@ -322,7 +322,6 @@ class Chat extends Component {
     }
 
     accessChat = (data) => {
-        // console.log("User selected data", data)
         try {
             const url = '/user/accessChat';
             // const data = { receiverId, authorId }
@@ -345,7 +344,7 @@ class Chat extends Component {
                 }
             }).then((response) => {
                 const datas = response.data.data
-                console.log("accessChat function", datas);
+                // console.log("accessChat function", datas);
                 // console.log("Join room ", datas._id)
                 this.socket.emit('join chat', datas._id);
                 // this.socket.emit("setup", data.id);
@@ -370,7 +369,7 @@ class Chat extends Component {
 
 
     sendNotification = (id, datas) => {
-        console.log("Send Notification function is run.....");
+        // console.log("Send Notification function is run.....");
         this.socket.emit('send_notification', { id, message: datas });
     };
 
@@ -431,8 +430,7 @@ class Chat extends Component {
         }).then((response) => {
             if (response.data.status === true) {
                 const data = response.data.data;
-
-                // console.log("getAllMessage function ", data)
+                // console.log("getAllMessage function", data)
                 this.setState({
                     userChat: data
                 })
@@ -455,7 +453,7 @@ class Chat extends Component {
         // const files = Array.from(event.target.files);
         const files = event.target.files;
         // console.log("files", files)
-        this.setState({ selectedFile: files })
+        this.setState({ selectedFile: files });
     };
 
     onEmojiClick = (emoji) => {
@@ -562,7 +560,6 @@ class Chat extends Component {
                 }).catch((error) => {
                     console.log("error", error);
                 });
-
             } catch (error) {
                 console.log("error", error)
             }
@@ -587,11 +584,12 @@ class Chat extends Component {
             console.error('Error fetching users:', error);
         }
     }
+
     handleCreateGroup = () => {
         this.setState({ showModal: true });
     };
     handleEditGroupName = (data) => {
-        console.log("ChatID", data)
+        // console.log("ChatID", data)
         this.setState({ showEdit: true });
         this.setState({ groupEditData: data })
         this.setState({ groupName: data.name });
@@ -599,8 +597,8 @@ class Chat extends Component {
 
     handleUpdateGroupName = () => {
         const { groupEditData, groupName } = this.state;
-        console.log("groupName", groupName);
-        console.log("groupEditData", groupEditData.chatId);
+        // console.log("groupName", groupName);
+        // console.log("groupEditData", groupEditData.chatId);
 
         try {
             const url = "/user/updateGroupName/";
@@ -612,7 +610,7 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             }).then((response) => {
-                console.log("Update successfully.....", response)
+                // console.log("Update successfully.....", response)
                 this.fetchAllUserData();
                 this.setState({ sendChatData: "" });
                 this.setState({ groupName: "" });
@@ -660,8 +658,10 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 },
             });
+            // item.admin || item.seller || item.user
             const allUsers = response.data.data;
-            const data = allUsers.map(item => item.seller === null ? item.user : item.seller);
+            // const data = allUsers.map(item => item.seller === null ? item.user : item.seller);
+            const data = allUsers.map(item => item.admin || item.seller || item.user);
             const notAddedUser = data.filter(obj1 => !groupData.some(obj2 => obj2.id === obj1.id));
 
             this.setState({ notAddedUser: notAddedUser })
@@ -672,7 +672,6 @@ class Chat extends Component {
     }
 
     clickToAddUser = async (data) => {
-        console.log("click to add function run ")
         const { sendChatData } = this.state;
         try {
             const url = `user/addGroupMember/${sendChatData.chatId}`;
@@ -685,7 +684,7 @@ class Chat extends Component {
             }).then((response) => {
                 this.getAllMessage(sendChatData.chatId);
                 this.fetchAllUserData();
-                toast.success("New User Added", { autoClose: 3000 })
+                // toast.success("New User Added", { autoClose: 3000 })
                 toast.error(response.data.message, { autoClose: 3000 })
                 // this.setState({ subscriptionChecked: response.data.status })
             }).catch((error) => {
@@ -728,7 +727,7 @@ class Chat extends Component {
                     if (response.data.status === true) {
                         this.setState({ sendChatData: "" });
                         this.fetchAllUserData();
-                        toast.success(`You Block ${data.name} Successfully`, { autoClose: 3000 })
+                        toast.success(`You Block ${data.name} Successfully`, { autoClose: 3000 });
                         // this.props.history.push('/chat')
                     }
 
@@ -740,7 +739,7 @@ class Chat extends Component {
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json;charset=UTF-8',
-                        'Authorization': `Bearer ${this.authInfo.token}`
+                        'Authorization': `Bearer ${this.authInfo.token}`,
                     }
                 }).then((response) => {
                     if (response.data.status === true) {
@@ -831,8 +830,8 @@ class Chat extends Component {
     });
 
     handleRemoveFromGroup = (chatId, userId) => {
-        console.log("chatId", chatId);
-        console.log("userId", userId)
+        // console.log("chatId", chatId);
+        // console.log("userId", userId);
 
         try {
             const url = "/user/removeFromGroup/";
@@ -854,6 +853,25 @@ class Chat extends Component {
             console.log("error", error)
         }
     }
+
+    handleRightClick = (event) => {
+        event.preventDefault(); // Prevent the default context menu from appearing
+        alert("Right-click detected")
+        console.log('Right-click detected');
+        // Add your custom right-click functionality here
+    };
+
+    handleTouchStart = (event) => {
+        alert("Touch start detected")
+        console.log('Touch start detected');
+        // Add your custom touch start functionality here
+    };
+
+    handleTouchEnd = (event) => {
+        alert("Touch end detected")
+        console.log('Touch end detected');
+        // Add your custom touch end functionality here
+    };
 
 
     render() {
@@ -910,18 +928,42 @@ class Chat extends Component {
                                                     All Search result
                                                     {users.map((item, index) =>
                                                         <div className="chat_user_item"
-                                                            onClick={() => this.accessChat(item.seller === null ? item.user : item.seller)}
+                                                            onClick={() => this.accessChat(item.admin || item.seller || item.user)}
                                                             key={item.id || index}
                                                         >
                                                             <a href="#" className="d-flex align-items-center chatUser_info">
                                                                 <div className="userInfo-col userThumb">
                                                                     <div className="user_thumb">
-                                                                        <img className="img-fluid" src={item.seller === null ? item.user.image_url : item.seller.image_url} alt="user img" />
+                                                                        {/* <img className="img-fluid" src={item.seller === null ? item.user.image_url : item.seller.image_url} alt="user img" /> */}
+                                                                        <img
+                                                                            className="img-fluid"
+                                                                            src={
+                                                                                item.user !== null
+                                                                                    ? item.user.image_url
+                                                                                    : item.seller === null
+                                                                                        ? item.admin.image_url
+                                                                                        : item.seller.image_url
+                                                                            }
+                                                                            alt="user img"
+                                                                        />
                                                                     </div>
                                                                     {/* <span className="user-inactive user-active"></span> */}
                                                                 </div>
                                                                 <div className="userInfo-col userInfo">
-                                                                    {item.seller === null ? <h3>{item.user.name} <span className="badge text-bg-success">{item.user.id === this.authInfo.id ? "YOU" : ""}</span></h3> : <h3>{item.seller.name}  <span className="badge text-bg-primary">{item.seller.role}</span></h3>}
+                                                                    {/* {item.seller === null ? <h3>{item.user.name} <span className="badge text-bg-success">{item.user.id === this.authInfo.id ? "YOU" : ""}</span></h3> : <h3>{item.seller.name}  <span className="badge text-bg-primary">{item.seller.role}</span></h3>} */}
+                                                                    {item.user !== null ? (
+                                                                        <h3>
+                                                                            {item.user.name} <span className="badge text-bg-success">{item.user.id === this.authInfo.id ? "YOU" : ""}</span>
+                                                                        </h3>
+                                                                    ) : item.seller === null ? (
+                                                                        <h3>
+                                                                            {item.admin.name} <span className="badge text-bg-primary">{item.admin.role}</span>
+                                                                        </h3>
+                                                                    ) : (
+                                                                        <h3>
+                                                                            {item.seller.name} <span className="badge text-bg-warning">{item.seller.role}</span>
+                                                                        </h3>
+                                                                    )}
                                                                 </div>
                                                             </a>
                                                         </div>
@@ -1068,38 +1110,27 @@ class Chat extends Component {
                                                                     {item.sender.id !== this.authInfo.id ? (
                                                                         <ul>
                                                                             <li className="sender">
-                                                                                {item.isVisible === true ? <>
-                                                                                    <div className="userThumb">
-                                                                                        <div className="user_thumb">
-                                                                                            <img className="img-fluid" src={item.sender.image_url} alt="user img" />
-                                                                                        </div>
-                                                                                        <span className="user-inactive user-active"></span>
+                                                                                <div className="userThumb">
+                                                                                    <div className="user_thumb">
+                                                                                        <img className="img-fluid" src={item.sender.image_url} alt="user img" />
                                                                                     </div>
-                                                                                    {item.mediaContent === null ? (item.messageContent === null ? <></> : <p>{item.messageContent}</p>) :
-                                                                                        this.renderMedia(item.mediaContent)
-                                                                                    }
-                                                                                    <a href="#"><img src={delete_icone} alt="add" width={"20px"} height={"20px"} onClick={() => { this.handleMessageDelete(item._id) }} /></a>
-                                                                                    <br />
-                                                                                    <span className='time'>{moment(item.timestamp).format('hh:mm A')}</span>
-                                                                                </> :
-                                                                                    <p className="bg-light text-danger">
-                                                                                        <i>This message was deleted..!</i>
-                                                                                    </p>
-                                                                                }
+                                                                                    <span className="user-inactive user-active"></span>
+                                                                                </div>
+                                                                                {item.mediaContent === null ? (item.messageContent === null ? <></> : <p>{item.messageContent}</p>) : this.renderMedia(item.mediaContent)}
+                                                                                {/* <a href="#"><img src={delete_icone} alt="add" width={"20px"} height={"20px"} onClick={() => { this.handleMessageDelete(item._id) }} /></a> */}
+                                                                                <br />
+                                                                                {item.mediaContent !== null && item.messageContent !== null ? <p>{item.messageContent}</p> : <></>}
+                                                                                <span className='time'>{moment(item.timestamp).format('hh:mm A')}</span>
                                                                             </li>
                                                                         </ul>
                                                                     ) : (
                                                                         <ul>
-                                                                            <li className="repaly">
-                                                                                {item.isVisible === true ? <>
-                                                                                    <a href="#"><img src={delete_icone} alt="add" width={"20px"} height={"20px"} onClick={() => { this.handleMessageDelete(item._id) }} /></a>
-                                                                                    {item.mediaContent === null ? <p>{item.messageContent}</p> : this.renderMedia(item.mediaContent)}
-                                                                                    <span className='time'>{moment(item.timestamp).fromNow()}</span>
-                                                                                </> :
-                                                                                    <p className="bg-light text-danger">
-                                                                                        <i>This message was deleted..!</i>
-                                                                                    </p>
-                                                                                }
+                                                                            <li className="repaly" >
+                                                                                <a href="#"><img src={delete_icone} alt="add" width={"20px"} height={"20px"} onClick={() => { this.handleMessageDelete(item._id) }} /></a>
+                                                                                {item.mediaContent === null ? <p>{item.messageContent}</p> : this.renderMedia(item.mediaContent)}
+                                                                                <br />
+                                                                                {item.mediaContent !== null && item.messageContent !== null ? <p>{item.messageContent}</p> : <></>}
+                                                                                <span className='time'>{moment(item.timestamp).fromNow()}</span>
                                                                             </li>
                                                                         </ul>
                                                                     )}
@@ -1141,11 +1172,9 @@ class Chat extends Component {
                                                                 placeholder="Write message…"
                                                                 value={this.state.messageContent}
                                                                 onChange={this.handleMessageContent}
+                                                                disabled={selectedFile !== null && selectedFile.length > 1 ? true : false}
                                                             />
                                                             <div className="emoji" onClick={this.toggleEmojiPicker}>😊</div>
-                                                            {/* <button type="button" className="emoji btn btn-light" onClick={this.toggleEmojiPicker}>
-                                                                😊
-                                                            </button> */}
                                                             {showEmojiPicker && <Picker data={data} onEmojiSelect={this.onEmojiClick} />}
 
                                                             <button type="button" onClick={this.sendMessage}>
@@ -1299,7 +1328,20 @@ class Chat extends Component {
                                             <span className="user-inactive user-active"></span>
                                         </div>
                                         <div className="userInfo-col userInfo">
-                                            {item.seller === null ? <h3>{item.user.name} <span className="badge text-bg-success">{item.user.id === this.authInfo.id ? "YOU" : ""}</span> </h3> : <h3>{item.seller.name}  <span className="badge text-bg-primary">{item.seller.role}</span></h3>}
+                                            {/* {item.seller === null ? <h3>{item.user.name} <span className="badge text-bg-success">{item.user.id === this.authInfo.id ? "YOU" : ""}</span> </h3> : <h3>{item.seller.name}  <span className="badge text-bg-primary">{item.seller.role}</span></h3>} */}
+                                            {item.user !== null ? (
+                                                <h3>
+                                                    {item.user.name} <span className="badge text-bg-success">{item.user.id === this.authInfo.id ? "YOU" : ""}</span>
+                                                </h3>
+                                            ) : item.seller === null ? (
+                                                <h3>
+                                                    {item.admin.name} <span className="badge text-bg-primary">{item.admin.role}</span>
+                                                </h3>
+                                            ) : (
+                                                <h3>
+                                                    {item.seller.name} <span className="badge text-bg-warning">{item.seller.role}</span>
+                                                </h3>
+                                            )}
                                         </div>
                                         {/* <div className="userInfo-col chatTime">
                                             <div className="chatTime">
@@ -1316,7 +1358,7 @@ class Chat extends Component {
                                                 value=""
                                                 aria-label="Checkbox for following text input"
                                                 // onClick={() => this.handleCheckboxClick(item.seller === null ? item.user._id : item.seller._id)}
-                                                onClick={() => this.handleCheckboxClick(item.seller === null ? item.user : item.seller)}
+                                                onClick={() => this.handleCheckboxClick(item.admin || item.seller || item.user)}
                                             />
                                         </div>
                                     </a>

@@ -99,6 +99,7 @@
         "react-simple-image-slider": "^2.3.0",
         "react-simple-star-rating": "^5.1.7",
         "react-slick": "^0.30.2",
+        "react-slider": "^2.0.6",
         "react-stripe-elements": "^6.1.2",
         "react-time-ago": "^7.1.9",
         "react-toastify": "^8.0.2",

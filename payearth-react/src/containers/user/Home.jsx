@@ -9,7 +9,7 @@ import TrendingProducts from "./../../components/user/home/TrendingProducts";
 import PopularBrands from "./../../components/user/home/PopularBrands";
 import RecentSearch from "./../../components/user/home/RecentSearch";
 import Footer from "./../../components/common/Footer";
-import ServiceListing from "./service/ServicesListing";
+import ServicesDisplay from "./service/ServicesDisplay";
 import { GetAllBanner } from "../../components/common/BannerFrame";
 // import io from 'socket.io-client'
 
@@ -20,6 +20,7 @@ class Home extends Component {
     super(props);
     this.state = {
       isToggle: true,
+      serviceData: '',
     };
 
     // this.socket = io.connect('https://localhost:7700');
@@ -47,9 +48,14 @@ class Home extends Component {
   handleIsToggle = (isToggle) => {
     this.setState({ isToggle });
   };
+  handleServiceData = (data) => {
+    // console.log("Data after search...", data)
+    this.setState({ serviceData: data })
+  }
 
   render() {
-    const { isToggle } = this.state;
+    const { isToggle, serviceData } = this.state;
+    // console.log("serviceData send to service listing page : ", serviceData)
 
     return (
       <React.Fragment>
@@ -58,11 +64,11 @@ class Home extends Component {
         {/* Lazy load the Header component */}
         <Suspense fallback={<h1>Loading please wait...</h1>}>
           {/* Pass handleIsToggle function as props to Header */}
-          <Header handleIsToggle={this.handleIsToggle} />
+          <Header handleIsToggle={this.handleIsToggle} sendServiceData={this.handleServiceData} />
         </Suspense>
         {!isToggle ? (
           <React.Fragment>
-            <ServiceListing />
+            <ServicesDisplay serviceData={serviceData} />
           </React.Fragment>
         ) : (
           <React.Fragment>

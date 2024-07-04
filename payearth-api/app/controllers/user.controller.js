@@ -200,12 +200,7 @@ router.post("/updateorderstatus", updateOrderStatus);
 router.get("/sellerid/:id", getSellerByProductId);
 router.post("/savepayment", savepaymentdata);
 
-router.post(
-  "/order/reviews",
-  uploadReview.array("images", 6),
-  addReviewValidation,
-  addReview
-);
+router.post("/order/reviews", uploadReview.array("images", 6), addReviewValidation, addReview);
 router.post(
   "/order/complaints",
   uploadComplaint.array("images", 6),

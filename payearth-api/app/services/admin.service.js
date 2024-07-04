@@ -11,7 +11,7 @@ const db = require("../helpers/db");
 const msg = require('../helpers/messages.json');
 const fs = require('fs');
 
-const { Admin, User, Seller, Coupon, Product, Category, Brand, TodayDeal, BannerImage, TrendingProduct, PopularProduct, Color, OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline, ProductSales, cmsPost, cmsPage, cmsCategory, bannerAdvertisement } = require("../helpers/db");
+const { Admin, User, Seller, Coupon, Product, Category, Brand, TodayDeal, BannerImage, TrendingProduct, PopularProduct, Color, OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline, ProductSales, cmsPost, cmsPage, cmsCategory, bannerAdvertisement, Chat, ChatMessage, Services } = require("../helpers/db");
 
 module.exports = {
     authenticate,
@@ -110,7 +110,28 @@ module.exports = {
     deleteBannerAdv,
     getBannerById,
     updateBanner,
-    createNewBanner
+    createNewBanner,
+
+    allServiceData,
+    getServiceItems,
+    getAdminCategories,
+    editService,
+    deleteService,
+    statusChange,
+
+    getAllUser,
+    accessChat,
+    fetchChat,
+    fetchBlockChat,
+    createGroupChat,
+    sendMessage,
+    allMessages,
+    userChatBlock,
+    userUnblockChat,
+    chatMessageDelete,
+    removeFromGroup,
+    addGroupMember,
+    updateGroupName,
 };
 
 // Validator function
@@ -2629,22 +2650,481 @@ async function updateBanner(req) {
     }
 }
 
+// Services
 
-// cron.schedule('0 0 * * *', async () => {
-//     console.log('Running cron job to update status at midnight');
-//     try {
-//       const data = await Data.find({ status: 'pending' });
-//       data.forEach(async (item) => {
-//         item.status = 'completed';
-//         await item.save();
-//       });
-//       console.log('Status updated successfully');
-//     } catch (error) {
-//       console.error('Error updating status:', error);
-//     }
-//   });
+async function allServiceData(req) {
+    try {
+        const result = await Services.find({})
+            .sort({ createdAt: 'desc' })
+            .populate('createdBy', 'name')
+            .populate('category', 'categoryName');
+        //  console.log("result",  result)
+        if (result && result.length > 0) {
+            //  console.log("service-list ", result)
+            return result
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+async function getServiceItems(req) {
+    try {
+        let id = req.params.id;
+        //  console.log(id)
+        let result = await Services.find({ $or: [{ createdBy: id }, { _id: id }] })
+            .select(
+            // "serviceCode name featuredImage imageId description isActive createdAt"
+        )
+            .populate({
+                path: "category",
+                model: Category,
+                select: "categoryName",
+            })
+            .exec(); // Added exec() to execute the query
+
+        if (result.length > 0) {
+            return result;
+        } else {
+            return [];
+        }
+    } catch (err) {
+        console.log("Error", err);
+        throw err;
+    }
+}
+
+
+async function getAdminCategories(req) {
+    try {
+        const result = await Category.find({})
+            .sort({ createdAt: 'desc' })
+        //.populate('createdBy', 'name')
+        // .populate('category', 'categoryName');
+        //  console.log("result",  result)
+        if (result && result.length > 0) {
+            //  console.log("service-list ", result)
+            return result
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+// console.log(Category)
 
 
 
+async function editService(req) {
+    try {
+        const id = req.params.id;
+        const param = req.body;
+        const statusData = {
+            name: param.name,
+            category: param.category,
+            description: param.description,
+            featuredImage: param.featuredImage,
+            imageId: param.imageId,
+            updatedBy: param.seller_id,
+        };
+
+        const updatedOrder = await Services.findOneAndUpdate(
+            { _id: id },
+            statusData,
+            { new: true }
+        );
+        if (!updatedOrder) {
+            console.log("Service not found.");
+            return null;
+        }
+
+        console.log("Service updated successfully:", updatedOrder);
+        return updatedOrder;
+    } catch (err) {
+        console.log("Error:", err);
+        throw err;
+    }
+}
+
+async function deleteService(req) {
+    const id = req.params.id;
+    // console.log('id for delete:',id)
+    try {
+        const deleted = await Services.findByIdAndDelete(id);
+        return deleted;
+    } catch (error) {
+        console.error("Error deleting service:", error);
+    }
+}
+
+async function statusChange(req) {
+    const id = req.params.id;
+    try {
+        const service = await Services.findById(id).select("isActive");
+        service.isActive = !service.isActive;    // Toggle the isActive status
+        await service.save();  // Save the updated service
+        return service;
+    } catch (error) {
+        console.error("Error deleting service:", error);
+    }
+}
 
 
+// Chat ******************************************************
+//getAllUser
+
+async function getAllUser(req) {
+    const keyword = req.query.search
+        ? {
+            $or: [
+                { name: { $regex: req.query.search, $options: "i" } },
+                { email: { $regex: req.query.search, $options: "i" } },
+            ],
+        }
+        : {};
+
+    const [users, sellers, admins] = await Promise.all([
+        User.find(keyword).select("name email role image_url"),
+        Seller.find(keyword).select("name email role image_url"),
+        Admin.find(keyword).select("name email role image_url"),
+    ]);
+
+    let result = [];
+    users.forEach((user) => {
+        const correspondingSeller = sellers.find(
+            (seller) => seller.email === user.email
+        );
+        const correspondingAdmin = admins.find(
+            (admin) => admin.email === user.email
+        );
+        result.push({
+            user: user,
+            seller: correspondingSeller || null,
+            admin: correspondingAdmin || null,
+        });
+    });
+
+    sellers.forEach((seller) => {
+        if (!users.find((user) => user.email === seller.email)) {
+            const correspondingAdmin = admins.find(
+                (admin) => admin.email === seller.email
+            );
+            result.push({
+                user: null,
+                seller: seller,
+                admin: correspondingAdmin || null,
+            });
+        }
+    });
+
+    admins.forEach((admin) => {
+        if (!users.find((user) => user.email === admin.email) &&
+            !sellers.find((seller) => seller.email === admin.email)) {
+            result.push({
+                user: null,
+                seller: null,
+                admin: admin,
+            });
+        }
+    });
+    return result;
+}
+
+
+
+async function accessChat(req) {
+    const { receiverId, authorId } = req.body;
+    if (!receiverId) {
+        console.log("receiverId not send in request")
+    }
+    // const finalChatdata = await Chat.findOne({ authorId: authorId.name, receiverId: receiverId.name });
+    var isChat = await Chat.find({
+        isGroupChat: false,
+        $or: [
+            {
+                $and: [
+                    { 'chatUsers.id': authorId.id },
+                    { 'chatUsers.id': receiverId.id }
+                ]
+            },
+            {
+                $and: [
+                    { 'chatUsers.id': receiverId.id },
+                    { 'chatUsers.id': authorId.id }
+                ]
+            }
+        ]
+    }).sort({ createdAt: "desc" }).populate("latestMessage");
+    // console.log("isChat", isChat.length)
+
+    if (isChat.length > 0) {
+        return isChat[0];
+    } else {
+        const newReceiverIds = [authorId, receiverId];
+        // console.log("newReceiverIds", newReceiverIds)
+        var chatData = {
+            chatName: "sender",
+            isGroupChat: false,
+            chatUsers: newReceiverIds,
+        };
+        try {
+            // console.log("chatData :  ", chatData)
+            const createdChat = await Chat.create(chatData);
+            const fullChat = await Chat.findOne({ _id: createdChat._id })
+            // console.log("fullChatData", fullChat)
+            return fullChat;
+        } catch (error) {
+            console.log("error", error)
+        }
+    }
+}
+
+async function fetchChat(req) {
+    const authorId = req.params.id;
+    try {
+        const query = {
+            isBlock: false,
+            'chatUsers.id': authorId
+        };
+
+        const fieldsToSelect = "id chatName isGroupChat isBlock chatUsers latestMessage";
+        let result = await Chat.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect)
+            .populate({
+                path: 'latestMessage',
+                match: { isVisible: true },
+                select: 'messageContent mediaContent timestamp'
+            });
+        // console.log("result", result)
+
+        result = result.sort((a, b) => {
+            if (a.latestMessage && b.latestMessage) {
+                return new Date(b.latestMessage.timestamp) - new Date(a.latestMessage.timestamp);
+            } else if (a.latestMessage) {
+                return -1;
+            } else if (b.latestMessage) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+
+        return result;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function fetchBlockChat(req) {
+    const authorId = req.params.id;
+    try {
+        const query = {
+            isBlock: true,
+            'chatUsers.id': authorId
+        };
+
+        const fieldsToSelect = "id chatName isGroupChat isBlock blockByUser chatUsers";
+        const result = await Chat.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect);
+        // console.log("result", result)
+        return result;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+async function sendMessage(req) {
+    const { authorId, messageContent, chatId, mediaContent } = req.body;
+
+    if (!chatId || !authorId) {
+        console.log("Invalid Data pass")
+    }
+
+    var newMessage = {
+        sender: authorId,
+        messageContent: messageContent,
+        mediaContent: mediaContent,
+        chat: chatId
+    }
+
+    try {
+        var message = await ChatMessage.create(newMessage);
+        message = await message.populate({
+            path: "chat",
+            model: Chat,
+        })
+        // .populate({
+        //   path: "latestMessage",
+        //   model: ChatMessage,
+        // })
+
+        await Chat.findByIdAndUpdate(chatId, {
+            latestMessage: message,
+        });
+        // console.log("message", message)
+        return message
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+async function allMessages(req) {
+    const chatId = req.params.id;
+
+    try {
+        const message = await ChatMessage.find({ chat: chatId, isVisible: true })
+            .populate({
+                path: "chat",
+                model: Chat,
+            })
+        // console.log("All message", message)
+        return message
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+async function userChatBlock(req) {
+    const chatId = req.params.id;
+    const { isBlock, blockByUser } = req.body;
+    try {
+        const chat = await Chat.findByIdAndUpdate(chatId, { isBlock, blockByUser }, { new: true });
+        //  console.log("update banner", banner)
+        return chat;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+async function userUnblockChat(req) {
+    const chatId = req.params.id;
+    const { isBlock, blockByUser } = req.body;
+    try {
+        const chat = await Chat.findByIdAndUpdate(chatId, { isBlock, blockByUser }, { new: true });
+        //  console.log("update banner", banner)
+        return chat;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+// User Block chat..
+async function chatMessageDelete(req) {
+    const id = req.params.id;
+    const { isVisible } = req.body;
+    try {
+        const chatMessage = await ChatMessage.findByIdAndUpdate(id, { isVisible }, { new: true });
+        //  console.log("update banner", banner)
+        return chatMessage;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+// remove from group
+async function removeFromGroup(req) {
+    const { chatId, userId } = req.body;
+    try {
+        const updatedChat = await Chat.findByIdAndUpdate(
+            chatId,
+            { $pull: { chatUsers: { id: userId } } },
+            { new: true }
+        );
+        return updatedChat;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+async function addGroupMember(req) {
+    const chatId = req.params.id;
+    const { id, name, image_url, isGroupAdmin } = req.body;
+    try {
+        const addUser = await Chat.findByIdAndUpdate(
+            chatId,
+            { $push: { chatUsers: { id, name, image_url, isGroupAdmin } } },
+            { new: true });
+        //  console.log("update banner", banner)
+        return addUser;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+async function createGroupChat(req) {
+    const { authorId, receiverId, groupName } = req.body;
+
+    if (!receiverId || !Array.isArray(receiverId) || receiverId.length === 0) {
+        console.log("Please field add details....")
+    }
+
+
+    // const finalChatdata = await Chat.findOne({ authorId: authorId.name, receiverId: receiverId.name });
+
+    var isChat = await Chat.find({
+        isGroupChat: true,
+        chatName: groupName,
+    }).sort({ createdAt: "desc" });
+
+    // console.log("isChat", isChat.length)
+
+    if (isChat.length > 0) {
+        return isChat[0];
+    } else {
+
+        const receiverData = receiverId.map(receiver => ({
+            id: receiver.id,
+            name: receiver.name,
+            image_url: receiver.image_url
+        }));
+
+        receiverData.push(authorId)
+
+
+
+        // console.log("receiverData", receiverData);
+
+        var chatData = {
+            chatName: groupName,
+            isGroupChat: true,
+            chatUsers: receiverData,
+
+            // usersAll: [{
+            //   authorId: authorId,
+            //   users: receiverData
+            // }],
+        };
+        try {
+            // console.log("chatData :  ", chatData)
+            const createdChat = await Chat.create(chatData);
+            const fullChat = await Chat.findOne({ _id: createdChat._id })
+            // console.log("fullChatData", fullChat)
+            return fullChat;
+        } catch (error) {
+            console.log("error", error)
+        }
+    }
+}
+
+async function updateGroupName(req) {
+    // const chatId = req.params.id;
+    const { chatId, groupName } = req.body;
+
+    // console.log("chatId", chatId);
+    // console.log("groupName", groupName);
+    try {
+        const chatData = await Chat.findByIdAndUpdate(chatId,
+            { $set: { chatName: groupName } },
+            { new: true }
+        );
+        return chatData;
+    } catch (error) {
+        console.log(error);
+    }
+}
