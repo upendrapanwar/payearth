@@ -126,6 +126,7 @@ import ScrollToTopButton from "./containers/user/ScrollToTopButton";
 // import BannerCheckOut from './containers/user/BannerCheckOut';
 import StripePaymentForm from "./containers/user/BannerCheckOutStripe";
 import ServiceOrder from "./containers/user/service/ServiceOrder";
+import adminAddService from './containers/admin/AddService';
 
 
 function App() {
@@ -511,6 +512,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+          <PrivateRoute path="/admin/add-service" component={adminAddService} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
           {/* Community Routes */}
           <PrivateRoute
             path="/admin/manage-banner-advertisement"

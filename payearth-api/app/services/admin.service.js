@@ -112,6 +112,7 @@ module.exports = {
     updateBanner,
     createNewBanner,
 
+    addService,
     allServiceData,
     getServiceItems,
     getAdminCategories,
@@ -2652,16 +2653,56 @@ async function updateBanner(req) {
 
 // Services
 
+async function addService(req) {
+    const param = req.body;
+    var lName = param.name.toLowerCase();
+  
+    if (await Services.findOne({ lname: lName })) {
+      throw 'Service Name "' + param.name + '" already exists.';
+    }
+  
+    let input = {
+      admin_id: param.admin_id,
+      name: param.name,
+      lname: lName,
+      slug: param.slug,
+      charges: param.charges,
+      category: param.category,
+      description: param.description,
+      featuredImage: param.image,
+      imageId: param.imageId,
+      isActive: true,
+      isService: true,
+      createdByAdmin: param.admin_id,
+      updatedBy: param.admin_id,
+    };
+  
+    const serviceData = new Services(input);
+    const data = await serviceData.save();
+  
+    if (data) {
+      let res = await Services.findById({ _id: data._id }).select();
+      console.log("REsponse", res);
+      if (res) {
+        return res;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
 async function allServiceData(req) {
     try {
         const result = await Services.find({})
             .sort({ createdAt: 'desc' })
             .populate('createdBy', 'name')
+            .populate('createdByAdmin','name')
             .populate('category', 'categoryName');
-        //  console.log("result",  result)
         if (result && result.length > 0) {
-            //  console.log("service-list ", result)
-            return result
+          //    console.log("service-list ", result)
+            return result          
         }
     } catch (error) {
         console.log(error);
@@ -2698,21 +2739,17 @@ async function getServiceItems(req) {
 
 async function getAdminCategories(req) {
     try {
-        const result = await Category.find({})
+        const result = await Category.find({isActive: true,isService: true,})
             .sort({ createdAt: 'desc' })
-        //.populate('createdBy', 'name')
-        // .populate('category', 'categoryName');
-        //  console.log("result",  result)
         if (result && result.length > 0) {
-            //  console.log("service-list ", result)
+             // console.log("service-list ", result)
             return result
         }
     } catch (error) {
         console.log(error);
     }
-}
+ }
 // console.log(Category)
-
 
 
 async function editService(req) {
@@ -2734,11 +2771,11 @@ async function editService(req) {
             { new: true }
         );
         if (!updatedOrder) {
-            console.log("Service not found.");
+           // console.log("Service not found.");
             return null;
         }
 
-        console.log("Service updated successfully:", updatedOrder);
+      //  console.log("Service updated successfully:", updatedOrder);
         return updatedOrder;
     } catch (err) {
         console.log("Error:", err);

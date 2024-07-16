@@ -194,9 +194,10 @@ router.get("/getBannerById/:id", getBannerById);
 router.put("/updateBanner/:id", updateBanner);
 router.post("/createNewBanner", createNewBanner);
 
+router.post("/services", addService);                             //$$$$$$$$$$$$$$$$$$$
 router.get("/services", allServiceData);
 router.get("/service/items/:id", getServiceItems);
-router.get("/categories", getAdminCategories);
+router.get("/getcategories", getAdminCategories);            //  change
 router.put('/service/edit/:id', editService);
 router.delete("/services/delete/:id", deleteService);
 router.put("/service/status/:id", statusChange);
@@ -815,6 +816,29 @@ function createNewBanner(req, res, next) {
 }
 
 //Services
+
+function addService(req, res, next) {
+   // console.log('Hello there how are you....');
+  // console.log('Req*********', req.body);
+    if (req.files && req.files.fileValidationError) {
+        return res.status(400).json({ status: false, message: req.files.fileValidationError });
+    }
+
+    adminService.addService(req)
+        .then(service => {
+            if (service) {
+                res.status(201).json({ status: true, message: msg.service.add.success, data: service });
+            } else {
+                res.status(400).json({ status: false, message: msg.service.add.error });
+            }
+        })
+        .catch(err => {
+            console.error('Error in addService:', err);
+            res.status(500).json({ status: false, message: 'Internal server error' });
+        });
+}
+
+
 function allServiceData(req, res, next) {
     adminService.allServiceData(req)
         .then((Service => Service ? res.status(200).json({ status: true, data: Service }) : res.status(400).json({ status: false, message: "ERROR ", data: [] })))

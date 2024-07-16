@@ -82,11 +82,11 @@ const Services = (props) => {
       ) : (
         <React.Fragment>
           <Banner />
-          <section className="popular_products_sec">
-            <SectionTitle title="Our Services" />
+          <section className="popular_products_sec">            
             <div className="container">
               <div className="row">
                 <div className="col-sm-12 m-auto">
+                <SectionTitle title="Our Services" />
                   <div className="cards_wrapper">
                     {currentServiceData.map((service) => (
                       <Link
@@ -100,7 +100,8 @@ const Services = (props) => {
                         <div className="serviceListing-content text-center">
                           <h3 className="m-auto">{service.name}</h3>
                           <div
-                            className="service-desc m-auto p-2"
+                            className="service-desc m-auto p-2 overflow-hidden text-truncate"
+                            style={{ maxHeight: "4em", }}
                             dangerouslySetInnerHTML={{
                               __html: service.description,
                             }}

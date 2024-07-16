@@ -667,7 +667,8 @@ class ServiceCheckout extends Component {
      * @param {*} orderTrackingId 
      */
     updateOrderStatus = (orderId, orderTrackingId) => {
-
+        const formData = localStorage.getItem('serviceData')
+        //console.log('dataofservicetosave',formData)
         let reqBody = {
             orderId: orderId,
             orderStatus: orderTrackingId,
@@ -682,6 +683,37 @@ class ServiceCheckout extends Component {
             console.log("ORDER STATUS", response.data.data);
             // this.handleCheckOut();
             this.setState({ showModal: true });
+
+
+            localStorage.setItem('serviceName', this.state.serviceName);
+            localStorage.setItem('serviceCategory', this.state.serviceCategory);
+
+            axios.post('seller/services', formData, {
+                headers: {
+                    'Accept': 'application/form-data',
+                    'Content-Type': 'application/json; charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            }).then((response) => {
+                if (response.data.status) {
+                    //   this.props.history.push('/seller/service-checkout');
+                }
+             //   console.log('its ressssss', response)
+            }).catch(error => {
+                console.log('error =>', error)
+                if (error.response) {
+                    toast.error(error.response.data.message);
+                }
+            }).finally(() => {
+               // console.log('inside the finally block')
+                setTimeout(() => {
+                    //   this.dispatch(setLoading({ loading: false }));
+                }, 300);
+            });
+
+
+
+
 
             // toast.success('Payment Successfull', { autoClose: 3000 });
             // this.props.history.push('/my-banners')

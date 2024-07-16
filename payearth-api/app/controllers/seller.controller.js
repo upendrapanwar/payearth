@@ -761,47 +761,47 @@ function getTopSellingCategoryChartData(req, res, next) {
 
 //Services
 
-// function addService(req, res, next) {
-//     console.log('Hello there how are you....');
-//     console.log('Req*********', req.body);
-//     if (req.files && req.files.fileValidationError) {
-//         return res.status(400).json({ status: false, message: req.files.fileValidationError });
-//     }
-
-//     sellerService.addService(req)
-//         .then(service => {
-//             if (service) {
-//                 res.status(201).json({ status: true, message: msg.service.add.success, data: service });
-//             } else {
-//                 res.status(400).json({ status: false, message: msg.service.add.error });
-//             }
-//         })
-//         .catch(err => {
-//             console.error('Error in addService:', err);
-//             res.status(500).json({ status: false, message: 'Internal server error' });
-//         });
-// }
-
 function addService(req, res, next) {
-  if (req.files && req.files.fileValidationError) {
-    return res
-      .status(400)
-      .json({ status: false, message: req.files.fileValidationError });
-  }
+   // console.log('Hello there how are you....');
+   // console.log('Req*********', req.body);
+    if (req.files && req.files.fileValidationError) {
+        return res.status(400).json({ status: false, message: req.files.fileValidationError });
+    }
 
-  sellerService
-    .addService(req)
-    .then((service) =>
-      service
-        ? res.status(201).json({ status: true, data: service })
-        : res
-          .status(400)
-          .json({ status: false, message: "Service data not found!" })
-    )
-    .catch((err) =>
-      next(res.status(400).json({ status: false, message: err }))
-    );
+    sellerService.addService(req)
+        .then(service => {
+            if (service) {
+                res.status(201).json({ status: true, message: msg.service.add.success, data: service });
+            } else {
+                res.status(400).json({ status: false, message: msg.service.add.error });
+            }
+        })
+        .catch(err => {
+            console.error('Error in addService:', err);
+            res.status(500).json({ status: false, message: 'Internal server error' });
+        });
 }
+
+// function addService(req, res, next) {
+//   if (req.files && req.files.fileValidationError) {
+//     return res
+//       .status(400)
+//       .json({ status: false, message: req.files.fileValidationError });
+//   }
+
+//   sellerService
+//     .addService(req)
+//     .then((service) =>
+//       service
+//         ? res.status(201).json({ status: true, data: service })
+//         : res
+//           .status(400)
+//           .json({ status: false, message: "Service data not found!" })
+//     )
+//     .catch((err) =>
+//       next(res.status(400).json({ status: false, message: err }))
+//     );
+// }
 
 // function addServicesFeaturedImage(req, res, next) {
 //     sellerService.addFeaturedImage(req)
