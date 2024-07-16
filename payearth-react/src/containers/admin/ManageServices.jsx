@@ -200,16 +200,15 @@ class ManageServices extends Component {
             const inactiveServices = response.data.data.filter(item => item.isActive === false);
 
             this.setState({
-                // activeServiceData: activeServices,
-                activeServiceData: "",
+                activeServiceData: activeServices,   
                 loading: false,
                 error: null
                 //   pagination: response.data.data.paginationData
             });
 
             this.setState({
-                // inactiveServiceData: inactiveServices,
-                inactiveServiceData: "",
+                inactiveServiceData: inactiveServices,
+
                 loading: false,
                 error: null
                 //   pagination: response.data.data.paginationData
@@ -433,305 +432,293 @@ class ManageServices extends Component {
 
         return (
             <React.Fragment>
-                {loading === true ? <SpinnerLoader /> : ""}
-                <Header />
-                <div className="seller_dash_wrap pt-5 pb-5">
-                    <div className="container ">
-                        <div className="bg-white rounded-3 pt-3 pb-5">
-                            <div className="dash_inner_wrap">
-                                <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
-                                    <div className="dash_title">Manage Service</div>
-                                    {/* <a className="custom_btn btn_yellow w-auto btn" href='#'>Add Service</a> */}
-<<<<<<< HEAD
-                                    <div className="">
-                                        <span>
-                                            <Link
-                                                className="btn custom_btn btn_yellow mx-auto"
-                                                to="#"
-=======
-                                    <div className="text-center">
-                                        <span>
-                                            <Link
-                                                className="btn custom_btn btn_yellow mx-auto "
-                                                to="/admin/add-service"
->>>>>>> a2041dc5169ba79c95c0ffb1afd303496cec8c81
-                                                onClick={this.clearSessionStorage}
-                                            >
-                                                Add New Service
-                                            </Link>
-                                        </span>
-                                    </div>
+            {loading === true ? <SpinnerLoader /> : ""}
+            <Header />
+            <div className="seller_dash_wrap pt-5 pb-5">
+                <div className="container ">
+                    <div className="bg-white rounded-3 pt-3 pb-5">
+                        <div className="dash_inner_wrap">
+                            <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
+                                <div className="dash_title">Manage Service</div>
+                                {/* <a className="custom_btn btn_yellow w-auto btn" href='#'>Add Service</a> */}
+                                <div className="text-center">
+                                    <span>
+                                        <Link
+                                            className="btn custom_btn btn_yellow mx-auto "
+                                            to="/admin/add-service"
+                                            onClick={this.clearSessionStorage}
+                                        >
+                                            Add New Service
+                                        </Link>
+                                    </span>
                                 </div>
                             </div>
-                            <nav className="orders_tabs">
-<<<<<<< HEAD
-                                <div className="nav nav-tabs" id="nav-tab" role="tablist">
-=======
-                                <div className="nav nav-tabs flex-column flex-md-row" id="nav-tab" role="tablist">
->>>>>>> a2041dc5169ba79c95c0ffb1afd303496cec8c81
-                                    <button
-                                        // className="nav-link active"
-                                        className={`nav-link ${activeTab === 'nav-pending-orders' ? 'active' : ''}`}
-                                        id="nav-pending-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-pending-orders" type="button" role="tab" aria-controls="nav-pending-orders" aria-selected="true" onClick={() => this.handleTabClick('nav-pending-orders')}>Added Services</button>
-                                    <button
-                                        //  className="nav-link" 
-                                        className={`nav-link ${activeTab === 'nav-ongoing-orders' ? 'active' : ''}`}
-                                        id="nav-ongoing-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-ongoing-orders" type="button" role="tab" aria-controls="nav-ongoing-orders" aria-selected="false" onClick={() => this.handleTabClick('nav-ongoing-orders')}>Pending for approval</button>
-                                    <button
-                                        // className="nav-link" 
-                                        className={`nav-link ${activeTab === 'nav-cancelled-orders' ? 'active' : ''}`}
-                                        id="nav-cancelled-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-cancelled-orders" type="button" role="tab" aria-controls="nav-cancelled-orders" aria-selected="true" onClick={() => this.handleTabClick('nav-cancelled-orders')}>Rejected Services</button>
-                                </div>
-                            </nav>
-                            <div className="orders_table tab-content pt-0 pb-0" id="nav-tabContent">
-                                <div
-                                    // className="tab-pane fade show active" 
-                                    className={`tab-pane fade ${activeTab === 'nav-pending-orders' ? 'show active' : ''}`}
-                                    id="nav-pending-orders" role="tabpanel" aria-labelledby="nav-pending-orders-tab">
-                                    <DataTableExtensions
-                                        columns={this.activeService_column}
-                                        data={activeServiceData}
-                                    >
-                                        <DataTable
-                                            pagination
-                                            noHeader
-                                            highlightOnHover
-                                            defaultSortField="id"
-                                            defaultSortAsc={false}
-                                            selectableRows
-                                            onSelectedRowsChange={this.handleRowSelected}
-                                            selectedRows={selectedRows}
-                                            paginationRowsPerPageOptions={[5, 8, 12, 16]}
-                                            // paginationPerPage={paginationPerPage}
-                                            paginationPerPage={5}
-                                        />
-                                    </DataTableExtensions>
-                                </div>
-                                <div
-                                    //  className="tab-pane fade" 
-                                    className={`tab-pane fade ${activeTab === 'nav-ongoing-orders' ? 'show active' : ''}`}
-                                    id="nav-ongoing-orders" role="tabpanel" aria-labelledby="nav-ongoing-orders-tab">
-                                    <table className="table table-responsive table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Service ID</th>
-                                                <th>Service Name</th>
-                                                <th>Selling Quantity</th>
-                                                <th>Category</th>
-                                                <th>Total Stock Quantity</th>
-                                                <th>Status</th>
-                                                <th className="invisible">action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>1JSLYUCW</td>
-                                                <td>Testing11</td>
-                                                <td>10</td>
-                                                <td>Books and CDs</td>
-                                                <td>10</td>
-                                                <td><div className="form-check form-switch">
-                                                    <input
-                                                        className="form-check-input" type="checkbox"
-                                                        value=""
-                                                        checked={this.setState.check}
-                                                        onChange={this.handleChange}
-                                                    />
-                                                </div></td>
-                                                <td><Link to="/admin/manage-service-details" className="custom_btn btn_yellow_bordered w-auto btn">Details</Link></td>
-                                            </tr>
-                                            <tr>
-                                                <td>1JSLYUCW</td>
-                                                <td>Testing11</td>
-                                                <td>10</td>
-                                                <td>Books and CDs</td>
-                                                <td>10</td>
-                                                <td><div className="form-check form-switch">
-                                                    <input
-                                                        className="form-check-input" type="checkbox"
-                                                        value=""
-                                                        checked={this.setState.check}
-                                                        onChange={this.handleChange}
-                                                    />
-                                                </div></td>
-                                                <td><Link to="/admin/manage-service-details" className="custom_btn btn_yellow_bordered w-auto btn">Details</Link></td>
-                                            </tr>
-                                            <tr>
-                                                <td>1JSLYUCW</td>
-                                                <td>Testing11</td>
-                                                <td>10</td>
-                                                <td>Books and CDs</td>
-                                                <td>10</td>
-                                                <td><div className="form-check form-switch">
-                                                    <input
-                                                        className="form-check-input" type="checkbox"
-                                                        value=""
-                                                        checked={this.setState.check}
-                                                        onChange={this.handleChange}
-                                                    />
-                                                </div></td>
-                                                <td><Link to="/admin/manage-service-details" className="custom_btn btn_yellow_bordered w-auto btn">Details</Link></td>
-                                            </tr>
-                                            <tr>
-                                                <td>1JSLYUCW</td>
-                                                <td>Testing11</td>
-                                                <td>10</td>
-                                                <td>Books and CDs</td>
-                                                <td>10</td>
-                                                <td><div className="form-check form-switch">
-                                                    <input
-                                                        className="form-check-input" type="checkbox"
-                                                        value=""
-                                                        checked={this.setState.check}
-                                                        onChange={this.handleChange}
-                                                    />
-                                                </div></td>
-                                                <td><Link to="/admin/manage-service-details" className="custom_btn btn_yellow_bordered w-auto btn">Details</Link></td>
-                                            </tr>
-                                            <tr>
-                                                <td>1JSLYUCW</td>
-                                                <td>Testing11</td>
-                                                <td>10</td>
-                                                <td>Books and CDs</td>
-                                                <td>10</td>
-                                                <td><div className="form-check form-switch">
-                                                    <input
-                                                        className="form-check-input" type="checkbox"
-                                                        value=""
-                                                        checked={this.setState.check}
-                                                        onChange={this.handleChange}
-                                                    />
-                                                </div></td>
-                                                <td><Link to="/admin/manage-service-details" className="custom_btn btn_yellow_bordered w-auto btn">Details</Link></td>
-                                            </tr>
-                                            <tr>
-                                                <td>1JSLYUCW</td>
-                                                <td>Testing11</td>
-                                                <td>10</td>
-                                                <td>Books and CDs</td>
-                                                <td>10</td>
-                                                <td><div className="form-check form-switch">
-                                                    <input
-                                                        className="form-check-input" type="checkbox"
-                                                        value=""
-                                                        checked={this.setState.check}
-                                                        onChange={this.handleChange}
-                                                    />
-                                                </div></td>
-                                                <td><Link to="/admin/manage-service-details" className="custom_btn btn_yellow_bordered w-auto btn">Details</Link></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <div
-                                    // className="tab-pane fade"
-                                    className={`tab-pane fade ${activeTab === 'nav-cancelled-orders' ? 'show active' : ''}`}
-                                    id="nav-cancelled-orders" role="tabpanel" aria-labelledby="nav-cancelled-orders-tab">
-                                    {/* <div className="tab-pane fade show active" id="nav-pending-orders" role="tabpanel" aria-labelledby="nav-pending-orders-tab"> */}
-                                    <DataTableExtensions
-                                        columns={this.inactiveService_column}
-                                        data={inactiveServiceData}
-                                    >
-                                        <DataTable
-                                            pagination
-                                            paginationRowsPerPageOptions={[5, 8, 12, 16]}
-                                            paginationPerPage={5}
-                                            noHeader
-                                            highlightOnHover
-                                            //defaultSortField="id"
-                                            // defaultSortAsc={false}
-                                            selectableRows
-                                            onSelectedRowsChange={this.handleRowSelected}
-                                            selectedRows={selectedRows}
-                                        />
-                                    </DataTableExtensions>
-                                    {/* </div> */}
-                                </div>
+                        </div>
+                        <nav className="orders_tabs">
+                            <div className="nav nav-tabs flex-column flex-md-row" id="nav-tab" role="tablist">
+                                <button
+                                    // className="nav-link active"
+                                    className={`nav-link ${activeTab === 'nav-pending-orders' ? 'active' : ''}`}
+                                    id="nav-pending-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-pending-orders" type="button" role="tab" aria-controls="nav-pending-orders" aria-selected="true" onClick={() => this.handleTabClick('nav-pending-orders')}>Added Services</button>
+                                <button
+                                    //  className="nav-link" 
+                                    className={`nav-link ${activeTab === 'nav-ongoing-orders' ? 'active' : ''}`}
+                                    id="nav-ongoing-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-ongoing-orders" type="button" role="tab" aria-controls="nav-ongoing-orders" aria-selected="false" onClick={() => this.handleTabClick('nav-ongoing-orders')}>Pending for approval</button>
+                                <button
+                                    // className="nav-link" 
+                                    className={`nav-link ${activeTab === 'nav-cancelled-orders' ? 'active' : ''}`}
+                                    id="nav-cancelled-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-cancelled-orders" type="button" role="tab" aria-controls="nav-cancelled-orders" aria-selected="true" onClick={() => this.handleTabClick('nav-cancelled-orders')}>Rejected Services</button>
+                            </div>
+                        </nav>
+                        <div className="orders_table tab-content pt-0 pb-0" id="nav-tabContent">
+                            <div
+                                // className="tab-pane fade show active" 
+                                className={`tab-pane fade ${activeTab === 'nav-pending-orders' ? 'show active' : ''}`}
+                                id="nav-pending-orders" role="tabpanel" aria-labelledby="nav-pending-orders-tab">
+                                <DataTableExtensions
+                                    columns={this.activeService_column}
+                                    data={activeServiceData}
+                                >
+                                    <DataTable
+                                        pagination
+                                        noHeader
+                                        highlightOnHover
+                                        defaultSortField="id"
+                                        defaultSortAsc={false}
+                                        selectableRows
+                                        onSelectedRowsChange={this.handleRowSelected}
+                                        selectedRows={selectedRows}
+                                        paginationRowsPerPageOptions={[5, 8, 12, 16]}
+                                        // paginationPerPage={paginationPerPage}
+                                        paginationPerPage={5}
+                                    />
+                                </DataTableExtensions>
+                            </div>
+                            <div
+                                //  className="tab-pane fade" 
+                                className={`tab-pane fade ${activeTab === 'nav-ongoing-orders' ? 'show active' : ''}`}
+                                id="nav-ongoing-orders" role="tabpanel" aria-labelledby="nav-ongoing-orders-tab">
+                                <table className="table table-responsive table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Service ID</th>
+                                            <th>Service Name</th>
+                                            <th>Selling Quantity</th>
+                                            <th>Category</th>
+                                            <th>Total Stock Quantity</th>
+                                            <th>Status</th>
+                                            <th className="invisible">action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1JSLYUCW</td>
+                                            <td>Testing11</td>
+                                            <td>10</td>
+                                            <td>Books and CDs</td>
+                                            <td>10</td>
+                                            <td><div className="form-check form-switch">
+                                                <input
+                                                    className="form-check-input" type="checkbox"
+                                                    value=""
+                                                    checked={this.setState.check}
+                                                    onChange={this.handleChange}
+                                                />
+                                            </div></td>
+                                            <td><Link to="/admin/manage-service-details" className="custom_btn btn_yellow_bordered w-auto btn">Details</Link></td>
+                                        </tr>
+                                        <tr>
+                                            <td>1JSLYUCW</td>
+                                            <td>Testing11</td>
+                                            <td>10</td>
+                                            <td>Books and CDs</td>
+                                            <td>10</td>
+                                            <td><div className="form-check form-switch">
+                                                <input
+                                                    className="form-check-input" type="checkbox"
+                                                    value=""
+                                                    checked={this.setState.check}
+                                                    onChange={this.handleChange}
+                                                />
+                                            </div></td>
+                                            <td><Link to="/admin/manage-service-details" className="custom_btn btn_yellow_bordered w-auto btn">Details</Link></td>
+                                        </tr>
+                                        <tr>
+                                            <td>1JSLYUCW</td>
+                                            <td>Testing11</td>
+                                            <td>10</td>
+                                            <td>Books and CDs</td>
+                                            <td>10</td>
+                                            <td><div className="form-check form-switch">
+                                                <input
+                                                    className="form-check-input" type="checkbox"
+                                                    value=""
+                                                    checked={this.setState.check}
+                                                    onChange={this.handleChange}
+                                                />
+                                            </div></td>
+                                            <td><Link to="/admin/manage-service-details" className="custom_btn btn_yellow_bordered w-auto btn">Details</Link></td>
+                                        </tr>
+                                        <tr>
+                                            <td>1JSLYUCW</td>
+                                            <td>Testing11</td>
+                                            <td>10</td>
+                                            <td>Books and CDs</td>
+                                            <td>10</td>
+                                            <td><div className="form-check form-switch">
+                                                <input
+                                                    className="form-check-input" type="checkbox"
+                                                    value=""
+                                                    checked={this.setState.check}
+                                                    onChange={this.handleChange}
+                                                />
+                                            </div></td>
+                                            <td><Link to="/admin/manage-service-details" className="custom_btn btn_yellow_bordered w-auto btn">Details</Link></td>
+                                        </tr>
+                                        <tr>
+                                            <td>1JSLYUCW</td>
+                                            <td>Testing11</td>
+                                            <td>10</td>
+                                            <td>Books and CDs</td>
+                                            <td>10</td>
+                                            <td><div className="form-check form-switch">
+                                                <input
+                                                    className="form-check-input" type="checkbox"
+                                                    value=""
+                                                    checked={this.setState.check}
+                                                    onChange={this.handleChange}
+                                                />
+                                            </div></td>
+                                            <td><Link to="/admin/manage-service-details" className="custom_btn btn_yellow_bordered w-auto btn">Details</Link></td>
+                                        </tr>
+                                        <tr>
+                                            <td>1JSLYUCW</td>
+                                            <td>Testing11</td>
+                                            <td>10</td>
+                                            <td>Books and CDs</td>
+                                            <td>10</td>
+                                            <td><div className="form-check form-switch">
+                                                <input
+                                                    className="form-check-input" type="checkbox"
+                                                    value=""
+                                                    checked={this.setState.check}
+                                                    onChange={this.handleChange}
+                                                />
+                                            </div></td>
+                                            <td><Link to="/admin/manage-service-details" className="custom_btn btn_yellow_bordered w-auto btn">Details</Link></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div
+                                // className="tab-pane fade"
+                                className={`tab-pane fade ${activeTab === 'nav-cancelled-orders' ? 'show active' : ''}`}
+                                id="nav-cancelled-orders" role="tabpanel" aria-labelledby="nav-cancelled-orders-tab">
+                                {/* <div className="tab-pane fade show active" id="nav-pending-orders" role="tabpanel" aria-labelledby="nav-pending-orders-tab"> */}
+                                <DataTableExtensions
+                                    columns={this.inactiveService_column}
+                                    data={inactiveServiceData}
+                                >
+                                    <DataTable
+                                        pagination
+                                        paginationRowsPerPageOptions={[5, 8, 12, 16]}
+                                        paginationPerPage={5}
+                                        noHeader
+                                        highlightOnHover
+                                        //defaultSortField="id"
+                                        // defaultSortAsc={false}
+                                        selectableRows
+                                        onSelectedRowsChange={this.handleRowSelected}
+                                        selectedRows={selectedRows}
+                                    />
+                                </DataTableExtensions>
+                                {/* </div> */}
                             </div>
                         </div>
                     </div>
                 </div>
-                <Footer />
+            </div>
+            <Footer />
 
-                <Modal
-                    show={this.state.showModal}
-                    onHide={() => this.setState({ showModal: false })}
-                    dialogClassName="modal-lg"
-                    aria-labelledby="example-custom-modal-styling-title"
+            <Modal
+                show={this.state.showModal}
+                onHide={() => this.setState({ showModal: false })}
+                dialogClassName="modal-lg"
+                aria-labelledby="example-custom-modal-styling-title"
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title id="example-custom-modal-styling-title">
+                        Service Details
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body
+                    style={{ maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}
                 >
-                    <Modal.Header closeButton>
-                        <Modal.Title id="example-custom-modal-styling-title">
-                            Service Details
-                        </Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body
-                        style={{ maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}
-                    >
-                        {selectedRows && (
-                            <div>
-                                <div className="d-flex flex-row justify-content-between align-items-start bg-light w-100 p-4">
-                                    <div className="row">
-                                        <div className="col-6">
-                                            <h6 className="fw-bold text-secondary mb-1">
-                                                Service Code : {selectedRows.serviceCode || ""}
-                                            </h6>
-                                            <br />
-                                            <h6 className="fw-bold text-secondary mb-1">
-                                                Service Name : {selectedRows.lname || ""}
-                                            </h6>
-                                            <br />
-                                            <h6 className="fw-bold text-secondary mb-1">
-                                                {/* Category : {selectedRows.category && selectedRows.category.categoryName || ""} */}
-                                                Category : {selectedRows.category?.categoryName || ''}
-                                            </h6>
-                                            <br />
-                                            <h6 className="fw-bold text-secondary mb-1">
-                                                Service Price : {selectedRows.charges || ""}
-                                            </h6>
-                                            <br />
-                                            <h6 className="fw-bold text-secondary mb-1">
-                                                Name : {selectedRows.createdBy?.name || selectedRows.createdByAdmin?.name || ''}
-                                            </h6>
-                                            <br />
-                                            <br />
-                                            <h6 className="fw-bold text-secondary mb-1">
-                                                Created At : {selectedRows.createdAt || ""}
-                                            </h6>
-                                            <br />
-                                            {/* <h6 className="fw-bold text-secondary mb-1">
-                                                Service Description :
-                                                <div
-                                                    dangerouslySetInnerHTML={{
-                                                        __html: selectedRows.description || "",
-                                                    }}
-                                                />
-                                            </h6> */}
-                                        </div>
-                                        <div className="col-6">
-                                            <img
-                                                src={selectedRows.featuredImage || ""}
-                                                alt="Not found!"
-                                                style={{ maxWidth: "350px" }}
+                    {selectedRows && (
+                        <div>
+                            <div className="d-flex flex-row justify-content-between align-items-start bg-light w-100 p-4">
+                                <div className="row">
+                                    <div className="col-6">
+                                        <h6 className="fw-bold text-secondary mb-1">
+                                            Service Code : {selectedRows.serviceCode || ""}
+                                        </h6>
+                                        <br />
+                                        <h6 className="fw-bold text-secondary mb-1">
+                                            Service Name : {selectedRows.lname || ""}
+                                        </h6>
+                                        <br />
+                                        <h6 className="fw-bold text-secondary mb-1">
+                                            {/* Category : {selectedRows.category && selectedRows.category.categoryName || ""} */}
+                                            Category : {selectedRows.category?.categoryName || ''}
+                                        </h6>
+                                        <br />
+                                        <h6 className="fw-bold text-secondary mb-1">
+                                            Service Price : {selectedRows.charges || ""}
+                                        </h6>
+                                        <br />
+                                        <h6 className="fw-bold text-secondary mb-1">
+                                            Name : {selectedRows.createdBy?.name || selectedRows.createdByAdmin?.name || ''}
+                                        </h6>
+                                        <br />
+                                        <br />
+                                        <h6 className="fw-bold text-secondary mb-1">
+                                            Created At : {selectedRows.createdAt || ""}
+                                        </h6>
+                                        <br />
+                                        {/* <h6 className="fw-bold text-secondary mb-1">
+                                            Service Description :
+                                            <div
+                                                dangerouslySetInnerHTML={{
+                                                    __html: selectedRows.description || "",
+                                                }}
                                             />
-                                        </div>
-                                        <div className="col-12">
-                                            <h6 className="fw-bold text-secondary mb-1">
-                                                Service Description :
-                                                <div
-                                                    className="ql-editor"
-                                                    dangerouslySetInnerHTML={{
-                                                        __html: selectedRows.description || "",
-                                                    }}
-                                                />
-                                            </h6>
-                                        </div>
+                                        </h6> */}
+                                    </div>
+                                    <div className="col-6">
+                                        <img
+                                            src={selectedRows.featuredImage || ""}
+                                            alt="Not found!"
+                                            style={{ maxWidth: "350px" }}
+                                        />
+                                    </div>
+                                    <div className="col-12">
+                                        <h6 className="fw-bold text-secondary mb-1">
+                                            Service Description :
+                                            <div
+                                                className="ql-editor"
+                                                dangerouslySetInnerHTML={{
+                                                    __html: selectedRows.description || "",
+                                                }}
+                                            />
+                                        </h6>
                                     </div>
                                 </div>
                             </div>
-                        )}
-                    </Modal.Body>
-                </Modal>
-            </React.Fragment >
+                        </div>
+                    )}
+                </Modal.Body>
+            </Modal>
+        </React.Fragment >
         );
     }
 

@@ -4,10 +4,7 @@ import config from "./../../../config.json";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  setLoginStatus,
-  setUserInfo,
-} from "../../../store/reducers/auth-reducer";
+import { setLoginStatus, setUserInfo } from "../../../store/reducers/auth-reducer";
 import {
   setProducts,
   setReqBody,
@@ -50,6 +47,7 @@ import logoutIcon from "./../../../assets/icons/logout.svg";
 import serviceIcon from "./../../../assets/icons/services_icon.svg";
 import { authVerification } from "../../../helpers/auth-verification";
 
+
 const subCategories = (catId, data) => {
   if (data && data.length) {
     return (
@@ -68,15 +66,15 @@ const subCategories = (catId, data) => {
     );
   }
 };
-//readStatus are comming from notification component
-const Header = ({ props, handleIsToggle, readStatus }) => {
+
+
+const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
   toast.configure();
   const loginStatus = useSelector((state) => state.auth.isLoggedIn);
   const userInfo = useSelector((state) => state.auth.userInfo);
   const dispatch = useDispatch();
   const location = useLocation();
   const history = useHistory();
-
   const productReqBody = useSelector((state) => state.product.reqBody);
   const serviceReqBody = useSelector((state) => state.service.reqBody);
   const productCategories = useSelector((state) => state.product.categories);
@@ -88,7 +86,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
     setReqBody,
     "header"
   );
-
   const [data, setData] = useState([]);
   const [registerModal, setRegister] = useState(false);
   const [forgotModal, setForgot] = useState(false);
@@ -96,7 +93,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
   const [isToggle, setIsToggle] = useState(false);
   const [notifiLength, setNotifiLength] = useState(null);
   const [showNotifi, setShowNotifi] = useState([]);
-
   const selectedCategory = useSelector(
     (state) => state.catSearch.selectedCategory
   );
@@ -109,9 +105,7 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
     searchInput !== "" ? searchInput : readUrlResult.searchInput
   );
   const [flag, setFlag] = useState(false);
-
   const url = location.search;
-
   var param = false;
   if (url !== null && url !== "") {
     if (/t=([^&]+)/.exec(url) !== null) {
@@ -119,7 +113,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
     }
   }
   const [resetModal, setReset] = useState(param);
-
   const openmodalHandler = () => {
     setRegister(false);
     setForgot(false);
@@ -131,7 +124,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
     dispatch(setIsLoginModalOpen({ isLoginModalOpen: false }));
     document.body.style.overflow = "unset";
   };
-
   const showregisterHandler = () => {
     dispatch(setIsLoginModalOpen({ isLoginModalOpen: false }));
     setForgot(false);
@@ -143,7 +135,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
     setRegister(false);
     document.body.style.overflow = "unset";
   };
-
   const showForgotHandler = () => {
     dispatch(setIsLoginModalOpen({ isLoginModalOpen: false }));
     setRegister(false);
@@ -151,12 +142,10 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
     setForgot(true);
     document.body.style.overflow = "hidden";
   };
-
   const hideForgotHandler = () => {
     setForgot(false);
     document.body.style.overflow = "unset";
   };
-
   const showRestPwdHandler = () => {
     dispatch(setIsLoginModalOpen({ isLoginModalOpen: false }));
     setRegister(false);
@@ -168,19 +157,12 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
     setReset(false);
     document.body.style.overflow = "unset";
   };
-
   const logout = () => {
-
     localStorage.clear();
     dispatch(setLoginStatus({ isLoggedIn: false }));
     dispatch(setUserInfo({ userInfo: [] }));
-
-    dispatch(setIsService({ isService: 0 }));
-    setIsToggle(false);
-
     window.location.href = "/";
   };
-
   const removeBackdrop = () => {
     const elements = document.getElementsByClassName("offcanvas-backdrop");
     while (elements.length > 0) {
@@ -189,18 +171,13 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
     document.body.style.overflow = "unset";
     document.body.style.padding = 0;
   };
-
   const handleCatChange = (selectedOption) =>
     setCatSelectedOption(selectedOption);
   const handleSearchInput = (event) => setSearchOption(event.target.value);
-
   const handleIsService = (event) => {
-    //dispatch(setIsService({ isService: parseInt(event.target.value) }));
-    const serviceValue = parseInt(event.target.value);
-    console.log("Button clicked, value:", serviceValue);
-    dispatch(setIsService({ isService: serviceValue }));
+    dispatch(setIsService({ isService: parseInt(event.target.value) }));
     // Set isToggle value based on isService
-    const isToggleValue = serviceValue === 0 ? true : false;
+    const isToggleValue = isService === 1 ? true : false;
     setIsToggle(isToggleValue);
     // handleIsToggle(isToggleValue);
     if (window.location.pathname === "/") {
@@ -208,7 +185,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
     }
     localStorage.setItem("isToggle", JSON.stringify(isToggleValue));
   };
-
   const getCategories = (catId) => {
     let categories = [];
     let url = "";
@@ -224,7 +200,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
     }
     let requestBody =
       isService === 0 ? { is_service: false } : { is_service: true };
-
     axios
       .post(url, requestBody)
       .then((response) => {
@@ -237,7 +212,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
             });
           });
         }
-
         if (isService === 0) {
           dispatch(setCategories({ categories }));
         } else {
@@ -254,21 +228,18 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
         }
       });
   };
-
   const handleSearch = () => {
     if (isService === 0) {
       let reqBody = { ...productReqBody };
       if (selectedCategory.value !== catSelectedOption.value) {
         reqBody.sub_category_filter = [];
       }
-
       dispatch(
         setCatSearchValue({
           selectedCategory: catSelectedOption,
           searchInput: searchOption,
         })
       );
-
       if (props.pageName === "product-listing") {
         reqBody.search_value = searchOption;
         if (catSelectedOption.value !== "") {
@@ -276,7 +247,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
         } else {
           reqBody.category_filter = [];
         }
-
         reqBody.sub_category_filter = [];
         reqBody.color_filter = [];
         reqBody.brand_filter = [];
@@ -345,14 +315,12 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
       if (selectedCategory.value !== catSelectedOption.value) {
         reqBody.sub_category_filter = [];
       }
-
       dispatch(
         setCatSearchValue({
           selectedCategory: catSelectedOption,
           searchInput: searchOption,
         })
       );
-
       if (props.pageName === "service-listing") {
         reqBody.search_value = searchOption;
         if (catSelectedOption.value !== "") {
@@ -360,7 +328,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
         } else {
           reqBody.category_filter = [];
         }
-
         reqBody.sub_category_filter = [];
         reqBody.rating_filter = [];
         reqBody.episode_filter = [];
@@ -433,7 +400,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
       getCategories(catId);
       setFlag(true);
     }
-
     if (isToggle === false) {
       if (location.pathname === "/service-listing") {
         dispatch(setIsService({ isService: 1 }));
@@ -441,10 +407,8 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
         dispatch(setIsService({ isService: 0 }));
       }
     }
-
     let requestBody =
       isService === 0 ? { is_service: false } : { is_service: true };
-
     axios
       .post("front/product/categories/menu", requestBody)
       .then((response) => {
@@ -457,7 +421,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
       .catch((error) => {
         console.log(error);
       });
-
     // Get categories
     axios
       .post("front/product/categories/search", requestBody)
@@ -471,14 +434,12 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
               value: category.id,
             });
           });
-
           setCategoryOptions(options);
           options.forEach((item) => {
             if (item.value === readUrlResult.catId) {
               setCatSelectedOption(item);
             }
           });
-
           if (!productCategories.length) {
             if (isService === 0) {
               // dispatch(setCategories({categories: options}));
@@ -493,7 +454,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
       .catch((error) => {
         console.log(error);
       });
-
     if (loginStatus && userInfo.role === "user") {
       const authInfo = JSON.parse(localStorage.getItem("authInfo"));
       fetchNotification(authInfo.id, authInfo.token);
@@ -510,7 +470,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
     userInfo.role,
     readStatus,
   ]);
-
   const cart = useSelector((state) => state.cart);
   localStorage.setItem("cart", cart);
   const getTotalQuantity = () => {
@@ -519,19 +478,16 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
       return total;
     }
     //console.log('loginStatus='+loginStatus);
-
     Object.keys(cart).forEach((item) => {
       let cartItems = cart[item];
       for (const key in cartItems) {
         total += cartItems[key].quantity;
       }
-
       //total += item.quantity
     });
     localStorage.setItem("totalQuantity", total);
     return total;
   };
-
   //get notification data to show on bell icon
   const fetchNotification = async (userId, token) => {
     try {
@@ -552,7 +508,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
           const sortedNotifications = data.sort(
             (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
           );
-
           // Take only the first two notifications
           const currentNotifications = sortedNotifications.slice(0, 3);
           setShowNotifi(currentNotifications);
@@ -565,7 +520,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
       console.log("Error", error);
     }
   };
-
   const truncateMessage = (message, maxLength = 1) => {
     if (message.length <= maxLength) {
       return message;
@@ -574,6 +528,37 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
       return `${truncatedMessage} ...`;
     }
   };
+
+  const handleSearchFilter = async () => {
+    console.log("searchOption", searchOption);
+    console.log("catSelectedOption", catSelectedOption);
+
+    try {
+      const query = new URLSearchParams();
+      if (catSelectedOption.label !== 'All') query.append('category', catSelectedOption.label);
+      if (searchOption) query.append('name', searchOption);
+
+      const response = await axios.get(`/front/searchFilterServices?${query.toString()}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+      });
+      console.log("response form searching..:", response.data.data);
+      sendServiceData(response.data.data);
+      // const response = await axios.get(`/front/searchFilterServices?category=${catSelectedOption.label}&name=${searchOption}`, {
+      //   headers: {
+      //     'Accept': 'application/json',
+      //     'Content-Type': 'application/json;charset=UTF-8',
+      //   },
+      // });
+      // console.log("response form searching..:", response.data.data)
+      // sendServiceData(response.data.data)
+    } catch (error) {
+      toast.error("Data Not Found", { autoClose: 3000 })
+      console.error('Error fetching users:', error);
+    }
+  }
 
   return (
     <React.Fragment>
@@ -604,7 +589,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
           onForgotShow={showForgotHandler}
         />
       )}
-
       {loginStatus && (
         <div
           className="offcanvas offcanvas-start side_menu_wrap"
@@ -703,7 +687,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
           </div>
         </div>
       )}
-
       <header className="header">
         <div className="container">
           <div className="row">
@@ -740,7 +723,7 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
                     </li>
                   </ul>
                   <ul>
-                    {/* <li className="login_links_wrapper me-3">
+                    <li className="login_links_wrapper me-3">
                       {loginStatus && userInfo.role === "user" ? (
                         <div className="notification_head">
                           <Link to="#">
@@ -785,7 +768,7 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
                       ) : (
                         ""
                       )}
-                    </li> */}
+                    </li>
                     <li className="login_links_wrapper me-3">
                       {loginStatus && userInfo.role === "user" ? (
                         <>
@@ -845,7 +828,6 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
             </div>
           </div>
         </div>
-
         <div className="main_nav">
           <div className="container">
             <div className="row">
@@ -902,7 +884,7 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
                             <button
                               className="btn btn_dark"
                               type="button"
-                              onClick={handleSearch}
+                              onClick={handleSearchFilter}
                             >
                               Search
                             </button>
@@ -969,17 +951,14 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
                                   >
                                     {/* `service-listing?cat=${value._id}` */}
                                     <Link
-                                      className="nav-link dropdown-toggle"
-                                      to="#"
                                       id="offcanvasNavbarDropdown"
+                                      className="nav-link gap-2"
+                                      to={`/service-listing?cat=${value._id}`}
+                                      // id="offcanvasNavbarDropdown"
                                       aria-expanded="false"
                                     >
                                       {value.name}
                                     </Link>
-                                    {subCategories(
-                                      value["_id"],
-                                      value.subCategories
-                                    )}
                                   </li>
                                 );
                               }
@@ -996,6 +975,7 @@ const Header = ({ props, handleIsToggle, readStatus }) => {
         </div>
       </header>
     </React.Fragment>
+
   );
 };
 

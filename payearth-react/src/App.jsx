@@ -726,11 +726,8 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
-<<<<<<< HEAD
 
-=======
           <PrivateRoute path="/admin/add-service" component={adminAddService} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
->>>>>>> a2041dc5169ba79c95c0ffb1afd303496cec8c81
           {/* Community Routes */}
           <PrivateRoute
             path="/admin/manage-banner-advertisement"
