@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Header from '../../components/admin/common/Header';
 import { toast } from 'react-toastify';
 import { setLoading } from '../../store/reducers/global-reducer';
+import SpinnerLoader from "../../components/common/SpinnerLoader";
 import { connect } from 'react-redux';
 import store from '../../store/index';
 import axios from 'axios';
@@ -12,6 +13,7 @@ import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 import Modal from "react-bootstrap/Modal";
 import CryptoJS from 'crypto-js';
+import 'react-quill/dist/quill.snow.css';
 class ManageServices extends Component {
     constructor(props) {
         super(props);
@@ -26,6 +28,8 @@ class ManageServices extends Component {
         // ***
         this.state = {
             check: false, data: [], selectedRows: [], showModal: false,
+            loading: true,
+            activeTab: localStorage.getItem('activeTab') || 'nav-pending-orders',
         }
     }
 
@@ -34,13 +38,19 @@ class ManageServices extends Component {
         this.setState({ selectedRows: state.selectedRows });
     }
 
+    //$$$$$$$$$$$$$$$$$$$$
+    handleTabClick = (tab) => {
+        this.setState({ activeTab: tab });
+        localStorage.setItem('activeTab', tab);
+    };
+
     handleActiveDetails = (row) => {
         this.setState({ selectedRows: row });
         this.setState({ showModal: true });
     };
 
     handleChange = (e) => {
-        console.log(e.target.checked)
+        //  console.log(e.target.checked)
         if (e.target.checked) {
             this.setState({ check: 'checked' })
             //  document.getElementsByTagName("input")[0].setAttribute('checked', 'checked')
@@ -62,7 +72,7 @@ class ManageServices extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`
             }
         }).then((response) => {
-            console.log('response of delete:', response)
+            // console.log('response of delete:', response)
             if (response.data.status) {
                 toast.success(response.data.message);
                 this.getServices();  // Refresh the list after deletion
@@ -123,9 +133,9 @@ class ManageServices extends Component {
                     })
                 }).then(response => response.json())
                     .then(data => {
-                        console.log("Cloudinary response data:", data);
+                        //    console.log("Cloudinary response data:", data);
                         if (data.result === 'ok') {
-                            toast.success("Image deleted successfully");
+                            //    toast.success("Image deleted successfully");
                         } else {
                             throw new Error("Failed to delete image from Cloudinary");
                         }
@@ -176,6 +186,7 @@ class ManageServices extends Component {
     getServices = () => {
         let url = '/admin/services';
         this.dispatch(setLoading({ loading: true }));
+        // this.dispatch(SpinnerLoader({ loading: true }));
         axios.get(url, {
             headers: {
                 'Accept': 'application/json',
@@ -183,20 +194,22 @@ class ManageServices extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`
             }
         }).then((response) => {
-            console.log("all servicess", response);
+            //  console.log("all servicess", response);
 
             const activeServices = response.data.data.filter(item => item.isActive === true);
             const inactiveServices = response.data.data.filter(item => item.isActive === false);
 
             this.setState({
-                activeServiceData: activeServices,
+                // activeServiceData: activeServices,
+                activeServiceData: "",
                 loading: false,
                 error: null
                 //   pagination: response.data.data.paginationData
             });
 
             this.setState({
-                inactiveServiceData: inactiveServices,
+                // inactiveServiceData: inactiveServices,
+                inactiveServiceData: "",
                 loading: false,
                 error: null
                 //   pagination: response.data.data.paginationData
@@ -209,6 +222,7 @@ class ManageServices extends Component {
             }).finally(() => {
                 setTimeout(() => {
                     this.dispatch(setLoading({ loading: false }));
+                    //  this.dispatch(SpinnerLoader({ loading: false }));
                 }, 300);
             });
     }
@@ -231,8 +245,7 @@ class ManageServices extends Component {
         },
         {
             name: "SERVICE-PROVIDER",
-            selector: (row, i) =>
-                row.createdBy.name,
+            selector: (row, i) => row.createdBy?.name || row.createdByAdmin?.name || 'N/A',
             sortable: true
         },
         {
@@ -319,8 +332,7 @@ class ManageServices extends Component {
         },
         {
             name: "SERVICE-PROVIDER",
-            selector: (row, i) =>
-                row.createdBy.name,
+            selector: (row, i) => row.createdBy?.name || row.createdByAdmin?.name || 'N/A',
             sortable: true
         },
         {
@@ -399,14 +411,15 @@ class ManageServices extends Component {
         const { activeServiceData } = this.state;
         const { inactiveServiceData } = this.state;
         //  console.log(ServiceData)
+        const { selectedRows, loading, } = this.state;
+        const { activeTab } = this.state;
+        //   if (loading) {
+        //     return <SpinnerLoader />;
+        //   }
 
-        const {
-            selectedRows,
-        } = this.state;
-
-        // console.log('selectedRows=',selectedRows)
         return (
             <React.Fragment>
+                {loading === true ? <SpinnerLoader /> : ""}
                 <Header />
                 <div className="seller_dash_wrap pt-5 pb-5">
                     <div className="container ">
@@ -414,18 +427,41 @@ class ManageServices extends Component {
                             <div className="dash_inner_wrap">
                                 <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
                                     <div className="dash_title">Manage Service</div>
-                                    <a className="custom_btn btn_yellow w-auto btn" href='#'>Add Service</a>
+                                    {/* <a className="custom_btn btn_yellow w-auto btn" href='#'>Add Service</a> */}
+                                    <div className="">
+                                        <span>
+                                            <Link
+                                                className="btn custom_btn btn_yellow mx-auto"
+                                                to="#"
+                                                onClick={this.clearSessionStorage}
+                                            >
+                                                Add New Service
+                                            </Link>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                             <nav className="orders_tabs">
                                 <div className="nav nav-tabs" id="nav-tab" role="tablist">
-                                    <button className="nav-link active" id="nav-pending-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-pending-orders" type="button" role="tab" aria-controls="nav-pending-orders" aria-selected="true">Added Services</button>
-                                    <button className="nav-link" id="nav-ongoing-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-ongoing-orders" type="button" role="tab" aria-controls="nav-ongoing-orders" aria-selected="false">Pending for approval</button>
-                                    <button className="nav-link" id="nav-cancelled-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-cancelled-orders" type="button" role="tab" aria-controls="nav-cancelled-orders" aria-selected="true">Rejected Services</button>
+                                    <button
+                                        // className="nav-link active"
+                                        className={`nav-link ${activeTab === 'nav-pending-orders' ? 'active' : ''}`}
+                                        id="nav-pending-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-pending-orders" type="button" role="tab" aria-controls="nav-pending-orders" aria-selected="true" onClick={() => this.handleTabClick('nav-pending-orders')}>Added Services</button>
+                                    <button
+                                        //  className="nav-link" 
+                                        className={`nav-link ${activeTab === 'nav-ongoing-orders' ? 'active' : ''}`}
+                                        id="nav-ongoing-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-ongoing-orders" type="button" role="tab" aria-controls="nav-ongoing-orders" aria-selected="false" onClick={() => this.handleTabClick('nav-ongoing-orders')}>Pending for approval</button>
+                                    <button
+                                        // className="nav-link" 
+                                        className={`nav-link ${activeTab === 'nav-cancelled-orders' ? 'active' : ''}`}
+                                        id="nav-cancelled-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-cancelled-orders" type="button" role="tab" aria-controls="nav-cancelled-orders" aria-selected="true" onClick={() => this.handleTabClick('nav-cancelled-orders')}>Rejected Services</button>
                                 </div>
                             </nav>
                             <div className="orders_table tab-content pt-0 pb-0" id="nav-tabContent">
-                                <div className="tab-pane fade show active" id="nav-pending-orders" role="tabpanel" aria-labelledby="nav-pending-orders-tab">
+                                <div
+                                    // className="tab-pane fade show active" 
+                                    className={`tab-pane fade ${activeTab === 'nav-pending-orders' ? 'show active' : ''}`}
+                                    id="nav-pending-orders" role="tabpanel" aria-labelledby="nav-pending-orders-tab">
                                     <DataTableExtensions
                                         columns={this.activeService_column}
                                         data={activeServiceData}
@@ -445,7 +481,10 @@ class ManageServices extends Component {
                                         />
                                     </DataTableExtensions>
                                 </div>
-                                <div className="tab-pane fade" id="nav-ongoing-orders" role="tabpanel" aria-labelledby="nav-ongoing-orders-tab">
+                                <div
+                                    //  className="tab-pane fade" 
+                                    className={`tab-pane fade ${activeTab === 'nav-ongoing-orders' ? 'show active' : ''}`}
+                                    id="nav-ongoing-orders" role="tabpanel" aria-labelledby="nav-ongoing-orders-tab">
                                     <table className="table table-responsive table-bordered">
                                         <thead>
                                             <tr>
@@ -558,25 +597,29 @@ class ManageServices extends Component {
                                         </tbody>
                                     </table>
                                 </div>
-                                <div className="tab-pane fade" id="nav-cancelled-orders" role="tabpanel" aria-labelledby="nav-cancelled-orders-tab">
-                                    <div className="tab-pane fade show active" id="nav-pending-orders" role="tabpanel" aria-labelledby="nav-pending-orders-tab">
-                                        <DataTableExtensions
-                                            columns={this.inactiveService_column}
-                                            data={inactiveServiceData}
-                                        >
-                                            <DataTable
-                                                pagination
-                                                paginationRowsPerPageOptions={[5, 8, 12, 16]}
-                                                paginationPerPage={5}
-                                                noHeader
-                                                highlightOnHover
-                                                //defaultSortField="id"
-                                                // defaultSortAsc={false}
-                                                selectableRows
-                                                onSelectedRowsChange={this.handleRowSelected}
-                                            />
-                                        </DataTableExtensions>
-                                    </div>
+                                <div
+                                    // className="tab-pane fade"
+                                    className={`tab-pane fade ${activeTab === 'nav-cancelled-orders' ? 'show active' : ''}`}
+                                    id="nav-cancelled-orders" role="tabpanel" aria-labelledby="nav-cancelled-orders-tab">
+                                    {/* <div className="tab-pane fade show active" id="nav-pending-orders" role="tabpanel" aria-labelledby="nav-pending-orders-tab"> */}
+                                    <DataTableExtensions
+                                        columns={this.inactiveService_column}
+                                        data={inactiveServiceData}
+                                    >
+                                        <DataTable
+                                            pagination
+                                            paginationRowsPerPageOptions={[5, 8, 12, 16]}
+                                            paginationPerPage={5}
+                                            noHeader
+                                            highlightOnHover
+                                            //defaultSortField="id"
+                                            // defaultSortAsc={false}
+                                            selectableRows
+                                            onSelectedRowsChange={this.handleRowSelected}
+                                            selectedRows={selectedRows}
+                                        />
+                                    </DataTableExtensions>
+                                    {/* </div> */}
                                 </div>
                             </div>
                         </div>
@@ -612,11 +655,16 @@ class ManageServices extends Component {
                                             </h6>
                                             <br />
                                             <h6 className="fw-bold text-secondary mb-1">
-                                                Category : {selectedRows.category && selectedRows.category.categoryName || ""}
+                                                {/* Category : {selectedRows.category && selectedRows.category.categoryName || ""} */}
+                                                Category : {selectedRows.category?.categoryName || ''}
                                             </h6>
                                             <br />
                                             <h6 className="fw-bold text-secondary mb-1">
-                                                Name : {selectedRows.createdBy && selectedRows.createdBy.name || ""}
+                                                Service Price : {selectedRows.charges || ""}
+                                            </h6>
+                                            <br />
+                                            <h6 className="fw-bold text-secondary mb-1">
+                                                Name : {selectedRows.createdBy?.name || selectedRows.createdByAdmin?.name || ''}
                                             </h6>
                                             <br />
                                             <br />
@@ -624,14 +672,14 @@ class ManageServices extends Component {
                                                 Created At : {selectedRows.createdAt || ""}
                                             </h6>
                                             <br />
-                                            <h6 className="fw-bold text-secondary mb-1">
+                                            {/* <h6 className="fw-bold text-secondary mb-1">
                                                 Service Description :
                                                 <div
                                                     dangerouslySetInnerHTML={{
                                                         __html: selectedRows.description || "",
                                                     }}
                                                 />
-                                            </h6>
+                                            </h6> */}
                                         </div>
                                         <div className="col-6">
                                             <img
@@ -639,6 +687,17 @@ class ManageServices extends Component {
                                                 alt="Not found!"
                                                 style={{ maxWidth: "350px" }}
                                             />
+                                        </div>
+                                        <div className="col-12">
+                                            <h6 className="fw-bold text-secondary mb-1">
+                                                Service Description :
+                                                <div
+                                                    className="ql-editor"
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: selectedRows.description || "",
+                                                    }}
+                                                />
+                                            </h6>
                                         </div>
                                     </div>
                                 </div>

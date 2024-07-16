@@ -274,13 +274,13 @@ const Post = ({ posts }) => {
                             {
                                 userInfo.role === 'user' &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
-                                    {posts.isSeller === false && posts.userId.id === authInfo.id ? "" : 'Follow'}
+                                    {posts.isSeller === false && posts.userId.id === authInfo.id ? "" : 'Follow U'}
                                 </Link>
                             }
                             {
                                 userInfo.role === 'seller' &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
-                                    {posts.isSeller === true && posts.sellerId.id === authInfo.id ? "" : 'Follow'}
+                                    {posts.isSeller === true && posts.sellerId.id === authInfo.id ? "" : 'Follow S'}
                                 </Link>
                             }
                         </div>

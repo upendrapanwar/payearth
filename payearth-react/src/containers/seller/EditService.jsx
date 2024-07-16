@@ -360,6 +360,7 @@ class EditService extends Component {
                                                                             [{ 'list': 'ordered' }, { 'list': 'bullet' }],
                                                                             ['bold', 'italic', 'underline'],
                                                                             ['link', 'image'],
+                                                                            [{ 'align': [] }],
                                                                             ['clean']
                                                                         ]
                                                                     }}

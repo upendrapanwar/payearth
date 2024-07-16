@@ -305,7 +305,7 @@ function Header() {
                       <div className="offcanvas-body d-block">
                         <ul className="seller_menu navbar-nav justify-content-end flex-grow-1 pe-0">
                           <li className="nav-item">
-                            <Link className="nav-link" to="/admin/chat">
+                            <Link className="nav-link" to="/admin/manage-notifications">
                               <div className="sm_icon">
                                 <img src={blackBellIcon} alt="" />
                               </div>

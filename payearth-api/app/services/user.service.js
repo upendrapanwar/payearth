@@ -108,6 +108,7 @@ module.exports = {
   bannerPayment,
   customerAuthorizePayment,
   createSubscription,
+  serviceCharges,
   getCommonService,
   CommonServiceById,
   addServiceReview,
@@ -2489,18 +2490,119 @@ async function createSubscription(req, res) {
 
     const subscription = await stripe.subscriptions.create({
       customer: customer.id,
-      items: [{ price: plan_Id }], // Replace with your plan ID
+      items: [{ price: plan_Id }],
       expand: ["latest_invoice.payment_intent"],
     });
 
     return subscription;
-    // return session;
-    // res.status(200).json({ subscription });
   } catch (error) {
     console.error("Error creating subscription:", error);
-    // res.status(500).send({ error: 'Subscription creation failed' });
   }
 }
+
+// STRIPE Service.............
+async function serviceCharges(req, res) {
+  const { paymentMethodId, email, amount, authName } = req.body;
+  console.log("amount", amount);
+
+  // const email = "test@gmail.com";
+
+  console.log("paymentMethodId", paymentMethodId); 
+  // console.log("email", email);
+  // console.log("authName", authName);
+
+
+  try {
+    const paymentMethod = await stripe.paymentMethods.create({
+      type: "card",
+      card: {
+        token: paymentMethodId,
+      },
+    });
+
+    const customer = await stripe.customers.create({
+      email: email,
+      payment_method: paymentMethod.id,
+      invoice_settings: {
+        default_payment_method: paymentMethod.id,
+      },
+      name: authName,
+    });
+
+    console.log("customer", customer);
+
+    await stripe.paymentMethods.attach(paymentMethod.id, {
+      customer: customer.id,
+    });
+
+    await stripe.customers.update(customer.id, {
+      invoice_settings: {
+        default_payment_method: paymentMethod.id,
+      },
+    });
+
+    await stripe.invoiceItems.create({
+      customer: customer.id,
+      amount: amount,
+      currency: 'usd',
+      description: 'Service charge',
+    });
+
+    const invoice = await stripe.invoices.create({
+      customer: customer.id,
+      // collection_method: 'charge_automatically',
+      auto_advance: true,
+      collection_method: 'charge_automatically',
+    });
+    console.log("invoice", invoice)
+
+    const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id);
+
+    // console.log("finalizedInvoice :", finalizedInvoice);
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount,
+      currency: 'usd',
+      customer: customer.id,
+      payment_method: paymentMethod.id,
+      // confirmation_method: 'manual',
+      automatic_payment_methods: {
+        enabled: true,  // Enable automatic payment methods
+        // allow_redirects: 'always',  // Always allow redirects for payment methods that require it
+      },
+      confirm: true,
+      return_url: 'https://pay.earth/',  // Set your return URL here
+    });
+    const response = {
+      paymentIntent: paymentIntent,
+      invoice: finalizedInvoice,
+    };
+    // console.log("Confirmed Payment Intent", response);
+    return response
+  } catch (error) {
+    console.log("Error", error)
+
+  }
+}
+
+// TEST**************
+// async function serviceCharges(req, res) {
+//   // const { amount } = req.body;
+//   const amount = 1000
+//   try {
+//     const paymentIntent = await stripe.paymentIntents.create({
+//       // amount: amount * 100, // amount in cents
+//       amount: amount,
+//       currency: 'usd',
+//     });
+//     const clientSecret = paymentIntent.client_secret;
+//     return clientSecret;
+//     // res.json({ clientSecret: paymentIntent.client_secret });
+//   } catch (error) {
+//     // res.status(500).json({ error: error.message });
+//     console.log("error", error)
+//   }
+// }
+
 
 // *******************************************************************************
 // *******************************************************************************

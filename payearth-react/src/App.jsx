@@ -124,7 +124,8 @@ import PageDetail from "./components/common/PageDetails";
 import Zoom from "./components/user/common/services/zoom/Zoom";
 import ScrollToTopButton from "./containers/user/ScrollToTopButton";
 // import BannerCheckOut from './containers/user/BannerCheckOut';
-import StripePaymentForm from "./containers/user/BannerCheckOutStripe";
+import StripePaymentForms from "./containers/user/paymentCheckoutStripe";
+import StripePaymentForm from "./containers/user/paymentCheckoutStripe";
 import ServiceOrder from "./containers/user/service/ServiceOrder";
 
 
@@ -171,7 +172,9 @@ function App() {
             component={Notifications}
             exact
           />
+
           <PublicRoute path="/chat" restricted={false} component={Chat} exact />
+
           <PublicRoute
             path="/user-contact"
             restricted={false}
@@ -193,6 +196,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/my-wishlist"
             component={MyWishlist}
@@ -200,6 +204,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/savelater"
             component={SaveLaterlist}
@@ -207,6 +212,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/service-order"
             component={ServiceOrder}
@@ -214,6 +220,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/my-orders"
             component={MyOrders}
@@ -221,6 +228,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/my-banners"
             component={MyBanner}
@@ -228,6 +236,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/create-banner"
             component={CreateNewBanner}
@@ -235,14 +244,28 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           {/* <PublicRoute path="/bannerCheckout" restricted={false} component={BannerCheckOut} exact /> */}
-          <PublicRoute
+          {/* <PublicRoute
             path="/bannerCheckout"
+            restricted={false}
+            component={StripePaymentForms}
+            exact
+          /> */}
+
+          <PublicRoute
+            path="/service_Charge_Checkout"
             restricted={false}
             component={StripePaymentForm}
             exact
           />
-          <PrivateRoute path="/user/banner-edit/:id" component={MyBannerEdit} roles={[Role.user]} currentUserRole={userInfo.role} exact />
+
+          <PrivateRoute
+            path="/user/banner-edit/:id"
+            component={MyBannerEdit}
+            roles={[Role.user]}
+            currentUserRole={userInfo.role}
+            exact />
 
           <PrivateRoute
             path="/order-detail/:id"
@@ -295,28 +318,166 @@ function App() {
           <PrivateRoute path="/seller/dashboard" component={SellerDashboard} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
 
           {/* SellerManageSubscription */}
-          <PrivateRoute path="/seller/manage-subscription-plan" component={SellerManageSubscription} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/manage-banner-advertisement" component={SellerManageBannerAdvertisement} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/manage-banner-list" component={SellerBannerList} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/banner-edit/:id" component={SellerBannerEdit} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
+          <PrivateRoute
+            path="/seller/manage-subscription-plan"
+            component={SellerManageSubscription}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/manage-banner-advertisement"
+            component={SellerManageBannerAdvertisement}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/manage-banner-list"
+            component={SellerBannerList}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/banner-edit/:id"
+            component={SellerBannerEdit}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
 
 
-          <PrivateRoute path="/seller/product-stock-management" component={ProductStockManagement} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/chat" component={SellerChat} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/service-stock-management" component={ServiceStockManagement} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/add-product" component={AddProduct} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/edit-product/:id" component={EditProduct} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/product-orders" component={ProductOrders} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/service-orders" component={ServiceOrders} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/listed-items" component={ListedProducts} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/contact" component={Contact} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/payments" component={Payments} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/product-detail/:id" component={SellerProductDetail} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/service-detail/:id" component={SellerServiceDetail} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/order-detail/:id" component={SellerOrderDetail} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/add-service" component={AddService} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/service-checkout" component={ServiceCheckoutStripe} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
-          <PrivateRoute path="/seller/edit-service/:id" component={EditService} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
+          <PrivateRoute
+            path="/seller/product-stock-management"
+            component={ProductStockManagement}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/chat"
+            component={SellerChat}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/service-stock-management"
+            component={ServiceStockManagement}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/add-product"
+            component={AddProduct}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/edit-product/:id"
+            component={EditProduct}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/product-orders"
+            component={ProductOrders}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/service-orders"
+            component={ServiceOrders}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/listed-items"
+            component={ListedProducts}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/contact"
+            component={Contact}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/payments"
+            component={Payments}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/product-detail/:id"
+            component={SellerProductDetail}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/service-detail/:id"
+            component={SellerServiceDetail}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/order-detail/:id"
+            component={SellerOrderDetail}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/add-service"
+            component={AddService}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/service-checkout"
+            component={ServiceCheckoutStripe}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/edit-service/:id"
+            component={EditService}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
 
           {/* Admin routes */}
           <PublicRoute
@@ -349,99 +510,142 @@ function App() {
             component={AdminPayments}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/admin/post-module"
             restricted={false}
             component={AdminPostModule}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/admin/post-module-add-new"
             restricted={false}
             component={AdminPostModuleAddNew}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/admin/post-module-edit/:id"
             restricted={false}
             component={AdminPostEdit}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
 
-          <PublicRoute
+          <PrivateRoute
             path="/admin/page-module"
             restricted={false}
             component={AdminPageModule}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/admin/page-module-add-new"
             restricted={false}
             component={AdminPageModuleAddNew}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/admin/page-module-edit/:id"
             restricted={false}
             component={AdminPageEdit}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
 
-          <PublicRoute
+          <PrivateRoute
             path="/admin/category-module"
             restricted={false}
             component={AdminCategoryModel}
-            exact
-          />
-          <PublicRoute
-            path="/admin/category-module-edit/:id"
-            restricted={false}
-            component={AdminCategoryModelEdit}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
 
-          <PublicRoute
+          <PrivateRoute
+            path="/admin/category-module-edit/:id"
+            restricted={false}
+            component={AdminCategoryModelEdit}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
             path="/admin/manage-payment-details/:id"
             restricted={false}
             component={ManagePaymentDetails}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/admin/chat"
             restricted={false}
             component={AdminChat}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/admin/manage-order-details/:id"
             restricted={false}
             component={ManageOrderDetails}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/admin/manage-products"
             restricted={false}
             component={ManageProducts}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/admin/manage-product-details"
             restricted={false}
             component={ManageProductDetails}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/admin/manage-services"
             restricted={false}
             component={ManageServices}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/admin/manage-service-details"
             restricted={false}
             component={ManageServiceDetails}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/admin/manage-community"
             component={ManageCommunity}
@@ -464,18 +668,24 @@ function App() {
             exact
           />
 
-          <PublicRoute
+          <PrivateRoute
             path="/admin/manage-notifications"
             restricted={false}
             component={ManageNotifications}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/admin/manage-customers"
             restricted={false}
             component={ManageCustomers}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/admin/orders"
             component={AdminOrders}
@@ -483,6 +693,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/admin/dashboard"
             component={AdminDashboard}
@@ -490,6 +701,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/admin/add-coupon"
             component={AddCoupon}
@@ -497,6 +709,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/admin/coupons"
             component={CouponsListing}
@@ -504,6 +717,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/admin/manage-vendors"
             component={ManageVendors}
@@ -511,6 +725,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           {/* Community Routes */}
           <PrivateRoute
             path="/admin/manage-banner-advertisement"
@@ -519,6 +734,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/admin/manage-support"
             component={ManageSupport}
@@ -526,6 +742,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/admin/manage-banner-list"
             component={ManageBannerList}
@@ -533,6 +750,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/admin/manage-banner-list-edit/:id"
             component={ManageBannerListEdit}
@@ -540,7 +758,14 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
-          <PrivateRoute path="/admin/admin-manage-subscriptionplan" component={AdminManageSubPlan} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
+
+          <PrivateRoute
+            path="/admin/admin-manage-subscriptionplan"
+            component={AdminManageSubPlan}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
+            exact
+          />
           {/* AdminManageSubPlan */}
 
           <PrivateRoute path="/admin/edit-service/:id"

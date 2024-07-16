@@ -90,7 +90,9 @@ const Community = () => {
 
         }, 0.001);
     }
-    const createPost = () => {
+    const createPost = async () => {
+        console.log("authInfo Seller or User", authInfo.token);
+        const token = authInfo.token;
         setAddMore(false);
         let reqBody = {};
         if (userInfo.role === 'user') {
@@ -123,14 +125,14 @@ const Community = () => {
         let videoFormData = new FormData();
         videos.forEach((val) => {
             videoFormData.append('videos', val);
-        })
+        });
         // console.log(videos);
         dispatch(setLoading({ loading: true }))
-        axios.post('community/posts', reqBody, {
+        await axios.post('community/posts', reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
-                'Authorization': `Bearer ${authInfo.token}`
+                'Authorization': `Bearer ${token}`
             }
         }).then(response => {
             if (response.data.status) {

@@ -765,7 +765,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
                     </li>
                   </ul>
                   <ul>
-                    <li className="login_links_wrapper me-3">
+                    {/* <li className="login_links_wrapper me-3">
                       {loginStatus && userInfo.role === "user" ? (
                         <div className="notification_head">
                           <Link to="#">
@@ -810,7 +810,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
                       ) : (
                         ""
                       )}
-                    </li>
+                    </li> */}
                     <li className="login_links_wrapper me-3">
                       {loginStatus && userInfo.role === "user" ? (
                         <>

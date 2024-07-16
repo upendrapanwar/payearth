@@ -230,6 +230,7 @@ router.put("/blockBanner/:id", blockBanner);
 router.post("/createAuthorizeCustomer/payment", customerAuthorizePayment);
 router.post("/schedule/payment", bannerPayment);
 router.post("/create-subscription", createSubscription);
+router.post("/serviceCharge", serviceCharges);
 
 router.get("/get-common-service", getAllCommonService);
 router.get("/get-common-service/:id", getCommonServiceById);
@@ -1081,11 +1082,13 @@ function bannerPayment(req, res, next) {
 function createSubscription(req, res, next) {
   userService
     .createSubscription(req)
-    .then((data) =>
-      data
-        ? res.status(200).json({ status: true, data: data })
-        : res.status(400).json({ status: false, message: "ERROR ", data: [] })
-    )
+    .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function serviceCharges(req, res, next) {
+  userService.serviceCharges(req)
+    .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 

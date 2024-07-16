@@ -11,12 +11,19 @@ import ServiceDetailsTabbing from "../../../components/user/common/services/Serv
 import SpinnerLoader from "../../../components/common/SpinnerLoader";
 import { BannerTopIframe } from "../../../components/common/BannerFrame";
 import arrow_back from '../../../assets/icons/arrow-back.svg'
+import { useHistory } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { isLogin } from './../../../helpers/login';
+
 
 const ServiceDetails = () => {
+  const history = useHistory();
+  const currentUser = isLogin();
   const { id } = useParams();
   const [commonServiceData, setCommonServiceData] = useState([]);
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
+  // const [charges, setCharges] = useState("");
   const [reviews, setReviews] = useState([]);
   const myRef = useRef(null);
   const [loading, setLoading] = useState(true);
@@ -33,12 +40,17 @@ const ServiceDetails = () => {
   const fetchData = async () => {
     try {
       const res = await axios.get(`/user/get-common-service/${id}`);
+      const data = res.data.data;
+      sessionStorage.setItem('serviceDetails', JSON.stringify(data));
       const dataArray = Array.isArray(res.data.data)
         ? res.data.data
         : [res.data.data];
       setCommonServiceData(dataArray);
+
       setDescription(dataArray[0].description); // Set description
       setCategory(dataArray[0].category.categoryName); //Set category
+      // setCharges(dataArray[0].charges)
+
       setReviews(dataArray[0].reviews); // Set reviews
       setLoading(false); // Set loading to false after fetching data
     } catch (error) {
@@ -58,6 +70,15 @@ const ServiceDetails = () => {
     // Process the data received from ServiceDetailTabbing
     console.log("Data received from ServiceDetailTabbing:", data);
   };
+
+  const handleCheckout = () => {
+    if (!currentUser) {
+      toast.error("Please Login", { autoClose: 3000 })
+
+    } else {
+      history.push('/service_Charge_Checkout');
+    }
+  }
 
   return (
     <React.Fragment>
@@ -91,9 +112,16 @@ const ServiceDetails = () => {
                       <p>{data.category.categoryName}</p>
                       <p>{data.description ? parse(data.description) : ""}</p>
                       <div className="pdi_fea">
-                        <Link className="btn custom_btn btn_yellow" to="#">
+                        <button
+                          className="btn custom_btn btn_yellow"
+                          onClick={handleCheckout}
+                        >
+                          <b>{`$${data.charges}`}</b>&nbsp; Pay Now
+                        </button>
+                        {/* <button className="btn custom_btn btn_yellow" onClick={() => { this.props.history.push('/user/service_Charge_Checkout') }}>{<b>{`$${data.charges}`}</b>}&nbsp; Pay Now</button> */}
+                        {/* <Link className="btn custom_btn btn_yellow" to="#">
                           {<b>{`$${data.charges}`}</b>}&nbsp; Pay Now
-                        </Link>
+                        </Link> */}
                         <br />
                       </div>
                       <div className="pdi_share">
