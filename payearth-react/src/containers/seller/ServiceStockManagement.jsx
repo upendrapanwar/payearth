@@ -5,7 +5,7 @@ import store from "../../store/index";
 import { setLoading } from "../../store/reducers/global-reducer";
 import SpinnerLoader from "../../components/common/SpinnerLoader";
 import NotFound from "../../components/common/NotFound";
-import { Link } from "react-router-dom";
+import { Link} from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import DataTable from "react-data-table-component";
@@ -17,6 +17,7 @@ import Calendar from "./Calendar";
 import Modal from "react-bootstrap/Modal";
 import emptyImg from "./../../assets/images/emptyimage.png";
 import { CalendarLogout } from "./CalendarLogout";
+import 'react-quill/dist/quill.snow.css';
 
 class ServiceStockManagement extends Component {
   constructor(props) {
@@ -38,7 +39,8 @@ class ServiceStockManagement extends Component {
       editedData: {}, // State to store edited data
       emptyImg: emptyImg,
       isCalendarAuthorized: accessToken ? true : false,
-      paginationPerPage: 5
+      paginationPerPage: 5,
+      activeTab: localStorage.getItem('activeTab') || 'nav-appointment',
     };
   }
 
@@ -58,10 +60,11 @@ class ServiceStockManagement extends Component {
     this.setState({ isCalendarAuthorized: true });
   };
 
-  // handleCalendarLogout = () => {
-  //   this.setState({ isCalendarAuthorized: false });
-  //   localStorage.setItem('isCalendarAuthorized', 'false');
-  // }
+//$$$$$$$$$$$$$$$$$$$$
+  handleTabClick = (tab) => {
+    this.setState({ activeTab: tab });
+    localStorage.setItem('activeTab', tab);
+  };
 
   getAddedServices = () => {
     axios
@@ -73,7 +76,7 @@ class ServiceStockManagement extends Component {
         },
       })
       .then((res) => {
-        console.log("Data", res);
+     //    console.log("Data", res);
         this.setState({
           service: res.data.data,
           loading: false,
@@ -146,11 +149,13 @@ class ServiceStockManagement extends Component {
     this.setState({ showModal: true });
   };
 
-  handleUpdateStatus = (id) => {
+  handleUpdateStatus = (id, currentStatus) => {
+    const newStatus = !currentStatus;
+   // console.log('status....',newStatus)
     axios
       .put(
         `seller/service/items/status-update/${id}`,
-        { isActive: false },
+        { isActive: newStatus },
         {
           headers: {
             Accept: "application/json",
@@ -161,7 +166,7 @@ class ServiceStockManagement extends Component {
       )
       .then((res) => {
         this.getUpdate();
-        console.log("Response of Status request", res);
+   //     console.log("Response of Status request", res);
       })
       .catch((error) => {
         console.log("error", error);
@@ -255,12 +260,20 @@ class ServiceStockManagement extends Component {
           >
             Edit
           </button>
-          <button
-            onClick={() => this.handleUpdateStatus(row._id)}
-            className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+          {row.isActive ? (<button
+            onClick={() => this.handleUpdateStatus(row._id,row.isActive)}
+            className="custom_btn btn_yellow_bordered  w-auto  btn btn-width action_btn_new"
           >
-            Cancel
+            Inactive
           </button>
+          ) : (
+            <button
+              onClick={() => this.handleUpdateStatus(row._id,row.isActive)}
+              className="custom_btn btn_yellow_bordered w-auto  btn btn-width action_btn_new"
+            >
+              active
+            </button>
+          )}
         </>
       ),
     },
@@ -467,10 +480,11 @@ class ServiceStockManagement extends Component {
       isCalendarAuthorized,
       paginationPerPage
     } = this.state;
+    const { activeTab } = this.state;
 
-    console.log("selected Rows", selectedRows);
-    console.log("meeting :->", meeting);
-    console.log("subscriber :", subscriber)
+    // console.log("selected Rows", selectedRows);
+    // console.log("meeting :->", meeting);
+    // console.log("subscriber :", subscriber)
 
     if (loading) {
       return <SpinnerLoader />;
@@ -509,7 +523,8 @@ class ServiceStockManagement extends Component {
                   <nav className="orders_tabs">
                     <div className="nav nav-tabs" id="nav-tab" role="tablist">
                       <button
-                        className="nav-link active"
+                       // className="nav-link active "
+                        className={`nav-link ${activeTab === 'nav-appointment' ? 'active' : ''}`}
                         id="nav-appointment-tab"
                         data-bs-toggle="tab"
                         data-bs-target="#nav-appointment"
@@ -517,11 +532,13 @@ class ServiceStockManagement extends Component {
                         role="tab"
                         aria-controls="nav-appointment"
                         aria-selected="true"
+                        onClick={() => this.handleTabClick('nav-appointment')}
                       >
                         Appointments
                       </button>
                       <button
-                        className="nav-link"
+                       // className="nav-link  "
+                        className={`nav-link ${activeTab === 'nav-service' ? 'active' : ''}`}
                         id="nav-service-tab"
                         data-bs-toggle="tab"
                         data-bs-target="#nav-service"
@@ -529,11 +546,13 @@ class ServiceStockManagement extends Component {
                         role="tab"
                         aria-controls="nav-service"
                         aria-selected="false"
+                        onClick={() => this.handleTabClick('nav-service')}
                       >
                         My Services
                       </button>
                       <button
-                        className="nav-link"
+                       // className="nav-link"
+                        className={`nav-link ${activeTab === 'nav-subscriber' ? 'active' : ''}`}
                         id="nav-subscriber-tab"
                         data-bs-toggle="tab"
                         data-bs-target="#nav-subscriber"
@@ -541,11 +560,13 @@ class ServiceStockManagement extends Component {
                         role="tab"
                         aria-controls="nav-subscriber"
                         aria-selected="false"
+                        onClick={() => this.handleTabClick('nav-subscriber')}
                       >
                         Subscribers List
                       </button>
                       <button
-                        className="nav-link"
+                        //className="nav-link"
+                        className={`nav-link ${activeTab === 'nav-meeting' ? 'active' : ''}`}
                         id="nav-meeting-tab"
                         data-bs-toggle="tab"
                         data-bs-target="#nav-meeting"
@@ -553,6 +574,7 @@ class ServiceStockManagement extends Component {
                         role="tab"
                         aria-controls="nav-meeting"
                         aria-selected="false"
+                        onClick={() => this.handleTabClick('nav-meeting')}
                       >
                         Meeting History
                       </button>
@@ -567,7 +589,8 @@ class ServiceStockManagement extends Component {
                 >
                   {/* Appointments */}
                   <div
-                    className="tab-pane fade show active"
+                   // className="tab-pane fade show active"
+                   className={`tab-pane fade ${activeTab === 'nav-appointment' ? 'show active' : ''}`}
                     id="nav-appointment"
                     role="tabpanel"
                     aria-labelledby="nav-appointment-tab"
@@ -610,7 +633,8 @@ class ServiceStockManagement extends Component {
 
                   {/* My Services */}
                   <div
-                    className="tab-pane fade"
+                    //className="tab-pane fade"
+                    className={`tab-pane fade ${activeTab === 'nav-service' ? 'show active' : ''}`}
                     id="nav-service"
                     role="tabpanel"
                     aria-labelledby="nav-service-tab"
@@ -649,7 +673,8 @@ class ServiceStockManagement extends Component {
 
                   {/* Subscribers List */}
                   <div
-                    className="tab-pane fade"
+                    //className="tab-pane fade"
+                    className={`tab-pane fade ${activeTab === 'nav-subscriber' ? 'show active' : ''}`}
                     id="nav-subscriber"
                     role="tabpanel"
                     aria-labelledby="nav-subscriber-tab"
@@ -688,7 +713,8 @@ class ServiceStockManagement extends Component {
 
                   {/* Meeting History */}
                   <div
-                    className="tab-pane fade"
+                    //className="tab-pane fade"
+                    className={`tab-pane fade ${activeTab === 'nav-meeting' ? 'show active' : ''}`}
                     id="nav-meeting"
                     role="tabpanel"
                     aria-labelledby="nav-meeting-tab"
@@ -760,25 +786,25 @@ class ServiceStockManagement extends Component {
                       </h6>
                       <br />
                       <h6 className="fw-bold text-secondary mb-1">
-                        Service Category : {selectedRows.categoryName || ""}
+                        Service Category : {selectedRows.category && selectedRows.category.categoryName || ""}
                       </h6>
                       <br />
                       <h6 className="fw-bold text-secondary mb-1">
-                        Service Price : {selectedRows.price || ""}
+                        Service Price : {selectedRows.charges || ""}
                       </h6>
                       <br />
                       <h6 className="fw-bold text-secondary mb-1">
                         Created At : {selectedRows.createdAt || ""}
                       </h6>
                       <br />
-                      <h6 className="fw-bold text-secondary mb-1">
+                      {/* <h6 className="fw-bold text-secondary mb-1">
                         Service Description :
                         <div
                           dangerouslySetInnerHTML={{
                             __html: selectedRows.description || "",
                           }}
                         />
-                      </h6>
+                      </h6> */}
                     </div>
                     <div className="col-6">
                       <img
@@ -786,6 +812,17 @@ class ServiceStockManagement extends Component {
                         alt="Not found!"
                         style={{ maxWidth: "350px" }}
                       />
+                    </div>
+                    <div className="col-12">
+                      <h6 className="fw-bold text-secondary mb-1">
+                        Service Description :
+                        <div
+                        className="ql-editor"
+                          dangerouslySetInnerHTML={{
+                            __html: selectedRows.description || "",
+                          }}
+                        />
+                      </h6>
                     </div>
                   </div>
                 </div>

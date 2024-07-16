@@ -20,9 +20,27 @@ class ManageCommunity extends Component {
     constructor(props) {
         super(props);
         //this.box = React.createRef();
+<<<<<<< HEAD
         this.state = { selectedMenu: null, postComment: '', showEmoji: false };
+=======
+        this.state = {
+            selectedMenu: null,
+            postComment: '',
+            showEmoji: false,
+           // activeTab: localStorage.getItem('activeTab') || 'nav-alllisting',
+        };
+>>>>>>> a2041dc5169ba79c95c0ffb1afd303496cec8c81
 
     }
+
+    // handleTabClick = (tab) => {
+    //     this.setState({ activeTab: tab });
+    //     localStorage.setItem('activeTab', tab);
+    // };
+
+
+
+
     /*
     componentDidMount() {
         // Adding a click event listener
@@ -63,7 +81,11 @@ class ManageCommunity extends Component {
         }, () => console.log(this.state.postComment));
     }
     render() {
+<<<<<<< HEAD
 
+=======
+        const { activeTab } = this.state;
+>>>>>>> a2041dc5169ba79c95c0ffb1afd303496cec8c81
         const { dispatch } = this.props;
 
         const { loading } = store.getState().global;
@@ -131,6 +153,24 @@ class ManageCommunity extends Component {
                                                         </div>
                                                         <div className=" css-1wy0on6"><span className=" css-1okebmr-indicatorSeparator"></span>
                                                             <div className=" css-tlfecz-indicatorContainer" aria-hidden="true"><svg height="20" width="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false" className="css-8mmkcg"><path d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"></path></svg></div>
+<<<<<<< HEAD
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="sort_select text-normal css-2b097c-container"><span aria-live="polite" aria-atomic="false" aria-relevant="additions text" className="css-7pg0cj-a11yText"></span>
+                                                    <div className=" css-yk16xz-control">
+                                                        <div className=" css-1hwfws3">
+                                                            <div className=" css-1uccc91-singleValue">Choose Product</div>
+                                                            <div className="css-1g6gooi">
+                                                                <div className="" style={{ display: "inline-block" }}><input autocapitalize="none" autocomplete="off" autocorrect="off" id="react-select-4-input" spellcheck="false" tabindex="0" type="text" aria-autocomplete="list" value="" style={{ boxSizing: "content-box", width: "2px", background: "0px center", border: "0px", fontSize: "inherit", opacity: "1", outline: "0px", padding: "0px", color: "inherit" }} />
+                                                                    <div style={{ position: "absolute", top: "0px", left: "0px", visibility: "hidden", height: "0px", overflow: "scroll", whiteSpace: "pre", fontSize: "15px", fontFamily: "Montserrat, sans-serif", fontWeight: "400", fontStyle: "normal", letterSpacing: "normal", textTransform: "none" }}></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className=" css-1wy0on6"><span className=" css-1okebmr-indicatorSeparator"></span>
+                                                            <div className=" css-tlfecz-indicatorContainer" aria-hidden="true"><svg height="20" width="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false" className="css-8mmkcg"><path d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"></path></svg></div>
+                                                        </div>
+=======
                                                         </div>
                                                     </div>
                                                 </div>
@@ -155,6 +195,154 @@ class ManageCommunity extends Component {
 
                                 <div className="community_listing_wrap">
 
+                                    {/* <div className="cumm_title">All Listing</div> */}
+
+                                    <nav className="orders_tabs ">
+                                        <div className="nav nav-tabs" id="nav-tab" role="tablist">
+                                            <button
+                                                className="nav-link active"
+                                               // className={`nav-link ${activeTab === 'nav-alllisting' ? 'active' : ''}`}
+                                                id="nav-alllisting-tab"
+                                                data-bs-toggle="tab"
+                                                data-bs-target="#nav-alllisting"
+                                                type="button"
+                                                role="tab"
+                                                aria-controls="nav-alllisting"
+                                                ria-selected="true"
+                                               // onClick={() => this.handleTabClick('nav-alllisting')}
+                                            >All Listing
+                                            </button>
+                                            <button
+                                                className="nav-link"
+                                              //  className={`nav-link ${activeTab === 'nav-reports' ? 'active' : ''}`}
+                                                id="nav-reports-tab"
+                                                data-bs-toggle="tab"
+                                                data-bs-target="#nav-reports"
+                                                type="button" role="tab"
+                                                aria-controls="nav-reports"
+                                                aria-selected="false"
+                                               // onClick={() => this.handleTabClick('nav-reports')}
+                                            >Reports
+                                            </button>
+                                        </div>
+                                    </nav>
+                                    <div
+                                        className="orders_table tab-content pt-0 pb-0 addPost_table_extention"
+                                        id="nav-tabContent"
+                                    >
+                                        {/* **********all-list data********** */}
+                                        <div
+                                            className="tab-pane fade show active"
+                                            // className={`tab-pane fade ${activeTab === 'nav-alllisting' ? 'show active' : ''}`}
+                                            id="nav-alllisting"
+                                            role="tabpanel"
+                                            aria-labelledby="nav-alllisting-tab"
+                                        >
+
+
+                                            <div className="post">
+                                                <div className="post_head">
+                                                    <div className="post_by">
+                                                        <div className="poster_img "><img src="https://143.244.158.217:7700/uploads/users/2.jpg" alt="" /></div>
+                                                        <div className="poster_info">
+                                                            <div className="poster_name">Ryan Smith</div><time datetime="2022-05-06T10:51:29.988Z" title="Friday, May 6, 2022 at 4:21:29 PM">6 months ago</time></div>
+                                                    </div>
+                                                    <div className="post_on">Category : <a href="#">Milk &amp; Honey Book</a></div>
+                                                    <div className="post_action">
+                                                        <div className="post-opts">
+                                                            <a href="#" title="" className="ed-opts-open" ><img src={ellipsis} alt="1" onClick={this.onClickMenu} /></a>
+
+                                                            <ul className={(this.state.selectedMenu === "1") ? 'ed-options showEmoji' : 'ed-options hideEmoji'}>
+                                                                <li><a href="#" title={this.state.selectedMenu}>Block user</a></li>
+                                                                <li><a href="#" title="test">Ban user</a></li>
+                                                                <li><a href="#" title="">Hide Post</a></li>
+                                                                <li><a href="#" title="">Report Abuse</a></li>
+                                                                <li><a href="#" title="">Unfollow User</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+                                                <div className="post_body">
+                                                    <div className="post_text">
+                                                        <h3>Introduction your self!</h3>
+                                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc tincidunt porta lectus a mollis. Curabitur ut convallis tortor. Aliquam erat volutpat. Nullam dictum enim ac urna suscipit, nec laoreet dolor pellentesque.😁</p>
+                                                    </div>
+
+                                                </div>
+                                                <div className="post_foot">
+                                                    <div className="post_actions">
+                                                        <ul className="ps_links">
+                                                            <li>
+                                                                <a href="#"><img src="static/media/heart-icon-bordered.9c5d0551.svg" /> 81</a>
+
+                                                                <a data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseComment6274fdb144f43d2aa8a416fa" href="#"><i className="post_icon ps_comment"></i> 1 Comments</a>
+                                                            </li>
+
+                                                            <li className="cumm_action_button">
+                                                                <a className="btn custom_btn btn_yellow edit_cumm" href="#">Edit</a>
+                                                                <a className="btn custom_btn btn_yellow_bordered edit_cumm" href="#">Delete</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div className="post">
+                                                <div className="post_head">
+                                                    <div className="post_by">
+                                                        <div className="poster_img "><img src="https://143.244.158.217:7700/uploads/users/2.jpg" alt="" /></div>
+                                                        <div className="poster_info">
+                                                            <div className="poster_name">Ryan Smith</div><time datetime="2022-05-06T10:51:29.988Z" title="Friday, May 6, 2022 at 4:21:29 PM">6 months ago</time></div>
+                                                    </div>
+                                                    <div className="post_on">Category : <a href="#">Milk &amp; Honey Book</a></div>
+                                                    <div className="post_action">
+                                                        <div className="post-opts">
+                                                            <a href="#" title="" className="ed-opts-open"><img src={ellipsis} alt="2" onClick={this.onClickMenu} /></a>
+                                                            <ul className={(this.state.selectedMenu === "2") ? 'ed-options showEmoji' : 'ed-options hideEmoji'}>
+                                                                <li><a href="#" title="">Block user</a></li>
+                                                                <li><a href="#" title="">Ban user</a></li>
+                                                                <li><a href="#" title="">Hide Post</a></li>
+                                                                <li><a href="#" title="">Report Abuse</a></li>
+                                                                <li><a href="#" title="">Unfollow User</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="post_body">
+                                                    <div className="post_text">
+                                                        <h3>Introduction your self!</h3>
+                                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc tincidunt porta lectus a mollis. Curabitur ut convallis tortor. Aliquam erat volutpat. Nullam dictum enim ac urna suscipit, nec laoreet dolor pellentesque.😁</p>
+                                                    </div>
+
+                                                </div>
+                                                <div className="post_foot">
+                                                    <div className="post_actions">
+                                                        <ul className="ps_links">
+                                                            <li>
+                                                                <a href="#"><img src="static/media/heart-icon-bordered.9c5d0551.svg" /> 81</a>
+
+                                                                <a data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseComment6274fdb144f43d2aa8a416fa" href="#"><i className="post_icon ps_comment"></i> 1 Comments</a>
+                                                            </li>
+
+                                                            <li className="cumm_action_button">
+                                                                <a className="btn custom_btn btn_yellow edit_cumm" href="#">Edit</a>
+                                                                <a className="btn custom_btn btn_yellow_bordered edit_cumm" href="#">Delete</a>
+                                                            </li>
+
+
+                                                        </ul>
+>>>>>>> a2041dc5169ba79c95c0ffb1afd303496cec8c81
+                                                    </div>
+                                                </div>
+                                            </div><button className="btn custom_btn btn_yellow mx-auto">Post</button></div>
+                                    </div>
+                                </div> */}
+
+                                <div className="community_listing_wrap">
+
                                     <div className="cumm_title">All Listing</div>
 
                                     <div className="post">
@@ -164,6 +352,7 @@ class ManageCommunity extends Component {
                                                 <div className="poster_info">
                                                     <div className="poster_name">Ryan Smith</div><time datetime="2022-05-06T10:51:29.988Z" title="Friday, May 6, 2022 at 4:21:29 PM">6 months ago</time></div>
                                             </div>
+<<<<<<< HEAD
                                             <div className="post_on">Category : <a href="#">Milk &amp; Honey Book</a></div>
                                             <div className="post_action">
                                                 <div className="post-opts">
@@ -412,6 +601,190 @@ class ManageCommunity extends Component {
 
                                 </div>
 
+=======
+
+
+                                            <div className="post">
+                                                <div className="post_head">
+                                                    <div className="post_by">
+                                                        <div className="poster_img "><img src="https://143.244.158.217:7700/uploads/users/2.jpg" alt="" /></div>
+                                                        <div className="poster_info">
+                                                            <div className="poster_name">Ryan Smith</div><time datetime="2022-05-06T10:51:29.988Z" title="Friday, May 6, 2022 at 4:21:29 PM">6 months ago</time></div>
+                                                    </div>
+                                                    <div className="post_on">Category : <a href="#">Milk &amp; Honey Book</a></div>
+                                                    <div className="post_action">
+                                                        <div className="post-opts">
+                                                            <a href="#" title="" className="ed-opts-open"><img src={ellipsis} alt="3" onClick={this.onClickMenu} /></a>
+                                                            <ul className={(this.state.selectedMenu === "3") ? 'ed-options showEmoji' : 'ed-options hideEmoji'}>
+                                                                <li><a href="#" title="">Block user</a></li>
+                                                                <li><a href="#" title="">Ban user</a></li>
+                                                                <li><a href="#" title="">Hide Post</a></li>
+                                                                <li><a href="#" title="">Report Abuse</a></li>
+                                                                <li><a href="#" title="">Unfollow User</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="post_body">
+                                                    <div className="post_text">
+                                                        <h3>Introduction your self!</h3>
+                                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc tincidunt porta lectus a mollis. Curabitur ut convallis tortor. Aliquam erat volutpat. Nullam dictum enim ac urna suscipit, nec laoreet dolor pellentesque.😁</p>
+                                                    </div>
+
+                                                </div>
+                                                <div className="post_foot">
+                                                    <div className="post_actions">
+                                                        <ul className="ps_links">
+                                                            <li>
+                                                                <a href="#"><img src="static/media/heart-icon-bordered.9c5d0551.svg" /> 81</a>
+
+                                                                <a data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseComment6274fdb144f43d2aa8a416fa" href="#"><i className="post_icon ps_comment"></i> 1 Comments</a>
+                                                            </li>
+
+                                                            <li className="cumm_action_button">
+                                                                <a className="btn custom_btn btn_yellow edit_cumm" href="#">Edit</a>
+                                                                <a className="btn custom_btn btn_yellow_bordered edit_cumm" href="#">Delete</a>
+                                                            </li>
+
+
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div className="post">
+                                                <div className="post_head">
+                                                    <div className="post_by">
+                                                        <div className="poster_img "><img src="https://143.244.158.217:7700/uploads/users/2.jpg" alt="" /></div>
+                                                        <div className="poster_info">
+                                                            <div className="poster_name">Ryan Smith</div><time datetime="2022-05-06T10:51:29.988Z" title="Friday, May 6, 2022 at 4:21:29 PM">6 months ago</time></div>
+                                                    </div>
+                                                    <div className="post_on">Category : <a href="#">Milk &amp; Honey Book</a></div>
+                                                    <div className="post_action">
+                                                        <div className="post-opts">
+                                                            <a href="#" title="" className="ed-opts-open"><img src={ellipsis} alt="4" onClick={this.onClickMenu} /></a>
+                                                            <ul className={(this.state.selectedMenu === "4") ? 'ed-options showEmoji' : 'ed-options hideEmoji'}>
+                                                                <li><a href="#" title="">Block user</a></li>
+                                                                <li><a href="#" title="">Ban user</a></li>
+                                                                <li><a href="#" title="">Hide Post</a></li>
+                                                                <li><a href="#" title="">Report Abuse</a></li>
+                                                                <li><a href="#" title="">Unfollow User</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="post_body">
+                                                    <div className="post_text">
+                                                        <h3>Introduction your self!</h3>
+                                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc tincidunt porta lectus a mollis. Curabitur ut convallis tortor. Aliquam erat volutpat. Nullam dictum enim ac urna suscipit, nec laoreet dolor pellentesque.😁</p>
+                                                    </div>
+
+                                                </div>
+                                                <div className="post_foot">
+                                                    <div className="post_actions">
+                                                        <ul className="ps_links">
+                                                            <li>
+                                                                <a href="#"><img src="static/media/heart-icon-bordered.9c5d0551.svg" /> 81</a>
+
+                                                                <a data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseComment6274fdb144f43d2aa8a416fa" href="#"><i className="post_icon ps_comment"></i> 1 Comments</a>
+                                                            </li>
+
+                                                            <li className="cumm_action_button">
+                                                                <a className="btn custom_btn btn_yellow edit_cumm" href="#">Edit</a>
+                                                                <a className="btn custom_btn btn_yellow_bordered edit_cumm" href="#">Delete</a>
+                                                            </li>
+
+
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="post">
+                                                <div className="post_head">
+                                                    <div className="post_by">
+                                                        <div className="poster_img "><img src="https://143.244.158.217:7700/uploads/users/2.jpg" alt="" /></div>
+                                                        <div className="poster_info">
+                                                            <div className="poster_name">Ryan Smith</div><time datetime="2022-05-06T10:51:29.988Z" title="Friday, May 6, 2022 at 4:21:29 PM">6 months ago</time></div>
+                                                    </div>
+                                                    <div className="post_on">Category : <a href="#">Milk &amp; Honey Book</a></div>
+                                                    <div className="post_action">
+                                                        <div className="post-opts">
+                                                            <a href="#" title="" className="ed-opts-open"><img src={ellipsis} alt="5" onClick={this.onClickMenu} /></a>
+                                                            <ul className={(this.state.selectedMenu === "5") ? 'ed-options showEmoji' : 'ed-options hideEmoji'}>
+                                                                <li><a href="#" title="">Block user</a></li>
+                                                                <li><a href="#" title="">Ban user</a></li>
+                                                                <li><a href="#" title="">Hide Post</a></li>
+                                                                <li><a href="#" title="">Report Abuse</a></li>
+                                                                <li><a href="#" title="">Unfollow User</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="post_body">
+                                                    <div className="post_text">
+                                                        <h3>Introduction your self!</h3>
+                                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc tincidunt porta lectus a mollis. Curabitur ut convallis tortor. Aliquam erat volutpat. Nullam dictum enim ac urna suscipit, nec laoreet dolor pellentesque.😁</p>
+                                                    </div>
+
+                                                </div>
+                                                <div className="post_foot">
+                                                    <div className="post_actions">
+                                                        <ul className="ps_links">
+                                                            <li>
+                                                                <a href="#"><img src="static/media/heart-icon-bordered.9c5d0551.svg" /> 81</a>
+
+                                                                <a data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="collapseComment6274fdb144f43d2aa8a416fa" href="#"><i className="post_icon ps_comment"></i> 1 Comments</a>
+                                                            </li>
+
+                                                            <li className="cumm_action_button">
+                                                                <a className="btn custom_btn btn_yellow edit_cumm" href="#">Edit</a>
+                                                                <a className="btn custom_btn btn_yellow_bordered edit_cumm" href="#">Delete</a>
+                                                            </li>
+
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="pagination">
+                                                <ul>
+                                                    <li><a className="link disabled" href="#"><span className="fa fa-angle-left me-2"></span> Prev</a></li>
+                                                    <li><a className="link active" href="#">1</a></li>
+                                                    <li><a className="link" href="#">2</a></li>
+                                                    <li><a className="link" href="#">3</a></li>
+                                                    <li><a className="link" href="#">4</a></li>
+                                                    <li><a className="link disabled" href="#">Next <span className="fa fa-angle-right ms-2"></span></a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        {/* **********report-data********** */}
+                                        <div
+                                            className="tab-pane fade"
+                                           // className={`tab-pane fade ${activeTab === 'nav-reports' ? 'show active' : ''}`}
+                                            id="nav-reports"
+                                            role="tabpanel"
+                                            aria-labelledby="nav-reports-tab"
+                                        >
+                                            <div className="col-lg-3">
+                                                <div className="cumm_sidebar_box bg-white p-3 rounded-3">
+                                                    <div className="cumm_title">advanced filter</div>
+                                                    <div className="filter_box"><select className="form-select mb-3" aria-label="Default select example"><option>Category</option><option value="1">One</option><option value="2">Two</option><option value="3">Three</option></select><select className="form-select mb-3"
+                                                        aria-label="Default select example"><option>Product</option><option value="1">One</option><option value="2">Two</option><option value="3">Three</option></select>
+                                                        <div className="form-check mb-3 mt-4"><input className="form-check-input" type="checkbox" id="latestPost" value="" /><label className="form-check-label" for="latestPost">Latest Post</label></div>
+                                                        <div className="form-check mb-3"><input className="form-check-input" type="checkbox" id="popularPost" value="" /><label className="form-check-label" for="popularPost">Most Popular Post</label></div>
+                                                        <div className="form-check mb-3"><input className="form-check-input" type="checkbox" id="CommentedPost" value="" /><label className="form-check-label" for="CommentedPost">Most Commented Post</label></div>
+                                                        <div className="filter_btn_box"><a className="btn custom_btn btn_yellow_bordered" href="#">Filter</a></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+>>>>>>> a2041dc5169ba79c95c0ffb1afd303496cec8c81
                             </div>
                             {/* <div className="col-lg-3">
                                 <div className="cumm_sidebar_box bg-white p-3 rounded-3">
@@ -427,11 +800,15 @@ class ManageCommunity extends Component {
                             </div> */}
                         </div>
                     </div>
+<<<<<<< HEAD
                 </div>
+=======
+                </div >
+>>>>>>> a2041dc5169ba79c95c0ffb1afd303496cec8c81
 
                 <Footer />
 
-            </React.Fragment>
+            </React.Fragment >
         );
     }
 }

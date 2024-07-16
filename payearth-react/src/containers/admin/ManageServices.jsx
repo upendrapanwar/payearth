@@ -284,6 +284,19 @@ class ManageServices extends Component {
             sortable: true
         },
         {
+           // name:
+            // (
+            //     <div style={{ display: 'flex', alignItems: 'center' }}>
+            //         <span>ACTIONS</span>
+            //         <button
+            //         className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+            //         // onClick={() => this.handleDeleteSeletedData(row._id)}
+            //         onClick={() => this.handleDeleteSelectedData()}
+            //     >
+            //         Delete
+            //     </button>
+            //     </div>
+            // ),
             name: 'ACTIONS',
             width: "350px",
             cell: (row) => (
@@ -317,6 +330,7 @@ class ManageServices extends Component {
                 </>
             ),
         },
+
     ]
 
 
@@ -428,11 +442,19 @@ class ManageServices extends Component {
                                 <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
                                     <div className="dash_title">Manage Service</div>
                                     {/* <a className="custom_btn btn_yellow w-auto btn" href='#'>Add Service</a> */}
+<<<<<<< HEAD
                                     <div className="">
                                         <span>
                                             <Link
                                                 className="btn custom_btn btn_yellow mx-auto"
                                                 to="#"
+=======
+                                    <div className="text-center">
+                                        <span>
+                                            <Link
+                                                className="btn custom_btn btn_yellow mx-auto "
+                                                to="/admin/add-service"
+>>>>>>> a2041dc5169ba79c95c0ffb1afd303496cec8c81
                                                 onClick={this.clearSessionStorage}
                                             >
                                                 Add New Service
@@ -442,7 +464,11 @@ class ManageServices extends Component {
                                 </div>
                             </div>
                             <nav className="orders_tabs">
+<<<<<<< HEAD
                                 <div className="nav nav-tabs" id="nav-tab" role="tablist">
+=======
+                                <div className="nav nav-tabs flex-column flex-md-row" id="nav-tab" role="tablist">
+>>>>>>> a2041dc5169ba79c95c0ffb1afd303496cec8c81
                                     <button
                                         // className="nav-link active"
                                         className={`nav-link ${activeTab === 'nav-pending-orders' ? 'active' : ''}`}

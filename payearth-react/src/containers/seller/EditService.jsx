@@ -37,6 +37,12 @@ class EditService extends Component {
             featuredImage: '',
             imageId: '',
             charges: '',
+         //*   
+            newImageUploaded: false, // Flag to indicate a new image has been uploaded
+            previousImageId: '', // Store the previous image ID
+            selectedFile: null, // To store the selected file
+            selectedImageUrl: '', // To display the selected image immediately
+      //*
         };
 
     }
@@ -63,7 +69,7 @@ class EditService extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`
             }
         }).then(response => {
-            console.log("service-category:", response)
+            // console.log("service-category:", response)
             if (response.data.status) {
                 if (param === null) {
                     let catOptions = [];
@@ -89,7 +95,7 @@ class EditService extends Component {
     }
 
     getSelectedService = () => {
-        console.log("ServiceId:", this.state.serviceId);
+        // console.log("ServiceId:", this.state.serviceId);
         axios
             .get(`seller/service/items/${this.state.serviceId}`, {
                 headers: {
@@ -99,7 +105,7 @@ class EditService extends Component {
                 },
             })
             .then((res) => {
-                console.log("Data", res.data.data);
+                // console.log("Data", res.data.data);
                 const serviceData = res.data.data[0];
                 const defaultCatOption = { label: serviceData.category.categoryName, value: '' };
                 const description = serviceData.description;
@@ -115,6 +121,8 @@ class EditService extends Component {
                     featuredImage: featuredImage,
                     imageId: imageId,
                     charges: charges,
+                    //*
+                    previousImageId: imageId, // Set the previous image ID
                     serviceCategory: serviceData.category.id,
                 });
             })
@@ -125,74 +133,164 @@ class EditService extends Component {
 
 
 
-    handleImageEdit = (e) => {
-        const file = e.target.files[0];
-        console.log(" image file size", file.size)
-        console.log(" image file **********", file)
-        const fileSize = file.size
-        // 5242880 = 5mb
-        const maxSize = 5242880;
-        if (fileSize <= maxSize) {
-            const data = new FormData()
-            console.log("Form data data", data)
-            data.append("file", file)
-            data.append("upload_preset", "pay-earth-images")
-            data.append("cloud_name", this.cloudName)
+    // handleImageEdit = (e) => {
+    //     const file = e.target.files[0];
+    //     // console.log(" image file size", file.size)
+    //     // console.log(" image file **********", file)
+    //     const fileSize = file.size
+    //     // 5242880 = 5mb
+    //     const maxSize = 5242880;
+    //     if (fileSize <= maxSize) {
+    //         const data = new FormData()
+    //       //  console.log("Form data data", data)
+    //         data.append("file", file)
+    //         data.append("upload_preset", "pay-earth-images")
+    //         data.append("cloud_name", this.cloudName)
 
-            console.log("dataIMAge", data)
-            console.log("dataIMAge", data.secure_url)
-            // https://api.cloudinary.com/v1_1/${this.cloudName}/video/upload   <= video file example
+    //      //   console.log("dataIMAge", data)
+    //       //  console.log("dataIMAge", data.secure_url)
+    //         // https://api.cloudinary.com/v1_1/${this.cloudName}/video/upload   <= video file example
 
-            // Delete existing image if it exists
-            if (this.state.imageId) {
-                console.log("this.apiKey .env", this.apiKey);
+    //         // Delete existing image if it exists
+    //         if (this.state.imageId) {
+    //          //   console.log("this.apiKey .env", this.apiKey);
                 
-                const timestamp = Math.floor(Date.now() / 1000); // Current timestamp in seconds
-                const stringToSign = `public_id=${this.state.imageId}&timestamp=${timestamp}${this.apiSecret}`;
-                const signature = CryptoJS.SHA1(stringToSign).toString(CryptoJS.enc.Hex);
+    //             const timestamp = Math.floor(Date.now() / 1000); // Current timestamp in seconds
+    //             const stringToSign = `public_id=${this.state.imageId}&timestamp=${timestamp}${this.apiSecret}`;
+    //             const signature = CryptoJS.SHA1(stringToSign).toString(CryptoJS.enc.Hex);
 
-                const cloudinaryDeleteUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/destroy`;
-                fetch(cloudinaryDeleteUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        public_id: this.state.imageId,
-                        api_key: this.apiKey,
-                        timestamp,
-                        signature
-                    })
-                })
-                    .then(response => response.json())
+    //             const cloudinaryDeleteUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/destroy`;
+    //             fetch(cloudinaryDeleteUrl, {
+    //                 method: 'POST',
+    //                 headers: {
+    //                     'Content-Type': 'application/json'
+    //                 },
+    //                 body: JSON.stringify({
+    //                     public_id: this.state.imageId,
+    //                     api_key: this.apiKey,
+    //                     timestamp,
+    //                     signature
+    //                 })
+    //             })
+    //                 .then(response => response.json())
+    //                 .then(data => {
+    //               //      console.log("Image deleted successfully:", data);
+    //                 }).catch(error => {
+    //                     console.error("Error deleting image:", error);
+    //                 });
+    //         }
+
+    //         // Upload new image
+    //         fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`, {
+    //             method: "post",
+    //             body: data
+    //         }).then((res) => res.json())
+    //             .then((data) => {
+    //                 // console.log(data.secure_url);
+    //               //  console.log("data.............................................", data)
+    //                 this.setState({ featuredImage: data.secure_url });
+    //                 //  this.setState({ image: data.secure_url });
+    //                 this.setState({ imageId: data.public_id });
+    //             }).catch((err) => {
+    //                 console.log(err)
+    //             })
+    //     } else {
+    //         toast.error("Image size must be less than 5 MB", { autoClose: 3000 });
+    //     }
+    // };
+    handleImageEdit = (event) => {
+        const file = event.target.files[0];
+        this.setState({
+            selectedFile: file,
+            selectedImageUrl: URL.createObjectURL(file) // Set the URL for previewing the selected image
+        });
+    };
+    handleSubmit = () => {
+        const { selectedFile, newImageUploaded, previousImageId } = this.state;
+
+        // Only attempt to upload if a file is selected
+        if (selectedFile) {
+            const fileSize = selectedFile.size;
+            const maxSize = 5242880; // 5MB
+
+            if (fileSize <= maxSize) {
+                const data = new FormData();
+                data.append("file", selectedFile);
+                data.append("upload_preset", "pay-earth-images");
+                data.append("cloud_name", this.cloudName);
+
+                // Upload new image
+                fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`, {
+                    method: "post",
+                    body: data
+                }).then(response => response.json())
                     .then(data => {
-                        console.log("Image deleted successfully:", data);
+                        this.setState({
+                            featuredImage: data.secure_url,
+                            imageId: data.public_id,
+                            newImageUploaded: true, // Flag to indicate a new image has been uploaded
+                            selectedImageUrl: '', // Clear the selected image URL after upload
+                        });
+                      //  toast.success("New image uploaded successfully");
+                        this.saveService(); // Call save service after image upload
                     }).catch(error => {
-                        console.error("Error deleting image:", error);
+                        console.error("Error uploading new image:", error);
+                        toast.error("Error uploading new image");
                     });
+            } else {
+                toast.error("Image size must be less than 5 MB", { autoClose: 3000 });
             }
-
-            // Upload new image
-            fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`, {
-                method: "post",
-                body: data
-            }).then((res) => res.json())
-                .then((data) => {
-                    // console.log(data.secure_url);
-                    console.log("data.............................................", data)
-                    this.setState({ featuredImage: data.secure_url });
-                    //  this.setState({ image: data.secure_url });
-                    this.setState({ imageId: data.public_id });
-                }).catch((err) => {
-                    console.log(err)
-                })
         } else {
-            toast.error("Image size must be less than 5 MB", { autoClose: 3000 });
+            this.saveService(); // Call save service without uploading a new image
         }
     };
+    
 
 
-    handleSubmit = values => {
+    // handleSubmit = values => {
+    //     const formData = {
+    //         seller_id: this.authInfo.id,
+    //         name: this.state.serviceName,
+    //         charges: this.state.charges,
+    //         category: this.state.serviceCategory,
+    //         description: this.state.description,
+    //         featuredImage: this.state.featuredImage,
+    //         imageId: this.state.imageId,
+    //     }
+    //   //  console.log("FormDataaaaa", formData)
+
+    //     this.dispatch(setLoading({ loading: true }));
+    //     axios.put(`seller/service/edit/${this.state.serviceId}`, formData, {
+    //         headers: {
+    //             'Accept': 'application/form-data',
+    //             'Content-Type': 'application/json; charset=UTF-8',
+    //             'Authorization': `Bearer ${this.authInfo.token}`
+    //         }
+    //     }).then((response) => {
+    //         if (response.data.status) {
+    //             toast.success(response.data.message);
+    //             this.props.history.goBack();
+    //             //navigate(-1);
+    //         }
+    //         // console.log("FormDataaaaa responce", response)
+    //     }).catch(error => {
+    //         console.log('error =>', error)
+    //         if (error.response) {
+    //             toast.error(error.response.data.message);
+    //         }
+    //     }).finally(() => {
+    //       //  console.log('inside the finally block')
+    //         setTimeout(() => {
+    //             this.dispatch(setLoading({ loading: false }));
+    //         }, 300);
+    //     });
+    // }
+
+
+
+    saveService = () => {
+        const { newImageUploaded, previousImageId } = this.state;
+
         const formData = {
             seller_id: this.authInfo.id,
             name: this.state.serviceName,
@@ -201,35 +299,70 @@ class EditService extends Component {
             description: this.state.description,
             featuredImage: this.state.featuredImage,
             imageId: this.state.imageId,
-        }
-        console.log("FormDataaaaa", formData)
+        };
+       // console.log("FormData", formData);
 
         this.dispatch(setLoading({ loading: true }));
-        axios.put(`seller/service/edit/${this.state.serviceId}`, formData, {
-            headers: {
-                'Accept': 'application/form-data',
-                'Content-Type': 'application/json; charset=UTF-8',
-                'Authorization': `Bearer ${this.authInfo.token}`
-            }
-        }).then((response) => {
-            if (response.data.status) {
-                toast.success(response.data.message);
-                this.props.history.goBack();
-                //navigate(-1);
-            }
-            // console.log("FormDataaaaa responce", response)
-        }).catch(error => {
-            console.log('error =>', error)
-            if (error.response) {
-                toast.error(error.response.data.message);
-            }
-        }).finally(() => {
-            console.log('inside the finally block')
-            setTimeout(() => {
-                this.dispatch(setLoading({ loading: false }));
-            }, 300);
-        });
-    }
+
+        const deleteImagePromise = newImageUploaded && previousImageId
+            ? (() => {
+                const timestamp = Math.floor(Date.now() / 1000);
+                const stringToSign = `public_id=${previousImageId}&timestamp=${timestamp}${this.apiSecret}`;
+                const signature = CryptoJS.SHA1(stringToSign).toString(CryptoJS.enc.Hex);
+
+                const cloudinaryDeleteUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/destroy`;
+                return fetch(cloudinaryDeleteUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        public_id: previousImageId,
+                        api_key: this.apiKey,
+                        timestamp,
+                        signature
+                    })
+                }).then(response => response.json())
+                    .then(data => {
+                      //  console.log("Image deleted successfully:", data);
+                     //   toast.success("Existing image deleted successfully");
+                    }).catch(error => {
+                        console.error("Error deleting image:", error);
+                        toast.error("Error deleting existing image");
+                    });
+            })()
+            : Promise.resolve();
+
+        deleteImagePromise
+            .then(() => {
+                // Save the service
+                return axios.put(`seller/service/edit/${this.state.serviceId}`, formData, {
+                    headers: {
+                        'Accept': 'application/form-data',
+                        'Content-Type': 'application/json; charset=UTF-8',
+                        'Authorization': `Bearer ${this.authInfo.token}`
+                    }
+                });
+            })
+            .then((response) => {
+                if (response.data.status) {
+                    toast.success(response.data.message);
+                    this.props.history.goBack();
+                }
+            })
+            .catch(error => {
+                console.log('error =>', error);
+                if (error.response) {
+                    toast.error(error.response.data.message);
+                }
+            })
+            .finally(() => {
+             //   console.log('inside the finally block');
+                setTimeout(() => {
+                    this.dispatch(setLoading({ loading: false }));
+                }, 300);
+            });
+    };
 
     render() {
         const { loading } = store.getState().global;
@@ -239,6 +372,7 @@ class EditService extends Component {
             serviceName,
             description,
             featuredImage,
+            selectedImageUrl,
             charges,
         } = this.state;
 
@@ -330,8 +464,8 @@ class EditService extends Component {
                                                                 onBlur={handleBlur}
                                                                 value={defaultCatOption}
                                                                 onChange={(selectedOption) => {
-                                                                    console.log("SelectedOption", selectedOption)
-                                                                    console.log("SelectedOption in state", this.state.defaultCatOption)
+                                                                 //   console.log("SelectedOption", selectedOption)
+                                                                  //  console.log("SelectedOption in state", this.state.defaultCatOption)
                                                                     this.setState({ serviceCategory: selectedOption.value, defaultCatOption: selectedOption });
                                                                     // this.getCategories(selectedOption.value);
                                                                 }}
@@ -374,7 +508,8 @@ class EditService extends Component {
                                                         <div className='formImage-wrapper'>
                                                             <label className="form-label">Featured Image</label>
                                                             <div className='text-center formImage-pannel'>
-                                                                <div className='formImage'><img src={featuredImage} alt='...' />
+                                                                {/* <div className='formImage'><img src={featuredImage} alt='...' /> */}
+                                                                <div className='formImage'><img src={selectedImageUrl || this.state.featuredImage} alt='...' />
                                                                     <p className='text-danger'> Size must be less than 5 MB</p>
                                                                 </div>
                                                             </div>

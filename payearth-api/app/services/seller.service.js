@@ -2205,7 +2205,7 @@ async function addService(req) {
     // }
 
     let res = await Services.findById({ _id: data._id }).select();
-    console.log("REsponse", res);
+ //  console.log("REsponse", res);
     if (res) {
       return res;
     } else {
@@ -2499,18 +2499,16 @@ async function serviceStatusUpdate(req) {
   try {
     const id = req.params.id;
     const statusData = req.body;
-
+    const newStatus = statusData.isActive;
     const updatedOrder = await Services.findOneAndUpdate(
       { _id: id },
-      statusData,
+      { isActive: newStatus },
       { new: true }
     );
     if (!updatedOrder) {
       console.log("Service not found.");
       return null;
     }
-
-    console.log("Service updated successfully:", updatedOrder);
     return updatedOrder;
   } catch (err) {
     console.log("Error:", err);
@@ -2522,6 +2520,10 @@ async function getServiceItems(req) {
   try {
     let id = req.params.id;
     let result = await Services.find({ $or: [{ createdBy: id }, { _id: id }] })
+    // let result = await Services.find({ $or: [
+    //   { 'createdBy.userId': id },
+    //   { _id: id }
+    // ]  })
       .select(
         "serviceCode name charges featuredImage imageId description isActive createdAt"
       )

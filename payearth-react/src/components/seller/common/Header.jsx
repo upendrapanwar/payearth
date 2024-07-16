@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState,useEffect } from "react";
 import { Link } from "react-router-dom";
 import logo from "./../../../assets/images/logo.png";
 import closeIcon from "./../../../assets/icons/close_icon.svg";
@@ -13,20 +13,30 @@ import homeIcon from "./../../../assets/icons/home-icon.svg";
 import bannerIcon from "./../../../assets/icons/banners_icon.svg";
 import blcakbellIcon from "../../../assets/icons/notification-black-bell-icon.svg";
 import bellIcon from "../../../assets/icons/notification-bell.svg";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import {
   setLoginStatus,
   setUserInfo,
 } from "./../../../store/reducers/auth-reducer";
 import { authVerification } from "../../../helpers/auth-verification";
 import Notifications from "./../../../containers/user/Notifications";
+import {
+  setCatSearchValue,
+  setIsService,
+} from "../../../store/reducers/cat-search-reducer";
 
 const Header = () => {
+  const [isToggle, setIsToggle] = useState(false);
+  const isService = useSelector((state) => state.catSearch.isService);
   const dispatch = useDispatch();
   const logout = () => {
     localStorage.clear();
     dispatch(setLoginStatus({ isLoggedIn: false }));
     dispatch(setUserInfo({ userInfo: [] }));
+
+    dispatch(setIsService({ isService: 0 }));
+    setIsToggle(false);
+
     window.location.href = "/seller/login";
   };
 

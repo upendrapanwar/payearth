@@ -1,6 +1,8 @@
 var mongoose = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
 const Schema = mongoose.Schema; 
+  
+
 
 const schema = new Schema({
     serviceCode: { type: String, unique: true, required: false, index: true, default: function() { return getRandomString(8); } },
@@ -24,6 +26,7 @@ const schema = new Schema({
     videoCount: { type: Number, required: false, default: 0 },
     subscriberCount: { type: Number, required: false, default: 0 },
     createdBy: { type: Schema.Types.ObjectId, ref: 'Seller', required: false },
+    createdByAdmin: { type: Schema.Types.ObjectId, ref: 'Admin', required: false },
     updatedBy: { type: Schema.Types.ObjectId, ref: 'Seller', required: false },
 }, {
     timestamps: true,
