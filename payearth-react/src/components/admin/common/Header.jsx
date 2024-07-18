@@ -111,6 +111,16 @@ function Header() {
                   Manage Orders
                 </Link>
               </li>
+
+              <li>
+                <Link to="/admin/service-order" onClick={() => removeBackdrop()}>
+                  <i className="icon">
+                    <img src={shoppingBagIcon} alt="" />
+                  </i>{" "}
+                  Service Orders
+                </Link>
+              </li>
+
               <li>
                 <Link to="/admin/payments" onClick={() => removeBackdrop()}>
                   <i className="icon">

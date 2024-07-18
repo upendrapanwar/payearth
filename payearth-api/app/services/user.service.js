@@ -2610,7 +2610,7 @@ async function serviceCharges(req, res) {
 //GET Common All Services
 async function getCommonService(req) {
   try {
-    let result = await Services.find({})
+    let result = await Services.find({isActive:true})
       .select(
         "serviceCode name featuredImage imageId description isActive createdAt"
       )

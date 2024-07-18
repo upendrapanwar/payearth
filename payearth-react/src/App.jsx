@@ -71,6 +71,7 @@ import AdminRegister from "./containers/admin/Register";
 import AdminForgotPwd from "./containers/admin/ForgotPassword";
 import AdminResetPwd from "./containers/admin/ResetPassword";
 import AdminOrders from "./containers/admin/Orders";
+import AdminServiceOrders from "./containers/admin/ServiceOrder";
 import AdminDashboard from "./containers/admin/Dashboard";
 import AdminPayments from "./containers/admin/Payments";
 import AdminChat from "./containers/admin/Chat";
@@ -690,6 +691,14 @@ function App() {
           <PrivateRoute
             path="/admin/orders"
             component={AdminOrders}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/admin/Service-order"
+            component={AdminServiceOrders}
             roles={[Role.admin]}
             currentUserRole={userInfo.role}
             exact

@@ -96,6 +96,7 @@ module.exports = {
   getServiceData,
   saveCalendarEvents,
   getCalendarEvents,
+  sellerServiceOrders,
   createSellerBanner,
   getBannersBySellerId,
   deleteBanner,
@@ -2205,7 +2206,7 @@ async function addService(req) {
     // }
 
     let res = await Services.findById({ _id: data._id }).select();
- //  console.log("REsponse", res);
+    //  console.log("REsponse", res);
     if (res) {
       return res;
     } else {
@@ -2520,10 +2521,10 @@ async function getServiceItems(req) {
   try {
     let id = req.params.id;
     let result = await Services.find({ $or: [{ createdBy: id }, { _id: id }] })
-    // let result = await Services.find({ $or: [
-    //   { 'createdBy.userId': id },
-    //   { _id: id }
-    // ]  })
+      // let result = await Services.find({ $or: [
+      //   { 'createdBy.userId': id },
+      //   { _id: id }
+      // ]  })
       .select(
         "serviceCode name charges featuredImage imageId description isActive createdAt"
       )
@@ -2684,6 +2685,49 @@ async function getCalendarEvents() {
   } catch (err) {
     console.log("Error", err);
     return false;
+  }
+}
+
+async function sellerServiceOrders(req) {
+  const { id } = req.body;
+//  console.log('sellerId', id)
+  
+  try {
+      const filteredResult = await OrderDetails.find({ isService: true,})
+          .sort({ createdAt: 'desc' })
+          .populate({
+              path: "serviceId",
+              model: Services,
+              match: { 'createdBy': id },
+              select: "",
+              populate: [
+                  {
+                      path: "createdBy",
+                      model: Seller,
+                      select: ""
+                  },
+                  {
+                      path: "createdByAdmin",
+                      model: Admin,
+                      select: ""
+                  }
+              ]
+          },
+          )
+          .populate({
+              path: "userId",
+              model: User,
+              select: ""
+          },)
+
+          const result = filteredResult.filter(doc => doc.serviceId !== null);
+      //  .populate('category', 'categoryName');
+      if (result && result.length > 0) {
+            //  console.log("service-list ", result)
+          return result
+      }
+  } catch (error) {
+      console.log(error);
   }
 }
 

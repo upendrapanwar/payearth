@@ -7,9 +7,12 @@ import { setLoading } from "../../store/reducers/global-reducer";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { connect } from "react-redux";
-import {NotFound} from "../../components/common/NotFound";
+import { NotFound } from "../../components/common/NotFound";
 import SpinnerLoader from "../../components/common/SpinnerLoader";
 import Select from "react-select";
+
+import DataTable from 'react-data-table-component';
+import DataTableExtensions from "react-data-table-component-extensions";
 
 class ServiceOrders extends Component {
   constructor(props) {
@@ -97,10 +100,12 @@ class ServiceOrders extends Component {
       Item: "",
     };
   }
+  
 
   componentDidMount() {
-    this.getServiceOrders(false, null, "pending");
-    this.handleItemType("pending");
+   // this.getServiceOrders(false, null, "pending");
+    //this.handleItemType("pending");
+    this.getOrders();
   }
 
   getServiceOrders = (pagination, param, type) => {
@@ -303,6 +308,82 @@ class ServiceOrders extends Component {
     }
   };
 
+
+
+  getOrders = () => {
+    let url = '/seller/service-order';
+    const reqBody = { id: this.authInfo.id }; 
+   // console.log('reqBody', reqBody);
+    this.dispatch(setLoading({ loading: true }));
+    // this.dispatch(SpinnerLoader({ loading: true }));
+    axios.post(url, reqBody, {
+      headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Authorization': `Bearer ${this.authInfo.token}`
+      }
+  }).then((response) => {
+     // console.log("all servicess with user", response);
+      const userdata = response.data.data;
+      // const activeServices = response.data.data.filter(item => item.isActive === true);
+      // const inactiveServices = response.data.data.filter(item => item.isActive === false);
+
+      this.setState({
+        // activeServiceData: activeServices, 
+        userServiceData: userdata,
+        loading: false,
+        error: null
+        //   pagination: response.data.data.paginationData
+      });
+
+      // this.setState({
+      //    // inactiveServiceData: inactiveServices,
+
+      //     loading: false,
+      //     error: null
+      //     //   pagination: response.data.data.paginationData
+      // });
+    })
+      .catch(error => {
+        if (error.response && error.response.data.status === false) {
+          toast.error(error.response.data.message);
+        }
+      }).finally(() => {
+        setTimeout(() => {
+          this.dispatch(setLoading({ loading: false }));
+          //  this.dispatch(SpinnerLoader({ loading: false }));
+        }, 300);
+      });
+  }
+
+
+
+  userService_column = [
+  
+    {
+      name: "YOUR SERVICES",
+      selector: (row, i) => row.serviceId.name || 'N/A',
+      sortable: true
+    },
+    
+    {
+      name: "USERS",
+      selector: (row, i) => row.userId.name || 'N/A',
+      sortable: true
+    },
+    {
+      name: "PRICE",
+      selector: (row, i) => row.price || 'N/A',
+      sortable: true
+    },
+    // {
+    //   name: "CREATEDBY",
+    //   selector: (row, i) => row.serviceId.createdBy?.name || row.serviceId.createdByAdmin?.name || 'N/A',
+    //   sortable: true
+    // },
+  ]
+
+
   render() {
     const { loading } = store.getState().global;
     const {
@@ -321,6 +402,7 @@ class ServiceOrders extends Component {
       completedServicesPagination,
       item,
     } = this.state;
+    const { userServiceData } = this.state;
 
     return (
       <React.Fragment>
@@ -449,7 +531,7 @@ class ServiceOrders extends Component {
                     role="tabpanel"
                     aria-labelledby="nav-pending-orders-tab"
                   >
-                    {pendingServices.length > 0 ? (
+                    {/* {pendingServices.length > 0 ? (
                       <table className="table table-responsive table-bordered">
                         <thead>
                           <tr>
@@ -472,7 +554,7 @@ class ServiceOrders extends Component {
                               Payment
                             </th>
                             {/* <th className="invisible">action</th> */}
-                          </tr>
+                    {/* </tr>
                         </thead>
                         <tbody>
                           {pendingServices.length &&
@@ -551,7 +633,28 @@ class ServiceOrders extends Component {
                           </li>
                         </ul>
                       </div>
-                    )}
+                    )}*/}
+
+                    <DataTableExtensions
+                      columns={this.userService_column}
+                      data={userServiceData}
+                    >
+                      <DataTable
+                        pagination
+                        noHeader
+                        highlightOnHover
+                        defaultSortField="id"
+                        defaultSortAsc={false}
+                        selectableRows
+                        //onSelectedRowsChange={this.handleRowSelected}
+                        //   selectedRows={selectedRows}
+                        paginationRowsPerPageOptions={[5, 8, 12, 16]}
+                        // paginationPerPage={paginationPerPage}
+                        paginationPerPage={5}
+                      />
+                    </DataTableExtensions>
+
+
                   </div>
                   <div
                     className="tab-pane fade"
@@ -621,11 +724,10 @@ class ServiceOrders extends Component {
                           <li>
                             <Link
                               to="#"
-                              className={`link ${
-                                ongoingServicesPagination.hasPrevPage
-                                  ? ""
-                                  : "disabled"
-                              }`}
+                              className={`link ${ongoingServicesPagination.hasPrevPage
+                                ? ""
+                                : "disabled"
+                                }`}
                               onClick={() =>
                                 this.getServiceOrders(
                                   true,
@@ -642,11 +744,10 @@ class ServiceOrders extends Component {
                           <li>
                             <Link
                               to="#"
-                              className={`link ${
-                                ongoingServicesPagination.hasNextPage
-                                  ? ""
-                                  : "disabled"
-                              }`}
+                              className={`link ${ongoingServicesPagination.hasNextPage
+                                ? ""
+                                : "disabled"
+                                }`}
                               onClick={() =>
                                 this.getServiceOrders(
                                   true,
@@ -731,11 +832,10 @@ class ServiceOrders extends Component {
                           <li>
                             <Link
                               to="#"
-                              className={`link ${
-                                canceledServicesPagination.hasPrevPage
-                                  ? ""
-                                  : "disabled"
-                              }`}
+                              className={`link ${canceledServicesPagination.hasPrevPage
+                                ? ""
+                                : "disabled"
+                                }`}
                               onClick={() =>
                                 this.getServiceOrders(
                                   true,
@@ -752,11 +852,10 @@ class ServiceOrders extends Component {
                           <li>
                             <Link
                               to="#"
-                              className={`link ${
-                                canceledServicesPagination.hasNextPage
-                                  ? ""
-                                  : "disabled"
-                              }`}
+                              className={`link ${canceledServicesPagination.hasNextPage
+                                ? ""
+                                : "disabled"
+                                }`}
                               onClick={() =>
                                 this.getServiceOrders(
                                   true,
@@ -841,11 +940,10 @@ class ServiceOrders extends Component {
                           <li>
                             <Link
                               to="#"
-                              className={`link ${
-                                completedServicesPagination.hasPrevPage
-                                  ? ""
-                                  : "disabled"
-                              }`}
+                              className={`link ${completedServicesPagination.hasPrevPage
+                                ? ""
+                                : "disabled"
+                                }`}
                               onClick={() =>
                                 this.getServiceOrders(
                                   true,
@@ -862,11 +960,10 @@ class ServiceOrders extends Component {
                           <li>
                             <Link
                               to="#"
-                              className={`link ${
-                                completedServicesPagination.hasNextPage
-                                  ? ""
-                                  : "disabled"
-                              }`}
+                              className={`link ${completedServicesPagination.hasNextPage
+                                ? ""
+                                : "disabled"
+                                }`}
                               onClick={() =>
                                 this.getServiceOrders(
                                   true,

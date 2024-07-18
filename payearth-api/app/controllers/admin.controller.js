@@ -201,6 +201,7 @@ router.get("/getcategories", getAdminCategories);            //  change
 router.put('/service/edit/:id', editService);
 router.delete("/services/delete/:id", deleteService);
 router.put("/service/status/:id", statusChange);
+router.get("/service-order", userServiceOrders);
 
 router.get("/getAllUser", getAllUser);
 router.post("/accessChat", accessChat);
@@ -818,8 +819,8 @@ function createNewBanner(req, res, next) {
 //Services
 
 function addService(req, res, next) {
-   // console.log('Hello there how are you....');
-  // console.log('Req*********', req.body);
+    // console.log('Hello there how are you....');
+    // console.log('Req*********', req.body);
     if (req.files && req.files.fileValidationError) {
         return res.status(400).json({ status: false, message: req.files.fileValidationError });
     }
@@ -961,5 +962,14 @@ function addGroupMember(req, res, next) {
 function updateGroupName(req, res, next) {
     adminService.updateGroupName(req)
         .then((name) => name ? res.json({ status: true, data: name }) : res.json({ status: false, message: "ERROR" }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+//Admin
+function userServiceOrders(req, res, next) {
+    adminService.userServiceOrders(req)
+        .then((items) => items
+            ? res.status(200).json({ status: true, data: items })
+            : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch((err) => next(res.json({ status: false, message: err })));
 }

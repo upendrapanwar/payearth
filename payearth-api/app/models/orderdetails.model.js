@@ -5,6 +5,7 @@ const Schema = mongoose.Schema;
 const schema = new Schema({
     orderId: [{ type: Schema.Types.ObjectId, ref: "Order", required: false }],
     productId: [{ type: Schema.Types.ObjectId, ref: "Product", required: false }],
+    serviceId:{ type: Schema.Types.ObjectId, ref: "Service", required: false },
     quantity: [{ type: Number,required: false, default: 0 }],
     price: { type: Number, required: false, default: 0 },
     color: { type: String, required: false, default: "" },

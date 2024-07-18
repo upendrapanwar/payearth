@@ -11,7 +11,7 @@ const db = require("../helpers/db");
 const msg = require('../helpers/messages.json');
 const fs = require('fs');
 
-const { Admin, User, Seller, Coupon, Product, Category, Brand, TodayDeal, BannerImage, TrendingProduct, PopularProduct, Color, OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline, ProductSales, cmsPost, cmsPage, cmsCategory, bannerAdvertisement, Chat, ChatMessage, Services } = require("../helpers/db");
+const { Admin, User, Seller, Coupon, Product, Category, Brand, TodayDeal, BannerImage, TrendingProduct, PopularProduct, Color, OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline, ProductSales, cmsPost, cmsPage, cmsCategory, bannerAdvertisement, Chat, ChatMessage, Services, OrderDetails } = require("../helpers/db");
 
 module.exports = {
     authenticate,
@@ -119,6 +119,7 @@ module.exports = {
     editService,
     deleteService,
     statusChange,
+    userServiceOrders,
 
     getAllUser,
     accessChat,
@@ -2656,53 +2657,53 @@ async function updateBanner(req) {
 async function addService(req) {
     const param = req.body;
     var lName = param.name.toLowerCase();
-  
+
     if (await Services.findOne({ lname: lName })) {
-      throw 'Service Name "' + param.name + '" already exists.';
+        throw 'Service Name "' + param.name + '" already exists.';
     }
-  
+
     let input = {
-      admin_id: param.admin_id,
-      name: param.name,
-      lname: lName,
-      slug: param.slug,
-      charges: param.charges,
-      category: param.category,
-      description: param.description,
-      featuredImage: param.image,
-      imageId: param.imageId,
-      isActive: true,
-      isService: true,
-      createdByAdmin: param.admin_id,
-      updatedBy: param.admin_id,
+        admin_id: param.admin_id,
+        name: param.name,
+        lname: lName,
+        slug: param.slug,
+        charges: param.charges,
+        category: param.category,
+        description: param.description,
+        featuredImage: param.image,
+        imageId: param.imageId,
+        isActive: true,
+        isService: true,
+        createdByAdmin: param.admin_id,
+        updatedBy: param.admin_id,
     };
-  
+
     const serviceData = new Services(input);
     const data = await serviceData.save();
-  
+
     if (data) {
-      let res = await Services.findById({ _id: data._id }).select();
-      console.log("REsponse", res);
-      if (res) {
-        return res;
-      } else {
-        return false;
-      }
+        let res = await Services.findById({ _id: data._id }).select();
+        console.log("REsponse", res);
+        if (res) {
+            return res;
+        } else {
+            return false;
+        }
     } else {
-      return false;
+        return false;
     }
-  }
+}
 
 async function allServiceData(req) {
     try {
         const result = await Services.find({})
             .sort({ createdAt: 'desc' })
             .populate('createdBy', 'name')
-            .populate('createdByAdmin','name')
+            .populate('createdByAdmin', 'name')
             .populate('category', 'categoryName');
         if (result && result.length > 0) {
-          //    console.log("service-list ", result)
-            return result          
+            //    console.log("service-list ", result)
+            return result
         }
     } catch (error) {
         console.log(error);
@@ -2739,16 +2740,16 @@ async function getServiceItems(req) {
 
 async function getAdminCategories(req) {
     try {
-        const result = await Category.find({isActive: true,isService: true,})
+        const result = await Category.find({ isActive: true, isService: true, })
             .sort({ createdAt: 'desc' })
         if (result && result.length > 0) {
-             // console.log("service-list ", result)
+            // console.log("service-list ", result)
             return result
         }
     } catch (error) {
         console.log(error);
     }
- }
+}
 // console.log(Category)
 
 
@@ -2771,11 +2772,11 @@ async function editService(req) {
             { new: true }
         );
         if (!updatedOrder) {
-           // console.log("Service not found.");
+            // console.log("Service not found.");
             return null;
         }
 
-      //  console.log("Service updated successfully:", updatedOrder);
+        //  console.log("Service updated successfully:", updatedOrder);
         return updatedOrder;
     } catch (err) {
         console.log("Error:", err);
@@ -2806,6 +2807,42 @@ async function statusChange(req) {
     }
 }
 
+async function userServiceOrders(req) {
+    try {
+        const result = await OrderDetails.find({ isService: true })
+            .sort({ createdAt: 'desc' })
+            .populate({
+                path: "serviceId",
+                model: Services,
+                select: "",
+                populate: [
+                    {
+                        path: "createdBy",
+                        model: Seller,
+                        select: ""
+                    },
+                    {
+                        path: "createdByAdmin",
+                        model: Admin,
+                        select: ""
+                    }
+                ]
+            },
+            )
+            .populate({
+                path: "userId",
+                model: User,
+                select: ""
+            },)
+        //  .populate('category', 'categoryName');
+        if (result && result.length > 0) {
+            //    console.log("service-list ", result)
+            return result
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 // Chat ******************************************************
 //getAllUser

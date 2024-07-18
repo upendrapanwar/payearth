@@ -204,6 +204,7 @@ router.get("/service/getServiceData", getServiceData);
 router.get("/service/getServiceStatus/:meetingStatus", getServiceStatus);
 router.post("/service/save-calendar-events", saveCalendarEvents);
 router.get("/service/get-calendar-events", getCalendarEvents);
+router.post("/service-order", sellerServiceOrders);
 
 // Banner
 router.put("/sellerAddPlan/:id", sellerAddPlan);
@@ -935,6 +936,14 @@ function getCalendarEvents(req, res, next) {
         : res.status(400).json({ status: false, message: "ERROR ", data: [] })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function sellerServiceOrders(req, res, next) {
+  sellerService.sellerServiceOrders(req)
+      .then((items) => items
+          ? res.status(200).json({ status: true, data: items })
+          : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+      .catch((err) => next(res.json({ status: false, message: err })));
 }
 
 /***********************BANNER**********************/

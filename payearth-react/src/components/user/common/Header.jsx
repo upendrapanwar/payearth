@@ -161,6 +161,8 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
     localStorage.clear();
     dispatch(setLoginStatus({ isLoggedIn: false }));
     dispatch(setUserInfo({ userInfo: [] }));
+    dispatch(setIsService({ isService: 0 }));
+    setIsToggle(false);
     window.location.href = "/";
   };
   const removeBackdrop = () => {
@@ -174,10 +176,13 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
   const handleCatChange = (selectedOption) =>
     setCatSelectedOption(selectedOption);
   const handleSearchInput = (event) => setSearchOption(event.target.value);
+
   const handleIsService = (event) => {
-    dispatch(setIsService({ isService: parseInt(event.target.value) }));
+    const isServiceValue = parseInt(event.target.value);
+    dispatch(setIsService({ isService: isServiceValue }));
+    //dispatch(setIsService({ isService: parseInt(event.target.value) }));
     // Set isToggle value based on isService
-    const isToggleValue = isService === 1 ? true : false;
+    const isToggleValue = isServiceValue === 0 ? true : false;
     setIsToggle(isToggleValue);
     // handleIsToggle(isToggleValue);
     if (window.location.pathname === "/") {
@@ -185,6 +190,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
     }
     localStorage.setItem("isToggle", JSON.stringify(isToggleValue));
   };
+
   const getCategories = (catId) => {
     let categories = [];
     let url = "";
@@ -723,7 +729,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
                     </li>
                   </ul>
                   <ul>
-                    <li className="login_links_wrapper me-3">
+                    {/* <li className="login_links_wrapper me-3">
                       {loginStatus && userInfo.role === "user" ? (
                         <div className="notification_head">
                           <Link to="#">
@@ -768,7 +774,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
                       ) : (
                         ""
                       )}
-                    </li>
+                    </li> */}
                     <li className="login_links_wrapper me-3">
                       {loginStatus && userInfo.role === "user" ? (
                         <>

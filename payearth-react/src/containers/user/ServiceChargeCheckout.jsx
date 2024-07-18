@@ -557,12 +557,14 @@ class ServiceCheckOut extends Component {
      * @param {*} orderStatus 
      */
     saveOrderDetails = (orderId, orderStatus) => {
+        const serviceId=sessionStorage.getItem('serviceId');
         let reqBody = {}
         var prodArray = [];
         // for (var i = 0; i < subscriptionPlanData.length; i++) {
         prodArray.push({
             orderId: orderId,
             //   productId: productData[i].productId,
+            serviceId:serviceId,
             //  quantity: productData[i].quantity,
             price: this.state.stripeResponse.data.paymentIntent.amount_received / 100,
             //  color: productData[i].color,
