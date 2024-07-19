@@ -706,6 +706,7 @@ class ManageServices extends Component {
                                                 Service Description :
                                                 <div
                                                     className="ql-editor"
+                                                    style={{ maxWidth: '700px' }}
                                                     dangerouslySetInnerHTML={{
                                                         __html: selectedRows.description || "",
                                                     }}

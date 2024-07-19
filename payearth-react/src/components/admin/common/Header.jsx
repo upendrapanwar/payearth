@@ -5,6 +5,7 @@ import smChatIcon from "./../../../assets/icons/sm_chat.svg";
 import smcommunityIcon from "./../../../assets/icons/sm_community.svg";
 import contactIcon from "./../../../assets/icons/sm_contact.svg";
 import smLogoutIcon from "./../../../assets/icons/sm_logout.svg";
+import homeIcon from "./../../../assets/icons/home-icon.svg";
 import shoppingBagIcon from "./../../../assets/icons/shopping-bag.svg";
 import creditCardIcon from "./../../../assets/icons/credit-card.svg";
 import notificationBellIcon from "./../../../assets/icons/notification-bell.svg";
@@ -68,6 +69,14 @@ function Header() {
         <div className="offcanvas-body">
           <div className="side_menu_body">
             <ul className="side_menu_links">
+            <li>
+                <Link to="/admin/dashboard" onClick={() => removeBackdrop()}>
+                  <i className="icon">
+                  <img src={homeIcon} alt="" />
+                  </i>{" "}
+                  Dashboard
+                </Link>
+              </li>
               <li>
                 <Link to="/admin/post-module" onClick={() => removeBackdrop()}>
                   <i className="icon">

@@ -5,7 +5,7 @@ import store from "../../store/index";
 import { setLoading } from "../../store/reducers/global-reducer";
 import SpinnerLoader from "../../components/common/SpinnerLoader";
 import NotFound from "../../components/common/NotFound";
-import { Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import DataTable from "react-data-table-component";
@@ -60,7 +60,7 @@ class ServiceStockManagement extends Component {
     this.setState({ isCalendarAuthorized: true });
   };
 
-//$$$$$$$$$$$$$$$$$$$$
+  //$$$$$$$$$$$$$$$$$$$$
   handleTabClick = (tab) => {
     this.setState({ activeTab: tab });
     localStorage.setItem('activeTab', tab);
@@ -76,7 +76,7 @@ class ServiceStockManagement extends Component {
         },
       })
       .then((res) => {
-     //    console.log("Data", res);
+        //    console.log("Data", res);
         this.setState({
           service: res.data.data,
           loading: false,
@@ -151,7 +151,7 @@ class ServiceStockManagement extends Component {
 
   handleUpdateStatus = (id, currentStatus) => {
     const newStatus = !currentStatus;
-   // console.log('status....',newStatus)
+    // console.log('status....',newStatus)
     axios
       .put(
         `seller/service/items/status-update/${id}`,
@@ -166,7 +166,7 @@ class ServiceStockManagement extends Component {
       )
       .then((res) => {
         this.getUpdate();
-   //     console.log("Response of Status request", res);
+        //     console.log("Response of Status request", res);
       })
       .catch((error) => {
         console.log("error", error);
@@ -261,14 +261,14 @@ class ServiceStockManagement extends Component {
             Edit
           </button>
           {row.isActive ? (<button
-            onClick={() => this.handleUpdateStatus(row._id,row.isActive)}
+            onClick={() => this.handleUpdateStatus(row._id, row.isActive)}
             className="custom_btn btn_yellow_bordered  w-auto  btn btn-width action_btn_new"
           >
             Inactive
           </button>
           ) : (
             <button
-              onClick={() => this.handleUpdateStatus(row._id,row.isActive)}
+              onClick={() => this.handleUpdateStatus(row._id, row.isActive)}
               className="custom_btn btn_yellow_bordered w-auto  btn btn-width action_btn_new"
             >
               active
@@ -523,7 +523,7 @@ class ServiceStockManagement extends Component {
                   <nav className="orders_tabs">
                     <div className="nav nav-tabs" id="nav-tab" role="tablist">
                       <button
-                       // className="nav-link active "
+                        // className="nav-link active "
                         className={`nav-link ${activeTab === 'nav-appointment' ? 'active' : ''}`}
                         id="nav-appointment-tab"
                         data-bs-toggle="tab"
@@ -537,7 +537,7 @@ class ServiceStockManagement extends Component {
                         Appointments
                       </button>
                       <button
-                       // className="nav-link  "
+                        // className="nav-link  "
                         className={`nav-link ${activeTab === 'nav-service' ? 'active' : ''}`}
                         id="nav-service-tab"
                         data-bs-toggle="tab"
@@ -551,7 +551,7 @@ class ServiceStockManagement extends Component {
                         My Services
                       </button>
                       <button
-                       // className="nav-link"
+                        // className="nav-link"
                         className={`nav-link ${activeTab === 'nav-subscriber' ? 'active' : ''}`}
                         id="nav-subscriber-tab"
                         data-bs-toggle="tab"
@@ -589,8 +589,8 @@ class ServiceStockManagement extends Component {
                 >
                   {/* Appointments */}
                   <div
-                   // className="tab-pane fade show active"
-                   className={`tab-pane fade ${activeTab === 'nav-appointment' ? 'show active' : ''}`}
+                    // className="tab-pane fade show active"
+                    className={`tab-pane fade ${activeTab === 'nav-appointment' ? 'show active' : ''}`}
                     id="nav-appointment"
                     role="tabpanel"
                     aria-labelledby="nav-appointment-tab"
@@ -817,7 +817,8 @@ class ServiceStockManagement extends Component {
                       <h6 className="fw-bold text-secondary mb-1">
                         Service Description :
                         <div
-                        className="ql-editor"
+                          className="ql-editor"
+                          style={{ maxWidth: '700px' }}
                           dangerouslySetInnerHTML={{
                             __html: selectedRows.description || "",
                           }}

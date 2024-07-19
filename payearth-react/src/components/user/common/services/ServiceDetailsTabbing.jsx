@@ -587,24 +587,48 @@ function ServiceDetailsTabbing(props) {
   };
 
   //Converted rating value into stars
+  // const renderStarRating = (ratingValue) => {
+  //   const stars = [];
+  //   for (let i = 0; i < 5; i++) {
+  //     if (i < Math.floor(ratingValue)) {
+  //       // Full star
+  //       stars.push(<li className="star rated" key={i}></li>);
+  //     } else {
+  //       // Half star
+  //       if (i - ratingValue === -0.5) {
+  //         stars.push(<li className="star half-star" key={i}></li>);
+  //       } else {
+  //         // Empty star
+  //         stars.push(<li className="star" key={i}></li>);
+  //       }
+  //     }
+  //   }
+  //   return <ul className="rating">{stars}</ul>;
+  // };
   const renderStarRating = (ratingValue) => {
     const stars = [];
+    // Calculate full stars
+    const fullStars = Math.floor(ratingValue);
+    // Check if there's a half star
+    const hasHalfStar = ratingValue - fullStars >= 0.5;
+    // Iterate through 5 stars
     for (let i = 0; i < 5; i++) {
-      if (i < Math.floor(ratingValue)) {
+      if (i < fullStars) {
         // Full star
         stars.push(<li className="star rated" key={i}></li>);
-      } else {
+      } else if (hasHalfStar && i === fullStars) {
         // Half star
-        if (i - ratingValue === -0.5) {
-          stars.push(<li className="star half-star" key={i}></li>);
-        } else {
-          // Empty star
-          stars.push(<li className="star" key={i}></li>);
-        }
+        stars.push(<li className="star half-star" key={i}></li>);
+      } else {
+        // Empty star
+        stars.push(<li className="star" key={i}></li>);
       }
     }
+
     return <ul className="rating">{stars}</ul>;
   };
+
+
 
   // Function to format the date
   const formatDate = (date) => {
@@ -960,7 +984,7 @@ function ServiceDetailsTabbing(props) {
                         role="tabpanel"
                         aria-labelledby="description-tab"
                       >
-                        <p className="mb-0">{parse(props.description)}</p>
+                        <p className="ql-editor ql-discription mb-0">{parse(props.description)}</p>
                       </div>
                     ) : (
                       ""
@@ -972,7 +996,7 @@ function ServiceDetailsTabbing(props) {
                       role="tabpanel"
                       aria-labelledby="description-tab"
                     >
-                      <p className="mb-0">{parse(props.description)}</p>
+                      <p className="ql-editor ql-discription mb-0">{parse(props.description)}</p>
                     </div>
                   )}
                   {/* Reviews Content */}

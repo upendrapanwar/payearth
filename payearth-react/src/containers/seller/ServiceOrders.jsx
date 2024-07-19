@@ -13,6 +13,7 @@ import Select from "react-select";
 
 import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
+import arrow_back from './../../assets/icons/arrow-back.svg';
 
 class ServiceOrders extends Component {
   constructor(props) {
@@ -100,10 +101,10 @@ class ServiceOrders extends Component {
       Item: "",
     };
   }
-  
+
 
   componentDidMount() {
-   // this.getServiceOrders(false, null, "pending");
+    // this.getServiceOrders(false, null, "pending");
     //this.handleItemType("pending");
     this.getOrders();
   }
@@ -312,18 +313,18 @@ class ServiceOrders extends Component {
 
   getOrders = () => {
     let url = '/seller/service-order';
-    const reqBody = { id: this.authInfo.id }; 
-   // console.log('reqBody', reqBody);
+    const reqBody = { id: this.authInfo.id };
+    // console.log('reqBody', reqBody);
     this.dispatch(setLoading({ loading: true }));
     // this.dispatch(SpinnerLoader({ loading: true }));
     axios.post(url, reqBody, {
       headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json;charset=UTF-8',
-          'Authorization': `Bearer ${this.authInfo.token}`
+        'Accept': 'application/json',
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Authorization': `Bearer ${this.authInfo.token}`
       }
-  }).then((response) => {
-     // console.log("all servicess with user", response);
+    }).then((response) => {
+      // console.log("all servicess with user", response);
       const userdata = response.data.data;
       // const activeServices = response.data.data.filter(item => item.isActive === true);
       // const inactiveServices = response.data.data.filter(item => item.isActive === false);
@@ -359,13 +360,13 @@ class ServiceOrders extends Component {
 
 
   userService_column = [
-  
+
     {
       name: "YOUR SERVICES",
       selector: (row, i) => row.serviceId.name || 'N/A',
       sortable: true
     },
-    
+
     {
       name: "USERS",
       selector: (row, i) => row.userId.name || 'N/A',
@@ -415,7 +416,13 @@ class ServiceOrders extends Component {
                 <div className="dash_inner_wrap">
                   <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
                     <div className="dash_title">Service Orders</div>
-                    {item === "pending" && (
+                    <div className="">
+                      <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/dashboard">
+                        <img src={arrow_back} alt="linked-in" />&nbsp;
+                        Back
+                      </Link>
+                    </div>
+                    {/* {item === "pending" && (
                       <Select
                         className="sort_select text-normal ms-auto"
                         options={sortingOptions}
@@ -446,7 +453,7 @@ class ServiceOrders extends Component {
                         value={defaultSelectedOptionCompleted}
                         onChange={this.handleChangeCompleted}
                       />
-                    )}
+                    )} */}
                   </div>
                 </div>
                 <nav className="orders_tabs">
@@ -469,7 +476,7 @@ class ServiceOrders extends Component {
                         this.handleItemType("pending");
                       }}
                     >
-                      Pending Orders
+                      Pending services
                     </button>
                     <button
                       className="nav-link"

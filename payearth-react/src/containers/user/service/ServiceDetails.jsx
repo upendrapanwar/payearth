@@ -31,8 +31,10 @@ const ServiceDetails = () => {
   //Service Id save in session For zoom Notification
   const serviceId = id;
   sessionStorage.setItem("serviceId", serviceId);
+  const [averageRating, setAverageRating] = useState(0);
 
   useEffect(() => {
+    fetchApi();
     fetchData();
     scrollToMyRef();
   }, []);
@@ -80,6 +82,47 @@ const ServiceDetails = () => {
     }
   }
 
+  const fetchApi = async () => {
+    try {
+      const response = await axios.get(`/user/get-service-review/${serviceId}`);
+      const result = response.data.data;
+      setReviews(result);
+      console.log("review data", result);
+
+      // Calculate average rating
+      if (result.length > 0) {
+        const totalRating = result.reduce((acc, curr) => acc + curr.rating, 0);
+        const average = totalRating / result.length;
+        setAverageRating(average);
+      }
+    } catch (error) {
+      console.log("Error fetching data:", error);
+    }
+  };
+
+  const renderStarRating = (ratingValue) => {
+    const stars = [];
+    // Calculate full stars
+    const fullStars = Math.floor(ratingValue);
+    // Check if there's a half star
+    const hasHalfStar = ratingValue - fullStars >= 0.5;
+    // Iterate through 5 stars
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        // Full star
+        stars.push(<li className="star rated" key={i}></li>);
+      } else if (hasHalfStar && i === fullStars) {
+        // Half star
+        stars.push(<li className="star half-star" key={i}></li>);
+      } else {
+        // Empty star
+        stars.push(<li className="star" key={i}></li>);
+      }
+    }
+
+    return <ul className="rating">{stars}</ul>;
+  };
+
   return (
     <React.Fragment>
       {loading === true ? <SpinnerLoader /> : ""}
@@ -104,13 +147,21 @@ const ServiceDetails = () => {
                 <div className="col-md-6">
                   <div className="prod_dtl_info">
                     <div className="prod_dtl_body">
+                      <p className="review_count">
+                        {/* Display average rating */}
+                        Average Rating: {averageRating.toFixed(1)}
+                      </p>
+                      {/* Render star rating for averageRating */}
+                      <p className="rating_point d-inline-flex align-items-center">
+                        {renderStarRating(averageRating)}
+                      </p>
                       <h2>{data.name}</h2>
                       <div className="pdi_avblty">
                         <p>Service Code : {data.serviceCode}</p>
+                        <p>Category : {data.category.categoryName}</p>
                       </div>
                       <div className="pdi_desc"></div>
-                      <p>{data.category.categoryName}</p>
-                      <p>{data.description ? parse(data.description) : ""}</p>
+                      <p className="ql-editor ql-discription">Discription : {data.description ? parse(data.description) : ""}</p>
                       <div className="pdi_fea">
                         <button
                           className="btn custom_btn btn_yellow"
@@ -127,7 +178,11 @@ const ServiceDetails = () => {
                       <div className="pdi_share">
                         <p>
                           Created :{" "}
-                          {new Date(data.createdAt).toLocaleDateString()} Time :{" "}
+                          {new Date(data.createdAt).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          })}{"  "}Time :{" "}
                           {new Date(data.createdAt).toLocaleTimeString()}
                         </p>
                       </div>

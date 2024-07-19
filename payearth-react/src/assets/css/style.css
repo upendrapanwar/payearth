@@ -4523,3 +4523,8 @@ h4 {
     opacity: 0;
   }
 }
+
+.ql-discription{
+  max-width: 100%;
+  max-height:200px;
+}
