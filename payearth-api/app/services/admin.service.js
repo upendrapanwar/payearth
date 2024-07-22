@@ -2809,22 +2809,22 @@ async function statusChange(req) {
 
 async function userServiceOrders(req) {
     try {
-        const result = await OrderDetails.find({ isService: true })
+        const result = await OrderDetails.find({ isService: true})
             .sort({ createdAt: 'desc' })
             .populate({
                 path: "serviceId",
                 model: Services,
-                select: "",
+                select: "createdBy createdByAdmin name",
                 populate: [
                     {
                         path: "createdBy",
                         model: Seller,
-                        select: ""
+                        select: "name email _id"
                     },
                     {
                         path: "createdByAdmin",
                         model: Admin,
-                        select: ""
+                        select: "name email _id"
                     }
                 ]
             },
@@ -2832,7 +2832,7 @@ async function userServiceOrders(req) {
             .populate({
                 path: "userId",
                 model: User,
-                select: ""
+                select: "name email _id"
             },)
         //  .populate('category', 'categoryName');
         if (result && result.length > 0) {

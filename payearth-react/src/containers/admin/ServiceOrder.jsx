@@ -521,10 +521,9 @@ class ServiceOrders extends Component {
             }
         }).then((response) => {
             console.log("all servicess with user", response);
-            const userdata = response.data.data;
+            const userdata = response.data.data.filter(item => item.serviceId!==null);
             // const activeServices = response.data.data.filter(item => item.isActive === true);
             // const inactiveServices = response.data.data.filter(item => item.isActive === false);
-
             this.setState({
                 // activeServiceData: activeServices, 
                 userServiceData: userdata,

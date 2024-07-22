@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Header from '../../components/seller/common/Header';
+import Header from '../../components/admin/common/Header';
 import Footer from '../../components/common/Footer';
 import { Formik } from 'formik';
 import Select from 'react-select';
