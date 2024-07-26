@@ -2661,10 +2661,10 @@ async function addService(req) {
     // if (await Services.findOne({ lname: lName })) {
     //     throw 'Service Name "' + param.name + '" already exists.';
     // }
-    const existingService = await Services.findOne({ lname: lName });
-    if (existingService) {
-        throw new Error('Service Name "' + param.name + '" already exists.');
-    }
+    // const existingService = await Services.findOne({ lname: lName });
+    // if (existingService) {
+    //     throw new Error('Service Name "' + param.name + '" already exists.');
+    // }
 
     let input = {
         admin_id: param.admin_id,

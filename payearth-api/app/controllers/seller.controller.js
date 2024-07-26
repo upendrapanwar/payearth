@@ -205,7 +205,7 @@ router.get("/service/getServiceStatus/:meetingStatus", getServiceStatus);
 router.post("/service/save-calendar-events", saveCalendarEvents);
 router.get("/service/get-calendar-events", getCalendarEvents);
 router.post("/service-order", sellerServiceOrders);
-router.get("/services_checkName", servicesCheckName)
+//router.get("/services_checkName", servicesCheckName)
 
 // Banner
 router.put("/sellerAddPlan/:id", sellerAddPlan);
@@ -948,11 +948,11 @@ function sellerServiceOrders(req, res, next) {
 }
 
 
-function servicesCheckName(req, res, next) {
-  sellerService.servicesCheckName(req)
-  .then((Service => Service ? res.status(200).json({ status: true, data: Service }) : res.status(400).json({ status: false, message: "ERROR ", data: [] })))
-  .catch(err => next(res.json({ status: false, message: err })))
-}
+// function servicesCheckName(req, res, next) {
+//   sellerService.servicesCheckName(req)
+//   .then((Service => Service ? res.status(200).json({ status: true, data: Service }) : res.status(400).json({ status: false, message: "ERROR ", data: [] })))
+//   .catch(err => next(res.json({ status: false, message: err })))
+// }
 
 /***********************BANNER**********************/
 

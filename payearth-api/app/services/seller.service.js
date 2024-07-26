@@ -97,7 +97,7 @@ module.exports = {
   saveCalendarEvents,
   getCalendarEvents,
   sellerServiceOrders,
-  servicesCheckName,
+  //servicesCheckName,
   createSellerBanner,
   getBannersBySellerId,
   deleteBanner,
@@ -2090,9 +2090,9 @@ async function addService(req) {
 
   var lName = param.name.toLowerCase();
 
-  if (await Services.findOne({ lname: lName })) {
-    throw 'Service Name "' + param.name + '" already exists.';
-  }
+  // if (await Services.findOne({ lname: lName })) {
+  //   throw 'Service Name "' + param.name + '" already exists.';
+  // }
 
   // if (files.length > 0) {
 
@@ -2732,18 +2732,18 @@ async function sellerServiceOrders(req) {
   }
 }
 
-async function servicesCheckName (req, res) {
-    try {
-        const result = await Services.find({})
-            .sort({ createdAt: 'desc' })
-        if (result && result.length > 0) {
-            //    console.log("service-list ", result)
-            return result
-        }
-    } catch (error) {
-        console.log(error);
-    }
-}
+// async function servicesCheckName (req, res) {
+//     try {
+//         const result = await Services.find({})
+//             .sort({ createdAt: 'desc' })
+//         if (result && result.length > 0) {
+//             //    console.log("service-list ", result)
+//             return result
+//         }
+//     } catch (error) {
+//         console.log(error);
+//     }
+// }
 // POST API CREATE NEW BANNER....................................
 async function createSellerBanner(req, res) {
   try {

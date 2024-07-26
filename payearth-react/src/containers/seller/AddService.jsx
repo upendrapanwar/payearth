@@ -291,30 +291,30 @@ class AddService extends Component {
     handleSubmit = async (values) => {
         this.dispatch(setLoading({ loading: true }));
 
-       const checkServiceExists = async (name) => {
-            try {
-                const response = await axios.get('seller/services_checkName', {
-                    headers: {
-                        'Authorization': `Bearer ${this.authInfo.token}`
-                    }
-                });
-                console.log('sercice exist response',response);
-                const exists = response.data.data.some(service => service.name === name);
-              //  return response.data.exists;
-              console.log('exist',exists)
-              return exists;
-            } catch (error) {
-                console.error("Error checking service name:", error);
-                return false;
-            }
-        };
-
-        const serviceExists = await checkServiceExists(values.name);
-            if (serviceExists) {
-                toast.error("A service with this name already exists. Please choose a different name.", { autoClose: 3000 });
-                this.dispatch(setLoading({ loading: false }));
-                return;
-            }
+    //    const checkServiceExists = async (name) => {
+    //         try {
+    //             const response = await axios.get('seller/services_checkName', {
+    //                 headers: {
+    //                     'Authorization': `Bearer ${this.authInfo.token}`
+    //                 }
+    //             });
+    //             console.log('sercice exist response',response);
+    //             const exists = response.data.data.some(service => service.name === name);
+    //           //  return response.data.exists;
+    //           console.log('exist',exists)
+    //           return exists;
+    //         } catch (error) {
+    //             console.error("Error checking service name:", error);
+    //             return false;
+    //         }
+    //     };
+//
+        // const serviceExists = await checkServiceExists(values.name);
+        //     if (serviceExists) {
+        //         toast.error("A service with this name already exists. Please choose a different name.", { autoClose: 3000 });
+        //         this.dispatch(setLoading({ loading: false }));
+        //         return;
+        //     }
 
         const uploadImage = () => {
             return new Promise((resolve, reject) => {
