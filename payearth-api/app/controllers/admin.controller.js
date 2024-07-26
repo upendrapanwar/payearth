@@ -106,6 +106,7 @@ router.post('/categories', createCategory);
 router.put('/categories/:id', editCategory);
 router.put('/categories/status/:id', statusCategory);
 router.get('/categories', listCategory);
+router.get('/service-categories-list', ServiceCategorylist);
 router.get('/categorybyid/:id', getCategoryById);
 router.delete('/categories/:id', deleteCategory);
 
@@ -328,6 +329,13 @@ function listCategory(req, res, next) {
         .then(categories => categories ? res.status(200).json({ status: true, data: categories }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
+
+function ServiceCategorylist(req, res, next) {
+    adminService.getServiceCategorylist()
+        .then(categories => categories ? res.status(200).json({ status: true, data: categories }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
 function getCategoryById(req, res, next) {
     adminService.getCateogyById(req.params.id)
         .then(categories => categories ? res.status(200).json({ status: true, data: categories }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))

@@ -101,6 +101,14 @@ class ServiceCheckout extends Component {
         } else {
             this.setState({ selectCard: null })
         }
+
+        var serviceData = localStorage.getItem('serviceData');
+        if(serviceData){
+            var retriveServiceData = JSON.parse(serviceData);
+            console.log("Check ServiceData name",retriveServiceData.name);
+            this.setState({serviceName : retriveServiceData.name})
+            this.setState({serviceCategory : retriveServiceData.category})
+        }
     }
 
     fetchStripePlans = async () => {
