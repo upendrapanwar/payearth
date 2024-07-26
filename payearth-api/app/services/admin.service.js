@@ -31,6 +31,7 @@ module.exports = {
     createCategory,
     editCategory,
     getCateogries,
+    getServiceCategorylist,
     deleteCategory,
     statusCategory,
     getCateogyById,
@@ -674,7 +675,6 @@ async function getById(id) {
 // }
 
 //Category 
-
 async function createCategory(param) {
 
     var Name = param.name.trim();
@@ -691,6 +691,7 @@ async function createCategory(param) {
         "createdBy": param.admin_id,
         "updatedBy": param.admin_id,
     };
+    console.log("Check catagories data", input)
 
     const category = new Category(input);
     const data = await category.save();
@@ -702,9 +703,77 @@ async function createCategory(param) {
     }
 }
 
+// async function editBanner(req) {
+
+//     var files = req.files; //multiple files
+//     var param = req.body;
+//     var bannerData = param.banner_data;
+//     var singleImageUrl = '';
+//     var bannerImagesArr = [];
+//     const id = req.params.id;
+
+//     const banner = await BannerImage.findById(id);
+
+//     if (!banner) return false;
+
+//     if (banner.page !== param.page && (await BannerImage.findOne({ page: param.page }))) {
+//         throw 'Page "' + param.page + '" already exists.';
+//     }
+
+//     const input = {
+//         "page": param.page,
+//         "singleImage": banner.singleImage,
+//         "bannerImages": banner.bannerImages,
+//         "isActive": param.is_active,
+//         "updatedBy": param.admin_id,
+//     };
+
+//     // if (typeof file != "undefined") {
+//     //     fs.unlinkSync(banner.logoImage);
+//     //     singleImageUrl = file.destination + "/" + file.filename;
+//     // } 
+
+//     if (files.length > 0) {
+//         singleImageUrl = files[0].destination + "/" + files[0].filename;
+//         input['singleImage'] = singleImageUrl;
+
+//         files.shift(); //remove first item.
+
+//         for (let i = 0; i < files.length; i++) {
+//             let path = files[i].destination + "/" + files[i].filename;
+//             let text = bannerData[i].text;
+//             let url = bannerData[i].url;
+//             let x = {
+//                 path: path,
+//                 text: text,
+//                 url: url
+//             };
+//             bannerImagesArr.push(x);
+//         }
+
+//         if (bannerImagesArr.length > 0) {
+//             input['bannerImages'] = bannerImagesArr;
+//         }
+
+//     }
+
+//     Object.assign(banner, input);
+
+//     const data = await banner.save();
+
+//     if (data) {
+//         return await BannerImage.findById(data.id).select();
+//     } else {
+//         return false;
+//     }
+// }
+
 async function editCategory(req) {
     const param = req.body;
     const id = req.params.id;
+    console.log("check param", param)
+    console.log("check id", id)
+
 
     const category = await Category.findById(id);
 
@@ -747,6 +816,15 @@ async function getCateogries() {
 }
 
 
+async function getServiceCategorylist() {
+    const result = await Category.find({ isService: true }).select().populate('createdBy', 'name').sort({ createdAt: 'desc' });
+
+    if (result && result.length > 0) return result;
+
+    return false;
+}
+
+
 async function deleteCategory(id) {
     const admin = Category.findById(id);
 
@@ -758,22 +836,13 @@ async function deleteCategory(id) {
 
 async function statusCategory(req) {
     const id = req.params.id;
-    const param = req.body;
-
-    const category = await Category.findById(id);
-
-    if (!category) {
-        return false;
-    } else {
-        const input = {
-            "isActive": param.is_active
-        };
-
-        Object.assign(category, input);
-
-        if (await category.save()) {
-            return await Category.findById(id).select();
-        }
+    try {
+        const category = await Category.findById(id).select("isActive");
+        category.isActive = !category.isActive;
+        await category.save();
+        return category;
+    } catch (error) {
+        console.error("Error deleting service:", error);
     }
 }
 
@@ -2809,7 +2878,7 @@ async function statusChange(req) {
 
 async function userServiceOrders(req) {
     try {
-        const result = await OrderDetails.find({ isService: true})
+        const result = await OrderDetails.find({ isService: true })
             .sort({ createdAt: 'desc' })
             .populate({
                 path: "serviceId",
