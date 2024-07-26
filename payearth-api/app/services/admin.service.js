@@ -2727,8 +2727,12 @@ async function addService(req) {
     const param = req.body;
     var lName = param.name.toLowerCase();
 
-    if (await Services.findOne({ lname: lName })) {
-        throw 'Service Name "' + param.name + '" already exists.';
+    // if (await Services.findOne({ lname: lName })) {
+    //     throw 'Service Name "' + param.name + '" already exists.';
+    // }
+    const existingService = await Services.findOne({ lname: lName });
+    if (existingService) {
+        throw new Error('Service Name "' + param.name + '" already exists.');
     }
 
     let input = {
@@ -2770,9 +2774,10 @@ async function allServiceData(req) {
             .populate('createdBy', 'name')
             .populate('createdByAdmin', 'name')
             .populate('category', 'categoryName');
-        if (result && result.length > 0) {
-            //    console.log("service-list ", result)
-            return result
+        if (result.length > 0) {
+            return result;
+        } else {
+            return [];
         }
     } catch (error) {
         console.log(error);
@@ -2828,6 +2833,7 @@ async function editService(req) {
         const param = req.body;
         const statusData = {
             name: param.name,
+            charges:param.charges,
             category: param.category,
             description: param.description,
             featuredImage: param.featuredImage,

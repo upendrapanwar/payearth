@@ -1038,7 +1038,7 @@ function ServiceDetailsTabbing(props) {
                       </div>
                       {/* User Reviews */}
                       <div className="col-sm-12 col-md-9">
-                        <div className="reviews_comments_box">
+                        <div className="reviews_comments_box overflow-auto"style={{ maxHeight: '350px' }}>
                           {/* Display Reviews */}
                           {currentReviews.length > 0
                             ? currentReviews.map((review, index) => (

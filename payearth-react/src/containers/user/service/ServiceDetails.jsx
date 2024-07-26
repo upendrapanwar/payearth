@@ -26,19 +26,19 @@ const ServiceDetails = () => {
   // const [charges, setCharges] = useState("");
   const [reviews, setReviews] = useState([]);
   const myRef = useRef(null);
+  const reportRef = useRef(null);
   const [loading, setLoading] = useState(true);
 
   //Service Id save in session For zoom Notification
   const serviceId = id;
   sessionStorage.setItem("serviceId", serviceId);
   const [averageRating, setAverageRating] = useState(0);
-
+  const [TotalReview, setTotalReview] = useState(0);
   useEffect(() => {
     fetchApi();
     fetchData();
     scrollToMyRef();
   }, []);
-
   const fetchData = async () => {
     try {
       const res = await axios.get(`/user/get-common-service/${id}`);
@@ -94,6 +94,7 @@ const ServiceDetails = () => {
         const totalRating = result.reduce((acc, curr) => acc + curr.rating, 0);
         const average = totalRating / result.length;
         setAverageRating(average);
+        setTotalReview(result.length);
       }
     } catch (error) {
       console.log("Error fetching data:", error);
@@ -123,6 +124,12 @@ const ServiceDetails = () => {
     return <ul className="rating">{stars}</ul>;
   };
 
+  const scrollToReport = () => {
+    if (reportRef.current) {
+      reportRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <React.Fragment>
       {loading === true ? <SpinnerLoader /> : ""}
@@ -135,36 +142,48 @@ const ServiceDetails = () => {
             commonServiceData.map((data, index) => (
               <div className="row g-0 bg-white rounded" key={index}>
                 <div className="d-flex justify-content-end">
-                  <Link className="btn custom_btn btn_yellow mx-2" to="/">
+                  <Link className="btn custom_btn btn_yellow  mt-3 mx-3" to="/">
                     <img src={arrow_back} alt="Back" />&nbsp;Back
                   </Link>
                 </div>
                 <div className="col-md-6">
                   <div className="ser_thumb_div">
-                    <img src={data.featuredImage} alt="Service Details Image" />
+                    <img
+                     className="img_srv_details"
+                     src={data.featuredImage} alt="Service Details Image" />
                   </div>
                 </div>
                 <div className="col-md-6">
                   <div className="prod_dtl_info">
                     <div className="prod_dtl_body">
-                      <p className="review_count">
-                        {/* Display average rating */}
-                        Average Rating: {averageRating.toFixed(1)}
-                      </p>
-                      {/* Render star rating for averageRating */}
-                      <p className="rating_point d-inline-flex align-items-center">
-                        {renderStarRating(averageRating)}
-                      </p>
+                      <div className="pdi_ratings">
+                        <div className="rating">
+                          <p className="review_count">
+                            Average Rating: {averageRating.toFixed(1)}
+                            <Link
+                              to="#"
+                              className="reviews_count"
+                             onClick={scrollToReport}
+                            >
+                              ( {TotalReview} Reviews )
+                            </Link>
+                          </p>
+                          <p className="rating_point ">
+                            {renderStarRating(averageRating)}
+                          </p>
+                        </div>
+                      </div>
                       <h2>{data.name}</h2>
                       <div className="pdi_avblty">
                         <p>Service Code : {data.serviceCode}</p>
                         <p>Category : {data.category.categoryName}</p>
                       </div>
                       <div className="pdi_desc"></div>
-                      <p className="ql-editor ql-discription">description : {data.description ? parse(data.description) : ""}</p>
-                      <div className="pdi_fea">
+                      <p>Description :</p>
+                      <p className="ql-editor ql-discription"> {data.description ? parse(data.description) : ""}</p>
+                      <div className="pdi_fea prod_foot">
                         <button
-                          className="btn custom_btn btn_yellow"
+                          className="btn custom_btn btn_yellow mx-4"
                           onClick={handleCheckout}
                         >
                           <b>{`$${data.charges}`}</b>&nbsp; Pay Now
@@ -182,8 +201,9 @@ const ServiceDetails = () => {
                             year: 'numeric',
                             month: 'long',
                             day: 'numeric',
-                          })}{"  "}Time :{" "}
-                          {new Date(data.createdAt).toLocaleTimeString()}
+                          })}
+                          {/* {"  "}Time :{" "}
+                          {new Date(data.createdAt).toLocaleTimeString()} */}
                         </p>
                       </div>
                       <div className="pdi_share_links"></div>
@@ -195,7 +215,7 @@ const ServiceDetails = () => {
         </div>
       </section>
       <div>
-        <ServiceDetailsTabbing serviceId={id} description={description} />
+        <ServiceDetailsTabbing serviceId={id} description={description} reportRef={reportRef}/>
       </div>
       <Footer />
       <GoToTop />

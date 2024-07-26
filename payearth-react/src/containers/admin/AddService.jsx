@@ -106,12 +106,31 @@ class adminAddService extends Component {
             };
             reader.readAsDataURL(file);
         } else {
+            this.setState({ imageFile: null, image: emptyImg });
             toast.error("Image size must be less than 5 MB", { autoClose: 3000 });
         }
     };
 
     handleSubmit = async (values) => {
         this.dispatch(setLoading({ loading: true }));
+
+        // const checkServiceExists = async (name) => {
+        //     try {
+        //         const response = await axios.get('admin/services', {
+        //             headers: {
+        //                 'Authorization': `Bearer ${this.authInfo.token}`
+        //             }
+        //         });
+        //         console.log('sercice exist response',response);
+        //         const exists=response.data.data.name==name;
+        //       //  return response.data.exists;
+        //       console.log('exist',exists)
+        //       return exists;
+        //     } catch (error) {
+        //         console.error("Error checking service name:", error);
+        //         return false;
+        //     }
+        // };
 
         const uploadImage = () => {
             return new Promise((resolve, reject) => {
@@ -131,7 +150,20 @@ class adminAddService extends Component {
         };
 
         try {
-            const imageData = await uploadImage();
+            // const serviceExists = await checkServiceExists(values.name);
+            // if (serviceExists) {
+            //     toast.error("A service with this name already exists. Please choose a different name.", { autoClose: 3000 });
+            //     this.dispatch(setLoading({ loading: false }));
+            //     return;
+            // }
+
+            let imageData;
+            if (this.state.imageFile) {
+                imageData = await uploadImage();
+            } else {
+                imageData = { secure_url: emptyImg, public_id: '' };
+            }
+            // const imageData = await uploadImage();
             const slug = this.generateUniqueSlug(values.name);
 
             const formData = {
@@ -208,12 +240,12 @@ class adminAddService extends Component {
                                             charges: '',
                                             category: defaultCatOption?.value,
                                             description: '',
-                                            price: '',
+                                            // price: '',
                                             // files: '',
                                             featuredImg: ''
                                         }}
                                         onSubmit={values => this.handleSubmit(values)}
-                                    // validationSchema={addServiceSchema}
+                                        validationSchema={addServiceSchema}
                                     >
                                         {({ values,
                                             errors,
@@ -280,7 +312,7 @@ class adminAddService extends Component {
                                                                     values.category = selectedOption.value;
                                                                     this.setState({ defaultCatOption: selectedOption });
                                                                     this.setState({ serviceCategory: selectedOption.value });
-                                                                    this.getCategories(selectedOption.value);
+                                                                    // this.getCategories(selectedOption.value);
                                                                 }}
                                                                 onBlur={handleBlur}
                                                             />
@@ -318,7 +350,7 @@ class adminAddService extends Component {
                                                                     onChange={this.handleDescriptionChange}
                                                                     modules={{
                                                                         toolbar: [
-                                                                            [{ 'header': '1' },{ 'header': '2' }, { 'font': [] }],
+                                                                            [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
                                                                             [{ 'list': 'ordered' }, { 'list': 'bullet' }],
                                                                             ['bold', 'italic', 'underline'],
                                                                             [{ 'align': [] }],

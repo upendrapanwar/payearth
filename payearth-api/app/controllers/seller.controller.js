@@ -205,6 +205,7 @@ router.get("/service/getServiceStatus/:meetingStatus", getServiceStatus);
 router.post("/service/save-calendar-events", saveCalendarEvents);
 router.get("/service/get-calendar-events", getCalendarEvents);
 router.post("/service-order", sellerServiceOrders);
+router.get("/services_checkName", servicesCheckName)
 
 // Banner
 router.put("/sellerAddPlan/:id", sellerAddPlan);
@@ -763,24 +764,24 @@ function getTopSellingCategoryChartData(req, res, next) {
 //Services
 
 function addService(req, res, next) {
-   // console.log('Hello there how are you....');
-   // console.log('Req*********', req.body);
-    if (req.files && req.files.fileValidationError) {
-        return res.status(400).json({ status: false, message: req.files.fileValidationError });
-    }
+  // console.log('Hello there how are you....');
+  // console.log('Req*********', req.body);
+  if (req.files && req.files.fileValidationError) {
+    return res.status(400).json({ status: false, message: req.files.fileValidationError });
+  }
 
-    sellerService.addService(req)
-        .then(service => {
-            if (service) {
-                res.status(201).json({ status: true, message: msg.service.add.success, data: service });
-            } else {
-                res.status(400).json({ status: false, message: msg.service.add.error });
-            }
-        })
-        .catch(err => {
-            console.error('Error in addService:', err);
-            res.status(500).json({ status: false, message: 'Internal server error' });
-        });
+  sellerService.addService(req)
+    .then(service => {
+      if (service) {
+        res.status(201).json({ status: true, message: msg.service.add.success, data: service });
+      } else {
+        res.status(400).json({ status: false, message: msg.service.add.error });
+      }
+    })
+    .catch(err => {
+      console.error('Error in addService:', err);
+      res.status(500).json({ status: false, message: 'Internal server error' });
+    });
 }
 
 // function addService(req, res, next) {
@@ -940,10 +941,17 @@ function getCalendarEvents(req, res, next) {
 
 function sellerServiceOrders(req, res, next) {
   sellerService.sellerServiceOrders(req)
-      .then((items) => items
-          ? res.status(200).json({ status: true, data: items })
-          : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
-      .catch((err) => next(res.json({ status: false, message: err })));
+    .then((items) => items
+      ? res.status(200).json({ status: true, data: items })
+      : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+
+function servicesCheckName(req, res, next) {
+  sellerService.servicesCheckName(req)
+  .then((Service => Service ? res.status(200).json({ status: true, data: Service }) : res.status(400).json({ status: false, message: "ERROR ", data: [] })))
+  .catch(err => next(res.json({ status: false, message: err })))
 }
 
 /***********************BANNER**********************/

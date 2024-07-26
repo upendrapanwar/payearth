@@ -97,6 +97,7 @@ module.exports = {
   saveCalendarEvents,
   getCalendarEvents,
   sellerServiceOrders,
+  servicesCheckName,
   createSellerBanner,
   getBannersBySellerId,
   deleteBanner,
@@ -1411,11 +1412,11 @@ async function getCategories(req) {
   var parent = param.parent ? param.parent : null;
 
   const result = await Category.find({
-    isActive: true,
+   // isActive: true,
     isService: param.is_service,
-    parent: parent,
+   // parent: parent,
   })
-    .select("id categoryName isService parent")
+    .select("id categoryName isService ")
     .sort({ createdAt: "desc" });
 
   if (result && result.length > 0) return result;
@@ -2731,6 +2732,18 @@ async function sellerServiceOrders(req) {
   }
 }
 
+async function servicesCheckName (req, res) {
+    try {
+        const result = await Services.find({})
+            .sort({ createdAt: 'desc' })
+        if (result && result.length > 0) {
+            //    console.log("service-list ", result)
+            return result
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
 // POST API CREATE NEW BANNER....................................
 async function createSellerBanner(req, res) {
   try {
