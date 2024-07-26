@@ -833,9 +833,17 @@ function addService(req, res, next) {
                 res.status(400).json({ status: false, message: msg.service.add.error });
             }
         })
+        // .catch(err => {
+        //     console.error('Error in addService:', err);
+        //     res.status(500).json({ status: false, message: 'Internal server error' });
+        // });
         .catch(err => {
-            console.error('Error in addService:', err);
-            res.status(500).json({ status: false, message: 'Internal server error' });
+            console.error('Error in addService:', err.message);
+            if (err.message.includes('Service Name')) {
+                res.status(400).json({ status: false, message: err.message });
+            } else {
+                res.status(500).json({ status: false, message: 'Internal server error' });
+            }
         });
 }
 

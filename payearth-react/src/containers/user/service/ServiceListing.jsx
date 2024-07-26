@@ -115,6 +115,7 @@ class ServiceListing extends Component {
     filterData() {
         const [minRange, maxRange] = this.state.range;
         const filteredData = this.state.services.filter(item => item.charges >= minRange && item.charges <= maxRange);
+        console.log("filteredData", filteredData)
         this.setState({ filteredData: filteredData });
     }
 
@@ -153,7 +154,8 @@ class ServiceListing extends Component {
             indexOfLastItem
         );
 
-        // console.log("data", data)
+
+        console.log("currentServiceData", currentServiceData)
         return (
             <React.Fragment>
                 {loading === true ? <SpinnerLoader /> : ''}
