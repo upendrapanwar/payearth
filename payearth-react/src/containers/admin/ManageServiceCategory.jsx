@@ -362,6 +362,7 @@ class ManageServiceCategory extends Component {
                                 <button type="button" className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new">Update</button>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </React.Fragment>
