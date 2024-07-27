@@ -663,7 +663,7 @@ function App() {
             exact
           />
 
-            <PrivateRoute
+          <PrivateRoute
             path="/admin/manage-categories-services"
             restricted={false}
             component={ManageServiceCategory}

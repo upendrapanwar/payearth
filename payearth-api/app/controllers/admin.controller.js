@@ -103,7 +103,7 @@ router.get('/sellers/:id', getSellerById);
 
 //Category
 router.post('/categories', createCategory);
-router.put('/categories/:id', editCategory);
+router.patch('/categories/:id', editServiceCategory);
 router.put('/categories/status/:id', statusCategory);
 router.get('/categories', listCategory);
 router.get('/service-categories-list', ServiceCategorylist);
@@ -310,16 +310,15 @@ function getExpiredCoupons(req, res, next) {
 // }
 
 
-//Category
-
+//All Categories for product, services 
 function createCategory(req, res, next) {
     adminService.createCategory(req.body)
         .then(category => category ? res.status(201).json({ status: true, message: msg.admin.category.add.success, data: category }) : res.status(400).json({ status: false, message: msg.admin.category.add.error }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
 
-function editCategory(req, res, next) {
-    adminService.editCategory(req)
+function editServiceCategory(req, res, next) {
+    adminService.editServiceCategory(req)
         .then(category => category ? res.status(200).json({ status: true, message: msg.admin.category.edit.success, data: category }) : res.status(400).json({ status: false, message: msg.admin.category.edit.error }))
         .catch(err => next(res.status(400).json({ status: false, message: err })));
 }

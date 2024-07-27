@@ -29,7 +29,7 @@ module.exports = {
     //statusUpdate,
     //delete: _delete 
     createCategory,
-    editCategory,
+    editServiceCategory,
     getCateogries,
     getServiceCategorylist,
     deleteCategory,
@@ -649,32 +649,7 @@ async function getById(id) {
     return admin;
 }
 
-// async function statusUpdate(id, param) {
-
-//     const admin = await Admin.findById(id);
-
-//     if (!admin) {
-//         return false;
-//     } else {
-//         const input = {
-//             "isActive": param.is_active
-//         };
-
-//         Object.assign(admin, input);
-
-//         if (await admin.save()) {
-//             return await Admin.findById(id).select("-password -otp_code -otp_valid_at -is_pass_req");
-//         }
-//     }
-// }
-
-// async function _delete(id) {
-//     const admin = Admin.findById(id);
-//     if (!admin) return false;
-//     return await Admin.findByIdAndRemove(id);
-// }
-
-//Category 
+//All Categories for product, services 
 async function createCategory(param) {
 
     var Name = param.name.trim();
@@ -703,83 +678,18 @@ async function createCategory(param) {
     }
 }
 
-// async function editBanner(req) {
-
-//     var files = req.files; //multiple files
-//     var param = req.body;
-//     var bannerData = param.banner_data;
-//     var singleImageUrl = '';
-//     var bannerImagesArr = [];
-//     const id = req.params.id;
-
-//     const banner = await BannerImage.findById(id);
-
-//     if (!banner) return false;
-
-//     if (banner.page !== param.page && (await BannerImage.findOne({ page: param.page }))) {
-//         throw 'Page "' + param.page + '" already exists.';
-//     }
-
-//     const input = {
-//         "page": param.page,
-//         "singleImage": banner.singleImage,
-//         "bannerImages": banner.bannerImages,
-//         "isActive": param.is_active,
-//         "updatedBy": param.admin_id,
-//     };
-
-//     // if (typeof file != "undefined") {
-//     //     fs.unlinkSync(banner.logoImage);
-//     //     singleImageUrl = file.destination + "/" + file.filename;
-//     // } 
-
-//     if (files.length > 0) {
-//         singleImageUrl = files[0].destination + "/" + files[0].filename;
-//         input['singleImage'] = singleImageUrl;
-
-//         files.shift(); //remove first item.
-
-//         for (let i = 0; i < files.length; i++) {
-//             let path = files[i].destination + "/" + files[i].filename;
-//             let text = bannerData[i].text;
-//             let url = bannerData[i].url;
-//             let x = {
-//                 path: path,
-//                 text: text,
-//                 url: url
-//             };
-//             bannerImagesArr.push(x);
-//         }
-
-//         if (bannerImagesArr.length > 0) {
-//             input['bannerImages'] = bannerImagesArr;
-//         }
-
-//     }
-
-//     Object.assign(banner, input);
-
-//     const data = await banner.save();
-
-//     if (data) {
-//         return await BannerImage.findById(data.id).select();
-//     } else {
-//         return false;
-//     }
-// }
-
-async function editCategory(req) {
+async function editServiceCategory(req) {
     const param = req.body;
     const id = req.params.id;
-    console.log("check param", param)
-    console.log("check id", id)
-
+    const name = param.categoryName;
+    console.log("Checking  param", param)
 
     const category = await Category.findById(id);
-
     if (!category) return false;
+    console.log("Checking  category", category)
 
-    var Name = param.name.trim();
+
+    var Name = name.trim();
     var lName = Name.toLowerCase();
 
     if (category.lname !== lName && (await Category.findOne({ lname: lName }))) {
@@ -789,11 +699,12 @@ async function editCategory(req) {
     const input = {
         "categoryName": Name,
         "lname": lName,
-        "parent": param.parent_id,
-        "isService": param.is_service ? param.is_service : false,
-        "onMainMenu": param.add_to_menu,
-        "updatedBy": param.admin_id,
+        "parent": category.parent,
+        "isService": category.isService,
+        "onMainMenu": category.onMainMenu,
+        "updatedBy": category.updatedBy,
     };
+    console.log("checking input", input)
 
     Object.assign(category, input);
 
@@ -2833,7 +2744,7 @@ async function editService(req) {
         const param = req.body;
         const statusData = {
             name: param.name,
-            charges:param.charges,
+            charges: param.charges,
             category: param.category,
             description: param.description,
             featuredImage: param.featuredImage,

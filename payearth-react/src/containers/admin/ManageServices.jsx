@@ -194,7 +194,7 @@ class ManageServices extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`
             }
         }).then((response) => {
-              console.log("all servicess", response);
+            console.log("all servicess", response);
             const activeServices = response.data.data.filter(item => item.isActive === true);
             const inactiveServices = response.data.data.filter(item => item.isActive === false);
 
@@ -665,7 +665,7 @@ class ManageServices extends Component {
                                                 Service Name : {selectedRows.lname || ""}
                                             </h6>
                                             <br />
-                                             <h6 className="fw-bold text-secondary mb-1">
+                                            <h6 className="fw-bold text-secondary mb-1">
                                                 {/* Category : {selectedRows.category && selectedRows.category.categoryName || ""} */}
                                                 Category : {selectedRows.category?.categoryName || ''}
                                             </h6>

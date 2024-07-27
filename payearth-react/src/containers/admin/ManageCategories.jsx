@@ -6,7 +6,7 @@ import Header from "../../components/admin/common/Header";
 import Footer from "../../components/common/Footer";
 import ManageProductsCategory from './ManageProductsCategory';
 import ManageServiceCategory from './ManageServiceCategory';
-import ManageBlogCategory from './ManageBlogCategory';
+import AdminCategoryModel from './CategoryModule';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 
 
@@ -70,7 +70,9 @@ class ManageCategories extends Component {
                             {loading && <SpinnerLoader />}
                             {activeCategory === 'product' && <ManageProductsCategory />}
                             {activeCategory === 'service' && <ManageServiceCategory />}
-                            {activeCategory === 'blog' && <ManageBlogCategory />}
+                            {/* {activeCategory === 'blog' && <ManageBlogCategory />} */}
+                            {activeCategory === 'blog' && <AdminCategoryModel />}
+
                         </div>
                     </div>
                 </div>

@@ -6,6 +6,8 @@ import * as Yup from 'yup';
 import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import { Helmet } from 'react-helmet';
+import { toast } from 'react-toastify';
+
 
 class ManageServiceCategory extends Component {
     constructor(props) {
@@ -15,28 +17,32 @@ class ManageServiceCategory extends Component {
             ServiceCategoryList: [],
             selectedRows: [],
             currentCategory: null,
+
         };
+
+        //for close bootstrap modal
+        this.modalRef = React.createRef();
 
         // Define columns
         this.category_column = [
             {
                 name: 'Creater Name',
-                selector: row => row.createdBy ? row.createdBy.name : 'N/A',
+                selector: (row, i) => row.createdBy ? row.createdBy.name : 'N/A',
                 sortable: true
             },
             {
                 name: 'Category Name',
-                selector: row => row.categoryName,
+                selector: (row, i) => row.categoryName,
                 sortable: true
             },
             {
                 name: 'Created Date',
-                selector: row => new Date(row.createdAt).toLocaleDateString(),
+                selector: (row, i) => new Date(row.createdAt).toLocaleDateString(),
                 sortable: true
             },
             {
                 name: 'Status',
-                selector: row => (
+                selector: (row, i) => (
                     <span className={`badge ${row.isActive ? 'bg-success' : 'bg-danger'}`}>
                         {row.isActive === true ? 'Active' : 'In-Active'}
                     </span>
@@ -45,7 +51,7 @@ class ManageServiceCategory extends Component {
             },
             {
                 name: "Action",
-                cell: row => {
+                cell: (row, i) => {
                     return (
                         <>
                             <button
@@ -70,12 +76,12 @@ class ManageServiceCategory extends Component {
                                     Active
                                 </button>
                             )}
-                            <button
+                            {/* <button
                                 className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
                                 onClick={() => this.handleDelete(row)}
                             >
                                 Delete
-                            </button>
+                            </button> */}
                         </>
                     );
                 },
@@ -130,11 +136,18 @@ class ManageServiceCategory extends Component {
                     'Content-Type': 'application/json;charset=UTF-8',
                     'Authorization': `Bearer ${token}`
                 }
-            });
 
-            // Re-fetch the list to include the new category
-            this.fetchServiceCategoryList();
-            resetForm();
+            }).then(async (response) => {
+                if (response.data.status === false) {
+                    toast.error(response.data.message);
+                } else {
+                    toast.success(response.data.message);
+                    // Re-fetch the list to include the new category
+                    await this.fetchServiceCategoryList();
+                }
+
+                resetForm();
+            })
         } catch (error) {
             console.error("There was an error saving the service category", error);
         } finally {
@@ -148,34 +161,42 @@ class ManageServiceCategory extends Component {
 
 
     handleEdit = (row) => {
-        // Implement edit logic here
-        console.log('Edit:', row);
+        this.setState({ currentCategory: { ...row, editCategoryName: row.categoryName } });
+        console.log("handleEdit current category:", this.state.currentCategory);
+        console.log("handleEdit categoryName:", row.categoryName);
     }
 
     updateServiceCategory = async (values, { setSubmitting }) => {
+        console.log("values", values)
         try {
-            const updateCategoryUrl = `/admin/categories/${values.id}`;
+            const updateCategoryUrl = `/admin/categories/${this.state.currentCategory.id}`;
             const authInfo = JSON.parse(localStorage.getItem('authInfo'));
             const token = authInfo ? authInfo.token : '';
 
-            await axios.put(updateCategoryUrl, values, {
+            await axios.patch(updateCategoryUrl, { categoryName: values.editCategoryName }, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
                     'Authorization': `Bearer ${token}`
                 }
-            });
-
-            // Re-fetch the list to include the updated category
-            this.fetchServiceCategoryList();
-            this.setState({ currentCategory: null });
+            }).then((response) => {
+                console.log("Checking response", response)
+                if (response.data.status === true) {
+                    toast.success(response.data.message)
+                    // Re-fetch the list to include the updated category
+                    this.fetchServiceCategoryList();
+                    this.setState({ currentCategory: null });
+                    this.modalRef.current.click();  // Close the modal
+                } else {
+                    toast.error(response.data.message);
+                }
+            })
         } catch (error) {
             console.error('There was an error updating the service category', error);
         } finally {
             setSubmitting(false);
         }
     };
-
 
     handleDelete = async (row) => {
         try {
@@ -236,7 +257,7 @@ class ManageServiceCategory extends Component {
 
         return (
             <React.Fragment>
-                <div class="seller_dash_wrap pb-5">
+                <div className="seller_dash_wrap pb-5">
                     <div className="container">
                         <Helmet>
                             <title>{"Category - Pay Earth"}</title>
@@ -317,18 +338,22 @@ class ManageServiceCategory extends Component {
                 </div>
 
                 {/* Modal */}
-                <div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
                                 <h5 className="modal-title" id="exampleModalLabel">Edit Service Category</h5>
-                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" ref={this.modalRef}></button>
                             </div>
                             <div className="modal-body">
                                 {currentCategory && (
                                     <Formik
-                                        initialValues={currentCategory}
-                                        validationSchema={validationSchema}
+                                        enableReinitialize={true}
+                                        initialValues={{ editCategoryName: currentCategory.categoryName }}
+                                        validationSchema={Yup.object({
+                                            editCategoryName: Yup.string()
+                                                .required('Category Name is required')
+                                        })}
                                         onSubmit={this.updateServiceCategory}
                                     >
                                         {({ isSubmitting }) => (
@@ -357,14 +382,10 @@ class ManageServiceCategory extends Component {
                                     </Formik>
                                 )}
                             </div>
-                            <div className="modal-footer">
-                                <button type="button" className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new" data-bs-dismiss="modal">Close</button>
-                                <button type="button" className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new">Update</button>
-                            </div>
                         </div>
-
                     </div>
                 </div>
+
             </React.Fragment>
         );
     }
