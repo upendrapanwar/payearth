@@ -2521,7 +2521,7 @@ async function serviceStatusUpdate(req) {
 async function getServiceItems(req) {
   try {
     let id = req.params.id;
-    let result = await Services.find({ $or: [{ createdBy: id }, { _id: id }] })
+    let result = await Services.find({ $or: [{ createdBy: id }, { _id: id }],isAvailable:true })
       // let result = await Services.find({ $or: [
       //   { 'createdBy.userId': id },
       //   { _id: id }

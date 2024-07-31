@@ -227,8 +227,8 @@ class ServiceListing extends Component {
                                 </div>
                                 <div className="row">
                                     <div className="col-sm-12">
-                                        <div className="cards_wrapper">
-                                            <div className='prod_card'>
+                                        <div className="cards_wrapper w-100">
+                                            <div className='prod_card w-100'>
                                                 {currentServiceData.length > 0 ? (
                                                     currentServiceData.map((item, index) =>
                                                         <div className="img_wrapper" key={index}>

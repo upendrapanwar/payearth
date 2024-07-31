@@ -347,7 +347,8 @@ class AddService extends Component {
                 seller_id: this.authInfo.id,
                 name: values.name,
                 charges: values.charges,
-                category: values.category,
+                category: values.category.value,
+                categoryName:values.category.label,
                 description: this.state.description,
                 image: imageData.secure_url,
                 imageId: imageData.public_id,
@@ -468,7 +469,7 @@ class AddService extends Component {
                                                                 options={catOptions}
                                                                 value={defaultCatOption}
                                                                 onChange={selectedOption => {
-                                                                    values.category = selectedOption.value;
+                                                                    values.category = selectedOption;
                                                                     this.setState({ defaultCatOption: selectedOption });
                                                                     this.setState({ serviceCategory: selectedOption.value });
                                                                    // this.getCategories(selectedOption.value);
