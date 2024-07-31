@@ -152,7 +152,7 @@ class AdminCategoryModelEdit extends Component {
         }).catch((error) => {
             console.error('Error:', error);
         });
-       
+
     }
 
     updateCategory = (e) => {

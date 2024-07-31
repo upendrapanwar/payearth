@@ -70,7 +70,6 @@ class ManageCategories extends Component {
                             {loading && <SpinnerLoader />}
                             {activeCategory === 'product' && <ManageProductsCategory />}
                             {activeCategory === 'service' && <ManageServiceCategory />}
-                            {/* {activeCategory === 'blog' && <ManageBlogCategory />} */}
                             {activeCategory === 'blog' && <AdminCategoryModel />}
 
                         </div>

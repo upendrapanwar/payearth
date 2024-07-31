@@ -69,10 +69,10 @@ function Header() {
         <div className="offcanvas-body">
           <div className="side_menu_body">
             <ul className="side_menu_links">
-            <li>
+              <li>
                 <Link to="/admin/dashboard" onClick={() => removeBackdrop()}>
                   <i className="icon">
-                  <img src={homeIcon} alt="" />
+                    <img src={homeIcon} alt="" />
                   </i>{" "}
                   Dashboard
                 </Link>
@@ -99,18 +99,6 @@ function Header() {
 
               {/* <li><Link to="/admin/page-module" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Pages </Link></li>
                             <li><Link to="/admin/page-module-add-new" onClick={() => removeBackdrop()}><i className="icon"><img src={bannerIcon} alt="" /></i> Create Page </Link></li> */}
-
-              <li>
-                <Link
-                  to="/admin/category-module"
-                  onClick={() => removeBackdrop()}
-                >
-                  <i className="icon">
-                    <img src={shoppingBagIcon} alt="" />
-                  </i>{" "}
-                  Create Category{" "}
-                </Link>
-              </li>
 
               <li>
                 <Link to="/admin/orders" onClick={() => removeBackdrop()}>

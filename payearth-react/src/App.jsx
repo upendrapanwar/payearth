@@ -103,7 +103,6 @@ import ManageBannerListEdit from "./containers/admin/ManageBannerListEdit";
 
 import ManageProductsCategory from "../src/containers/admin/ManageProductsCategory";
 import ManageServiceCategory from "../src/containers/admin/ManageServiceCategory";
-import ManageBlogCategory from "../src/containers/admin/ManageBlogCategory";
 
 
 import AdminManageSubPlan from "./containers/admin/ManageSubscriptionPlan";
@@ -667,15 +666,6 @@ function App() {
             path="/admin/manage-categories-services"
             restricted={false}
             component={ManageServiceCategory}
-            roles={[Role.admin]}
-            currentUserRole={userInfo.role}
-            exact
-          />
-
-          <PrivateRoute
-            path="/admin/manage-categories-blog"
-            restricted={false}
-            component={ManageBlogCategory}
             roles={[Role.admin]}
             currentUserRole={userInfo.role}
             exact

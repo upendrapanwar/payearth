@@ -167,33 +167,6 @@ class ServiceListing extends Component {
                             <div className="col-md-3">
                                 <div className="side_bar">
                                     <div className="filters">
-                                        {/* {servicesCategory.length > 0 ?
-                                            <ul className="filter_list">
-                                                <li>
-                                                    <h3>Categories</h3>
-                                                </li>
-                                                {servicesCategory.map((category, index) => {
-                                                    if (category.value !== '') {
-                                                        return <li key={category.id}>
-                                                            <div className="form-check d-flex">
-                                                                <input
-                                                                    className="form-check-input"
-                                                                    type="checkbox"
-                                                                    id={category.id}
-                                                                    value={category.id}
-                                                                    checked={categoryId === category.id ? true : this.state.selectedCategories.includes(category.id)}   
-                                                                    onChange={() => this.handleCatSelect(category.id)}
-                                                                />
-                                                                <label className="form-check-label" htmlFor={category.id}>{category.categoryName}</label>
-                                                            </div>
-                                                        </li>
-                                                    } else {
-                                                        return '';
-                                                    }
-                                                })}
-                                            </ul> : ''
-                                        } */}
-
                                         <ul className="filter_list">
                                             <li>
                                                 <h3>Price</h3>
@@ -207,7 +180,6 @@ class ServiceListing extends Component {
                                                     min={0}
                                                     max={100}
                                                     onChange={this.handleRangeChange}
-                                                // renderThumb={(props, state) => <div {...props}>{state.valueNow}</div>}
                                                 />
                                                 <br />
                                                 <span>Min: {this.state.range[0]}</span>
@@ -222,7 +194,6 @@ class ServiceListing extends Component {
                             <div className="col-md-9">
                                 <div className="row">
                                     <div className="col">
-                                        {/* <ListingHead title="Products" count={products.length} /> */}
                                     </div>
                                 </div>
                                 <div className="row">
@@ -234,18 +205,6 @@ class ServiceListing extends Component {
                                                         <div className="img_wrapper" key={index}>
                                                             <div className="btns_wrapper">
                                                                 <div className="share_option shadow">
-
-                                                                    {/* <span
-                                                                    onClick={() =>
-                                                                        inWishList ? removeToWishlist(data.id) : addToWishlist(data.id)
-                                                                    }
-                                                                >
-                                                                    <img
-                                                                        src={inWishList ? redHeartIcon : heartIconBordered}
-                                                                        alt="heart-icon"
-                                                                        title={`${inWishList ? "Remove" : "Add"} to wishlist`}
-                                                                    />
-                                                                </span> */}
                                                                 </div>
                                                             </div>
                                                             <Link
@@ -258,39 +217,6 @@ class ServiceListing extends Component {
                                                     )
                                                 ) : "No Services Found"}
                                             </div>
-
-
-                                            {/* {services.length > 0 ? (
-                                                services.map((service) => (
-                                                    <Link
-                                                        key={service._id}
-                                                        className="card"
-                                                        to={`/service-detail/${service._id}`}
-                                                    >
-                                                        <div className="serviceListing-Image">
-                                                            <img src={service.featuredImage} alt={service.name} />
-                                                        </div>
-                                                        <div className="serviceListing-content text-center">
-                                                            <h3 className="m-auto">{service.name}</h3>
-                                                            <div
-                                                                className="service-desc m-auto p-2"
-                                                                dangerouslySetInnerHTML={{
-                                                                    __html: service.description,
-                                                                }}
-                                                            ></div>
-                                                            <div className="text-center">
-                                                                <button
-                                                                    type="button"
-                                                                    className="btn custom_btn btn_yellow"
-                                                                >
-                                                                    View More
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </Link>
-                                                )))
-                                                : ""} */}
-
                                             <div className="cart-pagination">
                                                 {data.length > 4 && (
                                                     <ul className="pagination-wrapper">
