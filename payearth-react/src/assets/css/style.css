@@ -1653,6 +1653,19 @@ button.view_more img {
   width: 224px;
 }
 
+.serv_card {
+  max-width: 330px;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 0 10px 0 10px;
+  transition: var(--transition);
+  border: none;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 10%);
+  background-color: white;
+  position: relative;
+}
+
 .prod_card {
   max-width: 330px;
   width: 100%;
