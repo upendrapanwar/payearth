@@ -111,49 +111,50 @@ class ManageServices extends Component {
         };
 
         const deletePromises = selectedRows.map(row => {
-            let deleteImageRequest;
+           // let deleteImageRequest;
 
-            if (row.imageId) {
-                // If the service has an image, delete it from Cloudinary
-                const timestamp = Math.floor(Date.now() / 1000); // Current timestamp in seconds
-                const stringToSign = `public_id=${row.imageId}&timestamp=${timestamp}${this.apiSecret}`;
-                const signature = CryptoJS.SHA1(stringToSign).toString(CryptoJS.enc.Hex);
+            // if (row.imageId) {
+            //     // If the service has an image, delete it from Cloudinary
+            //     const timestamp = Math.floor(Date.now() / 1000); // Current timestamp in seconds
+            //     const stringToSign = `public_id=${row.imageId}&timestamp=${timestamp}${this.apiSecret}`;
+            //     const signature = CryptoJS.SHA1(stringToSign).toString(CryptoJS.enc.Hex);
 
-                const cloudinaryDeleteUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/destroy`;
-                deleteImageRequest = fetch(cloudinaryDeleteUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        public_id: row.imageId,
-                        api_key: this.apiKey,
-                        timestamp,
-                        signature
-                    })
-                }).then(response => response.json())
-                    .then(data => {
-                        //    console.log("Cloudinary response data:", data);
-                        if (data.result === 'ok') {
-                            //    toast.success("Image deleted successfully");
-                        } else {
-                            throw new Error("Failed to delete image from Cloudinary");
-                        }
-                    }).catch(error => {
-                        toast.error("Error deleting image from Cloudinary");
-                        console.error("Cloudinary deletion error:", error);
-                        throw error; // Rethrow error to propagate it further
-                    });
-            } else {
-                // If no image to delete, resolve immediately
-                deleteImageRequest = Promise.resolve();
-            }
+            //     const cloudinaryDeleteUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/destroy`;
+            //     deleteImageRequest = fetch(cloudinaryDeleteUrl, {
+            //         method: 'POST',
+            //         headers: {
+            //             'Content-Type': 'application/json'
+            //         },
+            //         body: JSON.stringify({
+            //             public_id: row.imageId,
+            //             api_key: this.apiKey,
+            //             timestamp,
+            //             signature
+            //         })
+            //     }).then(response => response.json())
+            //         .then(data => {
+            //             //    console.log("Cloudinary response data:", data);
+            //             if (data.result === 'ok') {
+            //                 //    toast.success("Image deleted successfully");
+            //             } else {
+            //                 throw new Error("Failed to delete image from Cloudinary");
+            //             }
+            //         }).catch(error => {
+            //             toast.error("Error deleting image from Cloudinary");
+            //             console.error("Cloudinary deletion error:", error);
+            //             throw error; // Rethrow error to propagate it further
+            //         });
+            // } else {
+            //     // If no image to delete, resolve immediately
+            //     deleteImageRequest = Promise.resolve();
+            // }
 
             // Delete the service from your backend
             const deleteServiceRequest = axios.delete(`/admin/services/delete/${row._id}`, { headers })
                 .then(response => {
                     if (response.data.status) {
                         toast.success(response.data.message); // Show success toast for each successful deletion
+                        this.getServices();
                     } else {
                         toast.error(response.data.message); // Show error toast for unsuccessful deletion
                     }
@@ -169,17 +170,17 @@ class ManageServices extends Component {
                 });
 
             // Return a promise that resolves when both deletion actions are complete
-            return deleteImageRequest.then(() => deleteServiceRequest);
+           // return deleteImageRequest.then(() => deleteServiceRequest);
         });
 
-        Promise.all(deletePromises)
-            .then(() => {
-                this.getServices(); // Refresh the list after deletion
-            })
-            .catch(error => {
-                console.error("Error during deletion process:", error);
-                toast.error("An unexpected error occurred. Please try again.");
-            });
+        // Promise.all(deletePromises)
+        //     .then(() => {
+        //         this.getServices(); // Refresh the list after deletion
+        //     })
+        //     .catch(error => {
+        //         console.error("Error during deletion process:", error);
+        //         toast.error("An unexpected error occurred. Please try again.");
+        //     });
     };
 
 
@@ -295,7 +296,7 @@ class ManageServices extends Component {
             //     </div>
             // ),
             name: 'ACTIONS',
-            width: "350px",
+            width: "460px",
             cell: (row) => (
                 <>
                     <button
@@ -383,7 +384,7 @@ class ManageServices extends Component {
         },
         {
             name: 'ACTIONS',
-            width: "350px",
+            width: "480px",
             cell: (row) => (
                 <>
                     <button

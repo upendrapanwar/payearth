@@ -2680,7 +2680,7 @@ async function addService(req) {
 
 async function allServiceData(req) {
     try {
-        const result = await Services.find({})
+        const result = await Services.find({isAvailable:true})
             .sort({ createdAt: 'desc' })
             .populate('createdBy', 'name')
             .populate('createdByAdmin', 'name')
@@ -2772,9 +2772,27 @@ async function editService(req) {
 
 async function deleteService(req) {
     const id = req.params.id;
+    const statusData = {
+        isActive:false,
+        isAvailable:false,
+    };
     // console.log('id for delete:',id)
+    // try {
+    //     const deleted = await Services.findByIdAndDelete(id);
+    //     return deleted;
+    // } catch (error) {
+    //     console.error("Error deleting service:", error);
+    // }
     try {
-        const deleted = await Services.findByIdAndDelete(id);
+        const deleted = await Services.findOneAndUpdate(
+            { _id: id },
+            statusData,
+            { new: true }
+        );
+        if (!deleted) {
+            // console.log("Service not found.");
+            return null;
+        }
         return deleted;
     } catch (error) {
         console.error("Error deleting service:", error);

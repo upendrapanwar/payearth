@@ -15,6 +15,7 @@ const schema = new Schema({
     featuredImage: { type: String, required: false, default: "" },
     imageId: { type: String, required: false, default: "" },
     isActive: { type: Boolean, required: false, default: true },
+    isAvailable: { type: Boolean, required: false, default: true },
     approveStatus: { type: String, enum: ["none", "pending", "reject"], required: false, default: "none" },
     reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
     reviewCount: { type: Number, required: false, default: 0 },

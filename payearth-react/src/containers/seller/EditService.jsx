@@ -495,8 +495,8 @@ class EditService extends Component {
                                                                             [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
                                                                             [{ 'list': 'ordered' }, { 'list': 'bullet' }],
                                                                             ['bold', 'italic', 'underline'],
-                                                                            ['link', 'image'],
                                                                             [{ 'align': [] }],
+                                                                            ['link', 'image'],
                                                                             ['clean']
                                                                         ]
                                                                     }}

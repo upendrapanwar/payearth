@@ -8,6 +8,6 @@ export default Yup.object().shape({
 
      name: Yup.string().required('Service name is required'),
      charges: Yup.number().typeError('Charges must be a number').required('Charges are required'),
-     category: Yup.string().required('Category is required'),
+     category: Yup.mixed().required('Category is required'),
     //description: Yup.string().required("Description is required."),
 });
