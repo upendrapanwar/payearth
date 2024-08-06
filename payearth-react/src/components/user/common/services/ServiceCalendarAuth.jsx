@@ -2,13 +2,12 @@ import React, { useEffect, useState } from "react";
 import { GoogleLogin } from "react-google-login";
 import { gapi } from "gapi-script";
 import ServiceCalendar from "./ServiceCalendar";
-import axios from "axios";
 
 //Google calendar client secret from .env
 const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
 const SCOPES = process.env.REACT_APP_SCOPES;
 
-function ServiceCalendarAuth({ userId, authToken, onAuthSuccess }) {
+function ServiceCalendarAuth() {
   const [refreshTimer, setRefreshTimer] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -18,23 +17,25 @@ function ServiceCalendarAuth({ userId, authToken, onAuthSuccess }) {
 
   // Google Auth 2.0 authentication for generate refresh token
   const responseGoogle = async (response) => {
-
+    console.log("checking google response", response);
     //generated refresh token
     const { code } = response;
+    console.log("checking code", code)
     //set refresh token in localStorage
-
-
-    console.log("access_token check..........#######################", code)
     localStorage.setItem("refreshToken", code);
-
-
 
     //use gapi for generate access token for authentication purpose
     try {
       const authInstance = gapi.auth2.getAuthInstance();
+      console.log("checking authInstance", authInstance)
+
       const currentUser = authInstance.currentUser.get();
+      console.log("checking currentUser", currentUser)
+
       //generated access token
       const accessToken = currentUser.getAuthResponse().access_token;
+      console.log("checking accessToken for google calendar", accessToken)
+
       //set access token in localStorage
       localStorage.setItem("accessToken", accessToken);
       setIsAuthenticated(true);

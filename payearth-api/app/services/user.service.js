@@ -18,9 +18,7 @@ var ApiContracts = require("authorizenet").APIContracts;
 var ApiControllers = require("authorizenet").APIControllers;
 var SDKConstants = require("authorizenet").Constants;
 const fs = require("fs");
-const stripe = require("stripe")(
-  "sk_test_51OewZgD2za5c5GtO7jqYHLMoDerwvEM69zgVsie3FNLrO0LLSLwFJGzXv4VIIGqScWn6cfBKfGbMChza2fBIQhsv00D9XQRaOk"
-);
+const stripe = require("stripe")(config.stripe_secret_key);
 
 const {
   User,
@@ -2507,7 +2505,7 @@ async function serviceCharges(req, res) {
 
   // const email = "test@gmail.com";
 
-  console.log("paymentMethodId", paymentMethodId); 
+  console.log("paymentMethodId", paymentMethodId);
   // console.log("email", email);
   // console.log("authName", authName);
 
@@ -2610,7 +2608,7 @@ async function serviceCharges(req, res) {
 //GET Common All Services
 async function getCommonService(req) {
   try {
-    let result = await Services.find({isActive:true})
+    let result = await Services.find({ isActive: true })
       .select(
         "serviceCode name featuredImage imageId description isActive createdAt"
       )

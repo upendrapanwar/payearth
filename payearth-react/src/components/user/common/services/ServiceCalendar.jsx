@@ -8,21 +8,17 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { toast } from "react-toastify";
 import moment from "moment";
-// import io from "socket.io-client";
 
-const SOCKET_SERVER_URL = process.env.REACT_APP_SOCKET_SERVER_URL;
 
 function ServiceCalendar() {
   //get global authInfo for userId
   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
   const user_id = authInfo.id;
   //get accessToken from google calendar auth
-
-
   const accessToken = localStorage.getItem("accessToken");
 
   //myChange>>>>>>>   refreshToken
-  // const accessToken = localStorage.getItem("refreshToken");
+  const refreshToken = localStorage.getItem("refreshToken");
 
   //get serviceId with help of useParams
   // Create a socket instance
@@ -77,15 +73,11 @@ function ServiceCalendar() {
     } else {
       fetchEvents();
       fetchGoogleEvents();
-      toast.success("New event added!");
     }
   }, [id]);
 
   //handleDateClick for open form to add new event
   const handleDateClick = (arg) => {
-
-    console.log("arg.dateStr", arg.dateStr)
-
     setNewEvent((prevEvent) => ({
       ...prevEvent,
       meetingDate: arg.dateStr,
@@ -124,20 +116,17 @@ function ServiceCalendar() {
     const eventData = {
       start: {
         dateTime: start_datetime,
-        timeZone: "Asia/Kolkata", // Update with your time zone
+        timeZone: "Europe/Paris", // Update with your time zone
       },
       end: {
         dateTime: end_datetime,
-        timeZone: "Asia/Kolkata", // Update with your time zone
+        timeZone: "Europe/Paris", // Update with your time zone
       },
       summary: newEvent.event_title,
       description: newEvent.description,
       location: "https://ZoomMeeting.com", // Update with your meeting URL
     };
 
-    console.log("eventData : ", eventData)
-
-    console.log("accessToken for calnder", accessToken)
     try {
       await axios.post(
         `https://www.googleapis.com/calendar/v3/calendars/primary/events`,
@@ -172,7 +161,7 @@ function ServiceCalendar() {
             Authorization: `Bearer ${accessToken}`,
           },
         }
-      );
+      )
       const eventsData = response.data.items.map((item) => ({
         eventId: item.id,
         title: item.summary,
@@ -234,10 +223,10 @@ function ServiceCalendar() {
     const popover = new bootstrap.Popover(info.el, {
       title: info.event._def.extendedProps.meetingTitle,
       placement: "auto",
-      trigger: "hover",
+      trigger: "click",
       customClass: "popoverStyle",
       content: `<p><strong>Name: </strong>${info.event._def.extendedProps.user_name}</p>
-                    <p><strong>Description: </strong>Meeting will be held for ${info.event._def.extendedProps.description} appointment.</p>
+                    <p><strong>Description: </strong>${info.event._def.extendedProps.description} appointment.</p>
                     <p><strong>Start Time: </strong>${startTime}</p>
                     <p><strong>End Time: </strong>${endTime}</p>
                     <p><strong>Zoom Meeting url: </strong>${info.event._def.extendedProps.meeting_url}</p>`,
@@ -402,7 +391,7 @@ function ServiceCalendar() {
           return (
             <div className="row">
               <div className="col-8">
-                &nbsp;<span>{eventInfo.event.extendedProps.description}</span>
+                &nbsp;<span>{eventInfo.event.extendedProps.meetingTitle}</span>
               </div>
               <div className="col-2">
                 <button

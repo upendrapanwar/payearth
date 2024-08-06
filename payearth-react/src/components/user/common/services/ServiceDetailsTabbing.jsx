@@ -54,7 +54,6 @@ function ServiceDetailsTabbing(props) {
         }
       }).then((response) => {
         // console.log("response", response)
-        console.log("access_token", response.data.data)
         setZoomAccessToken(response.data.data)
       }).catch((error) => {
         console.log("error", error)
@@ -71,8 +70,6 @@ function ServiceDetailsTabbing(props) {
       const response = await axios.get(`/user/get-service-review/${serviceId}`);
       const result = response.data.data;
       setReviews(result);
-      console.log("review data", result);
-
       // Calculate average rating
       if (result.length > 0) {
         const totalRating = result.reduce((acc, curr) => acc + curr.rating, 0);

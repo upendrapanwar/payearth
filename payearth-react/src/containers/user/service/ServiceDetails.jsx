@@ -87,8 +87,6 @@ const ServiceDetails = () => {
       const response = await axios.get(`/user/get-service-review/${serviceId}`);
       const result = response.data.data;
       setReviews(result);
-      console.log("review data", result);
-
       // Calculate average rating
       if (result.length > 0) {
         const totalRating = result.reduce((acc, curr) => acc + curr.rating, 0);
@@ -149,8 +147,8 @@ const ServiceDetails = () => {
                 <div className="col-md-6">
                   <div className="ser_thumb_div">
                     <img
-                     className="img_srv_details"
-                     src={data.featuredImage} alt="Service Details Image" />
+                      className="img_srv_details"
+                      src={data.featuredImage} alt="Service Details Image" />
                   </div>
                 </div>
                 <div className="col-md-6">
@@ -163,7 +161,7 @@ const ServiceDetails = () => {
                             <Link
                               to="#"
                               className="reviews_count"
-                             onClick={scrollToReport}
+                              onClick={scrollToReport}
                             >
                               ( {TotalReview} Reviews )
                             </Link>
@@ -215,7 +213,7 @@ const ServiceDetails = () => {
         </div>
       </section>
       <div>
-        <ServiceDetailsTabbing serviceId={id} description={description} reportRef={reportRef}/>
+        <ServiceDetailsTabbing serviceId={id} description={description} reportRef={reportRef} />
       </div>
       <Footer />
       <GoToTop />
