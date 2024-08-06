@@ -7,8 +7,7 @@ import ServiceCalendar from "./ServiceCalendar";
 import { isLogin } from "./../../../../helpers/login";
 import { toast } from "react-toastify";
 import ServiceCalendarAuth from "./ServiceCalendarAuth";
-import { useHistory } from 'react-router-dom';
-
+import { useHistory } from "react-router-dom";
 
 function ServiceDetailsTabbing(props) {
   const history = useHistory();
@@ -21,11 +20,18 @@ function ServiceDetailsTabbing(props) {
   const [isCalendarAuthorized, setIsCalendarAuthorized] = useState(
     accessToken ? true : false
   );
+  const { scrollToReviews } = props;
+  const [activeTab, setActiveTab] = useState("description");
+
+  useEffect(() => {
+    if (scrollToReviews) {
+      setActiveTab("reviews");
+    }
+  }, [scrollToReviews]);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(3);
-
 
   useEffect(() => {
     fetchApi();
@@ -41,28 +47,35 @@ function ServiceDetailsTabbing(props) {
   //Zoom Token fetch
 
   const fetchAcces_token = () => {
-    const clientId = process.env.REACT_APP_ZOOM_CLIENT_ID
-    const clientSecret = process.env.REACT_APP_ZOOM_CLIENT_SECRET
-    const account_id = process.env.REACT_APP_ZOOM_ACCOUNT_ID
+    const clientId = process.env.REACT_APP_ZOOM_CLIENT_ID;
+    const clientSecret = process.env.REACT_APP_ZOOM_CLIENT_SECRET;
+    const account_id = process.env.REACT_APP_ZOOM_ACCOUNT_ID;
     try {
-      const url = '/user/zoomCreateUserToken';
-      axios.post(url, { clientId, clientSecret, account_id }, {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json;charset=UTF-8',
-          'Authorization': `Bearer ${authInfo.token}`
-        }
-      }).then((response) => {
-        // console.log("response", response)
-        setZoomAccessToken(response.data.data)
-      }).catch((error) => {
-        console.log("error", error)
-      })
+      const url = "/user/zoomCreateUserToken";
+      axios
+        .post(
+          url,
+          { clientId, clientSecret, account_id },
+          {
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json;charset=UTF-8",
+              Authorization: `Bearer ${authInfo.token}`,
+            },
+          }
+        )
+        .then((response) => {
+          // console.log("response", response)
+          console.log("access_token", response.data.data);
+          setZoomAccessToken(response.data.data);
+        })
+        .catch((error) => {
+          console.log("error", error);
+        });
     } catch (error) {
-      console.log("error", error)
+      console.log("error", error);
     }
-  }
-
+  };
 
   //called get api for user service review
   const fetchApi = async () => {
@@ -149,8 +162,6 @@ function ServiceDetailsTabbing(props) {
     return <ul className="rating">{stars}</ul>;
   };
 
-
-
   // Function to format the date
   const formatDate = (date) => {
     return `${new Date(date).getDate()}-${new Date(date).getMonth() + 1
@@ -218,15 +229,15 @@ function ServiceDetailsTabbing(props) {
 
   const listUsers = async () => {
     try {
-      const response = await axios.get('https://api.zoom.us/v2/users', {
+      const response = await axios.get("https://api.zoom.us/v2/users", {
         headers: {
-          'Authorization': `Bearer ${zoomAccessToken}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${zoomAccessToken}`,
+          "Content-Type": "application/json",
         },
       });
 
       const users = response.data.users;
-      console.log('List of users:', users);
+      console.log("List of users:", users);
 
       // const userExists = users.some(user => user.email === 'User@gmail.com');
       // if (userExists) {
@@ -235,7 +246,7 @@ function ServiceDetailsTabbing(props) {
       //     console.log('User does not exist');
       // }
     } catch (error) {
-      console.error('Error listing users:', error.response.data);
+      console.error("Error listing users:", error.response.data);
     }
   };
 
@@ -245,7 +256,6 @@ function ServiceDetailsTabbing(props) {
   };
 
   const createZoomUser = async () => {
-
     const requestData = {
       zoomAccessToken: zoomAccessToken,
       email: "test1eyno@gmail.com",
@@ -262,7 +272,8 @@ function ServiceDetailsTabbing(props) {
     };
 
     try {
-      await axios.post("/user/createZoomUser", requestData, { headers })
+      await axios
+        .post("/user/createZoomUser", requestData, { headers })
         .then((response) => {
           console.log("response foom zooom pending ", response);
           // setZoom_userId(response.data.data.id);
@@ -270,16 +281,13 @@ function ServiceDetailsTabbing(props) {
         .catch((error) => {
           console.log("Error :>", error);
         });
-
     } catch (error) {
       console.log("Error", error);
     }
-  }
-
+  };
 
   async function createZoomMeeting() {
-
-    console.log("zoomAccessToken", zoomAccessToken)
+    console.log("zoomAccessToken", zoomAccessToken);
     // // e.preventDefault();
     // const currentDateTime = new Date();
     // // Current Date
@@ -293,15 +301,13 @@ function ServiceDetailsTabbing(props) {
     //   currentMinutes < 10 ? "0" + currentMinutes : currentMinutes;
     // const currentTime = `${currentHours}:${currentMinutes}`;
 
-
-
     const requestData = {
       // start_time: combineDateTime(currentDate, currentTime),
       zoomAccessToken: zoomAccessToken,
-      zoom_userId: zoom_userId
+      zoom_userId: zoom_userId,
     };
 
-    console.log("requestData", requestData)
+    console.log("requestData", requestData);
 
     const headers = {
       Accept: "application/json",
@@ -310,10 +316,11 @@ function ServiceDetailsTabbing(props) {
     };
 
     try {
-      console.log("run under create Zoom Meeting")
-      await axios.post("/user/createZoomMeeting", requestData, { headers })
+      console.log("run under create Zoom Meeting");
+      await axios
+        .post("/user/createZoomMeeting", requestData, { headers })
         .then((response) => {
-          console.log("response", response)
+          console.log("response", response);
           // const meetingData = response.data.data;
           // const join_url = meetingData.join_url;
           // console.log("join_url", join_url)
@@ -350,14 +357,18 @@ function ServiceDetailsTabbing(props) {
                   ) : (
                     <li className="nav-item" role="presentation">
                       <button
-                        className="nav-link active"
+                        //className="nav-link active"
+                        className={`nav-link ${activeTab === "appointment" ? "active" : ""
+                          }`}
                         id="appointment-tab"
                         data-bs-toggle="tab"
                         data-bs-target="#appointment"
                         type="button"
                         role="tab"
                         aria-controls="appointment"
-                        aria-selected="false"
+                        // aria-selected="false"
+                        aria-selected={activeTab === "appointment"}
+                        onClick={() => setActiveTab("appointment")}
                       >
                         Appointment
                       </button>
@@ -370,14 +381,17 @@ function ServiceDetailsTabbing(props) {
                   ) : (
                     <li className="nav-item" role="presentation">
                       <button
-                        className="nav-link"
+                        className={`nav-link ${activeTab === "zoommeeting" ? "active" : ""
+                          }`}
                         id="zoommeeting-tab"
                         data-bs-toggle="tab"
                         data-bs-target="#zoommeeting"
                         type="button"
                         role="tab"
                         aria-controls="zoommeeting"
-                        aria-selected="false"
+                        // aria-selected="false"
+                        aria-selected={activeTab === "zoommeeting"}
+                        onClick={() => setActiveTab("zoommeeting")}
                       >
                         Meeting
                       </button>
@@ -389,14 +403,17 @@ function ServiceDetailsTabbing(props) {
                   {!currentUser ? (
                     <li className="nav-item" role="presentation">
                       <button
-                        className="nav-link active"
+                        className={`nav-link ${activeTab === "description" ? "active" : ""
+                          }`}
                         id="description-tab"
                         data-bs-toggle="tab"
                         data-bs-target="#description"
                         type="button"
                         role="tab"
                         aria-controls="description"
-                        aria-selected="false"
+                        //aria-selected="false"
+                        aria-selected={activeTab === "description"}
+                        onClick={() => setActiveTab("description")}
                       >
                         Description
                       </button>
@@ -404,14 +421,17 @@ function ServiceDetailsTabbing(props) {
                   ) : (
                     <li className="nav-item" role="presentation">
                       <button
-                        className="nav-link"
+                        className={`nav-link ${activeTab === "description" ? "active" : ""
+                          }`}
                         id="description-tab"
                         data-bs-toggle="tab"
                         data-bs-target="#description"
                         type="button"
                         role="tab"
                         aria-controls="description"
-                        aria-selected="false"
+                        //aria-selected="false"
+                        aria-selected={activeTab === "description"}
+                        onClick={() => setActiveTab("description")}
                       >
                         Description
                       </button>
@@ -421,14 +441,17 @@ function ServiceDetailsTabbing(props) {
                   {/* Reviews Tab */}
                   <li className="nav-item" role="presentation">
                     <button
-                      className="nav-link"
+                      className={`nav-link ${activeTab === "reviews" ? "active" : ""
+                        }`}
                       id="reviews-tab"
                       data-bs-toggle="tab"
                       data-bs-target="#reviews"
                       type="button"
                       role="tab"
                       aria-controls="reviews"
-                      aria-selected="true"
+                      //aria-selected="true"
+                      aria-selected={activeTab === "reviews"}
+                      onClick={() => setActiveTab("reviews")}
                     >
                       Reviews
                     </button>
@@ -439,7 +462,9 @@ function ServiceDetailsTabbing(props) {
                     ""
                   ) : !isCalendarAuthorized ? (
                     <div
-                      className="tab-pane fade show active"
+                      //className="tab-pane fade show active"
+                      className={`tab-pane fade ${activeTab === "appointment" ? "show active" : ""
+                        }`}
                       id="appointment"
                       role="tabpanel"
                       aria-labelledby="appointment-tab"
@@ -454,7 +479,9 @@ function ServiceDetailsTabbing(props) {
                     </div>
                   ) : (
                     <div
-                      className="tab-pane fade show active"
+                      // className="tab-pane fade show active"
+                      className={`tab-pane fade ${activeTab === "appointment" ? "show active" : ""
+                        }`}
                       id="appointment"
                       role="tabpanel"
                       aria-labelledby="appointment-tab"
@@ -469,7 +496,9 @@ function ServiceDetailsTabbing(props) {
                     ""
                   ) : (
                     <div
-                      className="tab-pane fade"
+                      // className="tab-pane fade"
+                      className={`tab-pane fade ${activeTab === "zoommeeting" ? "show active" : ""
+                        }`}
                       id="zoommeeting"
                       role="tabpanel"
                       aria-labelledby="zoommeeting-tab"
@@ -500,29 +529,39 @@ function ServiceDetailsTabbing(props) {
                   {!currentUser ? (
                     props.description ? (
                       <div
-                        className="tab-pane fade show active"
+                        // className="tab-pane fade show active"
+                        className={`tab-pane fade ${activeTab === "description" ? "show active" : ""
+                          }`}
                         id="description"
                         role="tabpanel"
                         aria-labelledby="description-tab"
                       >
-                        <p className="ql-editor ql-discription mb-0">{parse(props.description)}</p>
+                        <p className="ql-editor ql-discription mb-0">
+                          {parse(props.description)}
+                        </p>
                       </div>
                     ) : (
                       ""
                     )
                   ) : (
                     <div
-                      className="tab-pane fade"
+                      // className="tab-pane fade"
+                      className={`tab-pane fade ${activeTab === "description" ? "show active" : ""
+                        }`}
                       id="description"
                       role="tabpanel"
                       aria-labelledby="description-tab"
                     >
-                      <p className="ql-editor ql-discription mb-0">{parse(props.description)}</p>
+                      <p className="ql-editor ql-discription mb-0">
+                        {parse(props.description)}
+                      </p>
                     </div>
                   )}
                   {/* Reviews Content */}
                   <div
-                    className="tab-pane review"
+                    // className="tab-pane review"
+                    className={`tab-pane fade ${activeTab === "reviews" ? "show active" : ""
+                      }`}
                     id="reviews"
                     role="tabpanel"
                     aria-labelledby="reviews-tab"
@@ -559,7 +598,10 @@ function ServiceDetailsTabbing(props) {
                       </div>
                       {/* User Reviews */}
                       <div className="col-sm-12 col-md-9">
-                        <div className="reviews_comments_box overflow-auto" style={{ maxHeight: '350px' }}>
+                        <div
+                          className="reviews_comments_box overflow-auto"
+                          style={{ maxHeight: "350px" }}
+                        >
                           {/* Display Reviews */}
                           {currentReviews.length > 0
                             ? currentReviews.map((review, index) => (

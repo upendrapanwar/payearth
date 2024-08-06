@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import Header from "../../../components/user/common/Header";
 import { Link } from "react-router-dom";
 import PageTitle from "../../../components/user/common/PageTitle";
@@ -44,6 +44,8 @@ class ServiceListing extends Component {
       filteredData: [],
     };
   }
+  //const [averageRating, setAverageRating] = useState(0);
+
   getQueryParam(param) {
     const queryParams = new URLSearchParams(this.props.location.search);
     return queryParams.get(param);
@@ -105,6 +107,7 @@ class ServiceListing extends Component {
         }
       );
       this.setState({ services: response.data.data });
+      // console.log("all service data------", response);
     } catch (error) {
       console.error("Error fetching products:", error);
     }
@@ -169,6 +172,36 @@ class ServiceListing extends Component {
     }
   };
 
+  renderStarRating = (item) => {
+    // console.log("its item", item);
+    const totalRating = item.reviews.reduce(
+      (acc, curr) => acc + curr.rating,
+      0
+    );
+    const average = totalRating / item.reviews.length;
+    //console.log(" service average------", average);
+
+    const stars = [];
+    // Calculate full stars
+    const fullStars = Math.floor(average);
+    // Check if there's a half star
+    const hasHalfStar = average - fullStars >= 0.5;
+    // Iterate through 5 stars
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        // Full star
+        stars.push(<li className="star rated" key={i}></li>);
+      } else if (hasHalfStar && i === fullStars) {
+        // Half star
+        stars.push(<li className="star half-star" key={i}></li>);
+      } else {
+        // Empty star
+        stars.push(<li className="star" key={i}></li>);
+      }
+    }
+    return <ul className="rating">{stars}</ul>;
+  };
+
   render() {
     const { loading } = store.getState().global;
     const {
@@ -185,6 +218,7 @@ class ServiceListing extends Component {
     const currentServiceData = data.slice(indexOfFirstItem, indexOfLastItem);
 
     console.log("currentServiceData", currentServiceData);
+    //console.log('itam----',)
     return (
       <React.Fragment>
         {loading === true ? <SpinnerLoader /> : ""}
@@ -232,29 +266,65 @@ class ServiceListing extends Component {
                       <div className=" w-100 d-md-flex flex-row ">
                         {currentServiceData.length > 0
                           ? currentServiceData.map((item, index) => (
-                              <div className=" serv_card    " key={index}>
-                                <div className="btns_wrapper">
-                                  <div className="share_option shadow"></div>
+                              <div className=" serv_card" key={index}>
+                                <div className="img_wrapper">
+                                  {/* <div className="btns_wrapper">
+                                    <div className="share_option shadow"></div>
+                                  </div> */}
+                                  <Link to={`/service-detail/${item._id}`}>
+                                    <img
+                                      src={item.featuredImage}
+                                      className="img-fluid"
+                                      alt="..."
+                                    />
+                                  </Link>
                                 </div>
-                                <Link to={`/service-detail/${item._id}`}>
-                                  <img
-                                    src={item.featuredImage}
-                                    className="img-fluid"
-                                    alt="..."
-                                  />
-                                </Link>
-                                <p>{item.charges}</p>
+                                <div className="prod_info_head">
+                                  <div className="prod_info">
+                                    {/* {this.getAverageRating(item)} */}
+                                    {/* <p> Average Rating:{AverageRating}</p>; */}
+                                    <p className="rating_point ">
+                                      {this.renderStarRating(item)}
+                                    </p>
+                                    <p className="product_name">
+                                      <Link
+                                        to={
+                                          data.isService === false
+                                            ? `/product-detail/${item._id}`
+                                            : `/service-detail/${item._id}`
+                                        }
+                                      >
+                                        {item.name}
+                                      </Link>
+                                    </p>
+                                    <p className="review_count">
+                                      {/* Average Rating: {averageRating.toFixed(1)} */}
+                                    </p>
+                                  </div>
+
+                                  <div className="priceData">
+                                    <p className="price ">{item.charges} $</p>
+                                  </div>
+                                </div>
+                                <div className="d-grid gap-2 col-6 mx-auto mb-2 ">
+                                  <Link
+                                    className="btn btn_yellow"
+                                    to={`/service-detail/${item._id}`}
+                                  >
+                                    View
+                                  </Link>
+                                </div>
                               </div>
                             ))
                           : "No Services Found"}
                       </div>
                       <div className="cart-pagination">
-                        {data.length > 3 && (
+                        {data.length > 4 && (
                           <ul className="pagination-wrapper">
                             <li>
                               <button onClick={this.prevPage}>Prev</button>
                             </li>
-                            {Array(Math.ceil(data.length / 3))
+                            {Array(Math.ceil(data.length / 4))
                               .fill()
                               .map((_, index) => (
                                 <li key={index}>

@@ -2720,9 +2720,20 @@ async function addServiceReview(req) {
     }
 
     if (data) {
-      // Service reviews update
+      // console.log('data-----11', data)
       const filter = { _id: param._id };
       await ServiceReview.findOneAndUpdate(filter, updateData, { new: true });
+      // Service reviews update
+      if (!reviewData || reviewData.length === 0) {
+        const serviceFilter = { _id: param.serviceId };
+        await Services.findOneAndUpdate(
+          serviceFilter,
+          {
+            $push: { reviews: data._id },
+          },
+          { new: true }
+        );
+      }
 
       let result = await ServiceReview.findById(data.id).select();
 

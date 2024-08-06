@@ -24,6 +24,7 @@ const {
   cmsPage,
   bannerAdvertisement,
   Services,
+  ServiceReview,
 } = require("../helpers/db");
 
 module.exports = {
@@ -948,18 +949,37 @@ async function searchFilterServices(req, res) {
 
       // Find items that match the category and name
       items = await Services.find({
+        isActive: true,
         category: categoryData._id,
         categoryName: new RegExp(name, 'i'), // Case-insensitive match
-      }).populate('category');
+      }).populate('category')
+        .populate({
+          path: 'reviews',
+          model: ServiceReview,
+          select: ''
+        })
+        .exec();
     } else if (name) {
       // Find items that match the name only
       // console.log("This esle is run")
       items = await Services.find({
         name: new RegExp(name, 'i'), // Case-insensitive match
-      }).populate('category');
+        isActive: true,
+      }).populate('category')
+        .populate({
+          path: 'reviews',
+          model: ServiceReview,
+          select: ''
+        })
+        .exec();;
     }
     else {
-      items = await Services.find({})
+      items = await Services.find({ isActive: true, }).populate({
+        path: 'reviews',
+        model: ServiceReview,
+        select: ''
+      })
+        .exec();
     }
     // console.log("Services filter data", items);
     return items;
@@ -986,14 +1006,20 @@ async function getServicesByCategory(req) {
     const categories = req.query.categories;
     let services
     if (categories) {
-      // console.log("categories", categories)
+      console.log("categories", categories)
       const selectedCategories = categories.split(',');
+      // const selectedCategories = categories.split(',').map(cat => mongoose.Types.ObjectId(cat));
       services = await Services.find({ category: { $in: selectedCategories } });
-      // console.log("services with checkbox select..", services)
       return services
     } else {
-      services = await Services.find({ category: mongoose.Types.ObjectId(categoryId) });
-      // console.log("services with only id select", services)
+      //console.log("services with only id select", services)
+      services = await Services.find({ category: mongoose.Types.ObjectId(categoryId), isActive: true, })
+        .populate({
+          path: 'reviews',
+          model: ServiceReview,
+          select: ''
+        })
+        .exec();
       return services
     }
   } catch (err) {
