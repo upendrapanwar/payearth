@@ -2507,7 +2507,7 @@ async function serviceCharges(req, res) {
 
   // const email = "test@gmail.com";
 
-  console.log("paymentMethodId", paymentMethodId); 
+  console.log("paymentMethodId", paymentMethodId);
   // console.log("email", email);
   // console.log("authName", authName);
 
@@ -2610,7 +2610,7 @@ async function serviceCharges(req, res) {
 //GET Common All Services
 async function getCommonService(req) {
   try {
-    let result = await Services.find({isActive:true})
+    let result = await Services.find({ isActive: true })
       .select(
         "serviceCode name featuredImage imageId description isActive createdAt"
       )
@@ -2722,9 +2722,20 @@ async function addServiceReview(req) {
     }
 
     if (data) {
-      // Service reviews update
+      // console.log('data-----11', data)
       const filter = { _id: param._id };
       await ServiceReview.findOneAndUpdate(filter, updateData, { new: true });
+      // Service reviews update
+      if (!reviewData || reviewData.length === 0) {
+        const serviceFilter = { _id: param.serviceId };
+        await Services.findOneAndUpdate(
+          serviceFilter,
+          {
+            $push: { reviews: data._id },
+          },
+          { new: true }
+        );
+      }
 
       let result = await ServiceReview.findById(data.id).select();
 

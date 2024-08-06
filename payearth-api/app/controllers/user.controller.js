@@ -1148,6 +1148,7 @@ async function addServiceReview(req, res, next) {
         message: "Service review added successfully",
         data: review,
       });
+      // console.log('review-------', review)
     } else {
       res
         .status(400)

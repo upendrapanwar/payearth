@@ -1658,12 +1658,29 @@ button.view_more img {
   width: 100%;
   border-radius: 8px;
   overflow: hidden;
-  margin: 0 10px 0 10px;
+  margin: 15px 10px 15px 10px;
   transition: var(--transition);
   border: none;
   box-shadow: 0 1px 2px rgb(0 0 0 / 10%);
   background-color: white;
   position: relative;
+}
+
+.serv_card .img_wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 100%; 
+  max-height: 200px;
+  min-height: 200px;
+  overflow: hidden;
+  border-bottom: 1px solid #eeeeee;
+}
+.serv_card .img_wrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  /* object-fit: cover; */
 }
 
 .prod_card {
