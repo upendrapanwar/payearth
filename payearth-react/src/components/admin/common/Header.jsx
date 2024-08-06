@@ -121,7 +121,7 @@ function Header() {
                   <i className="icon">
                     <img src={shoppingBagIcon} alt="" />
                   </i>{" "}
-                  Service Orders
+                  Manage Service Orders
                 </Link>
               </li>
 
