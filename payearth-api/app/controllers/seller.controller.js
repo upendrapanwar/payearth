@@ -239,6 +239,20 @@ router.put("/updateGroupName", updateGroupName);
 //Seller appointment calendar
 // router.get("/getMeetingData/:id", getMeeting);
 
+// community
+router.get('/posts/:id', getPosts);
+router.post('/posts', addPost);
+router.post('/postImages/:id', addPostImages);
+router.post('/postVideos/:id', addPostVideos);
+router.post('/postLikes/:id', addPostLike);
+router.get('/postComments/:id', getPostComments);
+router.post('/postComments/:id', addPostComment);
+router.post('/follow-user', followUser);
+router.post('/unfollowUser', unfollowUser);
+router.put('/postRemoved', postDelete);
+router.put('/updatePost', updatePost);
+
+
 module.exports = router;
 
 function register(req, res, next) {
@@ -763,24 +777,24 @@ function getTopSellingCategoryChartData(req, res, next) {
 //Services
 
 function addService(req, res, next) {
-   // console.log('Hello there how are you....');
-   // console.log('Req*********', req.body);
-    if (req.files && req.files.fileValidationError) {
-        return res.status(400).json({ status: false, message: req.files.fileValidationError });
-    }
+  // console.log('Hello there how are you....');
+  // console.log('Req*********', req.body);
+  if (req.files && req.files.fileValidationError) {
+    return res.status(400).json({ status: false, message: req.files.fileValidationError });
+  }
 
-    sellerService.addService(req)
-        .then(service => {
-            if (service) {
-                res.status(201).json({ status: true, message: msg.service.add.success, data: service });
-            } else {
-                res.status(400).json({ status: false, message: msg.service.add.error });
-            }
-        })
-        .catch(err => {
-            console.error('Error in addService:', err);
-            res.status(500).json({ status: false, message: 'Internal server error' });
-        });
+  sellerService.addService(req)
+    .then(service => {
+      if (service) {
+        res.status(201).json({ status: true, message: msg.service.add.success, data: service });
+      } else {
+        res.status(400).json({ status: false, message: msg.service.add.error });
+      }
+    })
+    .catch(err => {
+      console.error('Error in addService:', err);
+      res.status(500).json({ status: false, message: 'Internal server error' });
+    });
 }
 
 // function addService(req, res, next) {
@@ -940,10 +954,10 @@ function getCalendarEvents(req, res, next) {
 
 function sellerServiceOrders(req, res, next) {
   sellerService.sellerServiceOrders(req)
-      .then((items) => items
-          ? res.status(200).json({ status: true, data: items })
-          : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
-      .catch((err) => next(res.json({ status: false, message: err })));
+    .then((items) => items
+      ? res.status(200).json({ status: true, data: items })
+      : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
 }
 
 /***********************BANNER**********************/
@@ -1240,3 +1254,82 @@ function deleteNotification(req, res, next) {
 }
 //**************************************************************************** */
 //**************************************************************************** */
+
+
+// community
+
+function getPosts(req, res, next) {
+  sellerService.getPosts(req)
+    .then(result => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+    .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function addPost(req, res, next) {
+  sellerService.addPost(req)
+    .then(result => result ? res.status(201).json({ status: true, message: msg.post.add.success, data: result }) : res.status(400).json({ status: false, message: msg.post.add.error }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function addPostImages(req, res, next) {
+  if (req.files && req.files.fileValidationError) {
+    return res.status(400).json({ status: false, message: req.files.fileValidationError });
+  }
+  sellerService.addPostImages(req)
+    .then(result => result ? res.status(201).json({ status: true, message: msg.postimage.add.success }) : res.status(400).json({ status: false, message: msg.postimage.add.error }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function addPostVideos(req, res, next) {
+  if (req.files && req.files.fileValidationError) {
+    return res.status(400).json({ status: false, message: req.files.fileValidationError });
+  }
+  sellerService.addPostVideos(req)
+    .then(result => result ? res.status(201).json({ status: true, message: msg.postvideo.add.success }) : res.status(400).json({ status: false, message: msg.postvideo.add.error }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function addPostLike(req, res, next) {
+
+  sellerService.addPostLike(req)
+    .then(result => result ? res.status(201).json({ status: true, message: req.body.isLike ? msg.postlike.yes.success : msg.postlike.no.success }) : res.status(400).json({ status: false, message: req.body.isLike ? msg.postlike.yes.error : msg.postlike.no.error }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function getPostComments(req, res, next) {
+
+  sellerService.getPostComments(req)
+    .then(result => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+    .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function addPostComment(req, res, next) {
+
+  sellerService.addPostComment(req)
+    .then(result => result ? res.status(201).json({ status: true, message: msg.postcomment.add.success, data: result }) : res.status(400).json({ status: false, message: msg.postcomment.add.error }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function followUser(req, res, next) {
+  sellerService.followUser(req)
+    .then(result => result ? res.status(201).json({ status: true, message: "Followed successfully....!" }) : res.status(400).json({ status: false, message: msg.follow.yes.error }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function unfollowUser(req, res, next) {
+  sellerService.unfollowUser(req)
+    .then(result => result ? res.status(201).json({ status: true, message: "Unfollowed successfully....!" }) : res.status(400).json({ status: false, message: msg.follow.yes.error }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function postDelete(req, res, next) {
+  sellerService.postDelete(req)
+    .then(result => result ? res.status(201).json({ status: true, message: "Post Removed..!" }) : res.status(400).json({ status: false, message: msg.follow.yes.error }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function updatePost(req, res, next) {
+  sellerService.updatePost(req)
+    .then(result => result ? res.status(201).json({ status: true, message: "Updated...!" }) : res.status(400).json({ status: false, message: msg.follow.yes.error }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+

@@ -45,6 +45,8 @@ const {
   Chat,
   ChatMessage,
   Notification,
+  Post,
+
 } = require("../helpers/db");
 
 module.exports = {
@@ -129,6 +131,8 @@ module.exports = {
   addNotification,
   getNotification,
   deleteNotification,
+
+  addPost,
 };
 
 function sendMail(mailOptions) {
@@ -3319,8 +3323,6 @@ async function createGroupChat(req) {
 
     receiverData.push(authorId)
 
-
-
     // console.log("receiverData", receiverData);
 
     var chatData = {
@@ -3586,3 +3588,45 @@ async function deleteNotification(req) {
   }
 }
 // *******************************************************************************
+
+
+// community
+
+async function addPost(req) {
+  const param = req.body;
+
+  let input = {
+      postContent: param.content,
+      categoryId: param.category_id ? param.category_id : null,
+      productId: param.product_id ? param.product_id : null,
+      userId: param.user_id ? param.user_id : null,
+      sellerId: param.seller_id ? param.seller_id : null,
+      isSeller: param.is_seller,
+      postStatus: param.post_status,
+      postImages: [],
+      postVideos: [],
+      likeCount: 0,
+      likes: [],
+      commentCount: 0,
+      comments: [],
+      parentId: param.parent_id ? param.parent_id : null,
+      isActive: true
+  };
+
+  const post = new Post(input);
+
+  const data = await post.save();
+
+  if (data) {
+
+      let res = await Post.findById(data.id).select();
+
+      if (res) {
+          return res;
+      } else {
+          return false;
+      }
+  } else {
+      return false;
+  }
+}

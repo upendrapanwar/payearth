@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import logo from "./../../../assets/images/logo.png";
 import closeIcon from "./../../../assets/icons/close_icon.svg";
@@ -10,6 +10,7 @@ import communityIcon from "./../../../assets/icons/sm_community.svg";
 import contactIcon from "./../../../assets/icons/sm_contact.svg";
 import smLogoutIcon from "./../../../assets/icons/sm_logout.svg";
 import homeIcon from "./../../../assets/icons/home-icon.svg";
+import userImg from '../../../assets/images/user.png'
 import bannerIcon from "./../../../assets/icons/banners_icon.svg";
 import blcakbellIcon from "../../../assets/icons/notification-black-bell-icon.svg";
 import bellIcon from "../../../assets/icons/notification-bell.svg";
@@ -26,6 +27,8 @@ import {
 } from "../../../store/reducers/cat-search-reducer";
 
 const Header = () => {
+  const userInfo = useSelector(state => state.auth.userInfo);
+  const authInfo = useSelector(state => state.auth.authInfo);
   const [isToggle, setIsToggle] = useState(false);
   const isService = useSelector((state) => state.catSearch.isService);
   const dispatch = useDispatch();
@@ -253,7 +256,7 @@ const Header = () => {
                             </Link>
                           </li>
                           <li className="nav-item">
-                            <Link className="nav-link" to="/community">
+                            <Link className="nav-link" to="/seller_community">
                               <div className="sm_icon">
                                 <img src={communityIcon} alt="" />
                               </div>
@@ -279,6 +282,24 @@ const Header = () => {
                               </div>
                               <span>Logout</span>
                             </Link>
+                          </li>
+                          {/* Add user profile */}
+                          <li className="nav-item dropdown">
+                            <Link className="nav-link dropdown-toggle" to="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                              <div className="com_user_acc">
+                                <div className="com_user_img"><img src={userInfo.imgUrl !== null && userInfo.imgUrl !== '' ? userInfo.imgUrl : userImg} alt="" /></div>
+                                <div className="com_user_name">
+                                  <div className="cu_name">{userInfo.name}</div>
+                                  <div>{userInfo.role}</div>
+                                </div>
+                              </div>
+                            </Link>
+                            <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                              <li><Link className="dropdown-item" to="/community-profile">Account</Link></li>
+                              {/* <li><Link className="dropdown-item" to="#">Setting</Link></li> */}
+                              <li><hr className="dropdown-divider" /></li>
+                              <li><Link className="dropdown-item" to="#" onClick={() => logout()} >Log Out</Link></li>
+                            </ul>
                           </li>
                         </ul>
                       </div>

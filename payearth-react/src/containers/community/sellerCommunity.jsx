@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Footer from '../../components/common/Footer';
-import Header from '../../components/community/common/Header';
+import Header from '../../components/seller/common/Header';
 import UserHeader from '../../components/user/common/Header';
 import userImg from '../../assets/images/user.png'
 import { Link } from 'react-router-dom';
@@ -20,7 +20,7 @@ import Picker from 'emoji-picker-react';
 import { toast } from 'react-toastify';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
 
-const Community = () => {
+const SellerCommunity = () => {
     const userInfo = useSelector(state => state.auth.userInfo);
     const authInfo = useSelector(state => state.auth.authInfo);
     const loading = useSelector(state => state.global.loading);
@@ -108,9 +108,9 @@ const Community = () => {
             category_id: categoryId,
             product_id: productId,
             post_status: postStatus,
-            user_id: authInfo.id,
-            seller_id: null,
-            is_seller: false,
+            user_id: null,
+            seller_id: authInfo.id,
+            is_seller: true,
             parent_id: null
         };
 
@@ -140,7 +140,7 @@ const Community = () => {
         setInputStr('');
         try {
             dispatch(setLoading({ loading: true }));
-            const postResponse = await axios.post('community/posts', reqBody, {
+            const postResponse = await axios.post('/seller/posts', reqBody, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
@@ -325,15 +325,15 @@ const Community = () => {
     }, []);
 
     const handleEdit = (data) => {
-        console.log("Data for edit test ###$$#$$#$#$#", data)
+        console.log("Edit data in community", data)
         setIsUpdate(true);
         const selectedCatOption = {
-            label: data.categoryId === null ? "" : data.categoryId.categoryName,
-            value: data.categoryId === null ? "" : data.categoryId.id,
+            label: data.categoryId.categoryName,
+            value: data.categoryId.id
         }
         const selectedProOption = {
-            label: data.productId === null ? "" : data.productId.name,
-            value: data.productId === null ? "" : data.productId.id
+            label: data.productId.name,
+            value: data.productId.id
         }
         handleCategories(selectedCatOption)
         handleProducts(selectedProOption)
@@ -386,8 +386,7 @@ const Community = () => {
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
 
-            <div className='seller_body'>
-                <UserHeader />
+            <div className='seller_body'>           
                 <Header />
                 <div className="cumm_page_wrap pt-5 pb-5">
                     <div className="container">
@@ -520,7 +519,7 @@ const Community = () => {
                                         </div>
                                     </div>
                                 </div>
-                                {
+                                {/* {
                                     postsData.length > 0 ?
                                         <div>
                                             {postsData.map((value, index) => {
@@ -530,7 +529,7 @@ const Community = () => {
                                             })}
                                         </div>
                                         : <NotFound msg="Data not found." />
-                                }
+                                } */}
                                 {/* <PostListing/> */}
                             </div>
 
@@ -591,4 +590,4 @@ const Community = () => {
     );
 }
 
-export default Community;
+export default SellerCommunity;

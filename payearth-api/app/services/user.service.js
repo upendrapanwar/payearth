@@ -103,8 +103,9 @@ module.exports = {
   getBannersByUserId,
   deleteBanner,
   getBannerById,
-  updateBanner,
-  blockBanner,
+  updateBanner, 
+  
+  blockBanner , 
   bannerPayment,
   customerAuthorizePayment,
   createSubscription,

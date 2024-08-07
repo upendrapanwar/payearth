@@ -11,6 +11,7 @@ import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 import SpinnerLoader from '../../../components/common/SpinnerLoader';
 import { setLoading } from '../../../store/reducers/global-reducer';
 import { getPostsData } from '../../../helpers/post-listing';
@@ -25,7 +26,9 @@ TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
 
 
-const Post = ({ posts }) => {
+const Post = ({ posts, sendEditData }) => {
+
+    // console.log("all posts", posts)
 
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
@@ -48,6 +51,7 @@ const Post = ({ posts }) => {
     const [sliderImages, setSliderImages] = useState([]);
     const [sliderVideos, setSliderVideos] = useState([]);
     const [ShowSlider, setShowSlider] = useState(false);
+    const [isFollowing, setIsFollowing] = useState(false);
     const date = new Date(posts.createdAt);
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
@@ -93,7 +97,6 @@ const Post = ({ posts }) => {
                 dispatch(setLoading({ loading: false }));
             }, 300);
         });
-
     }
 
     const removeFromLiked = (postId) => {
@@ -180,20 +183,21 @@ const Post = ({ posts }) => {
         setTempImg(img);
         setShowSingleImg(true);
     }
-    const handleSliderShow = (img) => {
-        setTempImg(img);
+    const handleSliderShow = (item) => {
+        setTempImg(item.url);
         if (posts.postImages.length > 0) {
-            let sliderImages = [{ url: config.apiURI + img }];
-            posts.postImages.filter((val) => val.url !== img).forEach((value) => {
-                sliderImages.push({ url: config.apiURI + value.url });
+            let sliderImages = [{ url: item.url }];
+            posts.postImages.filter((val) => val.url !== item.url).forEach((value) => {
+                sliderImages.push({ url: value.url });
             });
             setSliderImages(sliderImages);
         }
         if (posts.postVideos.length > 0) {
-            let sliderVideos = [{ url: '' }];
+            let sliderVideos = [{ url: item.url }];
             posts.postVideos.forEach((value) => {
-                sliderVideos.push({ url: config.apiURI + value.url });
+                sliderVideos.push({ url: value.url });
             });
+            // console.log("sliderVideos", sliderVideos)
             setSliderVideos(sliderVideos);
         }
         setShowSlider(true)
@@ -201,6 +205,7 @@ const Post = ({ posts }) => {
     const hideSlider = () => {
         setShowSlider(false)
         setSliderImages([]);
+        setSliderVideos([]);
     }
     const handleModel = () => {
         setOpenModel(true);
@@ -258,29 +263,169 @@ const Post = ({ posts }) => {
         }
     });
 
+
+    // const handleFollow = (posts) => {
+    //     const userId = posts.userId.id;
+    //     console.log("userId", userId)
+
+
+    //     // const response = await axios.post(url, {
+    //     //     headers: {
+    //     //         'Accept': 'application/json',
+    //     //         'Content-Type': 'application/json;charset=UTF-8',
+    //     //         'Authorization': `Bearer ${authInfo.token}`
+    //     //     }
+    //     // });
+    //     // console.log("response", response)
+
+    //     const url = "community/follow-user";
+    //     // const categoryData = {
+    //     //     names,
+    //     //     slug,
+    //     //     description,
+    //     // }
+    //     axios.post(url, {
+    //         headers: {
+    //             'Accept': 'application/json',
+    //             "access-control-allow-origin": "https://localhost:3000",
+    //             'Content-Type': 'application/json;charset=UTF-8',
+    //             'Authorization': `Bearer ${authInfo.token}`
+    //         }
+    //     })
+    //         .then((response) => {
+    //             // this.getCategory();
+    //             console.log("Follow Succesfully", response);
+    //         })
+    //         .catch((error) => {
+    //             console.error('Error in saving category:', error);
+    //         });
+    // }
+
+    const handleFollow = (posts) => {
+        const currentUserId = authInfo.id;
+        const userIdToFollow = posts.userId === null ? posts.sellerId.id : posts.userId.id;
+        var reqBody = {
+            role: posts.userId === null ? "seller" : "user",
+            currentUserId: currentUserId,
+            userIdToFollow: userIdToFollow,
+        }
+        axios.post(`community/follow-user`, reqBody, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${authInfo.token}`
+            }
+        }).then(response => {
+            if (response.data.status) {
+                // console.log("response", response.data.message);
+                toast.success(response.data.message);
+                getPostsData(dispatch);
+            }
+        }).catch(error => {
+            console.log(error);
+        });
+    }
+
+    const handleUnfollow = (posts) => {
+        const currentUserId = authInfo.id;
+        const userIdToUnfollow = posts.userId.id;
+        var reqBody = {
+            currentUserId: currentUserId,
+            userIdToUnfollow: userIdToUnfollow,
+        }
+        axios.post(`community/unfollowUser`, reqBody, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${authInfo.token}`
+            }
+        }).then(response => {
+            if (response.data.status) {
+                // console.log("response", response.data.message);
+                toast.success(response.data.message);
+                getPostsData(dispatch);
+            }
+        }).catch(error => {
+            console.log(error);
+        });
+    }
+
+    const handleRemove = (postId) => {
+        var reqBody = {
+            postId: postId,
+        }
+        axios.put(`community/postRemoved`, reqBody, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${authInfo.token}`
+            }
+        }).then(response => {
+            if (response.data.status) {
+                toast.success(response.data.message);
+                getPostsData(dispatch);
+            }
+        }).catch(error => {
+            console.log(error);
+        });
+    }
+
+    const handleEdit = (postEditData) => {
+        // console.log("postEditData", postEditData)
+        sendEditData(postEditData);
+    }
+
+    // const isFollowing = posts.userId !== null ? posts.userId.community.followerData.includes(authInfo.id) : false;
+
+    // const isFollowing = posts.userId.community.followerData.includes(authInfo.id);
+    // console.log("isFollowing", isFollowing);
+
+    useEffect(() => {
+        // Function to fetch data
+        const fetchData = () => {
+            let response = false;
+
+            if (posts.userId?.community?.followerData) {
+                response = posts.userId.community.followerData.includes(authInfo.id);
+            } else if (posts.sellerId?.community?.followerData) {
+                response = posts.sellerId.community.followerData.includes(authInfo.id);
+            } else if (posts.adminId?.community?.followerData) {
+                response = posts.adminId.community.followerData.includes(authInfo.id);
+            }
+
+            console.log("response", response);
+            setIsFollowing(response);
+        };
+        fetchData();
+    }, []);
+
+
     return (
         <React.Fragment>
             {/* {loading === true ? <SpinnerLoader /> : ''} */}
-            <div className="post" >
+            <div className="post">
                 <div className="post_head">
                     <div className="post_by">
-                        <div className="poster_img "><img src={posts.isSeller ? config.apiURI + posts.sellerId.image_url : posts.userId.image_url !== null ? config.apiURI + posts.userId.image_url : userImg} alt="" /></div>
+                        <div className="poster_img "><img src={posts.userId === null ? posts.sellerId.image_url : posts.userId.image_url} alt="" /></div>
+                        {/* <div className="poster_img "><img src={posts.isSeller ? config.apiURI + posts.sellerId.image_url : posts.userId.image_url !== null ? config.apiURI + posts.userId.image_url : userImg} alt="" /></div> */}
                         <div className="poster_info">
                             <div className="poster_name">{posts.isSeller ? posts.sellerId.name : posts.userId.name}</div>
-                            <ReactTimeAgo date={date} locale="en-US" timeStyle="round-minute"/>
+                            <ReactTimeAgo date={date} locale="en-US" timeStyle="round-minute" />
                             {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseFollow${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseFollow${posts.id}`}>
                                 Follow
                             </Link> */}
                             {
                                 userInfo.role === 'user' &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
-                                    {posts.isSeller === false && posts.userId.id === authInfo.id ? "" : 'Follow U'}
+                                    {posts.isSeller === false && posts.userId.id === authInfo.id
+                                        ? "" : isFollowing ? 'Unfollow' : 'Follow'}
+                                    {/* {posts.isSeller === false && posts.userId.id === authInfo.id ? "" : 'Follow'} */}
                                 </Link>
                             }
                             {
                                 userInfo.role === 'seller' &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
-                                    {posts.isSeller === true && posts.sellerId.id === authInfo.id ? "" : 'Follow S'}
+                                    {posts.isSeller === true && posts.sellerId.id === authInfo.id ? "" : 'Follow'}
                                 </Link>
                             }
                         </div>
@@ -300,19 +445,28 @@ const Post = ({ posts }) => {
                                         </div>
                                         <ul>
                                             <li>
-                                                <div className="fp_fc">18</div>
+                                                {/* <div className="fp_fc">{posts.userId.community.followers}</div> */}
+                                                <div className="fp_fc">{posts.userId === null ? posts.sellerId.community.followers : posts.userId.community.followers}</div>
                                                 <small>Followes</small>
                                             </li>
                                             <li>
-                                                <div className="fp_fc">06</div>
+                                                {/* <div className="fp_fc">{posts.userId.community.following}</div> */}
+                                                <div className="fp_fc">{posts.userId === null ? posts.sellerId.community.following : posts.userId.community.following}</div>
                                                 <small>Following</small>
                                             </li>
                                             <li>
                                                 <div className="fp_fc">02</div>
                                                 <small>Posts</small>
                                             </li>
+
                                         </ul>
-                                        <Link to="#" className="btn custom_btn btn_yellow">Follow</Link>
+                                        {isFollowing ?
+                                            <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleUnfollow(posts)}>Unfollow</Link>
+                                            :
+                                            <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleFollow(posts)}>Follow</Link>
+                                        }
+
+
                                     </div>
                                 </div>
                                 : ''
@@ -345,7 +499,7 @@ const Post = ({ posts }) => {
                     </div>
                     {/* post images */}
                     <div className={`post_single_img ${showSingleImg ? 'open' : ''}`}>
-                        <img className='single_img' src={config.apiURI + tempImg} alt="" />
+                        <img className='single_img' src={tempImg} alt="" />
                         <i className='icon' onClick={() => setShowSingleImg(false)}><img src={closeIcon} alt="" /></i>
                         {/* <button type="button" className="view_more text-reset"><img src={closeIcon} className="img-fluid" alt="close_icon" /> Close</button> */}
                     </div>
@@ -364,14 +518,15 @@ const Post = ({ posts }) => {
                             />
                         </div>
                     }
+
                     {/* slider end */}
                     <div className='post_img_box container'>
                         <div className='row post_img_internal_box'>
                             {posts.postImages.slice(0, 2).map((image, ind) => {
                                 return (
                                     <>
-                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-6'}`} key={ind} onClick={() => handleSliderShow(image.url)}>
-                                            <div className="post_img mb-3 "><img src={config.apiURI + image.url} alt="" /></div>
+                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-6'}`} key={ind} onClick={() => handleSliderShow(image)}>
+                                            <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
                                         </div>
                                     </>
                                 )
@@ -379,8 +534,8 @@ const Post = ({ posts }) => {
                             {posts.postImages.slice(2, 4).map((image, ind) => {
                                 return (
                                     <>
-                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(image.url)}>
-                                            <div className="post_img mb-3 "><img src={config.apiURI + image.url} alt="" /></div>
+                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(image)}>
+                                            <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
                                         </div>
                                     </>
                                 )
@@ -388,30 +543,32 @@ const Post = ({ posts }) => {
                             {posts.postImages.slice(4, 5).map((image, ind) => {
                                 return (
                                     <>
-                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(image.url)}>
+                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(image)}>
                                             {
                                                 posts.postImages.length > 5 &&
                                                 <span>{`${posts.postImages.length - 5}+`}</span>
                                             }
-                                            <div className="post_img mb-3 " ><img src={config.apiURI + image.url} alt="" /></div>
+                                            <div className="post_img mb-3 " ><img src={image.url} alt="" /></div>
                                         </div>
                                     </>
                                 )
                             })}
+
                             {posts.postVideos.map((video, ind) => {
                                 return (
-                                    <div className={`post_main_div ${posts.postVideos.length === 1 ? 'col-12' : 'col-md-4 '}`} key={ind} onClick={() => handleSliderShow()} >
+                                    <div className={`post_main_div ${posts.postVideos.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(video)} >
                                         <Link to="#" className='cp_video_play' >
                                             <img src={videoPlay} />
                                         </Link>
                                         <div className="post_img mb-3 ">
                                             <video controls>
-                                                <source src={config.apiURI + video.url} type="video/mp4" />
+                                                <source src={video.url} type="video/mp4" />
                                             </video>
                                         </div>
                                     </div>
                                 )
                             })}
+
                         </div>
                     </div>
                     {/* post videos */}
@@ -443,7 +600,21 @@ const Post = ({ posts }) => {
                                 </Link>
                                 <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}><i className="post_icon ps_comment"></i> {posts.commentCount} Comments</Link>
                             </li>
+
                             <li className="ms-auto">
+                                {(posts.userId?.id === authInfo.id || posts.sellerId?.id === authInfo.id || posts.adminId?.id === authInfo.id) ? (
+                                    <>
+                                        <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleEdit(posts)}>Edit</button>
+                                        <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
+                                    </>
+                                ) : null}
+                                {/* {posts.userId.id === authInfo.id ? <>
+                                    <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleEdit(posts)}>Edit</button>
+                                    <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
+                                </>
+                                    : ""
+                                } */}
+
                                 {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseShareTo${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseShareTo${posts.id}`}>
                                     <i className="post_icon ps_share"></i> Share
                                 </Link> */}
@@ -498,7 +669,7 @@ const Post = ({ posts }) => {
                                                         <div className="commnt_by">
                                                             <div className="cb_name">{val.isSeller ? val.sellerId.name : val.userId.name}</div>
                                                             {/* <div className="cb_date">{`${new Date(val.createdAt).getDate() < 10 ? `0${new Date(val.createdAt).getDate()}` : `${new Date(val.createdAt).getDate()}`} - ${new Date(val.createdAt).getMonth() + 1 < 10 ? `0${new Date(val.createdAt).getMonth() + 1}` : `${new Date(val.createdAt).getMonth() + 1}`} - ${new Date(val.createdAt).getFullYear()}`}</div> */}
-                                                            <div className="cb_date"> <ReactTimeAgo date={new Date(val.createdAt)} locale="en-US" timeStyle="round-minute"/></div>
+                                                            <div className="cb_date"> <ReactTimeAgo date={new Date(val.createdAt)} locale="en-US" timeStyle="round-minute" /></div>
                                                         </div>
                                                         <p>{val.content}</p>
                                                     </div>

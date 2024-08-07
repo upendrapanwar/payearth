@@ -5,6 +5,7 @@ const schema = new Schema({
     postContent: { type: String, required: false, default: '' },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: false, default: null },
     sellerId: { type: Schema.Types.ObjectId, ref: 'Seller', required: false, default: null },
+    // adminId: { type: Schema.Types.ObjectId, ref: 'Admin', required: false, default: null },
     isSeller: { type: Boolean, required: false, default: true },
     productId: { type: Schema.Types.ObjectId, ref: 'Product', required: false, default: null },
     categoryId: { type: Schema.Types.ObjectId, ref: 'Category', required: false, default: null },
@@ -16,6 +17,7 @@ const schema = new Schema({
     comments: [{ type: Schema.Types.ObjectId, ref: 'PostComment' }],
     parentId: { type: Schema.Types.ObjectId, ref: 'Post', required: false, default: null },
     isActive: { type: Boolean, required: false, default: true },
+    postStatus: { type: String, required: false, default: "Followers" }
 }, {
     timestamps: true,
 });

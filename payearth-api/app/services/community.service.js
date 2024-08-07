@@ -6,39 +6,63 @@ mongoose.Promise = global.Promise;
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpeg_static = require('ffmpeg-static');
 
-const { Post, FollowRequest, PostImages, PostVideos, PostLike, PostComment, Category, Product, User, Seller } = require("../helpers/db");
+const { Post, FollowRequest, PostImages, PostVideos, PostLike, PostComment, Category, Product, User, Seller, Admin } = require("../helpers/db");
 
 module.exports = {
-    getPosts,    
+    getPosts,
     createPost,
     addPostImages,
     addPostVideos,
     addPostLike,
     getPostComments,
     addPostComment,
-    sendFollowRequest,
+    followUser,
+    unfollowUser,
+    postDelete,
+    updatePost,
+    // sendFollowRequest,
     setFollow,
     getCategories,
-    getProductsByCatId,    
+    getProductsByCatId,
 };
 
-async function getPosts() {
-    const posts = await Post.find({ isActive: true })
+async function getPosts(req) {
+    const authorId = req.params.id;
+    // console.log("authorId", authorId)
+    const user = await User.findById(authorId).populate('community.followingData');
+    // console.log("user", user)
+    if (!user) {
+        return { success: false, message: "User not found" };
+    }
+    const followerIds = user.community.followingData.map(follower => follower._id);
+    // console.log("followerIds", followerIds)
+
+    const posts = await Post.find({
+        $or: [
+            { postStatus: "Public" },
+            {
+                postStatus: "Followers",
+                userId: { $in: followerIds }
+            },
+            { userId: authorId }
+        ],
+        isActive: true
+    })
         .sort({ createdAt: 'desc' })
         .populate([
-
             {
                 path: "sellerId",
                 model: Seller,
-                select: "name image_url",
+                select: "name image_url community",
                 match: { isActive: true },
             },
             {
                 path: "userId",
                 model: User,
-                select: "name image_url",
+                select: "name image_url community",
                 match: { isActive: true },
-            }, {
+            },
+            {
                 path: "postImages",
                 model: PostImages,
                 select: "url",
@@ -54,13 +78,13 @@ async function getPosts() {
                 path: "categoryId",
                 model: Category,
                 select: "categoryName isService"
-                    //match: { isActive: true }
+                //match: { isActive: true }
             },
             {
                 path: "productId",
                 model: Product,
                 select: "name isService"
-                    //match: { isActive: true }
+                //match: { isActive: true }
             },
             {
                 path: "likes",
@@ -68,17 +92,17 @@ async function getPosts() {
                 select: "-isActive -postId",
                 match: { isActive: true },
                 populate: [{
-                        path: "sellerId",
-                        model: Seller,
-                        select: "name image_url",
-                        match: { isActive: true },
-                    },
-                    {
-                        path: "userId",
-                        model: User,
-                        select: "name image_url",
-                        match: { isActive: true },
-                    }
+                    path: "sellerId",
+                    model: Seller,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                {
+                    path: "userId",
+                    model: User,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
                 ]
             },
             {
@@ -87,17 +111,17 @@ async function getPosts() {
                 select: "-isActive -postId",
                 match: { isActive: true },
                 populate: [{
-                        path: "sellerId",
-                        model: Seller,
-                        select: "name image_url",
-                        match: { isActive: true },
-                    },
-                    {
-                        path: "userId",
-                        model: User,
-                        select: "name image_url",
-                        match: { isActive: true },
-                    }
+                    path: "sellerId",
+                    model: Seller,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                {
+                    path: "userId",
+                    model: User,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
                 ]
             },
             {
@@ -105,30 +129,47 @@ async function getPosts() {
                 model: Post,
                 match: { isActive: true },
                 populate: [{
-                        path: "postImages",
-                        model: PostImages,
-                        select: "url",
-                        match: { isActive: true }
-                    },
-                    {
-                        path: "postVideos",
-                        model: PostVideos,
-                        select: "url",
-                        match: { isActive: true }
-                    },
-                    {
-                        path: "categoryId",
-                        model: Category,
-                        select: "categoryName isService"
-                            //match: { isActive: true }
-                    },
-                    {
-                        path: "productId",
-                        model: Product,
-                        select: "name isService"
-                            //match: { isActive: true }
-                    },
-                    {
+                    path: "postImages",
+                    model: PostImages,
+                    select: "url",
+                    match: { isActive: true }
+                },
+                {
+                    path: "postVideos",
+                    model: PostVideos,
+                    select: "url",
+                    match: { isActive: true }
+                },
+                {
+                    path: "categoryId",
+                    model: Category,
+                    select: "categoryName isService"
+                    //match: { isActive: true }
+                },
+                {
+                    path: "productId",
+                    model: Product,
+                    select: "name isService"
+                    //match: { isActive: true }
+                },
+                {
+                    path: "sellerId",
+                    model: Seller,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                {
+                    path: "userId",
+                    model: User,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                {
+                    path: "likes",
+                    model: PostLike,
+                    select: "-isActive -postId",
+                    match: { isActive: true },
+                    populate: [{
                         path: "sellerId",
                         model: Seller,
                         select: "name image_url",
@@ -140,34 +181,16 @@ async function getPosts() {
                         select: "name image_url",
                         match: { isActive: true },
                     },
-                    {
-                        path: "likes",
-                        model: PostLike,
-                        select: "-isActive -postId",
-                        match: { isActive: true },
-                        populate: [{
-                                path: "sellerId",
-                                model: Seller,
-                                select: "name image_url",
-                                match: { isActive: true },
-                            },
-                            {
-                                path: "userId",
-                                model: User,
-                                select: "name image_url",
-                                match: { isActive: true },
-                            }
-                        ]
-                    }
+                    ]
+                }
                 ]
             }
-
         ]);
+    // console.log("posts", posts)
     if (posts && posts.length > 0) {
         return posts;
     }
     return false;
-
 }
 
 
@@ -181,6 +204,7 @@ async function createPost(req) {
         userId: param.user_id ? param.user_id : null,
         sellerId: param.seller_id ? param.seller_id : null,
         isSeller: param.is_seller,
+        postStatus: param.post_status,
         postImages: [],
         postVideos: [],
         likeCount: 0,
@@ -210,108 +234,82 @@ async function createPost(req) {
 }
 
 async function addPostImages(req) {
-    const files = req.files;
-    var res = false;
-    var postImages = [];
-    var postId = req.params.id;
+    const { images } = req.body;
+    const postId = req.params.id;
 
-    if (files.length > 0) {
+    if (!Array.isArray(images) || images.length === 0) {
+        return res.status(400).json({ success: false, message: "No videos provided" });
+    }
 
-        for (var i = 0; i < files.length; i++) {
-            let url = files[i].destination + "/" + files[i].filename;
+    try {
+        var postImages = [];
+        var allImagesSaved = true;
+        for (let i = 0; i < images.length; i++) {
+            const image = images[i];
             let input = {
                 postId: postId,
-                url: url,
+                url: image.url,
                 isActive: true
             };
-
             let postImage = new PostImages(input);
             let data = await postImage.save();
-
             if (data) {
                 postImages.push(data.id);
-                res = true;
             } else {
-                res = false;
+                allImagesSaved = false;
+                break; // Exit loop if save fails
             }
         }
+        if (allImagesSaved) {
+            const filter = { _id: postId };
+            const updateData = { $push: { postImages: { $each: postImages } } };
+            await Post.findOneAndUpdate(filter, updateData, { new: true });
+            return postImages
+        } else {
+            return { success: false, message: "Failed to save" };
+        }
+    } catch (error) {
+        console.log("error", error)
     }
 
-    if (res == true) {
-
-        //update in post
-        const filter = { _id: postId };
-        const updateData = { $push: { postImages: postImages } };
-        await Post.findOneAndUpdate(filter, updateData, { new: true });
-        return true;
-    } else {
-        return false;
-    }
 }
 
+async function addPostVideos(req, res) {
+    const { videos } = req.body;
+    const postId = req.params.id;
 
-async function addPostVideos(req) {
-    const files = req.files;
-    var res = false;
-    var postVideos = [];
-    var postId = req.params.id;
-    var thumb_folder = config.uploadDir + '/posts/video_thumbs';
-
-    if (files.length > 0) {
-
-        for (var i = 0; i < files.length; i++) {
-
-            //for thumb file
-            let path = files[i].path;
-            let thumb_file_name = files[i].filename + '-' + Date.now() + '-thumb.png';
-            let thumb_full = thumb_folder + '/' + thumb_file_name;
-
-            // try {
-            //     //create thumb file
-            //     ffmpeg(path)
-            //         .setFfmpegPath(ffmpeg_static)
-            //         .screenshots({
-            //             timestamps: [0.0],
-            //             filename: thumb_file_name,
-            //             folder: thumb_folder
-            //         }).on('end', function() {
-            //             //
-            //         });
-            // } catch (err) {
-            //     console.log('Error', err);
-            // }
-
-            let url = files[i].destination + "/" + files[i].filename;
-
+    if (!Array.isArray(videos) || videos.length === 0) {
+        return res.status(400).json({ success: false, message: "No videos provided" });
+    }
+    try {
+        var postVideos = [];
+        var allVideosSaved = true;
+        for (let i = 0; i < videos.length; i++) {
+            const video = videos[i];
             let input = {
                 postId: postId,
-                url: url,
-                thumb: thumb_full,
+                url: video.url,
                 isActive: true
             };
-
-
             let postVideo = new PostVideos(input);
             let data = await postVideo.save();
-
             if (data) {
                 postVideos.push(data.id);
-                res = true;
             } else {
-                res = false;
+                allVideosSaved = false;
+                break; // Exit loop if save fails
             }
         }
-    }
-
-    if (res == true) {
-
-        //update in post
-        const filter = { _id: postId };
-        const updateData = { $push: { postVideos: postVideos } };
-        await Post.findOneAndUpdate(filter, updateData, { new: true });
-        return true;
-    } else {
-        return false;
+        if (allVideosSaved) {
+            const filter = { _id: postId };
+            const updateData = { $push: { postVideos: { $each: postVideos } } };
+            await Post.findOneAndUpdate(filter, updateData, { new: true });
+            return postVideos
+        } else {
+            return { success: false, message: "Failed to save" };
+        }
+    } catch (error) {
+        console.log("error", error)
     }
 }
 
@@ -437,12 +435,226 @@ async function addPostComment(req) {
 
 }
 
+async function followUser(req) {
+    try {
+        const param = req.body;
+        const currentUserId = param.currentUserId;
+        const userIdToFollow = param.userIdToFollow;
+        const role = param.role;
+
+
+        if (role === "seller") {
+            // If a seller is following someone (another seller or a user)
+            await User.updateOne(
+                { _id: currentUserId },
+                {
+                    $addToSet: { 'community.followingData': userIdToFollow },
+                    $inc: { 'community.following': 1 }
+                }
+            );
+
+            const isFollowingSeller = await Seller.exists({ _id: userIdToFollow });
+            if (isFollowingSeller) {
+                await Seller.updateOne(
+                    { _id: userIdToFollow },
+                    {
+                        $addToSet: { 'community.followerData': currentUserId },
+                        $inc: { 'community.followers': 1 }
+                    }
+                );
+            } else {
+                await User.updateOne(
+                    { _id: userIdToFollow },
+                    {
+                        $addToSet: { 'community.followerData': currentUserId },
+                        $inc: { 'community.followers': 1 }
+                    }
+                );
+            }
+
+            return { success: true, message: 'Followed successfully....!' };
+
+        } else if (role === "user") {
+            // Buyer follow to another Buyer...
+            await User.updateOne(
+                { _id: currentUserId },
+                {
+                    $addToSet: { 'community.followingData': userIdToFollow },
+                    $inc: { 'community.following': 1 }
+                }
+            );
+
+            const isFollowingSeller = await Seller.exists({ _id: userIdToFollow });
+            if (isFollowingSeller) {
+                await Seller.updateOne(
+                    { _id: userIdToFollow },
+                    {
+                        $addToSet: { 'community.followerData': currentUserId },
+                        $inc: { 'community.followers': 1 }
+                    }
+                );
+            } else {
+                await User.updateOne(
+                    { _id: userIdToFollow },
+                    {
+                        $addToSet: { 'community.followerData': currentUserId },
+                        $inc: { 'community.followers': 1 }
+                    }
+                );
+            }
+
+            return { success: true, message: 'Followed successfully....!' };
+        }
+
+        // if (role === "seller") {
+        //     console.log("seller follow function run..")
+
+        //     await Seller.updateOne(
+        //         { _id: currentUserId },
+        //         {
+        //             $addToSet: { 'community.followingData': userIdToFollow },
+        //             $inc: { 'community.following': 1 }
+        //         }
+        //     );
+
+        //     await Seller.updateOne(
+        //         { _id: userIdToFollow },
+        //         {
+        //             $addToSet: { 'community.followerData': currentUserId },
+        //             $inc: { 'community.followers': 1 }
+        //         }
+        //     );
+        //     return { success: true, message: 'Followed successfully....!' };
+
+        // } else if (role === "user") {
+        //     console.log("user follow function run..")
+        //     await User.updateOne(
+        //         { _id: currentUserId },
+        //         {
+        //             $addToSet: { 'community.followingData': userIdToFollow },
+        //             $inc: { 'community.following': 1 }
+        //         }
+        //     );
+
+        //     await User.updateOne(
+        //         { _id: userIdToFollow },
+        //         {
+        //             $addToSet: { 'community.followerData': currentUserId },
+        //             $inc: { 'community.followers': 1 }
+        //         }
+        //     );
+        //     return { success: true, message: 'Followed successfully....!' };
+        // }
+
+        // test*****************************************end
+
+        // await User.updateOne(
+        //     { _id: currentUserId },
+        //     {
+        //         $addToSet: { 'community.followingData': userIdToFollow },
+        //         $inc: { 'community.following': 1 }
+        //     }
+        // );
+
+        // await User.updateOne(
+        //     { _id: userIdToFollow },
+        //     {
+        //         $addToSet: { 'community.followerData': currentUserId },
+        //         $inc: { 'community.followers': 1 }
+        //     }
+        // );
+
+
+    } catch (err) {
+        console.log('Error', err);
+        return false;
+    }
+}
+
+async function unfollowUser(req) {
+    try {
+        const param = req.body;
+        const currentUserId = param.currentUserId;
+        const userIdToUnfollow = param.userIdToUnfollow;
+        const role = param.role;
+        console.log("role", role)
+
+        await User.updateOne(
+            { _id: currentUserId },
+            {
+                $pull: { 'community.followingData': userIdToUnfollow },
+                $inc: { 'community.following': -1 }
+            }
+        );
+
+        await User.updateOne(
+            { _id: userIdToUnfollow },
+            {
+                $pull: { 'community.followerData': currentUserId },
+                $inc: { 'community.followers': -1 }
+            }
+        );
+        return { success: true, message: 'Unfollowed successfully....!' };
+
+    } catch (err) {
+        console.log('Error', err);
+        return false;
+    }
+}
+
+async function postDelete(req) {
+    try {
+        const param = req.body;
+        const postId = param.postId;
+
+        const result = await Post.updateOne(
+            { _id: postId },
+            { $set: { isActive: false } }
+        );
+        return result;
+
+    } catch (err) {
+        console.log('Error', err);
+        return false;
+    }
+}
+
+async function updatePost(req) {
+    try {
+        const param = req.body;
+        // console.log("param", param);
+        const result = await Post.updateOne(
+            { _id: param.postId },
+            {
+                $set: {
+                    postContent: param.content,
+                    productId: param.product_id,
+                    categoryId: param.category_id,
+                    postStatus: param.post_status
+                }
+            }
+        );
+        return result;
+
+    } catch (err) {
+        console.log('Error', err);
+        return false;
+    }
+}
+
+
+
 async function sendFollowRequest(req) {
 
     try {
         const param = req.body;
+        console.log("param", param)
         const Follower = param.follower; //self
         const Following = param.following; // the one, you want to follow/unfollow
+
+        console.log("Follower", Follower);
+        console.log("Following", Following);
+
         var followingData;
         var followerData;
 

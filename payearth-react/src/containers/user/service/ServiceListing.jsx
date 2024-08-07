@@ -53,7 +53,7 @@ class ServiceListing extends Component {
             const newCategoryId = this.getQueryParam('cat');
             this.setState({ categoryId: newCategoryId }, () => {
                 this.getServices();
-                // this.handleCatSelect(newCategoryId);
+                this.handleCatSelect(newCategoryId);
             });
         }
         if (prevState.services !== this.state.services || prevState.range !== this.state.range) {
@@ -103,6 +103,7 @@ class ServiceListing extends Component {
             const selectedCategories = prevState.selectedCategories.includes(categoryId)
                 ? prevState.selectedCategories.filter((id) => id !== categoryId)
                 : [...prevState.selectedCategories, categoryId];
+            console.log("selectedCategories TEST ", selectedCategories)
             return { selectedCategories };
         }, this.getServices);
     }
