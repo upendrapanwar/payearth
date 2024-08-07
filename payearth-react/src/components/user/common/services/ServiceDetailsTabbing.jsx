@@ -494,7 +494,6 @@ function ServiceDetailsTabbing(props) {
                       </p>
                     </div>
                   )}
-
                   {!currentUser ? (
                     ""
                   ) : (
