@@ -44,13 +44,11 @@ function ServiceCalendarAuth() {
       console.error("Error getting access token:", error);
     }
   };
-
   //responseError if access token remove from localStorage
   const responseError = (error) => {
     localStorage.removeItem("accessToken");
     console.error("Google authentication error:", error);
   };
-
   // Function for generate new access token after expired old access token
   const refreshAccessToken = async () => {
     try {
@@ -58,22 +56,17 @@ function ServiceCalendarAuth() {
       if (!refreshToken) {
         throw new Error("Refresh token not found in local storage");
       }
-
       const authInstance = gapi.auth2.getAuthInstance();
       const currentUser = authInstance.currentUser.get();
       await currentUser.reloadAuthResponse();
-
       const newAccessToken = currentUser.getAuthResponse().access_token;
       console.log("New Access Token", newAccessToken);
-
       // Check if the access token is different from the previous one
       const oldAccessToken = localStorage.getItem("accessToken");
       if (newAccessToken !== oldAccessToken) {
         console.log("Access token replaced successfully");
       }
-
       localStorage.setItem("accessToken", newAccessToken);
-
       // Calculate the remaining time until token expiration (in milliseconds)
       const expiresIn = currentUser.getAuthResponse().expires_in * 1000;
       const refreshTime = expiresIn - 2 * 60 * 1000; // Refresh 2 minutes before expiration
@@ -86,7 +79,6 @@ function ServiceCalendarAuth() {
       console.error("Error refreshing access token:", error);
     }
   };
-
   return (
     <React.Fragment>
       <div style={{ marginTop: "30px", marginBottom: "50px" }}>
