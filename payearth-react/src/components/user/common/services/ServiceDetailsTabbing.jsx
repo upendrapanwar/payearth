@@ -351,54 +351,6 @@ function ServiceDetailsTabbing(props) {
             >
               <div className="detail_tab">
                 <ul className="nav nav-tabs border-0" id="myTab" role="tablist">
-                  {/* Appointment Tab */}
-                  {!currentUser ? (
-                    ""
-                  ) : (
-                    <li className="nav-item" role="presentation">
-                      <button
-                        //className="nav-link active"
-                        className={`nav-link ${activeTab === "appointment" ? "active" : ""
-                          }`}
-                        id="appointment-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#appointment"
-                        type="button"
-                        role="tab"
-                        aria-controls="appointment"
-                        // aria-selected="false"
-                        aria-selected={activeTab === "appointment"}
-                        onClick={() => setActiveTab("appointment")}
-                      >
-                        Appointment
-                      </button>
-                    </li>
-                  )}
-                  {/* ****************zoom meeting************* */}
-                  {/* Zoom Meeting Tab */}
-                  {!currentUser ? (
-                    ""
-                  ) : (
-                    <li className="nav-item" role="presentation">
-                      <button
-                        className={`nav-link ${activeTab === "zoommeeting" ? "active" : ""
-                          }`}
-                        id="zoommeeting-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#zoommeeting"
-                        type="button"
-                        role="tab"
-                        aria-controls="zoommeeting"
-                        // aria-selected="false"
-                        aria-selected={activeTab === "zoommeeting"}
-                        onClick={() => setActiveTab("zoommeeting")}
-                      >
-                        Meeting
-                      </button>
-                    </li>
-                  )}
-                  {/* ****************zoom meeting************* */}
-
                   {/* Description Tab */}
                   {!currentUser ? (
                     <li className="nav-item" role="presentation">
@@ -456,6 +408,57 @@ function ServiceDetailsTabbing(props) {
                       Reviews
                     </button>
                   </li>
+
+                  {/* Appointment Tab */}
+                  {!currentUser ? (
+                    ""
+                  ) : (
+                    <li className="nav-item" role="presentation">
+                      <button
+                        //className="nav-link active"
+                        className={`nav-link ${
+                          activeTab === "appointment" ? "active" : ""
+                        }`}
+                        id="appointment-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#appointment"
+                        type="button"
+                        role="tab"
+                        aria-controls="appointment"
+                        // aria-selected="false"
+                        aria-selected={activeTab === "appointment"}
+                        onClick={() => setActiveTab("appointment")}
+                      >
+                        Appointment
+                      </button>
+                    </li>
+                  )}
+
+                  {/* ****************zoom meeting************* */}
+                  {/* Zoom Meeting Tab */}
+                  {!currentUser ? (
+                    ""
+                  ) : (
+                    <li className="nav-item" role="presentation">
+                      <button
+                        className={`nav-link ${
+                          activeTab === "zoommeeting" ? "active" : ""
+                        }`}
+                        id="zoommeeting-tab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#zoommeeting"
+                        type="button"
+                        role="tab"
+                        aria-controls="zoommeeting"
+                        // aria-selected="false"
+                        aria-selected={activeTab === "zoommeeting"}
+                        onClick={() => setActiveTab("zoommeeting")}
+                      >
+                        Meeting
+                      </button>
+                    </li>
+                  )}
+                  {/* ****************zoom meeting************* */}
                 </ul>
                 <div className="tab-content" id="myTabContent">
                   {!currentUser ? (
@@ -605,41 +608,41 @@ function ServiceDetailsTabbing(props) {
                           {/* Display Reviews */}
                           {currentReviews.length > 0
                             ? currentReviews.map((review, index) => (
-                              <div className="user_comment_box" key={index}>
-                                <div className="d-flex align-items-center">
-                                  <p className="title mr-auto">
-                                    {review.review.title}
-                                  </p>
-                                  {/* Add delete icon here */}
-                                  {currentUser &&
-                                    review.userId._id === authInfo.id && (
-                                      <button
-                                        style={{
-                                          marginTop: "-14px",
-                                          float: "right",
-                                        }}
-                                        className="btn btn-link text-danger"
-                                        onClick={() =>
-                                          deleteReview(review._id)
-                                        }
-                                      >
-                                        <FaTrash />
-                                      </button>
-                                    )}
-                                </div>
+                                <div className="user_comment_box" key={index}>
+                                  <div className="d-flex align-items-center">
+                                    <p className="title mr-auto">
+                                      {review.review.title}
+                                    </p>
+                                    {/* Add delete icon here */}
+                                    {currentUser &&
+                                      review.userId._id === authInfo.id && (
+                                        <button
+                                          style={{
+                                            marginTop: "-14px",
+                                            float: "right",
+                                          }}
+                                          className="btn btn-link text-danger"
+                                          onClick={() =>
+                                            deleteReview(review._id)
+                                          }
+                                        >
+                                          <FaTrash />
+                                        </button>
+                                      )}
+                                  </div>
 
-                                <p className="feedback">
-                                  {review.review.description}
-                                </p>
-                                <p className="rating">
-                                  {renderStarRating(review.rating)}
-                                </p>
-                                <p className="date mb-0">
-                                  {review.userId.name} |{" "}
-                                  {formatDate(review.createdAt)}
-                                </p>
-                              </div>
-                            ))
+                                  <p className="feedback">
+                                    {review.review.description}
+                                  </p>
+                                  <p className="rating">
+                                    {renderStarRating(review.rating)}
+                                  </p>
+                                  <p className="date mb-0">
+                                    {review.userId.name} |{" "}
+                                    {formatDate(review.createdAt)}
+                                  </p>
+                                </div>
+                              ))
                             : ""}
 
                           {/* Pagination buttons */}
