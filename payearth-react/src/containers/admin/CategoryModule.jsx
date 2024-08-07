@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import Header from '../../components/admin/common/Header';
-import Footer from '../../components/common/Footer';
 import store from '../../store/index';
-import { Link } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
@@ -226,7 +224,6 @@ class AdminCategoryModel extends Component {
         return (
             <React.Fragment>
                 {loading === true ? <SpinnerLoader /> : ''}
-                <Header />
                 <div className="container">
                     <Helmet>
                         <title>{"Category - Pay Earth"}</title>
@@ -333,10 +330,9 @@ class AdminCategoryModel extends Component {
                         </div>
                     </div>
                 </div>
-                <Footer />
             </React.Fragment>
         );
     }
 }
 
-export default AdminCategoryModel;
+export default withRouter(AdminCategoryModel);

@@ -16,18 +16,18 @@ class ManageProducts extends Component {
     constructor(props) {
         super(props);
         const { dispatch } = props;
-        this.dispatch = dispatch;        
+        this.dispatch = dispatch;
         this.authInfo = store.getState().auth.authInfo;
-        this.state = {check: '', data: [],}
+        this.state = { check: '', data: [], }
     }
-   
+
     handleChange = (e) => {
-        console.log(e.target.checked)        
+        console.log(e.target.checked)
         if (e.target.checked) {
             this.setState({ check: 'checked' })
         } else { this.setState({ check: null }) }
     }
-    
+
     getProducts = () => {
         let reqBody = {
             count: {
@@ -88,8 +88,8 @@ class ManageProducts extends Component {
                             <nav className="orders_tabs">
                                 <div className="nav nav-tabs" id="nav-tab" role="tablist">
                                     <button className="nav-link active" id="nav-pending-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-pending-orders" type="button" role="tab" aria-controls="nav-pending-orders" aria-selected="true">Added Products</button>
-                                    <button className="nav-link" id="nav-ongoing-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-ongoing-orders" type="button" role="tab" aria-controls="nav-ongoing-orders" aria-selected="false">Pending for approval</button>
-                                    <button className="nav-link" id="nav-cancelled-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-cancelled-orders" type="button" role="tab" aria-controls="nav-cancelled-orders" aria-selected="true">Rejected Products</button>
+                                    <button className="nav-link" id="nav-ongoing-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-ongoing-orders" type="button" role="tab" aria-controls="nav-ongoing-orders" aria-selected="false">Draft</button>
+                                    <button className="nav-link" id="nav-cancelled-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-cancelled-orders" type="button" role="tab" aria-controls="nav-cancelled-orders" aria-selected="true">Trash</button>
                                 </div>
                             </nav>
                             <div className="orders_table tab-content pt-0 pb-0" id="nav-tabContent">

@@ -5,7 +5,7 @@ import smChatIcon from "./../../../assets/icons/sm_chat.svg";
 import smcommunityIcon from "./../../../assets/icons/sm_community.svg";
 import contactIcon from "./../../../assets/icons/sm_contact.svg";
 import smLogoutIcon from "./../../../assets/icons/sm_logout.svg";
-import homeIcon from "./../../../assets/icons/home-icon.svg";
+import homeIcon from "./../../../assets/icons/sm_home.svg";
 import shoppingBagIcon from "./../../../assets/icons/shopping-bag.svg";
 import creditCardIcon from "./../../../assets/icons/credit-card.svg";
 import notificationBellIcon from "./../../../assets/icons/notification-bell.svg";
@@ -69,10 +69,10 @@ function Header() {
         <div className="offcanvas-body">
           <div className="side_menu_body">
             <ul className="side_menu_links">
-            <li>
+              <li>
                 <Link to="/admin/dashboard" onClick={() => removeBackdrop()}>
                   <i className="icon">
-                  <img src={homeIcon} alt="" />
+                    <img src={homeIcon} alt="" />
                   </i>{" "}
                   Dashboard
                 </Link>
@@ -101,18 +101,6 @@ function Header() {
                             <li><Link to="/admin/page-module-add-new" onClick={() => removeBackdrop()}><i className="icon"><img src={bannerIcon} alt="" /></i> Create Page </Link></li> */}
 
               <li>
-                <Link
-                  to="/admin/category-module"
-                  onClick={() => removeBackdrop()}
-                >
-                  <i className="icon">
-                    <img src={shoppingBagIcon} alt="" />
-                  </i>{" "}
-                  Create Category{" "}
-                </Link>
-              </li>
-
-              <li>
                 <Link to="/admin/orders" onClick={() => removeBackdrop()}>
                   <i className="icon">
                     <img src={shoppingBagIcon} alt="" />
@@ -120,13 +108,20 @@ function Header() {
                   Manage Orders
                 </Link>
               </li>
-
+              <li>
+                <Link to="/admin/manage-categories" onClick={() => removeBackdrop()}>
+                  <i className="icon">
+                    <img src={shoppingBagIcon} alt="" />
+                  </i>{" "}
+                  Manage Categories
+                </Link>
+              </li>
               <li>
                 <Link to="/admin/service-order" onClick={() => removeBackdrop()}>
                   <i className="icon">
                     <img src={shoppingBagIcon} alt="" />
                   </i>{" "}
-                  Service Orders
+                  Manage Service Orders
                 </Link>
               </li>
 

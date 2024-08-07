@@ -29,8 +29,9 @@ module.exports = {
     //statusUpdate,
     //delete: _delete 
     createCategory,
-    editCategory,
+    editServiceCategory,
     getCateogries,
+    getServiceCategorylist,
     deleteCategory,
     statusCategory,
     getCateogyById,
@@ -648,33 +649,7 @@ async function getById(id) {
     return admin;
 }
 
-// async function statusUpdate(id, param) {
-
-//     const admin = await Admin.findById(id);
-
-//     if (!admin) {
-//         return false;
-//     } else {
-//         const input = {
-//             "isActive": param.is_active
-//         };
-
-//         Object.assign(admin, input);
-
-//         if (await admin.save()) {
-//             return await Admin.findById(id).select("-password -otp_code -otp_valid_at -is_pass_req");
-//         }
-//     }
-// }
-
-// async function _delete(id) {
-//     const admin = Admin.findById(id);
-//     if (!admin) return false;
-//     return await Admin.findByIdAndRemove(id);
-// }
-
-//Category 
-
+//All Categories for product, services 
 async function createCategory(param) {
 
     var Name = param.name.trim();
@@ -691,6 +666,7 @@ async function createCategory(param) {
         "createdBy": param.admin_id,
         "updatedBy": param.admin_id,
     };
+    console.log("Check catagories data", input)
 
     const category = new Category(input);
     const data = await category.save();
@@ -702,15 +678,18 @@ async function createCategory(param) {
     }
 }
 
-async function editCategory(req) {
+async function editServiceCategory(req) {
     const param = req.body;
     const id = req.params.id;
+    const name = param.categoryName;
+    console.log("Checking  param", param)
 
     const category = await Category.findById(id);
-
     if (!category) return false;
+    console.log("Checking  category", category)
 
-    var Name = param.name.trim();
+
+    var Name = name.trim();
     var lName = Name.toLowerCase();
 
     if (category.lname !== lName && (await Category.findOne({ lname: lName }))) {
@@ -720,11 +699,12 @@ async function editCategory(req) {
     const input = {
         "categoryName": Name,
         "lname": lName,
-        "parent": param.parent_id,
-        "isService": param.is_service ? param.is_service : false,
-        "onMainMenu": param.add_to_menu,
-        "updatedBy": param.admin_id,
+        "parent": category.parent,
+        "isService": category.isService,
+        "onMainMenu": category.onMainMenu,
+        "updatedBy": category.updatedBy,
     };
+    console.log("checking input", input)
 
     Object.assign(category, input);
 
@@ -747,6 +727,15 @@ async function getCateogries() {
 }
 
 
+async function getServiceCategorylist() {
+    const result = await Category.find({ isService: true }).select().populate('createdBy', 'name').sort({ createdAt: 'desc' });
+
+    if (result && result.length > 0) return result;
+
+    return false;
+}
+
+
 async function deleteCategory(id) {
     const admin = Category.findById(id);
 
@@ -758,22 +747,13 @@ async function deleteCategory(id) {
 
 async function statusCategory(req) {
     const id = req.params.id;
-    const param = req.body;
-
-    const category = await Category.findById(id);
-
-    if (!category) {
-        return false;
-    } else {
-        const input = {
-            "isActive": param.is_active
-        };
-
-        Object.assign(category, input);
-
-        if (await category.save()) {
-            return await Category.findById(id).select();
-        }
+    try {
+        const category = await Category.findById(id).select("isActive");
+        category.isActive = !category.isActive;
+        await category.save();
+        return category;
+    } catch (error) {
+        console.error("Error deleting service:", error);
     }
 }
 
@@ -2658,9 +2638,13 @@ async function addService(req) {
     const param = req.body;
     var lName = param.name.toLowerCase();
 
-    if (await Services.findOne({ lname: lName })) {
-        throw 'Service Name "' + param.name + '" already exists.';
-    }
+    // if (await Services.findOne({ lname: lName })) {
+    //     throw 'Service Name "' + param.name + '" already exists.';
+    // }
+    // const existingService = await Services.findOne({ lname: lName });
+    // if (existingService) {
+    //     throw new Error('Service Name "' + param.name + '" already exists.');
+    // }
 
     let input = {
         admin_id: param.admin_id,
@@ -2696,14 +2680,15 @@ async function addService(req) {
 
 async function allServiceData(req) {
     try {
-        const result = await Services.find({})
+        const result = await Services.find({isAvailable:true})
             .sort({ createdAt: 'desc' })
             .populate('createdBy', 'name')
             .populate('createdByAdmin', 'name')
             .populate('category', 'categoryName');
-        if (result && result.length > 0) {
-            //    console.log("service-list ", result)
-            return result
+        if (result.length > 0) {
+            return result;
+        } else {
+            return [];
         }
     } catch (error) {
         console.log(error);
@@ -2759,6 +2744,7 @@ async function editService(req) {
         const param = req.body;
         const statusData = {
             name: param.name,
+            charges: param.charges,
             category: param.category,
             description: param.description,
             featuredImage: param.featuredImage,
@@ -2786,9 +2772,27 @@ async function editService(req) {
 
 async function deleteService(req) {
     const id = req.params.id;
+    const statusData = {
+        isActive:false,
+        isAvailable:false,
+    };
     // console.log('id for delete:',id)
+    // try {
+    //     const deleted = await Services.findByIdAndDelete(id);
+    //     return deleted;
+    // } catch (error) {
+    //     console.error("Error deleting service:", error);
+    // }
     try {
-        const deleted = await Services.findByIdAndDelete(id);
+        const deleted = await Services.findOneAndUpdate(
+            { _id: id },
+            statusData,
+            { new: true }
+        );
+        if (!deleted) {
+            // console.log("Service not found.");
+            return null;
+        }
         return deleted;
     } catch (error) {
         console.error("Error deleting service:", error);
@@ -2814,17 +2818,17 @@ async function userServiceOrders(req) {
             .populate({
                 path: "serviceId",
                 model: Services,
-                select: "",
+                select: "createdBy createdByAdmin name",
                 populate: [
                     {
                         path: "createdBy",
                         model: Seller,
-                        select: ""
+                        select: "name email _id"
                     },
                     {
                         path: "createdByAdmin",
                         model: Admin,
-                        select: ""
+                        select: "name email _id"
                     }
                 ]
             },
@@ -2832,7 +2836,7 @@ async function userServiceOrders(req) {
             .populate({
                 path: "userId",
                 model: User,
-                select: ""
+                select: "name email _id"
             },)
         //  .populate('category', 'categoryName');
         if (result && result.length > 0) {

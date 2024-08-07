@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Header from '../../components/seller/common/Header';
+import Header from '../../components/admin/common/Header';
 import Footer from '../../components/common/Footer';
 import { Formik } from 'formik';
 import Select from 'react-select';
@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { setLoading } from '../../store/reducers/global-reducer';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
+import editServiceSchema from '../../validation-schemas/editServiceSchema';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import ReactQuill from 'react-quill';
@@ -262,13 +263,15 @@ class AdminEditService extends Component {
                                 <div className="dash_inner_wrap">
                                     <Formik
                                         initialValues={{
-                                            name: '',
-                                            charges:'',
+                                            name: serviceName ||'',
+                                            charges: charges ||'',
                                             category: defaultCatOption?.value,
                                             description: '',
                                             featuredImg: ''
                                         }}
+                                        enableReinitialize
                                         onSubmit={values => this.handleSubmit(values)}
+                                     validationSchema={editServiceSchema}
                                     >
                                         {({ values,
                                             errors,
@@ -360,6 +363,7 @@ class AdminEditService extends Component {
                                                                             [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
                                                                             [{ 'list': 'ordered' }, { 'list': 'bullet' }],
                                                                             ['bold', 'italic', 'underline'],
+                                                                            [{ 'align': [] }],
                                                                             ['link', 'image'],
                                                                             ['clean']
                                                                         ]

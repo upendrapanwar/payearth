@@ -521,10 +521,9 @@ class ServiceOrders extends Component {
             }
         }).then((response) => {
             console.log("all servicess with user", response);
-            const userdata = response.data.data;
+            const userdata = response.data.data.filter(item => item.serviceId !== null);
             // const activeServices = response.data.data.filter(item => item.isActive === true);
             // const inactiveServices = response.data.data.filter(item => item.isActive === false);
-
             this.setState({
                 // activeServiceData: activeServices, 
                 userServiceData: userdata,
@@ -597,12 +596,15 @@ class ServiceOrders extends Component {
             <React.Fragment>
                 <div className="seller_body">
                     <Header />
+                    <div className="inr_top_page_title">
+                        <h2>Manage Services Orders</h2>
+                    </div>
                     <div className="seller_dash_wrap pt-5 pb-5">
                         <div className="container ">
                             <div className="bg-white rounded-3 pt-3 pb-5">
                                 <div className="dash_inner_wrap">
                                     <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
-                                        <div className="dash_title">Service Orders</div>
+                                        <div className="dash_title">Ongoing Orders</div>
                                         <div className="">
                                             <Link className="btn custom_btn btn_yellow mx-auto " to="/admin/dashboard">
                                                 <img src={arrow_back} alt="linked-in" />&nbsp;
@@ -709,12 +711,12 @@ class ServiceOrders extends Component {
                                 </div>
                                 <nav className="orders_tabs">
 
-                                    <div className="nav nav-tabs nav-fill" id="nav-tab" role="tablist">
+                                    {/* <div className="nav nav-tabs nav-fill" id="nav-tab" role="tablist">
                                         <button className="nav-link active" id="nav-pending-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-pending-orders" type="button" role="tab" aria-controls="nav-pending-orders" aria-selected="true">Pending services</button>
                                         <button className="nav-link" id="nav-ongoing-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-ongoing-orders" type="button" role="tab" aria-controls="nav-ongoing-orders" aria-selected="false">Ongoing Orders</button>
                                         <button className="nav-link" id="nav-cancelled-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-cancelled-orders" type="button" role="tab" aria-controls="nav-cancelled-orders" aria-selected="true">Cancelled and Refunded Orders</button>
                                         <button className="nav-link" id="nav-completed-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-completed-orders" type="button" role="tab" aria-controls="nav-completed-orders" aria-selected="true">Completed Orders</button>
-                                    </div>
+                                    </div> */}
                                 </nav>
                                 <div className="orders_table tab-content pt-0 pb-0" id="nav-tabContent">
                                     <div className="tab-pane fade show active" id="nav-pending-orders" role="tabpanel" aria-labelledby="nav-pending-orders-tab">

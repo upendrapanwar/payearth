@@ -6,11 +6,11 @@ import shoppingBagIcon from "./../../../assets/icons/shopping-bag.svg";
 import creditCardIcon from "./../../../assets/icons/credit-card.svg";
 import logoutIcon from "./../../../assets/icons/logout.svg";
 import smChatIcon from "./../../../assets/icons/sm_chat.svg";
+import userImg from '../../../assets/images/user.png'
 import communityIcon from "./../../../assets/icons/sm_community.svg";
 import contactIcon from "./../../../assets/icons/sm_contact.svg";
 import smLogoutIcon from "./../../../assets/icons/sm_logout.svg";
-import homeIcon from "./../../../assets/icons/home-icon.svg";
-import userImg from '../../../assets/images/user.png'
+import smhomeIcon from "./../../../assets/icons/sm_home.svg";
 import bannerIcon from "./../../../assets/icons/banners_icon.svg";
 import blcakbellIcon from "../../../assets/icons/notification-black-bell-icon.svg";
 import bellIcon from "../../../assets/icons/notification-bell.svg";
@@ -80,7 +80,7 @@ const Header = () => {
               <li>
                 <Link to="/seller/dashboard" onClick={() => removeBackdrop()}>
                   <i className="icon">
-                    <img src={homeIcon} alt="" />
+                    <img src={smhomeIcon} alt="" />
                   </i>
                   Dashboard
                 </Link>

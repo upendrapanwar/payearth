@@ -13,7 +13,7 @@ import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 
-class AdminCategoryModelEdit extends Component {
+class ManageBlogCateEdit extends Component {
     constructor(props) {
         super(props);
         this.authInfo = store.getState().auth.authInfo;
@@ -299,4 +299,4 @@ class AdminCategoryModelEdit extends Component {
     }
 }
 
-export default AdminCategoryModelEdit;
+export default ManageBlogCateEdit;

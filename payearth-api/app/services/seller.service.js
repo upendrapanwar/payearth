@@ -99,6 +99,7 @@ module.exports = {
   saveCalendarEvents,
   getCalendarEvents,
   sellerServiceOrders,
+  //servicesCheckName,
   createSellerBanner,
   getBannersBySellerId,
   deleteBanner,
@@ -1415,11 +1416,11 @@ async function getCategories(req) {
   var parent = param.parent ? param.parent : null;
 
   const result = await Category.find({
-    isActive: true,
+   // isActive: true,
     isService: param.is_service,
-    parent: parent,
+   // parent: parent,
   })
-    .select("id categoryName isService parent")
+    .select("id categoryName isService ")
     .sort({ createdAt: "desc" });
 
   if (result && result.length > 0) return result;
@@ -2093,9 +2094,9 @@ async function addService(req) {
 
   var lName = param.name.toLowerCase();
 
-  if (await Services.findOne({ lname: lName })) {
-    throw 'Service Name "' + param.name + '" already exists.';
-  }
+  // if (await Services.findOne({ lname: lName })) {
+  //   throw 'Service Name "' + param.name + '" already exists.';
+  // }
 
   // if (files.length > 0) {
 
@@ -2524,7 +2525,7 @@ async function serviceStatusUpdate(req) {
 async function getServiceItems(req) {
   try {
     let id = req.params.id;
-    let result = await Services.find({ $or: [{ createdBy: id }, { _id: id }] })
+    let result = await Services.find({ $or: [{ createdBy: id }, { _id: id }],isAvailable:true })
       // let result = await Services.find({ $or: [
       //   { 'createdBy.userId': id },
       //   { _id: id }
@@ -2735,6 +2736,18 @@ async function sellerServiceOrders(req) {
   }
 }
 
+// async function servicesCheckName (req, res) {
+//     try {
+//         const result = await Services.find({})
+//             .sort({ createdAt: 'desc' })
+//         if (result && result.length > 0) {
+//             //    console.log("service-list ", result)
+//             return result
+//         }
+//     } catch (error) {
+//         console.log(error);
+//     }
+// }
 // POST API CREATE NEW BANNER....................................
 async function createSellerBanner(req, res) {
   try {

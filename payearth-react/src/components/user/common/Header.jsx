@@ -112,6 +112,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
       param = /t=([^&]+)/.exec(url)[1] === "resetpass" ? true : false;
     }
   }
+  const [navbarExpanded, setNavbarExpanded] = useState(false);
   const [resetModal, setReset] = useState(param);
   const openmodalHandler = () => {
     setRegister(false);
@@ -566,6 +567,16 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
     }
   }
 
+  const renderItems = (items) => {
+    return items.map((item, index) => (
+      <li className="nav-item" key={index}>
+        <Link className="nav-link" to={isService === 0 ? `product-listing?cat=${item._id}` : `/service-listing?cat=${item._id}`}>
+          {item.name}
+        </Link>
+      </li>
+    ));
+  };
+
   return (
     <React.Fragment>
       {loginModal && (
@@ -926,51 +937,55 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
                             </button>
                           </div>
                         </div>
-                        <ul className="navbar-nav justify-content-end flex-grow-1 pe-0">
-                          {data && data.length
-                            ? data.map((value, index) => {
-                              if (isService === 0) {
-                                return (
-                                  <li
-                                    className="nav-item dropdown"
-                                    key={index}
+                        <div className="container-fluid">
+                          {data && data.length > 4 && (
+                            <button
+                              className="navbar-toggler px-0"
+                              type="button"
+                              aria-controls="navbarExampleOnHover"
+                              aria-expanded={navbarExpanded}
+                              aria-label="Toggle navigation"
+                              onClick={() => setNavbarExpanded(!navbarExpanded)}
+                            >
+                              <i className="fas fa-bars"></i>
+                            </button>
+                          )}
+
+                          <div className={`collapse navbar-collapse ${navbarExpanded ? 'show' : ''}`} id="navbarExampleOnHover">
+                            <ul className="navbar-nav justify-content-end flex-grow-1 pe-0">
+                              {data && data.length ? renderItems(data.slice(0, 4)) : ""}
+                              {data && data.length > 4 && (
+                                <li className="nav-item dropdown dropdown-hover position-static">
+                                  <a
+                                    className="nav-link dropdown-toggle view_more"
+                                    href="#"
+                                    id="viewMoreDropdown"
+                                    role="button"
+                                    aria-expanded="false"
+                                    onClick={(e) => e.preventDefault()}
                                   >
-                                    <Link
-                                      className="nav-link dropdown-toggle"
-                                      to={`product-listing?cat=${value._id}`}
-                                      id="offcanvasNavbarDropdown"
-                                      aria-expanded="false"
-                                    >
-                                      {value.name}
-                                    </Link>
-                                    {subCategories(
-                                      value["_id"],
-                                      value.subCategories
-                                    )}
-                                  </li>
-                                );
-                              } else {
-                                return (
-                                  <li
-                                    className="nav-item dropdown"
-                                    key={index}
-                                  >
-                                    {/* `service-listing?cat=${value._id}` */}
-                                    <Link
-                                      id="offcanvasNavbarDropdown"
-                                      className="nav-link gap-2"
-                                      to={`/service-listing?cat=${value._id}`}
-                                      // id="offcanvasNavbarDropdown"
-                                      aria-expanded="false"
-                                    >
-                                      {value.name}
-                                    </Link>
-                                  </li>
-                                );
-                              }
-                            })
-                            : ""}
-                        </ul>
+                                    View More
+                                  </a>
+                                  <div className="dropdown-menu  w-75 mt-0 end-0" aria-labelledby="viewMoreDropdown" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0 }}>
+                                    <div className="container">
+                                      <div className="row my-3">
+                                        {data.slice(4).map((item, index) => (
+                                          <div className="col-md-6 col-lg-4 mb-3 mb-lg-0 " key={index}>
+                                            <div className="list-group list-group-flush">
+                                              <Link className="list-group-item list-group-item-action" to={isService === 0 ? `product-listing?cat=${item._id}` : `/service-listing?cat=${item._id}`}>
+                                                {item.name}
+                                              </Link>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </li>
+                              )}
+                            </ul>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

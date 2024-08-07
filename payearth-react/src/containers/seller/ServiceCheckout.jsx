@@ -27,7 +27,7 @@ class ServiceCheckout extends Component {
         this.userInfo = store.getState().auth.userInfo;
         let serviceName = localStorage.getItem('serviceName');
         let serviceCategory = localStorage.getItem('serviceCategory');
-
+        console.log('serviceCategory---', serviceCategory)
         this.state = {
             formStatus: false,
             chargeData: '',
@@ -100,6 +100,16 @@ class ServiceCheckout extends Component {
             this.setState({ selectCard: retrievedDataset })
         } else {
             this.setState({ selectCard: null })
+        }
+
+        var serviceData = localStorage.getItem('serviceData');
+        if (serviceData) {
+            var retriveServiceData = JSON.parse(serviceData);
+            console.log("Check ServiceData name", retriveServiceData.name);
+            console.log("Check ServiceData name", retriveServiceData);
+            this.setState({ serviceName: retriveServiceData.name })
+            this.setState({ serviceCategory: retriveServiceData.category })
+            this.setState({ serviceCategoryName: retriveServiceData.categoryName })
         }
     }
 
@@ -698,14 +708,14 @@ class ServiceCheckout extends Component {
                 if (response.data.status) {
                     //   this.props.history.push('/seller/service-checkout');
                 }
-             //   console.log('its ressssss', response)
+                //   console.log('its ressssss', response)
             }).catch(error => {
                 console.log('error =>', error)
                 if (error.response) {
                     toast.error(error.response.data.message);
                 }
             }).finally(() => {
-               // console.log('inside the finally block')
+                // console.log('inside the finally block')
                 setTimeout(() => {
                     //   this.dispatch(setLoading({ loading: false }));
                 }, 300);
@@ -751,7 +761,8 @@ class ServiceCheckout extends Component {
     }
 
     render() {
-        const { selectCard, planPrice, serviceName, serviceCategory, isLoading, stripeResponse } = this.state;
+        const { selectCard, planPrice, serviceName, serviceCategory, serviceCategoryName, isLoading, stripeResponse } = this.state;
+        console.log('serviceCategory---', serviceCategory)
         this.onSubmit = () => {
             let disCode = document.getElementById('myCoupon').value
             console.log(disCode)
@@ -804,7 +815,7 @@ class ServiceCheckout extends Component {
                                         <div className="payment_list">
                                             <ul>
                                                 <li>Service Name : <b>{serviceName}</b></li>
-                                                <li>Service Category : <b>{serviceCategory}</b></li>
+                                                <li>Service Category : <b>{serviceCategoryName}</b></li>
                                                 <li>Subscription Price : <b>$ {planPrice}</b></li>
                                                 {/* <li>Tax(18%) : {this.getTotal().tax}$ </li> */}
                                             </ul>

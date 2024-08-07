@@ -15,6 +15,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import arrow_back from './../../assets/icons/arrow-back.svg'
 import CryptoJS from 'crypto-js';
+import editServiceSchema from '../../validation-schemas/editServiceSchema';
 
 class EditService extends Component {
 
@@ -394,14 +395,15 @@ class EditService extends Component {
                                 <div className="dash_inner_wrap">
                                     <Formik
                                         initialValues={{
-                                            name: '',
-                                            charges: '',
+                                            name: serviceName ||'',
+                                            charges: charges ||'',
                                             category: defaultCatOption?.value,
                                             description: '',
                                             featuredImg: ''
                                         }}
+                                        enableReinitialize
                                         onSubmit={values => this.handleSubmit(values)}
-                                    // validationSchema={addServiceSchema}
+                                     validationSchema={editServiceSchema}
                                     >
                                         {({ values,
                                             errors,
@@ -493,8 +495,8 @@ class EditService extends Component {
                                                                             [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
                                                                             [{ 'list': 'ordered' }, { 'list': 'bullet' }],
                                                                             ['bold', 'italic', 'underline'],
-                                                                            ['link', 'image'],
                                                                             [{ 'align': [] }],
+                                                                            ['link', 'image'],
                                                                             ['clean']
                                                                         ]
                                                                     }}

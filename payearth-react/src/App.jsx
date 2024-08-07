@@ -101,6 +101,10 @@ import ManageBannerAdvertisement from "./containers/admin/ManageBannerAdvertisem
 import ManageBannerList from "./containers/admin/ManageBannerList";
 import ManageBannerListEdit from "./containers/admin/ManageBannerListEdit";
 
+import ManageProductsCategory from "../src/containers/admin/ManageProductsCategory";
+import ManageServiceCategory from "../src/containers/admin/ManageServiceCategory";
+
+
 import AdminManageSubPlan from "./containers/admin/ManageSubscriptionPlan";
 
 import AdminEditService from "./containers/admin/EditService";
@@ -129,6 +133,7 @@ import StripePaymentForms from "./containers/user/paymentCheckoutStripe";
 import StripePaymentForm from "./containers/user/paymentCheckoutStripe";
 import ServiceOrder from "./containers/user/service/ServiceOrder";
 import adminAddService from './containers/admin/AddService';
+import ManageCategories from "./containers/admin/ManageCategories";
 
 
 function App() {
@@ -634,6 +639,33 @@ function App() {
             path="/admin/manage-services"
             restricted={false}
             component={ManageServices}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/admin/manage-categories"
+            restricted={false}
+            component={ManageCategories}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/admin/manage-categories-product"
+            restricted={false}
+            component={ManageProductsCategory}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/admin/manage-categories-services"
+            restricted={false}
+            component={ManageServiceCategory}
             roles={[Role.admin]}
             currentUserRole={userInfo.role}
             exact

@@ -1,11 +1,11 @@
 var mongoose = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
-const Schema = mongoose.Schema; 
-  
+const Schema = mongoose.Schema;
+
 
 
 const schema = new Schema({
-    serviceCode: { type: String, unique: true, required: false, index: true, default: function() { return getRandomString(8); } },
+    serviceCode: { type: String, unique: true, required: false, index: true, default: function () { return getRandomString(8); } },
     name: { type: String, required: true },
     lname: { type: String, required: false, default: "", index: true },
     slug: { type: String, required: false, default: "" },
@@ -15,8 +15,9 @@ const schema = new Schema({
     featuredImage: { type: String, required: false, default: "" },
     imageId: { type: String, required: false, default: "" },
     isActive: { type: Boolean, required: false, default: true },
+    isAvailable: { type: Boolean, required: false, default: true },
     approveStatus: { type: String, enum: ["none", "pending", "reject"], required: false, default: "none" },
-    reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
+    reviews: [{ type: Schema.Types.ObjectId, ref: 'ServiceReview' }],
     reviewCount: { type: Number, required: false, default: 0 },
     totalRatingScore: { type: Number, required: false, default: 0 },
     avgRating: { type: Number, required: false, default: 0 },

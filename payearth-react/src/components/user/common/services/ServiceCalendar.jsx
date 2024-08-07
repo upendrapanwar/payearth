@@ -8,28 +8,21 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { toast } from "react-toastify";
 import moment from "moment";
-// import io from "socket.io-client";
-
-const SOCKET_SERVER_URL = process.env.REACT_APP_SOCKET_SERVER_URL;
 
 function ServiceCalendar() {
   //get global authInfo for userId
   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
   const user_id = authInfo.id;
+
   //get accessToken from google calendar auth
-
-
   const accessToken = localStorage.getItem("accessToken");
-
-  //myChange>>>>>>>   refreshToken
-  // const accessToken = localStorage.getItem("refreshToken");
+  const refreshToken = localStorage.getItem("refreshToken");
 
   //get serviceId with help of useParams
   // Create a socket instance
   const socket = useRef(null);
   const { id } = useParams();
   const service_id = id;
-
   const [formOpen, setFormOpen] = useState(false);
   const [eventDetails, setEventDetails] = useState([]);
   const [newEvent, setNewEvent] = useState({
@@ -37,13 +30,12 @@ function ServiceCalendar() {
     meetingTime: "",
     description: "",
   });
-
   // const [notification, setNotification] = useState([]);
   const [zoomAuth, setZoomAuth] = useState([]);
-
   const calendarRef = useRef(null);
 
-  //fetch meeting data created by user
+
+  //Google calendar Events data are being fetched by data base  
   const fetchEvents = async () => {
     try {
       const response = await axios.get(`/user/get-meeting/${authInfo.id}`, {
@@ -70,6 +62,7 @@ function ServiceCalendar() {
     }
   };
 
+
   //useEffect for re-rendering
   useEffect(() => {
     if (!localStorage.getItem("authInfo")) {
@@ -77,15 +70,12 @@ function ServiceCalendar() {
     } else {
       fetchEvents();
       fetchGoogleEvents();
-      toast.success("New event added!");
     }
   }, [id]);
 
+
   //handleDateClick for open form to add new event
   const handleDateClick = (arg) => {
-
-    console.log("arg.dateStr", arg.dateStr)
-
     setNewEvent((prevEvent) => ({
       ...prevEvent,
       meetingDate: arg.dateStr,
@@ -93,6 +83,7 @@ function ServiceCalendar() {
     // fetchEvents();
     setFormOpen(true);
   };
+
 
   //handleInputChange onChange event for form
   const handleInputChange = (event) => {
@@ -103,14 +94,13 @@ function ServiceCalendar() {
     });
   };
 
+
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-
     // Calculate start_datetime
     const start_datetime = moment(
       `${newEvent.meetingDate}T${newEvent.meetingTime}`
     ).toISOString(); // Convert to ISO string format
-
     // Check if the selected date is after the current date
     if (moment(start_datetime).isBefore(moment(), "day")) {
       // If the selected date is before the current date, show an error toast
@@ -120,24 +110,21 @@ function ServiceCalendar() {
 
     // Calculate end_datetime by adding 1 hour to start_datetime
     const end_datetime = moment(start_datetime).add(1, "hour").toISOString(); // Convert to ISO string format
-
     const eventData = {
       start: {
         dateTime: start_datetime,
-        timeZone: "Asia/Kolkata", // Update with your time zone
+        timeZone: "Europe/Paris",
       },
       end: {
         dateTime: end_datetime,
-        timeZone: "Asia/Kolkata", // Update with your time zone
+        timeZone: "Europe/Paris",
       },
       summary: newEvent.event_title,
       description: newEvent.description,
-      location: "https://ZoomMeeting.com", // Update with your meeting URL
+      location: "https://ZoomMeeting.com",
     };
 
-    console.log("eventData : ", eventData)
-
-    console.log("accessToken for calnder", accessToken)
+    //Event wii be saved on google calendar
     try {
       await axios.post(
         `https://www.googleapis.com/calendar/v3/calendars/primary/events`,
@@ -153,15 +140,14 @@ function ServiceCalendar() {
       setFormOpen(false);
       // Optionally, you can update state or perform other actions after successful submission
       setNewEvent({ meetingDate: "", meetingTime: "", description: "", event_title: "" });
-
       fetchGoogleEvents();
     } catch (error) {
       toast.error("Event hasn't added");
-
       console.error("Error submitting form:", error);
     }
   };
 
+  //envent is being fetched by google calendar
   const fetchGoogleEvents = async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
@@ -173,6 +159,7 @@ function ServiceCalendar() {
           },
         }
       );
+
       const eventsData = response.data.items.map((item) => ({
         eventId: item.id,
         title: item.summary,
@@ -181,11 +168,11 @@ function ServiceCalendar() {
         description: item.description,
         meeting_url: item.location,
       }));
-
       //get last index data from eventsData
       if (eventsData.length > 0) {
         const lastEvent = eventsData[eventsData.length - 1];
-        // Call saveCalendarEvents to save the fetched data
+
+        //google calender Event will be saved in the data base
         saveCalendarEvents([lastEvent], service_id, user_id);
       } else {
         console.log("No events fetched.");
@@ -195,7 +182,7 @@ function ServiceCalendar() {
     }
   };
 
-  //save calendar data in database
+  //google calender Event will be saved in the data base
   const saveCalendarEvents = async (eventsData, service_id, user_id) => {
     try {
       const requestData = eventsData.map((event) => ({
@@ -208,7 +195,6 @@ function ServiceCalendar() {
         event_description: event.description,
         meeting_url: event.meeting_url,
       }));
-
       const response = await axios.post(
         `/user/add-meeting-user/${authInfo.id}`,
         requestData,
@@ -226,18 +212,20 @@ function ServiceCalendar() {
     }
   };
 
+
   //show pop up after add event by user
   const eventDidMountHandler = (info) => {
     const startTime = moment(info.event.start).format("YYYY-MM-DD HH:mm");
     const endTime = moment(info.event.end).format("YYYY-MM-DD HH:mm");
-
     const popover = new bootstrap.Popover(info.el, {
       title: info.event._def.extendedProps.meetingTitle,
       placement: "auto",
       trigger: "hover",
+      trigger: "click",
       customClass: "popoverStyle",
       content: `<p><strong>Name: </strong>${info.event._def.extendedProps.user_name}</p>
                     <p><strong>Description: </strong>Meeting will be held for ${info.event._def.extendedProps.description} appointment.</p>
+                    <p><strong>Description: </strong>${info.event._def.extendedProps.description} appointment.</p>
                     <p><strong>Start Time: </strong>${startTime}</p>
                     <p><strong>End Time: </strong>${endTime}</p>
                     <p><strong>Zoom Meeting url: </strong>${info.event._def.extendedProps.meeting_url}</p>`,
@@ -250,6 +238,7 @@ function ServiceCalendar() {
     }, 3000);
     return popover;
   };
+
 
   //pop-up style
   const eventCellDidMountHandler = (info) => {
@@ -276,11 +265,12 @@ function ServiceCalendar() {
     });
   };
 
+
+  //Events will be deleted from google calendar & data base
   const handleDeleteEvent = async (id, event_id) => {
+    //Events will be deleted from google calendar
     try {
       const accessToken = localStorage.getItem("accessToken");
-
-      // Make a DELETE request to Google Calendar API to delete the event
       await axios.delete(
         `https://www.googleapis.com/calendar/v3/calendars/primary/events/${event_id}`,
         {
@@ -292,19 +282,21 @@ function ServiceCalendar() {
     } catch (error) {
       console.error("Error deleting event from google calender:", error);
     }
+
+    //Events will be deleted from data base
     try {
       await axios.delete(`/user/delete-meeting/${id}`, {
         headers: {
           Authorization: `Bearer ${authInfo.token}`,
         },
       });
-
       setEventDetails(eventDetails.filter((event) => event.id !== id));
       // hidePopover();
     } catch (error) {
       console.error("Error deleting event:", error);
     }
   };
+
 
   return (
     <React.Fragment>
@@ -321,6 +313,8 @@ function ServiceCalendar() {
                   aria-label="Close"
                 ></button>
               </div>
+
+              {/* Modal form will be added events on google calendar */}
               <div className="modal-body">
                 <form onSubmit={handleFormSubmit}>
                   <div className="mb-3">
@@ -388,22 +382,34 @@ function ServiceCalendar() {
           </div>
         </div>
       )}
+
+      {/* Full Calendar are being displayed calendar */}
       <FullCalendar
+        height="125vh"
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView={"dayGridMonth"}
         initialDate={new Date()}
+        headerToolbar={{
+          left: '', // Hide default left buttons
+          center: 'title', // Center the title
+          right: 'prev,next today' // Default buttons on the right
+        }}
         dateClick={handleDateClick}
         events={eventDetails}
         eventDidMount={(info) => {
           eventDidMountHandler(info);
           eventCellDidMountHandler(info);
         }}
+
+        // Event will be display in the calendar
         eventContent={(eventInfo) => {
           return (
             <div className="row">
               <div className="col-8">
-                &nbsp;<span>{eventInfo.event.extendedProps.description}</span>
+                &nbsp;<span>{eventInfo.event.extendedProps.meetingTitle}</span>
               </div>
+
+              {/* Event will be deleted by button */}
               <div className="col-2">
                 <button
                   className="btn-close btn-close-white ms-auto"
@@ -424,5 +430,4 @@ function ServiceCalendar() {
     </React.Fragment>
   );
 }
-
 export default ServiceCalendar;
