@@ -88,7 +88,8 @@ const Services = (props) => {
                 <div className="col-sm-12 m-auto">
                 <SectionTitle title="Our Services" />
                   <div className="cards_wrapper">
-                    {currentServiceData.map((service) => (
+                  {currentServiceData.length > 0 ? (
+                    currentServiceData.map((service) => (
                       <Link
                         key={service._id}
                         className="card"
@@ -116,7 +117,12 @@ const Services = (props) => {
                           </div>
                         </div>
                       </Link>
-                    ))}
+                    ))
+                  ) : (
+                    <div className=" col-sm-12 m-auto ">
+                    <p className="text-center fw-bold">No service available</p>
+                    </div>
+                  )}
                   </div>
                   {/* Pagination controls */}
                   <div className="cart-pagination">

@@ -182,20 +182,14 @@ class ServiceListing extends Component {
     //console.log(" service average------", average);
 
     const stars = [];
-    // Calculate full stars
     const fullStars = Math.floor(average);
-    // Check if there's a half star
     const hasHalfStar = average - fullStars >= 0.5;
-    // Iterate through 5 stars
     for (let i = 0; i < 5; i++) {
       if (i < fullStars) {
-        // Full star
         stars.push(<li className="star rated" key={i}></li>);
       } else if (hasHalfStar && i === fullStars) {
-        // Half star
         stars.push(<li className="star half-star" key={i}></li>);
       } else {
-        // Empty star
         stars.push(<li className="star" key={i}></li>);
       }
     }

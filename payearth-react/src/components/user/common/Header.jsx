@@ -164,7 +164,8 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
     dispatch(setUserInfo({ userInfo: [] }));
     dispatch(setIsService({ isService: 0 }));
     setIsToggle(false);
-    window.location.href = "/";
+    //window.location.href = "/";
+    history.push('/');
   };
   const removeBackdrop = () => {
     const elements = document.getElementsByClassName("offcanvas-backdrop");

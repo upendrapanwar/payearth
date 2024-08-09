@@ -326,24 +326,11 @@ class ServiceOrders extends Component {
     }).then((response) => {
       // console.log("all servicess with user", response);
       const userdata = response.data.data;
-      // const activeServices = response.data.data.filter(item => item.isActive === true);
-      // const inactiveServices = response.data.data.filter(item => item.isActive === false);
-
       this.setState({
-        // activeServiceData: activeServices, 
         userServiceData: userdata,
         loading: false,
         error: null
-        //   pagination: response.data.data.paginationData
       });
-
-      // this.setState({
-      //    // inactiveServiceData: inactiveServices,
-
-      //     loading: false,
-      //     error: null
-      //     //   pagination: response.data.data.paginationData
-      // });
     })
       .catch(error => {
         if (error.response && error.response.data.status === false) {

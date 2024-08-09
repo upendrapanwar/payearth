@@ -2730,9 +2730,11 @@ async function sellerServiceOrders(req) {
       if (result && result.length > 0) {
             //  console.log("service-list ", result)
           return result
+      } else {
+        return [];
       }
   } catch (error) {
-      console.log(error);
+    console.log(error);
   }
 }
 

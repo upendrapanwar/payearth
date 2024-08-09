@@ -291,47 +291,47 @@ class ServiceStockManagement extends Component {
     //   ),
     //   sortable: true,
     // },
-    {
-      name: "Subscriber_Name",
-      selector: (row, i) => row.userId.name,
-      sortable: true,
-    },
-    {
-      name: "Subscriber_Email",
-      selector: (row, i) => row.userId.email,
-      sortable: true,
-    },
-    {
-      name: "Service ID",
-      selector: (row, i) => row.serviceId === null ? "" : row.serviceId.serviceCode,
-      sortable: true,
-    },
-    {
-      name: "Service Name",
-      selector: (row, i) => row.serviceId === null ? "" : row.serviceId.name,
-      sortable: true,
-    },
-    {
-      name: "Category",
-      selector: (row, i) => row.serviceId === null ? "" : row.serviceId.category.categoryName,
-      sortable: true,
-    },
-    // author
-    {
-      name: "Meeting Date & Time",
-      selector: (row, i) => row.createdAt,
-      sortable: true,
-      width: "200px",
+    // {
+    //   name: "Subscriber_Name",
+    //   selector: (row, i) => row.userId.name,
+    //   sortable: true,
+    // },
+    // {
+    //   name: "Subscriber_Email",
+    //   selector: (row, i) => row.userId.email,
+    //   sortable: true,
+    // },
+    // {
+    //   name: "Service ID",
+    //   selector: (row, i) => row.serviceId === null ? "" : row.serviceId.serviceCode,
+    //   sortable: true,
+    // },
+    // {
+    //   name: "Service Name",
+    //   selector: (row, i) => row.serviceId === null ? "" : row.serviceId.name,
+    //   sortable: true,
+    // },
+    // {
+    //   name: "Category",
+    //   selector: (row, i) => row.serviceId === null ? "" : row.serviceId.category.categoryName,
+    //   sortable: true,
+    // },
+    // // author
+    // {
+    //   name: "Meeting Date & Time",
+    //   selector: (row, i) => row.createdAt,
+    //   sortable: true,
+    //   width: "200px",
 
-      cell: (row) => {
-        const options = { year: "numeric", month: "long", day: "numeric" };
-        const date = new Date(row.meetingDate).toLocaleDateString(
-          "en-US",
-          options
-        );
-        return <div>{date}</div>;
-      },
-    },
+    //   cell: (row) => {
+    //     const options = { year: "numeric", month: "long", day: "numeric" };
+    //     const date = new Date(row.meetingDate).toLocaleDateString(
+    //       "en-US",
+    //       options
+    //     );
+    //     return <div>{date}</div>;
+    //   },
+    // },
     // {
     //   name: "Status",
     //   selector: (row, i) =>
@@ -386,56 +386,56 @@ class ServiceStockManagement extends Component {
     //   ),
     //   sortable: true,
     // },
-    {
-      name: "Subscriber_Name",
-      selector: (row, i) => row.userId.name,
-      sortable: true,
-    },
-    {
-      name: "Subscriber_Email",
-      selector: (row, i) => row.userId.email,
-      sortable: true,
-    },
-    {
-      name: "Service ID",
-      selector: (row, i) => row.serviceId.serviceCode,
-      sortable: true,
-    },
-    {
-      name: "Service Name",
-      selector: (row, i) => row.serviceId.name,
-      sortable: true,
-    },
-    {
-      name: "Category",
-      selector: (row, i) => row.serviceId.category.categoryName,
-      sortable: true,
-    },
-    // author
-    {
-      name: "Service Start Date & Time",
-      selector: (row, i) => row.createdAt,
-      sortable: true,
-      width: "200px",
+    // {
+    //   name: "Subscriber_Name",
+    //   selector: (row, i) => row.userId.name,
+    //   sortable: true,
+    // },
+    // {
+    //   name: "Subscriber_Email",
+    //   selector: (row, i) => row.userId.email,
+    //   sortable: true,
+    // },
+    // {
+    //   name: "Service ID",
+    //   selector: (row, i) => row.serviceId.serviceCode,
+    //   sortable: true,
+    // },
+    // {
+    //   name: "Service Name",
+    //   selector: (row, i) => row.serviceId.name,
+    //   sortable: true,
+    // },
+    // {
+    //   name: "Category",
+    //   selector: (row, i) => row.serviceId.category.categoryName,
+    //   sortable: true,
+    // },
+    // // author
+    // {
+    //   name: "Service Start Date & Time",
+    //   selector: (row, i) => row.createdAt,
+    //   sortable: true,
+    //   width: "200px",
 
-      cell: (row) => {
-        const options = { year: "numeric", month: "long", day: "numeric" };
-        const date = new Date(row.meetingDate).toLocaleDateString(
-          "en-US",
-          options
-        );
-        return <div>{date}</div>;
-      },
-    },
-    {
-      name: "Status",
-      selector: (row, i) => (
-        <p className="p-1 text-white bg-success  bg-opacity-6 border-info rounded">
-          {row.meetingStatus}
-        </p>
-      ),
-      sortable: true,
-    },
+    //   cell: (row) => {
+    //     const options = { year: "numeric", month: "long", day: "numeric" };
+    //     const date = new Date(row.meetingDate).toLocaleDateString(
+    //       "en-US",
+    //       options
+    //     );
+    //     return <div>{date}</div>;
+    //   },
+    // },
+    // {
+    //   name: "Status",
+    //   selector: (row, i) => (
+    //     <p className="p-1 text-white bg-success  bg-opacity-6 border-info rounded">
+    //       {row.meetingStatus}
+    //     </p>
+    //   ),
+    //   sortable: true,
+    // },
     // {
     //   name: "Actions",
     //   // width: "350px",

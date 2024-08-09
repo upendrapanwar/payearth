@@ -183,12 +183,13 @@ const ServiceDetails = () => {
                         <p>Service Code : {data.serviceCode}</p>
                         <p>Category : {data.category.categoryName}</p>
                       </div>
-                      <div className="pdi_desc"></div>
+                      <div className="pdi_desc">
                       <p>Description :</p>
-                      <p className="ql-editor ql-discription">
+                      <div className="ql-editor ql-discription">
                         {" "}
                         {data.description ? parse(data.description) : ""}
-                      </p>
+                      </div>
+                      </div>
                       <div className="pdi_fea prod_foot">
                         <button
                           className="btn custom_btn btn_yellow mx-4"

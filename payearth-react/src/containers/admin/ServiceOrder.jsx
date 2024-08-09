@@ -522,23 +522,11 @@ class ServiceOrders extends Component {
         }).then((response) => {
             console.log("all servicess with user", response);
             const userdata = response.data.data.filter(item => item.serviceId !== null);
-            // const activeServices = response.data.data.filter(item => item.isActive === true);
-            // const inactiveServices = response.data.data.filter(item => item.isActive === false);
-            this.setState({
-                // activeServiceData: activeServices, 
+            this.setState({ 
                 userServiceData: userdata,
                 loading: false,
                 error: null
-                //   pagination: response.data.data.paginationData
             });
-
-            // this.setState({
-            //    // inactiveServiceData: inactiveServices,
-
-            //     loading: false,
-            //     error: null
-            //     //   pagination: response.data.data.paginationData
-            // });
         })
             .catch(error => {
                 if (error.response && error.response.data.status === false) {
@@ -560,7 +548,7 @@ class ServiceOrders extends Component {
     userService_column = [
         {
             name: "USERS",
-            selector: (row, i) => row.userId.name || 'N/A',
+            selector: (row, i) => (row.userId && row.userId.name) ? row.userId.name : 'N/A',
             sortable: true
         },
         {
@@ -594,6 +582,7 @@ class ServiceOrders extends Component {
         // console.log('userServiceData-------',userServiceData)
         return (
             <React.Fragment>
+                {loading === true ? <SpinnerLoader /> : ""}
                 <div className="seller_body">
                     <Header />
                     <div className="inr_top_page_title">
