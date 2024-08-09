@@ -64,6 +64,7 @@ import SellerBannerList from './containers/seller/ManageBannerList';
 import SellerBannerEdit from './containers/seller/ManageBannerListEdit';
 import AdvertiseShare from "./components/common/AdvertiseShare";
 import SellerManageSubscription from "./containers/seller/ManageSubscriptionPlan";
+import SellerCommunity from "./containers/community/sellerCommunity";
 
 
 import AdminLogin from "./containers/admin/Login";
@@ -815,7 +816,8 @@ function App() {
             component={AdminEditService}
             roles={[Role.admin]}
             currentUserRole={userInfo.role}
-            exact />
+            exact
+          />
 
           <PublicRoute
             path="/community"
@@ -823,6 +825,14 @@ function App() {
             component={Community}
             exact
           />
+
+          <PublicRoute
+            path="/seller_community"
+            restricted={false}
+            component={SellerCommunity}
+            exact
+          />
+
           <PublicRoute
             path="/community-profile"
             restricted={false}

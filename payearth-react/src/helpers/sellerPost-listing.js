@@ -1,17 +1,24 @@
 import axios from "axios";
-import { setPostsData } from "../store/reducers/post-reducer";
+import { setSellerPostsData } from "../store/reducers/post-reducer";
 import { setLoading } from './../store/reducers/global-reducer';
 
-const getPostsData = async (dispatch) => {
+const getSellerPostsData = async (dispatch) => {
+    console.log("seller post function run")
     dispatch(setLoading({ loading: true }));
     const authInfo = JSON.parse(localStorage.getItem("authInfo"));
     console.log("AuthId", authInfo.id)
-    await axios.get(`community/front/posts/${authInfo.id}`)
+    const config = {
+        headers: {
+            Authorization: `Bearer ${authInfo.token}`,
+        },
+    };
+    await axios.get(`/seller/seller_community/posts/${authInfo.id}`, config)
         .then(response => {
+            console.log("response>>", response)
             if (response.data.status) {
                 let res = response.data.data;
                 console.log("forntend post comminity response", res)
-                dispatch(setPostsData({ postsData: res }));
+                dispatch(setSellerPostsData({ SellerPostsData: res }));
             }
         }).catch(error => {
             console.log(error);
@@ -22,5 +29,4 @@ const getPostsData = async (dispatch) => {
         });
 }
 
-
-export { getPostsData };
+export { getSellerPostsData };

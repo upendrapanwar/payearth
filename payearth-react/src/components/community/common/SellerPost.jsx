@@ -12,7 +12,7 @@ import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-import SpinnerLoader from '../../../components/common/SpinnerLoader';
+import SpinnerLoader from '../../common/SpinnerLoader';
 import { setLoading } from '../../../store/reducers/global-reducer';
 import { getPostsData } from '../../../helpers/post-listing';
 import SimpleImageSlider from "react-simple-image-slider";
@@ -26,7 +26,7 @@ TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
 
 
-const Post = ({ posts, sendEditData }) => {
+const SellerPost = ({ posts, sendEditData }) => {
 
     // console.log("all posts", posts)
 
@@ -698,4 +698,4 @@ const Post = ({ posts, sendEditData }) => {
     );
 };
 
-export default Post;
+export default SellerPost;

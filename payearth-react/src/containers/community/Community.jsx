@@ -110,7 +110,9 @@ const Community = () => {
             post_status: postStatus,
             user_id: authInfo.id,
             seller_id: null,
+            admin_id: null,
             is_seller: false,
+            is_admin: false,
             parent_id: null
         };
 
@@ -328,12 +330,12 @@ const Community = () => {
         console.log("Data for edit test ###$$#$$#$#$#", data)
         setIsUpdate(true);
         const selectedCatOption = {
-            label: data.categoryId === null ? "" : data.categoryId.categoryName,
-            value: data.categoryId === null ? "" : data.categoryId.id,
+            label: data.categoryId === null ? null : data.categoryId.categoryName,
+            value: data.categoryId === null ? null : data.categoryId.id,
         }
         const selectedProOption = {
-            label: data.productId === null ? "" : data.productId.name,
-            value: data.productId === null ? "" : data.productId.id
+            label: data.productId === null ? null : data.productId.name,
+            value: data.productId === null ? null : data.productId.id
         }
         handleCategories(selectedCatOption)
         handleProducts(selectedProOption)
