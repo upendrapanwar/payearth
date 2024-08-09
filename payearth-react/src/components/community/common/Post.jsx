@@ -304,8 +304,9 @@ const Post = ({ posts, sendEditData }) => {
     const handleFollow = (posts) => {
         const currentUserId = authInfo.id;
         const userIdToFollow = posts.userId === null ? posts.sellerId.id : posts.userId.id;
+        const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
         var reqBody = {
-            role: posts.userId === null ? "seller" : "user",
+            role: role,
             currentUserId: currentUserId,
             userIdToFollow: userIdToFollow,
         }
@@ -317,9 +318,10 @@ const Post = ({ posts, sendEditData }) => {
             }
         }).then(response => {
             if (response.data.status) {
+                getPostsData(dispatch);
                 // console.log("response", response.data.message);
                 toast.success(response.data.message);
-                getPostsData(dispatch);
+
             }
         }).catch(error => {
             console.log(error);
@@ -328,8 +330,11 @@ const Post = ({ posts, sendEditData }) => {
 
     const handleUnfollow = (posts) => {
         const currentUserId = authInfo.id;
-        const userIdToUnfollow = posts.userId.id;
+        // const userIdToUnfollow = posts.userId.id;
+        const userIdToUnfollow = posts.userId === null ? posts.sellerId.id : posts.userId.id;
+        const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
         var reqBody = {
+            role: role,
             currentUserId: currentUserId,
             userIdToUnfollow: userIdToUnfollow,
         }
@@ -395,8 +400,10 @@ const Post = ({ posts, sendEditData }) => {
 
             console.log("response", response);
             setIsFollowing(response);
+
         };
         fetchData();
+        getPostsData(dispatch);
     }, []);
 
 

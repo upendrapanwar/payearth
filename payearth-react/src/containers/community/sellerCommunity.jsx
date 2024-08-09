@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Footer from '../../components/common/Footer';
 import Header from '../../components/seller/common/Header';
-import UserHeader from '../../components/user/common/Header';
 import userImg from '../../assets/images/user.png'
 import { Link } from 'react-router-dom';
 import InputEmoji from 'react-input-emoji'
@@ -14,7 +13,7 @@ import { useSelector } from 'react-redux';
 import config from '../.././config.json'
 import { useDispatch } from 'react-redux';
 import { NotFound } from '../../components/common/NotFound';
-import { getPostsData } from '../../helpers/post-listing';
+import { getSellerPostsData } from '../../helpers/sellerPost-listing';
 import Select from 'react-select';
 import Picker from 'emoji-picker-react';
 import { toast } from 'react-toastify';
@@ -110,7 +109,9 @@ const SellerCommunity = () => {
             post_status: postStatus,
             user_id: null,
             seller_id: authInfo.id,
+            admin_id: null,
             is_seller: true,
+            is_admin: false,
             parent_id: null
         };
 
@@ -232,7 +233,7 @@ const SellerCommunity = () => {
                         });
                     }
                 }
-                getPostsData(dispatch);
+                getSellerPostsData(dispatch);
             }
         } catch (error) {
             console.log(error);
@@ -320,20 +321,20 @@ const SellerCommunity = () => {
     }
 
     useEffect(() => {
-        getPostsData(dispatch);
+        getSellerPostsData(dispatch);
         getCategories();
     }, []);
 
     const handleEdit = (data) => {
-        console.log("Edit data in community", data)
+        console.log("Data for edit test ###$$#$$#$#$#", data)
         setIsUpdate(true);
         const selectedCatOption = {
-            label: data.categoryId.categoryName,
-            value: data.categoryId.id
+            label: data.categoryId === null ? null : data.categoryId.categoryName,
+            value: data.categoryId === null ? null : data.categoryId.id,
         }
         const selectedProOption = {
-            label: data.productId.name,
-            value: data.productId.id
+            label: data.productId === null ? null : data.productId.name,
+            value: data.productId === null ? null : data.productId.id
         }
         handleCategories(selectedCatOption)
         handleProducts(selectedProOption)
@@ -360,7 +361,7 @@ const SellerCommunity = () => {
         }).then(response => {
             if (response.data.status) {
                 toast.success(response.data.message);
-                getPostsData(dispatch);
+                getSellerPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
@@ -385,8 +386,7 @@ const SellerCommunity = () => {
     return (
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
-
-            <div className='seller_body'>           
+            <div className='seller_body'>        
                 <Header />
                 <div className="cumm_page_wrap pt-5 pb-5">
                     <div className="container">

@@ -134,6 +134,7 @@ module.exports = {
   deleteNotification,
 
   addPost,
+  getPosts
 };
 
 function sendMail(mailOptions) {
@@ -1416,9 +1417,9 @@ async function getCategories(req) {
   var parent = param.parent ? param.parent : null;
 
   const result = await Category.find({
-   // isActive: true,
+    // isActive: true,
     isService: param.is_service,
-   // parent: parent,
+    // parent: parent,
   })
     .select("id categoryName isService ")
     .sort({ createdAt: "desc" });
@@ -2525,7 +2526,7 @@ async function serviceStatusUpdate(req) {
 async function getServiceItems(req) {
   try {
     let id = req.params.id;
-    let result = await Services.find({ $or: [{ createdBy: id }, { _id: id }],isAvailable:true })
+    let result = await Services.find({ $or: [{ createdBy: id }, { _id: id }], isAvailable: true })
       // let result = await Services.find({ $or: [
       //   { 'createdBy.userId': id },
       //   { _id: id }
@@ -2695,44 +2696,44 @@ async function getCalendarEvents() {
 
 async function sellerServiceOrders(req) {
   const { id } = req.body;
-//  console.log('sellerId', id)
-  
-  try {
-      const filteredResult = await OrderDetails.find({ isService: true,})
-          .sort({ createdAt: 'desc' })
-          .populate({
-              path: "serviceId",
-              model: Services,
-              match: { 'createdBy': id },
-              select: "",
-              populate: [
-                  {
-                      path: "createdBy",
-                      model: Seller,
-                      select: ""
-                  },
-                  {
-                      path: "createdByAdmin",
-                      model: Admin,
-                      select: ""
-                  }
-              ]
-          },
-          )
-          .populate({
-              path: "userId",
-              model: User,
-              select: ""
-          },)
+  //  console.log('sellerId', id)
 
-          const result = filteredResult.filter(doc => doc.serviceId !== null);
-      //  .populate('category', 'categoryName');
-      if (result && result.length > 0) {
-            //  console.log("service-list ", result)
-          return result
-      }
+  try {
+    const filteredResult = await OrderDetails.find({ isService: true, })
+      .sort({ createdAt: 'desc' })
+      .populate({
+        path: "serviceId",
+        model: Services,
+        match: { 'createdBy': id },
+        select: "",
+        populate: [
+          {
+            path: "createdBy",
+            model: Seller,
+            select: ""
+          },
+          {
+            path: "createdByAdmin",
+            model: Admin,
+            select: ""
+          }
+        ]
+      },
+      )
+      .populate({
+        path: "userId",
+        model: User,
+        select: ""
+      },)
+
+    const result = filteredResult.filter(doc => doc.serviceId !== null);
+    //  .populate('category', 'categoryName');
+    if (result && result.length > 0) {
+      //  console.log("service-list ", result)
+      return result
+    }
   } catch (error) {
-      console.log(error);
+    console.log(error);
   }
 }
 
@@ -3604,26 +3605,26 @@ async function deleteNotification(req) {
 
 
 // community
-
 async function addPost(req) {
   const param = req.body;
 
   let input = {
-      postContent: param.content,
-      categoryId: param.category_id ? param.category_id : null,
-      productId: param.product_id ? param.product_id : null,
-      userId: param.user_id ? param.user_id : null,
-      sellerId: param.seller_id ? param.seller_id : null,
-      isSeller: param.is_seller,
-      postStatus: param.post_status,
-      postImages: [],
-      postVideos: [],
-      likeCount: 0,
-      likes: [],
-      commentCount: 0,
-      comments: [],
-      parentId: param.parent_id ? param.parent_id : null,
-      isActive: true
+    postContent: param.content,
+    categoryId: param.category_id ? param.category_id : null,
+    productId: param.product_id ? param.product_id : null,
+    userId: param.user_id ? param.user_id : null,
+    sellerId: param.seller_id ? param.seller_id : null,
+    isSeller: param.is_seller,
+    isAdmin: param.is_admin,
+    postStatus: param.post_status,
+    postImages: [],
+    postVideos: [],
+    likeCount: 0,
+    likes: [],
+    commentCount: 0,
+    comments: [],
+    parentId: param.parent_id ? param.parent_id : null,
+    isActive: true
   };
 
   const post = new Post(input);
@@ -3632,14 +3633,181 @@ async function addPost(req) {
 
   if (data) {
 
-      let res = await Post.findById(data.id).select();
+    let res = await Post.findById(data.id).select();
 
-      if (res) {
-          return res;
-      } else {
-          return false;
-      }
-  } else {
+    if (res) {
+      return res;
+    } else {
       return false;
+    }
+  } else {
+    return false;
   }
+}
+
+async function getPosts(req) {
+  const authorId = req.params.id;
+  console.log("authorId", authorId)
+  const seller = await Seller.findById(authorId).populate('community.followingData');
+
+  if (!seller) {
+    return { success: false, message: "User not founddddddddd" };
+  }
+  const followerIds = seller.community.followingData.map(follower => follower._id);
+  console.log("followerIds", followerIds)
+
+  const posts = await Post.find({
+    $or: [
+      { postStatus: "Public" },
+      {
+        postStatus: "Followers",
+        sellerId: { $in: followerIds }
+      },
+      { sellerId: authorId }
+    ],
+    isActive: true,
+  })
+    .sort({ createdAt: 'desc' })
+    .populate([
+      {
+        path: "sellerId",
+        model: Seller,
+        select: "name image_url community role",
+        match: { isActive: true },
+      },
+      {
+        path: "userId",
+        model: User,
+        select: "name image_url community role",
+        match: { isActive: true },
+      },
+      {
+        path: "postImages",
+        model: PostImages,
+        select: "url",
+        // match: { isActive: true }
+      },
+      // {
+      //   path: "postVideos",
+      //   model: PostVideos,
+      //   select: "url",
+      //   match: { isActive: true }
+      // },
+      // {
+      //   path: "categoryId",
+      //   model: Category,
+      //   select: "categoryName isService"
+      //   //match: { isActive: true }
+      // },
+      // {
+      //   path: "productId",
+      //   model: Product,
+      //   select: "name isService"
+      //   //match: { isActive: true }
+      // },
+      // {
+      //   path: "likes",
+      //   model: PostLike,
+      //   select: "-isActive -postId",
+      //   match: { isActive: true },
+      //   populate: [{
+      //     path: "sellerId",
+      //     model: Seller,
+      //     select: "name image_url",
+      //     match: { isActive: true },
+      //   },
+      //   {
+      //     path: "userId",
+      //     model: User,
+      //     select: "name image_url",
+      //     match: { isActive: true },
+      //   },
+      //   ]
+      // },
+      // {
+      //   path: "comments",
+      //   model: PostComment,
+      //   select: "-isActive -postId",
+      //   match: { isActive: true },
+      //   populate: [{
+      //     path: "sellerId",
+      //     model: Seller,
+      //     select: "name image_url",
+      //     match: { isActive: true },
+      //   },
+      //   {
+      //     path: "userId",
+      //     model: User,
+      //     select: "name image_url",
+      //     match: { isActive: true },
+      //   },
+      //   ]
+      // },
+      // {
+      //   path: "parentId",
+      //   model: Post,
+      //   match: { isActive: true },
+      //   populate: [{
+      //     path: "postImages",
+      //     model: PostImages,
+      //     select: "url",
+      //     match: { isActive: true }
+      //   },
+      //   {
+      //     path: "postVideos",
+      //     model: PostVideos,
+      //     select: "url",
+      //     match: { isActive: true }
+      //   },
+      //   {
+      //     path: "categoryId",
+      //     model: Category,
+      //     select: "categoryName isService"
+      //     //match: { isActive: true }
+      //   },
+      //   {
+      //     path: "productId",
+      //     model: Product,
+      //     select: "name isService"
+      //     //match: { isActive: true }
+      //   },
+      //   {
+      //     path: "sellerId",
+      //     model: Seller,
+      //     select: "name image_url",
+      //     match: { isActive: true },
+      //   },
+      //   {
+      //     path: "userId",
+      //     model: User,
+      //     select: "name image_url",
+      //     match: { isActive: true },
+      //   },
+      //   {
+      //     path: "likes",
+      //     model: PostLike,
+      //     select: "-isActive -postId",
+      //     match: { isActive: true },
+      //     populate: [{
+      //       path: "sellerId",
+      //       model: Seller,
+      //       select: "name image_url",
+      //       match: { isActive: true },
+      //     },
+      //     {
+      //       path: "userId",
+      //       model: User,
+      //       select: "name image_url",
+      //       match: { isActive: true },
+      //     },
+      //     ]
+      //   }
+      //   ]
+      // }
+    ]);
+  console.log("postIn seller", posts)
+  if (posts && posts.length > 0) {
+    // return posts;
+  }
+  return false;
 }

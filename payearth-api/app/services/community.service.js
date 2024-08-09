@@ -28,14 +28,13 @@ module.exports = {
 
 async function getPosts(req) {
     const authorId = req.params.id;
-    // console.log("authorId", authorId)
+    console.log("authorId", authorId)
     const user = await User.findById(authorId).populate('community.followingData');
     // console.log("user", user)
     if (!user) {
         return { success: false, message: "User not found" };
     }
     const followerIds = user.community.followingData.map(follower => follower._id);
-    // console.log("followerIds", followerIds)
 
     const posts = await Post.find({
         $or: [
@@ -53,13 +52,13 @@ async function getPosts(req) {
             {
                 path: "sellerId",
                 model: Seller,
-                select: "name image_url community",
+                select: "name image_url community role",
                 match: { isActive: true },
             },
             {
                 path: "userId",
                 model: User,
-                select: "name image_url community",
+                select: "name image_url community role",
                 match: { isActive: true },
             },
             {
@@ -186,8 +185,9 @@ async function getPosts(req) {
                 ]
             }
         ]);
-    // console.log("posts", posts)
+    // console.log("posts test", posts)
     if (posts && posts.length > 0) {
+        // console.log("posts test ", posts)
         return posts;
     }
     return false;
@@ -203,7 +203,9 @@ async function createPost(req) {
         productId: param.product_id ? param.product_id : null,
         userId: param.user_id ? param.user_id : null,
         sellerId: param.seller_id ? param.seller_id : null,
+        adminId: param.admin_id ? param.admin_id : null,
         isSeller: param.is_seller,
+        isAdmin: param.is_admin,
         postStatus: param.post_status,
         postImages: [],
         postVideos: [],
@@ -506,48 +508,7 @@ async function followUser(req) {
             return { success: true, message: 'Followed successfully....!' };
         }
 
-        // if (role === "seller") {
-        //     console.log("seller follow function run..")
-
-        //     await Seller.updateOne(
-        //         { _id: currentUserId },
-        //         {
-        //             $addToSet: { 'community.followingData': userIdToFollow },
-        //             $inc: { 'community.following': 1 }
-        //         }
-        //     );
-
-        //     await Seller.updateOne(
-        //         { _id: userIdToFollow },
-        //         {
-        //             $addToSet: { 'community.followerData': currentUserId },
-        //             $inc: { 'community.followers': 1 }
-        //         }
-        //     );
-        //     return { success: true, message: 'Followed successfully....!' };
-
-        // } else if (role === "user") {
-        //     console.log("user follow function run..")
-        //     await User.updateOne(
-        //         { _id: currentUserId },
-        //         {
-        //             $addToSet: { 'community.followingData': userIdToFollow },
-        //             $inc: { 'community.following': 1 }
-        //         }
-        //     );
-
-        //     await User.updateOne(
-        //         { _id: userIdToFollow },
-        //         {
-        //             $addToSet: { 'community.followerData': currentUserId },
-        //             $inc: { 'community.followers': 1 }
-        //         }
-        //     );
-        //     return { success: true, message: 'Followed successfully....!' };
-        // }
-
-        // test*****************************************end
-
+        // ****************Below buyer to buyer follow req sent functionality....**********************//
         // await User.updateOne(
         //     { _id: currentUserId },
         //     {
@@ -564,7 +525,6 @@ async function followUser(req) {
         //     }
         // );
 
-
     } catch (err) {
         console.log('Error', err);
         return false;
@@ -577,24 +537,83 @@ async function unfollowUser(req) {
         const currentUserId = param.currentUserId;
         const userIdToUnfollow = param.userIdToUnfollow;
         const role = param.role;
-        console.log("role", role)
 
-        await User.updateOne(
-            { _id: currentUserId },
-            {
-                $pull: { 'community.followingData': userIdToUnfollow },
-                $inc: { 'community.following': -1 }
-            }
-        );
+        if (role === "seller") {
+            await User.updateOne(
+                { _id: currentUserId },
+                {
+                    $pull: { 'community.followingData': userIdToUnfollow },
+                    $inc: { 'community.following': -1 }
+                }
+            );
 
-        await User.updateOne(
-            { _id: userIdToUnfollow },
-            {
-                $pull: { 'community.followerData': currentUserId },
-                $inc: { 'community.followers': -1 }
+            const isFollowingSeller = await Seller.exists({ _id: userIdToUnfollow });
+            if (isFollowingSeller) {
+                await Seller.updateOne(
+                    { _id: userIdToUnfollow },
+                    {
+                        $pull: { 'community.followerData': currentUserId },
+                        $inc: { 'community.followers': -1 }
+                    }
+                );
+            } else {
+                await User.updateOne(
+                    { _id: userIdToUnfollow },
+                    {
+                        $pull: { 'community.followerData': currentUserId },
+                        $inc: { 'community.followers': -1 }
+                    }
+                );
             }
-        );
-        return { success: true, message: 'Unfollowed successfully....!' };
+
+            return { success: true, message: 'Unfollowed successfully....!' };
+
+        } else if (role === "user") {
+            await User.updateOne(
+                { _id: currentUserId },
+                {
+                    $pull: { 'community.followingData': userIdToUnfollow },
+                    $inc: { 'community.following': -1 }
+                }
+            );
+
+            const isFollowingSeller = await Seller.exists({ _id: userIdToUnfollow });
+            if (isFollowingSeller) {
+                await Seller.updateOne(
+                    { _id: userIdToUnfollow },
+                    {
+                        $pull: { 'community.followerData': currentUserId },
+                        $inc: { 'community.followers': -1 }
+                    }
+                );
+            } else {
+                await User.updateOne(
+                    { _id: userIdToUnfollow },
+                    {
+                        $pull: { 'community.followerData': currentUserId },
+                        $inc: { 'community.followers': -1 }
+                    }
+                );
+            }
+
+            return { success: true, message: 'Unfollowed successfully....!' };
+        }
+        // ****************Below buyer to buyer unfollowing req functionality....**********************//
+        // await User.updateOne(
+        //     { _id: currentUserId },
+        //     {
+        //         $pull: { 'community.followingData': userIdToUnfollow },
+        //         $inc: { 'community.following': -1 }
+        //     }
+        // );
+        // await User.updateOne(
+        //     { _id: userIdToUnfollow },
+        //     {
+        //         $pull: { 'community.followerData': currentUserId },
+        //         $inc: { 'community.followers': -1 }
+        //     }
+        // );
+        // return { success: true, message: 'Unfollowed successfully....!' };
 
     } catch (err) {
         console.log('Error', err);

@@ -241,7 +241,7 @@ router.put("/updateGroupName", updateGroupName);
 // router.get("/getMeetingData/:id", getMeeting);
 
 // community
-router.get('/posts/:id', getPosts);
+router.get('/seller_community/posts/:id', getPosts);
 router.post('/posts', addPost);
 router.post('/postImages/:id', addPostImages);
 router.post('/postVideos/:id', addPostVideos);
@@ -1265,7 +1265,6 @@ function deleteNotification(req, res, next) {
 
 
 // community
-
 function getPosts(req, res, next) {
   sellerService.getPosts(req)
     .then(result => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
