@@ -390,7 +390,7 @@ const Community = () => {
 
             <div className='seller_body'>
                 <UserHeader />
-                <Header />
+                {/* <Header /> */}
                 <div className="cumm_page_wrap pt-5 pb-5">
                     <div className="container">
                         <div className="row">

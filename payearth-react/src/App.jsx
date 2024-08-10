@@ -121,6 +121,7 @@ import EditProduct from "./containers/seller/EditProduct";
 import ManageVendors from "./containers/admin/ManageVendors";
 import Community from "./containers/community/Community";
 import CommunityProfile from "./containers/community/CommunityProfile";
+import SharePostDatd from "./components/community/common/SharePostData";
 
 import Blog from "./components/common/BlogModel";
 import BlogDetail from "./components/common/BlogDetails";
@@ -688,6 +689,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/admin/manage-reports"
             component={ManageReports}
@@ -837,6 +839,22 @@ function App() {
             path="/community-profile"
             restricted={false}
             component={CommunityProfile}
+            exact
+          />
+          {/* SharePostDatd */}
+
+          {/* <PublicRoute
+            path="/share_community/:id"
+            restricted={false}
+            component={SharePostDatd}
+            exact
+          /> */}
+
+          <PrivateRoute
+            path="/share_community/:id"
+            roles={[Role.user]}
+            currentUserRole={userInfo.role}
+            component={SharePostDatd}
             exact
           />
 

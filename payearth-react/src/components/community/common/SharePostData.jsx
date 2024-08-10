@@ -1,3 +1,24 @@
+// import React from 'react'
+// import { useLocation } from 'react-router-dom';
+
+
+// const SharePostData = () => {
+// const location = useLocation();
+// const urlPath = location.pathname;
+// const parts = urlPath.split('/');
+// const postId = parts[parts.length - 1];
+
+// console.log("postId data", postId)
+
+
+//     return (
+//         <div>SharePostData</div>
+//     )
+// }
+
+// export default SharePostData
+
+
 import React, { useRef, useState } from 'react';
 import userImg from '../../../assets/images/user.png'
 import closeIcon from '../../../assets/icons/close_icon.svg'
@@ -14,10 +35,11 @@ import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import SpinnerLoader from '../../../components/common/SpinnerLoader';
 import { setLoading } from '../../../store/reducers/global-reducer';
-import { getPostsData } from '../../../helpers/post-listing';
+// import { getPostsData } from '../../../helpers/post-listing';
 import SimpleImageSlider from "react-simple-image-slider";
 import ReactTimeAgo from 'react-time-ago'
 import TimeAgo from 'javascript-time-ago'
+import { useLocation } from 'react-router-dom';
 
 import en from 'javascript-time-ago/locale/en.json'
 import ru from 'javascript-time-ago/locale/ru.json'
@@ -26,14 +48,20 @@ TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
 
 
-const Post = ({ posts, sendEditData, sendShareData }) => {
+const SharePostData = ({ posts }) => {
+
+    const location = useLocation();
+    const urlPath = location.pathname;
+    const parts = urlPath.split('/');
+    const postId = parts[parts.length - 1];
+
+    console.log("postId data", postId)
 
     // console.log("all posts", posts)
-
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
     const loading = useSelector(state => state.global.loading);
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
 
     const [comments, setComments] = useState('');
     const [commentsArr, setCommentsArr] = useState(posts.comments);
@@ -54,6 +82,10 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
     const [isFollowing, setIsFollowing] = useState(false);
     const date = new Date(posts.createdAt);
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+    const getPostData = () => {
+
+    }
 
     const handleComments = (e) => {
         setComments(e.target.value);
@@ -77,7 +109,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             }
         }
         setComments('');
-        dispatch(setLoading({ loading: true }))
+        // dispatch(setLoading({ loading: true }))
         axios.post(`community/postComments/${postId}`, reqBody, {
             headers: {
                 'Accept': 'application/json',
@@ -88,13 +120,13 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             if (response.data.status) {
                 setCommentsCount(commentsCount + 1);
                 let res = response.data.data
-                getPostsData(dispatch);
+                // getPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
         }).finally(() => {
             setTimeout(() => {
-                dispatch(setLoading({ loading: false }));
+                // dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
@@ -129,7 +161,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             }
         }).then(response => {
             if (response.data.status) {
-                getPostsData(dispatch);
+                // getPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
@@ -165,7 +197,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             }
         }).then(response => {
             if (response.data.status) {
-                getPostsData(dispatch);
+                // getPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
@@ -235,7 +267,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
     //         let sliderImages = [];
     //         posts.postImages.forEach((value) => {
     //             sliderImages.push({ url: config.apiURI + value.url })
-    //         });          
+    //         });
     //         setSliderImages(sliderImages);
     //     }
     // }, []);
@@ -251,17 +283,17 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             document.removeEventListener("mousedown", followHandler)
         }
     });
-    useEffect(() => {
-        let shareHandler = (event) => {
-            if (!shareRef.current.contains(event.target)) {
-                setOpenShare(false);
-            }
-        }
-        document.addEventListener("mousedown", shareHandler)
-        return () => {
-            document.removeEventListener("mousedown", shareHandler)
-        }
-    });
+    // useEffect(() => {
+    //     let shareHandler = (event) => {
+    //         if (!shareRef.current.contains(event.target)) {
+    //             setOpenShare(false);
+    //         }
+    //     }
+    //     document.addEventListener("mousedown", shareHandler)
+    //     return () => {
+    //         document.removeEventListener("mousedown", shareHandler)
+    //     }
+    // });
 
 
     // const handleFollow = (posts) => {
@@ -318,7 +350,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             }
         }).then(response => {
             if (response.data.status) {
-                getPostsData(dispatch);
+                // getPostsData(dispatch);
                 // console.log("response", response.data.message);
                 toast.success(response.data.message);
 
@@ -348,7 +380,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             if (response.data.status) {
                 // console.log("response", response.data.message);
                 toast.success(response.data.message);
-                getPostsData(dispatch);
+                // getPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
@@ -368,17 +400,17 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
         }).then(response => {
             if (response.data.status) {
                 toast.success(response.data.message);
-                getPostsData(dispatch);
+                // getPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
         });
     }
 
-    const handleEdit = (postEditData) => {
-        // console.log("postEditData", postEditData)
-        sendEditData(postEditData);
-    }
+    // const handleEdit = (postEditData) => {
+    //     // console.log("postEditData", postEditData)
+    //     sendEditData(postEditData);
+    // }
 
     // const isFollowing = posts.userId !== null ? posts.userId.community.followerData.includes(authInfo.id) : false;
 
@@ -403,44 +435,41 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
 
         };
         fetchData();
-        getPostsData(dispatch);
+        // getPostsData(dispatch);
     }, []);
 
-    const handleShare = () => {
+    const handleShare = (postId) => {
+        console.log("Selected postID", postId)
         setOpenShare(true)
     }
 
-    const handleFacebookShare = (postId) => {
-        // const url = `https://pay.earth/share_community/${postId}`
-        const url = `https://localhost:3000/share_community/${postId}`
-        const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-        // window.open(facebookShareUrl, '_blank');
-        window.open(url, '_blank');
-    };
+    // const handleFacebookShare = () => {
+    //     const { shareAdvertise } = this.state;
+    //     const url = `https://pay.earth/advertisement/${shareAdvertise}`
+    //     const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    //     window.open(facebookShareUrl, '_blank');
+    // };
 
-    const handleTwitterShare = (postId) => {
-        // const { shareAdvertise } = this.state;
-        // const url = `https://pay.earth/share_community/${postId}`
-        const url = `https://localhost:3000/share_community/${postId}`
-        const twitterShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`;
-        window.open(twitterShareUrl, '_blank');
-    };
+    // const handleTwitterShare = () => {
+    //     // const { shareAdvertise } = this.state;
+    //     const url = `https://pay.earth/advertisement/${shareAdvertise}`
+    //     const twitterShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`;
+    //     window.open(twitterShareUrl, '_blank');
+    // };
 
-    const handleInstagramShare = (postId) => {
-        // const { shareAdvertise } = this.state;
-        // const url = `https://pay.earth/share_community/${postId}`
-        const url = `https://localhost:3000/share_community/${postId}`
-        const instagramShareUrl = `https://www.instagram.com/?url=${url}`
-        window.open(instagramShareUrl, '_blank');
-    };
+    // const handleInstagramShare = () => {
+    //     // const { shareAdvertise } = this.state;
+    //     const url = `https://pay.earth/advertisement/${shareAdvertise}`
+    //     const instagramShareUrl = `https://www.instagram.com/?url=${url}`
+    //     window.open(instagramShareUrl, '_blank');
+    // };
 
-    const handleWhatsappShare = (postId) => {
-        // const { shareAdvertise } = this.state;
-        // const caption = encodeURIComponent(`https://pay.earth/share_community/${postId}`);
-        const caption = encodeURIComponent(`https://localhost:3000/share_community/${postId}`);
-        const whatsappShareUrl = `https://api.whatsapp.com/send?text=${caption}`;
-        window.open(whatsappShareUrl, '_blank');
-    }
+    // const handleWhatsappShareUrl = () => {
+    //     // const { shareAdvertise } = this.state;
+    //     const caption = encodeURIComponent(`https://pay.earth/advertisement/${shareAdvertise}`);
+    //     const whatsappShareUrl = `https://api.whatsapp.com/send?text=${caption}`;
+    //     window.open(whatsappShareUrl, '_blank');
+    // }
 
 
     return (
@@ -626,12 +655,12 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                             </li>
 
                             <li className="ms-auto">
-                                {(posts.userId?.id === authInfo.id || posts.sellerId?.id === authInfo.id || posts.adminId?.id === authInfo.id) ? (
+                                {/* {(posts.userId?.id === authInfo.id || posts.sellerId?.id === authInfo.id || posts.adminId?.id === authInfo.id) ? (
                                     <>
                                         <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleEdit(posts)}>Edit</button>
                                         <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
                                     </>
-                                ) : null}
+                                ) : null} */}
                                 {/* {posts.userId.id === authInfo.id ? <>
                                     <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleEdit(posts)}>Edit</button>
                                     <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
@@ -645,7 +674,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                 <Link
                                     to="#"
                                     // onClick={() => setOpenShare(true)}
-                                    onClick={() => handleShare(posts)}
+                                    onClick={() => handleShare(posts.id)}
                                     className="post_follow">
                                     <i className="post_icon ps_share"></i> Share
                                 </Link>
@@ -653,7 +682,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
 
                         </ul>
                         {/* <div className="collapse collapse_pop" id={`collapseShareTo${posts.id}`}> */}
-                        <div ref={shareRef}>
+                        {/* <div ref={shareRef}>
                             {
                                 openShare ?
                                     <div className="collapse_pop">
@@ -662,15 +691,15 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                                 <i className="post_icon ps_share"></i>
                                                 Share
                                             </li>
-                                            <li><Link to="#" onClick={() => handleFacebookShare(posts.id)}>Facebook</Link></li>
-                                            <li><Link to="#" onClick={() => handleTwitterShare(posts.id)}>Twitter</Link></li>
-                                            <li><Link to="#" onClick={() => handleInstagramShare(posts.id)}>Instagram</Link></li>
-                                            <li><Link to="#" onClick={() => handleWhatsappShare(posts.id)}>Whatsapp</Link></li>
+                                            <li><Link to="#">Internal</Link></li>
+                                            <li><Link to="#">Facebook</Link></li>
+                                            <li><Link to="#">Twitter</Link></li>
+                                            <li><Link to="#">Linkedin</Link></li>
                                         </ul>
                                     </div>
                                     : ''
                             }
-                        </div>
+                        </div> */}
                         <div className="collapse post_comments" id={`collapseComment${posts.id}`}>
                             <ul className="comnt_list">
                                 <li>
@@ -678,11 +707,22 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                         <div className="avtar_img"><img className="img-fluid" src={userImg} alt="" /></div>
                                         <div className="add_comnt">
                                             <div className="ac_box">
-                                                <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
-                                                <button type="submit" className="btn btn_yellow custom_btn" onClick={() => addNewComment(posts.id)} disabled={!comments.trim()}>
-                                                    {/* <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}>
-                                                        Add Comment
-                                                    </Link> */}
+                                                <textarea
+                                                    className="form-control"
+                                                    placeholder="Add Comment"
+                                                    name=""
+                                                    id=""
+                                                    rows="3"
+                                                    value={comments}
+                                                    onChange={(e) => handleComments(e)}>
+
+                                                </textarea>
+                                                <button
+                                                    type="submit"
+                                                    className="btn btn_yellow custom_btn"
+                                                    // onClick={() => addNewComment(posts.id)}
+                                                    disabled={!comments.trim()}
+                                                >
                                                     Add Comment
                                                 </button>
 
@@ -722,4 +762,4 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
     );
 };
 
-export default Post;
+export default SharePostData;
