@@ -415,29 +415,29 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
         const url = `https://localhost:3000/share_community/${postId}`
         const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
         // window.open(facebookShareUrl, '_blank');
-        window.open(url, '_blank');
+        window.open(facebookShareUrl, '_blank');
     };
 
     const handleTwitterShare = (postId) => {
         // const { shareAdvertise } = this.state;
-        // const url = `https://pay.earth/share_community/${postId}`
-        const url = `https://localhost:3000/share_community/${postId}`
+        const url = `https://pay.earth/share_community/${postId}`
+        // const url = `https://localhost:3000/share_community/${postId}`
         const twitterShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`;
         window.open(twitterShareUrl, '_blank');
     };
 
     const handleInstagramShare = (postId) => {
         // const { shareAdvertise } = this.state;
-        // const url = `https://pay.earth/share_community/${postId}`
-        const url = `https://localhost:3000/share_community/${postId}`
+        const url = `https://pay.earth/share_community/${postId}`
+        // const url = `https://localhost:3000/share_community/${postId}`
         const instagramShareUrl = `https://www.instagram.com/?url=${url}`
         window.open(instagramShareUrl, '_blank');
     };
 
     const handleWhatsappShare = (postId) => {
         // const { shareAdvertise } = this.state;
-        // const caption = encodeURIComponent(`https://pay.earth/share_community/${postId}`);
-        const caption = encodeURIComponent(`https://localhost:3000/share_community/${postId}`);
+        const caption = encodeURIComponent(`https://pay.earth/share_community/${postId}`);
+        // const caption = encodeURIComponent(`https://localhost:3000/share_community/${postId}`);
         const whatsappShareUrl = `https://api.whatsapp.com/send?text=${caption}`;
         window.open(whatsappShareUrl, '_blank');
     }
