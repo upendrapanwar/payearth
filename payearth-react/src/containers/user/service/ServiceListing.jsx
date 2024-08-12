@@ -40,7 +40,8 @@ class ServiceListing extends Component {
       selectedCategories: [],
       currentPage: 1,
       itemsPerPage: 4,
-      range: [0, 100],
+      maxCharges:0,
+      range: [0,0],
       filteredData: [],
     };
   }
@@ -108,6 +109,13 @@ class ServiceListing extends Component {
       );
       this.setState({ services: response.data.data });
       // console.log("all service data------", response);
+      const maxCharges = response.data.data.length > 0
+        ? Math.max(...response.data.data.map(service => service.charges))
+        : 0;
+      this.setState({ 
+        maxCharges: maxCharges,
+        range: [0,maxCharges],
+      });
     } catch (error) {
       console.error("Error fetching products:", error);
     }
@@ -125,13 +133,17 @@ class ServiceListing extends Component {
   };
 
   handleServiceData = (data) => {
-    // console.log("header selected data :", data)
+    console.log("header selected data :", data)
+    const maxCharges = data.length > 0
+        ? Math.max(...data.map(service => service.charges))
+        : 0;
     this.setState({
       services: data,
       selectedCategories: [],
       categoryId: "",
-      range: [0, 100],
+      range: [0,maxCharges],
       filteredData: [],
+      maxCharges:maxCharges
     });
   };
   // range
@@ -205,6 +217,7 @@ class ServiceListing extends Component {
       currentPage,
       itemsPerPage,
       filteredData,
+      maxCharges,
     } = this.state;
     const data = filteredData.length === 0 ? services : filteredData;
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -238,7 +251,7 @@ class ServiceListing extends Component {
                           trackClassName="track"
                           value={this.state.range}
                           min={0}
-                          max={100}
+                          max={maxCharges}
                           onChange={this.handleRangeChange}
                         />
                         <br />

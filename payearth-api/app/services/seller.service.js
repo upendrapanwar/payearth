@@ -138,7 +138,20 @@ module.exports = {
   deleteNotification,
 
   addPost,
-  getPosts
+  getPosts,
+  //addPostImages,
+ // addPostLike,
+
+    getPostComments,
+    addPostComment,
+   // followUser,
+   // unfollowUser,
+    postDelete,
+    //updatePost,
+    // sendFollowRequest,
+   // setFollow,
+    getCategories,
+   // getProductsByCatId,
 };
 
 function sendMail(mailOptions) {
@@ -3809,9 +3822,214 @@ async function getPosts(req) {
         ]
       }
     ]);
-  console.log("postIn seller", posts)
+  //console.log("postIn seller", posts)
   if (posts && posts.length > 0) {
      return posts;
+  }
+  return false;
+}
+
+// async function addPostImages(req) {
+//   const { images } = req.body;
+//   const postId = req.params.id;
+// console.log('function save image run')
+//   if (!Array.isArray(images) || images.length === 0) {
+//       return res.status(400).json({ success: false, message: "No videos provided" });
+//   }
+
+//   try {
+//       var postImages = [];
+//       var allImagesSaved = true;
+//       for (let i = 0; i < images.length; i++) {
+//           const image = images[i];
+//           let input = {
+//               postId: postId,
+//               url: image.url,
+//               isActive: true
+//           };
+//           let postImage = new PostImages(input);
+//           let data = await postImage.save();
+//           if (data) {
+//               postImages.push(data.id);
+//           } else {
+//               allImagesSaved = false;
+//               break; // Exit loop if save fails
+//           }
+//       }
+//       if (allImagesSaved) {
+//           const filter = { _id: postId };
+//           const updateData = { $push: { postImages: { $each: postImages } } };
+//           await Post.findOneAndUpdate(filter, updateData, { new: true });
+//           return postImages
+//       } else {
+//           return { success: false, message: "Failed to save" };
+//       }
+//   } catch (error) {
+//       console.log("error", error)
+//   }
+
+// }
+
+// async function addPostLike(req) {
+// console.log('like api run----------------')
+//   const param = req.body;
+//   const postId = req.params.id;
+//   const isSeller = param.isSeller;
+//   const isLike = param.isLike;
+//   var where = { postId: postId };
+//   var input = { postId: postId, isActive: true, isSeller: isSeller };
+
+//   if (isSeller == true) {
+//       where['sellerId'] = param.seller_id;
+//       input['sellerId'] = param.seller_id;
+//       input['userId'] = null;
+//   } else {
+//       where['userId'] = param.user_id;
+//       input['userId'] = param.user_id;
+//       input['sellerId'] = null;
+//   }
+
+//   var postLikeData = await PostLike.findOne(where);
+
+//   if (postLikeData && isLike == true) {
+//       throw 'This post is already liked.';
+//   }
+
+//   if (isLike == true) {
+//       //add row into collection
+//       const postlike = new PostLike(input);
+
+//       const data = await postlike.save();
+
+//       if (data) {
+
+//           //update in post
+//           const filter = { _id: postId };
+//           const updateData = { $push: { likes: data.id }, $inc: { likeCount: 1 } };
+
+//           await Post.findOneAndUpdate(filter, updateData, { new: true });
+
+//           let result = await PostLike.findById(data.id).select();
+//           if (result) {
+//               return result;
+//           } else {
+//               return false;
+//           }
+//       } else {
+//           return false;
+//       }
+//   } else {
+
+//       //update in post
+//       const filter = { _id: postId };
+//       const updateData = { $pull: { likes: postLikeData._id }, $inc: { likeCount: -1 } };
+
+//       await Post.findOneAndUpdate(filter, updateData, { new: true });
+
+//       //delete row from collection
+//       await PostLike.findByIdAndRemove(postLikeData._id);
+
+//       return true;
+
+//   }
+// }
+
+async function postDelete(req) {
+  try {
+      const param = req.body;
+      const postId = param.postId;
+
+      const result = await Post.updateOne(
+          { _id: postId },
+          { $set: { isActive: false } }
+      );
+      return result;
+
+  } catch (err) {
+      console.log('Error', err);
+      return false;
+  }
+}
+
+// async function updatePost(req) {
+//   try {
+//       const param = req.body;
+//       // console.log("param", param);
+//       const result = await Post.updateOne(
+//           { _id: param.postId },
+//           {
+//               $set: {
+//                   postContent: param.content,
+//                   productId: param.product_id,
+//                   categoryId: param.category_id,
+//                   postStatus: param.post_status
+//               }
+//           }
+//       );
+//       return result;
+
+//   } catch (err) {
+//       console.log('Error', err);
+//       return false;
+//   }
+// }
+
+
+async function addPostComment(req) {
+  console.log('addpostcoment api run----------------')
+  const param = req.body;
+  console.log('param   ---', param)
+  const postId = req.params.id;
+  const isSeller = param.isSeller;
+  const content = param.content;
+
+  var input = {
+      postId: postId,
+      isActive: true,
+      isSeller: isSeller,
+      content: content
+  };
+
+  if (isSeller == true) {
+      input['sellerId'] = param.seller_id;
+      input['userId'] = null;
+  } else {
+      input['userId'] = param.user_id;
+      input['sellerId'] = null;
+  }
+
+  //add row into collection
+  const postcomment = new PostComment(input);
+
+  const data = await postcomment.save();
+
+  if (data) {
+
+      //update in post
+      const filter = { _id: postId };
+      const updateData = { $push: { comments: data.id }, $inc: { commentCount: 1 } };
+
+      await Post.findOneAndUpdate(filter, updateData, { new: true });
+
+      let result = await PostComment.findById(data.id).select();
+      if (result) {
+          return result;
+      } else {
+          return false;
+      }
+  } else {
+      return false;
+  }
+
+}
+
+
+async function getPostComments(req) {
+  const postId = req.params.id;
+  const comments = await PostComment.find({ postId: postId, isActive: true })
+      .sort({ createdAt: 'desc' });
+  if (comments && comments.length > 0) {
+      return comments;
   }
   return false;
 }

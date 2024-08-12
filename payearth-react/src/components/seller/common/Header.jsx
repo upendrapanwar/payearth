@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory} from "react-router-dom";
 import logo from "./../../../assets/images/logo.png";
 import closeIcon from "./../../../assets/icons/close_icon.svg";
 import shoppingBagIcon from "./../../../assets/icons/shopping-bag.svg";
@@ -31,6 +31,7 @@ const Header = () => {
   const authInfo = useSelector(state => state.auth.authInfo);
   const [isToggle, setIsToggle] = useState(false);
   const isService = useSelector((state) => state.catSearch.isService);
+  const history = useHistory();
   const dispatch = useDispatch();
   const logout = () => {
     localStorage.clear();
@@ -40,7 +41,8 @@ const Header = () => {
     dispatch(setIsService({ isService: 0 }));
     setIsToggle(false);
 
-    window.location.href = "/seller/login";
+    //window.location.href = "/seller/login";
+    history.push('/seller/login');
   };
 
   useEffect(() => {

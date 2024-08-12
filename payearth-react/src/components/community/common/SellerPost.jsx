@@ -15,6 +15,7 @@ import { toast } from 'react-toastify';
 import SpinnerLoader from '../../common/SpinnerLoader';
 import { setLoading } from '../../../store/reducers/global-reducer';
 import { getPostsData } from '../../../helpers/post-listing';
+import{getSellerPostsData} from '../../../helpers/sellerPost-listing';
 import SimpleImageSlider from "react-simple-image-slider";
 import ReactTimeAgo from 'react-time-ago'
 import TimeAgo from 'javascript-time-ago'
@@ -60,15 +61,7 @@ const SellerPost = ({ posts, sendEditData }) => {
     }
     const addNewComment = (postId) => {
         let reqBody = {};
-        if (userInfo.role === 'user') {
-            reqBody = {
-                content: comments,
-                isSeller: false,
-                user_id: authInfo.id,
-                seller_id: null
-            }
-        }
-        else {
+        if (userInfo.role === 'seller') {
             reqBody = {
                 content: comments,
                 isSeller: true,
@@ -76,9 +69,17 @@ const SellerPost = ({ posts, sendEditData }) => {
                 seller_id: authInfo.id
             }
         }
+        else {
+            reqBody = {
+                content: comments,
+                isSeller: false,
+                user_id: authInfo.id,
+                seller_id: null
+            }
+        }
         setComments('');
         dispatch(setLoading({ loading: true }))
-        axios.post(`community/postComments/${postId}`, reqBody, {
+        axios.post(`seller/postComments/${postId}`, reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -88,7 +89,7 @@ const SellerPost = ({ posts, sendEditData }) => {
             if (response.data.status) {
                 setCommentsCount(commentsCount + 1);
                 let res = response.data.data
-                getPostsData(dispatch);
+                getSellerPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
@@ -121,7 +122,7 @@ const SellerPost = ({ posts, sendEditData }) => {
                 seller_id: authInfo.id
             }
         }
-        axios.post(`community/postLikes/${postId}`, reqBody, {
+        axios.post(`seller/postLikes/${postId}`, reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -129,7 +130,7 @@ const SellerPost = ({ posts, sendEditData }) => {
             }
         }).then(response => {
             if (response.data.status) {
-                getPostsData(dispatch);
+                getSellerPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
@@ -157,7 +158,7 @@ const SellerPost = ({ posts, sendEditData }) => {
                 seller_id: authInfo.id
             }
         }
-        axios.post(`community/postLikes/${postId}`, reqBody, {
+        axios.post(`seller/postLikes/${postId}`, reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -165,7 +166,7 @@ const SellerPost = ({ posts, sendEditData }) => {
             }
         }).then(response => {
             if (response.data.status) {
-                getPostsData(dispatch);
+                getSellerPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
@@ -310,7 +311,7 @@ const SellerPost = ({ posts, sendEditData }) => {
             currentUserId: currentUserId,
             userIdToFollow: userIdToFollow,
         }
-        axios.post(`community/follow-user`, reqBody, {
+        axios.post(`seller/follow-user`, reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -318,7 +319,7 @@ const SellerPost = ({ posts, sendEditData }) => {
             }
         }).then(response => {
             if (response.data.status) {
-                getPostsData(dispatch);
+                getSellerPostsData(dispatch);
                 // console.log("response", response.data.message);
                 toast.success(response.data.message);
 
@@ -338,7 +339,7 @@ const SellerPost = ({ posts, sendEditData }) => {
             currentUserId: currentUserId,
             userIdToUnfollow: userIdToUnfollow,
         }
-        axios.post(`community/unfollowUser`, reqBody, {
+        axios.post(`seller/unfollowUser`, reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -348,7 +349,7 @@ const SellerPost = ({ posts, sendEditData }) => {
             if (response.data.status) {
                 // console.log("response", response.data.message);
                 toast.success(response.data.message);
-                getPostsData(dispatch);
+                getSellerPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
@@ -359,7 +360,7 @@ const SellerPost = ({ posts, sendEditData }) => {
         var reqBody = {
             postId: postId,
         }
-        axios.put(`community/postRemoved`, reqBody, {
+        axios.put(`seller/postRemoved`, reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -368,7 +369,7 @@ const SellerPost = ({ posts, sendEditData }) => {
         }).then(response => {
             if (response.data.status) {
                 toast.success(response.data.message);
-                getPostsData(dispatch);
+                getSellerPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
@@ -403,7 +404,7 @@ const SellerPost = ({ posts, sendEditData }) => {
 
         };
         fetchData();
-        getPostsData(dispatch);
+        getSellerPostsData(dispatch);
     }, []);
 
 
@@ -674,7 +675,8 @@ const SellerPost = ({ posts, sendEditData }) => {
                                                 <div className="commnt_text">
                                                     <div className="commnt_body">
                                                         <div className="commnt_by">
-                                                            <div className="cb_name">{val.isSeller ? val.sellerId.name : val.userId.name}</div>
+                                                            {/* <div className="cb_name">{val.isSeller===true ? val.sellerId.name : val.userId.name}</div> */}
+                                                            <div className="cb_name">{val.isSeller ? (val.sellerId && val.sellerId.name ? val.sellerId.name : 'N/A') : (val.userId && val.userId.name ? val.userId.name : 'N/A')}</div>
                                                             {/* <div className="cb_date">{`${new Date(val.createdAt).getDate() < 10 ? `0${new Date(val.createdAt).getDate()}` : `${new Date(val.createdAt).getDate()}`} - ${new Date(val.createdAt).getMonth() + 1 < 10 ? `0${new Date(val.createdAt).getMonth() + 1}` : `${new Date(val.createdAt).getMonth() + 1}`} - ${new Date(val.createdAt).getFullYear()}`}</div> */}
                                                             <div className="cb_date"> <ReactTimeAgo date={new Date(val.createdAt)} locale="en-US" timeStyle="round-minute" /></div>
                                                         </div>
