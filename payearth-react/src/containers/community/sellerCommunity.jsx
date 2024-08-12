@@ -352,7 +352,7 @@ const SellerCommunity = () => {
             post_status: postStatus,
         }
 
-        axios.put(`community/updatePost`, reqBody, {
+        axios.put(`seller/updatePost`, reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',

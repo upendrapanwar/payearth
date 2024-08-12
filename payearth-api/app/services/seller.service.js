@@ -147,7 +147,7 @@ module.exports = {
    // followUser,
    // unfollowUser,
     postDelete,
-    //updatePost,
+    updatePost,
     // sendFollowRequest,
    // setFollow,
     getCategories,
@@ -3951,28 +3951,28 @@ async function postDelete(req) {
   }
 }
 
-// async function updatePost(req) {
-//   try {
-//       const param = req.body;
-//       // console.log("param", param);
-//       const result = await Post.updateOne(
-//           { _id: param.postId },
-//           {
-//               $set: {
-//                   postContent: param.content,
-//                   productId: param.product_id,
-//                   categoryId: param.category_id,
-//                   postStatus: param.post_status
-//               }
-//           }
-//       );
-//       return result;
+async function updatePost(req) {
+  try {
+      const param = req.body;
+      // console.log("param", param);
+      const result = await Post.updateOne(
+          { _id: param.postId },
+          {
+              $set: {
+                  postContent: param.content,
+                  productId: param.product_id,
+                  categoryId: param.category_id,
+                  postStatus: param.post_status
+              }
+          }
+      );
+      return result;
 
-//   } catch (err) {
-//       console.log('Error', err);
-//       return false;
-//   }
-// }
+  } catch (err) {
+      console.log('Error', err);
+      return false;
+  }
+}
 
 
 async function addPostComment(req) {
