@@ -140,7 +140,7 @@ module.exports = {
   addPost,
   getPosts,
   //addPostImages,
- // addPostLike,
+  addPostLike,
 
     getPostComments,
     addPostComment,
@@ -3724,7 +3724,7 @@ async function getPosts(req) {
       {
         path: "likes",
         model: PostLike,
-        select: "isActive postId sellerId userId",
+        select: "isActive isSeller postId sellerId userId",
        // match: { isActive: true },
         populate: [
           {
@@ -3870,69 +3870,69 @@ async function getPosts(req) {
 
 // }
 
-// async function addPostLike(req) {
-// console.log('like api run----------------')
-//   const param = req.body;
-//   const postId = req.params.id;
-//   const isSeller = param.isSeller;
-//   const isLike = param.isLike;
-//   var where = { postId: postId };
-//   var input = { postId: postId, isActive: true, isSeller: isSeller };
+async function addPostLike(req) {
+console.log('like api run----------------')
+  const param = req.body;
+  const postId = req.params.id;
+  const isSeller = param.isSeller;
+  const isLike = param.isLike;
+  var where = { postId: postId };
+  var input = { postId: postId, isActive: true, isSeller: isSeller };
 
-//   if (isSeller == true) {
-//       where['sellerId'] = param.seller_id;
-//       input['sellerId'] = param.seller_id;
-//       input['userId'] = null;
-//   } else {
-//       where['userId'] = param.user_id;
-//       input['userId'] = param.user_id;
-//       input['sellerId'] = null;
-//   }
+  if (isSeller == true) {
+      where['sellerId'] = param.seller_id;
+      input['sellerId'] = param.seller_id;
+      input['userId'] = null;
+  } else {
+      where['userId'] = param.user_id;
+      input['userId'] = param.user_id;
+      input['sellerId'] = null;
+  }
 
-//   var postLikeData = await PostLike.findOne(where);
+  var postLikeData = await PostLike.findOne(where);
 
-//   if (postLikeData && isLike == true) {
-//       throw 'This post is already liked.';
-//   }
+  if (postLikeData && isLike == true) {
+      throw 'This post is already liked.';
+  }
 
-//   if (isLike == true) {
-//       //add row into collection
-//       const postlike = new PostLike(input);
+  if (isLike == true) {
+      //add row into collection
+      const postlike = new PostLike(input);
 
-//       const data = await postlike.save();
+      const data = await postlike.save();
 
-//       if (data) {
+      if (data) {
 
-//           //update in post
-//           const filter = { _id: postId };
-//           const updateData = { $push: { likes: data.id }, $inc: { likeCount: 1 } };
+          //update in post
+          const filter = { _id: postId };
+          const updateData = { $push: { likes: data.id }, $inc: { likeCount: 1 } };
 
-//           await Post.findOneAndUpdate(filter, updateData, { new: true });
+          await Post.findOneAndUpdate(filter, updateData, { new: true });
 
-//           let result = await PostLike.findById(data.id).select();
-//           if (result) {
-//               return result;
-//           } else {
-//               return false;
-//           }
-//       } else {
-//           return false;
-//       }
-//   } else {
+          let result = await PostLike.findById(data.id).select();
+          if (result) {
+              return result;
+          } else {
+              return false;
+          }
+      } else {
+          return false;
+      }
+  } else {
 
-//       //update in post
-//       const filter = { _id: postId };
-//       const updateData = { $pull: { likes: postLikeData._id }, $inc: { likeCount: -1 } };
+      //update in post
+      const filter = { _id: postId };
+      const updateData = { $pull: { likes: postLikeData._id }, $inc: { likeCount: -1 } };
 
-//       await Post.findOneAndUpdate(filter, updateData, { new: true });
+      await Post.findOneAndUpdate(filter, updateData, { new: true });
 
-//       //delete row from collection
-//       await PostLike.findByIdAndRemove(postLikeData._id);
+      //delete row from collection
+      await PostLike.findByIdAndRemove(postLikeData._id);
 
-//       return true;
+      return true;
 
-//   }
-// }
+  }
+}
 
 async function postDelete(req) {
   try {
@@ -3976,9 +3976,9 @@ async function postDelete(req) {
 
 
 async function addPostComment(req) {
-  console.log('addpostcoment api run----------------')
+  //console.log('addpostcoment api run----------------')
   const param = req.body;
-  console.log('param   ---', param)
+ // console.log('param   ---', param)
   const postId = req.params.id;
   const isSeller = param.isSeller;
   const content = param.content;

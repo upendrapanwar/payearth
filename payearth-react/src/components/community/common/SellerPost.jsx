@@ -142,20 +142,20 @@ const SellerPost = ({ posts, sendEditData }) => {
         liked.push(authInfo.id);
         setFilteredLikes(liked);
         let reqBody = {};
-        if (userInfo.role === 'user') {
-            reqBody = {
-                isLike: filteredLikes.includes(authInfo.id),
-                isSeller: false,
-                user_id: authInfo.id,
-                seller_id: null
-            }
-        }
-        else {
+        if (userInfo.role === 'seller') {
             reqBody = {
                 isLike: filteredLikes.includes(authInfo.id),
                 isSeller: true,
                 user_id: null,
                 seller_id: authInfo.id
+            }
+        }
+        else {
+            reqBody = {
+                isLike: filteredLikes.includes(authInfo.id),
+                isSeller: false,
+                user_id: authInfo.id,
+                seller_id: null
             }
         }
         axios.post(`seller/postLikes/${postId}`, reqBody, {
