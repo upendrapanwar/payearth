@@ -121,7 +121,7 @@ import EditProduct from "./containers/seller/EditProduct";
 import ManageVendors from "./containers/admin/ManageVendors";
 import Community from "./containers/community/Community";
 import CommunityProfile from "./containers/community/CommunityProfile";
-import SharePostDatd from "./components/community/common/SharePostData";
+import SharePostData from "./components/community/common/SharePostData";
 
 import Blog from "./components/common/BlogModel";
 import BlogDetail from "./components/common/BlogDetails";
@@ -854,7 +854,7 @@ function App() {
             path="/share_community/:id"
             roles={[Role.user]}
             currentUserRole={userInfo.role}
-            component={SharePostDatd}
+            component={SharePostData}
             exact
           />
 

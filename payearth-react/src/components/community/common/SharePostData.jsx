@@ -1,24 +1,3 @@
-// import React from 'react'
-// import { useLocation } from 'react-router-dom';
-
-
-// const SharePostData = () => {
-// const location = useLocation();
-// const urlPath = location.pathname;
-// const parts = urlPath.split('/');
-// const postId = parts[parts.length - 1];
-
-// console.log("postId data", postId)
-
-
-//     return (
-//         <div>SharePostData</div>
-//     )
-// }
-
-// export default SharePostData
-
-
 import React, { useRef, useState } from 'react';
 import userImg from '../../../assets/images/user.png'
 import closeIcon from '../../../assets/icons/close_icon.svg'
@@ -34,8 +13,6 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import SpinnerLoader from '../../../components/common/SpinnerLoader';
-import { setLoading } from '../../../store/reducers/global-reducer';
-// import { getPostsData } from '../../../helpers/post-listing';
 import SimpleImageSlider from "react-simple-image-slider";
 import ReactTimeAgo from 'react-time-ago'
 import TimeAgo from 'javascript-time-ago'
@@ -48,30 +25,26 @@ TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
 
 
-const SharePostData = ({ posts }) => {
-
+const SharePostData = () => {
     const location = useLocation();
     const urlPath = location.pathname;
     const parts = urlPath.split('/');
     const postId = parts[parts.length - 1];
-
-    console.log("postId data", postId)
-
-    // console.log("all posts", posts)
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
-    const loading = useSelector(state => state.global.loading);
-    // const dispatch = useDispatch();
+    const [loading, setLoading] = useState(true);
+    const [posts, setSharePost] = useState();
 
-    const [comments, setComments] = useState('');
-    const [commentsArr, setCommentsArr] = useState(posts.comments);
+    // const [commentsArr, setCommentsArr] = useState(posts.comments);
+    const [commentsArr, setCommentsArr] = useState();
     const [newCommentsArr, setNewCommentsArr] = useState([]);
-    const [commentsCount, setCommentsCount] = useState(posts.commentCount);
+    // const [commentsCount, setCommentsCount] = useState(posts.commentCount);
+    const [commentsCount, setCommentsCount] = useState();
     const [commentsToShow, setCommentsToShow] = useState(2);
     const [isReadMore, setIsReadMore] = useState(true);
-    const [likes, setLikes] = useState(posts.likeCount);
+    // const [likes, setLikes] = useState(posts.likeCount);
     const [filteredLikes, setFilteredLikes] = useState([]);
-    const [likesArr, setLikesArr] = useState(posts.likes);
+    // const [likesArr, setLikesArr] = useState(posts.likes);
     const [openModal, setOpenModel] = useState(false);
     const [openShare, setOpenShare] = useState(false);
     const [showSingleImg, setShowSingleImg] = useState(false);
@@ -80,153 +53,270 @@ const SharePostData = ({ posts }) => {
     const [sliderVideos, setSliderVideos] = useState([]);
     const [ShowSlider, setShowSlider] = useState(false);
     const [isFollowing, setIsFollowing] = useState(false);
-    const date = new Date(posts.createdAt);
+    // const date = new Date(posts.createdAt);
+
+    //********************************************
+    const [postContent, setPostContent] = useState("");
+    const [postImages, setPostImages] = useState("");
+    const [postVideos, setPostVideos] = useState("");
+    const [userId, setUserId] = useState("");
+    const [sellerId, setSellerId] = useState("");
+    const [adminId, setAdminId] = useState("");
+    const [isActive, setIsActive] = useState("");
+    const [isSeller, setIsSeller] = useState("");
+    const [likes, setLikes] = useState("");
+    const [postStatus, setPostStatus] = useState("");
+    const [comments, setComments] = useState("");
+    const [commentCount, setCommentCount] = useState("");
+
+    //********************************************/
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
-    const getPostData = () => {
+    useEffect(() => {
+        const getPostData = async () => {
+            const url = `community/getPostById/${postId}`;
+            try {
+                const response = await axios.get(url, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        // 'Authorization': `Bearer ${authInfo.token}`
+                    }
+                });
 
-    }
+                if (response.data.status) {
+                    console.log("response.data.data", response.data.data);
+
+                    const data = response.data.data
+                    // setSharePost(response.data.data);
+                    setPostContent(data.postContent);
+                    setPostImages(data.postImages);
+                    setPostVideos(data.postVideos);
+                    setUserId(data.userId);
+                    setSellerId(data.sellerId);
+                    setAdminId(data.adminId)
+                    setIsActive(data.isActive);
+                    setIsSeller(data.isSeller);
+                    setLikes(data.likes);
+                    setPostStatus(data.postStatus);
+                    setComments(data.comments);
+                    setCommentCount(data.commentCount);
+                    setLoading(false)
+                }
+            } catch (error) {
+                if (error.response && error.response.data.status === false) {
+                    toast.error(error.response.data.message);
+                } else {
+                    console.error("An unexpected error occurred", error);
+                    toast.error("An unexpected error occurred. Please try again later.");
+                }
+            }
+        };
+
+        // Call the function when the component mounts
+        getPostData();
+    }, [postId, authInfo, setSharePost]);
+
+
+
+    // useEffect(() => {
+    //     const getPostData = async () => {
+    //         const url = `community/getPostById/${postId}`;
+    //         try {
+    //             const response = await axios.get(url, {
+    //                 headers: {
+    //                     'Accept': 'application/json',
+    //                     'Content-Type': 'application/json;charset=UTF-8',
+    //                     'Authorization': `Bearer ${authInfo.token}`
+    //                 }
+    //             });
+
+    //             if (response.data.status) {
+    //                 console.log("response.data.data", response.data.data);
+    //                 setSharePost(response.data.data);
+    //             }
+    //         } catch (error) {
+    //             if (error.response && error.response.data.status === false) {
+    //                 toast.error(error.response.data.message);
+    //             } else {
+    //                 console.error("An unexpected error occurred", error);
+    //                 toast.error("An unexpected error occurred. Please try again later.");
+    //             }
+    //         }
+    //     };
+    // }, [])
+
+    // const getPostData = async () => {
+    //     const url = `community/getPostById/${postId}`;
+    //     try {
+    //         const response = await axios.get(url, {
+    //             headers: {
+    //                 'Accept': 'application/json',
+    //                 'Content-Type': 'application/json;charset=UTF-8',
+    //                 'Authorization': `Bearer ${authInfo.token}`
+    //             }
+    //         });
+
+    //         if (response.data.status) {
+    //             console.log("response.data.data", response.data.data);
+    //             setSharePost(response.data.data);
+    //         }
+    //     } catch (error) {
+    //         if (error.response && error.response.data.status === false) {
+    //             toast.error(error.response.data.message);
+    //         } else {
+    //             console.error("An unexpected error occurred", error);
+    //             toast.error("An unexpected error occurred. Please try again later.");
+    //         }
+    //     }
+    // };
+
 
     const handleComments = (e) => {
         setComments(e.target.value);
     }
-    const addNewComment = (postId) => {
-        let reqBody = {};
-        if (userInfo.role === 'user') {
-            reqBody = {
-                content: comments,
-                isSeller: false,
-                user_id: authInfo.id,
-                seller_id: null
-            }
-        }
-        else {
-            reqBody = {
-                content: comments,
-                isSeller: true,
-                user_id: null,
-                seller_id: authInfo.id
-            }
-        }
-        setComments('');
-        // dispatch(setLoading({ loading: true }))
-        axios.post(`community/postComments/${postId}`, reqBody, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Authorization': `Bearer ${authInfo.token}`
-            }
-        }).then(response => {
-            if (response.data.status) {
-                setCommentsCount(commentsCount + 1);
-                let res = response.data.data
-                // getPostsData(dispatch);
-            }
-        }).catch(error => {
-            console.log(error);
-        }).finally(() => {
-            setTimeout(() => {
-                // dispatch(setLoading({ loading: false }));
-            }, 300);
-        });
-    }
 
-    const removeFromLiked = (postId) => {
-        let updatedLikes = filteredLikes;
-        let index = updatedLikes.indexOf(authInfo.id);
-        updatedLikes.splice(index, 1);
-        setFilteredLikes(updatedLikes);
-        let reqBody = {};
-        if (userInfo.role === 'user') {
-            reqBody = {
-                isLike: filteredLikes.includes(authInfo.id),
-                isSeller: false,
-                user_id: authInfo.id,
-                seller_id: null
-            }
-        }
-        else {
-            reqBody = {
-                isLike: filteredLikes.includes(authInfo.id),
-                isSeller: true,
-                user_id: null,
-                seller_id: authInfo.id
-            }
-        }
-        axios.post(`community/postLikes/${postId}`, reqBody, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Authorization': `Bearer ${authInfo.token}`
-            }
-        }).then(response => {
-            if (response.data.status) {
-                // getPostsData(dispatch);
-            }
-        }).catch(error => {
-            console.log(error);
-        });
+    // const addNewComment = (postId) => {
+    //     let reqBody = {};
+    //     if (userInfo.role === 'user') {
+    //         reqBody = {
+    //             content: comments,
+    //             isSeller: false,
+    //             user_id: authInfo.id,
+    //             seller_id: null
+    //         }
+    //     }
+    //     else {
+    //         reqBody = {
+    //             content: comments,
+    //             isSeller: true,
+    //             user_id: null,
+    //             seller_id: authInfo.id
+    //         }
+    //     }
+    //     setComments('');
+    //     // dispatch(setLoading({ loading: true }))
+    //     axios.post(`community/postComments/${postId}`, reqBody, {
+    //         headers: {
+    //             'Accept': 'application/json',
+    //             'Content-Type': 'application/json;charset=UTF-8',
+    //             'Authorization': `Bearer ${authInfo.token}`
+    //         }
+    //     }).then(response => {
+    //         if (response.data.status) {
+    //             setCommentsCount(commentsCount + 1);
+    //             let res = response.data.data
+    //             // getPostsData(dispatch);
+    //         }
+    //     }).catch(error => {
+    //         console.log(error);
+    //     }).finally(() => {
+    //         setTimeout(() => {
+    //             // dispatch(setLoading({ loading: false }));
+    //         }, 300);
+    //     });
+    // }
 
-    }
-    const addToLiked = (postId) => {
-        let liked = filteredLikes
-        liked.push(authInfo.id);
-        setFilteredLikes(liked);
-        let reqBody = {};
-        if (userInfo.role === 'user') {
-            reqBody = {
-                isLike: filteredLikes.includes(authInfo.id),
-                isSeller: false,
-                user_id: authInfo.id,
-                seller_id: null
-            }
-        }
-        else {
-            reqBody = {
-                isLike: filteredLikes.includes(authInfo.id),
-                isSeller: true,
-                user_id: null,
-                seller_id: authInfo.id
-            }
-        }
-        axios.post(`community/postLikes/${postId}`, reqBody, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Authorization': `Bearer ${authInfo.token}`
-            }
-        }).then(response => {
-            if (response.data.status) {
-                // getPostsData(dispatch);
-            }
-        }).catch(error => {
-            console.log(error);
-        });
-    }
+    // const removeFromLiked = (postId) => {
+    //     let updatedLikes = filteredLikes;
+    //     let index = updatedLikes.indexOf(authInfo.id);
+    //     updatedLikes.splice(index, 1);
+    //     setFilteredLikes(updatedLikes);
+    //     let reqBody = {};
+    //     if (userInfo.role === 'user') {
+    //         reqBody = {
+    //             isLike: filteredLikes.includes(authInfo.id),
+    //             isSeller: false,
+    //             user_id: authInfo.id,
+    //             seller_id: null
+    //         }
+    //     }
+    //     else {
+    //         reqBody = {
+    //             isLike: filteredLikes.includes(authInfo.id),
+    //             isSeller: true,
+    //             user_id: null,
+    //             seller_id: authInfo.id
+    //         }
+    //     }
+    //     axios.post(`community/postLikes/${postId}`, reqBody, {
+    //         headers: {
+    //             'Accept': 'application/json',
+    //             'Content-Type': 'application/json;charset=UTF-8',
+    //             'Authorization': `Bearer ${authInfo.token}`
+    //         }
+    //     }).then(response => {
+    //         if (response.data.status) {
+    //             // getPostsData(dispatch);
+    //         }
+    //     }).catch(error => {
+    //         console.log(error);
+    //     });
+
+    // }
+
+
+    // const addToLiked = (postId) => {
+    //     let liked = filteredLikes
+    //     liked.push(authInfo.id);
+    //     setFilteredLikes(liked);
+    //     let reqBody = {};
+    //     if (userInfo.role === 'user') {
+    //         reqBody = {
+    //             isLike: filteredLikes.includes(authInfo.id),
+    //             isSeller: false,
+    //             user_id: authInfo.id,
+    //             seller_id: null
+    //         }
+    //     }
+    //     else {
+    //         reqBody = {
+    //             isLike: filteredLikes.includes(authInfo.id),
+    //             isSeller: true,
+    //             user_id: null,
+    //             seller_id: authInfo.id
+    //         }
+    //     }
+    //     axios.post(`community/postLikes/${postId}`, reqBody, {
+    //         headers: {
+    //             'Accept': 'application/json',
+    //             'Content-Type': 'application/json;charset=UTF-8',
+    //             'Authorization': `Bearer ${authInfo.token}`
+    //         }
+    //     }).then(response => {
+    //         if (response.data.status) {
+    //             // getPostsData(dispatch);
+    //         }
+    //     }).catch(error => {
+    //         console.log(error);
+    //     });
+    // }
 
     const viewMoreComments = (id) => {
         let initialCommentToShow = commentsToShow;
-        if (posts.id === id) {
+        if (postId === id) {
             initialCommentToShow = initialCommentToShow + 2;
         }
         setCommentsToShow(initialCommentToShow);
     }
+
     const handleImgShow = (img) => {
         setTempImg(img);
         setShowSingleImg(true);
     }
     const handleSliderShow = (item) => {
         setTempImg(item.url);
-        if (posts.postImages.length > 0) {
+        if (postImages.length > 0) {
+
             let sliderImages = [{ url: item.url }];
-            posts.postImages.filter((val) => val.url !== item.url).forEach((value) => {
+            postImages.filter((val) => val.url !== item.url).forEach((value) => {
                 sliderImages.push({ url: value.url });
             });
             setSliderImages(sliderImages);
         }
-        if (posts.postVideos.length > 0) {
+        if (postVideos.length > 0) {
             let sliderVideos = [{ url: item.url }];
-            posts.postVideos.forEach((value) => {
+            postVideos.forEach((value) => {
                 sliderVideos.push({ url: value.url });
             });
             // console.log("sliderVideos", sliderVideos)
@@ -244,23 +334,23 @@ const SharePostData = ({ posts }) => {
     }
     let followRef = useRef();
     let shareRef = useRef();
-    useEffect(() => {
-        // for likes
-        const getLikes = () => {
-            let likes = posts.likes;
-            let filteredLikes = [];
-            likes.forEach((value) => {
-                if (value.isSeller) {
-                    filteredLikes.push(value.sellerId.id);
-                }
-                else {
-                    filteredLikes.push(value.userId.id);
-                }
-            });
-            setFilteredLikes(filteredLikes);
-        }
-        getLikes();
-    }, [posts]);
+    // useEffect(() => {
+    //     // for likes
+    //     const getLikes = () => {
+    //         let likes = posts.likes;
+    //         let filteredLikes = [];
+    //         likes.forEach((value) => {
+    //             if (value.isSeller) {
+    //                 filteredLikes.push(value.sellerId.id);
+    //             }
+    //             else {
+    //                 filteredLikes.push(value.userId.id);
+    //             }
+    //         });
+    //         setFilteredLikes(filteredLikes);
+    //     }
+    //     getLikes();
+    // }, [posts]);
 
     // useEffect(() => {
     //     if (posts.postImages.length > 0) {
@@ -272,17 +362,17 @@ const SharePostData = ({ posts }) => {
     //     }
     // }, []);
 
-    useEffect(() => {
-        let followHandler = (event) => {
-            if (!followRef.current.contains(event.target)) {
-                setOpenModel(false);
-            }
-        }
-        document.addEventListener("mousedown", followHandler)
-        return () => {
-            document.removeEventListener("mousedown", followHandler)
-        }
-    });
+    // useEffect(() => {
+    //     let followHandler = (event) => {
+    //         if (!followRef.current.contains(event.target)) {
+    //             setOpenModel(false);
+    //         }
+    //     }
+    //     document.addEventListener("mousedown", followHandler)
+    //     return () => {
+    //         document.removeEventListener("mousedown", followHandler)
+    //     }
+    // });
     // useEffect(() => {
     //     let shareHandler = (event) => {
     //         if (!shareRef.current.contains(event.target)) {
@@ -333,79 +423,79 @@ const SharePostData = ({ posts }) => {
     //         });
     // }
 
-    const handleFollow = (posts) => {
-        const currentUserId = authInfo.id;
-        const userIdToFollow = posts.userId === null ? posts.sellerId.id : posts.userId.id;
-        const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
-        var reqBody = {
-            role: role,
-            currentUserId: currentUserId,
-            userIdToFollow: userIdToFollow,
-        }
-        axios.post(`community/follow-user`, reqBody, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Authorization': `Bearer ${authInfo.token}`
-            }
-        }).then(response => {
-            if (response.data.status) {
-                // getPostsData(dispatch);
-                // console.log("response", response.data.message);
-                toast.success(response.data.message);
+    // const handleFollow = (posts) => {
+    //     const currentUserId = authInfo.id;
+    //     const userIdToFollow = posts.userId === null ? posts.sellerId.id : posts.userId.id;
+    //     const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
+    //     var reqBody = {
+    //         role: role,
+    //         currentUserId: currentUserId,
+    //         userIdToFollow: userIdToFollow,
+    //     }
+    //     axios.post(`community/follow-user`, reqBody, {
+    //         headers: {
+    //             'Accept': 'application/json',
+    //             'Content-Type': 'application/json;charset=UTF-8',
+    //             'Authorization': `Bearer ${authInfo.token}`
+    //         }
+    //     }).then(response => {
+    //         if (response.data.status) {
+    //             // getPostsData(dispatch);
+    //             // console.log("response", response.data.message);
+    //             toast.success(response.data.message);
 
-            }
-        }).catch(error => {
-            console.log(error);
-        });
-    }
+    //         }
+    //     }).catch(error => {
+    //         console.log(error);
+    //     });
+    // }
 
-    const handleUnfollow = (posts) => {
-        const currentUserId = authInfo.id;
-        // const userIdToUnfollow = posts.userId.id;
-        const userIdToUnfollow = posts.userId === null ? posts.sellerId.id : posts.userId.id;
-        const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
-        var reqBody = {
-            role: role,
-            currentUserId: currentUserId,
-            userIdToUnfollow: userIdToUnfollow,
-        }
-        axios.post(`community/unfollowUser`, reqBody, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Authorization': `Bearer ${authInfo.token}`
-            }
-        }).then(response => {
-            if (response.data.status) {
-                // console.log("response", response.data.message);
-                toast.success(response.data.message);
-                // getPostsData(dispatch);
-            }
-        }).catch(error => {
-            console.log(error);
-        });
-    }
+    // const handleUnfollow = (posts) => {
+    //     const currentUserId = authInfo.id;
+    //     // const userIdToUnfollow = posts.userId.id;
+    //     const userIdToUnfollow = posts.userId === null ? posts.sellerId.id : posts.userId.id;
+    //     const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
+    //     var reqBody = {
+    //         role: role,
+    //         currentUserId: currentUserId,
+    //         userIdToUnfollow: userIdToUnfollow,
+    //     }
+    //     axios.post(`community/unfollowUser`, reqBody, {
+    //         headers: {
+    //             'Accept': 'application/json',
+    //             'Content-Type': 'application/json;charset=UTF-8',
+    //             'Authorization': `Bearer ${authInfo.token}`
+    //         }
+    //     }).then(response => {
+    //         if (response.data.status) {
+    //             // console.log("response", response.data.message);
+    //             toast.success(response.data.message);
+    //             // getPostsData(dispatch);
+    //         }
+    //     }).catch(error => {
+    //         console.log(error);
+    //     });
+    // }
 
-    const handleRemove = (postId) => {
-        var reqBody = {
-            postId: postId,
-        }
-        axios.put(`community/postRemoved`, reqBody, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Authorization': `Bearer ${authInfo.token}`
-            }
-        }).then(response => {
-            if (response.data.status) {
-                toast.success(response.data.message);
-                // getPostsData(dispatch);
-            }
-        }).catch(error => {
-            console.log(error);
-        });
-    }
+    // const handleRemove = (postId) => {
+    //     var reqBody = {
+    //         postId: postId,
+    //     }
+    //     axios.put(`community/postRemoved`, reqBody, {
+    //         headers: {
+    //             'Accept': 'application/json',
+    //             'Content-Type': 'application/json;charset=UTF-8',
+    //             'Authorization': `Bearer ${authInfo.token}`
+    //         }
+    //     }).then(response => {
+    //         if (response.data.status) {
+    //             toast.success(response.data.message);
+    //             // getPostsData(dispatch);
+    //         }
+    //     }).catch(error => {
+    //         console.log(error);
+    //     });
+    // }
 
     // const handleEdit = (postEditData) => {
     //     // console.log("postEditData", postEditData)
@@ -417,79 +507,51 @@ const SharePostData = ({ posts }) => {
     // const isFollowing = posts.userId.community.followerData.includes(authInfo.id);
     // console.log("isFollowing", isFollowing);
 
-    useEffect(() => {
-        // Function to fetch data
-        const fetchData = () => {
-            let response = false;
+    // useEffect(() => {
+    //     // Function to fetch data
+    //     const fetchData = () => {
+    //         let response = false;
 
-            if (posts.userId?.community?.followerData) {
-                response = posts.userId.community.followerData.includes(authInfo.id);
-            } else if (posts.sellerId?.community?.followerData) {
-                response = posts.sellerId.community.followerData.includes(authInfo.id);
-            } else if (posts.adminId?.community?.followerData) {
-                response = posts.adminId.community.followerData.includes(authInfo.id);
-            }
+    //         if (posts.userId?.community?.followerData) {
+    //             response = posts.userId.community.followerData.includes(authInfo.id);
+    //         } else if (posts.sellerId?.community?.followerData) {
+    //             response = posts.sellerId.community.followerData.includes(authInfo.id);
+    //         } else if (posts.adminId?.community?.followerData) {
+    //             response = posts.adminId.community.followerData.includes(authInfo.id);
+    //         }
 
-            console.log("response", response);
-            setIsFollowing(response);
+    //         console.log("response", response);
+    //         setIsFollowing(response);
 
-        };
-        fetchData();
-        // getPostsData(dispatch);
-    }, []);
+    //     };
+    //     fetchData();
+    //     // getPostsData(dispatch);
+    // }, []);
 
     const handleShare = (postId) => {
         console.log("Selected postID", postId)
         setOpenShare(true)
     }
-
-    // const handleFacebookShare = () => {
-    //     const { shareAdvertise } = this.state;
-    //     const url = `https://pay.earth/advertisement/${shareAdvertise}`
-    //     const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-    //     window.open(facebookShareUrl, '_blank');
-    // };
-
-    // const handleTwitterShare = () => {
-    //     // const { shareAdvertise } = this.state;
-    //     const url = `https://pay.earth/advertisement/${shareAdvertise}`
-    //     const twitterShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`;
-    //     window.open(twitterShareUrl, '_blank');
-    // };
-
-    // const handleInstagramShare = () => {
-    //     // const { shareAdvertise } = this.state;
-    //     const url = `https://pay.earth/advertisement/${shareAdvertise}`
-    //     const instagramShareUrl = `https://www.instagram.com/?url=${url}`
-    //     window.open(instagramShareUrl, '_blank');
-    // };
-
-    // const handleWhatsappShareUrl = () => {
-    //     // const { shareAdvertise } = this.state;
-    //     const caption = encodeURIComponent(`https://pay.earth/advertisement/${shareAdvertise}`);
-    //     const whatsappShareUrl = `https://api.whatsapp.com/send?text=${caption}`;
-    //     window.open(whatsappShareUrl, '_blank');
-    // }
-
+    console.log("postImages", postImages)
 
     return (
         <React.Fragment>
-            {/* {loading === true ? <SpinnerLoader /> : ''} */}
+            {loading === true ? <SpinnerLoader /> : ''}
             <div className="post">
                 <div className="post_head">
                     <div className="post_by">
-                        <div className="poster_img "><img src={posts.userId === null ? posts.sellerId.image_url : posts.userId.image_url} alt="" /></div>
+                        <div className="poster_img "><img src={userId === null ? sellerId.image_url : userId.image_url} alt="" /></div>
                         {/* <div className="poster_img "><img src={posts.isSeller ? config.apiURI + posts.sellerId.image_url : posts.userId.image_url !== null ? config.apiURI + posts.userId.image_url : userImg} alt="" /></div> */}
                         <div className="poster_info">
-                            <div className="poster_name">{posts.isSeller ? posts.sellerId.name : posts.userId.name}</div>
-                            <ReactTimeAgo date={date} locale="en-US" timeStyle="round-minute" />
+                            <div className="poster_name">{isSeller ? sellerId.name : userId.name}</div>
+                            {/* <ReactTimeAgo date={date} locale="en-US" timeStyle="round-minute" /> */}
                             {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseFollow${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseFollow${posts.id}`}>
-                                Follow
-                            </Link> */}
+                            Follow
+                        </Link> */}
                             {
                                 userInfo.role === 'user' &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
-                                    {posts.isSeller === false && posts.userId.id === authInfo.id
+                                    {isSeller === false && userId.id === authInfo.id
                                         ? "" : isFollowing ? 'Unfollow' : 'Follow'}
                                     {/* {posts.isSeller === false && posts.userId.id === authInfo.id ? "" : 'Follow'} */}
                                 </Link>
@@ -497,7 +559,7 @@ const SharePostData = ({ posts }) => {
                             {
                                 userInfo.role === 'seller' &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
-                                    {posts.isSeller === true && posts.sellerId.id === authInfo.id ? "" : 'Follow'}
+                                    {isSeller === true && sellerId.id === authInfo.id ? "" : 'Follow'}
                                 </Link>
                             }
                         </div>
@@ -509,10 +571,10 @@ const SharePostData = ({ posts }) => {
                                 <div className={`post_follow_pop`}>
                                     <div className="follow_box">
                                         <div className="post_by">
-                                            <div className="poster_img" ><img src={posts.isSeller ? config.apiURI + posts.sellerId.image_url : posts.userId.image_url !== null ? config.apiURI + posts.userId.image_url : userImg} alt="" /></div>
+                                            <div className="poster_img" ><img src={isSeller ? sellerId.image_url : userId.image_url !== null ? userId.image_url : userImg} alt="" /></div>
                                             <div className="poster_info">
                                                 <div className="poster_name">{posts.isSeller ? posts.sellerId.name : posts.userId.name}</div>
-                                                <small>{posts.isSeller ? 'Seller' : 'User'}</small>
+                                                <small>{isSeller ? 'Seller' : 'User'}</small>
                                             </div>
                                         </div>
                                         <ul>
@@ -533,35 +595,36 @@ const SharePostData = ({ posts }) => {
 
                                         </ul>
                                         {isFollowing ?
-                                            <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleUnfollow(posts)}>Unfollow</Link>
+                                            <Link to="#" className="btn custom_btn btn_yellow"
+                                            // onClick={() => handleUnfollow(posts)}
+                                            >Unfollow</Link>
                                             :
-                                            <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleFollow(posts)}>Follow</Link>
+                                            <Link to="#" className="btn custom_btn btn_yellow"
+                                            // onClick={() => handleFollow(posts)}
+                                            >Follow</Link>
                                         }
-
-
                                     </div>
                                 </div>
                                 : ''
                         }
                     </div>
-                    <div className="post_on">
-                        {/* Date : {`${date.getDate() < 10 ? `0${date.getDate()}` : `${date.getDate()}`} - ${date.getMonth() + 1 < 10 ? `0${date.getMonth() + 1}` : `${date.getMonth() + 1}`} - ${date.getFullYear()}`} */}
-                        {/* {date.toLocaleDateString("en-US", options)} */}
-                        {/* <ReactTimeAgo date={date} locale="en-US" timeStyle="twitter"/> */}
-                        {/* <span>{posts.productId !== null || posts.categoryId !== null ? '|' : ''}</span> */}
-                        {
-                            posts.productId !== null || posts.categoryId !== null ?
-                                // <span>{Object.keys(posts.productId).length ? 'Product' : 'Category'} : {Object.keys(posts.productId).length ? `${posts.productId.name}` : `${posts.categoryId.name}`}</span>
-                                <>{posts.productId !== null ? 'Product' : 'Category'} : {posts.productId !== null ? <Link to={`product-detail/${posts.productId.id}`}>{posts.productId.name}</Link> : <Link to={`product-listing?cat=${posts.categoryId.id}&search=`}>{posts.categoryId.categoryName}</Link>}</>
-                                : ''
-                        }
-                    </div>
+
+                    {/* Product show... */}
+                    {/* <div className="post_on">
+                
+                    {
+                        posts.productId !== null || posts.categoryId !== null ?
+                            <>{posts.productId !== null ? 'Product' : 'Category'} : {posts.productId !== null ? <Link to={`product-detail/${posts.productId.id}`}>{posts.productId.name}</Link> : <Link to={`product-listing?cat=${posts.categoryId.id}&search=`}>{posts.categoryId.categoryName}</Link>}</>
+                            : ''
+                    }
+                       </div> */}
+
                 </div>
                 <div className="post_body">
                     <div className="post_text">
-                        <p>{isReadMore ? posts.postContent.slice(0, 150) : posts.postContent}
+                        <p>{isReadMore ? postContent.slice(0, 150) : postContent}
                             {
-                                posts.postContent.length > 150 ?
+                                postContent.length > 150 ?
                                     <span onClick={() => setIsReadMore(!isReadMore)} className="read-or-hide">
                                         {isReadMore ? "...read more" : " show less"}
                                     </span>
@@ -569,6 +632,8 @@ const SharePostData = ({ posts }) => {
                             }
                         </p>
                     </div>
+
+
                     {/* post images */}
                     <div className={`post_single_img ${showSingleImg ? 'open' : ''}`}>
                         <img className='single_img' src={tempImg} alt="" />
@@ -594,28 +659,46 @@ const SharePostData = ({ posts }) => {
                     {/* slider end */}
                     <div className='post_img_box container'>
                         <div className='row post_img_internal_box'>
-                            {posts.postImages.slice(0, 2).map((image, ind) => {
+
+                            {postImages.slice(0, 2).map((image, ind) => {
                                 return (
                                     <>
-                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-6'}`} key={ind} onClick={() => handleSliderShow(image)}>
+                                        <div className={`post_child_div ${postImages.length === 1 ? 'col-12' : 'col-md-6'}`} key={ind} onClick={() => handleSliderShow(image)}>
                                             <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
                                         </div>
                                     </>
                                 )
                             })}
-                            {posts.postImages.slice(2, 4).map((image, ind) => {
+
+                            <div className="post_child_div'col-12">
+                                <div className="post_img mb-3 ">
+                                    <img src={postImages.url} alt="" />
+                                </div>
+                            </div>
+
+
+                            {/* {postImages.slice(0, 2).map((image, ind) => {
                                 return (
                                     <>
-                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(image)}>
+                                        <div className={`post_child_div ${postImages.length === 1 ? 'col-12' : 'col-md-6'}`} key={ind} onClick={() => handleSliderShow(image)}>
                                             <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
                                         </div>
                                     </>
                                 )
                             })}
-                            {posts.postImages.slice(4, 5).map((image, ind) => {
+                            {postImages.slice(2, 4).map((image, ind) => {
                                 return (
                                     <>
-                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(image)}>
+                                        <div className={`post_child_div ${postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(image)}>
+                                            <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
+                                        </div>
+                                    </>
+                                )
+                            })}
+                            {postImages.slice(4, 5).map((image, ind) => {
+                                return (
+                                    <>
+                                        <div className={`post_child_div ${postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(image)}>
                                             {
                                                 posts.postImages.length > 5 &&
                                                 <span>{`${posts.postImages.length - 5}+`}</span>
@@ -625,10 +708,9 @@ const SharePostData = ({ posts }) => {
                                     </>
                                 )
                             })}
-
-                            {posts.postVideos.map((video, ind) => {
+                            {postVideos.map((video, ind) => {
                                 return (
-                                    <div className={`post_main_div ${posts.postVideos.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(video)} >
+                                    <div className={`post_main_div ${postVideos.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(video)} >
                                         <Link to="#" className='cp_video_play' >
                                             <img src={videoPlay} />
                                         </Link>
@@ -639,7 +721,7 @@ const SharePostData = ({ posts }) => {
                                         </div>
                                     </div>
                                 )
-                            })}
+                            })} */}
 
                         </div>
                     </div>
@@ -647,37 +729,37 @@ const SharePostData = ({ posts }) => {
                 <div className="post_foot">
                     <div className="post_actions">
                         <ul className="ps_links">
-                            <li>
+                            {/* <li>
                                 <Link to="#" onClick={() => filteredLikes.length !== 0 && filteredLikes.includes(authInfo.id) ? removeFromLiked(posts.id) : addToLiked(posts.id)}>
                                     <img src={filteredLikes.length !== 0 && filteredLikes.includes(authInfo.id) ? redHeartIcon : heartIconBordered} /> {posts.likeCount}
                                 </Link>
                                 <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}><i className="post_icon ps_comment"></i> {posts.commentCount} Comments</Link>
-                            </li>
+                            </li> */}
 
                             <li className="ms-auto">
-                                {/* {(posts.userId?.id === authInfo.id || posts.sellerId?.id === authInfo.id || posts.adminId?.id === authInfo.id) ? (
+                                {/* {(userId?.id === authInfo.id || sellerId?.id === authInfo.id || adminId?.id === authInfo.id) ? (
                                     <>
                                         <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleEdit(posts)}>Edit</button>
                                         <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
                                     </>
                                 ) : null} */}
                                 {/* {posts.userId.id === authInfo.id ? <>
-                                    <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleEdit(posts)}>Edit</button>
-                                    <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
-                                </>
-                                    : ""
-                                } */}
+                                <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleEdit(posts)}>Edit</button>
+                                <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
+                            </>
+                                : ""
+                            } */}
 
                                 {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseShareTo${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseShareTo${posts.id}`}>
-                                    <i className="post_icon ps_share"></i> Share
-                                </Link> */}
-                                <Link
+                                <i className="post_icon ps_share"></i> Share
+                            </Link> */}
+                                {/* <Link
                                     to="#"
                                     // onClick={() => setOpenShare(true)}
-                                    onClick={() => handleShare(posts.id)}
+                                    onClick={() => handleShare(posts)}
                                     className="post_follow">
                                     <i className="post_icon ps_share"></i> Share
-                                </Link>
+                                </Link> */}
                             </li>
 
                         </ul>
@@ -691,47 +773,37 @@ const SharePostData = ({ posts }) => {
                                                 <i className="post_icon ps_share"></i>
                                                 Share
                                             </li>
-                                            <li><Link to="#">Internal</Link></li>
-                                            <li><Link to="#">Facebook</Link></li>
-                                            <li><Link to="#">Twitter</Link></li>
-                                            <li><Link to="#">Linkedin</Link></li>
+                                            <li><Link to="#" onClick={() => handleFacebookShare(posts.id)}>Facebook</Link></li>
+                                            <li><Link to="#" onClick={() => handleTwitterShare(posts.id)}>Twitter</Link></li>
+                                            <li><Link to="#" onClick={() => handleInstagramShare(posts.id)}>Instagram</Link></li>
+                                            <li><Link to="#" onClick={() => handleWhatsappShare(posts.id)}>Whatsapp</Link></li>
                                         </ul>
                                     </div>
                                     : ''
                             }
                         </div> */}
-                        <div className="collapse post_comments" id={`collapseComment${posts.id}`}>
+
+
+                        <div className="collapse post_comments" id={`collapseComment${postId}`}>
                             <ul className="comnt_list">
                                 <li>
                                     <div className="add_commnt">
                                         <div className="avtar_img"><img className="img-fluid" src={userImg} alt="" /></div>
                                         <div className="add_comnt">
                                             <div className="ac_box">
-                                                <textarea
-                                                    className="form-control"
-                                                    placeholder="Add Comment"
-                                                    name=""
-                                                    id=""
-                                                    rows="3"
-                                                    value={comments}
-                                                    onChange={(e) => handleComments(e)}>
-
-                                                </textarea>
-                                                <button
-                                                    type="submit"
-                                                    className="btn btn_yellow custom_btn"
-                                                    // onClick={() => addNewComment(posts.id)}
-                                                    disabled={!comments.trim()}
-                                                >
+                                                <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
+                                                {/* <button type="submit" className="btn btn_yellow custom_btn" 
+                                                onClick={() => addNewComment(postId)} disabled={!comments.trim()}
+                                                >                
                                                     Add Comment
-                                                </button>
+                                                </button> */}
 
                                             </div>
                                         </div>
                                     </div>
                                 </li>
-                                <li>
-                                    {posts.comments.slice(0, commentsToShow).map((val, id) => {
+                                {/* <li>
+                                    {comments.slice(0, commentsToShow).map((val, id) => {
                                         return (
                                             <div className="commnt_box" key={id}>
                                                 <div className="avtar_img"><img className="img-fluid" src={userImg} alt="" /></div>
@@ -739,20 +811,20 @@ const SharePostData = ({ posts }) => {
                                                     <div className="commnt_body">
                                                         <div className="commnt_by">
                                                             <div className="cb_name">{val.isSeller ? val.sellerId.name : val.userId.name}</div>
-                                                            {/* <div className="cb_date">{`${new Date(val.createdAt).getDate() < 10 ? `0${new Date(val.createdAt).getDate()}` : `${new Date(val.createdAt).getDate()}`} - ${new Date(val.createdAt).getMonth() + 1 < 10 ? `0${new Date(val.createdAt).getMonth() + 1}` : `${new Date(val.createdAt).getMonth() + 1}`} - ${new Date(val.createdAt).getFullYear()}`}</div> */}
                                                             <div className="cb_date"> <ReactTimeAgo date={new Date(val.createdAt)} locale="en-US" timeStyle="round-minute" /></div>
                                                         </div>
                                                         <p>{val.content}</p>
                                                     </div>
-                                                    {/* <Link to="#" className="reply_link">Reply</Link> */}
+                                                    
                                                 </div>
                                             </div>
                                         )
                                     })}
-                                    {posts.commentCount == 0 ? '' :
-                                        <button className={`btn load_more_post ${posts.comments.length === commentsToShow || posts.comments.length === commentsToShow - 1 ? 'd-none' : ''}`} onClick={() => viewMoreComments(posts.id)} >view more comments</button>
+                                    {commentCount == 0 ? '' :
+                                        <button className={`btn load_more_post ${comments.length === commentsToShow || comments.length === commentsToShow - 1 ? 'd-none' : ''}`}
+                                            onClick={() => viewMoreComments(postId)} >view more comments</button>
                                     }
-                                </li>
+                                </li> */}
                             </ul>
                         </div>
                     </div>

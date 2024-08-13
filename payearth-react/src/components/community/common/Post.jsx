@@ -698,8 +698,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                                 <div className="commnt_text">
                                                     <div className="commnt_body">
                                                         <div className="commnt_by">
-                                                            {/* <div className="cb_name">{val.isSeller ? val.sellerId.name : val.userId.name}</div> */}
-                                                            <div className="cb_name">{val.isSeller ? (val.sellerId && val.sellerId.name ? val.sellerId.name : 'N/A') : (val.userId && val.userId.name ? val.userId.name : 'N/A')}</div>
+                                                            <div className="cb_name">{val.isSeller ? val.sellerId.name : val.userId.name}</div>
                                                             {/* <div className="cb_date">{`${new Date(val.createdAt).getDate() < 10 ? `0${new Date(val.createdAt).getDate()}` : `${new Date(val.createdAt).getDate()}`} - ${new Date(val.createdAt).getMonth() + 1 < 10 ? `0${new Date(val.createdAt).getMonth() + 1}` : `${new Date(val.createdAt).getMonth() + 1}`} - ${new Date(val.createdAt).getFullYear()}`}</div> */}
                                                             <div className="cb_date"> <ReactTimeAgo date={new Date(val.createdAt)} locale="en-US" timeStyle="round-minute" /></div>
                                                         </div>
