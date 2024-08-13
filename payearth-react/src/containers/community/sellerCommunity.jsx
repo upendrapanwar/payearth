@@ -25,7 +25,7 @@ const SellerCommunity = () => {
     const authInfo = useSelector(state => state.auth.authInfo);
     const loading = useSelector(state => state.global.loading);
     const SellerPostsData = useSelector(state => state.post.SellerPostsData);
-    console.log("Posts Seller", SellerPostsData)
+    //console.log("Posts Seller", SellerPostsData)
     const postCategories = useSelector(state => state.post.postCategories);
     const postProducts = useSelector(state => state.post.postProducts);
     const dispatch = useDispatch();
@@ -112,7 +112,9 @@ const SellerCommunity = () => {
             admin_id: null,
             is_seller: true,
             is_admin: false,
-            parent_id: null
+            parent_id: null,
+            postImages:images,
+            postVideos:videos,
         };
 
         // if (userInfo.role === 'user') {
@@ -198,14 +200,14 @@ const SellerCommunity = () => {
 
                 if (imageUrls.length > 0 && videoUrls.length > 0) {
                     await Promise.all([
-                        axios.post(`community/postImages/${postId}`, { images: imageUrls }, {
+                        axios.post(`seller/postImages/${postId}`, { images: imageUrls }, {
                             headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json; charset=UTF-8',
                                 'Authorization': `Bearer ${authInfo.token}`
                             }
                         }),
-                        axios.post(`community/postVideos/${postId}`, { videos: videoUrls }, {
+                        axios.post(`seller/postVideos/${postId}`, { videos: videoUrls }, {
                             headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json; charset=UTF-8',
@@ -215,7 +217,7 @@ const SellerCommunity = () => {
                     ]);
                 } else {
                     if (imageUrls.length > 0) {
-                        await axios.post(`community/postImages/${postId}`, { images: imageUrls }, {
+                        await axios.post(`seller/postImages/${postId}`, { images: imageUrls }, {
                             headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json; charset=UTF-8',
@@ -224,7 +226,7 @@ const SellerCommunity = () => {
                         });
                     }
                     if (videoUrls.length > 0) {
-                        await axios.post(`community/postVideos/${postId}`, { videos: videoUrls }, {
+                        await axios.post(`seller/postVideos/${postId}`, { videos: videoUrls }, {
                             headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json; charset=UTF-8',
@@ -383,6 +385,19 @@ const SellerCommunity = () => {
         });
     }
 
+    const resetForm = () => {
+        setInputStr('');
+        setImages([]);
+        setVideos([]);
+        setPostStatus('Followers');
+        // setShowPicker(false);
+        setIsUpdate(false);
+        setCategoryId(null);
+        setProductId(null);
+        setDefaultProductOption({ label: 'Choose Product', value: '' });
+        setDefaultCategoryOption({ label: 'Choose Category', value: '' });
+    };
+
     return (
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
@@ -393,8 +408,13 @@ const SellerCommunity = () => {
                         <div className="row">
                             <div className="col-lg-12">
                                 <div className="createpost bg-white rounded-3">
-                                    <div className="cp_top">
+                                    <div className="cp_top  d-flex justify-content-between align-items-center">
                                         <div className="cumm_title">Create your post</div>
+                                        {/* {isUpdate && ( */}
+                                            <div className="close-icon" onClick={resetForm}>
+                                                <button type="button" class="btn-close" aria-label="Close"></button>
+                                            </div>
+                                         {/* )} */}
                                     </div>
                                     <div className="cp_body">
                                         <div className="com_user_acc">
@@ -471,12 +491,16 @@ const SellerCommunity = () => {
                                         </div>
                                         <div className='cp_foot'>
                                             <div className={`cp_action_grp `}>
+                                            {!isUpdate && (
+                                                <>
                                                 <div className="cp_upload_btn cp_upload_img">
                                                     <input type="file" id="post_img" accept="image/*" multiple={true} onChange={(event) => handlePreview(event)} />
                                                 </div>
                                                 <div className="cp_upload_btn cp_upload_video">
                                                     <input type="file" id='post_video' accept="video/*" multiple onChange={(event) => handleVideoPreview(event)} />
                                                 </div>
+                                                </>
+                                            )}
                                                 {/* <select className="form-select form-select-lg cp_select mb-3" aria-label=".form-select category"  onChange={(event) => handleCategories(event)}>
                                                     {
                                                         postCategories.map((value, index) => {

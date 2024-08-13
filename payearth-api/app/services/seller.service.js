@@ -139,13 +139,14 @@ module.exports = {
 
   addPost,
   getPosts,
-  //addPostImages,
+  addPostImages,
+  addPostVideos,
   addPostLike,
 
     getPostComments,
     addPostComment,
-   // followUser,
-   // unfollowUser,
+    followUser,
+    unfollowUser,
     postDelete,
     updatePost,
     // sendFollowRequest,
@@ -3829,46 +3830,46 @@ async function getPosts(req) {
   return false;
 }
 
-// async function addPostImages(req) {
-//   const { images } = req.body;
-//   const postId = req.params.id;
-// console.log('function save image run')
-//   if (!Array.isArray(images) || images.length === 0) {
-//       return res.status(400).json({ success: false, message: "No videos provided" });
-//   }
+async function addPostImages(req) {
+  const { images } = req.body;
+  const postId = req.params.id;
+console.log('function save image run')
+  if (!Array.isArray(images) || images.length === 0) {
+      return res.status(400).json({ success: false, message: "No videos provided" });
+  }
 
-//   try {
-//       var postImages = [];
-//       var allImagesSaved = true;
-//       for (let i = 0; i < images.length; i++) {
-//           const image = images[i];
-//           let input = {
-//               postId: postId,
-//               url: image.url,
-//               isActive: true
-//           };
-//           let postImage = new PostImages(input);
-//           let data = await postImage.save();
-//           if (data) {
-//               postImages.push(data.id);
-//           } else {
-//               allImagesSaved = false;
-//               break; // Exit loop if save fails
-//           }
-//       }
-//       if (allImagesSaved) {
-//           const filter = { _id: postId };
-//           const updateData = { $push: { postImages: { $each: postImages } } };
-//           await Post.findOneAndUpdate(filter, updateData, { new: true });
-//           return postImages
-//       } else {
-//           return { success: false, message: "Failed to save" };
-//       }
-//   } catch (error) {
-//       console.log("error", error)
-//   }
+  try {
+      var postImages = [];
+      var allImagesSaved = true;
+      for (let i = 0; i < images.length; i++) {
+          const image = images[i];
+          let input = {
+              postId: postId,
+              url: image.url,
+              isActive: true
+          };
+          let postImage = new PostImages(input);
+          let data = await postImage.save();
+          if (data) {
+              postImages.push(data.id);
+          } else {
+              allImagesSaved = false;
+              break; // Exit loop if save fails
+          }
+      }
+      if (allImagesSaved) {
+          const filter = { _id: postId };
+          const updateData = { $push: { postImages: { $each: postImages } } };
+          await Post.findOneAndUpdate(filter, updateData, { new: true });
+          return postImages
+      } else {
+          return { success: false, message: "Failed to save" };
+      }
+  } catch (error) {
+      console.log("error", error)
+  }
 
-// }
+}
 
 async function addPostLike(req) {
 console.log('like api run----------------')
@@ -4032,4 +4033,228 @@ async function getPostComments(req) {
       return comments;
   }
   return false;
+}
+
+async function addPostVideos(req, res) {
+  const { videos } = req.body;
+  const postId = req.params.id;
+
+  if (!Array.isArray(videos) || videos.length === 0) {
+      return res.status(400).json({ success: false, message: "No videos provided" });
+  }
+  try {
+      var postVideos = [];
+      var allVideosSaved = true;
+      for (let i = 0; i < videos.length; i++) {
+          const video = videos[i];
+          let input = {
+              postId: postId,
+              url: video.url,
+              isActive: true
+          };
+          let postVideo = new PostVideos(input);
+          let data = await postVideo.save();
+          if (data) {
+              postVideos.push(data.id);
+          } else {
+              allVideosSaved = false;
+              break; // Exit loop if save fails
+          }
+      }
+      if (allVideosSaved) {
+          const filter = { _id: postId };
+          const updateData = { $push: { postVideos: { $each: postVideos } } };
+          await Post.findOneAndUpdate(filter, updateData, { new: true });
+          return postVideos
+      } else {
+          return { success: false, message: "Failed to save" };
+      }
+  } catch (error) {
+      console.log("error", error)
+  }
+}
+
+async function followUser(req) {
+  try {
+      const param = req.body;
+      const currentUserId = param.currentUserId;
+      const userIdToFollow = param.userIdToFollow;
+      const role = param.role;
+
+
+      if (role === "seller") {
+          // If a seller is following someone (another seller or a user)
+          await User.updateOne(
+              { _id: currentUserId },
+              {
+                  $addToSet: { 'community.followingData': userIdToFollow },
+                  $inc: { 'community.following': 1 }
+              }
+          );
+
+          const isFollowingSeller = await Seller.exists({ _id: userIdToFollow });
+          if (isFollowingSeller) {
+              await Seller.updateOne(
+                  { _id: userIdToFollow },
+                  {
+                      $addToSet: { 'community.followerData': currentUserId },
+                      $inc: { 'community.followers': 1 }
+                  }
+              );
+          } else {
+              await User.updateOne(
+                  { _id: userIdToFollow },
+                  {
+                      $addToSet: { 'community.followerData': currentUserId },
+                      $inc: { 'community.followers': 1 }
+                  }
+              );
+          }
+
+          return { success: true, message: 'Followed successfully....!' };
+
+      } else if (role === "user") {
+          // Buyer follow to another Buyer...
+          await User.updateOne(
+              { _id: currentUserId },
+              {
+                  $addToSet: { 'community.followingData': userIdToFollow },
+                  $inc: { 'community.following': 1 }
+              }
+          );
+
+          const isFollowingSeller = await Seller.exists({ _id: userIdToFollow });
+          if (isFollowingSeller) {
+              await Seller.updateOne(
+                  { _id: userIdToFollow },
+                  {
+                      $addToSet: { 'community.followerData': currentUserId },
+                      $inc: { 'community.followers': 1 }
+                  }
+              );
+          } else {
+              await User.updateOne(
+                  { _id: userIdToFollow },
+                  {
+                      $addToSet: { 'community.followerData': currentUserId },
+                      $inc: { 'community.followers': 1 }
+                  }
+              );
+          }
+
+          return { success: true, message: 'Followed successfully....!' };
+      }
+
+      // ****************Below buyer to buyer follow req sent functionality....**********************//
+      // await User.updateOne(
+      //     { _id: currentUserId },
+      //     {
+      //         $addToSet: { 'community.followingData': userIdToFollow },
+      //         $inc: { 'community.following': 1 }
+      //     }
+      // );
+
+      // await User.updateOne(
+      //     { _id: userIdToFollow },
+      //     {
+      //         $addToSet: { 'community.followerData': currentUserId },
+      //         $inc: { 'community.followers': 1 }
+      //     }
+      // );
+
+  } catch (err) {
+      console.log('Error', err);
+      return false;
+  }
+}
+
+
+async function unfollowUser(req) {
+  try {
+      const param = req.body;
+      const currentUserId = param.currentUserId;
+      const userIdToUnfollow = param.userIdToUnfollow;
+      const role = param.role;
+
+      if (role === "seller") {
+          await User.updateOne(
+              { _id: currentUserId },
+              {
+                  $pull: { 'community.followingData': userIdToUnfollow },
+                  $inc: { 'community.following': -1 }
+              }
+          );
+
+          const isFollowingSeller = await Seller.exists({ _id: userIdToUnfollow });
+          if (isFollowingSeller) {
+              await Seller.updateOne(
+                  { _id: userIdToUnfollow },
+                  {
+                      $pull: { 'community.followerData': currentUserId },
+                      $inc: { 'community.followers': -1 }
+                  }
+              );
+          } else {
+              await User.updateOne(
+                  { _id: userIdToUnfollow },
+                  {
+                      $pull: { 'community.followerData': currentUserId },
+                      $inc: { 'community.followers': -1 }
+                  }
+              );
+          }
+
+          return { success: true, message: 'Unfollowed successfully....!' };
+
+      } else if (role === "user") {
+          await User.updateOne(
+              { _id: currentUserId },
+              {
+                  $pull: { 'community.followingData': userIdToUnfollow },
+                  $inc: { 'community.following': -1 }
+              }
+          );
+
+          const isFollowingSeller = await Seller.exists({ _id: userIdToUnfollow });
+          if (isFollowingSeller) {
+              await Seller.updateOne(
+                  { _id: userIdToUnfollow },
+                  {
+                      $pull: { 'community.followerData': currentUserId },
+                      $inc: { 'community.followers': -1 }
+                  }
+              );
+          } else {
+              await User.updateOne(
+                  { _id: userIdToUnfollow },
+                  {
+                      $pull: { 'community.followerData': currentUserId },
+                      $inc: { 'community.followers': -1 }
+                  }
+              );
+          }
+
+          return { success: true, message: 'Unfollowed successfully....!' };
+      }
+      // ****************Below buyer to buyer unfollowing req functionality....**********************//
+      // await User.updateOne(
+      //     { _id: currentUserId },
+      //     {
+      //         $pull: { 'community.followingData': userIdToUnfollow },
+      //         $inc: { 'community.following': -1 }
+      //     }
+      // );
+      // await User.updateOne(
+      //     { _id: userIdToUnfollow },
+      //     {
+      //         $pull: { 'community.followerData': currentUserId },
+      //         $inc: { 'community.followers': -1 }
+      //     }
+      // );
+      // return { success: true, message: 'Unfollowed successfully....!' };
+
+  } catch (err) {
+      console.log('Error', err);
+      return false;
+  }
 }

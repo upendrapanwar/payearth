@@ -384,6 +384,19 @@ const Community = () => {
         });
     }
 
+    const resetForm = () => {
+        setInputStr('');
+        setImages([]);
+        setVideos([]);
+        setPostStatus('Followers');
+        // setShowPicker(false);
+        setIsUpdate(false);
+        setCategoryId(null);
+        setProductId(null);
+        setDefaultProductOption({ label: 'Choose Product', value: '' });
+        setDefaultCategoryOption({ label: 'Choose Category', value: '' });
+    };
+
     return (
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
@@ -396,8 +409,13 @@ const Community = () => {
                         <div className="row">
                             <div className="col-lg-12">
                                 <div className="createpost bg-white rounded-3">
-                                    <div className="cp_top">
+                                    <div className="cp_top d-flex justify-content-between align-items-center">
                                         <div className="cumm_title">Create your post</div>
+                                         {/* {isUpdate && ( */}
+                                            <div className="close-icon" onClick={resetForm}>
+                                                <button type="button" class="btn-close" aria-label="Close"></button>
+                                            </div>
+                                         {/* )} */}
                                     </div>
                                     <div className="cp_body">
                                         <div className="com_user_acc">
@@ -474,12 +492,16 @@ const Community = () => {
                                         </div>
                                         <div className='cp_foot'>
                                             <div className={`cp_action_grp `}>
+                                            {!isUpdate && (
+                                                <>
                                                 <div className="cp_upload_btn cp_upload_img">
                                                     <input type="file" id="post_img" accept="image/*" multiple={true} onChange={(event) => handlePreview(event)} />
                                                 </div>
                                                 <div className="cp_upload_btn cp_upload_video">
                                                     <input type="file" id='post_video' accept="video/*" multiple onChange={(event) => handleVideoPreview(event)} />
                                                 </div>
+                                                </>
+                                                )}
                                                 {/* <select className="form-select form-select-lg cp_select mb-3" aria-label=".form-select category"  onChange={(event) => handleCategories(event)}>
                                                     {
                                                         postCategories.map((value, index) => {
