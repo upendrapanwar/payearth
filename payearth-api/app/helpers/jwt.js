@@ -16,6 +16,7 @@ function jwt() {
       /\/uploads*/,
       /\/front*/,
       /\/community\/front*/,
+      /\/community\/getPostById*/,
       /\/twitter*/,
       /\/publishBlog*/,
       /\/blogDetail*/,

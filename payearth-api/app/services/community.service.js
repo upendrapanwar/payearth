@@ -20,6 +20,7 @@ module.exports = {
     unfollowUser,
     postDelete,
     updatePost,
+    getPostById,
     // sendFollowRequest,
     setFollow,
     getCategories,
@@ -824,6 +825,63 @@ async function getProductsByCatId(req) {
 
     if (products && products.length > 0) {
         return products;
+    }
+    return false;
+}
+
+
+async function getPostById(req) {
+    const postId = req.params.id;
+    console.log("postId", postId)
+
+    const post = await Post.findOne({
+        _id: postId,
+        isActive: true
+    })
+        .sort({ createdAt: 'desc' })
+        .populate([
+            {
+                path: "sellerId",
+                model: Seller,
+                select: "name image_url community role",
+                match: { isActive: true },
+            },
+            {
+                path: "userId",
+                model: User,
+                select: "name image_url community role",
+                match: { isActive: true },
+            },
+            {
+                path: "postImages",
+                model: PostImages,
+                select: "url",
+                // match: { isActive: true }
+            },
+            {
+                path: "postVideos",
+                model: PostVideos,
+                select: "url",
+                match: { isActive: true }
+            },
+            {
+                path: "likes",
+                model: PostLike,
+                select: "isActive isSeller postId sellerId userId",
+                match: { isActive: true }
+            },
+            {
+                path: "comments",
+                model: PostComment,
+                select: "isActive isSeller postId sellerId userId",
+                match: { isActive: true }
+            },
+        ])
+    // console.log("Shared post", post)
+
+    if (post) {
+        // console.log("posts test ", post)
+        return post;
     }
     return false;
 }

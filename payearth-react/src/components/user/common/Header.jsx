@@ -462,10 +462,10 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
       .catch((error) => {
         console.log(error);
       });
-    if (loginStatus && userInfo.role === "user") {
-      const authInfo = JSON.parse(localStorage.getItem("authInfo"));
-      fetchNotification(authInfo.id, authInfo.token);
-    }
+    // if (loginStatus && userInfo.role === "user") {
+    //   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
+    //   fetchNotification(authInfo.id, authInfo.token);
+    // }
   }, [
     dispatch,
     productCategories,
