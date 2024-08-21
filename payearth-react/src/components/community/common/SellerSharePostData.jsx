@@ -25,7 +25,7 @@ TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
 
 
-const SharePostData = () => {
+const SellerSharePostData = () => {
     const location = useLocation();
     const urlPath = location.pathname;
     const parts = urlPath.split('/');
@@ -76,13 +76,13 @@ const SharePostData = () => {
 
     useEffect(() => {
         const getPostData = async () => {
-            const url = `community/getPostById/${postId}`;
+            const url = `seller/getPostById/${postId}`;
             try {
                 const response = await axios.get(url, {
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json;charset=UTF-8',
-                        // 'Authorization': `Bearer ${authInfo.token}`
+                        'Authorization': `Bearer ${authInfo.token}`
                     }
                 });
 
@@ -842,7 +842,7 @@ const SharePostData = () => {
                                                     <div className="commnt_text">
                                                         <div className="commnt_body">
                                                             <div className="commnt_by">
-                                                                <div className="cb_name">{val.isSeller ? val.sellerId.name : val.userId.name}</div>
+                                                                <div className="cb_name">{val.isSeller===true ? val.sellerId.name ||"" : val.userId.name ||""}</div>
                                                                 <div className="cb_date"> <ReactTimeAgo date={new Date(val.createdAt)} locale="en-US" timeStyle="round-minute" /></div>
                                                             </div>
                                                             <p>{val.content}</p> 
@@ -872,4 +872,4 @@ const SharePostData = () => {
     );
 };
 
-export default SharePostData;
+export default SellerSharePostData;

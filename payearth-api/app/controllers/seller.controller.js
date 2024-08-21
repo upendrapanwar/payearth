@@ -252,6 +252,7 @@ router.post('/follow-user', followUser);
 router.post('/unfollowUser', unfollowUser);
 router.put('/postRemoved', postDelete);
 router.put('/updatePost', updatePost);
+router.get("/getPostById/:id", getPostById);
 
 
 module.exports = router;
@@ -1338,5 +1339,12 @@ function updatePost(req, res, next) {
   sellerService.updatePost(req)
     .then(result => result ? res.status(201).json({ status: true, message: "Updated...!" }) : res.status(400).json({ status: false, message: msg.follow.yes.error }))
     .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function getPostById(req, res, next) {
+
+  sellerService.getPostById(req)
+      .then(result => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+      .catch(err => next(res.json({ status: false, message: err })));
 }
 

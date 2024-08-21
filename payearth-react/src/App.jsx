@@ -122,6 +122,7 @@ import ManageVendors from "./containers/admin/ManageVendors";
 import Community from "./containers/community/Community";
 import CommunityProfile from "./containers/community/CommunityProfile";
 import SharePostData from "./components/community/common/SharePostData";
+import SellerSharePostData from "./components/community/common/SellerSharePostData";
 
 import Blog from "./components/common/BlogModel";
 import BlogDetail from "./components/common/BlogDetails";
@@ -855,6 +856,14 @@ function App() {
             roles={[Role.user]}
             currentUserRole={userInfo.role}
             component={SharePostData}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller_share_community/:id"
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            component={SellerSharePostData}
             exact
           />
 

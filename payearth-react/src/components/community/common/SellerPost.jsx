@@ -409,6 +409,41 @@ const SellerPost = ({ posts, sendEditData }) => {
         getSellerPostsData(dispatch);
     }, []);
 
+    const handleShare = () => {
+        setOpenShare(true)
+    }
+
+    const handleFacebookShare = (postId) => {
+        // const url = `https://pay.earth/share_community/${postId}`
+        const url = `https://localhost:3000/share_community/${postId}`
+        const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+        // window.open(facebookShareUrl, '_blank');
+        window.open(facebookShareUrl, '_blank');
+    };
+
+    const handleTwitterShare = (postId) => {
+        // const { shareAdvertise } = this.state;
+        const url = `https://pay.earth/share_community/${postId}`
+        // const url = `https://localhost:3000/share_community/${postId}`
+        const twitterShareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`;
+        window.open(twitterShareUrl, '_blank');
+    };
+
+    const handleInstagramShare = (postId) => {
+        // const { shareAdvertise } = this.state;
+        const url = `https://pay.earth/share_community/${postId}`
+        // const url = `https://localhost:3000/share_community/${postId}`
+        const instagramShareUrl = `https://www.instagram.com/?url=${url}`
+        window.open(instagramShareUrl, '_blank');
+    };
+
+    const handleWhatsappShare = (postId) => {
+        // const { shareAdvertise } = this.state;
+        const caption = encodeURIComponent(`https://pay.earth/seller_share_community/${postId}`);
+        // const caption = encodeURIComponent(`https://localhost:3000/share_community/${postId}`);
+        const whatsappShareUrl = `https://api.whatsapp.com/send?text=${caption}`;
+        window.open(whatsappShareUrl, '_blank');
+    }
 
     return (
         <React.Fragment>
@@ -425,17 +460,17 @@ const SellerPost = ({ posts, sendEditData }) => {
                                 Follow
                             </Link> */}
                             {
-                                userInfo.role === 'user' &&
+                                userInfo.role === 'seller' &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
-                                    {posts.isSeller === false && posts.userId.id === authInfo.id
+                                    {posts.isSeller === true && posts.sellerId.id === authInfo.id
                                         ? "" : isFollowing ? 'Unfollow' : 'Follow'}
                                     {/* {posts.isSeller === false && posts.userId.id === authInfo.id ? "" : 'Follow'} */}
                                 </Link>
                             }
                             {
-                                userInfo.role === 'seller' &&
+                                userInfo.role === 'user' &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
-                                    {posts.isSeller === true && posts.sellerId.id === authInfo.id ? "" : 'Follow'}
+                                    {posts.isSeller === false && posts.userId.id === authInfo.id ? "" : isFollowing ? 'Unfollow' : 'Follow'}
                                 </Link>
                             }
                         </div>
@@ -628,7 +663,10 @@ const SellerPost = ({ posts, sendEditData }) => {
                                 {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseShareTo${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseShareTo${posts.id}`}>
                                     <i className="post_icon ps_share"></i> Share
                                 </Link> */}
-                                <Link to="#" onClick={() => setOpenShare(true)} className="post_follow">
+                                <Link to="#" 
+                                // onClick={() => setOpenShare(true)}
+                                onClick={() => handleShare(posts)}
+                                className="post_follow">
                                     <i className="post_icon ps_share"></i> Share
                                 </Link>
                             </li>
@@ -641,10 +679,10 @@ const SellerPost = ({ posts, sendEditData }) => {
                                     <div className="collapse_pop">
                                         <ul className="shareto">
                                             <li><i className="post_icon ps_share"></i> Share</li>
-                                            <li><Link to="#">Internal</Link></li>
-                                            <li><Link to="#">Facebook</Link></li>
-                                            <li><Link to="#">Twitter</Link></li>
-                                            <li><Link to="#">Linkedin</Link></li>
+                                            <li><Link to="#" onClick={() => handleFacebookShare(posts.id)}>Facebook</Link></li>
+                                            <li><Link to="#" onClick={() => handleTwitterShare(posts.id)}>Twitter</Link></li>
+                                            <li><Link to="#" onClick={() => handleInstagramShare(posts.id)}>Instagram</Link></li>
+                                            <li><Link to="#" onClick={() => handleWhatsappShare(posts.id)}>Whatsapp</Link></li>
                                         </ul>
                                     </div>
                                     : ''

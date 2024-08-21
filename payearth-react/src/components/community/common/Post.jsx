@@ -319,6 +319,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
         }).then(response => {
             if (response.data.status) {
                 getPostsData(dispatch);
+                setIsFollowing(true);
                 // console.log("response", response.data.message);
                 toast.success(response.data.message);
 
@@ -348,6 +349,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             if (response.data.status) {
                 // console.log("response", response.data.message);
                 toast.success(response.data.message);
+                setIsFollowing(false);
                 getPostsData(dispatch);
             }
         }).catch(error => {

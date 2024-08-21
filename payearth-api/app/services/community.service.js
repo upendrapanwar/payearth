@@ -873,9 +873,22 @@ async function getPostById(req) {
             {
                 path: "comments",
                 model: PostComment,
-                select: "isActive isSeller postId sellerId userId",
-                match: { isActive: true }
-            },
+                select: "isActive isSeller postId sellerId userId content createdAt",
+                match: { isActive: true },
+                populate: [{
+                        path: "sellerId",
+                        model: Seller,
+                        select: "name image_url",
+                        match: { isActive: true },
+                    },
+                    {
+                        path: "userId",
+                        model: User,
+                        select: "name image_url",
+                        match: { isActive: true },
+                    },
+                    ]
+            }
         ])
     // console.log("Shared post", post)
 
