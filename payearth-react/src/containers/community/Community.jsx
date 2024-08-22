@@ -51,11 +51,8 @@ const Community = () => {
     const [selectFilterCategory, setSelectFilterCategory] = useState(null);
     const [showMostLiked, setShowMostLiked] = useState(false);
     const [showMostCommented, setShowMostCommented] = useState(false);
-
-
     const [filteredData, setFilteredData] = useState(postsData);
 
-    const sortedPostsByLike = showMostLiked ? [...filteredData].sort((a, b) => b.likeCount - a.likeCount) : filteredData;
 
     const onEmojiClick = (event, emojiObject) => {
         setInputStr(prevInput => prevInput + emojiObject.emoji);
@@ -405,82 +402,12 @@ const Community = () => {
         setDefaultCategoryOption({ label: 'All', value: '' });
     };
 
-
-
     const handleFilterCategory = () => {
         const filtered = postsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
         console.log("Filtred", filtered)
         const dataToShow = filtered.length === 0 ? postsData : filtered;
         setFilteredData(dataToShow);
-
-        // second test start ****************
-
-        // const filtered = postsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
-        // console.log("Filtred", filtered)
-        // const dataToShow = filtered.length === 0 ? postsData : filtered;
-        // setFilteredData(dataToShow);
-
-        // const mostLikedPost = dataToShow.reduce((max, post) =>
-        //     (post.likeCount > max.likeCount ? post : max),
-        //     { likeCount: -Infinity }
-        // );
-
-        // const mostCommentedPost = dataToShow.reduce((max, post) =>
-        //     (post.commentCount > max.commentCount ? post : max),
-        //     { commentCount: -Infinity }
-        // );
-
-        // const combinedData = [...dataToShow];
-
-        // if (!combinedData.some(post => post._id === mostLikedPost._id)) {
-        //     combinedData.push(mostLikedPost);
-        // }
-        // if (!combinedData.some(post => post._id === mostCommentedPost._id)) {
-        //     combinedData.push(mostCommentedPost);
-        // }
-
-        // setFilteredData(combinedData);
-
-
-        // second test end ***************************
-
-
-        // let filteredPosts = postsData.filter(item =>
-        //     (item.categoryId && item.categoryId.id === selectFilterCategory) || !selectFilterCategory
-        // );
-
-        // console.log("filteredPosts", filteredPosts)
-
-        // if (showMostLiked || showMostCommented) {
-        //     const mostLikedPost = filteredPosts.reduce((max, post) =>
-        //         (post.likeCount > max.likeCount ? post : max),
-        //         { likeCount: -Infinity }
-        //     );
-        //     console.log("mostLikedPost", mostLikedPost)
-
-        //     const mostCommentedPost = filteredPosts.reduce((max, post) =>
-        //         (post.commentCount > max.commentCount ? post : max),
-        //         { commentCount: -Infinity }
-        //     );
-        //     console.log("mostCommentedPost", mostCommentedPost)
-
-        //     // Add the most liked post if it's not already in the filtered data
-        //     if (showMostLiked && mostLikedPost.likeCount > -Infinity &&
-        //         !filteredPosts.some(post => post._id === mostLikedPost._id)) {
-        //         filteredPosts.push(mostLikedPost);
-        //     }
-
-        //     // Add the most commented post if it's not already in the filtered data
-        //     if (showMostCommented && mostCommentedPost.commentCount > -Infinity &&
-        //         !filteredPosts.some(post => post._id === mostCommentedPost._id)) {
-        //         filteredPosts.push(mostCommentedPost);
-        //     }
-        // }
-        // console.log("filteredPosts", filteredPosts)
-        // setFilteredData(filteredPosts);
     }
-
-    // console.log("categoryOption", categoryOption)
 
     return (
         <React.Fragment>
@@ -629,24 +556,26 @@ const Community = () => {
                                         </div>
                                     </div>
                                 </div>
-                                {/* {
-                                    postsData.length > 0 ?
-                                        <div>
-                                            {postsData.map((value, index) => {
-                                                return (
-                                                    <Post key={index} posts={value} sendEditData={handleEdit} />
-                                                )
-                                            })}
-                                        </div>
-                                        : <NotFound msg="Data not found." />
-                                } */}
+
                                 {
                                     filteredData === null ? (
                                         postsData.length > 0 ? (
                                             <div>
-                                                {postsData.map((value, index) => (
-                                                    <Post key={index} posts={value} sendEditData={handleEdit} />
-                                                ))}
+                                                {[...postsData]
+                                                    .sort((a, b) => {
+                                                        if (showMostLiked && showMostCommented) {
+                                                            return b.likeCount - a.likeCount || b.comments.length - a.comments.length;
+                                                        } else if (showMostLiked) {
+                                                            return b.likeCount - a.likeCount;
+                                                        } else if (showMostCommented) {
+                                                            return b.comments.length - a.comments.length;
+                                                        } else {
+                                                            return 0; // No sorting
+                                                        }
+                                                    })
+                                                    .map((value, index) => (
+                                                        <Post key={index} posts={value} sendEditData={handleEdit} />
+                                                    ))}
                                             </div>
                                         ) : (
                                             <NotFound msg="Data not found." />
@@ -654,9 +583,21 @@ const Community = () => {
                                     ) : (
                                         filteredData.length > 0 ? (
                                             <div>
-                                                {filteredData.map((value, index) => (
-                                                    <Post key={index} posts={value} sendEditData={handleEdit} />
-                                                ))}
+                                                {[...filteredData]
+                                                    .sort((a, b) => {
+                                                        if (showMostLiked && showMostCommented) {
+                                                            return b.likeCount - a.likeCount || b.comments.length - a.comments.length;
+                                                        } else if (showMostLiked) {
+                                                            return b.likeCount - a.likeCount;
+                                                        } else if (showMostCommented) {
+                                                            return b.comments.length - a.comments.length;
+                                                        } else {
+                                                            return 0; // No sorting
+                                                        }
+                                                    })
+                                                    .map((value, index) => (
+                                                        <Post key={index} posts={value} sendEditData={handleEdit} />
+                                                    ))}
                                             </div>
                                         ) : (
                                             <NotFound msg="Data not found." />
