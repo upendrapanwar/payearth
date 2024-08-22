@@ -410,11 +410,11 @@ const SellerCommunity = () => {
                                 <div className="createpost bg-white rounded-3">
                                     <div className="cp_top  d-flex justify-content-between align-items-center">
                                         <div className="cumm_title">Create your post</div>
-                                        {/* {isUpdate && ( */}
+                                        {isUpdate && (
                                             <div className="close-icon" onClick={resetForm}>
                                                 <button type="button" class="btn-close" aria-label="Close"></button>
                                             </div>
-                                         {/* )} */}
+                                        )}
                                     </div>
                                     <div className="cp_body">
                                         <div className="com_user_acc">

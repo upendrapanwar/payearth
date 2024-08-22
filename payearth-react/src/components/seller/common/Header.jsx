@@ -297,7 +297,7 @@ const Header = () => {
                               </div>
                             </Link>
                             <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                              <li><Link className="dropdown-item" to="/community-profile">Account</Link></li>
+                              <li><Link className="dropdown-item" to="/Seller-profile">Account</Link></li>
                               {/* <li><Link className="dropdown-item" to="#">Setting</Link></li> */}
                               <li><hr className="dropdown-divider" /></li>
                               <li><Link className="dropdown-item" to="#" onClick={() => logout()} >Log Out</Link></li>

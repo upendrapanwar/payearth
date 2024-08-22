@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Footer from '../../components/common/Footer';
-import Header from '../../components/community/common/Header';
-import UserHeader from '../../components/user/common/Header';
+import Header from '../../components/seller/common/Header';
 import userImg from '../../assets/images/user.png'
 import { Link } from 'react-router-dom';
 import InputEmoji from 'react-input-emoji'
 import Post from '../../components/community/common/Post';
+import SellerPost from '../../components/community/common/SellerPost';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { setLoading } from '../../store/reducers/global-reducer';
 import { setPostCategories, setPostProducts } from '../../store/reducers/post-reducer';
@@ -14,18 +14,18 @@ import { useSelector } from 'react-redux';
 import config from '../.././config.json'
 import { useDispatch } from 'react-redux';
 import { NotFound } from '../../components/common/NotFound';
-import { getPostsData } from '../../helpers/post-listing';
+import { getSellerPostsData } from '../../helpers/sellerPost-listing';
 import Select from 'react-select';
 import Picker from 'emoji-picker-react';
 import { toast } from 'react-toastify';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
 
-const Community = () => {
+const SellerProfile = () => {
     const userInfo = useSelector(state => state.auth.userInfo);
     const authInfo = useSelector(state => state.auth.authInfo);
     const loading = useSelector(state => state.global.loading);
-    const postsData = useSelector(state => state.post.postsData);
-    console.log("Posts", postsData)
+    const SellerPostsData = useSelector(state => state.post.SellerPostsData);
+    //console.log("Posts Seller", SellerPostsData)
     const postCategories = useSelector(state => state.post.postCategories);
     const postProducts = useSelector(state => state.post.postProducts);
     const dispatch = useDispatch();
@@ -39,7 +39,7 @@ const Community = () => {
     const [categoryId, setCategoryId] = useState('');
     const [postStatus, setPostStatus] = useState('Followers');
     const [categoryOption, setCategoryOption] = useState([]);
-    const [defaultCategoryOption, setDefaultCategoryOption] = useState({ label: 'All', value: '' })
+    const [defaultCategoryOption, setDefaultCategoryOption] = useState({ label: 'Choose Category', value: '' })
     const [productOption, setProductOption] = useState([]);
     const [defaultProductOption, setDefaultProductOption] = useState({ label: 'Choose Product', value: '' })
     const [posts, setPosts] = useState([]);
@@ -48,20 +48,11 @@ const Community = () => {
     const [showPicker, setShowPicker] = useState(false);
     const [isUpdate, setIsUpdate] = useState(false);
     const [postUpdateId, setPostUpdateId] = useState(null)
-    const [selectFilterCategory, setSelectFilterCategory] = useState(null);
-    const [showMostLiked, setShowMostLiked] = useState(false);
-    const [showMostCommented, setShowMostCommented] = useState(false);
-
-
-    const [filteredData, setFilteredData] = useState(postsData);
-
-    const sortedPostsByLike = showMostLiked ? [...filteredData].sort((a, b) => b.likeCount - a.likeCount) : filteredData;
 
     const onEmojiClick = (event, emojiObject) => {
         setInputStr(prevInput => prevInput + emojiObject.emoji);
         setShowPicker(false);
     };
-
 
     const handlePreview = (event) => {
         let previews = [];
@@ -116,12 +107,14 @@ const Community = () => {
             category_id: categoryId,
             product_id: productId,
             post_status: postStatus,
-            user_id: authInfo.id,
-            seller_id: null,
+            user_id: null,
+            seller_id: authInfo.id,
             admin_id: null,
-            is_seller: false,
+            is_seller: true,
             is_admin: false,
-            parent_id: null
+            parent_id: null,
+            postImages:images,
+            postVideos:videos,
         };
 
         // if (userInfo.role === 'user') {
@@ -150,7 +143,7 @@ const Community = () => {
         setInputStr('');
         try {
             dispatch(setLoading({ loading: true }));
-            const postResponse = await axios.post('community/posts', reqBody, {
+            const postResponse = await axios.post('/seller/posts', reqBody, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
@@ -207,14 +200,14 @@ const Community = () => {
 
                 if (imageUrls.length > 0 && videoUrls.length > 0) {
                     await Promise.all([
-                        axios.post(`community/postImages/${postId}`, { images: imageUrls }, {
+                        axios.post(`seller/postImages/${postId}`, { images: imageUrls }, {
                             headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json; charset=UTF-8',
                                 'Authorization': `Bearer ${authInfo.token}`
                             }
                         }),
-                        axios.post(`community/postVideos/${postId}`, { videos: videoUrls }, {
+                        axios.post(`seller/postVideos/${postId}`, { videos: videoUrls }, {
                             headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json; charset=UTF-8',
@@ -224,7 +217,7 @@ const Community = () => {
                     ]);
                 } else {
                     if (imageUrls.length > 0) {
-                        await axios.post(`community/postImages/${postId}`, { images: imageUrls }, {
+                        await axios.post(`seller/postImages/${postId}`, { images: imageUrls }, {
                             headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json; charset=UTF-8',
@@ -233,7 +226,7 @@ const Community = () => {
                         });
                     }
                     if (videoUrls.length > 0) {
-                        await axios.post(`community/postVideos/${postId}`, { videos: videoUrls }, {
+                        await axios.post(`seller/postVideos/${postId}`, { videos: videoUrls }, {
                             headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json; charset=UTF-8',
@@ -242,7 +235,7 @@ const Community = () => {
                         });
                     }
                 }
-                getPostsData(dispatch);
+                getSellerPostsData(dispatch);
             }
         } catch (error) {
             console.log(error);
@@ -256,7 +249,7 @@ const Community = () => {
                 setCategoryId(null);
                 setProductId(null);
                 setDefaultProductOption({ label: 'Choose Product', value: '' });
-                setDefaultCategoryOption({ label: 'All', value: '' });
+                setDefaultCategoryOption({ label: 'Choose Category', value: '' });
             }, 300);
         }
     };
@@ -267,7 +260,7 @@ const Community = () => {
             if (response.data.status) {
                 let res = response.data.data;
                 dispatch(setPostCategories({ postCategories: res }));
-                let catOptions = [{ label: 'All', value: '' }]
+                let catOptions = [{ label: 'Choose Category', value: '' }]
                 res.forEach((value) => {
                     catOptions.push({ label: value.categoryName, value: value.id });
                 });
@@ -330,7 +323,7 @@ const Community = () => {
     }
 
     useEffect(() => {
-        getPostsData(dispatch);
+        getSellerPostsData(dispatch);
         getCategories();
     }, []);
 
@@ -361,7 +354,7 @@ const Community = () => {
             post_status: postStatus,
         }
 
-        axios.put(`community/updatePost`, reqBody, {
+        axios.put(`seller/updatePost`, reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -370,7 +363,7 @@ const Community = () => {
         }).then(response => {
             if (response.data.status) {
                 toast.success(response.data.message);
-                getPostsData(dispatch);
+                getSellerPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
@@ -387,7 +380,7 @@ const Community = () => {
                 setCategoryId(null);
                 setProductId(null);
                 setDefaultProductOption({ label: 'Choose Product', value: '' });
-                setDefaultCategoryOption({ label: 'All', value: '' });
+                setDefaultCategoryOption({ label: 'Choose Category', value: '' });
             }, 300);
         });
     }
@@ -402,104 +395,50 @@ const Community = () => {
         setCategoryId(null);
         setProductId(null);
         setDefaultProductOption({ label: 'Choose Product', value: '' });
-        setDefaultCategoryOption({ label: 'All', value: '' });
+        setDefaultCategoryOption({ label: 'Choose Category', value: '' });
     };
-
-
-
-    const handleFilterCategory = () => {
-        const filtered = postsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
-        console.log("Filtred", filtered)
-        const dataToShow = filtered.length === 0 ? postsData : filtered;
-        setFilteredData(dataToShow);
-
-        // second test start ****************
-
-        // const filtered = postsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
-        // console.log("Filtred", filtered)
-        // const dataToShow = filtered.length === 0 ? postsData : filtered;
-        // setFilteredData(dataToShow);
-
-        // const mostLikedPost = dataToShow.reduce((max, post) =>
-        //     (post.likeCount > max.likeCount ? post : max),
-        //     { likeCount: -Infinity }
-        // );
-
-        // const mostCommentedPost = dataToShow.reduce((max, post) =>
-        //     (post.commentCount > max.commentCount ? post : max),
-        //     { commentCount: -Infinity }
-        // );
-
-        // const combinedData = [...dataToShow];
-
-        // if (!combinedData.some(post => post._id === mostLikedPost._id)) {
-        //     combinedData.push(mostLikedPost);
-        // }
-        // if (!combinedData.some(post => post._id === mostCommentedPost._id)) {
-        //     combinedData.push(mostCommentedPost);
-        // }
-
-        // setFilteredData(combinedData);
-
-
-        // second test end ***************************
-
-
-        // let filteredPosts = postsData.filter(item =>
-        //     (item.categoryId && item.categoryId.id === selectFilterCategory) || !selectFilterCategory
-        // );
-
-        // console.log("filteredPosts", filteredPosts)
-
-        // if (showMostLiked || showMostCommented) {
-        //     const mostLikedPost = filteredPosts.reduce((max, post) =>
-        //         (post.likeCount > max.likeCount ? post : max),
-        //         { likeCount: -Infinity }
-        //     );
-        //     console.log("mostLikedPost", mostLikedPost)
-
-        //     const mostCommentedPost = filteredPosts.reduce((max, post) =>
-        //         (post.commentCount > max.commentCount ? post : max),
-        //         { commentCount: -Infinity }
-        //     );
-        //     console.log("mostCommentedPost", mostCommentedPost)
-
-        //     // Add the most liked post if it's not already in the filtered data
-        //     if (showMostLiked && mostLikedPost.likeCount > -Infinity &&
-        //         !filteredPosts.some(post => post._id === mostLikedPost._id)) {
-        //         filteredPosts.push(mostLikedPost);
-        //     }
-
-        //     // Add the most commented post if it's not already in the filtered data
-        //     if (showMostCommented && mostCommentedPost.commentCount > -Infinity &&
-        //         !filteredPosts.some(post => post._id === mostCommentedPost._id)) {
-        //         filteredPosts.push(mostCommentedPost);
-        //     }
-        // }
-        // console.log("filteredPosts", filteredPosts)
-        // setFilteredData(filteredPosts);
-    }
-
-    // console.log("categoryOption", categoryOption)
 
     return (
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
-
-            <div className='seller_body'>
-                <UserHeader />
-                {/* <Header /> */}
+            <div className='seller_body'>        
+                <Header />
                 <div className="cumm_page_wrap pt-5 pb-5">
                     <div className="container">
                         <div className="row">
+                        <div className="col-lg-12">
+                                <div className="comm_profile">
+                                    <div className="post_by">
+                                        <div className="poster_img"><img src={userImg} alt="" /></div>
+                                        <div className="poster_info">
+                                            <div className="poster_name">{userInfo.name}</div>
+                                            <small>{userInfo.role}</small>
+                                        </div>
+                                    </div>
+                                    <ul>
+                                        <li>
+                                            <div className="fp_fc">{userInfo.community.followers}</div>
+                                            <small>Followers</small>
+                                        </li>
+                                        <li>
+                                            <div className="fp_fc">{userInfo.community.following}</div>
+                                            <small>Following</small>
+                                        </li>
+                                        <li>
+                                            <div className="fp_fc">{posts.length}</div>
+                                            <small>Posts</small>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                             <div className="col-lg-9">
                                 <div className="createpost bg-white rounded-3">
-                                    <div className="cp_top d-flex justify-content-between align-items-center">
+                                    <div className="cp_top  d-flex justify-content-between align-items-center">
                                         <div className="cumm_title">Create your post</div>
-                                        {isUpdate && ( 
-                                        <div className="close-icon" onClick={resetForm}>
-                                            <button type="button" class="btn-close" aria-label="Close"></button>
-                                        </div>
+                                        {isUpdate && (
+                                            <div className="close-icon" onClick={resetForm}>
+                                                <button type="button" class="btn-close" aria-label="Close"></button>
+                                            </div>
                                         )}
                                     </div>
                                     <div className="cp_body">
@@ -577,16 +516,16 @@ const Community = () => {
                                         </div>
                                         <div className='cp_foot'>
                                             <div className={`cp_action_grp `}>
-                                                {!isUpdate && (
-                                                    <>
-                                                        <div className="cp_upload_btn cp_upload_img">
-                                                            <input type="file" id="post_img" accept="image/*" multiple={true} onChange={(event) => handlePreview(event)} />
-                                                        </div>
-                                                        <div className="cp_upload_btn cp_upload_video">
-                                                            <input type="file" id='post_video' accept="video/*" multiple onChange={(event) => handleVideoPreview(event)} />
-                                                        </div>
-                                                    </>
-                                                )}
+                                            {!isUpdate && (
+                                                <>
+                                                <div className="cp_upload_btn cp_upload_img">
+                                                    <input type="file" id="post_img" accept="image/*" multiple={true} onChange={(event) => handlePreview(event)} />
+                                                </div>
+                                                <div className="cp_upload_btn cp_upload_video">
+                                                    <input type="file" id='post_video' accept="video/*" multiple onChange={(event) => handleVideoPreview(event)} />
+                                                </div>
+                                                </>
+                                            )}
                                                 {/* <select className="form-select form-select-lg cp_select mb-3" aria-label=".form-select category"  onChange={(event) => handleCategories(event)}>
                                                     {
                                                         postCategories.map((value, index) => {
@@ -629,123 +568,69 @@ const Community = () => {
                                         </div>
                                     </div>
                                 </div>
-                                {/* {
-                                    postsData.length > 0 ?
+                                {
+                                    SellerPostsData.length > 0 ?
                                         <div>
-                                            {postsData.map((value, index) => {
+                                            {SellerPostsData.map((value, index) => {
                                                 return (
-                                                    <Post key={index} posts={value} sendEditData={handleEdit} />
+                                                    <SellerPost key={index} posts={value} sendEditData={handleEdit} />
                                                 )
                                             })}
                                         </div>
                                         : <NotFound msg="Data not found." />
-                                } */}
-                                {
-                                    filteredData === null ? (
-                                        postsData.length > 0 ? (
-                                            <div>
-                                                {postsData.map((value, index) => (
-                                                    <Post key={index} posts={value} sendEditData={handleEdit} />
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <NotFound msg="Data not found." />
-                                        )
-                                    ) : (
-                                        filteredData.length > 0 ? (
-                                            <div>
-                                                {filteredData.map((value, index) => (
-                                                    <Post key={index} posts={value} sendEditData={handleEdit} />
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <NotFound msg="Data not found." />
-                                        )
-                                    )
                                 }
+                                {/* <PostListing/> */}
+                                
                             </div>
 
                             {/* Filter */}
-                            <div className="col-lg-3">
+                            {/* <div className="col-lg-3">
                                 <div className="cumm_sidebar_box bg-white p-3 rounded-3">
                                     <div className="cumm_title">advanced filter</div>
                                     <div className="filter_box">
-                                        <select
-                                            className="form-select mb-3"
-                                            aria-label="Default select example"
-                                            onChange={(e) => setSelectFilterCategory(e.target.value)}
-                                            value={selectFilterCategory}
-                                        >
-                                            {categoryOption.map(category => (
-                                                <option key={category.value} value={category.value} >
-                                                    {category.label}
-                                                </option>
-                                            ))}
+                                        <select className="form-select mb-3" aria-label="Default select example">
+                                            <option >Category</option>
+                                            <option value="1">One</option>
+                                            <option value="2">Two</option>
+                                            <option value="3">Three</option>
                                         </select>
-
-                                        {/* <select className="form-select mb-3" aria-label="Default select example">
+                                        <select className="form-select mb-3" aria-label="Default select example">
                                             <option >Product</option>
                                             <option value="1">One</option>
                                             <option value="2">Two</option>
                                             <option value="3">Three</option>
-                                        </select> */}
-
-
-                                        {/* <div className="form-check mb-3 mt-4">
-                                            <input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                value=""
-                                                id="latestPost"
-                                                checked={showMostLiked}
-                                                onChange={(e) => setShowMostLiked(e.target.checked)}
-                                            />
+                                        </select>
+                                        <div className="form-check mb-3 mt-4">
+                                            <input className="form-check-input" type="checkbox" value="" id="latestPost" />
                                             <label className="form-check-label" htmlFor="latestPost">
                                                 Latest Post
                                             </label>
-                                        </div> */}
-
-
+                                        </div>
                                         <div className="form-check mb-3">
-                                            <input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                value=""
-                                                id="popularPost"
-                                                checked={showMostLiked}
-                                                onChange={(e) => setShowMostLiked(e.target.checked)}
-                                            // onChange={setShowMostLiked}
-                                            />
+                                            <input className="form-check-input" type="checkbox" value="" id="popularPost" />
                                             <label className="form-check-label" htmlFor="popularPost">
                                                 Most Popular Post
                                             </label>
                                         </div>
                                         <div className="form-check mb-3">
-                                            <input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                value=""
-                                                id="CommentedPost"
-                                                checked={showMostCommented}
-                                                onChange={(e) => setShowMostCommented(e.target.checked)}
-                                            />
+                                            <input className="form-check-input" type="checkbox" value="" id="CommentedPost" />
                                             <label className="form-check-label" htmlFor="CommentedPost">
                                                 Most Commented Post
                                             </label>
                                         </div>
 
                                         <div className="filter_btn_box">
-                                            <Link
-                                                to="#"
-                                                className="btn custom_btn btn_yellow_bordered"
-                                                onClick={handleFilterCategory}
-                                            >
-                                                Filter
-                                            </Link>
+                                            <Link to="#" className="btn custom_btn btn_yellow_bordered">Filter</Link>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                    &nbsp;
+                                    {/* <BannerIframe2 /> */}
+                            {/* <div className='sideBanner'>
+                                        <BannerIframe2 />
+                                    </div> */}
+
+                            {/* </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>
@@ -755,4 +640,4 @@ const Community = () => {
     );
 }
 
-export default Community;
+export default SellerProfile;

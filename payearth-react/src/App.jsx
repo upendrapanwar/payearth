@@ -121,6 +121,7 @@ import EditProduct from "./containers/seller/EditProduct";
 import ManageVendors from "./containers/admin/ManageVendors";
 import Community from "./containers/community/Community";
 import CommunityProfile from "./containers/community/CommunityProfile";
+import SellerProfile from "./containers/community/SellerProfile";
 import SharePostData from "./components/community/common/SharePostData";
 import SellerSharePostData from "./components/community/common/SellerSharePostData";
 
@@ -840,6 +841,13 @@ function App() {
             path="/community-profile"
             restricted={false}
             component={CommunityProfile}
+            exact
+          />
+
+          <PublicRoute
+            path="/seller-profile"
+            restricted={false}
+            component={SellerProfile}
             exact
           />
           {/* SharePostDatd */}

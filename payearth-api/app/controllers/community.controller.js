@@ -56,7 +56,7 @@ const fileFilterVideo = function (req, file, cb) {
 var uploadPostVideos = multer({ storage: storagePostVideo, fileFilter: fileFilterVideo }).any();
 
 //Routes
-// router.get('/front/posts', getPosts);
+router.get('/front/profile/posts/:id', getProfilePosts);
 router.get('/front/posts/:id', getPosts);
 router.post('/posts', addPost);
 router.post('/postImages/:id', uploadPostImages, addPostImages);
@@ -77,6 +77,13 @@ router.get('/front/products/:id', getProductsByCatId);
 
 
 module.exports = router;
+
+function getProfilePosts(req, res, next) {
+    console.log('api run')
+    communityService.getProfilePosts(req)
+        .then(result => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message:'No data found', data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
 
 function getPosts(req, res, next) {
 
