@@ -10,6 +10,7 @@ const { Post, FollowRequest, PostImages, PostVideos, PostLike, PostComment, Cate
 
 module.exports = {
     getPosts,
+    getProfilePosts,
     createPost,
     addPostImages,
     addPostVideos,
@@ -915,6 +916,162 @@ async function getPostById(req) {
     if (post) {
         // console.log("posts test ", post)
         return post;
+    }
+    return false;
+}
+
+
+async function getProfilePosts(req) {
+    const authorId = req.params.id;
+    const posts = await Post.find({
+        sellerId: authorId
+        // $or: [
+        //     { sellerId: authorId },
+        //     // { userId: authorId }
+        // ]
+    })
+        .sort({ createdAt: 'desc' })
+        .populate([
+            {
+                path: "sellerId",
+                model: Seller,
+                select: "name image_url community role",
+                match: { isActive: true },
+            },
+            {
+                path: "userId",
+                model: User,
+                select: "name image_url community role",
+                match: { isActive: true },
+            },
+            {
+                path: "postImages",
+                model: PostImages,
+                select: "url",
+                match: { isActive: true }
+            },
+            {
+                path: "postVideos",
+                model: PostVideos,
+                select: "url",
+                match: { isActive: true }
+            },
+            {
+                path: "categoryId",
+                model: Category,
+                select: "categoryName isService"
+                //match: { isActive: true }
+            },
+            {
+                path: "productId",
+                model: Product,
+                select: "name isService"
+                //match: { isActive: true }
+            },
+            {
+                path: "likes",
+                model: PostLike,
+                select: "-isActive -postId",
+                match: { isActive: true },
+                populate: [{
+                    path: "sellerId",
+                    model: Seller,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                {
+                    path: "userId",
+                    model: User,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                ]
+            },
+            {
+                path: "comments",
+                model: PostComment,
+                select: "-isActive -postId",
+                match: { isActive: true },
+                populate: [{
+                    path: "sellerId",
+                    model: Seller,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                {
+                    path: "userId",
+                    model: User,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                ]
+            },
+            {
+                path: "parentId",
+                model: Post,
+                match: { isActive: true },
+                populate: [{
+                    path: "postImages",
+                    model: PostImages,
+                    select: "url",
+                    match: { isActive: true }
+                },
+                {
+                    path: "postVideos",
+                    model: PostVideos,
+                    select: "url",
+                    match: { isActive: true }
+                },
+                {
+                    path: "categoryId",
+                    model: Category,
+                    select: "categoryName isService"
+                    //match: { isActive: true }
+                },
+                {
+                    path: "productId",
+                    model: Product,
+                    select: "name isService"
+                    //match: { isActive: true }
+                },
+                {
+                    path: "sellerId",
+                    model: Seller,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                {
+                    path: "userId",
+                    model: User,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                {
+                    path: "likes",
+                    model: PostLike,
+                    select: "-isActive -postId",
+                    match: { isActive: true },
+                    populate: [{
+                        path: "sellerId",
+                        model: Seller,
+                        select: "name image_url",
+                        match: { isActive: true },
+                    },
+                    {
+                        path: "userId",
+                        model: User,
+                        select: "name image_url",
+                        match: { isActive: true },
+                    },
+                    ]
+                }
+                ]
+            }
+        ]);
+    // console.log("posts test", posts)
+    if (posts){
+        // console.log("posts test ", posts)
+        return posts;
     }
     return false;
 }

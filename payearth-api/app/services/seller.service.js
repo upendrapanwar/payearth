@@ -150,12 +150,13 @@ module.exports = {
   unfollowUser,
   postDelete,
   updatePost,
-  createPostReport,
   // sendFollowRequest,
   // setFollow,
   getCategories,
   // getProductsByCatId,
-  getPostById
+  getPostById,
+
+  editProfileImage,
 };
 
 function sendMail(mailOptions) {
@@ -735,6 +736,7 @@ async function getProductById(id) {
 
 async function addProduct(req) {
   const files = req.files;
+  console.log(' req.files----', req.files)
   const param = req.body;
   var lName = param.name.toLowerCase();
   var imagesArr = [];
@@ -795,7 +797,6 @@ async function addProduct(req) {
     price: param.price,
     images: imagesArr,
     quantity: qtyObj,
-    isActive: false,
     createdBy: param.seller_id,
     updatedBy: param.seller_id,
     isActive: true,
@@ -4087,7 +4088,7 @@ async function followUser(req) {
 
     if (role === "seller") {
       // If a seller is following someone (another seller or a user)
-      await User.updateOne(
+      await Seller.updateOne(
         { _id: currentUserId },
         {
           $addToSet: { 'community.followingData': userIdToFollow },
@@ -4118,7 +4119,7 @@ async function followUser(req) {
 
     } else if (role === "user") {
       // Buyer follow to another Buyer...
-      await User.updateOne(
+      await Seller.updateOne(
         { _id: currentUserId },
         {
           $addToSet: { 'community.followingData': userIdToFollow },
@@ -4126,9 +4127,9 @@ async function followUser(req) {
         }
       );
 
-      const isFollowingSeller = await Seller.exists({ _id: userIdToFollow });
+      const isFollowingSeller = await User.exists({ _id: userIdToFollow });
       if (isFollowingSeller) {
-        await Seller.updateOne(
+        await User.updateOne(
           { _id: userIdToFollow },
           {
             $addToSet: { 'community.followerData': currentUserId },
@@ -4136,7 +4137,7 @@ async function followUser(req) {
           }
         );
       } else {
-        await User.updateOne(
+        await Seller.updateOne(
           { _id: userIdToFollow },
           {
             $addToSet: { 'community.followerData': currentUserId },
@@ -4180,7 +4181,7 @@ async function unfollowUser(req) {
     const role = param.role;
 
     if (role === "seller") {
-      await User.updateOne(
+      await Seller.updateOne(
         { _id: currentUserId },
         {
           $pull: { 'community.followingData': userIdToUnfollow },
@@ -4210,7 +4211,7 @@ async function unfollowUser(req) {
       return { success: true, message: 'Unfollowed successfully....!' };
 
     } else if (role === "user") {
-      await User.updateOne(
+      await Seller.updateOne(
         { _id: currentUserId },
         {
           $pull: { 'community.followingData': userIdToUnfollow },
@@ -4349,5 +4350,31 @@ async function createPostReport(req, res) {
     return false;
   } catch (error) {
     console.log('Error', error);
+  }
+}
+
+async function editProfileImage(req) {
+  try {
+    const id = req.params.id;
+    const param = req.body;
+    const statusData = {
+      image_url: param.image,
+    };
+
+    const updatedOrder = await Seller.findOneAndUpdate(
+      { _id: id },
+      statusData,
+      { new: true }
+    );
+    if (!updatedOrder) {
+      console.log("Seller not found.");
+      return null;
+    }
+
+    console.log("Profile Image updated successfully:", updatedOrder);
+    return updatedOrder;
+  } catch (err) {
+    console.log("Error:", err);
+    throw err;
   }
 }
