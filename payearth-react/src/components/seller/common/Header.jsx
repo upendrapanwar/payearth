@@ -25,14 +25,19 @@ import {
   setCatSearchValue,
   setIsService,
 } from "../../../store/reducers/cat-search-reducer";
+// import io from 'socket.io-client'
+// import axios from 'axios';
 
 const Header = () => {
+  // const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
   const userInfo = useSelector(state => state.auth.userInfo);
   const authInfo = useSelector(state => state.auth.authInfo);
   const [isToggle, setIsToggle] = useState(false);
   const isService = useSelector((state) => state.catSearch.isService);
   const history = useHistory();
   const dispatch = useDispatch();
+  // // const { notifications } = useContext(NotificationContext);
+  // const [unreadCount, setUnreadCount] = useState(0);
   const logout = () => {
     localStorage.clear();
     dispatch(setLoginStatus({ isLoggedIn: false }));
@@ -48,6 +53,35 @@ const Header = () => {
   useEffect(() => {
     authVerification(dispatch);
   }, [dispatch]);
+
+  // useEffect(() => {
+  //   // Join the specific user room
+  //   socket.emit('join_room', authInfo.id);
+
+  //   // Fetch initial unread count
+  //   const fetchUnreadCount = async () => {
+  //     try {
+  //       const response = await axios.get(`/api/notifications/unread/${authInfo.id}`);
+  //       setUnreadCount(response.data.unreadCount);
+  //     } catch (error) {
+  //       console.error('Error fetching unread notifications:', error);
+  //     }
+  //   };
+
+  //   fetchUnreadCount();
+
+  //   // Listen for new notifications in real-time
+  //   socket.on('new_notification', (notification) => {
+  //     setUnreadCount((prevCount) => prevCount + 1);
+  //     // Optionally display a toast or alert for the new notification
+  //     console.log('New Notification:', notification.message);
+  //   });
+
+  //   // Cleanup the socket when the component unmounts
+  //   return () => {
+  //     socket.off('new_notification');
+  //   };
+  // }, [authInfo.id]);
 
   const removeBackdrop = () => {
     const elements = document.getElementsByClassName("offcanvas-backdrop");
@@ -88,7 +122,7 @@ const Header = () => {
                 </Link>
               </li>
               <li>
-                <Link to="#" onClick={() => removeBackdrop()}>
+                <Link to="/seller/notifications" onClick={() => removeBackdrop()}>
                   <i className="icon">
                     <img src={bellIcon} alt="" />
                   </i>
@@ -241,9 +275,10 @@ const Header = () => {
                           {/* <li className="nav-item"><Link to="/seller/add-product" className="btn custom_btn btn_yellow w-auto text-uppercase">add new product</Link></li> */}
                           {/* seller notification bell icon */}
                           <li className="nav-item">
-                            <Link className="nav-link" to="#">
+                            <Link className="nav-link" to="/seller/notifications">
                               <div className="sm_icon">
                                 <img src={blcakbellIcon} alt="" />
+                                {/* {unreadCount > 0 && <span className="notification-count">{unreadCount}</span>} */}
                               </div>
                               <span>Notification</span>
                             </Link>

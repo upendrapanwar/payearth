@@ -254,6 +254,8 @@ router.put('/postRemoved', postDelete);
 router.put('/updatePost', updatePost);
 router.get("/getPostById/:id", getPostById);
 
+router.put("/editProfileImage/:id", editProfileImage);
+
 
 module.exports = router;
 
@@ -1348,3 +1350,9 @@ function getPostById(req, res, next) {
       .catch(err => next(res.json({ status: false, message: err })));
 }
 
+function editProfileImage(req, res, next) {
+
+  sellerService.editProfileImage(req)
+      .then(result => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+      .catch(err => next(res.json({ status: false, message: err })));
+}

@@ -29,7 +29,7 @@ TimeAgo.addLocale(ru)
 
 const SellerPost = ({ posts, sendEditData }) => {
 
-    // console.log("all posts", posts)
+    //console.log("all posts ----------", posts)
 
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
@@ -500,7 +500,7 @@ const SellerPost = ({ posts, sendEditData }) => {
                                                 <small>Following</small>
                                             </li>
                                             <li>
-                                                <div className="fp_fc">02</div>
+                                                <div className="fp_fc">00</div>
                                                 <small>Posts</small>
                                             </li>
 
