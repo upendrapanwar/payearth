@@ -155,6 +155,7 @@ module.exports = {
   getCategories,
   // getProductsByCatId,
   getPostById,
+  createPostReport,
 
   editProfileImage,
 };

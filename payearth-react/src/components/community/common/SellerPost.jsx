@@ -56,6 +56,9 @@ const SellerPost = ({ posts, sendEditData }) => {
     const [isFollowing, setIsFollowing] = useState(false);
     const [isReportOpen, setIsReportOpen] = useState(false);
     const [reportedPost, setReportedPost] = useState(null);
+    const [reportNote, setReportNote] = useState(null);
+    const [reportOption, setReportOption] = useState(null);
+
 
     const date = new Date(posts.createdAt);
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -460,10 +463,40 @@ const SellerPost = ({ posts, sendEditData }) => {
         setReportedPost(null);
     }
 
-    const handleReportPost = () => {
-        const data = reportedPost;
-        console.log("reportedPost send to admin", data)
+    const handleReportPost = async () => {
+        try {
+            const data = reportedPost;
+            console.log("reportedPost send to admin", data)
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authInfo.token}` // Replace authInfo.token with your actual token variable
+            };
+            const response = await axios.post('seller/createPostReport', {
+                reportType: reportOption,
+                notes: reportNote,
+                reportData: {
+                    postId: data.id,
+                    postCreatedBy: data.userId === null ? data.sellerId.id : data.userId.id,
+                },
+                reportBy: authInfo.id
+            }, { headers });
+            console.log("response", response.data)
+
+            toast.success("Report Succesfully");
+            setIsReportOpen(false);
+            // alert(response.data.message);
+        } catch (error) {
+            console.error('Error reporting post:', error);
+        }
     }
+
+    const handleNoteChange = (e) => {
+        setReportNote(e.target.value);
+    };
+
+    const handleOptionChange = (e) => {
+        setReportOption(e.target.value);
+    };
 
     return (
         <React.Fragment>
@@ -774,13 +807,72 @@ const SellerPost = ({ posts, sendEditData }) => {
                 centered
             >
                 <Modal.Body>
-                    <div className="share alert text-center" role="alert">
-                        <div className="social_links">
-                            <b>Are you sure you want to report ?</b>
-                            <br />
-                            <br />
-                            <button onClick={handleReportPost}>Yes</button>
-                            <button onClick={reportPopupClose}>No</button>
+                    <div>
+                        <p class="text-center fw-bold">Are you sure you want to report ?</p>
+                    </div>
+                    <div className="">
+                        <div className="form-check d-inline-block me-3">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                id="option1"
+                                name="options"
+                                value="Please delete this post"
+                                checked={reportOption === "Please delete this post"}
+                                onChange={handleOptionChange}
+                            />
+                            <label className="form-check-label" htmlFor="option1">
+                                Please delete this post
+                            </label>
+                        </div> <br />
+                        <div className="form-check d-inline-block me-3">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                id="option1"
+                                name="options"
+                                value="This post contains inappropriate language"
+                                checked={reportOption === "This post contains inappropriate language"}
+                                onChange={handleOptionChange}
+                            />
+                            <label className="form-check-label" htmlFor="option1">
+                                This post contains inappropriate language
+                            </label>
+                        </div> <br />
+                        <div className="form-check d-inline-block me-3">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                id="option2"
+                                name="options"
+                                value="This post voilates our Terms & Condition"
+                                checked={reportOption === "This post voilates our Terms & Condition"}
+                                onChange={handleOptionChange}
+                            />
+                            <label className="form-check-label" htmlFor="option2">
+                                This post voilates our Terms & Condition
+                            </label>
+                        </div> <br />
+                    </div>
+                    <br />
+                    <div className="input-section">
+                        <label htmlFor="">Note</label>
+                        <div className="field_item text-left mt-2">
+                            <textarea
+                                type="text"
+                                name="note"
+                                value={reportNote}
+                                onChange={handleNoteChange}
+                                cols="30"
+                                rows="10"
+                                className="form-control"
+                            ></textarea>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center mt-2">
+                        <div className="d-grid gap-2 d-md-block">
+                            <button className="btn btn-warning btn-sm" type="button" onClick={handleReportPost}>Send Report</button>
+                            <button className="btn btn-secondary btn-sm" type="button" onClick={reportPopupClose}>Cancle</button>
                         </div>
                     </div>
                 </Modal.Body>
