@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import userImg from '../../../assets/images/user.png'
+import Modal from "react-bootstrap/Modal";
 import closeIcon from '../../../assets/icons/close_icon.svg'
 import post from '../../../assets/images/posts/post_img.jpg'
 import { Link } from 'react-router-dom';
@@ -15,7 +16,7 @@ import { toast } from 'react-toastify';
 import SpinnerLoader from '../../common/SpinnerLoader';
 import { setLoading } from '../../../store/reducers/global-reducer';
 import { getPostsData } from '../../../helpers/post-listing';
-import{getSellerPostsData} from '../../../helpers/sellerPost-listing';
+import { getSellerPostsData } from '../../../helpers/sellerPost-listing';
 import SimpleImageSlider from "react-simple-image-slider";
 import ReactTimeAgo from 'react-time-ago'
 import TimeAgo from 'javascript-time-ago'
@@ -53,6 +54,9 @@ const SellerPost = ({ posts, sendEditData }) => {
     const [sliderVideos, setSliderVideos] = useState([]);
     const [ShowSlider, setShowSlider] = useState(false);
     const [isFollowing, setIsFollowing] = useState(false);
+    const [isReportOpen, setIsReportOpen] = useState(false);
+    const [reportedPost, setReportedPost] = useState(null);
+
     const date = new Date(posts.createdAt);
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
@@ -445,6 +449,22 @@ const SellerPost = ({ posts, sendEditData }) => {
         window.open(whatsappShareUrl, '_blank');
     }
 
+    const handleReportPopup = (post) => {
+        // alert(`Repost this post id : ${postId}`)
+        setIsReportOpen(true);
+        setReportedPost(post)
+    }
+
+    const reportPopupClose = () => {
+        setIsReportOpen(false);
+        setReportedPost(null);
+    }
+
+    const handleReportPost = () => {
+        const data = reportedPost;
+        console.log("reportedPost send to admin", data)
+    }
+
     return (
         <React.Fragment>
             {/* {loading === true ? <SpinnerLoader /> : ''} */}
@@ -649,10 +669,18 @@ const SellerPost = ({ posts, sendEditData }) => {
                             <li className="ms-auto">
                                 {(posts.userId?.id === authInfo.id || posts.sellerId?.id === authInfo.id || posts.adminId?.id === authInfo.id) ? (
                                     <>
-                                        <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() =>{ handleEdit(posts); window.scrollTo({ top: 0,behavior: 'smooth' })}}>Edit</button>
+                                        <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => { handleEdit(posts); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>Edit</button>
                                         <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
                                     </>
-                                ) : null}
+                                ) :
+                                    <Link
+                                        to="#"
+                                        // onClick={() => handleShare(posts)}
+                                        onClick={() => handleReportPopup(posts)}
+                                        className="post_follow">
+                                        Report
+                                    </Link>
+                                }
                                 {/* {posts.userId.id === authInfo.id ? <>
                                     <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleEdit(posts)}>Edit</button>
                                     <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
@@ -663,10 +691,10 @@ const SellerPost = ({ posts, sendEditData }) => {
                                 {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseShareTo${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseShareTo${posts.id}`}>
                                     <i className="post_icon ps_share"></i> Share
                                 </Link> */}
-                                <Link to="#" 
-                                // onClick={() => setOpenShare(true)}
-                                onClick={() => handleShare(posts)}
-                                className="post_follow">
+                                <Link to="#"
+                                    // onClick={() => setOpenShare(true)}
+                                    onClick={() => handleShare(posts)}
+                                    className="post_follow">
                                     <i className="post_icon ps_share"></i> Share
                                 </Link>
                             </li>
@@ -736,6 +764,27 @@ const SellerPost = ({ posts, sendEditData }) => {
                     </div>
                 </div>
             </div>
+
+            <Modal
+                show={isReportOpen}
+                // onHide={() => this.setState({ isShareOpen: false })}
+                onHide={() => setIsReportOpen(false)}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Body>
+                    <div className="share alert text-center" role="alert">
+                        <div className="social_links">
+                            <b>Are you sure you want to report ?</b>
+                            <br />
+                            <br />
+                            <button onClick={handleReportPost}>Yes</button>
+                            <button onClick={reportPopupClose}>No</button>
+                        </div>
+                    </div>
+                </Modal.Body>
+            </Modal>
         </React.Fragment>
     );
 };

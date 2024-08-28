@@ -69,6 +69,7 @@ router.post('/unfollowUser', unfollowUser);
 router.put('/postRemoved', postDelete);
 router.put('/updatePost', updatePost);
 router.get("/getPostById/:id", getPostById);
+router.post("/createPostReport", createPostReport)
 
 // router.post('/follow-request', sendFollowRequest);
 router.get('/front/categories', getCategories);
@@ -164,6 +165,13 @@ function getPostById(req, res, next) {
     communityService.getPostById(req)
         .then(result => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function createPostReport(req, res, next) {
+
+    communityService.createPostReport(req)
+        .then(result => result ? res.status(201).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.post.add.error }))
+        .catch(err => next(res.status(400).json({ status: false, message: err })));
 }
 
 function sendFollowRequest(req, res, next) {

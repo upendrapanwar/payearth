@@ -6,7 +6,7 @@ mongoose.Promise = global.Promise;
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpeg_static = require('ffmpeg-static');
 
-const { Post, FollowRequest, PostImages, PostVideos, PostLike, PostComment, Category, Product, User, Seller, Admin } = require("../helpers/db");
+const { Post, FollowRequest, PostImages, PostVideos, PostLike, PostComment, Category, Product, User, Seller, Admin, ReportPost } = require("../helpers/db");
 
 module.exports = {
     getPosts,
@@ -20,6 +20,7 @@ module.exports = {
     unfollowUser,
     postDelete,
     updatePost,
+    createPostReport,
     getPostById,
     // sendFollowRequest,
     setFollow,
@@ -662,6 +663,25 @@ async function updatePost(req) {
     }
 }
 
+async function createPostReport(req, res) {
+    try {
+        var param = req.body;
+        let input = {
+            reportData: param.reportData,
+            reportType: param.reportType,
+            notes: param.notes,
+            reportBy: param.reportBy,
+        };
+        const reportData = new ReportPost(input);
+        const data = await reportData.save();
+        if (data) {
+            return data;
+        }
+        return false;
+    } catch (error) {
+        console.log('Error', error);
+    }
+}
 
 
 async function sendFollowRequest(req) {
@@ -876,18 +896,18 @@ async function getPostById(req) {
                 select: "isActive isSeller postId sellerId userId content createdAt",
                 match: { isActive: true },
                 populate: [{
-                        path: "sellerId",
-                        model: Seller,
-                        select: "name image_url",
-                        match: { isActive: true },
-                    },
-                    {
-                        path: "userId",
-                        model: User,
-                        select: "name image_url",
-                        match: { isActive: true },
-                    },
-                    ]
+                    path: "sellerId",
+                    model: Seller,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                {
+                    path: "userId",
+                    model: User,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                ]
             }
         ])
     // console.log("Shared post", post)

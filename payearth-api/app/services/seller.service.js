@@ -50,6 +50,7 @@ const {
   PostImages,
   PostVideos,
   PostComment,
+  ReportPost,
 
 } = require("../helpers/db");
 
@@ -143,16 +144,17 @@ module.exports = {
   addPostVideos,
   addPostLike,
 
-    getPostComments,
-    addPostComment,
-    followUser,
-    unfollowUser,
-    postDelete,
-    updatePost,
-    // sendFollowRequest,
-   // setFollow,
-    getCategories,
-   // getProductsByCatId,
+  getPostComments,
+  addPostComment,
+  followUser,
+  unfollowUser,
+  postDelete,
+  updatePost,
+  createPostReport,
+  // sendFollowRequest,
+  // setFollow,
+  getCategories,
+  // getProductsByCatId,
   getPostById
 };
 
@@ -3727,20 +3729,20 @@ async function getPosts(req) {
         path: "likes",
         model: PostLike,
         select: "isActive isSeller postId sellerId userId",
-       // match: { isActive: true },
+        // match: { isActive: true },
         populate: [
           {
-          path: "sellerId",
-          model: Seller,
-          select: "name image_url",
-         // match: { isActive: true },
-        }, 
-        {
-          path: "userId",
-          model: User,
-          select: "name image_url",
-         // match: { isActive: true },
-        },
+            path: "sellerId",
+            model: Seller,
+            select: "name image_url",
+            // match: { isActive: true },
+          },
+          {
+            path: "userId",
+            model: User,
+            select: "name image_url",
+            // match: { isActive: true },
+          },
         ]
       },
       {
@@ -3826,7 +3828,7 @@ async function getPosts(req) {
     ]);
   //console.log("postIn seller", posts)
   if (posts && posts.length > 0) {
-     return posts;
+    return posts;
   }
   return false;
 }
@@ -3834,46 +3836,46 @@ async function getPosts(req) {
 async function addPostImages(req) {
   const { images } = req.body;
   const postId = req.params.id;
-console.log('function save image run')
+  console.log('function save image run')
   if (!Array.isArray(images) || images.length === 0) {
-      return res.status(400).json({ success: false, message: "No videos provided" });
+    return res.status(400).json({ success: false, message: "No videos provided" });
   }
 
   try {
-      var postImages = [];
-      var allImagesSaved = true;
-      for (let i = 0; i < images.length; i++) {
-          const image = images[i];
-          let input = {
-              postId: postId,
-              url: image.url,
-              isActive: true
-          };
-          let postImage = new PostImages(input);
-          let data = await postImage.save();
-          if (data) {
-              postImages.push(data.id);
-          } else {
-              allImagesSaved = false;
-              break; // Exit loop if save fails
-          }
-      }
-      if (allImagesSaved) {
-          const filter = { _id: postId };
-          const updateData = { $push: { postImages: { $each: postImages } } };
-          await Post.findOneAndUpdate(filter, updateData, { new: true });
-          return postImages
+    var postImages = [];
+    var allImagesSaved = true;
+    for (let i = 0; i < images.length; i++) {
+      const image = images[i];
+      let input = {
+        postId: postId,
+        url: image.url,
+        isActive: true
+      };
+      let postImage = new PostImages(input);
+      let data = await postImage.save();
+      if (data) {
+        postImages.push(data.id);
       } else {
-          return { success: false, message: "Failed to save" };
+        allImagesSaved = false;
+        break; // Exit loop if save fails
       }
+    }
+    if (allImagesSaved) {
+      const filter = { _id: postId };
+      const updateData = { $push: { postImages: { $each: postImages } } };
+      await Post.findOneAndUpdate(filter, updateData, { new: true });
+      return postImages
+    } else {
+      return { success: false, message: "Failed to save" };
+    }
   } catch (error) {
-      console.log("error", error)
+    console.log("error", error)
   }
 
 }
 
 async function addPostLike(req) {
-console.log('like api run----------------')
+  console.log('like api run----------------')
   const param = req.body;
   const postId = req.params.id;
   const isSeller = param.isSeller;
@@ -3882,97 +3884,97 @@ console.log('like api run----------------')
   var input = { postId: postId, isActive: true, isSeller: isSeller };
 
   if (isSeller == true) {
-      where['sellerId'] = param.seller_id;
-      input['sellerId'] = param.seller_id;
-      input['userId'] = null;
+    where['sellerId'] = param.seller_id;
+    input['sellerId'] = param.seller_id;
+    input['userId'] = null;
   } else {
-      where['userId'] = param.user_id;
-      input['userId'] = param.user_id;
-      input['sellerId'] = null;
+    where['userId'] = param.user_id;
+    input['userId'] = param.user_id;
+    input['sellerId'] = null;
   }
 
   var postLikeData = await PostLike.findOne(where);
 
   if (postLikeData && isLike == true) {
-      throw 'This post is already liked.';
+    throw 'This post is already liked.';
   }
 
   if (isLike == true) {
-      //add row into collection
-      const postlike = new PostLike(input);
+    //add row into collection
+    const postlike = new PostLike(input);
 
-      const data = await postlike.save();
+    const data = await postlike.save();
 
-      if (data) {
-
-          //update in post
-          const filter = { _id: postId };
-          const updateData = { $push: { likes: data.id }, $inc: { likeCount: 1 } };
-
-          await Post.findOneAndUpdate(filter, updateData, { new: true });
-
-          let result = await PostLike.findById(data.id).select();
-          if (result) {
-              return result;
-          } else {
-              return false;
-          }
-      } else {
-          return false;
-      }
-  } else {
+    if (data) {
 
       //update in post
       const filter = { _id: postId };
-      const updateData = { $pull: { likes: postLikeData._id }, $inc: { likeCount: -1 } };
+      const updateData = { $push: { likes: data.id }, $inc: { likeCount: 1 } };
 
       await Post.findOneAndUpdate(filter, updateData, { new: true });
 
-      //delete row from collection
-      await PostLike.findByIdAndRemove(postLikeData._id);
+      let result = await PostLike.findById(data.id).select();
+      if (result) {
+        return result;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  } else {
 
-      return true;
+    //update in post
+    const filter = { _id: postId };
+    const updateData = { $pull: { likes: postLikeData._id }, $inc: { likeCount: -1 } };
+
+    await Post.findOneAndUpdate(filter, updateData, { new: true });
+
+    //delete row from collection
+    await PostLike.findByIdAndRemove(postLikeData._id);
+
+    return true;
 
   }
 }
 
 async function postDelete(req) {
   try {
-      const param = req.body;
-      const postId = param.postId;
+    const param = req.body;
+    const postId = param.postId;
 
-      const result = await Post.updateOne(
-          { _id: postId },
-          { $set: { isActive: false } }
-      );
-      return result;
+    const result = await Post.updateOne(
+      { _id: postId },
+      { $set: { isActive: false } }
+    );
+    return result;
 
   } catch (err) {
-      console.log('Error', err);
-      return false;
+    console.log('Error', err);
+    return false;
   }
 }
 
 async function updatePost(req) {
   try {
-      const param = req.body;
-      // console.log("param", param);
-      const result = await Post.updateOne(
-          { _id: param.postId },
-          {
-              $set: {
-                  postContent: param.content,
-                  productId: param.product_id,
-                  categoryId: param.category_id,
-                  postStatus: param.post_status
-              }
-          }
-      );
-      return result;
+    const param = req.body;
+    // console.log("param", param);
+    const result = await Post.updateOne(
+      { _id: param.postId },
+      {
+        $set: {
+          postContent: param.content,
+          productId: param.product_id,
+          categoryId: param.category_id,
+          postStatus: param.post_status
+        }
+      }
+    );
+    return result;
 
   } catch (err) {
-      console.log('Error', err);
-      return false;
+    console.log('Error', err);
+    return false;
   }
 }
 
@@ -3980,24 +3982,24 @@ async function updatePost(req) {
 async function addPostComment(req) {
   //console.log('addpostcoment api run----------------')
   const param = req.body;
- // console.log('param   ---', param)
+  // console.log('param   ---', param)
   const postId = req.params.id;
   const isSeller = param.isSeller;
   const content = param.content;
 
   var input = {
-      postId: postId,
-      isActive: true,
-      isSeller: isSeller,
-      content: content
+    postId: postId,
+    isActive: true,
+    isSeller: isSeller,
+    content: content
   };
 
   if (isSeller == true) {
-      input['sellerId'] = param.seller_id;
-      input['userId'] = null;
+    input['sellerId'] = param.seller_id;
+    input['userId'] = null;
   } else {
-      input['userId'] = param.user_id;
-      input['sellerId'] = null;
+    input['userId'] = param.user_id;
+    input['sellerId'] = null;
   }
 
   //add row into collection
@@ -4007,20 +4009,20 @@ async function addPostComment(req) {
 
   if (data) {
 
-      //update in post
-      const filter = { _id: postId };
-      const updateData = { $push: { comments: data.id }, $inc: { commentCount: 1 } };
+    //update in post
+    const filter = { _id: postId };
+    const updateData = { $push: { comments: data.id }, $inc: { commentCount: 1 } };
 
-      await Post.findOneAndUpdate(filter, updateData, { new: true });
+    await Post.findOneAndUpdate(filter, updateData, { new: true });
 
-      let result = await PostComment.findById(data.id).select();
-      if (result) {
-          return result;
-      } else {
-          return false;
-      }
-  } else {
+    let result = await PostComment.findById(data.id).select();
+    if (result) {
+      return result;
+    } else {
       return false;
+    }
+  } else {
+    return false;
   }
 
 }
@@ -4029,9 +4031,9 @@ async function addPostComment(req) {
 async function getPostComments(req) {
   const postId = req.params.id;
   const comments = await PostComment.find({ postId: postId, isActive: true })
-      .sort({ createdAt: 'desc' });
+    .sort({ createdAt: 'desc' });
   if (comments && comments.length > 0) {
-      return comments;
+    return comments;
   }
   return false;
 }
@@ -4041,290 +4043,311 @@ async function addPostVideos(req, res) {
   const postId = req.params.id;
 
   if (!Array.isArray(videos) || videos.length === 0) {
-      return res.status(400).json({ success: false, message: "No videos provided" });
+    return res.status(400).json({ success: false, message: "No videos provided" });
   }
   try {
-      var postVideos = [];
-      var allVideosSaved = true;
-      for (let i = 0; i < videos.length; i++) {
-          const video = videos[i];
-          let input = {
-              postId: postId,
-              url: video.url,
-              isActive: true
-          };
-          let postVideo = new PostVideos(input);
-          let data = await postVideo.save();
-          if (data) {
-              postVideos.push(data.id);
-          } else {
-              allVideosSaved = false;
-              break; // Exit loop if save fails
-          }
-      }
-      if (allVideosSaved) {
-          const filter = { _id: postId };
-          const updateData = { $push: { postVideos: { $each: postVideos } } };
-          await Post.findOneAndUpdate(filter, updateData, { new: true });
-          return postVideos
+    var postVideos = [];
+    var allVideosSaved = true;
+    for (let i = 0; i < videos.length; i++) {
+      const video = videos[i];
+      let input = {
+        postId: postId,
+        url: video.url,
+        isActive: true
+      };
+      let postVideo = new PostVideos(input);
+      let data = await postVideo.save();
+      if (data) {
+        postVideos.push(data.id);
       } else {
-          return { success: false, message: "Failed to save" };
+        allVideosSaved = false;
+        break; // Exit loop if save fails
       }
+    }
+    if (allVideosSaved) {
+      const filter = { _id: postId };
+      const updateData = { $push: { postVideos: { $each: postVideos } } };
+      await Post.findOneAndUpdate(filter, updateData, { new: true });
+      return postVideos
+    } else {
+      return { success: false, message: "Failed to save" };
+    }
   } catch (error) {
-      console.log("error", error)
+    console.log("error", error)
   }
 }
 
 async function followUser(req) {
   try {
-      const param = req.body;
-      const currentUserId = param.currentUserId;
-      const userIdToFollow = param.userIdToFollow;
-      const role = param.role;
+    const param = req.body;
+    const currentUserId = param.currentUserId;
+    const userIdToFollow = param.userIdToFollow;
+    const role = param.role;
 
 
-      if (role === "seller") {
-          // If a seller is following someone (another seller or a user)
-          await User.updateOne(
-              { _id: currentUserId },
-              {
-                  $addToSet: { 'community.followingData': userIdToFollow },
-                  $inc: { 'community.following': 1 }
-              }
-          );
+    if (role === "seller") {
+      // If a seller is following someone (another seller or a user)
+      await User.updateOne(
+        { _id: currentUserId },
+        {
+          $addToSet: { 'community.followingData': userIdToFollow },
+          $inc: { 'community.following': 1 }
+        }
+      );
 
-          const isFollowingSeller = await Seller.exists({ _id: userIdToFollow });
-          if (isFollowingSeller) {
-              await Seller.updateOne(
-                  { _id: userIdToFollow },
-                  {
-                      $addToSet: { 'community.followerData': currentUserId },
-                      $inc: { 'community.followers': 1 }
-                  }
-              );
-          } else {
-              await User.updateOne(
-                  { _id: userIdToFollow },
-                  {
-                      $addToSet: { 'community.followerData': currentUserId },
-                      $inc: { 'community.followers': 1 }
-                  }
-              );
+      const isFollowingSeller = await Seller.exists({ _id: userIdToFollow });
+      if (isFollowingSeller) {
+        await Seller.updateOne(
+          { _id: userIdToFollow },
+          {
+            $addToSet: { 'community.followerData': currentUserId },
+            $inc: { 'community.followers': 1 }
           }
-
-          return { success: true, message: 'Followed successfully....!' };
-
-      } else if (role === "user") {
-          // Buyer follow to another Buyer...
-          await User.updateOne(
-              { _id: currentUserId },
-              {
-                  $addToSet: { 'community.followingData': userIdToFollow },
-                  $inc: { 'community.following': 1 }
-              }
-          );
-
-          const isFollowingSeller = await Seller.exists({ _id: userIdToFollow });
-          if (isFollowingSeller) {
-              await Seller.updateOne(
-                  { _id: userIdToFollow },
-                  {
-                      $addToSet: { 'community.followerData': currentUserId },
-                      $inc: { 'community.followers': 1 }
-                  }
-              );
-          } else {
-              await User.updateOne(
-                  { _id: userIdToFollow },
-                  {
-                      $addToSet: { 'community.followerData': currentUserId },
-                      $inc: { 'community.followers': 1 }
-                  }
-              );
+        );
+      } else {
+        await User.updateOne(
+          { _id: userIdToFollow },
+          {
+            $addToSet: { 'community.followerData': currentUserId },
+            $inc: { 'community.followers': 1 }
           }
-
-          return { success: true, message: 'Followed successfully....!' };
+        );
       }
 
-      // ****************Below buyer to buyer follow req sent functionality....**********************//
-      // await User.updateOne(
-      //     { _id: currentUserId },
-      //     {
-      //         $addToSet: { 'community.followingData': userIdToFollow },
-      //         $inc: { 'community.following': 1 }
-      //     }
-      // );
+      return { success: true, message: 'Followed successfully....!' };
 
-      // await User.updateOne(
-      //     { _id: userIdToFollow },
-      //     {
-      //         $addToSet: { 'community.followerData': currentUserId },
-      //         $inc: { 'community.followers': 1 }
-      //     }
-      // );
+    } else if (role === "user") {
+      // Buyer follow to another Buyer...
+      await User.updateOne(
+        { _id: currentUserId },
+        {
+          $addToSet: { 'community.followingData': userIdToFollow },
+          $inc: { 'community.following': 1 }
+        }
+      );
+
+      const isFollowingSeller = await Seller.exists({ _id: userIdToFollow });
+      if (isFollowingSeller) {
+        await Seller.updateOne(
+          { _id: userIdToFollow },
+          {
+            $addToSet: { 'community.followerData': currentUserId },
+            $inc: { 'community.followers': 1 }
+          }
+        );
+      } else {
+        await User.updateOne(
+          { _id: userIdToFollow },
+          {
+            $addToSet: { 'community.followerData': currentUserId },
+            $inc: { 'community.followers': 1 }
+          }
+        );
+      }
+
+      return { success: true, message: 'Followed successfully....!' };
+    }
+
+    // ****************Below buyer to buyer follow req sent functionality....**********************//
+    // await User.updateOne(
+    //     { _id: currentUserId },
+    //     {
+    //         $addToSet: { 'community.followingData': userIdToFollow },
+    //         $inc: { 'community.following': 1 }
+    //     }
+    // );
+
+    // await User.updateOne(
+    //     { _id: userIdToFollow },
+    //     {
+    //         $addToSet: { 'community.followerData': currentUserId },
+    //         $inc: { 'community.followers': 1 }
+    //     }
+    // );
 
   } catch (err) {
-      console.log('Error', err);
-      return false;
+    console.log('Error', err);
+    return false;
   }
 }
 
 
 async function unfollowUser(req) {
   try {
-      const param = req.body;
-      const currentUserId = param.currentUserId;
-      const userIdToUnfollow = param.userIdToUnfollow;
-      const role = param.role;
+    const param = req.body;
+    const currentUserId = param.currentUserId;
+    const userIdToUnfollow = param.userIdToUnfollow;
+    const role = param.role;
 
-      if (role === "seller") {
-          await User.updateOne(
-              { _id: currentUserId },
-              {
-                  $pull: { 'community.followingData': userIdToUnfollow },
-                  $inc: { 'community.following': -1 }
-              }
-          );
+    if (role === "seller") {
+      await User.updateOne(
+        { _id: currentUserId },
+        {
+          $pull: { 'community.followingData': userIdToUnfollow },
+          $inc: { 'community.following': -1 }
+        }
+      );
 
-          const isFollowingSeller = await Seller.exists({ _id: userIdToUnfollow });
-          if (isFollowingSeller) {
-              await Seller.updateOne(
-                  { _id: userIdToUnfollow },
-                  {
-                      $pull: { 'community.followerData': currentUserId },
-                      $inc: { 'community.followers': -1 }
-                  }
-              );
-          } else {
-              await User.updateOne(
-                  { _id: userIdToUnfollow },
-                  {
-                      $pull: { 'community.followerData': currentUserId },
-                      $inc: { 'community.followers': -1 }
-                  }
-              );
+      const isFollowingSeller = await Seller.exists({ _id: userIdToUnfollow });
+      if (isFollowingSeller) {
+        await Seller.updateOne(
+          { _id: userIdToUnfollow },
+          {
+            $pull: { 'community.followerData': currentUserId },
+            $inc: { 'community.followers': -1 }
           }
-
-          return { success: true, message: 'Unfollowed successfully....!' };
-
-      } else if (role === "user") {
-          await User.updateOne(
-              { _id: currentUserId },
-              {
-                  $pull: { 'community.followingData': userIdToUnfollow },
-                  $inc: { 'community.following': -1 }
-              }
-          );
-
-          const isFollowingSeller = await Seller.exists({ _id: userIdToUnfollow });
-          if (isFollowingSeller) {
-              await Seller.updateOne(
-                  { _id: userIdToUnfollow },
-                  {
-                      $pull: { 'community.followerData': currentUserId },
-                      $inc: { 'community.followers': -1 }
-                  }
-              );
-          } else {
-              await User.updateOne(
-                  { _id: userIdToUnfollow },
-                  {
-                      $pull: { 'community.followerData': currentUserId },
-                      $inc: { 'community.followers': -1 }
-                  }
-              );
+        );
+      } else {
+        await User.updateOne(
+          { _id: userIdToUnfollow },
+          {
+            $pull: { 'community.followerData': currentUserId },
+            $inc: { 'community.followers': -1 }
           }
-
-          return { success: true, message: 'Unfollowed successfully....!' };
+        );
       }
-      // ****************Below buyer to buyer unfollowing req functionality....**********************//
-      // await User.updateOne(
-      //     { _id: currentUserId },
-      //     {
-      //         $pull: { 'community.followingData': userIdToUnfollow },
-      //         $inc: { 'community.following': -1 }
-      //     }
-      // );
-      // await User.updateOne(
-      //     { _id: userIdToUnfollow },
-      //     {
-      //         $pull: { 'community.followerData': currentUserId },
-      //         $inc: { 'community.followers': -1 }
-      //     }
-      // );
-      // return { success: true, message: 'Unfollowed successfully....!' };
+
+      return { success: true, message: 'Unfollowed successfully....!' };
+
+    } else if (role === "user") {
+      await User.updateOne(
+        { _id: currentUserId },
+        {
+          $pull: { 'community.followingData': userIdToUnfollow },
+          $inc: { 'community.following': -1 }
+        }
+      );
+
+      const isFollowingSeller = await Seller.exists({ _id: userIdToUnfollow });
+      if (isFollowingSeller) {
+        await Seller.updateOne(
+          { _id: userIdToUnfollow },
+          {
+            $pull: { 'community.followerData': currentUserId },
+            $inc: { 'community.followers': -1 }
+          }
+        );
+      } else {
+        await User.updateOne(
+          { _id: userIdToUnfollow },
+          {
+            $pull: { 'community.followerData': currentUserId },
+            $inc: { 'community.followers': -1 }
+          }
+        );
+      }
+
+      return { success: true, message: 'Unfollowed successfully....!' };
+    }
+    // ****************Below buyer to buyer unfollowing req functionality....**********************//
+    // await User.updateOne(
+    //     { _id: currentUserId },
+    //     {
+    //         $pull: { 'community.followingData': userIdToUnfollow },
+    //         $inc: { 'community.following': -1 }
+    //     }
+    // );
+    // await User.updateOne(
+    //     { _id: userIdToUnfollow },
+    //     {
+    //         $pull: { 'community.followerData': currentUserId },
+    //         $inc: { 'community.followers': -1 }
+    //     }
+    // );
+    // return { success: true, message: 'Unfollowed successfully....!' };
 
   } catch (err) {
-      console.log('Error', err);
-      return false;
+    console.log('Error', err);
+    return false;
   }
 }
 
 async function getPostById(req) {
-    const postId = req.params.id;
-    console.log("postId", postId)
+  const postId = req.params.id;
+  console.log("postId", postId)
 
-    const post = await Post.findOne({
-        _id: postId,
-        isActive: true
-    })
-        .sort({ createdAt: 'desc' })
-        .populate([
-            {
-                path: "sellerId",
-                model: Seller,
-                select: "name image_url community role",
-                match: { isActive: true },
-            },
-            {
-                path: "userId",
-                model: User,
-                select: "name image_url community role",
-                match: { isActive: true },
-            },
-            {
-                path: "postImages",
-                model: PostImages,
-                select: "url",
-                // match: { isActive: true }
-            },
-            {
-                path: "postVideos",
-                model: PostVideos,
-                select: "url",
-                match: { isActive: true }
-            },
-            {
-                path: "likes",
-                model: PostLike,
-                select: "isActive isSeller postId sellerId userId",
-                match: { isActive: true }
-            },
-            {
-                path: "comments",
-                model: PostComment,
-                select: "isActive isSeller postId sellerId userId content createdAt",
-                // match: { isActive: true },
-                populate: [{
-                        path: "sellerId",
-                        model: Seller,
-                        select: "name image_url",
-                        // match: { isActive: true },
-                    },
-                    {
-                        path: "userId",
-                        model: User,
-                        select: "name image_url",
-                        // match: { isActive: true },
-                    },
-                    ]
-            }
-        ])
-    // console.log("Shared post", post)
+  const post = await Post.findOne({
+    _id: postId,
+    isActive: true
+  })
+    .sort({ createdAt: 'desc' })
+    .populate([
+      {
+        path: "sellerId",
+        model: Seller,
+        select: "name image_url community role",
+        match: { isActive: true },
+      },
+      {
+        path: "userId",
+        model: User,
+        select: "name image_url community role",
+        match: { isActive: true },
+      },
+      {
+        path: "postImages",
+        model: PostImages,
+        select: "url",
+        // match: { isActive: true }
+      },
+      {
+        path: "postVideos",
+        model: PostVideos,
+        select: "url",
+        match: { isActive: true }
+      },
+      {
+        path: "likes",
+        model: PostLike,
+        select: "isActive isSeller postId sellerId userId",
+        match: { isActive: true }
+      },
+      {
+        path: "comments",
+        model: PostComment,
+        select: "isActive isSeller postId sellerId userId content createdAt",
+        // match: { isActive: true },
+        populate: [{
+          path: "sellerId",
+          model: Seller,
+          select: "name image_url",
+          // match: { isActive: true },
+        },
+        {
+          path: "userId",
+          model: User,
+          select: "name image_url",
+          // match: { isActive: true },
+        },
+        ]
+      }
+    ])
+  // console.log("Shared post", post)
 
-    if (post) {
-        // console.log("posts test ", post)
-        return post;
+  if (post) {
+    // console.log("posts test ", post)
+    return post;
+  }
+  return false;
+}
+
+
+async function createPostReport(req, res) {
+  try {
+    var param = req.body;
+    let input = {
+      reportData: param.reportData,
+      reportType: param.reportType,
+      notes: param.notes,
+      reportBy: param.reportBy,
+    };
+    const reportData = new ReportPost(input);
+    const data = await reportData.save();
+    if (data) {
+      return data;
     }
     return false;
+  } catch (error) {
+    console.log('Error', error);
+  }
 }

@@ -33,7 +33,8 @@ function ServiceCalendarAuth() {
       console.log("checking currentUser", currentUser)
 
       //generated access token
-      const accessToken = currentUser.getAuthResponse().access_token;
+      // const accessToken = currentUser.getAuthResponse().access_token;
+      const accessToken = currentUser.xc.access_token;
       console.log("checking accessToken for google calendar", accessToken)
 
       //set access token in localStorage
