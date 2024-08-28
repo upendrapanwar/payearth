@@ -6,10 +6,11 @@ mongoose.Promise = global.Promise;
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpeg_static = require('ffmpeg-static');
 
-const { Post, FollowRequest, PostImages, PostVideos, PostLike, PostComment, Category, Product, User, Seller, Admin } = require("../helpers/db");
+const { Post, FollowRequest, PostImages, PostVideos, PostLike, PostComment, Category, Product, User, Seller, Admin, ReportPost } = require("../helpers/db");
 
 module.exports = {
     getPosts,
+    getProfilePosts,
     createPost,
     addPostImages,
     addPostVideos,
@@ -20,6 +21,7 @@ module.exports = {
     unfollowUser,
     postDelete,
     updatePost,
+    createPostReport,
     getPostById,
     // sendFollowRequest,
     setFollow,
@@ -662,6 +664,25 @@ async function updatePost(req) {
     }
 }
 
+async function createPostReport(req, res) {
+    try {
+        var param = req.body;
+        let input = {
+            reportData: param.reportData,
+            reportType: param.reportType,
+            notes: param.notes,
+            reportBy: param.reportBy,
+        };
+        const reportData = new ReportPost(input);
+        const data = await reportData.save();
+        if (data) {
+            return data;
+        }
+        return false;
+    } catch (error) {
+        console.log('Error', error);
+    }
+}
 
 
 async function sendFollowRequest(req) {
@@ -876,6 +897,161 @@ async function getPostById(req) {
                 select: "isActive isSeller postId sellerId userId content createdAt",
                 match: { isActive: true },
                 populate: [{
+                    path: "sellerId",
+                    model: Seller,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                {
+                    path: "userId",
+                    model: User,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                ]
+            }
+        ])
+    // console.log("Shared post", post)
+
+    if (post) {
+        // console.log("posts test ", post)
+        return post;
+    }
+    return false;
+}
+
+
+async function getProfilePosts(req) {
+    const authorId = req.params.id;
+    const posts = await Post.find({
+        sellerId: authorId
+        // $or: [
+        //     { sellerId: authorId },
+        //     // { userId: authorId }
+        // ]
+    })
+        .sort({ createdAt: 'desc' })
+        .populate([
+            {
+                path: "sellerId",
+                model: Seller,
+                select: "name image_url community role",
+                match: { isActive: true },
+            },
+            {
+                path: "userId",
+                model: User,
+                select: "name image_url community role",
+                match: { isActive: true },
+            },
+            {
+                path: "postImages",
+                model: PostImages,
+                select: "url",
+                match: { isActive: true }
+            },
+            {
+                path: "postVideos",
+                model: PostVideos,
+                select: "url",
+                match: { isActive: true }
+            },
+            {
+                path: "categoryId",
+                model: Category,
+                select: "categoryName isService"
+                //match: { isActive: true }
+            },
+            {
+                path: "productId",
+                model: Product,
+                select: "name isService"
+                //match: { isActive: true }
+            },
+            {
+                path: "likes",
+                model: PostLike,
+                select: "-isActive -postId",
+                match: { isActive: true },
+                populate: [{
+                    path: "sellerId",
+                    model: Seller,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                {
+                    path: "userId",
+                    model: User,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                ]
+            },
+            {
+                path: "comments",
+                model: PostComment,
+                select: "-isActive -postId",
+                match: { isActive: true },
+                populate: [{
+                    path: "sellerId",
+                    model: Seller,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                {
+                    path: "userId",
+                    model: User,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                ]
+            },
+            {
+                path: "parentId",
+                model: Post,
+                match: { isActive: true },
+                populate: [{
+                    path: "postImages",
+                    model: PostImages,
+                    select: "url",
+                    match: { isActive: true }
+                },
+                {
+                    path: "postVideos",
+                    model: PostVideos,
+                    select: "url",
+                    match: { isActive: true }
+                },
+                {
+                    path: "categoryId",
+                    model: Category,
+                    select: "categoryName isService"
+                    //match: { isActive: true }
+                },
+                {
+                    path: "productId",
+                    model: Product,
+                    select: "name isService"
+                    //match: { isActive: true }
+                },
+                {
+                    path: "sellerId",
+                    model: Seller,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                {
+                    path: "userId",
+                    model: User,
+                    select: "name image_url",
+                    match: { isActive: true },
+                },
+                {
+                    path: "likes",
+                    model: PostLike,
+                    select: "-isActive -postId",
+                    match: { isActive: true },
+                    populate: [{
                         path: "sellerId",
                         model: Seller,
                         select: "name image_url",
@@ -888,13 +1064,14 @@ async function getPostById(req) {
                         match: { isActive: true },
                     },
                     ]
+                }
+                ]
             }
-        ])
-    // console.log("Shared post", post)
-
-    if (post) {
-        // console.log("posts test ", post)
-        return post;
+        ]);
+    // console.log("posts test", posts)
+    if (posts){
+        // console.log("posts test ", posts)
+        return posts;
     }
     return false;
 }

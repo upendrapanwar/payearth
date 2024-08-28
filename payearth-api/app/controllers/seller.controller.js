@@ -252,7 +252,10 @@ router.post('/follow-user', followUser);
 router.post('/unfollowUser', unfollowUser);
 router.put('/postRemoved', postDelete);
 router.put('/updatePost', updatePost);
+router.post("/createPostReport", createPostReport)
 router.get("/getPostById/:id", getPostById);
+
+router.put("/editProfileImage/:id", editProfileImage);
 
 
 module.exports = router;
@@ -1341,10 +1344,23 @@ function updatePost(req, res, next) {
     .catch(err => next(res.status(400).json({ status: false, message: err })));
 }
 
+function createPostReport(req, res, next) {
+
+  sellerService.createPostReport(req)
+    .then(result => result ? res.status(201).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.post.add.error }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
 function getPostById(req, res, next) {
 
   sellerService.getPostById(req)
+    .then(result => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+    .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function editProfileImage(req, res, next) {
+
+  sellerService.editProfileImage(req)
       .then(result => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
       .catch(err => next(res.json({ status: false, message: err })));
 }
-

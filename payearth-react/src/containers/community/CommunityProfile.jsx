@@ -5,8 +5,10 @@ import post2 from '../../assets/images/posts/post_img2.jpg'
 import userImg from '../../assets/images/user_img.png'
 import { Link } from 'react-router-dom';
 import post from '../../assets/images/posts/post_img.jpg'
+
 // import PostListing from '../../components/community/common/PostListing';
 import Post from '../../components/community/common/Post';
+import SellerPost from '../../components/community/common/SellerPost';
 import { useState } from 'react';
 import { setLoading } from '../../store/reducers/global-reducer';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
@@ -14,6 +16,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import {NotFound} from '../../components/common/NotFound';
 import axios from 'axios';
+import SellerCommunity from './sellerCommunity';
 
 const CommunityProfile = () => {
     const userInfo = useSelector(state => state.auth.userInfo);
@@ -24,17 +27,20 @@ const CommunityProfile = () => {
     const dispatch = useDispatch();
     const getPosts = () => {
         dispatch(setLoading({ loading: true }))
-        axios.get('community/front/posts').then(response => {
+        const ID = authInfo.id ;
+        // console.log('ID____',ID);
+        // console.log('this page run--',authInfo.id);
+        axios.get(`community/front/profile/posts/${authInfo.id}`).then(response => {
             if (response.data.status) {
                 let res = response.data.data;
-                if (userInfo.role === 'user') {
-                   let post= res.filter((value) => value.isSeller === false && value.userId.id === authInfo.id);
-                   setPosts(post);
-                }
-                else {
-                    let post= res.filter((value) => value.isSeller === true && value.sellerId.id === authInfo.id);
-                    setPosts(post);
-                }
+                    if (userInfo.role === 'user') {
+                        let post= res.filter((value) => value.isSeller === false && value.userId.id === authInfo.id);
+                        setPosts(post);
+                    }
+                    else {
+                        let post= res.filter((value) => value.isSeller === true && value.sellerId.id === authInfo.id);
+                        setPosts(post);
+                    }
             }
         }).catch(error => {
             console.log(error);
@@ -83,12 +89,15 @@ const CommunityProfile = () => {
                             </div>
 
                             <div className="col-lg-9">
+                                <SellerCommunity/>
                                 {
                                     posts.length > 0 ?
                                         <div>
                                             {posts.map((value, index) => {
                                                 return (
-                                                    <Post key={index} posts={value} />
+
+                                                    // <Post key={index} posts={value} />
+                                                    <SellerPost key={index} posts={value} />
                                                 )
                                             })}
                                         </div>
@@ -99,24 +108,24 @@ const CommunityProfile = () => {
                                 <div className="cumm_sidebar_box bg-white p-3 rounded-3">
                                     <div className="cumm_title">My Post <br />advanced filter</div>
                                     <div className="filter_box">
-                                        <select className="form-select mb-3" aria-label="Default select example">
+                                        {/* <select className="form-select mb-3" aria-label="Default select example">
                                             <option >Product</option>
                                             <option value="1">One</option>
                                             <option value="2">Two</option>
                                             <option value="3">Three</option>
-                                        </select>
+                                        </select> */}
                                         <select className="form-select mb-3" aria-label="Default select example">
                                             <option >Category</option>
                                             <option value="1">One</option>
                                             <option value="2">Two</option>
                                             <option value="3">Three</option>
                                         </select>
-                                        <div className="form-check mb-3 mt-4">
+                                        {/* <div className="form-check mb-3 mt-4">
                                             <input className="form-check-input" type="checkbox" value="" id="latestPost" />
                                             <label className="form-check-label" htmlFor="latestPost">
                                                 Latest Post
                                             </label>
-                                        </div>
+                                        </div> */}
                                         <div className="form-check mb-3">
                                             <input className="form-check-input" type="checkbox" value="" id="popularPost" />
                                             <label className="form-check-label" htmlFor="popularPost">

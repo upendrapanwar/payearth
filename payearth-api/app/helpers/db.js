@@ -35,6 +35,7 @@ module.exports = {
   PostComment: require("../models/postcomment.model"),
   PostImages: require("../models/postimages.model"),
   PostVideos: require("../models/postvideos.model"),
+  ReportPost: require("../models/reportpost.model"),
   FollowRequest: require("../models/followrequest.model"),
   cmsPost: require("../models/cmspost.model"),
   cmsPage: require("../models/cmspage.model"),
@@ -45,10 +46,8 @@ module.exports = {
   Servicedetails: require("../models/servicedetail.model"),
   ServiceReview: require("../models/servicereview.model"),
   Calendar: require("../models/calendar.model"),
-
-  Chat : require("../models/chat.model"),
-  ChatMessage : require("../models/chatmessage.model"),
-
+  Chat: require("../models/chat.model"),
+  ChatMessage: require("../models/chatmessage.model"),
   Notification: require("../models/notification.model"),
 
 };

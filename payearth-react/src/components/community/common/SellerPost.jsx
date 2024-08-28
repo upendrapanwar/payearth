@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import userImg from '../../../assets/images/user.png'
+import Modal from "react-bootstrap/Modal";
 import closeIcon from '../../../assets/icons/close_icon.svg'
 import post from '../../../assets/images/posts/post_img.jpg'
 import { Link } from 'react-router-dom';
@@ -15,7 +16,7 @@ import { toast } from 'react-toastify';
 import SpinnerLoader from '../../common/SpinnerLoader';
 import { setLoading } from '../../../store/reducers/global-reducer';
 import { getPostsData } from '../../../helpers/post-listing';
-import{getSellerPostsData} from '../../../helpers/sellerPost-listing';
+import { getSellerPostsData } from '../../../helpers/sellerPost-listing';
 import SimpleImageSlider from "react-simple-image-slider";
 import ReactTimeAgo from 'react-time-ago'
 import TimeAgo from 'javascript-time-ago'
@@ -29,7 +30,7 @@ TimeAgo.addLocale(ru)
 
 const SellerPost = ({ posts, sendEditData }) => {
 
-    // console.log("all posts", posts)
+    //console.log("all posts ----------", posts)
 
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
@@ -53,6 +54,12 @@ const SellerPost = ({ posts, sendEditData }) => {
     const [sliderVideos, setSliderVideos] = useState([]);
     const [ShowSlider, setShowSlider] = useState(false);
     const [isFollowing, setIsFollowing] = useState(false);
+    const [isReportOpen, setIsReportOpen] = useState(false);
+    const [reportedPost, setReportedPost] = useState(null);
+    const [reportNote, setReportNote] = useState(null);
+    const [reportOption, setReportOption] = useState(null);
+
+
     const date = new Date(posts.createdAt);
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
@@ -219,10 +226,9 @@ const SellerPost = ({ posts, sendEditData }) => {
             let likes = posts.likes;
             let filteredLikes = [];
             likes.forEach((value) => {
-                if (value.isSeller) {
+                if (value.isSeller === true && value.sellerId?.id) {
                     filteredLikes.push(value.sellerId.id);
-                }
-                else {
+                } else if (value.userId?.id) {
                     filteredLikes.push(value.userId.id);
                 }
             });
@@ -445,6 +451,52 @@ const SellerPost = ({ posts, sendEditData }) => {
         window.open(whatsappShareUrl, '_blank');
     }
 
+    const handleReportPopup = (post) => {
+        // alert(`Repost this post id : ${postId}`)
+        setIsReportOpen(true);
+        setReportedPost(post)
+    }
+
+    const reportPopupClose = () => {
+        setIsReportOpen(false);
+        setReportedPost(null);
+    }
+
+    const handleReportPost = async () => {
+        try {
+            const data = reportedPost;
+            console.log("reportedPost send to admin", data)
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authInfo.token}` // Replace authInfo.token with your actual token variable
+            };
+            const response = await axios.post('seller/createPostReport', {
+                reportType: reportOption,
+                notes: reportNote,
+                reportData: {
+                    postId: data.id,
+                    postCreatedBy: data.userId === null ? data.sellerId.id : data.userId.id,
+                },
+                reportBy: authInfo.id
+            }, { headers });
+            console.log("response", response.data)
+
+            toast.success("Report Succesfully");
+            setIsReportOpen(false);
+            // alert(response.data.message);
+        } catch (error) {
+            console.error('Error reporting post:', error);
+        }
+    }
+
+    const handleNoteChange = (e) => {
+        setReportNote(e.target.value);
+    };
+
+    const handleOptionChange = (e) => {
+        setReportOption(e.target.value);
+    };
+
     return (
         <React.Fragment>
             {/* {loading === true ? <SpinnerLoader /> : ''} */}
@@ -500,7 +552,7 @@ const SellerPost = ({ posts, sendEditData }) => {
                                                 <small>Following</small>
                                             </li>
                                             <li>
-                                                <div className="fp_fc">02</div>
+                                                <div className="fp_fc">00</div>
                                                 <small>Posts</small>
                                             </li>
 
@@ -649,10 +701,18 @@ const SellerPost = ({ posts, sendEditData }) => {
                             <li className="ms-auto">
                                 {(posts.userId?.id === authInfo.id || posts.sellerId?.id === authInfo.id || posts.adminId?.id === authInfo.id) ? (
                                     <>
-                                        <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() =>{ handleEdit(posts); window.scrollTo({ top: 0,behavior: 'smooth' })}}>Edit</button>
+                                        <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => { handleEdit(posts); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>Edit</button>
                                         <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
                                     </>
-                                ) : null}
+                                ) :
+                                    <Link
+                                        to="#"
+                                        // onClick={() => handleShare(posts)}
+                                        onClick={() => handleReportPopup(posts)}
+                                        className="post_follow">
+                                        Report
+                                    </Link>
+                                }
                                 {/* {posts.userId.id === authInfo.id ? <>
                                     <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleEdit(posts)}>Edit</button>
                                     <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
@@ -663,10 +723,10 @@ const SellerPost = ({ posts, sendEditData }) => {
                                 {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseShareTo${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseShareTo${posts.id}`}>
                                     <i className="post_icon ps_share"></i> Share
                                 </Link> */}
-                                <Link to="#" 
-                                // onClick={() => setOpenShare(true)}
-                                onClick={() => handleShare(posts)}
-                                className="post_follow">
+                                <Link to="#"
+                                    // onClick={() => setOpenShare(true)}
+                                    onClick={() => handleShare(posts)}
+                                    className="post_follow">
                                     <i className="post_icon ps_share"></i> Share
                                 </Link>
                             </li>
@@ -736,6 +796,86 @@ const SellerPost = ({ posts, sendEditData }) => {
                     </div>
                 </div>
             </div>
+
+            <Modal
+                show={isReportOpen}
+                // onHide={() => this.setState({ isShareOpen: false })}
+                onHide={() => setIsReportOpen(false)}
+                size="md"
+                aria-labelledby="contained-modal-title-vcenter"
+                centered
+            >
+                <Modal.Body>
+                    <div>
+                        <p class="text-center fw-bold">Are you sure you want to report ?</p>
+                    </div>
+                    <div className="">
+                        <div className="form-check d-inline-block me-3">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                id="option1"
+                                name="options"
+                                value="Please delete this post"
+                                checked={reportOption === "Please delete this post"}
+                                onChange={handleOptionChange}
+                            />
+                            <label className="form-check-label" htmlFor="option1">
+                                Please delete this post
+                            </label>
+                        </div> <br />
+                        <div className="form-check d-inline-block me-3">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                id="option1"
+                                name="options"
+                                value="This post contains inappropriate language"
+                                checked={reportOption === "This post contains inappropriate language"}
+                                onChange={handleOptionChange}
+                            />
+                            <label className="form-check-label" htmlFor="option1">
+                                This post contains inappropriate language
+                            </label>
+                        </div> <br />
+                        <div className="form-check d-inline-block me-3">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                id="option2"
+                                name="options"
+                                value="This post voilates our Terms & Condition"
+                                checked={reportOption === "This post voilates our Terms & Condition"}
+                                onChange={handleOptionChange}
+                            />
+                            <label className="form-check-label" htmlFor="option2">
+                                This post voilates our Terms & Condition
+                            </label>
+                        </div> <br />
+                    </div>
+                    <br />
+                    <div className="input-section">
+                        <label htmlFor="">Note</label>
+                        <div className="field_item text-left mt-2">
+                            <textarea
+                                type="text"
+                                name="note"
+                                value={reportNote}
+                                onChange={handleNoteChange}
+                                cols="30"
+                                rows="10"
+                                className="form-control"
+                            ></textarea>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center mt-2">
+                        <div className="d-grid gap-2 d-md-block">
+                            <button className="btn btn-warning btn-sm" type="button" onClick={handleReportPost}>Send Report</button>
+                            <button className="btn btn-secondary btn-sm" type="button" onClick={reportPopupClose}>Cancle</button>
+                        </div>
+                    </div>
+                </Modal.Body>
+            </Modal>
         </React.Fragment>
     );
 };

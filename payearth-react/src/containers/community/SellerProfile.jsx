@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Footer from '../../components/common/Footer';
-import Header from '../../components/community/common/Header';
-import UserHeader from '../../components/user/common/Header';
+import Header from '../../components/seller/common/Header';
 import userImg from '../../assets/images/user.png'
 import { Link } from 'react-router-dom';
 import InputEmoji from 'react-input-emoji'
 import Post from '../../components/community/common/Post';
+import SellerPost from '../../components/community/common/SellerPost';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { setLoading } from '../../store/reducers/global-reducer';
 import { setPostCategories, setPostProducts } from '../../store/reducers/post-reducer';
@@ -14,18 +14,22 @@ import { useSelector } from 'react-redux';
 import config from '../.././config.json'
 import { useDispatch } from 'react-redux';
 import { NotFound } from '../../components/common/NotFound';
-import { getPostsData } from '../../helpers/post-listing';
+import { getSellerPostsData } from '../../helpers/sellerPost-listing';
 import Select from 'react-select';
 import Picker from 'emoji-picker-react';
 import { toast } from 'react-toastify';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
 
-const Community = () => {
+
+const SellerProfile = () => {
     const userInfo = useSelector(state => state.auth.userInfo);
     const authInfo = useSelector(state => state.auth.authInfo);
     const loading = useSelector(state => state.global.loading);
-    const postsData = useSelector(state => state.post.postsData);
-    console.log("Posts", postsData)
+    const AllSellerPostsData = useSelector(state => state.post.SellerPostsData);
+    const SellerPostsData = AllSellerPostsData.filter(post => post.sellerId && post.sellerId._id === authInfo.id);
+    const cloudName = process.env.REACT_APP_CLOUD_NAME;
+    // console.log("Posts Seller-----====-", AllSellerPostsData)
+    // console.log("Posts Seller-----====-", SellerPostsData)
     const postCategories = useSelector(state => state.post.postCategories);
     const postProducts = useSelector(state => state.post.postProducts);
     const dispatch = useDispatch();
@@ -39,7 +43,7 @@ const Community = () => {
     const [categoryId, setCategoryId] = useState('');
     const [postStatus, setPostStatus] = useState('Followers');
     const [categoryOption, setCategoryOption] = useState([]);
-    const [defaultCategoryOption, setDefaultCategoryOption] = useState({ label: 'All', value: '' })
+    const [defaultCategoryOption, setDefaultCategoryOption] = useState({ label: 'Choose Category', value: '' })
     const [productOption, setProductOption] = useState([]);
     const [defaultProductOption, setDefaultProductOption] = useState({ label: 'Choose Product', value: '' })
     const [posts, setPosts] = useState([]);
@@ -51,14 +55,20 @@ const Community = () => {
     const [selectFilterCategory, setSelectFilterCategory] = useState(null);
     const [showMostLiked, setShowMostLiked] = useState(false);
     const [showMostCommented, setShowMostCommented] = useState(false);
-    const [filteredData, setFilteredData] = useState(postsData);
+    const [filteredData, setFilteredData] = useState(SellerPostsData);
+    const [showModal, setShowModal] = useState(false);
+    // const [profileImage, setProfileImage] = useState("");
+    const [imageFile, setImageFile] = useState(null);
+    const [image, setImage] = useState('');
 
+
+    const handleShow = () => setShowModal(true);
+    const handleClose = () => setShowModal(false);
 
     const onEmojiClick = (event, emojiObject) => {
         setInputStr(prevInput => prevInput + emojiObject.emoji);
         setShowPicker(false);
     };
-
 
     const handlePreview = (event) => {
         let previews = [];
@@ -105,7 +115,7 @@ const Community = () => {
     }
     const createPost = async () => {
         // console.log("authInfo Seller or User", authInfo.token);
-        console.log("postStatus", postStatus)
+       // console.log("postStatus", postStatus)
         const token = authInfo.token;
         setAddMore(false);
         let reqBody = {
@@ -113,41 +123,21 @@ const Community = () => {
             category_id: categoryId,
             product_id: productId,
             post_status: postStatus,
-            user_id: authInfo.id,
-            seller_id: null,
+            user_id: null,
+            seller_id: authInfo.id,
             admin_id: null,
-            is_seller: false,
+            is_seller: true,
             is_admin: false,
-            parent_id: null
+            parent_id: null,
+            postImages: images,
+            postVideos: videos,
         };
 
-        // if (userInfo.role === 'user') {
-        //     reqBody = {
-        //         content: inputStr,
-        //         category_id: categoryId,
-        //         product_id: productId,
-        //         post_status: postStatus,
-        //         user_id: authInfo.id,
-        //         seller_id: null,
-        //         is_seller: false,
-        //         parent_id: null
-        //     }
-        // } else {
-        //     reqBody = {
-        //         content: inputStr,
-        //         category_id: categoryId,
-        //         product_id: productId,
-        //         post_status: postStatus,
-        //         user_id: null,
-        //         seller_id: authInfo.id,
-        //         is_seller: true,
-        //         parent_id: null
-        //     }
-        // }
+
         setInputStr('');
         try {
             dispatch(setLoading({ loading: true }));
-            const postResponse = await axios.post('community/posts', reqBody, {
+            const postResponse = await axios.post('/seller/posts', reqBody, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
@@ -204,14 +194,14 @@ const Community = () => {
 
                 if (imageUrls.length > 0 && videoUrls.length > 0) {
                     await Promise.all([
-                        axios.post(`community/postImages/${postId}`, { images: imageUrls }, {
+                        axios.post(`seller/postImages/${postId}`, { images: imageUrls }, {
                             headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json; charset=UTF-8',
                                 'Authorization': `Bearer ${authInfo.token}`
                             }
                         }),
-                        axios.post(`community/postVideos/${postId}`, { videos: videoUrls }, {
+                        axios.post(`seller/postVideos/${postId}`, { videos: videoUrls }, {
                             headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json; charset=UTF-8',
@@ -221,7 +211,7 @@ const Community = () => {
                     ]);
                 } else {
                     if (imageUrls.length > 0) {
-                        await axios.post(`community/postImages/${postId}`, { images: imageUrls }, {
+                        await axios.post(`seller/postImages/${postId}`, { images: imageUrls }, {
                             headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json; charset=UTF-8',
@@ -230,7 +220,7 @@ const Community = () => {
                         });
                     }
                     if (videoUrls.length > 0) {
-                        await axios.post(`community/postVideos/${postId}`, { videos: videoUrls }, {
+                        await axios.post(`seller/postVideos/${postId}`, { videos: videoUrls }, {
                             headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json; charset=UTF-8',
@@ -239,7 +229,7 @@ const Community = () => {
                         });
                     }
                 }
-                getPostsData(dispatch);
+                getSellerPostsData(dispatch);
             }
         } catch (error) {
             console.log(error);
@@ -253,7 +243,7 @@ const Community = () => {
                 setCategoryId(null);
                 setProductId(null);
                 setDefaultProductOption({ label: 'Choose Product', value: '' });
-                setDefaultCategoryOption({ label: 'All', value: '' });
+                setDefaultCategoryOption({ label: 'Choose Category', value: '' });
             }, 300);
         }
     };
@@ -264,7 +254,7 @@ const Community = () => {
             if (response.data.status) {
                 let res = response.data.data;
                 dispatch(setPostCategories({ postCategories: res }));
-                let catOptions = [{ label: 'All', value: '' }]
+                let catOptions = [{ label: 'Choose Category', value: '' }]
                 res.forEach((value) => {
                     catOptions.push({ label: value.categoryName, value: value.id });
                 });
@@ -283,7 +273,7 @@ const Community = () => {
     //     setCategoryId(event.target.value);
     // };
     const handleCategories = (selectedOption) => {
-        console.log("HandleCategory select option", selectedOption)
+       // console.log("HandleCategory select option", selectedOption)
         setDefaultCategoryOption(selectedOption);
         setDefaultProductOption({ label: 'Choose Product', value: '' });
         setCategoryId(selectedOption.value);
@@ -299,7 +289,7 @@ const Community = () => {
     //     console.log(event.target.value);
     // }
     const handleProducts = (selectedOption) => {
-        console.log("selectedProdOption", selectedOption)
+       // console.log("selectedProdOption", selectedOption)
         setDefaultProductOption(selectedOption);
         setProductId(selectedOption.value);
     }
@@ -327,12 +317,12 @@ const Community = () => {
     }
 
     useEffect(() => {
-        getPostsData(dispatch);
+        getSellerPostsData(dispatch);
         getCategories();
     }, []);
 
     const handleEdit = (data) => {
-        console.log("Data for edit test ###$$#$$#$#$#", data)
+        //console.log("Data for edit test ###$$#$$#$#$#", data)
         setIsUpdate(true);
         const selectedCatOption = {
             label: data.categoryId === null ? null : data.categoryId.categoryName,
@@ -358,7 +348,7 @@ const Community = () => {
             post_status: postStatus,
         }
 
-        axios.put(`community/updatePost`, reqBody, {
+        axios.put(`seller/updatePost`, reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -367,7 +357,7 @@ const Community = () => {
         }).then(response => {
             if (response.data.status) {
                 toast.success(response.data.message);
-                getPostsData(dispatch);
+                getSellerPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
@@ -384,7 +374,7 @@ const Community = () => {
                 setCategoryId(null);
                 setProductId(null);
                 setDefaultProductOption({ label: 'Choose Product', value: '' });
-                setDefaultCategoryOption({ label: 'All', value: '' });
+                setDefaultCategoryOption({ label: 'Choose Category', value: '' });
             }, 300);
         });
     }
@@ -399,122 +389,229 @@ const Community = () => {
         setCategoryId(null);
         setProductId(null);
         setDefaultProductOption({ label: 'Choose Product', value: '' });
-        setDefaultCategoryOption({ label: 'All', value: '' });
+        setDefaultCategoryOption({ label: 'Choose Category', value: '' });
     };
 
     const handleFilterCategory = () => {
-        const filtered = postsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
-        console.log("Filtred", filtered)
-        const dataToShow = filtered.length === 0 ? postsData : filtered;
+        const filtered = SellerPostsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
+        //console.log("Filtred", filtered)
+        const dataToShow = filtered.length === 0 ? SellerPostsData : filtered;
         setFilteredData(dataToShow);
     }
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file.size <= 5242880) { // 5MB limit
+            setImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImage(reader.result);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setImageFile(null);
+            setImage('');
+            toast.error("Image size must be less than 5 MB", { autoClose: 3000 });
+        }
+    };
+
+    const handleSave = async () => {
+        if (!imageFile) {
+            toast.error("Please select an image to upload", { autoClose: 3000 });
+            return;
+        }
+        setLoading(true);
+
+        const uploadImage = async () => {
+            const formData = new FormData();
+            formData.append("file", imageFile);
+            formData.append("upload_preset", "pay-earth-images");
+            formData.append("cloud_name", cloudName);
+            // Upload new image
+            try {
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await response.json();
+                // console.log("Cloudinary response:", data);
+                if (!data.secure_url || !data.public_id) {
+                    throw new Error('Invalid response from Cloudinary');
+                }
+                return data;
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                throw new Error('Error uploading image');
+            }
+        };
+
+        try {
+            const imageData = await uploadImage();
+            const formData = {
+                image: imageData.secure_url,
+                imageId: imageData.public_id,
+            };
+
+            // Save the image data to your database
+            await axios.put(`seller/editProfileImage/${authInfo.id}`, formData, {
+                headers: {
+                    'Accept': 'application/form-data',
+                    'Content-Type': 'application/json; charset=UTF-8',
+                    'Authorization': `Bearer ${authInfo.token}`
+                }
+            });
+            toast.success("Image uploaded successfully", { autoClose: 3000 });
+            setImage('');
+            setImageFile(null);
+        } catch (error) {
+            toast.error("Image upload failed at database . Please try again.", { autoClose: 3000 });
+        } finally {
+            setLoading(false);
+        }
+        handleClose();
+    };
+
+    //console.log("user imfo", userInfo)
     return (
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
-
             <div className='seller_body'>
-                <UserHeader />
-                {/* <Header /> */}
+                <Header />
                 <div className="cumm_page_wrap pt-5 pb-5">
                     <div className="container">
                         <div className="row">
-                            <div className="col-lg-9">
-                                <div className="createpost bg-white rounded-3">
-                                    <div className="cp_top d-flex justify-content-between align-items-center">
-                                        <div className="cumm_title">Create your post</div>
-                                        {isUpdate && ( 
-                                        <div className="close-icon" onClick={resetForm}>
-                                            <button type="button" class="btn-close" aria-label="Close"></button>
+                            <div className="col-lg-12">
+                                <div className="comm_profile">
+                                    <div className="post_by">
+                                        <div className="poster_img">
+                                            {/* <img src={userImg} alt="" /> */}
+                                            <img  src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg} alt="" /> 
+
                                         </div>
-                                        )}
+                                        <button
+                                            className="btn btn-dark"
+                                            onClick={handleShow}
+                                        >
+                                            <p>edit</p>
+                                        </button>
+                                        <div className="poster_info">
+                                            <div className="poster_name">{userInfo.name}</div>
+                                            <small>{userInfo.role}</small>
+                                        </div>
                                     </div>
-                                    <div className="cp_body">
-                                        <div className="com_user_acc">
-                                            <Link to='/community-profile'>
-                                                <div className="com_user_img"><img src={userInfo.imgUrl !== null && userInfo.imgUrl !== '' ? config.apiURI + userInfo.imgUrl : userImg} alt="" /></div>
-                                            </Link>
-                                            <div className="com_user_name">
-                                                <div className="cu_name">{userInfo.name}</div>
-                                                <select
-                                                    value={postStatus}
-                                                    onChange={e => setPostStatus(e.target.value)}
-                                                    className="form-select" name="" id="">
-                                                    <option value="Followers">Followers</option>
-                                                    <option value="Public">Public</option>
-                                                    {/* <option value="2">Only Me</option> */}
-                                                </select>
-                                            </div>
+                                    <ul>
+                                        <li>
+                                            <div className="fp_fc">{userInfo.community.followers}</div>
+                                            <small>Followers</small>
+                                        </li>
+                                        <li>
+                                            <div className="fp_fc">{userInfo.community.following}</div>
+                                            <small>Following</small>
+                                        </li>
+                                        <li>
+                                            <div className="fp_fc">{SellerPostsData.length}</div>
+                                            <small>Posts</small>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div className="col-lg-9">
+                                {isUpdate && (
+                                    <div className="createpost bg-white rounded-3">
+                                        <div className="cp_top  d-flex justify-content-between align-items-center">
+                                            <div className="cumm_title">Create your post</div>
+                                            {isUpdate && (
+                                                <div className="close-icon" onClick={resetForm}>
+                                                    <button type="button" className="btn-close" aria-label="Close"></button>
+                                                </div>
+                                            )}
                                         </div>
-                                        <div className="create_post_input">
-                                            {/* <div>
+                                        <div className="cp_body">
+                                            <div className="com_user_acc">
+                                                <Link to='/community-profile'>
+                                                    <div className="com_user_img"><img src={userInfo.imgUrl !== null && userInfo.imgUrl !== '' ? config.apiURI + userInfo.imgUrl : userImg} alt="" /></div>
+                                                </Link>
+                                                <div className="com_user_name">
+                                                    <div className="cu_name">{userInfo.name}</div>
+                                                    <select
+                                                        value={postStatus}
+                                                        onChange={e => setPostStatus(e.target.value)}
+                                                        className="form-select" name="" id="">
+                                                        <option value="Followers">Followers</option>
+                                                        <option value="Public">Public</option>
+                                                        {/* <option value="2">Only Me</option> */}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div className="create_post_input">
+                                                {/* <div>
                                                 <input type="text" className='form-control post_title' placeholder='Enter title' />
                                             </div> */}
-                                            {/* <InputEmoji
+                                                {/* <InputEmoji
                                                 value={text}
                                                 onChange={setText}
                                                 placeholder="What is on your mind ?"
                                             /> */}
-                                            <textarea
-                                                className="input-style"
-                                                value={inputStr}
-                                                onChange={e => setInputStr(e.target.value)}
-                                                placeholder="What's on your mind?"
-                                                rows="4" cols="50"
-                                            />
-                                            <img
-                                                className="emoji-icon"
-                                                src="https://icons.getbootstrap.com/assets/icons/emoji-smile.svg"
-                                                onClick={() => setShowPicker(val => !val)} />
-                                            <div className='picker-container'>
-                                                {showPicker && <Picker
-                                                    pickerStyle={{ width: '100%' }}
-                                                    onEmojiClick={onEmojiClick} />}
+                                                <textarea
+                                                    className="input-style"
+                                                    value={inputStr}
+                                                    onChange={e => setInputStr(e.target.value)}
+                                                    placeholder="What's on your mind?"
+                                                    rows="4" cols="50"
+                                                />
+                                                <img
+                                                    className="emoji-icon"
+                                                    src="https://icons.getbootstrap.com/assets/icons/emoji-smile.svg"
+                                                    onClick={() => setShowPicker(val => !val)} />
+                                                <div className='picker-container'>
+                                                    {showPicker && <Picker
+                                                        pickerStyle={{ width: '100%' }}
+                                                        onEmojiClick={onEmojiClick} />}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className='cp_box'>
-                                        {/* <div className='d-flex justify-content-center'>
+                                        <div className='cp_box'>
+                                            {/* <div className='d-flex justify-content-center'>
                                             <button className="btn  add_more_post" onClick={() => setAddMore(!addMore)}>{addMore ? 'Hide' : 'Add more to post'}</button>
                                         </div> */}
-                                        <div className="cp_preview_box">
-                                            <div className='mb-2 mt-2 video_preview'>
-                                                <ul className="load_imgs">
-                                                    {videoPreview.map((value, index) => {
-                                                        return <li key={index}>
-                                                            <Link to="#" className="delete_icon_btn" onClick={() => deleteVideoPreview(value)}><i className="fa fa-trash"></i></Link>
-                                                            <video controls>
-                                                                <source src={value} type="video/mp4" />
-                                                            </video>
-                                                        </li>
-                                                    })}
-                                                </ul>
-                                            </div>
+                                            <div className="cp_preview_box">
+                                                <div className='mb-2 mt-2 video_preview'>
+                                                    <ul className="load_imgs">
+                                                        {videoPreview.map((value, index) => {
+                                                            return <li key={index}>
+                                                                <Link to="#" className="delete_icon_btn" onClick={() => deleteVideoPreview(value)}><i className="fa fa-trash"></i></Link>
+                                                                <video controls>
+                                                                    <source src={value} type="video/mp4" />
+                                                                </video>
+                                                            </li>
+                                                        })}
+                                                    </ul>
+                                                </div>
 
-                                            <div className='mb-2 mt-2 img_preview'>
-                                                <ul className="load_imgs ">
-                                                    {preview.map((value, index) => {
-                                                        return <li key={index}>
-                                                            <Link to="#" className="delete_icon_btn" onClick={() => deleteImgPreview(value)}><i className="fa fa-trash"></i></Link>
-                                                            <img className='me-2' src={value} alt='..' />
-                                                        </li>
-                                                    })}
-                                                </ul>
+                                                <div className='mb-2 mt-2 img_preview'>
+                                                    <ul className="load_imgs ">
+                                                        {preview.map((value, index) => {
+                                                            return <li key={index}>
+                                                                <Link to="#" className="delete_icon_btn" onClick={() => deleteImgPreview(value)}><i className="fa fa-trash"></i></Link>
+                                                                <img className='me-2' src={value} alt='..' />
+                                                            </li>
+                                                        })}
+                                                    </ul>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div className='cp_foot'>
-                                            <div className={`cp_action_grp `}>
-                                                {!isUpdate && (
-                                                    <>
-                                                        <div className="cp_upload_btn cp_upload_img">
-                                                            <input type="file" id="post_img" accept="image/*" multiple={true} onChange={(event) => handlePreview(event)} />
-                                                        </div>
-                                                        <div className="cp_upload_btn cp_upload_video">
-                                                            <input type="file" id='post_video' accept="video/*" multiple onChange={(event) => handleVideoPreview(event)} />
-                                                        </div>
-                                                    </>
-                                                )}
-                                                {/* <select className="form-select form-select-lg cp_select mb-3" aria-label=".form-select category"  onChange={(event) => handleCategories(event)}>
+                                            <div className='cp_foot'>
+                                                <div className={`cp_action_grp `}>
+                                                    {!isUpdate && (
+                                                        <>
+                                                            <div className="cp_upload_btn cp_upload_img">
+                                                                <input type="file" id="post_img" accept="image/*" multiple={true} onChange={(event) => handlePreview(event)} />
+                                                            </div>
+                                                            <div className="cp_upload_btn cp_upload_video">
+                                                                <input type="file" id='post_video' accept="video/*" multiple onChange={(event) => handleVideoPreview(event)} />
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                    {/* <select className="form-select form-select-lg cp_select mb-3" aria-label=".form-select category"  onChange={(event) => handleCategories(event)}>
                                                     {
                                                         postCategories.map((value, index) => {
                                                             return (
@@ -525,8 +622,8 @@ const Community = () => {
                                                 </select>
                                                 <select  className="form-select form-select-lg cp_select mb-3" aria-label=".form-select Product" onChange={(event) => handleProducts(event)}>
                                                     {
-                                                     postProducts.length>0?
-                                                     postProducts.map((value,index)=>{
+                                                    postProducts.length>0?
+                                                    postProducts.map((value,index)=>{
                                                         return(
                                                             <option value={value.id} >{value.name}</option>
                                                         )
@@ -534,34 +631,35 @@ const Community = () => {
                                                     :<option value='' >Products</option>  
                                                     }
                                                 </select> */}
-                                                <Select
-                                                    className="sort_select text-normal "
-                                                    options={categoryOption}
-                                                    value={defaultCategoryOption}
-                                                    onChange={selectedOption => {
-                                                        handleCategories(selectedOption)
-                                                    }}
-                                                />
-                                                <Select
-                                                    className="sort_select text-normal"
-                                                    options={productOption}
-                                                    value={defaultProductOption}
-                                                    onChange={selectedOption => {
-                                                        handleProducts(selectedOption)
-                                                    }}
-                                                />
+                                                    <Select
+                                                        className="sort_select text-normal "
+                                                        options={categoryOption}
+                                                        value={defaultCategoryOption}
+                                                        onChange={selectedOption => {
+                                                            handleCategories(selectedOption)
+                                                        }}
+                                                    />
+                                                    <Select
+                                                        className="sort_select text-normal"
+                                                        options={productOption}
+                                                        value={defaultProductOption}
+                                                        onChange={selectedOption => {
+                                                            handleProducts(selectedOption)
+                                                        }}
+                                                    />
+                                                </div>
+                                                {isUpdate === true && <button className="btn custom_btn btn_yellow mx-auto" onClick={updatPost}> Update</button>}
+                                                {/* <button className="btn custom_btn btn_yellow mx-auto" onClick={() => createPost()} disabled={!inputStr.trim() && images.length === 0 && videos.length === 0 ? true : false} >Post</button> */}
                                             </div>
-                                            {isUpdate === true ? <button className="btn custom_btn btn_yellow mx-auto" onClick={updatPost}> Update</button> : <button className="btn custom_btn btn_yellow mx-auto" onClick={() => createPost()} disabled={!inputStr.trim() && images.length === 0 && videos.length === 0 ? true : false} >Post</button>}
-                                            {/* <button className="btn custom_btn btn_yellow mx-auto" onClick={() => createPost()} disabled={!inputStr.trim() && images.length === 0 && videos.length === 0 ? true : false} >Post</button> */}
                                         </div>
                                     </div>
-                                </div>
+                                )}
 
                                 {
                                     filteredData === null ? (
-                                        postsData.length > 0 ? (
+                                        SellerPostsData.length > 0 ? (
                                             <div>
-                                                {[...postsData]
+                                                {[...SellerPostsData]
                                                     .sort((a, b) => {
                                                         if (showMostLiked && showMostCommented) {
                                                             return b.likeCount - a.likeCount || b.comments.length - a.comments.length;
@@ -574,7 +672,7 @@ const Community = () => {
                                                         }
                                                     })
                                                     .map((value, index) => (
-                                                        <Post key={index} posts={value} sendEditData={handleEdit} />
+                                                        <SellerPost key={index} posts={value} sendEditData={handleEdit} />
                                                     ))}
                                             </div>
                                         ) : (
@@ -596,7 +694,7 @@ const Community = () => {
                                                         }
                                                     })
                                                     .map((value, index) => (
-                                                        <Post key={index} posts={value} sendEditData={handleEdit} />
+                                                        <SellerPost key={index} posts={value} sendEditData={handleEdit} />
                                                     ))}
                                             </div>
                                         ) : (
@@ -604,6 +702,7 @@ const Community = () => {
                                         )
                                     )
                                 }
+
                             </div>
 
                             {/* Filter */}
@@ -623,29 +722,6 @@ const Community = () => {
                                                 </option>
                                             ))}
                                         </select>
-
-                                        {/* <select className="form-select mb-3" aria-label="Default select example">
-                                            <option >Product</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
-                                        </select> */}
-
-
-                                        {/* <div className="form-check mb-3 mt-4">
-                                            <input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                value=""
-                                                id="latestPost"
-                                                checked={showMostLiked}
-                                                onChange={(e) => setShowMostLiked(e.target.checked)}
-                                            />
-                                            <label className="form-check-label" htmlFor="latestPost">
-                                                Latest Post
-                                            </label>
-                                        </div> */}
-
 
                                         <div className="form-check mb-3">
                                             <input
@@ -690,10 +766,53 @@ const Community = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* Modal */}
+                <div className={`modal fade ${showModal ? 'show d-block' : ''}`} tabIndex="-1" aria-labelledby="editImageModalLabel" aria-hidden={!showModal}>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title" id="editImageModalLabel">Edit Image</h5>
+                                <button type="button" className="btn-close" aria-label="Close" onClick={handleClose}></button>
+                            </div>
+                            <div className="modal-body">
+                                <form>
+                                    <div className="mb-3">
+                                        <label htmlFor="imageUpload" className="form-label">Upload New Image</label>
+                                        {/* <input className="form-control" type="file" id="imageUpload" /> */}
+                                        <div className='text-center formImage-pannel'>
+                                            {image ? <img src={image} alt='Preview' className="img-fluid" /> : <p>No image selected</p>}
+                                        </div>
+                                        <div className='formImageInput'>
+                                            <input
+                                                className="form-control mb-2"
+                                                style={{ height: "60px" }}
+                                                type="file"
+                                                name="featuredImg"
+                                                accept="image/*"
+                                                // value={values.featuredImg}
+                                                // value={this.state.featuredImg}
+                                                // onChange={(event) => {
+                                                //     handleChange("featuredImg")(event);
+                                                //     this.handleImageChange(event);
+                                                // }}
+                                                onChange={handleImageChange}
+                                            />
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-primary" onClick={handleSave}>Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <Footer />
             </div>
         </React.Fragment>
     );
 }
 
-export default Community;
+export default SellerProfile;

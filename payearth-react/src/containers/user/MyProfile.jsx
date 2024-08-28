@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 import { setUserInfo } from './../../store/reducers/auth-reducer';
 import SpinnerLoader from './../../components/common/SpinnerLoader';
 import store from '../../store/index';
+import userImg from '../../assets/images/user.png'
 import * as Yup from 'yup';
 
 class MyProfile extends Component {
@@ -146,7 +147,7 @@ class MyProfile extends Component {
     render() {
         const { loading } = store.getState().global;
         const { editProfile } = this.state;
-
+// console.log('this.state.userDetails----',this.state.userDetails)
         return (
             <React.Fragment>
                 { loading === true ? <SpinnerLoader /> : '' }
@@ -155,6 +156,31 @@ class MyProfile extends Component {
                 <section className="inr_wrap">
                     <div className="container">
                         <div className="row">
+                        <div className="col-lg-12">
+                                <div className="comm_profile">
+                                    <div className="post_by">
+                                        <div className="poster_img"><img src={userImg} alt="" /></div>
+                                        <div className="poster_info">
+                                            <div className="poster_name">{ this.state.userDetails.name}</div>
+                                            {/* <small>{userInfo.role}</small> */}
+                                        </div>
+                                    </div>
+                                    <ul>
+                                        <li>
+                                            <div className="fp_fc">{this.state.userDetails?.community?.followers || 0}</div>
+                                            <small>Followers</small>
+                                        </li>
+                                        <li>
+                                            <div className="fp_fc">{this.state.userDetails?.community?.following || 0}</div>
+                                            <small>Following</small>
+                                        </li>
+                                        {/* <li>
+                                            <div className="fp_fc">{SellerPostsData.length}</div>
+                                            <small>Posts</small>
+                                        </li> */}
+                                    </ul>
+                                </div>
+                            </div>
                             <div className="col-md-12">
                                 <div className="cart">
                                     <div className="cart_wrap">

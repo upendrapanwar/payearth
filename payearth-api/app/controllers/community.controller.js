@@ -56,7 +56,7 @@ const fileFilterVideo = function (req, file, cb) {
 var uploadPostVideos = multer({ storage: storagePostVideo, fileFilter: fileFilterVideo }).any();
 
 //Routes
-// router.get('/front/posts', getPosts);
+router.get('/front/profile/posts/:id', getProfilePosts);
 router.get('/front/posts/:id', getPosts);
 router.post('/posts', addPost);
 router.post('/postImages/:id', uploadPostImages, addPostImages);
@@ -69,6 +69,7 @@ router.post('/unfollowUser', unfollowUser);
 router.put('/postRemoved', postDelete);
 router.put('/updatePost', updatePost);
 router.get("/getPostById/:id", getPostById);
+router.post("/createPostReport", createPostReport)
 
 // router.post('/follow-request', sendFollowRequest);
 router.get('/front/categories', getCategories);
@@ -77,6 +78,13 @@ router.get('/front/products/:id', getProductsByCatId);
 
 
 module.exports = router;
+
+function getProfilePosts(req, res, next) {
+    console.log('api run')
+    communityService.getProfilePosts(req)
+        .then(result => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message:'No data found', data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
 
 function getPosts(req, res, next) {
 
@@ -164,6 +172,13 @@ function getPostById(req, res, next) {
     communityService.getPostById(req)
         .then(result => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function createPostReport(req, res, next) {
+
+    communityService.createPostReport(req)
+        .then(result => result ? res.status(201).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.post.add.error }))
+        .catch(err => next(res.status(400).json({ status: false, message: err })));
 }
 
 function sendFollowRequest(req, res, next) {

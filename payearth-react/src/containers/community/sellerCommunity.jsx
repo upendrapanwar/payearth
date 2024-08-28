@@ -48,6 +48,10 @@ const SellerCommunity = () => {
     const [showPicker, setShowPicker] = useState(false);
     const [isUpdate, setIsUpdate] = useState(false);
     const [postUpdateId, setPostUpdateId] = useState(null)
+    const [selectFilterCategory, setSelectFilterCategory] = useState(null);
+    const [showMostLiked, setShowMostLiked] = useState(false);
+    const [showMostCommented, setShowMostCommented] = useState(false);
+    const [filteredData, setFilteredData] = useState(SellerPostsData);
 
     const onEmojiClick = (event, emojiObject) => {
         setInputStr(prevInput => prevInput + emojiObject.emoji);
@@ -398,6 +402,13 @@ const SellerCommunity = () => {
         setDefaultCategoryOption({ label: 'Choose Category', value: '' });
     };
 
+    const handleFilterCategory = () => {
+        const filtered = SellerPostsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
+        console.log("Filtred", filtered)
+        const dataToShow = filtered.length === 0 ? SellerPostsData : filtered;
+        setFilteredData(dataToShow);
+    }
+
     return (
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
@@ -406,15 +417,15 @@ const SellerCommunity = () => {
                 <div className="cumm_page_wrap pt-5 pb-5">
                     <div className="container">
                         <div className="row">
-                            <div className="col-lg-12">
+                            <div className="col-lg-9">
                                 <div className="createpost bg-white rounded-3">
                                     <div className="cp_top  d-flex justify-content-between align-items-center">
                                         <div className="cumm_title">Create your post</div>
-                                        {/* {isUpdate && ( */}
+                                        {isUpdate && (
                                             <div className="close-icon" onClick={resetForm}>
                                                 <button type="button" class="btn-close" aria-label="Close"></button>
                                             </div>
-                                         {/* )} */}
+                                        )}
                                     </div>
                                     <div className="cp_body">
                                         <div className="com_user_acc">
@@ -543,7 +554,7 @@ const SellerCommunity = () => {
                                         </div>
                                     </div>
                                 </div>
-                                {
+                                {/* {
                                     SellerPostsData.length > 0 ?
                                         <div>
                                             {SellerPostsData.map((value, index) => {
@@ -553,59 +564,115 @@ const SellerCommunity = () => {
                                             })}
                                         </div>
                                         : <NotFound msg="Data not found." />
-                                }
+                                } */}
                                 {/* <PostListing/> */}
+                                {
+                                    filteredData === null ? (
+                                        SellerPostsData.length > 0 ? (
+                                            <div>
+                                                {[...SellerPostsData]
+                                                    .sort((a, b) => {
+                                                        if (showMostLiked && showMostCommented) {
+                                                            return b.likeCount - a.likeCount || b.comments.length - a.comments.length;
+                                                        } else if (showMostLiked) {
+                                                            return b.likeCount - a.likeCount;
+                                                        } else if (showMostCommented) {
+                                                            return b.comments.length - a.comments.length;
+                                                        } else {
+                                                            return 0; // No sorting
+                                                        }
+                                                    })
+                                                    .map((value, index) => (
+                                                        <SellerPost key={index} posts={value} sendEditData={handleEdit} />
+                                                    ))}
+                                            </div>
+                                        ) : (
+                                            <NotFound msg="Data not found." />
+                                        )
+                                    ) : (
+                                        filteredData.length > 0 ? (
+                                            <div>
+                                                {[...filteredData]
+                                                    .sort((a, b) => {
+                                                        if (showMostLiked && showMostCommented) {
+                                                            return b.likeCount - a.likeCount || b.comments.length - a.comments.length;
+                                                        } else if (showMostLiked) {
+                                                            return b.likeCount - a.likeCount;
+                                                        } else if (showMostCommented) {
+                                                            return b.comments.length - a.comments.length;
+                                                        } else {
+                                                            return 0; // No sorting
+                                                        }
+                                                    })
+                                                    .map((value, index) => (
+                                                        <SellerPost key={index} posts={value} sendEditData={handleEdit} />
+                                                    ))}
+                                            </div>
+                                        ) : (
+                                            <NotFound msg="Data not found." />
+                                        )
+                                    )
+                                }
                                 
                             </div>
 
                             {/* Filter */}
-                            {/* <div className="col-lg-3">
+                            <div className="col-lg-3">
                                 <div className="cumm_sidebar_box bg-white p-3 rounded-3">
                                     <div className="cumm_title">advanced filter</div>
                                     <div className="filter_box">
-                                        <select className="form-select mb-3" aria-label="Default select example">
-                                            <option >Category</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
+                                        <select
+                                            className="form-select mb-3"
+                                            aria-label="Default select example"
+                                            onChange={(e) => setSelectFilterCategory(e.target.value)}
+                                            value={selectFilterCategory}
+                                        >
+                                            {categoryOption.map(category => (
+                                                <option key={category.value} value={category.value} >
+                                                    {category.label}
+                                                </option>
+                                            ))}
                                         </select>
-                                        <select className="form-select mb-3" aria-label="Default select example">
-                                            <option >Product</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
-                                        </select>
-                                        <div className="form-check mb-3 mt-4">
-                                            <input className="form-check-input" type="checkbox" value="" id="latestPost" />
-                                            <label className="form-check-label" htmlFor="latestPost">
-                                                Latest Post
-                                            </label>
-                                        </div>
                                         <div className="form-check mb-3">
-                                            <input className="form-check-input" type="checkbox" value="" id="popularPost" />
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                value=""
+                                                id="popularPost"
+                                                checked={showMostLiked}
+                                                onChange={(e) => setShowMostLiked(e.target.checked)}
+                                            // onChange={setShowMostLiked}
+                                            />
                                             <label className="form-check-label" htmlFor="popularPost">
                                                 Most Popular Post
                                             </label>
                                         </div>
                                         <div className="form-check mb-3">
-                                            <input className="form-check-input" type="checkbox" value="" id="CommentedPost" />
+                                            <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                value=""
+                                                id="CommentedPost"
+                                                checked={showMostCommented}
+                                                onChange={(e) => setShowMostCommented(e.target.checked)}
+                                            />
                                             <label className="form-check-label" htmlFor="CommentedPost">
                                                 Most Commented Post
                                             </label>
                                         </div>
 
                                         <div className="filter_btn_box">
-                                            <Link to="#" className="btn custom_btn btn_yellow_bordered">Filter</Link>
+                                            <Link
+                                                to="#"
+                                                className="btn custom_btn btn_yellow_bordered"
+                                                onClick={handleFilterCategory}
+                                            >
+                                                Filter
+                                            </Link>
                                         </div>
                                     </div>
-                                    &nbsp;
-                                    {/* <BannerIframe2 /> */}
-                            {/* <div className='sideBanner'>
-                                        <BannerIframe2 />
-                                    </div> */}
-
-                            {/* </div>
-                            </div> */}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
