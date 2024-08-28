@@ -115,7 +115,7 @@ const SellerProfile = () => {
     }
     const createPost = async () => {
         // console.log("authInfo Seller or User", authInfo.token);
-        console.log("postStatus", postStatus)
+       // console.log("postStatus", postStatus)
         const token = authInfo.token;
         setAddMore(false);
         let reqBody = {
@@ -273,7 +273,7 @@ const SellerProfile = () => {
     //     setCategoryId(event.target.value);
     // };
     const handleCategories = (selectedOption) => {
-        console.log("HandleCategory select option", selectedOption)
+       // console.log("HandleCategory select option", selectedOption)
         setDefaultCategoryOption(selectedOption);
         setDefaultProductOption({ label: 'Choose Product', value: '' });
         setCategoryId(selectedOption.value);
@@ -289,7 +289,7 @@ const SellerProfile = () => {
     //     console.log(event.target.value);
     // }
     const handleProducts = (selectedOption) => {
-        console.log("selectedProdOption", selectedOption)
+       // console.log("selectedProdOption", selectedOption)
         setDefaultProductOption(selectedOption);
         setProductId(selectedOption.value);
     }
@@ -322,7 +322,7 @@ const SellerProfile = () => {
     }, []);
 
     const handleEdit = (data) => {
-        console.log("Data for edit test ###$$#$$#$#$#", data)
+        //console.log("Data for edit test ###$$#$$#$#$#", data)
         setIsUpdate(true);
         const selectedCatOption = {
             label: data.categoryId === null ? null : data.categoryId.categoryName,
@@ -394,7 +394,7 @@ const SellerProfile = () => {
 
     const handleFilterCategory = () => {
         const filtered = SellerPostsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
-        console.log("Filtred", filtered)
+        //console.log("Filtred", filtered)
         const dataToShow = filtered.length === 0 ? SellerPostsData : filtered;
         setFilteredData(dataToShow);
     }
@@ -420,7 +420,6 @@ const SellerProfile = () => {
             toast.error("Please select an image to upload", { autoClose: 3000 });
             return;
         }
-
         setLoading(true);
 
         const uploadImage = async () => {
@@ -428,29 +427,23 @@ const SellerProfile = () => {
             formData.append("file", imageFile);
             formData.append("upload_preset", "pay-earth-images");
             formData.append("cloud_name", cloudName);
-
             // Upload new image
             try {
                 const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
                     method: "POST",
                     body: formData
                 });
-                
                 const data = await response.json();
-               // console.log("Cloudinary response:", data);
-    
+                // console.log("Cloudinary response:", data);
                 if (!data.secure_url || !data.public_id) {
                     throw new Error('Invalid response from Cloudinary');
                 }
-    
                 return data;
-                
             } catch (error) {
                 console.error('Error uploading image:', error);
                 throw new Error('Error uploading image');
             }
         };
-    
 
         try {
             const imageData = await uploadImage();
@@ -478,7 +471,7 @@ const SellerProfile = () => {
         handleClose();
     };
 
-    console.log("user imfo", userInfo)
+    //console.log("user imfo", userInfo)
     return (
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}

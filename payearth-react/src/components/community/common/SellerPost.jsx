@@ -223,10 +223,9 @@ const SellerPost = ({ posts, sendEditData }) => {
             let likes = posts.likes;
             let filteredLikes = [];
             likes.forEach((value) => {
-                if (value.isSeller) {
+                if (value.isSeller === true && value.sellerId?.id) {
                     filteredLikes.push(value.sellerId.id);
-                }
-                else {
+                } else if (value.userId?.id) {
                     filteredLikes.push(value.userId.id);
                 }
             });
