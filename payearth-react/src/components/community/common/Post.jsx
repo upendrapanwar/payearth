@@ -223,10 +223,9 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             let likes = posts.likes;
             let filteredLikes = [];
             likes.forEach((value) => {
-                if (value.isSeller) {
+                if (value.isSeller === true && value.sellerId?.id) {
                     filteredLikes.push(value.sellerId.id);
-                }
-                else {
+                } else if (value.userId?.id) {
                     filteredLikes.push(value.userId.id);
                 }
             });
@@ -405,7 +404,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                 response = posts.adminId.community.followerData.includes(authInfo.id);
             }
 
-            console.log("response", response);
+           // console.log("response", response);
             setIsFollowing(response);
 
         };
@@ -463,7 +462,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
     const handleReportPost = async () => {
         try {
             const data = reportedPost;
-            console.log("reportedPost send to admin", data)
+           // console.log("reportedPost send to admin", data)
             const headers = {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${authInfo.token}` // Replace authInfo.token with your actual token variable
@@ -477,7 +476,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                 },
                 reportBy: authInfo.id
             }, { headers });
-            console.log("response", response.data)
+           // console.log("response", response.data)
             
             toast.success("Report Succesfully");
             setIsReportOpen(false);
