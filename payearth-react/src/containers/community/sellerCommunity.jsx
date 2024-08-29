@@ -51,7 +51,7 @@ const SellerCommunity = () => {
     const [selectFilterCategory, setSelectFilterCategory] = useState(null);
     const [showMostLiked, setShowMostLiked] = useState(false);
     const [showMostCommented, setShowMostCommented] = useState(false);
-    const [filteredData, setFilteredData] = useState(SellerPostsData);
+    const [filteredData, setFilteredData] = useState(null);
 
     const onEmojiClick = (event, emojiObject) => {
         setInputStr(prevInput => prevInput + emojiObject.emoji);
@@ -117,8 +117,8 @@ const SellerCommunity = () => {
             is_seller: true,
             is_admin: false,
             parent_id: null,
-            postImages:images,
-            postVideos:videos,
+            postImages: images,
+            postVideos: videos,
         };
 
         // if (userInfo.role === 'user') {
@@ -412,7 +412,7 @@ const SellerCommunity = () => {
     return (
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
-            <div className='seller_body'>        
+            <div className='seller_body'>
                 <Header />
                 <div className="cumm_page_wrap pt-5 pb-5">
                     <div className="container">
@@ -502,16 +502,16 @@ const SellerCommunity = () => {
                                         </div>
                                         <div className='cp_foot'>
                                             <div className={`cp_action_grp `}>
-                                            {!isUpdate && (
-                                                <>
-                                                <div className="cp_upload_btn cp_upload_img">
-                                                    <input type="file" id="post_img" accept="image/*" multiple={true} onChange={(event) => handlePreview(event)} />
-                                                </div>
-                                                <div className="cp_upload_btn cp_upload_video">
-                                                    <input type="file" id='post_video' accept="video/*" multiple onChange={(event) => handleVideoPreview(event)} />
-                                                </div>
-                                                </>
-                                            )}
+                                                {!isUpdate && (
+                                                    <>
+                                                        <div className="cp_upload_btn cp_upload_img">
+                                                            <input type="file" id="post_img" accept="image/*" multiple={true} onChange={(event) => handlePreview(event)} />
+                                                        </div>
+                                                        <div className="cp_upload_btn cp_upload_video">
+                                                            <input type="file" id='post_video' accept="video/*" multiple onChange={(event) => handleVideoPreview(event)} />
+                                                        </div>
+                                                    </>
+                                                )}
                                                 {/* <select className="form-select form-select-lg cp_select mb-3" aria-label=".form-select category"  onChange={(event) => handleCategories(event)}>
                                                     {
                                                         postCategories.map((value, index) => {
@@ -613,7 +613,7 @@ const SellerCommunity = () => {
                                         )
                                     )
                                 }
-                                
+
                             </div>
 
                             {/* Filter */}

@@ -51,7 +51,9 @@ const Community = () => {
     const [selectFilterCategory, setSelectFilterCategory] = useState(null);
     const [showMostLiked, setShowMostLiked] = useState(false);
     const [showMostCommented, setShowMostCommented] = useState(false);
-    const [filteredData, setFilteredData] = useState(postsData);
+    // const [filteredData, setFilteredData] = useState(postsData);
+    const [filteredData, setFilteredData] = useState(null);
+
 
 
     const onEmojiClick = (event, emojiObject) => {
@@ -423,10 +425,10 @@ const Community = () => {
                                 <div className="createpost bg-white rounded-3">
                                     <div className="cp_top d-flex justify-content-between align-items-center">
                                         <div className="cumm_title">Create your post</div>
-                                        {isUpdate && ( 
-                                        <div className="close-icon" onClick={resetForm}>
-                                            <button type="button" class="btn-close" aria-label="Close"></button>
-                                        </div>
+                                        {isUpdate && (
+                                            <div className="close-icon" onClick={resetForm}>
+                                                <button type="button" class="btn-close" aria-label="Close"></button>
+                                            </div>
                                         )}
                                     </div>
                                     <div className="cp_body">
