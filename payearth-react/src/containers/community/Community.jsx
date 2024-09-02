@@ -25,7 +25,6 @@ const Community = () => {
     const authInfo = useSelector(state => state.auth.authInfo);
     const loading = useSelector(state => state.global.loading);
     const postsData = useSelector(state => state.post.postsData);
-    console.log("Posts", postsData)
     const postCategories = useSelector(state => state.post.postCategories);
     const postProducts = useSelector(state => state.post.postProducts);
     const dispatch = useDispatch();
@@ -51,7 +50,9 @@ const Community = () => {
     const [selectFilterCategory, setSelectFilterCategory] = useState(null);
     const [showMostLiked, setShowMostLiked] = useState(false);
     const [showMostCommented, setShowMostCommented] = useState(false);
-    const [filteredData, setFilteredData] = useState(postsData);
+    // const [filteredData, setFilteredData] = useState(postsData);
+    const [filteredData, setFilteredData] = useState(null);
+
 
 
     const onEmojiClick = (event, emojiObject) => {
@@ -404,7 +405,10 @@ const Community = () => {
 
     const handleFilterCategory = () => {
         const filtered = postsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
-        console.log("Filtred", filtered)
+        // console.log("Filtred", filtered)
+        // if (filtered.length === 0) {
+        //     toast("Data not found, Showing all data");
+        // }
         const dataToShow = filtered.length === 0 ? postsData : filtered;
         setFilteredData(dataToShow);
     }
@@ -423,10 +427,10 @@ const Community = () => {
                                 <div className="createpost bg-white rounded-3">
                                     <div className="cp_top d-flex justify-content-between align-items-center">
                                         <div className="cumm_title">Create your post</div>
-                                        {isUpdate && ( 
-                                        <div className="close-icon" onClick={resetForm}>
-                                            <button type="button" class="btn-close" aria-label="Close"></button>
-                                        </div>
+                                        {isUpdate && (
+                                            <div className="close-icon" onClick={resetForm}>
+                                                <button type="button" class="btn-close" aria-label="Close"></button>
+                                            </div>
                                         )}
                                     </div>
                                     <div className="cp_body">
@@ -564,11 +568,11 @@ const Community = () => {
                                                 {[...postsData]
                                                     .sort((a, b) => {
                                                         if (showMostLiked && showMostCommented) {
-                                                            return b.likeCount - a.likeCount || b.comments.length - a.comments.length;
+                                                            return b.likeCount - a.likeCount || b.commentCount - a.commentCount;
                                                         } else if (showMostLiked) {
                                                             return b.likeCount - a.likeCount;
                                                         } else if (showMostCommented) {
-                                                            return b.comments.length - a.comments.length;
+                                                            return b.commentCount - a.commentCount;
                                                         } else {
                                                             return 0; // No sorting
                                                         }
@@ -586,11 +590,11 @@ const Community = () => {
                                                 {[...filteredData]
                                                     .sort((a, b) => {
                                                         if (showMostLiked && showMostCommented) {
-                                                            return b.likeCount - a.likeCount || b.comments.length - a.comments.length;
+                                                            return b.likeCount - a.likeCount || b.commentCount - a.commentCount;
                                                         } else if (showMostLiked) {
                                                             return b.likeCount - a.likeCount;
                                                         } else if (showMostCommented) {
-                                                            return b.comments.length - a.comments.length;
+                                                            return b.commentCount - a.commentCount;
                                                         } else {
                                                             return 0; // No sorting
                                                         }
