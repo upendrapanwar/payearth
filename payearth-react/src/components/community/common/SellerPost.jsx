@@ -24,8 +24,8 @@ import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en.json'
 import ru from 'javascript-time-ago/locale/ru.json'
 
-TimeAgo.addDefaultLocale(en)
-TimeAgo.addLocale(ru)
+// TimeAgo.addDefaultLocale(en)
+// TimeAgo.addLocale(ru)
 
 
 const SellerPost = ({ posts, sendEditData }) => {
@@ -465,29 +465,66 @@ const SellerPost = ({ posts, sendEditData }) => {
     const handleReportPost = async () => {
         try {
             const data = reportedPost;
-            console.log("reportedPost send to admin", data)
+            console.log("Reported post sent to admin:", data);
+
             const headers = {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authInfo.token}` // Replace authInfo.token with your actual token variable
+                'Authorization': `Bearer ${authInfo.token}` // Ensure authInfo.token is correctly set
             };
-            const response = await axios.post('seller/createPostReport', {
-                reportType: reportOption,
-                notes: reportNote,
-                reportData: {
-                    postId: data.id,
-                    postCreatedBy: data.userId === null ? data.sellerId.id : data.userId.id,
-                },
-                reportBy: authInfo.id
-            }, { headers });
-            console.log("response", response.data)
 
-            toast.success("Report Succesfully");
-            setIsReportOpen(false);
-            // alert(response.data.message);
+            const reportData = {
+                postId: data.id,
+                postCreatedBy: data.userId ? data.userId.id : data.sellerId.id, // Use a more concise conditional expression
+            };
+
+            const response = await axios.post(
+                'seller/createPostReport',
+                {
+                    reportType: reportOption,
+                    notes: reportNote,
+                    reportData,
+                    reportBy: authInfo.id
+                },
+                { headers }
+            );
+            if (response.data.status === true) {
+                toast.success("Report Successfully sent");
+                setIsReportOpen(false);
+            } else {
+                toast.error("Failed to send report. Please try again.");
+            }
         } catch (error) {
             console.error('Error reporting post:', error);
+            toast.error("An error occurred while reporting the post.");
         }
-    }
+    };
+
+    // const handleReportPost = async () => {
+    //     try {
+    //         const data = reportedPost;
+    //         console.log("reportedPost send to admin", data)
+    //         const headers = {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': `Bearer ${authInfo.token}` // Replace authInfo.token with your actual token variable
+    //         };
+    //         const response = await axios.post('seller/createPostReport', {
+    //             reportType: reportOption,
+    //             notes: reportNote,
+    //             reportData: {
+    //                 postId: data.id,
+    //                 postCreatedBy: data.userId === null ? data.sellerId.id : data.userId.id,
+    //             },
+    //             reportBy: authInfo.id
+    //         }, { headers });
+    //         console.log("response", response.data)
+
+    //         toast.success("Report Succesfully");
+    //         setIsReportOpen(false);
+    //         // alert(response.data.message);
+    //     } catch (error) {
+    //         console.error('Error reporting post:', error);
+    //     }
+    // }
 
     const handleNoteChange = (e) => {
         setReportNote(e.target.value);
