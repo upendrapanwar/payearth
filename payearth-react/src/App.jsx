@@ -123,7 +123,7 @@ import ManageVendors from "./containers/admin/ManageVendors";
 import SellerNotifications from "./containers/seller/Notifications";
 import Community from "./containers/community/Community";
 import CommunityProfile from "./containers/community/CommunityProfile";
-import SellerProfile from "./containers/community/sellerProfile";
+import SellerProfile from "./containers/community/SellerProfile";
 import SharePostData from "./components/community/common/SharePostData";
 import SellerSharePostData from "./components/community/common/SellerSharePostData";
 import AdminSharePostData from "./components/community/common/AdminSharePostData";
