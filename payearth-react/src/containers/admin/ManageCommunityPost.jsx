@@ -1,21 +1,22 @@
 import React, { useRef, useState } from 'react';
-import userImg from '../../../assets/images/user.png'
-import closeIcon from '../../../assets/icons/close_icon.svg'
+import userImg from '../../assets/images/user.png'
 import Modal from "react-bootstrap/Modal";
-import post from '../../../assets/images/posts/post_img.jpg'
+import closeIcon from '../../assets/icons/close_icon.svg'
+import post from '../../assets/images/posts/post_img.jpg'
 import { Link } from 'react-router-dom';
-import config from '../../../config.json'
-import videoPlay from '../../../assets/icons/video_play_icon.svg'
-import redHeartIcon from '../../../assets/icons/red-heart-icon-filled.svg'
-import heartIconBordered from '../../../assets/icons/heart-icon-bordered.svg';
+import config from '../../config.json'
+import videoPlay from '../../assets/icons/video_play_icon.svg'
+import redHeartIcon from '../../assets/icons/red-heart-icon-filled.svg'
+import heartIconBordered from '../../assets/icons/heart-icon-bordered.svg';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-import SpinnerLoader from '../../../components/common/SpinnerLoader';
-import { setLoading } from '../../../store/reducers/global-reducer';
-import { getPostsData } from '../../../helpers/post-listing';
+// import SpinnerLoader from '../../common/SpinnerLoader';
+import { setLoading } from '../../store/reducers/global-reducer';
+// import { getPostsData } from '../../../helpers/post-listing';
+// import { getSellerPostsData } from '../../helpers/sellerPost-listing';
 import SimpleImageSlider from "react-simple-image-slider";
 import ReactTimeAgo from 'react-time-ago'
 import TimeAgo from 'javascript-time-ago'
@@ -27,9 +28,9 @@ TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
 
 
-const Post = ({ posts, sendEditData, sendShareData }) => {
+const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
 
-    // console.log("all posts", posts)
+    console.log("all posts of this page----------", posts)
 
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
@@ -57,6 +58,8 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
     const [reportedPost, setReportedPost] = useState(null);
     const [reportNote, setReportNote] = useState(null);
     const [reportOption, setReportOption] = useState(null);
+
+
     const date = new Date(posts.createdAt);
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
@@ -65,25 +68,42 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
     }
     const addNewComment = (postId) => {
         let reqBody = {};
-        if (userInfo.role === 'user') {
-            reqBody = {
-                content: comments,
-                isSeller: false,
-                user_id: authInfo.id,
-                seller_id: null
-            }
-        }
-        else {
+        if (userInfo.role === 'seller') {
             reqBody = {
                 content: comments,
                 isSeller: true,
+                isAdmin: false,
                 user_id: null,
-                seller_id: authInfo.id
-            }
+                seller_id: authInfo.id,
+                admin_id: null,
+                user: 'seller',
+            };
+        }
+        else if (userInfo.role === 'user') {
+            reqBody = {
+                content: comments,
+                isSeller: false,
+                isAdmin: false,
+                user_id: authInfo.id,
+                seller_id: null,
+                admin_id: null,
+                user: 'user',
+            };
+        }
+        else if (userInfo.role === 'admin') {
+            reqBody = {
+                content: comments,
+                isSeller: false,
+                isAdmin: true,
+                user_id: null,
+                seller_id: null,
+                admin_id: authInfo.id,
+                user: 'admin',
+            };
         }
         setComments('');
         dispatch(setLoading({ loading: true }))
-        axios.post(`community/postComments/${postId}`, reqBody, {
+        axios.post(`admin/postComments/${postId}`, reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -93,7 +113,8 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             if (response.data.status) {
                 setCommentsCount(commentsCount + 1);
                 let res = response.data.data
-                getPostsData(dispatch);
+                getPosts();
+                // getSellerPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
@@ -126,7 +147,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                 seller_id: authInfo.id
             }
         }
-        axios.post(`community/postLikes/${postId}`, reqBody, {
+        axios.post(`seller/postLikes/${postId}`, reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -134,7 +155,8 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             }
         }).then(response => {
             if (response.data.status) {
-                getPostsData(dispatch);
+                // getSellerPostsData(dispatch);
+                getPosts();
             }
         }).catch(error => {
             console.log(error);
@@ -146,15 +168,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
         liked.push(authInfo.id);
         setFilteredLikes(liked);
         let reqBody = {};
-        if (userInfo.role === 'user') {
-            reqBody = {
-                isLike: filteredLikes.includes(authInfo.id),
-                isSeller: false,
-                user_id: authInfo.id,
-                seller_id: null
-            }
-        }
-        else {
+        if (userInfo.role === 'seller') {
             reqBody = {
                 isLike: filteredLikes.includes(authInfo.id),
                 isSeller: true,
@@ -162,7 +176,15 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                 seller_id: authInfo.id
             }
         }
-        axios.post(`community/postLikes/${postId}`, reqBody, {
+        else {
+            reqBody = {
+                isLike: filteredLikes.includes(authInfo.id),
+                isSeller: false,
+                user_id: authInfo.id,
+                seller_id: null
+            }
+        }
+        axios.post(`seller/postLikes/${postId}`, reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -170,7 +192,8 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             }
         }).then(response => {
             if (response.data.status) {
-                getPostsData(dispatch);
+                // getSellerPostsData(dispatch);
+                getPosts();
             }
         }).catch(error => {
             console.log(error);
@@ -314,7 +337,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             currentUserId: currentUserId,
             userIdToFollow: userIdToFollow,
         }
-        axios.post(`community/follow-user`, reqBody, {
+        axios.post(`seller/follow-user`, reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -322,7 +345,8 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             }
         }).then(response => {
             if (response.data.status) {
-                getPostsData(dispatch);
+                // getSellerPostsData(dispatch);
+                getPosts();
                 setIsFollowing(true);
                 // console.log("response", response.data.message);
                 toast.success(response.data.message);
@@ -343,7 +367,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             currentUserId: currentUserId,
             userIdToUnfollow: userIdToUnfollow,
         }
-        axios.post(`community/unfollowUser`, reqBody, {
+        axios.post(`seller/unfollowUser`, reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -354,7 +378,8 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                 // console.log("response", response.data.message);
                 toast.success(response.data.message);
                 setIsFollowing(false);
-                getPostsData(dispatch);
+                getPosts();
+                // getSellerPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
@@ -365,7 +390,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
         var reqBody = {
             postId: postId,
         }
-        axios.put(`community/postRemoved`, reqBody, {
+        axios.put(`admin/postRemoved`, reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -374,7 +399,8 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
         }).then(response => {
             if (response.data.status) {
                 toast.success(response.data.message);
-                getPostsData(dispatch);
+                // getSellerPostsData(dispatch);
+                getPosts();
             }
         }).catch(error => {
             console.log(error);
@@ -409,7 +435,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
 
         };
         fetchData();
-        getPostsData(dispatch);
+        // getSellerPostsData(dispatch);
     }, []);
 
     const handleShare = () => {
@@ -442,7 +468,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
 
     const handleWhatsappShare = (postId) => {
         // const { shareAdvertise } = this.state;
-        const caption = encodeURIComponent(`https://pay.earth/share_community/${postId}`);
+        const caption = encodeURIComponent(`https://pay.earth/admin_share_community/${postId}`);
         // const caption = encodeURIComponent(`https://localhost:3000/share_community/${postId}`);
         const whatsappShareUrl = `https://api.whatsapp.com/send?text=${caption}`;
         window.open(whatsappShareUrl, '_blank');
@@ -462,12 +488,12 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
     const handleReportPost = async () => {
         try {
             const data = reportedPost;
-            // console.log("reportedPost send to admin", data)
+            //console.log("reportedPost send to admin", data)
             const headers = {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${authInfo.token}` // Replace authInfo.token with your actual token variable
             };
-            const response = await axios.post('community/createPostReport', {
+            const response = await axios.post('seller/createPostReport', {
                 reportType: reportOption,
                 notes: reportNote,
                 reportData: {
@@ -520,21 +546,18 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                 Follow
                             </Link> */}
                             {
-                                userInfo.role === 'seller' && posts.isAdmin === false &&
+                                userInfo.role === 'seller' &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
                                     {posts.isSeller === true && posts.sellerId.id === authInfo.id
                                         ? "" : isFollowing ? 'Unfollow' : 'Follow'}
+                                    {/* {posts.isSeller === false && posts.userId.id === authInfo.id ? "" : 'Follow'} */}
                                 </Link>
                             }
                             {
-                                userInfo.role === 'user' && posts.isAdmin === false &&
+                                userInfo.role === 'user' &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
                                     {posts.isSeller === false && posts.userId.id === authInfo.id ? "" : isFollowing ? 'Unfollow' : 'Follow'}
                                 </Link>
-                            }
-                            {
-                                posts.isAdmin === true &&
-                                <span className="post_admin text-success">Admin</span>
                             }
                         </div>
                     </div>
@@ -563,7 +586,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                                 <small>Following</small>
                                             </li>
                                             <li>
-                                                <div className="fp_fc">02</div>
+                                                <div className="fp_fc">00</div>
                                                 <small>Posts</small>
                                             </li>
 
@@ -630,28 +653,28 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                     {/* slider end */}
                     <div className='post_img_box container'>
                         <div className='row post_img_internal_box'>
-                            {posts.postImages.slice(0, 2).map((image, ind) => {
+                            {posts.postImages.slice(0, 2).map((image, index) => {
                                 return (
                                     <>
-                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-6'}`} key={ind} onClick={() => handleSliderShow(image)}>
+                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-6'}`} key={`image-${index}`} onClick={() => handleSliderShow(image)}>
                                             <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
                                         </div>
                                     </>
                                 )
                             })}
-                            {posts.postImages.slice(2, 4).map((image, ind) => {
+                            {posts.postImages.slice(2, 4).map((image, index) => {
                                 return (
                                     <>
-                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(image)}>
+                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={`image-${index + 2}`} onClick={() => handleSliderShow(image)}>
                                             <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
                                         </div>
                                     </>
                                 )
                             })}
-                            {posts.postImages.slice(4, 5).map((image, ind) => {
+                            {posts.postImages.slice(4, 5).map((image, index) => {
                                 return (
                                     <>
-                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(image)}>
+                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={`image-${index + 4}`} onClick={() => handleSliderShow(image)}>
                                             {
                                                 posts.postImages.length > 5 &&
                                                 <span>{`${posts.postImages.length - 5}+`}</span>
@@ -662,9 +685,9 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                 )
                             })}
 
-                            {posts.postVideos.map((video, ind) => {
+                            {posts.postVideos.map((video, index) => {
                                 return (
-                                    <div className={`post_main_div ${posts.postVideos.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(video)} >
+                                    <div className={`post_main_div ${posts.postVideos.length === 1 ? 'col-12' : 'col-md-4'}`} key={`video-${index}`} onClick={() => handleSliderShow(video)} >
                                         <Link to="#" className='cp_video_play' >
                                             <img src={videoPlay} />
                                         </Link>
@@ -679,6 +702,25 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
 
                         </div>
                     </div>
+                    {/* post videos */}
+                    {/* <div className='post_img_box container'>
+                        <div className='row'>
+                            {posts.postVideos.map((video, ind) => {
+                                return (
+                                    <div className={`post_main_div ${posts.postVideos.length === 1 ? 'col-12' : 'col-md-4 '}`} key={ind}>
+                                        <Link to="#" className='cp_video_play' >
+                                            <img src={videoPlay} />
+                                        </Link>
+                                        <div className="post_img mb-3 ">
+                                            <video controls>
+                                                <source src={config.apiURI + video.url} type="video/mp4" />
+                                            </video>
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </div> */}
                 </div>
                 <div className="post_foot">
                     <div className="post_actions">
@@ -697,18 +739,25 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                         <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
                                     </>
                                 ) :
-                                    !posts.isAdmin && (
-                                        <Link
-                                            to="#"
-                                            onClick={() => handleReportPopup(posts)}
-                                            className="post_follow"
-                                        >
-                                            Report
-                                        </Link>
-                                    )
+                                    <Link
+                                        to="#"
+                                        // onClick={() => handleShare(posts)}
+                                        onClick={() => handleReportPopup(posts)}
+                                        className="post_follow">
+                                        Report
+                                    </Link>
                                 }
-                                <Link
-                                    to="#"
+                                {/* {posts.userId.id === authInfo.id ? <>
+                                    <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleEdit(posts)}>Edit</button>
+                                    <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
+                                </>
+                                    : ""
+                                } */}
+
+                                {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseShareTo${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseShareTo${posts.id}`}>
+                                    <i className="post_icon ps_share"></i> Share
+                                </Link> */}
+                                <Link to="#"
                                     // onClick={() => setOpenShare(true)}
                                     onClick={() => handleShare(posts)}
                                     className="post_follow">
@@ -723,10 +772,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                 openShare ?
                                     <div className="collapse_pop">
                                         <ul className="shareto">
-                                            <li>
-                                                <i className="post_icon ps_share"></i>
-                                                Share
-                                            </li>
+                                            <li><i className="post_icon ps_share"></i> Share</li>
                                             <li><Link to="#" onClick={() => handleFacebookShare(posts.id)}>Facebook</Link></li>
                                             <li><Link to="#" onClick={() => handleTwitterShare(posts.id)}>Twitter</Link></li>
                                             <li><Link to="#" onClick={() => handleInstagramShare(posts.id)}>Instagram</Link></li>
@@ -757,7 +803,6 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                                     </Link> */}
                                                     Add Comment
                                                 </button>
-
                                             </div>
                                         </div>
                                     </div>
@@ -766,25 +811,20 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                     {posts.comments.slice(0, commentsToShow).map((val, id) => {
                                         return (
                                             <div className="commnt_box" key={id}>
-                                                <div className="avtar_img">
-                                                    {/* <img className="img-fluid" src={userImg} alt="" /> */}
-                                                    <img className="img-fluid" src={val.isSeller
-                                                        ? (val.sellerId && val.sellerId.image_url ? val.sellerId.image_url : userImg)
-                                                        : val.isAdmin
-                                                            ? (val.adminId && val.adminId.image_url ? val.adminId.image_url : userImg)
-                                                            : (val.userId && val.userId.image_url ? val.userId.image_url : userImg)
-                                                    } alt="" />
-                                                </div>
+                                                <div className="avtar_img"><img className="img-fluid" src={userImg} alt="" /></div>
                                                 <div className="commnt_text">
                                                     <div className="commnt_body">
                                                         <div className="commnt_by">
-                                                            {val.isSeller
-                                                                ? (val.sellerId && val.sellerId.name ? val.sellerId.name : 'N/A')
-                                                                : val.isAdmin
-                                                                    ? (val.adminId && val.adminId.name ? val.adminId.name : 'N/A')
-                                                                    : (val.userId && val.userId.name ? val.userId.name : 'N/A')
-                                                            }
-                                                            {/* <div className="cb_name">{val.isSeller ? val.sellerId.name : val.userId.name}</div> */}
+                                                            {/* <div className="cb_name">{val.isSeller===true ? val.sellerId.name : val.userId.name}</div> */}
+                                                            <div className="cb_name">
+                                                                {val.isSeller
+                                                                    ? (val.sellerId && val.sellerId.name ? val.sellerId.name : 'N/A')
+                                                                    : val.isAdmin
+                                                                        ? (val.adminId && val.adminId.name ? val.adminId.name : 'N/A')
+                                                                        : (val.userId && val.userId.name ? val.userId.name : 'N/A')
+                                                                }
+                                                                {/* {val.isSeller ? (val.sellerId && val.sellerId.name ? val.sellerId.name : 'N/A') : (val.userId && val.userId.name ? val.userId.name : 'N/A')} */}
+                                                            </div>
                                                             {/* <div className="cb_date">{`${new Date(val.createdAt).getDate() < 10 ? `0${new Date(val.createdAt).getDate()}` : `${new Date(val.createdAt).getDate()}`} - ${new Date(val.createdAt).getMonth() + 1 < 10 ? `0${new Date(val.createdAt).getMonth() + 1}` : `${new Date(val.createdAt).getMonth() + 1}`} - ${new Date(val.createdAt).getFullYear()}`}</div> */}
                                                             <div className="cb_date"> <ReactTimeAgo date={new Date(val.createdAt)} locale="en-US" timeStyle="round-minute" /></div>
                                                         </div>
@@ -804,6 +844,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                     </div>
                 </div>
             </div>
+
             <Modal
                 show={isReportOpen}
                 // onHide={() => this.setState({ isShareOpen: false })}
@@ -883,9 +924,8 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                     </div>
                 </Modal.Body>
             </Modal>
-
         </React.Fragment>
     );
 };
 
-export default Post;
+export default ManageCommunityPost;

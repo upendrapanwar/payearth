@@ -3704,6 +3704,12 @@ async function getPosts(req) {
         match: { isActive: true },
       },
       {
+        path: "adminId",
+        model: Admin,
+        select: "name image_url community role",
+        match: { isActive: true },
+      },
+      {
         path: "postImages",
         model: PostImages,
         select: "url",
@@ -3761,6 +3767,12 @@ async function getPosts(req) {
         {
           path: "userId",
           model: User,
+          select: "name image_url",
+          match: { isActive: true },
+        },
+        {
+          path: "adminId",
+          model: Admin,
           select: "name image_url",
           match: { isActive: true },
         },
@@ -4287,6 +4299,12 @@ async function getPostById(req) {
         match: { isActive: true },
       },
       {
+        path: "adminId",
+        model: Admin,
+        select: "name image_url community role",
+        match: { isActive: true },
+      },
+      {
         path: "postImages",
         model: PostImages,
         select: "url",
@@ -4307,7 +4325,7 @@ async function getPostById(req) {
       {
         path: "comments",
         model: PostComment,
-        select: "isActive isSeller postId sellerId userId content createdAt",
+        select: "isActive isSeller isAdmin postId sellerId userId adminId content createdAt",
         // match: { isActive: true },
         populate: [{
           path: "sellerId",
@@ -4318,6 +4336,12 @@ async function getPostById(req) {
         {
           path: "userId",
           model: User,
+          select: "name image_url",
+          // match: { isActive: true },
+        },
+        {
+          path: "adminId",
+          model: Admin,
           select: "name image_url",
           // match: { isActive: true },
         },

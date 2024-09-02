@@ -218,6 +218,14 @@ router.put("/removeFromGroup", removeFromGroup)
 router.put("/addGroupMember/:id", addGroupMember);
 router.put("/updateGroupName", updateGroupName);
 
+//****community****/
+router.get("/all-posts", getAllPosts);
+router.post('/postComments/:id', addPostComment);
+router.post('/posts', addPost);
+router.post('/postImages/:id', addPostImages);
+router.post('/postVideos/:id', addPostVideos);
+router.put('/postRemoved', postDelete);
+router.put('/updatePost', updatePost);
 
 module.exports = router;
 
@@ -987,4 +995,59 @@ function userServiceOrders(req, res, next) {
             ? res.status(200).json({ status: true, data: items })
             : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+
+//**********community*********/
+
+function getAllPosts(req, res, next) {
+    adminService.getAllPosts(req)
+        .then((posts) => posts
+            ? res.status(200).json({ status: true, data: posts })
+            : res.status(400).json({ status: false, message: 'error messsage', data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function addPostComment(req, res, next) {
+    adminService.addPostComment(req)
+        .then(result => result
+            ? res.status(201).json({ status: true, message: msg.postcomment.add.success, data: result })
+            : res.status(400).json({ status: false, message: msg.postcomment.add.error }))
+        .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function addPost(req, res, next) {
+    adminService.addPost(req)
+        .then(result => result ? res.status(201).json({ status: true, message: msg.post.add.success, data: result }) : res.status(400).json({ status: false, message: msg.post.add.error }))
+        .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function addPostImages(req, res, next) {
+    if (req.files && req.files.fileValidationError) {
+        return res.status(400).json({ status: false, message: req.files.fileValidationError });
+    }
+    adminService.addPostImages(req)
+        .then(result => result ? res.status(201).json({ status: true, message: msg.postimage.add.success }) : res.status(400).json({ status: false, message: msg.postimage.add.error }))
+        .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function addPostVideos(req, res, next) {
+    if (req.files && req.files.fileValidationError) {
+        return res.status(400).json({ status: false, message: req.files.fileValidationError });
+    }
+    adminService.addPostVideos(req)
+        .then(result => result ? res.status(201).json({ status: true, message: msg.postvideo.add.success }) : res.status(400).json({ status: false, message: msg.postvideo.add.error }))
+        .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function postDelete(req, res, next) {
+    adminService.postDelete(req)
+        .then(result => result ? res.status(201).json({ status: true, message: "Post Removed..!" }) : res.status(400).json({ status: false, message: msg.follow.yes.error }))
+        .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function updatePost(req, res, next) {
+    adminService.updatePost(req)
+        .then(result => result ? res.status(201).json({ status: true, message: "Updated...!" }) : res.status(400).json({ status: false, message: msg.follow.yes.error }))
+        .catch(err => next(res.status(400).json({ status: false, message: err })));
 }

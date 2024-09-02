@@ -76,6 +76,7 @@ import AdminServiceOrders from "./containers/admin/ServiceOrder";
 import AdminDashboard from "./containers/admin/Dashboard";
 import AdminPayments from "./containers/admin/Payments";
 import AdminChat from "./containers/admin/Chat";
+import ManageCommunityPost from "./containers/admin/ManageCommunityPost";
 
 import AdminPostModule from "./containers/admin/PostModule";
 import AdminPostModuleAddNew from "./containers/admin/PostModuleAddNew";
@@ -122,9 +123,10 @@ import ManageVendors from "./containers/admin/ManageVendors";
 import SellerNotifications from "./containers/seller/Notifications";
 import Community from "./containers/community/Community";
 import CommunityProfile from "./containers/community/CommunityProfile";
-import SellerProfile from "./containers/community/SellerProfile";
+import SellerProfile from "./containers/community/sellerProfile";
 import SharePostData from "./components/community/common/SharePostData";
 import SellerSharePostData from "./components/community/common/SellerSharePostData";
+import AdminSharePostData from "./components/community/common/AdminSharePostData";
 
 import Blog from "./components/common/BlogModel";
 import BlogDetail from "./components/common/BlogDetails";
@@ -530,6 +532,12 @@ function App() {
             component={AdminPayments}
             exact
           />
+          <PublicRoute
+            path="/admin/manage-community-post"
+            restricted={false}
+            component={ManageCommunityPost}
+            exact
+          />
 
           <PrivateRoute
             path="/admin/post-module"
@@ -782,6 +790,14 @@ function App() {
             exact
           />
 
+          {/* <PrivateRoute
+            path="/admin/manage-community-post"
+            component={ManageCommunityPost}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
+            exact
+          /> */}
+
           <PrivateRoute path="/admin/add-service" component={adminAddService} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
           {/* Community Routes */}
           <PrivateRoute
@@ -881,6 +897,14 @@ function App() {
             roles={[Role.seller]}
             currentUserRole={userInfo.role}
             component={SellerSharePostData}
+            exact
+          />
+
+          <PrivateRoute
+            path="/admin_share_community/:id"
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            component={AdminSharePostData}
             exact
           />
 

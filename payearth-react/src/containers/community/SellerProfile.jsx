@@ -12,7 +12,7 @@ import { setLoading } from '../../store/reducers/global-reducer';
 import { setPostCategories, setPostProducts } from '../../store/reducers/post-reducer';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-import config from '../.././config.json'
+import config from '../../config.json'
 import { useDispatch } from 'react-redux';
 import { NotFound } from '../../components/common/NotFound';
 import { getSellerPostsData } from '../../helpers/sellerPost-listing';

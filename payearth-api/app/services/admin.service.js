@@ -11,7 +11,7 @@ const db = require("../helpers/db");
 const msg = require('../helpers/messages.json');
 const fs = require('fs');
 
-const { Admin, User, Seller, Coupon, Product, Category, Brand, TodayDeal, BannerImage, TrendingProduct, PopularProduct, Color, OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline, ProductSales, cmsPost, cmsPage, cmsCategory, bannerAdvertisement, Chat, ChatMessage, Services, OrderDetails } = require("../helpers/db");
+const { Admin, User, Seller, Coupon, Product, Category, Brand, TodayDeal, BannerImage, TrendingProduct, PopularProduct, Color, OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline, ProductSales, cmsPost, cmsPage, cmsCategory, bannerAdvertisement, Chat, ChatMessage, Services, OrderDetails, Post, PostLike, PostVideos, PostImages, PostComment, } = require("../helpers/db");
 
 module.exports = {
     authenticate,
@@ -135,6 +135,14 @@ module.exports = {
     removeFromGroup,
     addGroupMember,
     updateGroupName,
+
+    getAllPosts,
+    addPostComment,
+    addPost,
+    addPostImages,
+    addPostVideos,
+    postDelete,
+    updatePost,
 };
 
 // Validator function
@@ -2680,7 +2688,7 @@ async function addService(req) {
 
 async function allServiceData(req) {
     try {
-        const result = await Services.find({isAvailable:true})
+        const result = await Services.find({ isAvailable: true })
             .sort({ createdAt: 'desc' })
             .populate('createdBy', 'name')
             .populate('createdByAdmin', 'name')
@@ -2773,8 +2781,8 @@ async function editService(req) {
 async function deleteService(req) {
     const id = req.params.id;
     const statusData = {
-        isActive:false,
-        isAvailable:false,
+        isActive: false,
+        isAvailable: false,
     };
     // console.log('id for delete:',id)
     // try {
@@ -3204,5 +3212,386 @@ async function updateGroupName(req) {
         return chatData;
     } catch (error) {
         console.log(error);
+    }
+}
+
+
+
+
+async function getAllPosts(req) {
+    try {
+        const Allposts = await Post.find({ isActive: true })
+            .sort({ createdAt: 'desc' })
+            .populate([
+                {
+                    path: "sellerId",
+                    model: Seller,
+                    select: "name image_url community role",
+                    match: { isActive: true },
+                },
+                {
+                    path: "userId",
+                    model: User,
+                    select: "name image_url community role",
+                    match: { isActive: true },
+                },
+                {
+                    path: "adminId",
+                    model: Admin,
+                    select: "name image_url community role",
+                    match: { isActive: true },
+                },
+                {
+                    path: "postImages",
+                    model: PostImages,
+                    select: "url",
+                    // match: { isActive: true }
+                },
+                {
+                    path: "postVideos",
+                    model: PostVideos,
+                    select: "url",
+                    match: { isActive: true }
+                },
+                {
+                    path: "categoryId",
+                    model: Category,
+                    select: "categoryName isService"
+                    //match: { isActive: true }
+                },
+                {
+                    path: "productId",
+                    model: Product,
+                    select: "name isService"
+                    //match: { isActive: true }
+                },
+                {
+                    path: "likes",
+                    model: PostLike,
+                    select: "isActive isSeller postId sellerId userId",
+                    // match: { isActive: true },
+                    populate: [
+                        {
+                            path: "sellerId",
+                            model: Seller,
+                            select: "name image_url",
+                            // match: { isActive: true },
+                        },
+                        {
+                            path: "userId",
+                            model: User,
+                            select: "name image_url",
+                            // match: { isActive: true },
+                        },
+                    ]
+                },
+                {
+                    path: "comments",
+                    model: PostComment,
+                    select: "-isActive -postId",
+                    match: { isActive: true },
+                    populate: [{
+                        path: "sellerId",
+                        model: Seller,
+                        select: "name image_url",
+                        match: { isActive: true },
+                    },
+                    {
+                        path: "userId",
+                        model: User,
+                        select: "name image_url",
+                        match: { isActive: true },
+                    },
+                    {
+                        path: "adminId",
+                        model: Admin,
+                        select: "name image_url",
+                        match: { isActive: true },
+                    },
+                    ]
+                },
+                {
+                    path: "parentId",
+                    model: Post,
+                    match: { isActive: true },
+                    populate: [{
+                        path: "postImages",
+                        model: PostImages,
+                        select: "url",
+                        match: { isActive: true }
+                    },
+                    {
+                        path: "postVideos",
+                        model: PostVideos,
+                        select: "url",
+                        match: { isActive: true }
+                    },
+                    {
+                        path: "categoryId",
+                        model: Category,
+                        select: "categoryName isService"
+                        //match: { isActive: true }
+                    },
+                    {
+                        path: "productId",
+                        model: Product,
+                        select: "name isService"
+                        //match: { isActive: true }
+                    },
+                    {
+                        path: "sellerId",
+                        model: Seller,
+                        select: "name image_url",
+                        match: { isActive: true },
+                    },
+                    {
+                        path: "userId",
+                        model: User,
+                        select: "name image_url",
+                        match: { isActive: true },
+                    },
+                    {
+                        path: "likes",
+                        model: PostLike,
+                        select: "-isActive -postId",
+                        match: { isActive: true },
+                        populate: [{
+                            path: "sellerId",
+                            model: Seller,
+                            select: "name image_url",
+                            match: { isActive: true },
+                        },
+                        {
+                            path: "userId",
+                            model: User,
+                            select: "name image_url",
+                            match: { isActive: true },
+                        },
+                        ]
+                    }
+                    ]
+                }
+            ]);
+        return Allposts;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function addPostComment(req) {
+    const param = req.body;
+    const postId = req.params.id;
+    const content = param.content;
+    const isSeller = param.isSeller;
+    let reqBody = {};
+
+    if (isSeller) {
+        reqBody = {
+            content: content,
+            isSeller: true,
+            isAdmin: false,
+            userId: null,
+            sellerId: param.seller_id,
+            adminId: null
+        };
+    } else if (param.user === 'user') {
+        reqBody = {
+            content: content,
+            isSeller: false,
+            isAdmin: false,
+            userId: param.user_id,
+            sellerId: null,
+            adminId: null
+        };
+    } else if (param.user === 'admin') {
+        reqBody = {
+            content: content,
+            isSeller: false,
+            isAdmin: true,
+            userId: null,
+            sellerId: null,
+            adminId: param.admin_id
+        };
+    }
+
+    const postcomment = new PostComment(reqBody);
+    try {
+        const data = await postcomment.save();
+
+        if (data) {
+            // Update the post with the new comment
+            const filter = { _id: postId };
+            const updateData = { $push: { comments: data.id }, $inc: { commentCount: 1 } };
+            await Post.findOneAndUpdate(filter, updateData, { new: true });
+            const result = await PostComment.findById(data.id).select();
+
+            return result;
+        } else {
+            return false;
+        }
+    } catch (error) {
+        console.error('Error adding post comment:', error);
+        return false;
+    }
+}
+
+async function addPost(req) {
+    const param = req.body;
+    console.log('api run---', param)
+    let input = {
+        postContent: param.content,
+        categoryId: param.category_id ? param.category_id : null,
+        productId: param.product_id ? param.product_id : null,
+        userId: param.user_id ? param.user_id : null,
+        sellerId: param.seller_id ? param.seller_id : null,
+        adminId: param.admin_id ? param.admin_id : null,
+        isSeller: param.is_seller,
+        isAdmin: param.is_admin,
+        postStatus: param.post_status,
+        postImages: [],
+        postVideos: [],
+        likeCount: 0,
+        likes: [],
+        commentCount: 0,
+        comments: [],
+        parentId: param.parent_id ? param.parent_id : null,
+        isActive: true
+    };
+
+    const post = new Post(input);
+
+    const data = await post.save();
+
+    if (data) {
+
+        let res = await Post.findById(data.id).select();
+
+        if (res) {
+            return res;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
+
+async function addPostImages(req) {
+    const { images } = req.body;
+    const postId = req.params.id;
+    console.log('function save image run-----')
+    if (!Array.isArray(images) || images.length === 0) {
+        return res.status(400).json({ success: false, message: "No videos provided" });
+    }
+
+    try {
+        var postImages = [];
+        var allImagesSaved = true;
+        for (let i = 0; i < images.length; i++) {
+            const image = images[i];
+            let input = {
+                postId: postId,
+                url: image.url,
+                isActive: true
+            };
+            let postImage = new PostImages(input);
+            let data = await postImage.save();
+            if (data) {
+                postImages.push(data.id);
+            } else {
+                allImagesSaved = false;
+                break; // Exit loop if save fails
+            }
+        }
+        if (allImagesSaved) {
+            const filter = { _id: postId };
+            const updateData = { $push: { postImages: { $each: postImages } } };
+            await Post.findOneAndUpdate(filter, updateData, { new: true });
+            return postImages
+        } else {
+            return { success: false, message: "Failed to save" };
+        }
+    } catch (error) {
+        console.log("error", error)
+    }
+
+}
+
+async function addPostVideos(req, res) {
+    const { videos } = req.body;
+    const postId = req.params.id;
+
+    if (!Array.isArray(videos) || videos.length === 0) {
+        return res.status(400).json({ success: false, message: "No videos provided" });
+    }
+    try {
+        var postVideos = [];
+        var allVideosSaved = true;
+        for (let i = 0; i < videos.length; i++) {
+            const video = videos[i];
+            let input = {
+                postId: postId,
+                url: video.url,
+                isActive: true
+            };
+            let postVideo = new PostVideos(input);
+            let data = await postVideo.save();
+            if (data) {
+                postVideos.push(data.id);
+            } else {
+                allVideosSaved = false;
+                break; // Exit loop if save fails
+            }
+        }
+        if (allVideosSaved) {
+            const filter = { _id: postId };
+            const updateData = { $push: { postVideos: { $each: postVideos } } };
+            await Post.findOneAndUpdate(filter, updateData, { new: true });
+            return postVideos
+        } else {
+            return { success: false, message: "Failed to save" };
+        }
+    } catch (error) {
+        console.log("error", error)
+    }
+}
+
+async function postDelete(req) {
+    try {
+        const param = req.body;
+        const postId = param.postId;
+
+        const result = await Post.updateOne(
+            { _id: postId },
+            { $set: { isActive: false } }
+        );
+        return result;
+
+    } catch (err) {
+        console.log('Error', err);
+        return false;
+    }
+}
+
+async function updatePost(req) {
+    try {
+        const param = req.body;
+        // console.log("param", param);
+        const result = await Post.updateOne(
+            { _id: param.postId },
+            {
+                $set: {
+                    postContent: param.content,
+                    productId: param.product_id,
+                    categoryId: param.category_id,
+                    postStatus: param.post_status
+                }
+            }
+        );
+        return result;
+
+    } catch (err) {
+        console.log('Error', err);
+        return false;
     }
 }

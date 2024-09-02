@@ -64,14 +64,17 @@ const SellerSharePostData = () => {
     const [adminId, setAdminId] = useState("");
     const [isActive, setIsActive] = useState("");
     const [isSeller, setIsSeller] = useState("");
+    const [isAdmin, setIsAdmin] = useState("");
     const [likes, setLikes] = useState("");
     const [likeCount, setLikeCount] = useState("");
     const [postStatus, setPostStatus] = useState("");
     const [comments, setComments] = useState("");
     const [commentCount, setCommentCount] = useState("");
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [createdAt, setCreatedAt] = useState(null);
 
     //********************************************/
+    const date = new Date(createdAt);
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
     useEffect(() => {
@@ -96,14 +99,16 @@ const SellerSharePostData = () => {
                     setPostVideos(data.postVideos || []);
                     setUserId(data.userId);
                     setSellerId(data.sellerId);
-                    setAdminId(data.adminId)
+                    setAdminId(data.adminId);
                     setIsActive(data.isActive);
                     setIsSeller(data.isSeller);
+                    setIsAdmin(data.isAdmin);
                     setLikes(data.likes);
                     setLikeCount(data.likeCount);
                     setPostStatus(data.postStatus);
                     setComments(data.comments);
                     setCommentCount(data.commentCount);
+                    setCreatedAt(data.createdAt)
                     setLoading(false)
                 }
             } catch (error) {
@@ -118,7 +123,7 @@ const SellerSharePostData = () => {
 
         // Call the function when the component mounts
         getPostData();
-    }, [postId, authInfo, setSharePost]);
+    }, [postId, authInfo, ]);
 
 
 
@@ -539,7 +544,7 @@ const SellerSharePostData = () => {
         console.log("Selected postID", postId)
         setOpenShare(true)
     }
-    console.log("postImages", postImages)
+    console.log("post---", posts)
 
     return (
         <React.Fragment>
@@ -547,28 +552,43 @@ const SellerSharePostData = () => {
             <div className="post">
                 <div className="post_head">
                     <div className="post_by">
-                        <div className="poster_img "><img src={userId === null ? sellerId.image_url : userId.image_url} alt="" /></div>
+                        <div className="poster_img ">
+                            <img
+                                src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
+                                alt=""
+                                className="img-fluid"
+                            />
+                        </div>
+                        {/* <div className="poster_img "><img src={userId === null ? sellerId.image_url : userId.image_url} alt="" /></div> */}
                         {/* <div className="poster_img "><img src={posts.isSeller ? config.apiURI + posts.sellerId.image_url : posts.userId.image_url !== null ? config.apiURI + posts.userId.image_url : userImg} alt="" /></div> */}
                         <div className="poster_info">
-                            {/* <div className="poster_name">{isSeller ? sellerId.name : userId.name}</div> */}
-                            <div className="poster_name">{isSeller ? sellerId && sellerId.name : userId && userId.name}</div>
+                            <div className="poster_name">
+                                {isAdmin && adminId?.name
+                                    ? adminId.name
+                                    : isSeller && sellerId?.name
+                                        ? sellerId.name
+                                        : userId?.name || 'N/A'}
+                            </div>
                             {/* <ReactTimeAgo date={date} locale="en-US" timeStyle="round-minute" /> */}
                             {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseFollow${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseFollow${posts.id}`}>
                             Follow
                         </Link> */}
                             {
-                                userInfo.role === 'user' &&
+                                userInfo.role === 'seller' && isAdmin === false &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
-                                    {isSeller === false && userId.id === authInfo.id
+                                    {isSeller === true && sellerId.id === authInfo.id
                                         ? "" : isFollowing ? 'Unfollow' : 'Follow'}
-                                    {/* {posts.isSeller === false && posts.userId.id === authInfo.id ? "" : 'Follow'} */}
                                 </Link>
                             }
                             {
-                                userInfo.role === 'seller' &&
+                                userInfo.role === 'user' && isAdmin === false &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
-                                    {isSeller === true && sellerId.id === authInfo.id ? "" : 'Follow'}
+                                    {isSeller === false && userId.id === authInfo.id ? "" : isFollowing ? 'Unfollow' : 'Follow'}
                                 </Link>
+                            }
+                            {
+                                isAdmin === true &&
+                                <span className="post_admin text-success">Admin</span>
                             }
                         </div>
                     </div>
@@ -667,29 +687,29 @@ const SellerSharePostData = () => {
                     {/* slider end */}
                     <div className='post_img_box container'>
                         <div className='row post_img_internal_box'>
-                        {(postImages && postImages.length >= 0) || (postVideos && postVideos.length >= 0) ? (
-                            <>
-                                {postImages && postImages.length > 0 && (
-                                    <>
-                                        {postImages.slice(0, 2).map((image, ind) => {
-                                            return(
-                                                <>
-                                                    <div className={`post_child_div ${postImages.length === 1 ? 'col-12' : 'col-md-6'}`} key={image.url ||ind} onClick={() => handleSliderShow(image)}>
-                                                    <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
-                                                    </div>
-                                                </>
-                                            )
-                                        })}
+                            {(postImages && postImages.length >= 0) || (postVideos && postVideos.length >= 0) ? (
+                                <>
+                                    {postImages && postImages.length > 0 && (
+                                        <>
+                                            {postImages.slice(0, 2).map((image, ind) => {
+                                                return (
+                                                    <>
+                                                        <div className={`post_child_div ${postImages.length === 1 ? 'col-12' : 'col-md-6'}`} key={image.url || ind} onClick={() => handleSliderShow(image)}>
+                                                            <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
+                                                        </div>
+                                                    </>
+                                                )
+                                            })}
 
 
-                            {/* // <div className="post_child_div'col-12">
+                                            {/* // <div className="post_child_div'col-12">
                             //     <div className="post_img mb-3 ">
                             //         <img src={postImages.url} alt="" />
                             //     </div>
                             // </div>, */}
 
 
-                            {/* {postImages.slice(0, 2).map((image, ind) => { 
+                                            {/* {postImages.slice(0, 2).map((image, ind) => { 
                             //     return (
                             //         <>
                             //             <div className={`post_child_div ${postImages.length === 1 ? 'col-12' : 'col-md-6'}`} key={ind} onClick={() => handleSliderShow(image)}>
@@ -698,52 +718,52 @@ const SellerSharePostData = () => {
                             //         </>
                             //     )
                             // })} */}
-                                        { postImages.slice(2, 4).map((image, ind) => {
-                                            return (
-                                                <>
-                                                    <div className={`post_child_div ${postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={image.url || ind} onClick={() => handleSliderShow(image)}>
-                                                    <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
+                                            {postImages.slice(2, 4).map((image, ind) => {
+                                                return (
+                                                    <>
+                                                        <div className={`post_child_div ${postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={image.url || ind} onClick={() => handleSliderShow(image)}>
+                                                            <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
+                                                        </div>
+                                                    </>
+                                                )
+                                            })}
+                                            {postImages.slice(4, 5).map((image, ind) => {
+                                                return (
+                                                    <>
+                                                        <div className={`post_child_div ${postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(image)}>
+                                                            {
+                                                                postImages.length > 5 &&
+                                                                <span>{`${postImages.length - 5}+`}</span>
+                                                            }
+                                                            <div className="post_img mb-3 " ><img src={image.url} alt="" /></div>
+                                                        </div>
+                                                    </>
+                                                )
+                                            })}
+                                        </>
+                                    )}
+                                    {postVideos && postVideos.length > 0 && (
+                                        <>
+                                            {postVideos.map((video, ind) => {
+                                                return (
+                                                    <div className={`post_main_div ${postVideos.length === 1 ? 'col-12' : 'col-md-4'}`} key={video.url || ind} onClick={() => handleSliderShow(video)} >
+                                                        <Link to="#" className='cp_video_play' >
+                                                            <img src={videoPlay} />
+                                                        </Link>
+                                                        <div className="post_img mb-3 ">
+                                                            <video controls>
+                                                                <source src={video.url} type="video/mp4" />
+                                                            </video>
+                                                        </div>
                                                     </div>
-                                                </>
-                                            )
-                                        })}
-                                        { postImages.slice(4, 5).map((image, ind) => {
-                                            return (
-                                                <>
-                                                    <div className={`post_child_div ${postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(image)}>
-                                                    {
-                                                        postImages.length > 5 &&
-                                                        <span>{`${postImages.length - 5}+`}</span>
-                                                    }
-                                                    <div className="post_img mb-3 " ><img src={image.url} alt="" /></div>
-                                                    </div>
-                                                </>
-                                            )
-                                        })}
-                                    </>
-                                )}
-                                {postVideos && postVideos.length > 0 && (
-                                    <>
-                                        { postVideos.map((video, ind) => {
-                                            return (
-                                                <div className={`post_main_div ${postVideos.length === 1 ? 'col-12' : 'col-md-4'}`} key={video.url || ind} onClick={() => handleSliderShow(video)} >
-                                                    <Link to="#" className='cp_video_play' >
-                                                    <img src={videoPlay} />
-                                                    </Link>
-                                                    <div className="post_img mb-3 ">
-                                                        <video controls>
-                                                            <source src={video.url} type="video/mp4" />
-                                                        </video>
-                                                    </div>
-                                                </div>
-                                            )
-                                        })}
-                                    </>
-                                )}
-                            </>
+                                                )
+                                            })}
+                                        </>
+                                    )}
+                                </>
                             ) : (
-                            <p>Loading...</p>
-                        )} 
+                                <p>Loading...</p>
+                            )}
 
                         </div>
                     </div>
@@ -752,18 +772,18 @@ const SellerSharePostData = () => {
                     <div className="post_actions">
                         <ul className="ps_links">
                             <li>
-                                {(likeCount.length === 0) || (commentCount.length===0) ? (
+                                {(likeCount.length === 0) || (commentCount.length === 0) ? (
                                     <>
-                                        <img src={redHeartIcon} /> {likeCount} 
+                                        <img src={redHeartIcon} /> {likeCount}
                                     </>
-                                    ) : (
+                                ) : (
                                     <>
-                                {/* <Link to="#" onClick={() => filteredLikes.length !== 0 && filteredLikes.includes(authInfo.id) ? removeFromLiked(posts.id) : addToLiked(posts.id)}> */}
-                                    {/* <img src={likeCount.length !== 0 && filteredLikes.includes(authInfo.id) ? redHeartIcon : heartIconBordered} /> {posts.likeCount} */}
-                                <img src={redHeartIcon} /> {likeCount}
-                                {/* </Link> */}
-                                <Link onClick={toggleCollapse} to={`#collapseComment${posts.id}`} role="button" aria-expanded="isCollapsed" aria-controls={`collapseComment${posts.id}`}><i className="post_icon ps_comment"></i> {commentCount} Comments</Link>
-                                </>
+                                        {/* <Link to="#" onClick={() => filteredLikes.length !== 0 && filteredLikes.includes(authInfo.id) ? removeFromLiked(posts.id) : addToLiked(posts.id)}> */}
+                                        {/* <img src={likeCount.length !== 0 && filteredLikes.includes(authInfo.id) ? redHeartIcon : heartIconBordered} /> {posts.likeCount} */}
+                                        <img src={redHeartIcon} /> {likeCount}
+                                        {/* </Link> */}
+                                        <Link onClick={toggleCollapse} to={`#collapseComment${posts.id}`} role="button" aria-expanded="isCollapsed" aria-controls={`collapseComment${posts.id}`}><i className="post_icon ps_comment"></i> {commentCount} Comments</Link>
+                                    </>
                                 )}
                             </li>
 
@@ -833,35 +853,39 @@ const SellerSharePostData = () => {
                                     </div> */}
                                 </li>
                                 <li>
-                                {(comments && comments.length > 0) ? (
+                                    {(comments && comments.length > 0) ? (
                                         <>
-                                        {comments.map((val, id) => {
-                                            return (
-                                                <div className="commnt_box"  key={id}> 
-                                                    <div className="avtar_img"><img className="img-fluid" src={userImg} alt="" /></div> 
-                                                    <div className="commnt_text">
-                                                        <div className="commnt_body">
-                                                            <div className="commnt_by">
-                                                                <div className="cb_name">{val.isSeller===true ? val.sellerId.name ||"" : val.userId.name ||""}</div>
-                                                                <div className="cb_date"> <ReactTimeAgo date={new Date(val.createdAt)} locale="en-US" timeStyle="round-minute" /></div>
+                                            {comments.map((val, id) => {
+                                                return (
+                                                    <div className="commnt_box" key={id}>
+                                                        <div className="avtar_img"><img className="img-fluid" src={userImg} alt="" /></div>
+                                                        <div className="commnt_text">
+                                                            <div className="commnt_body">
+                                                                <div className="commnt_by">
+                                                                    {/* <div className="cb_name">{val.isSeller===true ? val.sellerId.name ||"" : val.userId.name ||""}</div> */}
+                                                                    <div className="cb_name">
+                                                                        {val.isAdmin ? val.adminId?.name
+                                                                            : val.isSeller ? val.sellerId?.name
+                                                                                : val.userId?.name || 'N/A'}
+                                                                    </div>
+                                                                    <div className="cb_date"> <ReactTimeAgo date={new Date(val.createdAt)} locale="en-US" timeStyle="round-minute" /></div>
+                                                                </div>
+                                                                <p>{val.content}</p>
                                                             </div>
-                                                            <p>{val.content}</p> 
                                                         </div>
-                                                        
                                                     </div>
-                                                </div>
-                                            )
-                                            })}  
-                                        {/* {comments.length > commentsToShow && (
+                                                )
+                                            })}
+                                            {/* {comments.length > commentsToShow && (
                                         // {commentCount == 0 ? '' :
                                             <button className={`btn load_more_post ${comments.length === commentsToShow || comments.length === commentsToShow - 1 ? 'd-none' : ''}`}
                                                 onClick={() => viewMoreComments(postId)} >view more comments</button>
                                         )} 
                                         <p>{val.content}</p> */}
                                         </>
-                                    ):(
-                                    <p>loading.....</p>
-                                )}
+                                    ) : (
+                                        <p>loading.....</p>
+                                    )}
                                 </li>
                             </ul>
                         </div>

@@ -503,27 +503,41 @@ const SellerPost = ({ posts, sendEditData }) => {
             <div className="post">
                 <div className="post_head">
                     <div className="post_by">
-                        {/* <div className="poster_img "><img src={posts.userId === null ? posts.sellerId.image_url : posts.userId.image_url} alt="" /></div> */}
-                        {/* <div className="poster_img "><img src={posts.isSeller ? config.apiURI + posts.sellerId.image_url : posts.userId.image_url !== null ? config.apiURI + posts.userId.image_url : userImg} alt="" /></div> */}
+                        <div className="poster_img">
+                            <img
+                                src={
+                                    posts.isAdmin && posts.adminId?.image_url ? posts.adminId.image_url :
+                                        posts.userId === null || posts.userId === undefined ?
+                                            (posts.sellerId?.image_url ? posts.sellerId.image_url : userImg) :
+                                            (posts.userId?.image_url ? posts.userId.image_url : userImg)
+                                }
+                                alt=""
+                            />
+                        </div>
                         <div className="poster_info">
-                            {/* <div className="poster_name">{posts.isSeller ? posts.sellerId.name : posts.userId.name}</div> */}
+                            <div className="poster_name">
+                                {posts.isAdmin ? posts.adminId.name : posts.isSeller ? posts.sellerId.name : posts.userId.name}
+                            </div>
                             <ReactTimeAgo date={date} locale="en-US" timeStyle="round-minute" />
                             {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseFollow${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseFollow${posts.id}`}>
                                 Follow
                             </Link> */}
                             {
-                                userInfo.role === 'seller' &&
+                                userInfo.role === 'seller' && posts.isAdmin === false &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
                                     {posts.isSeller === true && posts.sellerId.id === authInfo.id
                                         ? "" : isFollowing ? 'Unfollow' : 'Follow'}
-                                    {/* {posts.isSeller === false && posts.userId.id === authInfo.id ? "" : 'Follow'} */}
                                 </Link>
                             }
                             {
-                                userInfo.role === 'user' &&
+                                userInfo.role === 'user' && posts.isAdmin === false &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
                                     {posts.isSeller === false && posts.userId.id === authInfo.id ? "" : isFollowing ? 'Unfollow' : 'Follow'}
                                 </Link>
+                            }
+                            {
+                                posts.isAdmin === true &&
+                                <span className="post_admin text-success">Admin</span>
                             }
                         </div>
                     </div>
@@ -705,24 +719,16 @@ const SellerPost = ({ posts, sendEditData }) => {
                                         <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
                                     </>
                                 ) :
-                                    <Link
-                                        to="#"
-                                        // onClick={() => handleShare(posts)}
-                                        onClick={() => handleReportPopup(posts)}
-                                        className="post_follow">
-                                        Report
-                                    </Link>
+                                    !posts.isAdmin && (
+                                        <Link
+                                            to="#"
+                                            onClick={() => handleReportPopup(posts)}
+                                            className="post_follow"
+                                        >
+                                            Report
+                                        </Link>
+                                    )
                                 }
-                                {/* {posts.userId.id === authInfo.id ? <>
-                                    <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleEdit(posts)}>Edit</button>
-                                    <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
-                                </>
-                                    : ""
-                                } */}
-
-                                {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseShareTo${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseShareTo${posts.id}`}>
-                                    <i className="post_icon ps_share"></i> Share
-                                </Link> */}
                                 <Link to="#"
                                     // onClick={() => setOpenShare(true)}
                                     onClick={() => handleShare(posts)}
