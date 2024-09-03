@@ -422,37 +422,39 @@ async function socialLogin(req) {
       if (seller) {
         //Email send functionality.
         const mailOptions = {
-          from: config.mail_from_email, // sender address
-          to: seller.email, // list of receivers
-          subject: "Welcome Email - PayEarth",
-          text: "Welcome Email",
+          from: `"Payearth Support" <${config.mail_from_email}>`,
+          replyTo: `${config.mail_from_email}`,
+          to: seller.email,
+          subject: `Welcome to Payearth, ${seller.name}!`,
+          text: "",
           html:
-            `<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #555;">
-  <!-- Header -->
-  <div style="background-color: #6772E5; padding: 20px; text-align: center;">
-    <img src=${url} alt="Payearth" style="height: 40px;" />
-  </div>
+            ` <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #555;">
+              <!-- Header -->
+              <div style="background-color: #6772E5; padding: 20px; text-align: center;">
+                <img src="https://pay.earth:7700/uploads/logo.png" alt="Payearth" style="height: 40px;" />
+              </div>
+          
+              <!-- Body -->
+              <div style="padding: 20px; background-color: #f9f9f9;">
+                <h2 style="color: #333;">Welcome to Payearth, ${seller.name}!</h2>
+          
+                <p>Dear <b>${seller.name}</b>,</p>
+          
+                <p>You have successfully registered with Payearth. We are excited to have you onboard!</p>
+          
+                <p>Feel free to explore our services and reach out if you have any questions.</p>
+          
+                <p style="font-style: italic;">— The Payearth Team</p>
+              </div>
+          
+              <!-- Footer -->
+              <div style="padding: 10px; background-color: #6772E5; text-align: center; font-size: 12px; color: #aaa;">
+                <p>Payearth, 1234 Street Name, City, State, 12345</p>
+                <p>&copy; ${new Date().getFullYear()} Payearth. All rights reserved.</p>
+              </div>
+            </div>
+            `
 
-  <!-- Body -->
-  <div style="padding: 20px; background-color: #f9f9f9;">
-    <h2 style="color: #333;">Congratulations, ${seller.name}!</h2>
-
-    <p>Dear <b>${seller.name}</b>,</p>
-
-    <p>You have successfully registered as a seller on Payearth. We are delighted to have you join our platform!</p>
-
-    <p>Start adding your products and services to reach new customers. If you have any questions or need support, feel free to contact us at any time.</p>
-
-    <p style="font-style: italic;">— The Payearth Team</p>
-  </div>
-
-  <!-- Footer -->
-  <div style="padding: 10px; background-color: #6772E5; text-align: center; font-size: 12px; color: #aaa;">
-    <p>Payearth, 1234 Street Name, City, State, 12345</p>
-    <p>&copy; ${new Date().getFullYear()} Payearth. All rights reserved.</p>
-  </div>
-</div>
-`
         };
         SendEmail(mailOptions);
         const {
@@ -556,10 +558,11 @@ async function forgotPass(param) {
       verif_code;
 
     const mailOptions = {
-      from: config.mail_from_email, // sender address
-      to: seller.email, // list of receivers
+      from: `"Payearth Support" <${config.mail_from_email}>`,
+      replyTo: `${config.mail_from_email}`,
+      to: seller.email,
       subject: "Verification link generated for reset password.",
-      text: "Verification link",
+      text: "",
       html:
         `<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #555;">
   <!-- Header -->
