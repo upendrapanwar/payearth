@@ -29,7 +29,7 @@ import ru from 'javascript-time-ago/locale/ru.json'
 
 const Post = ({ posts, sendEditData, sendShareData }) => {
 
-    // console.log("all posts", posts)
+    console.log("all posts", posts)
 
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
@@ -490,6 +490,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             if (response.data.status === true) {
                 toast.success("Report Successfully sent");
                 setIsReportOpen(false);
+                setReportedPost(null);
             } else {
                 toast.error("Failed to send report. Please try again.");
             }
@@ -585,7 +586,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                 <div className={`post_follow_pop`}>
                                     <div className="follow_box">
                                         <div className="post_by">
-                                            <div className="poster_img" ><img src={posts.isSeller ? config.apiURI + posts.sellerId.image_url : posts.userId.image_url !== null ? config.apiURI + posts.userId.image_url : userImg} alt="" /></div>
+                                            <div className="poster_img" ><img src={posts.isSeller ? posts.sellerId.image_url : posts.userId.image_url !== null ? posts.userId.image_url : userImg} alt="" /></div>
                                             <div className="poster_info">
                                                 <div className="poster_name">{posts.isSeller ? posts.sellerId.name : posts.userId.name}</div>
                                                 <small>{posts.isSeller ? 'Seller' : 'User'}</small>
@@ -602,19 +603,20 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                                 <div className="fp_fc">{posts.userId === null ? posts.sellerId.community.following : posts.userId.community.following}</div>
                                                 <small>Following</small>
                                             </li>
-                                            <li>
+                                            {/* <li>
                                                 <div className="fp_fc">02</div>
                                                 <small>Posts</small>
-                                            </li>
+                                            </li> */}
 
                                         </ul>
-                                        {isFollowing ?
-                                            <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleUnfollow(posts)}>Unfollow</Link>
-                                            :
-                                            <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleFollow(posts)}>Follow</Link>
-                                        }
+                                        <div className="text-center">
+                                            {isFollowing ?
+                                                <Link to="#" className="btn custom_btn btn-info" onClick={() => handleUnfollow(posts)}>Unfollow</Link>
+                                                :
+                                                <Link to="#" className="btn custom_btn btn-info" onClick={() => handleFollow(posts)}>Follow</Link>
+                                            }
 
-
+                                        </div>
                                     </div>
                                 </div>
                                 : ''

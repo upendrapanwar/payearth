@@ -2205,7 +2205,7 @@ input[type="search"] {
 }
 
 .follow_box ul {
-  margin: 20px auto;
+  margin: 20px 40px;
   display: flex;
   justify-content: space-between;
 }
