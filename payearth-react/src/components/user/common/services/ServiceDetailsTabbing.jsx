@@ -35,7 +35,7 @@ function ServiceDetailsTabbing(props) {
 
   useEffect(() => {
     fetchApi();
-    fetchAcces_token();
+    // fetchAcces_token();
     // listUsers();
   }, []);
 
@@ -46,36 +46,35 @@ function ServiceDetailsTabbing(props) {
 
   //Zoom Token fetch
 
-  const fetchAcces_token = () => {
-    const clientId = process.env.REACT_APP_ZOOM_CLIENT_ID;
-    const clientSecret = process.env.REACT_APP_ZOOM_CLIENT_SECRET;
-    const account_id = process.env.REACT_APP_ZOOM_ACCOUNT_ID;
-    try {
-      const url = "/user/zoomCreateUserToken";
-      axios
-        .post(
-          url,
-          { clientId, clientSecret, account_id },
-          {
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json;charset=UTF-8",
-              Authorization: `Bearer ${authInfo.token}`,
-            },
-          }
-        )
-        .then((response) => {
-          // console.log("response", response)
-          console.log("access_token", response.data.data);
-          setZoomAccessToken(response.data.data);
-        })
-        .catch((error) => {
-          console.log("error", error);
-        });
-    } catch (error) {
-      console.log("error", error);
-    }
-  };
+  // const fetchAcces_token = () => {
+  //   const clientId = process.env.REACT_APP_ZOOM_CLIENT_ID;
+  //   const clientSecret = process.env.REACT_APP_ZOOM_CLIENT_SECRET;
+  //   const account_id = process.env.REACT_APP_ZOOM_ACCOUNT_ID;
+  //   try {
+  //     const url = "/user/zoomCreateUserToken";
+  //     axios
+  //       .post(
+  //         url,
+  //         { clientId, clientSecret, account_id },
+  //         {
+  //           headers: {
+  //             Accept: "application/json",
+  //             "Content-Type": "application/json;charset=UTF-8",
+  //             Authorization: `Bearer ${authInfo.token}`,
+  //           },
+  //         }
+  //       )
+  //       .then((response) => {
+  //         // console.log("response", response)
+  //         setZoomAccessToken(response.data.data);
+  //       })
+  //       .catch((error) => {
+  //         console.log("error", error);
+  //       });
+  //   } catch (error) {
+  //     console.log("error", error);
+  //   }
+  // };
 
   //called get api for user service review
   const fetchApi = async () => {
@@ -416,9 +415,8 @@ function ServiceDetailsTabbing(props) {
                     <li className="nav-item" role="presentation">
                       <button
                         //className="nav-link active"
-                        className={`nav-link ${
-                          activeTab === "appointment" ? "active" : ""
-                        }`}
+                        className={`nav-link ${activeTab === "appointment" ? "active" : ""
+                          }`}
                         id="appointment-tab"
                         data-bs-toggle="tab"
                         data-bs-target="#appointment"
@@ -441,9 +439,8 @@ function ServiceDetailsTabbing(props) {
                   ) : (
                     <li className="nav-item" role="presentation">
                       <button
-                        className={`nav-link ${
-                          activeTab === "zoommeeting" ? "active" : ""
-                        }`}
+                        className={`nav-link ${activeTab === "zoommeeting" ? "active" : ""
+                          }`}
                         id="zoommeeting-tab"
                         data-bs-toggle="tab"
                         data-bs-target="#zoommeeting"
@@ -607,41 +604,41 @@ function ServiceDetailsTabbing(props) {
                           {/* Display Reviews */}
                           {currentReviews.length > 0
                             ? currentReviews.map((review, index) => (
-                                <div className="user_comment_box" key={index}>
-                                  <div className="d-flex align-items-center">
-                                    <p className="title mr-auto">
-                                      {review.review.title}
-                                    </p>
-                                    {/* Add delete icon here */}
-                                    {currentUser &&
-                                      review.userId._id === authInfo.id && (
-                                        <button
-                                          style={{
-                                            marginTop: "-14px",
-                                            float: "right",
-                                          }}
-                                          className="btn btn-link text-danger"
-                                          onClick={() =>
-                                            deleteReview(review._id)
-                                          }
-                                        >
-                                          <FaTrash />
-                                        </button>
-                                      )}
-                                  </div>
-
-                                  <p className="feedback">
-                                    {review.review.description}
+                              <div className="user_comment_box" key={index}>
+                                <div className="d-flex align-items-center">
+                                  <p className="title mr-auto">
+                                    {review.review.title}
                                   </p>
-                                  <p className="rating">
-                                    {renderStarRating(review.rating)}
-                                  </p>
-                                  <p className="date mb-0">
-                                    {review.userId.name} |{" "}
-                                    {formatDate(review.createdAt)}
-                                  </p>
+                                  {/* Add delete icon here */}
+                                  {currentUser &&
+                                    review.userId._id === authInfo.id && (
+                                      <button
+                                        style={{
+                                          marginTop: "-14px",
+                                          float: "right",
+                                        }}
+                                        className="btn btn-link text-danger"
+                                        onClick={() =>
+                                          deleteReview(review._id)
+                                        }
+                                      >
+                                        <FaTrash />
+                                      </button>
+                                    )}
                                 </div>
-                              ))
+
+                                <p className="feedback">
+                                  {review.review.description}
+                                </p>
+                                <p className="rating">
+                                  {renderStarRating(review.rating)}
+                                </p>
+                                <p className="date mb-0">
+                                  {review.userId.name} |{" "}
+                                  {formatDate(review.createdAt)}
+                                </p>
+                              </div>
+                            ))
                             : ""}
 
                           {/* Pagination buttons */}

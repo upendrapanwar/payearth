@@ -19,6 +19,7 @@ var ApiControllers = require("authorizenet").APIControllers;
 var SDKConstants = require("authorizenet").Constants;
 const fs = require("fs");
 const stripe = require("stripe")(config.stripe_secret_key);
+const SendEmail = require("../helpers/email");
 
 const {
   User,
@@ -55,7 +56,7 @@ module.exports = {
   authenticate,
   getById,
   getUserByRole,
-  create,
+  userRegister,
   changePass,
   forgotPass,
   resetPass,
@@ -101,9 +102,9 @@ module.exports = {
   getBannersByUserId,
   deleteBanner,
   getBannerById,
-  updateBanner, 
-  
-  blockBanner , 
+  updateBanner,
+
+  blockBanner,
   bannerPayment,
   customerAuthorizePayment,
   createSubscription,
@@ -112,9 +113,9 @@ module.exports = {
   CommonServiceById,
   addServiceReview,
   getServiceReviews,
-  addMeetByUser,
-  getMeeting,
-  delMeetingByUser,
+  addGoogleEvent,
+  getGoogleEvent,
+  deleteGoogleEvent,
   getServiceOrder,
   deleteReviews,
   zoomRefreshToken,
@@ -143,35 +144,35 @@ module.exports = {
   getNotification,
   updateNotification,
   deleteNotification,
-
+  userContactUs,
 };
 
-function sendMail(mailOptions) {
-  // create reusable transporter object using the default SMTP transport
-  const transporter = nodemailer.createTransport({
-    port: config.mail_port, // true for 465, false for other ports
-    host: config.mail_host,
-    auth: {
-      user: config.mail_auth_user,
-      pass: config.mail_auth_pass,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
-    secure: config.mail_is_secure,
-  });
+// function sendMail(mailOptions) {
+//   // create reusable transporter object using the default SMTP transport
+//   const transporter = nodemailer.createTransport({
+//     port: config.mail_port, // true for 465, false for other ports
+//     host: config.mail_host,
+//     auth: {
+//       user: config.mail_auth_user,
+//       pass: config.mail_auth_pass,
+//     },
+//     tls: {
+//       rejectUnauthorized: false,
+//     },
+//     secure: config.mail_is_secure,
+//   });
 
-  transporter.sendMail(mailOptions, function (err, info) {
-    if (err) {
-      console.log("*** Error", err);
-    } else {
-      console.log("*** Success", info);
-    }
-  });
-  return true;
-}
+//   transporter.sendMail(mailOptions, function (err, info) {
+//     if (err) {
+//       console.log("*** Error", err);
+//     } else {
+//       console.log("*** Success", info);
+//     }
+//   });
+//   return true;
+// }
 
-async function create(param) {
+async function userRegister(param) {
   if (await User.findOne({ email: param.email })) {
     throw 'email "' + param.email + '" is already taken';
   }
@@ -181,22 +182,46 @@ async function create(param) {
     email: param.email,
     password: bcrypt.hashSync(param.password, 10),
     role: "user",
-    purchase_type: param.purchase_type,
     isActive: true,
   });
 
   //Email send functionality.
   const mailOptions = {
-    from: config.mail_from_email, // sender address
+    from: `"Payearth Support" <${config.mail_from_email}>`, // sender address
+    replyTo: `${config.mail_from_email}`,
     to: user.email,
-    subject: "Welcome Email - PayEarth",
-    text: "Welcome Email",
-    html:
-      "Dear <b>" +
-      user.name +
-      "</b>,<br/> You are successfully registered.<br/> ",
+    subject: `Welcome to Payearth, ${user.name}!`,
+    text: "",
+    html: `
+    <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #555;">
+      <!-- Header -->
+      <div style="background-color: #6772E5; padding: 20px; text-align: center;">
+        <img src="https://pay.earth:7700/uploads/logo.png" alt="Payearth" style="height: 40px;" />
+      </div>
+  
+      <!-- Body -->
+      <div style="padding: 20px; background-color: #f9f9f9;">
+        <h2 style="color: #333;">Welcome to Payearth, ${user.name}!</h2>
+  
+        <p>Dear <b>${user.name}</b>,</p>
+  
+        <p>You have successfully registered with Payearth. We are excited to have you onboard!</p>
+  
+        <p>Feel free to explore our services and reach out if you have any questions.</p>
+  
+        <p style="font-style: italic;">— The Payearth Team</p>
+      </div>
+  
+      <!-- Footer -->
+      <div style="padding: 10px; background-color: #6772E5; text-align: center; font-size: 12px; color: #aaa;">
+        <p>Payearth, 1234 Street Name, City, State, 12345</p>
+        <p>&copy; ${new Date().getFullYear()} Payearth. All rights reserved.</p>
+      </div>
+    </div>
+    `
   };
-  sendMail(mailOptions);
+  SendEmail(mailOptions);
+
 
   const data = await user.save();
   if (data) {
@@ -364,20 +389,46 @@ async function socialLogin(req) {
 
     if (data) {
       const user = await User.findById(data.id);
-
+      const url = "https://pay.earth:7700/uploads/logo.png"
       if (user) {
         //Email send functionality.
         const mailOptions = {
-          from: config.mail_from_email, // sender address
-          to: user.email, // list of receivers
-          subject: "Welcome Email - PayEarth",
-          text: "Welcome Email",
-          html:
-            "Dear <b>" +
-            user.name +
-            "</b>,<br/> You are successfully registered.<br/> ",
+          from: `"Payearth Support" <${config.mail_from_email}>`,
+          replyTo: `${config.mail_from_email}`,
+          to: user.email,
+          subject: `Welcome to Payearth, ${user.name}!`,
+          text: "",
+          html: `
+            <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #555;">
+              <!-- Header -->
+              <div style="background-color: #6772E5; padding: 20px; text-align: center;">
+                <img src= ${url} alt="Payearth" style="height: 40px;" />
+              </div>
+          
+              <!-- Body -->
+              <div style="padding: 20px; background-color: #f9f9f9;">
+                <h2 style="color: #333;">Welcome to Payearth, ${user.name}!</h2>
+          
+                <p>Dear <b>${user.name}</b>,</p>
+          
+                <p>You have successfully registered with Payearth. We are excited to have you onboard!</p>
+          
+                <p>Feel free to explore our services and reach out if you have any questions.</p>
+          
+                <p style="font-style: italic;">— The Payearth Team</p>
+              </div>
+          
+              <!-- Footer -->
+              <div style="padding: 10px; background-color: #6772E5; text-align: center; font-size: 12px; color: #aaa;">
+                <p>Payearth, 1234 Street Name, City, State, 12345</p>
+                <p>&copy; ${new Date().getFullYear()} Payearth. All rights reserved.</p>
+              </div>
+            </div>
+            `
         };
-        sendMail(mailOptions);
+        // sendMail(mailOptions);
+        SendEmail(mailOptions);
+
 
         const {
           password,
@@ -412,7 +463,6 @@ async function socialLogin(req) {
 async function forgotPass(param) {
   const email = param.email;
   const user = await User.findOne({ email });
-
   if (user) {
     var verif_code =
       Math.random().toString(36).substring(2, 15) +
@@ -435,28 +485,51 @@ async function forgotPass(param) {
     Object.assign(user, input);
 
     // Email send functionality.
-    let app_url =
-      config.app_env === "local"
-        ? config.react_local_url
-        : config.react_dev_url;
-    let url = app_url + "?t=resetpass&u=" + user.id + "&hash=" + verif_code;
+    let app_url = config.app_env === "local" ? config.react_local_url : config.react_dev_url;
+
+    const url = `${app_url}/?t=resetpass&u=${user.id}&hash=${verif_code}`;
+
     const mailOptions = {
-      from: config.mail_from_email, // sender address
-      to: user.email, // list of receivers
+      from: config.mail_from_email,
+      to: user.email,
       subject: "Verification link generated for reset password.",
       text: "Verification link",
       html:
-        "Dear <b>" +
-        user.name +
-        '</b>,<br/> password reset verification link is - <a href="' +
-        url +
-        '" target="_blank"><b>' +
-        url +
-        " </b></a><br/> It will expire in " +
-        config.verif_min +
-        " minutes.",
+        `
+        <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #555;">
+          <div style="background-color: #6772E5; padding: 20px; text-align: center;">
+            <img src="https://yourwebsite.com/logo.png" alt="Payearth" style="height: 40px;" />
+          </div>
+
+          <div style="padding: 20px; background-color: #f9f9f9;">
+            <h2 style="color: #333;">Reset Your Password</h2>
+
+            <p>Hello ${user.name},</p>
+
+            <p>You requested a password reset. Please click the button below to reset your password:</p>
+
+            <div style="text-align: center; margin: 20px 0;">
+              <a href="${url}" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #6772E5; text-decoration: none; border-radius: 5px;">
+                Reset Password
+              </a>
+            </div>
+
+            <p>This link is valid for 7 days. It will expire in 7 days.</p>
+
+            <p>If you didn't request a password reset, please ignore this email.</p>
+
+            <p style="font-style: italic;">— The Payearth Team</p>
+          </div>
+
+          <div style="padding: 10px; background-color: #6772E5; text-align: center; font-size: 12px; color: #aaa;">
+            <p>Payearth, 1234 Street Name, City, State, 12345</p>
+
+             <p>&copy; ${new Date().getFullYear()} Payearth. All rights reserved.</p>
+          </div>
+        </div>
+        `
     };
-    sendMail(mailOptions);
+    SendEmail(mailOptions);
 
     const data = await user.save();
 
@@ -469,7 +542,6 @@ async function forgotPass(param) {
     return false;
   }
 }
-
 async function resetPass(param) {
   const id = param.id;
   const user = await User.findById(id);
@@ -2786,7 +2858,41 @@ async function deleteReviews(req) {
 }
 // *******************************************************************************
 // *******************************************************************************
-async function addMeetByUser(req) {
+// async function addMeetByUser(req) {
+//   try {
+//     const reqData = req.body;
+//     let data = "";
+//     for (const event of reqData) {
+//       const existingEvent = await Calendar.findOne({
+//         event_id: event.event_id,
+//       });
+
+//       if (!existingEvent) {
+//         const eventData = {
+//           event_id: event.event_id,
+//           event_title: event.event_title,
+//           event_description: event.event_description,
+//           user_id: event.user_id,
+//           service_id: event.service_id,
+//           start_datetime: event.start_datetime,
+//           end_datetime: event.end_datetime,
+//           meeting_url: event.meeting_url,
+//         };
+
+//         data = await Calendar.create(eventData);
+//       } else {
+//         data = [];
+//       }
+//     }
+//     return data;
+//   } catch (err) {
+//     console.error("Error saving calendar events:", err);
+//     return false; // Indicate failure
+//   }
+// }
+
+//Add (save) Google Event in data base
+async function addGoogleEvent(req) {
   try {
     const reqData = req.body;
     let data = "";
@@ -2815,38 +2921,41 @@ async function addMeetByUser(req) {
     return data;
   } catch (err) {
     console.error("Error saving calendar events:", err);
-    return false; // Indicate failure
+    return false;
   }
 }
 
-// *******************************************************************************
-// *******************************************************************************
-//get meeting by UserId
-
-async function getMeeting(req) {
+//get google calendar events from data base.
+async function getGoogleEvent(req) {
   const user_id = req.params.id;
+
   try {
-    let result = await Calendar.find({ user_id })
+    let result = await Calendar.find({ user_id }).exec();
+
+    if (!result || result.length === 0) {
+      console.log("No events found for this user:", user_id);
+      return [];
+    }
+
+    result = await Calendar.find({ user_id })
       .populate({
         path: "service_id",
         model: Services,
-        select: "name createdBy ",
+        select: "name createdBy",
       })
       .populate({ path: "user_id", model: User, select: "name" })
       .sort({ createdAt: "desc" })
       .exec();
+
     return result;
   } catch (err) {
-    console.log("Error", err);
-    throw err;
+    console.error("Error:", err);
+    return false;
   }
 }
 
-// *******************************************************************************
-// *******************************************************************************
-//delete meeting by user
-
-async function delMeetingByUser(req) {
+//Delete google calendar events from data base.
+async function deleteGoogleEvent(req) {
   const id = req.params.id;
   try {
     const result = await Calendar.deleteOne({ _id: id });
@@ -2855,6 +2964,7 @@ async function delMeetingByUser(req) {
     console.log(error);
   }
 }
+
 // *******************************************************************************
 // *******************************************************************************
 //service order completed order list & Failed list
@@ -3690,3 +3800,71 @@ async function deleteNotification(req) {
 }
 // *******************************************************************************
 // *******************************************************************************
+//User Contact-Us
+async function userContactUs(param) {
+  const email = param.email;
+
+  const user = await User.findOne({ email });
+  console.log("user", user)
+
+  if (!user) {
+    console.log("email address not found. Please try again.");
+    return false;
+  }
+
+  const mailOptions = {
+
+    from: `"Payearth Support" <${param.email}>`,
+    replyTo: `${param.email}`,
+    to: config.mail_from_email,
+    subject: `"Contact Us Message from user" ${param.name}`,
+    text: "You have received a message from " + user.name,
+    html: `
+  <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #555;">
+  <!-- Header -->
+  <div style="background-color: #6772E5; padding: 20px; text-align: center;">
+    <img src="https://pay.earth:7700/uploads/logo.png" alt="Payearth" style="height: 40px;" />
+  </div>
+
+  <!-- Body -->
+  <div style="padding: 20px; background-color: #f9f9f9;">
+    <h2 style="color: #333;">New Contact Us Message from User ${user.name}</h2>
+
+    <p>Hello Payearth Admin,</p>
+
+    <p>You have received a new message from the contact us form on your website. Here are the details:</p>
+
+    <div style="margin-bottom: 20px;">
+      <p><strong>Name:</strong> ${param.name}</p>
+      <p><strong>Email:</strong> ${param.email}</p>
+    </div>
+
+    <div style="padding: 10px; background-color: #fff; border: 1px solid #ddd; border-radius: 4px;">
+      <p><strong>Message:</strong></p>
+      <p>${param.message}</p>
+    </div>
+
+    <p>Please review the message and respond as needed.</p>
+
+    <p style="font-style: italic;">— The Payearth Team</p>
+  </div>
+
+  <!-- Footer -->
+  <div style="padding: 10px; background-color: #6772E5; text-align: center; font-size: 12px; color: #aaa;">
+    <p>Payearth, 1234 Street Name, City, State, 12345</p>
+
+    <p>&copy; ${new Date().getFullYear()} Payearth. All rights reserved.</p>
+  </div>
+  </div>
+   `
+  };
+
+
+  try {
+    await SendEmail(mailOptions);
+    return mailOptions;
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return false
+  }
+}

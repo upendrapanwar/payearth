@@ -197,13 +197,17 @@ router.get("/getSubscriptionPlanBySeller/:id", getSubscriptionPlanBySeller);
 
 //Service Management
 router.post("/services", addService);
-router.get("/service/items/:id", getServiceItems); //Service  - added / pending / reject
+router.get("/service/items/:id", getServiceItems);
 router.put("/service/items/status-update/:id", serviceStatusUpdate);
 router.put("/service/edit/:id", editService);
 router.get("/service/getServiceData", getServiceData);
 router.get("/service/getServiceStatus/:meetingStatus", getServiceStatus);
 router.post("/service/save-calendar-events", saveCalendarEvents);
-router.get("/service/get-calendar-events", getCalendarEvents);
+router.get("/service/get-seller-calendar-events", getSellerCalendarEvents);
+router.delete("/service/delete-calendar-event/:id", delSellerCalendarEvents)
+router.post("/seller-contact-us", contactUsValidation, seller_contactUs);
+
+
 router.post("/service-order", sellerServiceOrders);
 //router.get("/services_checkName", servicesCheckName)
 
@@ -237,8 +241,6 @@ router.put("/removeFromGroup", removeFromGroup)
 router.put("/addGroupMember/:id", addGroupMember);
 router.put("/updateGroupName", updateGroupName);
 
-//Seller appointment calendar
-// router.get("/getMeetingData/:id", getMeeting);
 
 // community
 router.get('/seller_community/posts/:id', getPosts);
@@ -254,7 +256,6 @@ router.put('/postRemoved', postDelete);
 router.put('/updatePost', updatePost);
 router.post("/createPostReport", createPostReport)
 router.get("/getPostById/:id", getPostById);
-
 router.put("/editProfileImage/:id", editProfileImage);
 
 
@@ -946,9 +947,9 @@ function saveCalendarEvents(req, res, next) {
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 
-function getCalendarEvents(req, res, next) {
+function getSellerCalendarEvents(req, res, next) {
   sellerService
-    .getCalendarEvents(req)
+    .getSellerCalendarEvents(req)
     .then((data) =>
       data
         ? res.status(200).json({ status: true, data: data })
@@ -956,6 +957,37 @@ function getCalendarEvents(req, res, next) {
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
+
+function delSellerCalendarEvents(req, res, next) {
+  sellerService.delSellerCalendarEvents(req)
+    .then((data) => {
+      if (data) {
+        res.status(200).json({ status: true, data: data });
+      } else {
+        res.status(400).json({ status: false, message: "Event not found", data: [] });
+      }
+    })
+    .catch((err) => {
+      console.error("Error in delSellerCalendarEvents:", err);
+      res.status(500).json({ status: false, message: "Internal Server Error" });
+    });
+}
+
+function seller_contactUs(req, res, next) {
+  sellerService
+    .seller_contactUs(req.body)
+    .then((seller) =>
+      seller
+        ? res
+          .status(200)
+          .json({ status: true, message: "Email sent successfully." })
+        : res
+          .status(400)
+          .json({ status: false, message: "Email has not sent. Please, try again." })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
 
 function sellerServiceOrders(req, res, next) {
   sellerService.sellerServiceOrders(req)
@@ -1361,6 +1393,6 @@ function getPostById(req, res, next) {
 function editProfileImage(req, res, next) {
 
   sellerService.editProfileImage(req)
-      .then(result => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
-      .catch(err => next(res.json({ status: false, message: err })));
+    .then(result => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+    .catch(err => next(res.json({ status: false, message: err })));
 }

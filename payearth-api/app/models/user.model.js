@@ -7,7 +7,6 @@ const schema = new Schema({
     password: { type: String, required: false, default: '' },
     phone: { type: String, required: false, default: '' },
     role: { type: String, required: false, default: 'user' },
-    purchase_type: { type: String, enum: ['retail', 'wholesale'], required: false, default: 'retail' },
     social_accounts: {
         google: {
             google_id: { type: String, required: false, default: null, index: true },

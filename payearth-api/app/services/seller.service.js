@@ -17,6 +17,7 @@ const fs = require("fs");
 const ffmpeg = require("fluent-ffmpeg");
 const ffmpeg_static = require("ffmpeg-static");
 const LocationData = require("countrycitystatejson");
+const SendEmail = require("../helpers/email")
 
 const {
   User,
@@ -102,15 +103,14 @@ module.exports = {
   getServiceStatus,
   getServiceData,
   saveCalendarEvents,
-  getCalendarEvents,
+  getSellerCalendarEvents,
   sellerServiceOrders,
-  //servicesCheckName,
+  seller_contactUs,
   createSellerBanner,
   getBannersBySellerId,
   deleteBanner,
   getBannerById,
   updateBanner,
-  // getMeeting,
   createSellerSubscriptionPlan,
   sellerAddPlan,
   getSubscriptionPlanBySeller,
@@ -160,30 +160,30 @@ module.exports = {
   editProfileImage,
 };
 
-function sendMail(mailOptions) {
-  // create reusable transporter object using the default SMTP transport
-  const transporter = nodemailer.createTransport({
-    port: config.mail_port, // true for 465, false for other ports
-    host: config.mail_host,
-    auth: {
-      user: config.mail_auth_user,
-      pass: config.mail_auth_pass,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
-    secure: config.mail_is_secure,
-  });
+// function sendMail(mailOptions) {
+//   // create reusable transporter object using the default SMTP transport
+//   const transporter = nodemailer.createTransport({
+//     port: config.mail_port, // true for 465, false for other ports
+//     host: config.mail_host,
+//     auth: {
+//       user: config.mail_auth_user,
+//       pass: config.mail_auth_pass,
+//     },
+//     tls: {
+//       rejectUnauthorized: false,
+//     },
+//     secure: config.mail_is_secure,
+//   });
 
-  transporter.sendMail(mailOptions, function (err, info) {
-    if (err) {
-      console.log("*** Error", err);
-    } else {
-      console.log("*** Success", info);
-    }
-  });
-  return true;
-}
+//   transporter.sendMail(mailOptions, function (err, info) {
+//     if (err) {
+//       console.log("*** Error", err);
+//     } else {
+//       console.log("*** Success", info);
+//     }
+//   });
+//   return true;
+// }
 
 async function signup(req) {
   // const file = req.file;
@@ -217,16 +217,40 @@ async function signup(req) {
 
   //Email send functionality.
   const mailOptions = {
-    from: config.mail_from_email, // sender address
+    from: `"Payearth Support" <${config.mail_from_email}>`,
+    replyTo: `${config.mail_from_email}`,
     to: seller.email,
-    subject: "Welcome Email - PayEarth",
-    text: "Welcome Email",
+    subject: `Welcome to Payearth, ${seller.name}!`,
+    text: "",
     html:
-      "Dear <b>" +
-      seller.name +
-      "</b>,<br/> You are successfully registered as Seller.<br/> ",
+      `<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #555;">
+  <!-- Header -->
+  <div style="background-color: #6772E5; padding: 20px; text-align: center;">
+    <img src="https://pay.earth:7700/uploads/logo.png" alt="Payearth" style="height: 40px;" />
+  </div>
+
+  <!-- Body -->
+  <div style="padding: 20px; background-color: #f9f9f9;">
+    <h2 style="color: #333;">Seller Registration Successful!</h2>
+
+    <p>Dear <b>${seller.name}</b>,</p>
+
+    <p>You are successfully registered as a seller on Payearth. We are thrilled to have you join our marketplace!</p>
+
+    <p>Start adding your products and services to reach customers worldwide. If you have any questions or need assistance, feel free to contact us anytime.</p>
+
+    <p style="font-style: italic;">— The Payearth Team</p>
+  </div>
+
+  <!-- Footer -->
+  <div style="padding: 10px; background-color: #6772E5; text-align: center; font-size: 12px; color: #aaa;">
+    <p>Payearth, 1234 Street Name, City, State, 12345</p>
+    <p>&copy; ${new Date().getFullYear()} Payearth. All rights reserved.</p>
+  </div>
+</div>
+`
   };
-  sendMail(mailOptions);
+  SendEmail(mailOptions);
 
   const data = await seller.save();
   if (data) {
@@ -403,12 +427,34 @@ async function socialLogin(req) {
           subject: "Welcome Email - PayEarth",
           text: "Welcome Email",
           html:
-            "Dear <b>" +
-            seller.name +
-            "</b>,<br/> You are successfully registered as Seller.<br/> ",
-        };
-        sendMail(mailOptions);
+            `<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #555;">
+  <!-- Header -->
+  <div style="background-color: #6772E5; padding: 20px; text-align: center;">
+    <img src=${url} alt="Payearth" style="height: 40px;" />
+  </div>
 
+  <!-- Body -->
+  <div style="padding: 20px; background-color: #f9f9f9;">
+    <h2 style="color: #333;">Congratulations, ${seller.name}!</h2>
+
+    <p>Dear <b>${seller.name}</b>,</p>
+
+    <p>You have successfully registered as a seller on Payearth. We are delighted to have you join our platform!</p>
+
+    <p>Start adding your products and services to reach new customers. If you have any questions or need support, feel free to contact us at any time.</p>
+
+    <p style="font-style: italic;">— The Payearth Team</p>
+  </div>
+
+  <!-- Footer -->
+  <div style="padding: 10px; background-color: #6772E5; text-align: center; font-size: 12px; color: #aaa;">
+    <p>Payearth, 1234 Street Name, City, State, 12345</p>
+    <p>&copy; ${new Date().getFullYear()} Payearth. All rights reserved.</p>
+  </div>
+</div>
+`
+        };
+        SendEmail(mailOptions);
         const {
           password,
           reset_password,
@@ -515,17 +561,42 @@ async function forgotPass(param) {
       subject: "Verification link generated for reset password.",
       text: "Verification link",
       html:
-        "Dear <b>" +
-        seller.name +
-        '</b>,<br/> password reset verification link is - <a href="' +
-        url +
-        '" target="_blank"><b>' +
-        url +
-        " </b></a><br/> It will expire in " +
-        config.verif_min +
-        " minutes.",
+        `<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #555;">
+  <!-- Header -->
+  <div style="background-color: #6772E5; padding: 20px; text-align: center;">
+    <img src="https://yourwebsite.com/logo.png" alt="Payearth" style="height: 40px;" />
+  </div>
+
+  <!-- Body -->
+  <div style="padding: 20px; background-color: #f9f9f9;">
+    <h2 style="color: #333;">Password Reset Verification</h2>
+
+    <p>Dear <b>${seller.name}</b>,</p>
+
+    <p>You requested a password reset. Please click the link below to reset your password:</p>
+
+    <div style="text-align: center; margin: 20px 0;">
+      <a href="${url}" target="_blank" style="display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #6772E5; text-decoration: none; border-radius: 5px;">
+        Reset Password
+      </a>
+    </div>
+
+    <p>This link will expire in 7 days.</p>
+
+    <p>If you didn't request a password reset, please ignore this email.</p>
+
+    <p style="font-style: italic;">— The Payearth Team</p>
+  </div>
+
+  <!-- Footer -->
+  <div style="padding: 10px; background-color: #6772E5; text-align: center; font-size: 12px; color: #aaa;">
+    <p>Payearth, 1234 Street Name, City, State, 12345</p>
+    <p>&copy; ${new Date().getFullYear()} Payearth. All rights reserved.</p>
+  </div>
+</div>
+`
     };
-    sendMail(mailOptions);
+    SendEmail(mailOptions);
 
     const data = await seller.save();
 
@@ -2705,17 +2776,129 @@ async function saveCalendarEvents(req) {
   }
 }
 
-async function getCalendarEvents() {
+
+// fetch google calendar event from data base
+async function getSellerCalendarEvents(req) {
+  const { sellerId } = req.query;
+
   try {
-    const result = await Calendar.find().select(
-      "event_title event_description start_datetime end_datetime"
-    );
-    if (result && result.length > 0) return result;
+    const services = await Services.find({ createdBy: sellerId }).select('_id');
+    if (services.length === 0) {
+      return [];
+    }
+
+    const serviceIds = services.map(service => service._id);
+
+    const data = await Calendar.find({
+      service_id: { $in: serviceIds },
+      user_id: { $ne: null },
+    })
+      .populate({
+        path: 'service_id',
+        select: 'name'
+      })
+      .populate({
+        path: 'user_id',
+        select: 'name phone email'
+      })
+      .select("event_id user_id service_id event_title event_description start_datetime end_datetime meeting_url");
+    return data;
   } catch (err) {
     console.log("Error", err);
     return false;
   }
 }
+
+//delete google calendar events from database
+async function delSellerCalendarEvents(req) {
+  try {
+    const _id = req.params.id;
+
+    if (!_id) {
+      console.error("No event ID provided.", error);
+      return false;
+    }
+
+    const data = await Calendar.findByIdAndDelete(_id)
+
+    return data;
+  } catch (error) {
+    console.log("Error in delSellerCalendarEvents:", error);
+    return false;
+  }
+}
+
+//seller contact-us email function
+async function seller_contactUs(param) {
+  console.log("param", param);
+  const email = param.email;
+  console.log("param", email);
+
+  const seller = await Seller.findOne({ email });
+  console.log("user", seller)
+
+  if (!seller) {
+    console.log("email address not found. Please try again.");
+    return false;
+  }
+
+  const mailOptions = {
+
+    from: `"Payearth Support" <${param.email}>`,
+    replyTo: `${param.email}`,
+    to: config.mail_from_email,
+    subject: `"Contact Us Message from seller" ${param.name}`,
+    text: "You have received a message from " + seller.name,
+    html: `
+  <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #555;">
+  <!-- Header -->
+  <div style="background-color: #6772E5; padding: 20px; text-align: center;">
+    <img src="https://pay.earth:7700/uploads/logo.png" alt="Payearth" style="height: 40px;" />
+  </div>
+
+  <!-- Body -->
+  <div style="padding: 20px; background-color: #f9f9f9;">
+    <h2 style="color: #333;">New Contact Us Message from seller ${seller.name}</h2>
+
+    <p>Hello Payearth Admin,</p>
+
+    <p>You have received a new message from the contact us form on your website. Here are the details:</p>
+
+    <div style="margin-bottom: 20px;">
+      <p><strong>Name:</strong> ${param.name}</p>
+      <p><strong>Email:</strong> ${param.email}</p>
+    </div>
+
+    <div style="padding: 10px; background-color: #fff; border: 1px solid #ddd; border-radius: 4px;">
+      <p><strong>Message:</strong></p>
+      <p>${param.message}</p>
+    </div>
+
+    <p>Please review the message and respond as needed.</p>
+
+    <p style="font-style: italic;">— The Payearth Team</p>
+  </div>
+
+  <!-- Footer -->
+  <div style="padding: 10px; background-color: #6772E5; text-align: center; font-size: 12px; color: #aaa;">
+    <p>Payearth, 1234 Street Name, City, State, 12345</p>
+
+    <p>&copy; ${new Date().getFullYear()} Payearth. All rights reserved.</p>
+  </div>
+  </div>
+   `
+  };
+
+
+  try {
+    await SendEmail(mailOptions);
+    return mailOptions;
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return false
+  }
+}
+
 
 async function sellerServiceOrders(req) {
   const { id } = req.body;
@@ -2759,18 +2942,7 @@ async function sellerServiceOrders(req) {
   }
 }
 
-// async function servicesCheckName (req, res) {
-//     try {
-//         const result = await Services.find({})
-//             .sort({ createdAt: 'desc' })
-//         if (result && result.length > 0) {
-//             //    console.log("service-list ", result)
-//             return result
-//         }
-//     } catch (error) {
-//         console.log(error);
-//     }
-// }
+
 // POST API CREATE NEW BANNER....................................
 async function createSellerBanner(req, res) {
   try {

@@ -13,7 +13,6 @@ const schema = {
             "string.empty": "{{#label}} is required.",
             "any.required": "{{#label}} is required."
         }),
-        purchase_type: joi.string().label('Purchase Type').required(),
         password: joi.string().min(6).max(20).label("Password").required().messages({
             "string.empty": "{{#label}} is required.",
             "any.required": "{{#label}} is required.",
@@ -161,52 +160,52 @@ const schema = {
 };
 
 module.exports = {
-    registerValidation: async(req, res, next) => {
+    registerValidation: async (req, res, next) => {
         const value = await schema.register.validate(req.body);
         getMessage(value, res, next);
     },
 
-    loginValidation: async(req, res, next) => {
+    loginValidation: async (req, res, next) => {
         const value = await schema.login.validate(req.body);
         getMessage(value, res, next);
     },
 
-    changePassValidation: async(req, res, next) => {
+    changePassValidation: async (req, res, next) => {
         const value = await schema.changepass.validate(req.body);
         getMessage(value, res, next);
     },
 
-    forgotPassValidation: async(req, res, next) => {
+    forgotPassValidation: async (req, res, next) => {
         const value = await schema.forgotpass.validate(req.body);
         getMessage(value, res, next);
     },
 
-    resetPassValidation: async(req, res, next) => {
+    resetPassValidation: async (req, res, next) => {
         const value = await schema.resetpass.validate(req.body);
         getMessage(value, res, next);
     },
 
-    editProfileValidation: async(req, res, next) => {
+    editProfileValidation: async (req, res, next) => {
         const value = await schema.editprofile.validate(req.body);
         getMessage(value, res, next);
     },
 
-    addReviewValidation: async(req, res, next) => {
+    addReviewValidation: async (req, res, next) => {
         const value = await schema.addreview.validate(req.body);
         getMessage(value, res, next);
     },
 
-    addComplaintValidation: async(req, res, next) => {
+    addComplaintValidation: async (req, res, next) => {
         const value = await schema.addcomplaint.validate(req.body);
         getMessage(value, res, next);
     },
 
-    addCancelValidation: async(req, res, next) => {
+    addCancelValidation: async (req, res, next) => {
         const value = await schema.addcancel.validate(req.body);
         getMessage(value, res, next);
     },
 
-    addReturnValidation: async(req, res, next) => {
+    addReturnValidation: async (req, res, next) => {
         const value = await schema.addreturn.validate(req.body);
         getMessage(value, res, next);
     }

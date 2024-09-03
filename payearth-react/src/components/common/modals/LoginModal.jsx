@@ -30,7 +30,7 @@ const Modal = (props) => {
             axios.post('user/login', values).then(response => {
                 toast.dismiss();
                 if (response.data.status) {
-                    toast.success(response.data.message, {autoClose:3000});
+                    toast.success(response.data.message, { autoClose: 3000 });
 
                     let authInfo = {
                         expTime: response.data.data.expTime,
@@ -42,26 +42,26 @@ const Modal = (props) => {
                         email: response.data.data.email,
                         purchase_type: response.data.data.purchase_type,
                         role: response.data.data.role,
-                        community:response.data.data.community,
-                        imgUrl:response.data.data.image_url
+                        community: response.data.data.community,
+                        imgUrl: response.data.data.image_url
                     };
                     localStorage.setItem('userInfo', JSON.stringify(userInfo));
                     localStorage.setItem('authInfo', JSON.stringify(authInfo));
                     localStorage.setItem('isLoggedIn', 1);
-                    dispatch(setLoginStatus({isLoggedIn: true}));
-                    dispatch(setAuthInfo({authInfo}));
-                    dispatch(setUserInfo({userInfo}));
+                    dispatch(setLoginStatus({ isLoggedIn: true }));
+                    dispatch(setAuthInfo({ authInfo }));
+                    dispatch(setUserInfo({ userInfo }));
                     resetForm();
                     props.onClick();
                     getWishList(response.data.data['_id'], response.data.data.token);
                     history.push('/');
                 } else {
-                    toast.error(response.data.message, {autoClose:3000});
+                    toast.error(response.data.message, { autoClose: 3000 });
                 }
             }).catch(error => {
                 toast.dismiss();
                 if (error.response) {
-                    toast.error(error.response.data.message, {autoClose:3000});
+                    toast.error(error.response.data.message, { autoClose: 3000 });
                 }
             });
         }
@@ -75,9 +75,9 @@ const Modal = (props) => {
         }
     }
 
-    const getWishList = async(userId, token) => {
+    const getWishList = async (userId, token) => {
         let reqBody = {
-            count: {start: 0, limit: 5}
+            count: { start: 0, limit: 5 }
         };
         let selectedWishItems = [];
 
@@ -94,18 +94,18 @@ const Modal = (props) => {
                         selectedWishItems.push(item.productId.id);
                     });
                     localStorage.setItem('selectedWishItems', JSON.stringify(selectedWishItems));
-                    dispatch(setSelectedWishItems({selectedWishItems}));
+                    dispatch(setSelectedWishItems({ selectedWishItems }));
                 }
             }
         }).catch(error => {
-            if(error.response && error.response.data.status === false) {
+            if (error.response && error.response.data.status === false) {
                 toast.error(error.response.data.message);
             }
         });
     }
-    
 
-    return(
+
+    return (
         <Fragment>
             <PeModal onClose={props.onClick} onShow={props.onregisterShow} showForgotModal={props.onForgotShow}>
                 <div className="login_form">
@@ -138,8 +138,8 @@ const Modal = (props) => {
                             }
 
                             {seePassword ?
-                                <img src={visibleIcon} alt="eye-icon" onClick={handlePassword}/> :
-                                <img src={invisibleIcon} alt="invisible-icon" onClick={handlePassword}/>
+                                <img src={visibleIcon} alt="eye-icon" onClick={handlePassword} /> :
+                                <img src={invisibleIcon} alt="invisible-icon" onClick={handlePassword} />
                             }
 
                             {formik.touched.password && formik.errors.password ? (
@@ -166,9 +166,9 @@ const Modal = (props) => {
 };
 
 function LoginModal(props) {
-    return(
+    return (
         <Fragment>
-            {ReactDom.createPortal(<Modal onClick={props.onloginHide} onShow={props.onregisterShow} onForgotShow={props.onForgotShow}/>, document.getElementById('overlays'))}
+            {ReactDom.createPortal(<Modal onClick={props.onloginHide} onShow={props.onregisterShow} onForgotShow={props.onForgotShow} />, document.getElementById('overlays'))}
         </Fragment>
     )
 }

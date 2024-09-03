@@ -162,7 +162,7 @@ var uploadReturn = multer({
 // Routes
 router.post("/login", loginValidation, authenticate);
 router.post("/social-login", socialLogin);
-router.post("/signup", registerValidation, register);
+router.post("/signup", registerValidation, userRegister);
 router.post("/forgot-password", forgotPassValidation, forgotPass);
 router.put("/reset-password", resetPassValidation, resetPass);
 router.put("/change-password/:id", changePassValidation, changePass);
@@ -237,9 +237,18 @@ router.get("/get-common-service/:id", getCommonServiceById);
 router.post("/service-review", addServiceReview);
 router.get("/get-service-review/:id", getServiceReviews);
 router.delete("/delete-review/:id", deleteReviews);
-router.post("/add-meeting-user/:id", addMeetByUser);
-router.get("/get-meeting/:id", getMeeting);
-router.delete("/delete-meeting/:id", delMeetingByUser);
+
+// router.post("/add-meeting-user/:id", addMeetByUser);
+router.post("/add-calendar-event/:id", addGoogleEvent);
+
+// router.get("/get-meeting/:id", getMeeting);
+router.get("/get-calendar-event/:id", getGoogleEvent);
+
+
+// router.delete("/delete-meeting/:id", delMeetingByUser);
+router.delete("/del-calendar-event/:id", deleteGoogleEvent);
+
+
 router.get("/service-orders/:id", getServiceOrder);
 router.get("/zoomAccessToken/:id", zoomAccessToken);
 router.get("/zoomRefreshToken", zoomRefreshToken);
@@ -272,13 +281,14 @@ router.post("/add-notification", addNotification);
 router.get("/get-notification/:id", getNotification);
 router.patch("/update-notification/:id", updateNotification);
 router.delete("/delete-notification/:id", deleteNotification);
+router.post("/user-contact-us", userContactUs);
 
 
 module.exports = router;
 
-function register(req, res, next) {
+function userRegister(req, res, next) {
   userService
-    .create(req.body)
+    .userRegister(req.body)
     .then((user) =>
       user
         ? res.status(201).json({
@@ -1191,9 +1201,9 @@ function deleteReviews(req, res, next) {
 //*****************************************************************************************/
 //*****************************************************************************************/
 //Add meeting by user for service with seller
-function addMeetByUser(req, res, next) {
+function addGoogleEvent(req, res, next) {
   userService
-    .addMeetByUser(req)
+    .addGoogleEvent(req)
     .then((meeting) =>
       meeting
         ? res.status(200).json({ status: true, data: meeting })
@@ -1204,35 +1214,81 @@ function addMeetByUser(req, res, next) {
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 
+
 //*****************************************************************************************/
 //*****************************************************************************************/
 //get meeting data and show into the calendar
-function getMeeting(req, res, next) {
+// function getGoogleEvent(req, res, next) {
+//   userService
+//     .getGoogleEvent(req)
+//     .then((meetings) => {
+//       if (meetings && meetings.length > 0) {
+//         res.status(200).json({ status: true, data: meetings });
+//       } else {
+//         res.status(400).json({
+//           status: false,
+//           message: msg.common.no_data_err,
+//           data: [],
+//         });
+//       }
+//     })
+//     .catch((err) => {
+//       console.error(err); // Log the error for debugging purposes
+//       res.status(500).json({ status: false, message: err.message });
+//     });
+// }
+
+// Get meeting data and show in the calendar
+//***** */
+// function getGoogleEvent(req, res, next) {
+//   userService
+//     .getGoogleEvent(req)
+//     .then((result) => {
+//       if (result && result.length > 0) {
+//         res.status(200).json({ status: true, data: result });
+//       } else {
+//         res.status(404).json({
+//           status: false,
+//           message: msg.common.no_data_err,
+//           data: [],
+//         });
+//       }
+//     })
+//     .catch((err) => {
+//       console.error("Error fetching events:", err); // Log the error for debugging purposes
+//       res.status(500).json({ status: false, message: err.message });
+//     });
+// }
+
+function getGoogleEvent(req, res, next) {
   userService
-    .getMeeting(req)
-    .then((meetings) => {
-      if (meetings && meetings.length > 0) {
-        res.status(200).json({ status: true, data: meetings });
-      } else {
-        res.status(400).json({
-          status: false,
-          message: msg.common.no_data_err,
-          data: [],
-        });
-      }
-    })
-    .catch((err) => {
-      console.error(err); // Log the error for debugging purposes
-      res.status(500).json({ status: false, message: err.message });
-    });
+    .getGoogleEvent(req)
+    .then((result) =>
+      result
+        ? res.status(200).json({ status: true, data: result })
+        : res.status(400).json({ status: false, message: "ERROR ", data: [] })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
 }
+
 //*****************************************************************************************/
 //*****************************************************************************************/
 //delete meeting By user
 
-function delMeetingByUser(req, res, next) {
+// function delMeetingByUser(req, res, next) {
+//   userService
+//     .delMeetingByUser(req)
+//     .then((meeting) =>
+//       meeting
+//         ? res.json({ status: true, message: "Successfull Delete" })
+//         : res.json({ status: false, message: "ERROR" })
+//     )
+//     .catch((err) => next(res.json({ status: false, message: err })));
+// }
+
+function deleteGoogleEvent(req, res, next) {
   userService
-    .delMeetingByUser(req)
+    .deleteGoogleEvent(req)
     .then((meeting) =>
       meeting
         ? res.json({ status: true, message: "Successfull Delete" })
@@ -1503,3 +1559,19 @@ function deleteNotification(req, res, next) {
 }
 //*****************************************************************************************/
 //*****************************************************************************************/
+//User Contact-Us
+
+function userContactUs(req, res, next) {
+  userService
+    .userContactUs(req.body)
+    .then((user) =>
+      user
+        ? res
+          .status(200)
+          .json({ status: true, message: "Email sent successfully." })
+        : res
+          .status(400)
+          .json({ status: false, message: "Email has not sent. Please, try again." })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}

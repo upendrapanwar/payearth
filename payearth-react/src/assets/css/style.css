@@ -4564,3 +4564,9 @@ h4 {
   max-width: 100%;
   max-height:600px;
 }
+
+.fc-event.fc-event-start > div{
+  width: 100%;
+  padding: 6px 6px;
+}
+.fc-event.fc-event-start > div > div{line-height: 1.4;}
