@@ -25,7 +25,6 @@ const SellerCommunity = () => {
     const authInfo = useSelector(state => state.auth.authInfo);
     const loading = useSelector(state => state.global.loading);
     const SellerPostsData = useSelector(state => state.post.SellerPostsData);
-    //console.log("Posts Seller", SellerPostsData)
     const postCategories = useSelector(state => state.post.postCategories);
     const postProducts = useSelector(state => state.post.postProducts);
     const dispatch = useDispatch();
@@ -573,11 +572,11 @@ const SellerCommunity = () => {
                                                 {[...SellerPostsData]
                                                     .sort((a, b) => {
                                                         if (showMostLiked && showMostCommented) {
-                                                            return b.likeCount - a.likeCount || b.comments.length - a.comments.length;
+                                                            return b.likeCount - a.likeCount || b.commentCount - a.commentCount;
                                                         } else if (showMostLiked) {
                                                             return b.likeCount - a.likeCount;
                                                         } else if (showMostCommented) {
-                                                            return b.comments.length - a.comments.length;
+                                                            return b.commentCount - a.commentCount;
                                                         } else {
                                                             return 0; // No sorting
                                                         }
@@ -595,11 +594,11 @@ const SellerCommunity = () => {
                                                 {[...filteredData]
                                                     .sort((a, b) => {
                                                         if (showMostLiked && showMostCommented) {
-                                                            return b.likeCount - a.likeCount || b.comments.length - a.comments.length;
+                                                            return b.likeCount - a.likeCount || b.commentCount - a.commentCount;
                                                         } else if (showMostLiked) {
                                                             return b.likeCount - a.likeCount;
                                                         } else if (showMostCommented) {
-                                                            return b.comments.length - a.comments.length;
+                                                            return b.commentCount - a.commentCount;
                                                         } else {
                                                             return 0; // No sorting
                                                         }

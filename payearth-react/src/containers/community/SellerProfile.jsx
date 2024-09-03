@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Footer from '../../components/common/Footer';
 import Header from '../../components/seller/common/Header';
-import userImg from '../../assets/images/user.png'
+import userImg from '../../assets/images/user.png';
+import imageEditIcon from '../../assets/icons/pencil-square-outline-icon.svg';
 import { Link } from 'react-router-dom';
 import InputEmoji from 'react-input-emoji'
 import Post from '../../components/community/common/Post';
@@ -11,7 +12,7 @@ import { setLoading } from '../../store/reducers/global-reducer';
 import { setPostCategories, setPostProducts } from '../../store/reducers/post-reducer';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
-import config from '../.././config.json'
+import config from '../../config.json'
 import { useDispatch } from 'react-redux';
 import { NotFound } from '../../components/common/NotFound';
 import { getSellerPostsData } from '../../helpers/sellerPost-listing';
@@ -115,7 +116,7 @@ const SellerProfile = () => {
     }
     const createPost = async () => {
         // console.log("authInfo Seller or User", authInfo.token);
-       // console.log("postStatus", postStatus)
+        // console.log("postStatus", postStatus)
         const token = authInfo.token;
         setAddMore(false);
         let reqBody = {
@@ -273,7 +274,7 @@ const SellerProfile = () => {
     //     setCategoryId(event.target.value);
     // };
     const handleCategories = (selectedOption) => {
-       // console.log("HandleCategory select option", selectedOption)
+        // console.log("HandleCategory select option", selectedOption)
         setDefaultCategoryOption(selectedOption);
         setDefaultProductOption({ label: 'Choose Product', value: '' });
         setCategoryId(selectedOption.value);
@@ -289,7 +290,7 @@ const SellerProfile = () => {
     //     console.log(event.target.value);
     // }
     const handleProducts = (selectedOption) => {
-       // console.log("selectedProdOption", selectedOption)
+        // console.log("selectedProdOption", selectedOption)
         setDefaultProductOption(selectedOption);
         setProductId(selectedOption.value);
     }
@@ -483,17 +484,26 @@ const SellerProfile = () => {
                             <div className="col-lg-12">
                                 <div className="comm_profile">
                                     <div className="post_by">
-                                        <div className="poster_img">
-                                            {/* <img src={userImg} alt="" /> */}
-                                            <img  src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg} alt="" /> 
+                                        <div className="poster_img position-relative d-inline-block">
+                                            {/* User profile image */}
+                                            <img
+                                                src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
+                                                alt=""
+                                                className="img-fluid"
+                                            />
 
+                                            {/* Edit icon positioned over the user profile image */}
+                                            <img
+                                                src={imageEditIcon}
+                                                alt="Edit Icon"
+                                                className="position-absolute top-2 start-0 translate-middle p-1 bg-light rounded-circle"
+                                                style={{ width: '5px', height: '5px' }}
+                                            />
                                         </div>
-                                        <button
-                                            className="btn btn-dark"
-                                            onClick={handleShow}
-                                        >
-                                            <p>edit</p>
-                                        </button>
+                                        {/* <div className="poster_img">
+                                            <img src={imageEditIcon} alt="" />
+                                            <img src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg} alt="" />
+                                        </div> */}
                                         <div className="poster_info">
                                             <div className="poster_name">{userInfo.name}</div>
                                             <small>{userInfo.role}</small>
@@ -811,7 +821,7 @@ const SellerProfile = () => {
 
                 <Footer />
             </div>
-        </React.Fragment>
+        </React.Fragment >
     );
 }
 

@@ -24,13 +24,13 @@ import TimeAgo from 'javascript-time-ago'
 import en from 'javascript-time-ago/locale/en.json'
 import ru from 'javascript-time-ago/locale/ru.json'
 
-TimeAgo.addDefaultLocale(en)
-TimeAgo.addLocale(ru)
+// TimeAgo.addDefaultLocale(en)
+// TimeAgo.addLocale(ru)
 
 
 const SellerPost = ({ posts, sendEditData }) => {
 
-    //console.log("all posts ----------", posts)
+    console.log("all posts of this page----------", posts)
 
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
@@ -407,7 +407,7 @@ const SellerPost = ({ posts, sendEditData }) => {
                 response = posts.adminId.community.followerData.includes(authInfo.id);
             }
 
-            console.log("response", response);
+            // console.log("response", response);
             setIsFollowing(response);
 
         };
@@ -465,29 +465,40 @@ const SellerPost = ({ posts, sendEditData }) => {
     const handleReportPost = async () => {
         try {
             const data = reportedPost;
-            console.log("reportedPost send to admin", data)
+            console.log("Reported post sent to admin:", data);
+
             const headers = {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authInfo.token}` // Replace authInfo.token with your actual token variable
+                'Authorization': `Bearer ${authInfo.token}` // Ensure authInfo.token is correctly set
             };
-            const response = await axios.post('seller/createPostReport', {
-                reportType: reportOption,
-                notes: reportNote,
-                reportData: {
-                    postId: data.id,
-                    postCreatedBy: data.userId === null ? data.sellerId.id : data.userId.id,
-                },
-                reportBy: authInfo.id
-            }, { headers });
-            console.log("response", response.data)
 
-            toast.success("Report Succesfully");
-            setIsReportOpen(false);
-            // alert(response.data.message);
+            const reportData = {
+                postId: data.id,
+                postCreatedBy: data.userId ? data.userId.id : data.sellerId.id, // Use a more concise conditional expression
+            };
+
+            const response = await axios.post(
+                'seller/createPostReport',
+                {
+                    reportType: reportOption,
+                    notes: reportNote,
+                    reportData,
+                    reportBy: authInfo.id
+                },
+                { headers }
+            );
+            if (response.data.status === true) {
+                toast.success("Report Successfully sent");
+                setIsReportOpen(false);
+            } else {
+                toast.error("Failed to send report. Please try again.");
+            }
         } catch (error) {
             console.error('Error reporting post:', error);
+            toast.error("An error occurred while reporting the post.");
         }
-    }
+    };
+
 
     const handleNoteChange = (e) => {
         setReportNote(e.target.value);
@@ -503,27 +514,41 @@ const SellerPost = ({ posts, sendEditData }) => {
             <div className="post">
                 <div className="post_head">
                     <div className="post_by">
-                        <div className="poster_img "><img src={posts.userId === null ? posts.sellerId.image_url : posts.userId.image_url} alt="" /></div>
-                        {/* <div className="poster_img "><img src={posts.isSeller ? config.apiURI + posts.sellerId.image_url : posts.userId.image_url !== null ? config.apiURI + posts.userId.image_url : userImg} alt="" /></div> */}
+                        <div className="poster_img">
+                            <img
+                                src={
+                                    posts.isAdmin && posts.adminId?.image_url ? posts.adminId.image_url :
+                                        posts.userId === null || posts.userId === undefined ?
+                                            (posts.sellerId?.image_url ? posts.sellerId.image_url : userImg) :
+                                            (posts.userId?.image_url ? posts.userId.image_url : userImg)
+                                }
+                                alt=""
+                            />
+                        </div>
                         <div className="poster_info">
-                            <div className="poster_name">{posts.isSeller ? posts.sellerId.name : posts.userId.name}</div>
+                            <div className="poster_name">
+                                {posts.isAdmin ? posts.adminId.name : posts.isSeller ? posts.sellerId.name : posts.userId.name}
+                            </div>
                             <ReactTimeAgo date={date} locale="en-US" timeStyle="round-minute" />
                             {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseFollow${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseFollow${posts.id}`}>
                                 Follow
                             </Link> */}
                             {
-                                userInfo.role === 'seller' &&
+                                userInfo.role === 'seller' && posts.isAdmin === false &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
                                     {posts.isSeller === true && posts.sellerId.id === authInfo.id
                                         ? "" : isFollowing ? 'Unfollow' : 'Follow'}
-                                    {/* {posts.isSeller === false && posts.userId.id === authInfo.id ? "" : 'Follow'} */}
                                 </Link>
                             }
                             {
-                                userInfo.role === 'user' &&
+                                userInfo.role === 'user' && posts.isAdmin === false &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
                                     {posts.isSeller === false && posts.userId.id === authInfo.id ? "" : isFollowing ? 'Unfollow' : 'Follow'}
                                 </Link>
+                            }
+                            {
+                                posts.isAdmin === true &&
+                                <span className="post_admin text-success">Admin</span>
                             }
                         </div>
                     </div>
@@ -705,24 +730,16 @@ const SellerPost = ({ posts, sendEditData }) => {
                                         <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
                                     </>
                                 ) :
-                                    <Link
-                                        to="#"
-                                        // onClick={() => handleShare(posts)}
-                                        onClick={() => handleReportPopup(posts)}
-                                        className="post_follow">
-                                        Report
-                                    </Link>
+                                    !posts.isAdmin && (
+                                        <Link
+                                            to="#"
+                                            onClick={() => handleReportPopup(posts)}
+                                            className="post_follow"
+                                        >
+                                            Report
+                                        </Link>
+                                    )
                                 }
-                                {/* {posts.userId.id === authInfo.id ? <>
-                                    <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleEdit(posts)}>Edit</button>
-                                    <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
-                                </>
-                                    : ""
-                                } */}
-
-                                {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseShareTo${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseShareTo${posts.id}`}>
-                                    <i className="post_icon ps_share"></i> Share
-                                </Link> */}
                                 <Link to="#"
                                     // onClick={() => setOpenShare(true)}
                                     onClick={() => handleShare(posts)}
