@@ -429,7 +429,14 @@ const SellerCommunity = () => {
                                     <div className="cp_body">
                                         <div className="com_user_acc">
                                             <Link to='/community-profile'>
-                                                <div className="com_user_img"><img src={userInfo.imgUrl !== null && userInfo.imgUrl !== '' ? config.apiURI + userInfo.imgUrl : userImg} alt="" /></div>
+                                                <div className="com_user_img">
+                                                    {/* <img src={userInfo.imgUrl !== null && userInfo.imgUrl !== '' ? config.apiURI + userInfo.imgUrl : userImg} alt="" /> */}
+                                                    <img
+                                                        src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
+                                                        alt=""
+                                                        className="img-fluid"
+                                                    />
+                                                </div>
                                             </Link>
                                             <div className="com_user_name">
                                                 <div className="cu_name">{userInfo.name}</div>

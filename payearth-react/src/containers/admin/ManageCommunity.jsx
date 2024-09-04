@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Footer from '../../components/common/Footer';
-import Header from '../../components/seller/common/Header';
+import Header from '../../components/admin/common/Header';
 import userImg from '../../assets/images/user.png'
 import { Link } from 'react-router-dom';
 import InputEmoji from 'react-input-emoji'
