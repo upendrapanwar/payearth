@@ -490,10 +490,11 @@ async function forgotPass(param) {
     const url = `${app_url}/?t=resetpass&u=${user.id}&hash=${verif_code}`;
 
     const mailOptions = {
-      from: config.mail_from_email,
+      from: `"Payearth Support" <${config.mail_from_email}>`,
+      replyTo: `${config.mail_from_email}`,
       to: user.email,
       subject: "Verification link generated for reset password.",
-      text: "Verification link",
+      text: "",
       html:
         `
         <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #555;">

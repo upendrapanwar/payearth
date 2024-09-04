@@ -490,6 +490,7 @@ const SellerPost = ({ posts, sendEditData }) => {
             if (response.data.status === true) {
                 toast.success("Report Successfully sent");
                 setIsReportOpen(false);
+                setReportedPost(null);
             } else {
                 toast.error("Failed to send report. Please try again.");
             }
@@ -576,18 +577,20 @@ const SellerPost = ({ posts, sendEditData }) => {
                                                 <div className="fp_fc">{posts.userId === null ? posts.sellerId.community.following : posts.userId.community.following}</div>
                                                 <small>Following</small>
                                             </li>
-                                            <li>
+                                            {/* <li>
                                                 <div className="fp_fc">00</div>
                                                 <small>Posts</small>
-                                            </li>
+                                            </li> */}
 
                                         </ul>
-                                        {isFollowing ?
-                                            <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleUnfollow(posts)}>Unfollow</Link>
-                                            :
-                                            <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleFollow(posts)}>Follow</Link>
-                                        }
+                                        <div className="text-center">
+                                            {isFollowing ?
+                                                <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleUnfollow(posts)}>Unfollow</Link>
+                                                :
+                                                <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleFollow(posts)}>Follow</Link>
+                                            }
 
+                                        </div>
 
                                     </div>
                                 </div>
