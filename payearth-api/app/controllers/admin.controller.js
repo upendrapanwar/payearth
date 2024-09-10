@@ -227,6 +227,12 @@ router.post('/postVideos/:id', addPostVideos);
 router.put('/postRemoved', postDelete);
 router.put('/updatePost', updatePost);
 
+//****support****/
+router.get("/support-call-req", getSupportCallReq);
+router.put("/update/support-call-status/:id", updateSupportCallReqStatus);
+
+
+
 module.exports = router;
 
 function register(req, res, next) {
@@ -1050,4 +1056,17 @@ function updatePost(req, res, next) {
     adminService.updatePost(req)
         .then(result => result ? res.status(201).json({ status: true, message: "Updated...!" }) : res.status(400).json({ status: false, message: msg.follow.yes.error }))
         .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function getSupportCallReq(req, res, next) {
+    adminService.getSupportCallReq(req)
+        .then((result) => result ? res.json({ status: true, data: result, message: "Fetch Support Call Req successefully" }) : res.json({ status: false, message: "Error creating support request." }))
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+
+function updateSupportCallReqStatus(req, res, next) {
+    adminService.updateSupportCallReqStatus(req)
+        .then((data) => data ? res.json({ status: true, data: data, message: "Updated Support Status successefully" }) : res.json({ status: false, message: "Error updating support Status." }))
+        .catch((err) => next(res.json({ status: false, message: err.message })));
 }

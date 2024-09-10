@@ -50,6 +50,7 @@ const {
   Chat,
   ChatMessage,
   Notification,
+  Support,
 } = require("../helpers/db");
 
 module.exports = {
@@ -145,6 +146,8 @@ module.exports = {
   updateNotification,
   deleteNotification,
   userContactUs,
+  userSupportEmail,
+  supportReqCall,
 };
 
 // function sendMail(mailOptions) {
@@ -3791,7 +3794,7 @@ async function updateNotification(req) {
 // *******************************************************************************
 //deleteNotification
 async function deleteNotification(req) {
-  // const id = req.params.id;
+  const id = req.params.id;
   try {
     // const result = await Calendar.deleteOne({ _id: id });
     // return result;
@@ -3799,8 +3802,8 @@ async function deleteNotification(req) {
     console.log(error);
   }
 }
-// *******************************************************************************
-// *******************************************************************************
+
+
 //User Contact-Us
 async function userContactUs(param) {
   const email = param.email;
@@ -3833,7 +3836,7 @@ async function userContactUs(param) {
 
     <p>Hello Payearth Admin,</p>
 
-    <p>You have received a new message from the contact us form on your website. Here are the details:</p>
+    <p>You have received a new message from the contact us on payearth. Here are the details:</p>
 
     <div style="margin-bottom: 20px;">
       <p><strong>Name:</strong> ${param.name}</p>
@@ -3867,5 +3870,139 @@ async function userContactUs(param) {
   } catch (error) {
     console.error("Error sending email:", error);
     return false
+  }
+}
+
+//Support Email
+async function userSupportEmail(param) {
+  const email = param.email;
+  const name = param.name;
+  const message = param.message;
+
+  const mailOptions = {
+
+    from: `"Payearth Support" <${email}>`,
+    replyTo: `${email}`,
+    to: config.mail_from_email,
+    subject: `"Support Message from user" ${name}`,
+    text: `"You have received a message from " + ${name}`,
+    html: `
+  <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #555;">
+  <!-- Header -->
+  <div style="background-color: #6772E5; padding: 20px; text-align: center;">
+    <img src="https://pay.earth:7700/uploads/logo.png" alt="Payearth" style="height: 40px;" />
+  </div>
+
+  <!-- Body -->
+  <div style="padding: 20px; background-color: #f9f9f9;">
+    <h2 style="color: #333;">New Support Message from User ${name}</h2>
+
+    <p>Hello Payearth Admin,</p>
+
+    <p>You have received a new message from the support on payearth. Here are the details:</p>
+
+    <div style="margin-bottom: 20px;">
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+    </div>
+
+    <div style="padding: 10px; background-color: #fff; border: 1px solid #ddd; border-radius: 4px;">
+      <p><strong>Message:</strong></p>
+      <p>${message}</p>
+    </div>
+
+    <p>Please review the message and respond as needed.</p>
+
+    <p style="font-style: italic;">— The Payearth Team</p>
+  </div>
+
+  <!-- Footer -->
+  <div style="padding: 10px; background-color: #6772E5; text-align: center; font-size: 12px; color: #aaa;">
+    <p>Payearth, 1234 Street Name, City, State, 12345</p>
+
+    <p>&copy; ${new Date().getFullYear()} Payearth. All rights reserved.</p>
+  </div>
+  </div>
+   `
+  };
+
+
+  try {
+    await SendEmail(mailOptions);
+    return mailOptions;
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return false
+  }
+}
+
+//Support-call-request
+async function supportReqCall(req) {
+  try {
+    const { user_id, seller_id, name, email, phone, message, call_status } = req.body;
+
+    const data = new Support({
+      user_id,
+      seller_id,
+      name,
+      email,
+      phone,
+      message,
+      call_status
+    });
+
+    const result = await data.save();
+
+
+    const mailOptions = {
+      from: `"Payearth Support" <${email}>`,
+      replyTo: `${email}`,
+      to: config.mail_from_email,
+      subject: `Support call request from user ${name}`,
+      text: "",
+      html: `
+      <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #555;">
+        <!-- Header -->
+        <div style="background-color: #6772E5; padding: 20px; text-align: center;">
+          <img src="https://pay.earth:7700/uploads/logo.png" alt="Payearth" style="height: 40px;" />
+        </div>
+
+        <!-- Body -->
+        <div style="padding: 20px; background-color: #f9f9f9;">
+          <h2 style="color: #333;">New Support call request from User ${name}</h2>
+          <p>Hello Payearth Admin,</p>
+          <p>You have received a new message from the support call request on Payearth. Here are the details:</p>
+
+          <div style="margin-bottom: 20px;">
+            <p><strong>Name:</strong> ${name}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Phone:</strong> ${phone}</p>
+            <p><strong>Call Status:</strong> ${call_status}</p>
+          </div>
+
+          <div style="padding: 10px; background-color: #fff; border: 1px solid #ddd; border-radius: 4px;">
+            <p><strong>Message:</strong></p>
+            <p>${message}</p>
+          </div>
+
+          <p>Please review the message and respond as needed.</p>
+          <p style="font-style: italic;">— The Payearth Team</p>
+        </div>
+
+        <!-- Footer -->
+        <div style="padding: 10px; background-color: #6772E5; text-align: center; font-size: 12px; color: #aaa;">
+          <p>Payearth, 1234 Street Name, City, State, 12345</p>
+          <p>&copy; ${new Date().getFullYear()} Payearth. All rights reserved.</p>
+        </div>
+      </div>
+      `
+    };
+
+    await SendEmail(mailOptions);
+
+    return result;
+  } catch (error) {
+    console.error("Error:", error);
+    return false;
   }
 }

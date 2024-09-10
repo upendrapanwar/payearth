@@ -693,6 +693,14 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
                   </Link>
                 </li>
                 <li>
+                  <Link to="/user-support" onClick={() => removeBackdrop()}>
+                    <i className="icon">
+                      <img src={serviceIcon} alt="heart" />
+                    </i>{" "}
+                    Support
+                  </Link>
+                </li>
+                <li>
                   <Link to="#" onClick={() => logout()}>
                     <i className="icon">
                       <img src={logoutIcon} alt="logout" />

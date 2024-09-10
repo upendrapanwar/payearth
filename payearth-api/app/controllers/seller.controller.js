@@ -205,7 +205,12 @@ router.get("/service/getServiceStatus/:meetingStatus", getServiceStatus);
 router.post("/service/save-calendar-events", saveCalendarEvents);
 router.get("/service/get-seller-calendar-events", getSellerCalendarEvents);
 router.delete("/service/delete-calendar-event/:id", delSellerCalendarEvents)
+
+//contact-Us
 router.post("/seller-contact-us", contactUsValidation, seller_contactUs);
+
+//Support Page
+router.post("/support/send-email", contactUsValidation, sellerSupportEmail);
 
 
 router.post("/service-order", sellerServiceOrders);
@@ -257,6 +262,8 @@ router.put('/updatePost', updatePost);
 router.post("/createPostReport", createPostReport)
 router.get("/getPostById/:id", getPostById);
 router.put("/editProfileImage/:id", editProfileImage);
+router.post("/support/request-call", supportReqCall)
+
 
 
 module.exports = router;
@@ -1395,4 +1402,27 @@ function editProfileImage(req, res, next) {
   sellerService.editProfileImage(req)
     .then(result => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
     .catch(err => next(res.json({ status: false, message: err })));
+}
+
+// seller support-Email
+function sellerSupportEmail(req, res, next) {
+  sellerService
+    .sellerSupportEmail(req.body)
+    .then((user) =>
+      user
+        ? res
+          .status(200)
+          .json({ status: true, message: "Email sent successfully." })
+        : res
+          .status(400)
+          .json({ status: false, message: "Email has not sent. Please, try again." })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+
+function supportReqCall(req, res, next) {
+  sellerService.supportReqCall(req)
+    .then((result) => result ? res.json({ status: true, message: "Support request created successfully." }) : res.json({ status: false, message: "Error creating support request." }))
+    .catch((err) => next(res.json({ status: false, message: err.message })));
 }

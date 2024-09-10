@@ -4570,3 +4570,14 @@ h4 {
   padding: 6px 6px;
 }
 .fc-event.fc-event-start > div > div{line-height: 1.4;}
+
+.form_wrapper input.PhoneInputInput:focus { outline: none; border: 0px;}
+
+.seller_dash_wrap .check-table {
+  width: max-content;
+}
+
+.modal-scroll-content {
+  max-height: 300px;
+  overflow-y: auto; 
+}
