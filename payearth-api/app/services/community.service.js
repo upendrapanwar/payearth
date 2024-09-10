@@ -31,7 +31,7 @@ module.exports = {
 
 async function getPosts(req) {
     const authorId = req.params.id;
-    console.log("authorId", authorId)
+   // console.log("authorId", authorId)
     const user = await User.findById(authorId).populate('community.followingData');
     // console.log("user", user)
     if (!user) {
@@ -44,7 +44,10 @@ async function getPosts(req) {
             { postStatus: "Public" },
             {
                 postStatus: "Followers",
-                userId: { $in: followerIds }
+                $or: [
+                    { sellerId: { $in: followerIds } },
+                    { userId: { $in: followerIds } }
+                ]
             },
             { userId: authorId }
         ],
@@ -1093,7 +1096,7 @@ async function getProfilePosts(req) {
             }
         ]);
     // console.log("posts test", posts)
-    if (posts){
+    if (posts) {
         // console.log("posts test ", posts)
         return posts;
     }

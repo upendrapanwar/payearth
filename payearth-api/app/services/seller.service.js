@@ -3839,19 +3839,22 @@ async function getPosts(req) {
   const authorId = req.params.id;
   console.log("authorId", authorId)
   const seller = await Seller.findById(authorId).populate('community.followingData');
-
+  // console.log('seller----%%%', seller)
   if (!seller) {
-    return { success: false, message: "User not founddddddddd" };
+    return { success: false, message: "seller not founddddddddd" };
   }
   const followerIds = seller.community.followingData.map(follower => follower._id);
-  console.log("followerIds", followerIds)
+ // console.log("followerIds", followerIds)
 
   const posts = await Post.find({
     $or: [
       { postStatus: "Public" },
       {
         postStatus: "Followers",
-        sellerId: { $in: followerIds }
+        $or: [
+          { sellerId: { $in: followerIds } },
+          { userId: { $in: followerIds } }
+        ]
       },
       { sellerId: authorId }
     ],

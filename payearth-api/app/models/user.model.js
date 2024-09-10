@@ -22,8 +22,8 @@ const schema = new Schema({
         },
     },
     community: {
-        followerData: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-        followingData: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+        followerData: [{ type: Schema.Types.ObjectId }],
+        followingData: [{ type: Schema.Types.ObjectId }],
         followers: { type: Number, required: false, default: 0 },
         following: { type: Number, required: false, default: 0 },
     },
