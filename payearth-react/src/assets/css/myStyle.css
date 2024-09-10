@@ -3006,3 +3006,10 @@ input[type="search"] {
 
 .iframe-container iframe img { max-width: 100%!important;}
 
+
+
+
+.cp_body .spinner_loader{
+  padding: 40px;
+  position: relative;
+}

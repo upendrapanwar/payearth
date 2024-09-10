@@ -282,6 +282,9 @@ router.get("/get-notification/:id", getNotification);
 router.patch("/update-notification/:id", updateNotification);
 router.delete("/delete-notification/:id", deleteNotification);
 router.post("/user-contact-us", userContactUs);
+router.post("/user-support-email", userSupportEmail);
+router.post("/support/request-call", supportReqCall);
+
 
 
 module.exports = router;
@@ -1574,4 +1577,27 @@ function userContactUs(req, res, next) {
           .json({ status: false, message: "Email has not sent. Please, try again." })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+
+function userSupportEmail(req, res, next) {
+  userService
+    .userSupportEmail(req.body)
+    .then((user) =>
+      user
+        ? res
+          .status(200)
+          .json({ status: true, message: "Email sent successfully." })
+        : res
+          .status(400)
+          .json({ status: false, message: "Email has not sent. Please, try again." })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+
+function supportReqCall(req, res, next) {
+  userService.supportReqCall(req)
+    .then((result) => result ? res.json({ status: true, message: "Support request created successfully." }) : res.json({ status: false, message: "Error creating support request." }))
+    .catch((err) => next(res.json({ status: false, message: err.message })));
 }

@@ -111,7 +111,7 @@ import AdminManageSubPlan from "./containers/admin/ManageSubscriptionPlan";
 
 import AdminEditService from "./containers/admin/EditService";
 
-import ManageSupport from "./containers/admin/ManageSupport";
+import Support from "./containers/admin/SupportAdmin";
 
 // import Services from './containers/seller/Services';
 import EditService from "./containers/seller/EditService";
@@ -142,6 +142,14 @@ import ServiceOrder from "./containers/user/service/ServiceOrder";
 import adminAddService from './containers/admin/AddService';
 import ManageCategories from "./containers/admin/ManageCategories";
 import AdminProfile from "./containers/community/AdminProfile";
+import SupportUser from "./containers/user/SupportUser";
+import SupportSeller from "./containers/seller/SupportSeller";
+import SupportUserEmail from "./containers/user/SupportUserEmail";
+import { SupportSellerEmail } from "./containers/seller/SupportSellerEmail";
+import { SupportUserCall } from "./containers/user/SupportUserCall";
+import { SupportSellerCall } from "./containers/seller/SupportSellerCall";
+import { SupportAdminCall } from "./containers/admin/SupportAdminCall";
+import SupportAdmin from "./containers/admin/SupportAdmin";
 
 
 function App() {
@@ -196,6 +204,21 @@ function App() {
             component={UserContact}
             exact
           />
+
+          <PublicRoute
+            path="/user-support"
+            restricted={false}
+            component={SupportUser}
+            exact
+          />
+
+          <PublicRoute
+            path="/user-support-email"
+            restricted={false}
+            component={SupportUserEmail}
+            exact
+          />
+
 
           <PrivateRoute
             path="/my-profile"
@@ -281,6 +304,14 @@ function App() {
             roles={[Role.user]}
             currentUserRole={userInfo.role}
             exact />
+
+          <PrivateRoute
+            path="/user/support-call"
+            component={SupportUserCall}
+            roles={[Role.user]}
+            currentUserRole={userInfo.role}
+            exact />
+
 
           <PrivateRoute
             path="/order-detail/:id"
@@ -501,6 +532,32 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
+          <PrivateRoute
+            path="/seller/support"
+            component={SupportSeller}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+
+          <PrivateRoute
+            path="/seller/seller-support-email"
+            component={SupportSellerEmail}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/support-call"
+            component={SupportSellerCall}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
 
           {/* Admin routes */}
           <PublicRoute
@@ -811,7 +868,15 @@ function App() {
 
           <PrivateRoute
             path="/admin/manage-support"
-            component={ManageSupport}
+            component={SupportAdmin}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/admin/support-call"
+            component={SupportAdminCall}
             roles={[Role.admin]}
             currentUserRole={userInfo.role}
             exact

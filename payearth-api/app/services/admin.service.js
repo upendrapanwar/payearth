@@ -11,7 +11,13 @@ const db = require("../helpers/db");
 const msg = require('../helpers/messages.json');
 const fs = require('fs');
 
-const { Admin, User, Seller, Coupon, Product, Category, Brand, TodayDeal, BannerImage, TrendingProduct, PopularProduct, Color, OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline, ProductSales, cmsPost, cmsPage, cmsCategory, bannerAdvertisement, Chat, ChatMessage, Services, OrderDetails, Post, PostLike, PostVideos, PostImages, PostComment, } = require("../helpers/db");
+const { Admin, User, Seller, Coupon, Product, Category, Brand,
+    TodayDeal, BannerImage, TrendingProduct, PopularProduct, Color,
+    OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline,
+    ProductSales, cmsPost, cmsPage, cmsCategory, bannerAdvertisement,
+    Chat, ChatMessage, Services, OrderDetails, Post, PostLike, PostVideos,
+    PostImages, PostComment, Support,
+} = require("../helpers/db");
 
 module.exports = {
     authenticate,
@@ -144,6 +150,8 @@ module.exports = {
     addPostVideos,
     postDelete,
     updatePost,
+    getSupportCallReq,
+    updateSupportCallReqStatus,
 };
 
 // Validator function
@@ -3755,6 +3763,52 @@ async function updatePost(req) {
         );
         return result;
 
+    } catch (err) {
+        console.log('Error', err);
+        return false;
+    }
+}
+
+
+async function getSupportCallReq() {
+    try {
+
+        const result = await Support.find()
+            .select('user_id seller_id name email phone message call_status')
+            .populate('user_id seller_id')
+            .sort({ createdAt: -1 })
+            .exec();
+
+        return result;
+    } catch (err) {
+        console.log('Error', err);
+        return false;
+    }
+}
+
+
+
+async function updateSupportCallReqStatus(req) {
+    const { id } = req.params;
+    const { call_status } = req.body;
+
+    try {
+
+        const find = await Support.findById({ _id: id })
+
+        if (!find) {
+            console.log("Support Request is not found.")
+            return false;
+        }
+
+        const data = await Support.updateOne({ _id: id },
+            {
+                $set: {
+                    call_status: call_status
+                }
+            }
+        )
+        return data;
     } catch (err) {
         console.log('Error', err);
         return false;

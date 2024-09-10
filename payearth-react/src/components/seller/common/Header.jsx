@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useHistory} from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import logo from "./../../../assets/images/logo.png";
 import closeIcon from "./../../../assets/icons/close_icon.svg";
 import shoppingBagIcon from "./../../../assets/icons/shopping-bag.svg";
@@ -218,6 +218,14 @@ const Header = () => {
                     <img src={creditCardIcon} alt="" />
                   </i>{" "}
                   Payments
+                </Link>
+              </li>
+              <li>
+                <Link to="/seller/support" onClick={() => removeBackdrop()}>
+                  <i className="icon">
+                    <img src={creditCardIcon} alt="" />
+                  </i>{" "}
+                  Support
                 </Link>
               </li>
               <li>

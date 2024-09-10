@@ -16,28 +16,28 @@ class ForgotPassword extends Component {
         toast.configure();
     }
 
-    handleSubmit = (values, {resetForm}) => {
-        const {dispatch} = this.props;
-        dispatch(setLoading({loading: true}));
+    handleSubmit = (values, { resetForm }) => {
+        const { dispatch } = this.props;
+        dispatch(setLoading({ loading: true }));
         axios.post('seller/forgot-password', values).then(response => {
             if (response.data.status) {
-                toast.success(response.data.message, {autoClose: 3000});
+                toast.success(response.data.message, { autoClose: 3000 });
                 resetForm();
             }
         }).catch(error => {
             toast.dismiss();
             if (error.response) {
-                toast.error(error.response.data.message, {autoClose: 3000});
+                toast.error(error.response.data.message, { autoClose: 3000 });
             }
         }).finally(() => {
             setTimeout(() => {
-                dispatch(setLoading({loading: false}));
+                dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
 
     render() {
-        const {loading} = store.getState().global;
+        const { loading } = store.getState().global;
 
         return (
             <React.Fragment>
@@ -52,9 +52,9 @@ class ForgotPassword extends Component {
                                         <div className="form_wrapper">
                                             <h4 className="form_title mb-4">Forgot Password <small className="d-block">Please enter your registered email address</small></h4>
                                             <Formik
-                                                initialValues={{email: ''}}
-                                                onSubmit={(values, {resetForm}) => {
-                                                    this.handleSubmit(values, {resetForm});
+                                                initialValues={{ email: '' }}
+                                                onSubmit={(values, { resetForm }) => {
+                                                    this.handleSubmit(values, { resetForm });
                                                 }}
                                                 validationSchema={forgotPwdSchema}
                                             >

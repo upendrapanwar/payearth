@@ -22,8 +22,8 @@ class ResetPassword extends Component {
         toast.configure();
     }
 
-    handleSubmit = (values, {resetForm}) => {
-        const {dispatch} = this.props;
+    handleSubmit = (values, { resetForm }) => {
+        const { dispatch } = this.props;
         const currentUrl = window.location.search;
         var userId = null;
         var hash = null;
@@ -40,42 +40,42 @@ class ResetPassword extends Component {
         values['id'] = userId;
         values['code'] = hash;
 
-        if(values['id'] === null) this.props.history.push('/seller/forgot-password');
-        if(values['code'] === null) this.props.history.push('/seller/forgot-password');
+        if (values['id'] === null) this.props.history.push('/seller/forgot-password');
+        if (values['code'] === null) this.props.history.push('/seller/forgot-password');
 
-        dispatch(setLoading({loading: true}));
+        dispatch(setLoading({ loading: true }));
         axios.put('seller/reset-password', values).then(response => {
             if (response.data.status) {
-                toast.success(response.data.message, {autoClose: 3000});
+                toast.success(response.data.message, { autoClose: 3000 });
                 this.props.history.push('/');
                 resetForm();
             } else {
-                toast.error(response.data.message, {autoClose: 3000});
+                toast.error(response.data.message, { autoClose: 3000 });
             }
         }).catch(error => {
             toast.dismiss();
             if (error.response) {
-                toast.error(error.response.data.message, {autoClose: 3000});
+                toast.error(error.response.data.message, { autoClose: 3000 });
             }
         }).finally(() => {
             setTimeout(() => {
-                dispatch(setLoading({loading: false}));
+                dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
 
     handlePassword = () => {
         let flag = this.state.seePassword ? false : true;
-        this.setState({seePassword: flag});
+        this.setState({ seePassword: flag });
     }
 
     handleConfirmPassword = () => {
         let flag = this.state.seeConfirmPassword ? false : true;
-        this.setState({seeConfirmPassword: flag});
+        this.setState({ seeConfirmPassword: flag });
     }
 
     render() {
-        const {loading} = store.getState().global;
+        const { loading } = store.getState().global;
 
         return (
             <React.Fragment>
@@ -95,7 +95,7 @@ class ResetPassword extends Component {
                                                     password_confirmation: ''
                                                 }}
                                                 onSubmit={(values, { resetForm }) => {
-                                                    this.handleSubmit(values,{ resetForm });
+                                                    this.handleSubmit(values, { resetForm });
                                                 }}
                                                 validationSchema={changePwdSchema}
                                             >
