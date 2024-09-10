@@ -21,6 +21,8 @@ import SimpleImageSlider from "react-simple-image-slider";
 import ReactTimeAgo from 'react-time-ago'
 import TimeAgo from 'javascript-time-ago'
 
+import io from "socket.io-client";
+
 import en from 'javascript-time-ago/locale/en.json'
 import ru from 'javascript-time-ago/locale/ru.json'
 
@@ -30,13 +32,14 @@ import ru from 'javascript-time-ago/locale/ru.json'
 
 const SellerPost = ({ posts, sendEditData }) => {
 
-    console.log("all posts of this page----------", posts)
-
+    // console.log("all posts of this page----------", posts)
+    
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
     const loading = useSelector(state => state.global.loading);
     const dispatch = useDispatch();
-
+    console.log('authInfo------',authInfo);
+    console.log('userInfo------',userInfo);
     const [comments, setComments] = useState('');
     const [commentsArr, setCommentsArr] = useState(posts.comments);
     const [newCommentsArr, setNewCommentsArr] = useState([]);
@@ -312,6 +315,8 @@ const SellerPost = ({ posts, sendEditData }) => {
         const currentUserId = authInfo.id;
         const userIdToFollow = posts.userId === null ? posts.sellerId.id : posts.userId.id;
         const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
+        const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
+
         var reqBody = {
             role: role,
             currentUserId: currentUserId,
@@ -329,6 +334,40 @@ const SellerPost = ({ posts, sendEditData }) => {
                 setIsFollowing(true);
                 // console.log("response", response.data.message);
                 toast.success(response.data.message);
+                const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+
+                // Emit follow notification to the followed user
+                socket.emit('follow', {
+                    follower: { id: currentUserId, name: userInfo.name },
+                    followed: { id: userIdToFollow, name: posts.userId === null ? posts.sellerId.name : posts.userId.name },
+                });
+
+                const notificationReqBody = {
+                    type: 'follow',
+                    sender: {
+                        id: currentUserId,
+                        type:'Seller'
+                    },
+                    receiver: {
+                        id: userIdToFollow,
+                        type: receiverRole 
+                    },
+                    message: `${userInfo.name} followed you.`,
+                    isRead:'false',
+                    createdAt: new Date(),
+                };
+    
+                axios.post(`/notifications/save`, notificationReqBody, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': `Bearer ${authInfo.token}`,
+                    }
+                }).then(notificationResponse => {
+                    console.log("Notification saved:", notificationResponse.data.message);
+                }).catch(notificationError => {
+                    console.log("Error saving notification:", notificationError);
+                });
 
             }
         }).catch(error => {
@@ -358,6 +397,12 @@ const SellerPost = ({ posts, sendEditData }) => {
                 toast.success(response.data.message);
                 setIsFollowing(false);
                 getSellerPostsData(dispatch);
+                //     const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+                //      // Emit unfollow notification to the unfollowed user
+                // socket.emit('unfollow', {
+                //     follower: { id: currentUserId, name: authInfo.name },
+                //     unfollowed: { id: userIdToUnfollow, name: posts.userId === null ? posts.sellerId.name : posts.userId.name }
+                // });
             }
         }).catch(error => {
             console.log(error);
@@ -528,7 +573,12 @@ const SellerPost = ({ posts, sendEditData }) => {
                         </div>
                         <div className="poster_info">
                             <div className="poster_name">
-                                {posts.isAdmin ? posts.adminId.name : posts.isSeller ? posts.sellerId.name : posts.userId.name}
+                                {/* {posts.isAdmin ? posts.adminId.name : posts.isSeller ? posts.sellerId.name : posts.userId.name} */}
+                                {posts.isAdmin
+                                    ? posts.adminId?.name || 'N/A'
+                                    : posts.isSeller
+                                        ? posts.sellerId?.name || 'N/A'
+                                        : posts.userId?.name || 'N/A'}
                             </div>
                             <ReactTimeAgo date={date} locale="en-US" timeStyle="round-minute" />
                             {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseFollow${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseFollow${posts.id}`}>
@@ -587,7 +637,10 @@ const SellerPost = ({ posts, sendEditData }) => {
                                             {isFollowing ?
                                                 <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleUnfollow(posts)}>Unfollow</Link>
                                                 :
-                                                <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleFollow(posts)}>Follow</Link>
+                                                // <Link to="#" className="btn custom_btn btn_yellow" onClick={(e) => { e.preventDefault(); handleFollow(posts); }}>Follow</Link>
+                                                <Link to="#" className="btn custom_btn btn_yellow" onClick={(e) => { e.preventDefault(); handleFollow(posts); }}>
+                                                    Follow
+                                                </Link>
                                             }
 
                                         </div>

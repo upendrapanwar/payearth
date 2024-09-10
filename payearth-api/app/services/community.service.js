@@ -27,6 +27,8 @@ module.exports = {
     setFollow,
     getCategories,
     getProductsByCatId,
+
+    saveNotifications,
 };
 
 async function getPosts(req) {
@@ -1099,6 +1101,21 @@ async function getProfilePosts(req) {
     if (posts) {
         // console.log("posts test ", posts)
         return posts;
+    }
+    return false;
+}
+
+async function saveNotifications(req) {
+    let id = req.params.id;
+    var whereCondition = { category: id, isActive: true };
+
+    let sortOption = { isService: 'asc', name: 'asc' };
+    const products = await Product.find(whereCondition)
+        .select("id name isService")
+        .sort(sortOption);
+
+    if (products && products.length > 0) {
+        return products;
     }
     return false;
 }

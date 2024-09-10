@@ -21,7 +21,7 @@ import Picker from 'emoji-picker-react';
 import { toast } from 'react-toastify';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
 
-const SellerCommunity = () => {
+const AdminProfile = () => {
     const userInfo = useSelector(state => state.auth.userInfo);
     const authInfo = useSelector(state => state.auth.authInfo);
     const loading = useSelector(state => state.global.loading);
@@ -114,7 +114,7 @@ const SellerCommunity = () => {
             product_id: productId,
             post_status: postStatus,
             user_id: null,
-            seller_id:null,
+            seller_id: null,
             admin_id: authInfo.id,
             is_seller: false,
             is_admin: true,
@@ -415,9 +415,9 @@ const SellerCommunity = () => {
     }
 
     const getPosts = () => {
-        let url = '/admin/all-posts';
+        let url = `/admin/admin-posts/${authInfo.id}`;
         dispatch(setLoading({ loading: true }));
-        //dispatch(SpinnerLoader({ loading: true }));
+        // this.dispatch(SpinnerLoader({ loading: true }));
         axios.get(url, {
             headers: {
                 // 'Accept': 'application/json',
@@ -436,7 +436,7 @@ const SellerCommunity = () => {
             }).finally(() => {
                 setTimeout(() => {
                     dispatch(setLoading({ loading: false }));
-                   // dispatch(SpinnerLoader({ loading: false }));
+                    //  this.dispatch(SpinnerLoader({ loading: false }));
                 }, 300);
             });
     }
@@ -451,6 +451,44 @@ const SellerCommunity = () => {
                 <div className="cumm_page_wrap pt-5 pb-5">
                     <div className="container">
                         <div className="row">
+                            <div className="col-lg-12">
+                                <div className="comm_profile">
+                                    <div className="post_by">
+                                        <div className="poster_img position-relative d-inline-block">
+                                            <img
+                                                src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
+                                                alt=""
+                                                className="img-fluid"
+                                            />
+                                            {/* <img
+                                                src={imageEditIcon}
+                                                alt="Edit Icon"
+                                                className=" translate-middle w-25 h-25 bg-light rounded-circle border position-absolute bottom-0 end-0"
+                                                // className="position-absolute top-2 start-0 translate-middle p-1 bg-light rounded-circle"
+                                               // style={{ width: '5px', height: '5px' }}
+                                            /> */}
+                                        </div>
+                                        <div className="poster_info">
+                                            <div className="poster_name">{userInfo.name}</div>
+                                            <small>{userInfo.role}</small>
+                                        </div>
+                                    </div>
+                                    <ul>
+                                        {/* <li>
+                                            <div className="fp_fc">{userInfo.community.followers}</div>
+                                            <small>Followers</small>
+                                        </li>
+                                        <li>
+                                            <div className="fp_fc">{userInfo.community.following}</div>
+                                            <small>Following</small>
+                                        </li> */}
+                                        <li>
+                                            <div className="fp_fc">{SellerPostsData.length}</div>
+                                            <small>Posts</small>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                             <div className="col-lg-9">
                                 <div className="createpost bg-white rounded-3">
                                     <div className="cp_top  d-flex justify-content-between align-items-center">
@@ -614,7 +652,7 @@ const SellerCommunity = () => {
                                                 {[...SellerPostsData]
                                                     .sort((a, b) => {
                                                         if (showMostLiked && showMostCommented) {
-                                                            return b.likeCount - a.likeCount || b.commentCount- a.commentCount;
+                                                            return b.likeCount - a.likeCount || b.commentCount - a.commentCount;
                                                         } else if (showMostLiked) {
                                                             return b.likeCount - a.likeCount;
                                                         } else if (showMostCommented) {
@@ -703,7 +741,6 @@ const SellerCommunity = () => {
                                                 Most Commented Post
                                             </label>
                                         </div>
-
                                         <div className="filter_btn_box">
                                             <Link
                                                 to="#"
@@ -725,4 +762,4 @@ const SellerCommunity = () => {
     );
 }
 
-export default SellerCommunity;
+export default AdminProfile;

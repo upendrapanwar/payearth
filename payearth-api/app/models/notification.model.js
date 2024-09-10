@@ -3,30 +3,69 @@ const Schema = mongoose.Schema;
 
 const schema = new Schema(
   {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: false,
+    //   userId: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "User",
+    //     required: false,
+    //   },
+    //   serviceId: {
+    //     type: Schema.Types.ObjectId,
+    //     ref: "Services",
+    //     required: false,
+    //   },
+    //   message: {
+    //     type: String,
+    //     required: false,
+    //   },
+    //   timestamp: {
+    //     type: Date,
+    //     default: Date.now,
+    //   },
+    //   read: {
+    //     type: Boolean,
+    //     default: false,
+    //   },
+
+    type: {
+      type: String,
+      required: true,
+      enum: ['follow', 'like', 'comment', 'message']
     },
-    serviceId: {
-      type: Schema.Types.ObjectId,
-      ref: "Services",
-      required: false,
+    receiver: {
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+      },
+      type: {
+        type: String,
+        required: true,
+        enum: ['User', 'Seller', 'Admin']
+      }
+    },
+    sender: {
+      id: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+      },
+      type: {
+        type: String,
+        required: true,
+        enum: ['User', 'Seller', 'Admin']
+      }
     },
     message: {
       type: String,
-      required: false,
+      required: true
     },
-    timestamp: {
-      type: Date,
-      default: Date.now,
-    },
-    read: {
+    isRead: {
       type: Boolean,
-      default: false,
+      default: false
     },
+    createdAt: {
+      type: Date,
+      default: Date.now
   },
-  { timestamps: true }
+  }, { timestamps: true }
 );
 
 schema.set("toJSON", { virtuals: true, versionKey: false });
