@@ -20,7 +20,7 @@ const SupportUser = () => {
             const url = '/user/accessChat';
             axios.post(url, {
                 receiverId: {
-                    id: "66ded7487de31a3d1e36be3b",
+                    id: process.env.REACT_APP_SUPPORT_ADMIN_ID,
                     name: "Support Admin",
                     image_url: "",
                     // isSupport: false,
@@ -43,7 +43,7 @@ const SupportUser = () => {
                 if (response.data.status === true) {
                     history.push({
                         pathname: '/chat',
-                        state: { supportAdminId: "66ded7487de31a3d1e36be3b" }
+                        state: { supportAdminId: process.env.REACT_APP_SUPPORT_ADMIN_ID }
                     });
                 }
             }).catch((error) => {

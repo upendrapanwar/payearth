@@ -830,7 +830,7 @@ class Chat extends Component {
         const { allChatUsers } = this.state
         console.log("allChatUsers", allChatUsers)
 
-        const supportAdminId = "66ded7487de31a3d1e36be3b";
+        const supportAdminId = process.env.REACT_APP_SUPPORT_ADMIN_ID;
         const result = allChatUsers.find((chat) =>
             chat.chatUsers.some(user => user.id === supportAdminId)
         );
