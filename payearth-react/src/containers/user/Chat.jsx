@@ -201,7 +201,7 @@ class Chat extends Component {
                 // // const data = users.map(item => item.usersAll[0].users)
                 // console.log("chatName", res.map(item => item.chatName))
                 this.setState({ allChatUsers: users });
-
+                this.supportAdminChat()
             }).catch((error) => {
                 console.log("error", error)
             });
@@ -872,6 +872,21 @@ class Chat extends Component {
         console.log('Touch end detected');
         // Add your custom touch end functionality here
     };
+
+
+    supportAdminChat = () => {
+        const { allChatUsers } = this.state
+        console.log("allChatUsers", allChatUsers)
+
+        const supportAdminId = "66ded7487de31a3d1e36be3b";
+        const result = allChatUsers.find((chat) =>
+            chat.chatUsers.some(user => user.id === supportAdminId)
+        );
+
+        this.fetchAllMessage(result)
+
+        console.log("support chat Admin", result)
+    }
 
 
     render() {

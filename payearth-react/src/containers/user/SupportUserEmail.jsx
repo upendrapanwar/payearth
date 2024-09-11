@@ -12,7 +12,7 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import userContactSchema from '../../validation-schemas/userContactSchema'
 import SpinnerLoader from '../../components/common/SpinnerLoader';
-
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 
 const SupportUserEmail = () => {
@@ -73,7 +73,16 @@ const SupportUserEmail = () => {
                         <div className="bg-white rounded-3">
                             <div className="dash_inner_wrap contact_form_page">
                                 <div className="row">
+
                                     <div className="col-lg-12">
+                                        <div className="noti_wrap">
+                                            <div className='d-flex justify-content-end'><span>
+                                                <Link className="btn custom_btn btn_yellow mx-auto mt-2" to="/user-support">
+                                                    <img src={arrow_back} alt="linked-in" />&nbsp;
+                                                    Back
+                                                </Link>
+                                            </span></div>
+                                        </div>
                                         <div className="contact_form_wrap">
                                             <div className="form_wrapper">
                                                 <h4 className="form_title mb-4">Write us</h4>

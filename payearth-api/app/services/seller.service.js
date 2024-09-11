@@ -3844,7 +3844,7 @@ async function getPosts(req) {
     return { success: false, message: "seller not founddddddddd" };
   }
   const followerIds = seller.community.followingData.map(follower => follower._id);
- // console.log("followerIds", followerIds)
+  // console.log("followerIds", followerIds)
 
   const posts = await Post.find({
     $or: [
@@ -4652,7 +4652,6 @@ async function supportReqCall(req) {
       call_status
     });
 
-    const result = await data.save();
 
 
     const mailOptions = {
@@ -4701,6 +4700,7 @@ async function supportReqCall(req) {
 
     await SendEmail(mailOptions);
 
+    const result = await data.save();
 
     return result;
   } catch (error) {
