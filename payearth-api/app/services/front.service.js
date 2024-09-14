@@ -11,6 +11,8 @@ const {
   Product,
   Review,
   User,
+  Seller,
+  Admin,
   Brand,
   TrendingProduct,
   TodayDeal,
@@ -25,6 +27,7 @@ const {
   bannerAdvertisement,
   Services,
   ServiceReview,
+  Notification,
 } = require("../helpers/db");
 
 module.exports = {
@@ -56,6 +59,9 @@ module.exports = {
   searchFilterServices,
   getServiceCategory,
   getServicesByCategory,
+  saveNotifications,
+  getNotifications,
+  updateNotifications,
 };
 
 async function getReviews(id) {
@@ -1024,5 +1030,85 @@ async function getServicesByCategory(req) {
     }
   } catch (err) {
     console.log("Error", err)
+  }
+}
+
+async function saveNotifications(req) {
+  let data = req.body;
+  // console.log('notification data--',data)
+  const { type, receiver, sender, message } = data;
+
+  if (!type || !receiver || !sender || !message) {
+    throw new Error('Missing required fields: type, receiver, sender, or message');
+  }
+
+  const newNotification = new Notification({
+    type,
+    receiver: {
+      id: receiver.id,
+      type: receiver.type
+    },
+    sender: {
+      id: sender.id,
+      type: sender.type
+    },
+    message,
+    isRead: false,
+    createdAt: new Date()
+  });
+
+  try {
+    const savedNotification = await newNotification.save();
+    return savedNotification;
+  } catch (error) {
+    console.error('Error saving notification:', error);
+    throw new Error('Failed to save notification');
+  }
+}
+
+async function getNotifications(req) {
+  let id = req.params.id;
+  //console.log('notification da--', id)
+  try {
+    const notifications = await Notification.find({ 'receiver.id': mongoose.Types.ObjectId(id) }) .sort({ createdAt: 'desc' });
+  
+    for (let notification of notifications) {
+      let modelName = '';
+      
+      if (notification.sender.type === 'seller') {
+        modelName = 'Seller';
+      } else if (notification.sender.type === 'user') {
+        modelName = 'User';
+      } else if (notification.sender.type === 'admin') {
+        modelName = 'Admin';
+      }
+  
+      await notification.populate({
+        path: 'sender.id',
+        model: modelName,
+        select: 'name'
+      });
+    }
+  
+    return notifications;
+  } catch (error) {
+    console.error('Error getting notifications:', error);
+    throw new Error('Failed to get notifications');
+  }
+}
+
+async function updateNotifications(req) {
+  let id = req.params.id;
+  //console.log('notification da--', id)
+  try {
+    const notification = await Notification.updateMany( { 'receiver.id': id, isRead: false },{ $set: { isRead: true } } );
+    if (notification.modifiedCount > 0) {
+      return { message: 'Notifications updated successfully' };
+    } else {
+      return { message: 'No unread notifications found for the given user' };
+    }
+  } catch (error) {
+    console.error('Error updating notification:', error);
+    throw new Error('Failed to update notification');
   }
 }

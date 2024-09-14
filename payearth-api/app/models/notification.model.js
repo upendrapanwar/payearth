@@ -39,7 +39,7 @@ const schema = new Schema(
       type: {
         type: String,
         required: true,
-        enum: ['User', 'Seller', 'Admin']
+        enum: ['user', 'seller', 'admin']
       }
     },
     sender: {
@@ -50,7 +50,7 @@ const schema = new Schema(
       type: {
         type: String,
         required: true,
-        enum: ['User', 'Seller', 'Admin']
+        enum: ['user', 'seller', 'admin']
       }
     },
     message: {

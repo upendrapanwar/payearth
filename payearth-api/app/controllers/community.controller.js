@@ -75,9 +75,6 @@ router.post("/createPostReport", createPostReport)
 router.get('/front/categories', getCategories);
 router.get('/front/products/:id', getProductsByCatId);
 
-router.get('/notifications/save', saveNotifications);
-
-
 
 module.exports = router;
 
@@ -200,14 +197,6 @@ function getCategories(req, res, next) {
 function getProductsByCatId(req, res, next) {
 
     communityService.getProductsByCatId(req)
-        .then(result => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
-        .catch(err => next(res.json({ status: false, message: err })));
-}
-
-
-function saveNotifications(req, res, next) {
-
-    communityService.saveNotifications(req)
         .then(result => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }

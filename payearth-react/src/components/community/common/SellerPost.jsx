@@ -33,13 +33,13 @@ import ru from 'javascript-time-ago/locale/ru.json'
 const SellerPost = ({ posts, sendEditData }) => {
 
     // console.log("all posts of this page----------", posts)
-    
+
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
     const loading = useSelector(state => state.global.loading);
     const dispatch = useDispatch();
-    console.log('authInfo------',authInfo);
-    console.log('userInfo------',userInfo);
+    // console.log('authInfo------',authInfo);
+    // console.log('userInfo------',userInfo);
     const [comments, setComments] = useState('');
     const [commentsArr, setCommentsArr] = useState(posts.comments);
     const [newCommentsArr, setNewCommentsArr] = useState([]);
@@ -346,33 +346,36 @@ const SellerPost = ({ posts, sendEditData }) => {
                     type: 'follow',
                     sender: {
                         id: currentUserId,
-                        type:'Seller'
+                        type: 'seller'
+
                     },
                     receiver: {
                         id: userIdToFollow,
-                        type: receiverRole 
+                        type: receiverRole
                     },
                     message: `${userInfo.name} followed you.`,
-                    isRead:'false',
+                    isRead: 'false',
                     createdAt: new Date(),
                 };
-    
-                axios.post(`/notifications/save`, notificationReqBody, {
+
+                // axios.post('community/notifications', notificationReqBody, {
+                axios.post('front/notifications', notificationReqBody, {
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json;charset=UTF-8',
-                        'Authorization': `Bearer ${authInfo.token}`,
+                        'Authorization': `Bearer ${authInfo.token}`
                     }
-                }).then(notificationResponse => {
-                    console.log("Notification saved:", notificationResponse.data.message);
-                }).catch(notificationError => {
-                    console.log("Error saving notification:", notificationError);
+                }).then(response => {
+                    console.log("Notification saved:", response.data.message);
+                }).catch(error => {
+                    console.log("Error saving notification:", error);
                 });
 
             }
         }).catch(error => {
             console.log(error);
         });
+        setOpenModel(false);
     }
 
     const handleUnfollow = (posts) => {
@@ -407,6 +410,7 @@ const SellerPost = ({ posts, sendEditData }) => {
         }).catch(error => {
             console.log(error);
         });
+        setOpenModel(false);
     }
 
     const handleRemove = (postId) => {
@@ -637,10 +641,10 @@ const SellerPost = ({ posts, sendEditData }) => {
                                             {isFollowing ?
                                                 <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleUnfollow(posts)}>Unfollow</Link>
                                                 :
-                                                // <Link to="#" className="btn custom_btn btn_yellow" onClick={(e) => { e.preventDefault(); handleFollow(posts); }}>Follow</Link>
-                                                <Link to="#" className="btn custom_btn btn_yellow" onClick={(e) => { e.preventDefault(); handleFollow(posts); }}>
-                                                    Follow
-                                                </Link>
+                                                <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleFollow(posts)}>Follow</Link>
+                                                // <Link to="#" className="btn custom_btn btn_yellow" onClick={(e) => { e.preventDefault(); handleFollow(posts); }}>
+                                                //     Follow
+                                                // </Link>
                                             }
 
                                         </div>

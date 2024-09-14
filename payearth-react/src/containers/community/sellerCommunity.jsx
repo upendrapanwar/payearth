@@ -589,8 +589,17 @@ const SellerCommunity = () => {
                                                         }
                                                     })
                                                     .map((value, index) => (
-                                                        <SellerPost key={index} posts={value} sendEditData={handleEdit} />
+                                                        
+                                                        <SellerPost key={value._id ||index} posts={value} sendEditData={handleEdit} />
                                                     ))}
+                                                    
+                                                    {/* .map((value, index) => {
+                                                //         console.log('value------%^&%$%&', value);
+                                                //         return (
+                                                //             <SellerPost key={value._id} posts={value} sendEditData={handleEdit} />
+                                                //         );
+                                                //     })
+                                                // } */}
                                             </div>
                                         ) : (
                                             <NotFound msg="Data not found." />

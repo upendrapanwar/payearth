@@ -13,6 +13,7 @@ const fs = require("fs");
 const { ChatMessage } = require("../payearth-api/app/helpers/db");
 // const setupSocket1 = require("./app/helpers/socket-io");
 const socketIo = require("socket.io");
+const NotificationController = require('./app/controllers/notification.controller');
 
 
 const ENV = config.app_env;
@@ -158,81 +159,31 @@ io.on("connection", function (socket) {
     });
   });
 
-  // socket.off("setup", function () {
-  //   // console.log("USER DISCONECT");
-  //   socket.leave(userID)
-  // })
+  socket.off("setup", function () {
+    // console.log("USER DISCONECT");
+    socket.leave(userID)
+  })
 
   //***************************
-  socket.on('join', ({ userID }) => {
+  socket.on('allNotifications', ({ userID }) => {
     if (!userID) {
       console.error('User ID is required to join room');
       return;
     }
     socket.join(userID);
     console.log(`User with ID ${userID} joined their room.`);
-  //});
-
-  // const offlineNotifications = userNotifications[userID] || [];
-  // offlineNotifications.forEach(notification => {
-  //   io.to(userID).emit('receive_notification', notification);
-  // });
-  // userNotifications[userID] = [];
- });
-
-
-socket.on('follow', function ({ follower, followed }) {
-  if (!follower || !followed) {
-    console.error('Invalid data received in follow event:', { follower, followed });
-    return;
-  }
-  console.log('Follower:', follower);
-  console.log('Followed:', followed);
-
-  const notification = {
-    message: `${follower.name} started following you.`,
-    type: 'follow',
-    userID: follower.id,
-  };
-
-  // // Check if followed user is online
-  // const followedSocket = io.sockets.adapter.rooms.get(followed.id);
-  // if (followedSocket) {
-  //   // If online, send real-time notification
-  //   io.to(followed.id).emit('receive_notification', notification);
-  // } else {
-  //   // If offline, store the notification in the "database"
-  //   if (!userNotifications[followed.id]) {
-  //     userNotifications[followed.id] = [];
-  //   }
-  //   userNotifications[followed.id].push(notification);
-  // }
-
-  // Send notification to the followed user or seller
-  socket.in(followed.id).emit('receive_notification', {
-    //io.to(followed.id).emit('receive_notification', {
-    message: `${follower.name} started following you.`,
-    type: 'follow',
-    userID: follower.id
   });
 
-  // Optionally, send notification to the follower as well
-  socket.in(follower.id).emit('receive_notification', {
-    message: `You are now following ${followed.name}.`,
-    type: 'follow',
-    userID: followed.id
-  });
+  // Follow event
+  socket.on('follow', (data) => {
+    NotificationController.followUser(socket, data);
   });
 
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
   });
-  //**********************************/
-  socket.off("setup", function () {
-    // console.log("USER DISCONECT");
-    socket.leave(userID)
-  })
 
+  //**********************************/
 
   // Disconnect event
   socket.on('disconnect', () => {

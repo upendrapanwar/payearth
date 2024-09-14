@@ -25,17 +25,16 @@ import clostBtn from "./../../../assets/icons/close_icon.svg";
 import blackBellIcon from "../../../assets/icons/notification-black-bell-icon.svg";
 import { useSelector, useDispatch } from "react-redux";
 import {setLoginStatus, setUserInfo } from "./../../../store/reducers/auth-reducer";
-//import io from 'socket.io-client';
-//import axios from 'axios';
+import io from 'socket.io-client';
+import axios from 'axios';
 
 function Header() {
-  //const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
   const userInfo = useSelector(state => state.auth.userInfo);
   const authInfo = useSelector(state => state.auth.authInfo);
   const history = useHistory();
   const dispatch = useDispatch();
   //const { notifications } = useContext(NotificationContext);
- // const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const logout = () => {
     localStorage.clear();
@@ -74,6 +73,41 @@ function Header() {
   //   };
   // }, [authInfo.id]);
 
+  useEffect(() => {
+    const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+
+    if (authInfo && authInfo.id) {
+      socket.emit('join', { userID: authInfo.id });
+      console.log(`User with ID ${authInfo.id} joined their room.`);
+
+      axios.get(`front/notifications/${authInfo.id}`).then(response => {
+        console.log('Offline Notification data---:', response);
+        const offlineNotifications = response.data.data.filter(notification => !notification.isRead);
+        if (offlineNotifications && offlineNotifications.length > 0) {
+          offlineNotifications.forEach(notification => {
+            setUnreadCount((prevCount) => prevCount + 1);
+            console.log('Offline Notification:', notification.message);
+          });
+        }
+      });
+    }
+
+    socket.on('receive_notification', (notification) => {
+      if (!notification || !notification.message) {
+        console.error('Received invalid notification data:', notification);
+        return;
+      }
+
+      setUnreadCount((prevCount) => prevCount + 1);
+      console.log('New Notification:', notification.message);
+    });
+
+    return () => {
+      socket.off('receive_notification');
+      socket.disconnect();
+    };
+  }, [authInfo.id]);
+
   const removeBackdrop = () => {
     const elements = document.getElementsByClassName("offcanvas-backdrop");
     while (elements.length > 0) {
@@ -82,6 +116,15 @@ function Header() {
     document.body.style.overflow = "unset";
     document.body.style.padding = 0;
   };
+
+  const handleNotificationClick = () => {
+    axios.put(`front/updateNotifications/${authInfo.id}`).then(response => {
+      //console.log('Offline Notification data---:', response);
+      const offlineNotifications = response.data.data;
+      console.log('offlineNotifications--', offlineNotifications)
+    });
+    setUnreadCount(0);
+  }
 
   //*************** */
   return (
@@ -355,10 +398,10 @@ function Header() {
                       <div className="offcanvas-body d-block">
                         <ul className="seller_menu navbar-nav justify-content-end flex-grow-1 pe-0">
                           <li className="nav-item">
-                            <Link className="nav-link" to="/admin/manage-notifications">
+                            <Link className="nav-link" to="/admin/manage-notifications" onClick={handleNotificationClick}>
                               <div className="sm_icon">
                                 <img src={blackBellIcon} alt="" />
-                                {/* {unreadCount > 0 && <span className="notification-count">{unreadCount}</span>} */}
+                                {unreadCount > 0 && <span className="notification-count">{unreadCount}</span>}
                               </div>
                               <span>Notifications</span>
                             </Link>

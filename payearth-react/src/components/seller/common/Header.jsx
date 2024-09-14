@@ -59,17 +59,21 @@ const Header = () => {
     const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
 
     if (authInfo && authInfo.id) {
-      socket.emit('join', { userID: authInfo.id });
+      socket.emit('allNotifications', { userID: authInfo.id });
       console.log(`User with ID ${authInfo.id} joined their room.`);
 
-      // axios.get(`/notifications/${authInfo.id}`).then(response => {
-      //   const offlineNotifications = response.data;
-      //   offlineNotifications.forEach(notification => {
-      //     // Handle the notification
-      //     setUnreadCount((prevCount) => prevCount + 1);
-      //     console.log('Offline Notification:', notification.message);
-      //   });
-      // });
+      axios.get(`front/notifications/${authInfo.id}`).then(response => {
+        console.log('Offline Notification data---:', response);
+        const offlineNotifications = response.data.data.filter(notification => !notification.isRead);
+        // offlineNotifications.filter(notification => !notification.isRead);
+        if (offlineNotifications && offlineNotifications.length > 0) {
+          offlineNotifications.forEach(notification => {
+            // Handle the notification
+            setUnreadCount((prevCount) => prevCount + 1);
+            console.log('Offline Notification:', notification.message);
+          });
+        }
+      });
     }
 
 
@@ -78,11 +82,11 @@ const Header = () => {
         console.error('Received invalid notification data:', notification);
         return;
       }
-  
+
       setUnreadCount((prevCount) => prevCount + 1);
       console.log('New Notification:', notification.message);
     });
-  
+
     return () => {
       socket.off('receive_notification');
       socket.disconnect(); // Ensure disconnection on unmount
@@ -97,6 +101,15 @@ const Header = () => {
     document.body.style.overflow = "unset";
     document.body.style.padding = 0;
   };
+
+  const handleNotificationClick = () => {
+    axios.put(`front/updateNotifications/${authInfo.id}`).then(response => {
+      //console.log('Offline Notification data---:', response);
+      const offlineNotifications = response.data.data;
+      console.log('offlineNotifications--', offlineNotifications)
+    });
+    setUnreadCount(0);
+  }
 
   return (
     <React.Fragment>
@@ -289,7 +302,7 @@ const Header = () => {
                           {/* <li className="nav-item"><Link to="/seller/add-product" className="btn custom_btn btn_yellow w-auto text-uppercase">add new product</Link></li> */}
                           {/* seller notification bell icon */}
                           <li className="nav-item">
-                            <Link className="nav-link" to="/seller/notifications">
+                            <Link className="nav-link" to="/seller/notifications" onClick={handleNotificationClick}>
                               <div className="sm_icon">
                                 <img src={blcakbellIcon} alt="" />
                                 {unreadCount > 0 && <span className="notification-count">{unreadCount}</span>}
