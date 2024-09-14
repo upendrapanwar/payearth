@@ -178,7 +178,7 @@ class Chat extends Component {
                 // // const data = users.map(item => item.usersAll[0].users)
                 // console.log("chatName", res.map(item => item.chatName))
                 this.setState({ allChatUsers: users })
-
+                this.supportAdminChat()
             }).catch((error) => {
                 console.log("error", error)
             });
@@ -357,7 +357,7 @@ class Chat extends Component {
     // };
 
     fetchAllMessage = (data) => {
-        // console.log("fetchAllMessage function ", data)
+        console.log("fetchAllMessage function ", data)
         if (data.isGroupChat === false) {
             const userID = data.chatUsers[0].id !== this.authInfo.id ? data.chatUsers[0].id : data.chatUsers[1].id;
             this.setState({ selectUserId: userID });
@@ -557,7 +557,7 @@ class Chat extends Component {
             console.error('Error fetching users:', error);
         }
     }
-    
+
     handleCreateGroup = () => {
         this.setState({ showModal: true });
     };
@@ -826,10 +826,25 @@ class Chat extends Component {
     }
 
 
+    supportAdminChat = () => {
+        const { allChatUsers } = this.state
+        console.log("allChatUsers", allChatUsers)
+
+        const supportAdminId = process.env.REACT_APP_SUPPORT_ADMIN_ID;
+        const result = allChatUsers.find((chat) =>
+            chat.chatUsers.some(user => user.id === supportAdminId)
+        );
+
+        this.fetchAllMessage(result)
+
+        console.log("support chat Admin", result)
+    }
+
+
     render() {
         const { showChatUsers, users, allChatUsers, sendChatData, userChat, notAddedUser, selectedUsers, selectedFile, onlineUsers, showEmojiPicker } = this.state;
         const { loading } = store.getState().global;
-        // console.log("allChatUsers in render() :-", allChatUsers)
+        console.log("allChatUsers in render() :-", allChatUsers)
         // console.log(" notAddedUser", notAddedUser)
         // console.log("selectedFile : ", selectedFile)
         // console.log("users:>>>>", users)

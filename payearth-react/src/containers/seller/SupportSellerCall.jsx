@@ -5,9 +5,11 @@ import PageTitle from './../../components/user/common/PageTitle';
 import Footer from '../../components/common/Footer';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import SupportCallSchema from '../../validation-schemas/supportCallSchemas';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 export const SupportSellerCall = () => {
 
@@ -80,6 +82,14 @@ export const SupportSellerCall = () => {
                                     </div>
                                     <div className="col-lg-8">
                                         <div className="contact_form_wrap">
+                                            <div className="noti_wrap">
+                                                <div className='d-flex justify-content-end'><span>
+                                                    <Link className="btn custom_btn btn_yellow mx-auto mt-2" to="/seller/support">
+                                                        <img src={arrow_back} alt="linked-in" />&nbsp;
+                                                        Back
+                                                    </Link>
+                                                </span></div>
+                                            </div>
                                             <div className="form_wrapper">
                                                 <h4 className="form_title mb-4" style={{ color: '#3795BD' }}>Request for Call Back</h4>
                                                 <Formik

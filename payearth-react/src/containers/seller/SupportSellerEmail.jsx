@@ -11,17 +11,16 @@ import sellerContactSchema from '../../validation-schemas/sellerContactSchema'
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import arrow_back from '../../assets/icons/arrow-back.svg'
 
-export const SupportSellerEmail = () => {
 
+
+export const SupportSellerEmail = () => {
 
     const isLoged_In = isLogin();
 
-
     const [loading, setLoading] = React.useState(false);
 
-    const handleSubmit = (values, { resetForm }) => {
 
-        // Check if user is logged in
+    const handleSubmit = (values, { resetForm }) => {
         if (!isLoged_In) {
             toast.error("Please log in your account.", { autoClose: 3000 });
             return;
