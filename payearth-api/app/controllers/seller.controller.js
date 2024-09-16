@@ -259,7 +259,10 @@ router.post('/follow-user', followUser);
 router.post('/unfollowUser', unfollowUser);
 router.put('/postRemoved', postDelete);
 router.put('/updatePost', updatePost);
-router.post("/createPostReport", createPostReport)
+router.get('/getUserorSellerData/:id', getUserorSellerData);
+router.post("/createPostReport", createPostReport);
+router.put("/communityUserBlock", communityUserBlock);
+router.put("/communityUserUnblock", communityUserUnblock);
 router.get("/getPostById/:id", getPostById);
 router.put("/editProfileImage/:id", editProfileImage);
 router.post("/support/request-call", supportReqCall)
@@ -1383,11 +1386,28 @@ function updatePost(req, res, next) {
     .catch(err => next(res.status(400).json({ status: false, message: err })));
 }
 
-function createPostReport(req, res, next) {
+function getUserorSellerData(req, res, next) {
+  sellerService.getUserorSellerData(req)
+    .then(result => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+    .catch(err => next(res.json({ status: false, message: err })));
+}
 
+function createPostReport(req, res, next) {
   sellerService.createPostReport(req)
     .then(result => result ? res.status(201).json({ status: true, data: result }) : res.status(400).json({ status: false, message: msg.post.add.error }))
     .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function communityUserBlock(req, res, next) {
+  sellerService.communityUserBlock(req)
+    .then((user) => user ? res.json({ status: true, message: user }) : res.json({ status: false, message: "ERROR" }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function communityUserUnblock(req, res, next) {
+  sellerService.communityUserUnblock(req)
+    .then((user) => user ? res.json({ status: true, message: user }) : res.json({ status: false, message: "ERROR" }))
+    .catch((err) => next(res.json({ status: false, message: err })));
 }
 
 function getPostById(req, res, next) {
