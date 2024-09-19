@@ -25,8 +25,8 @@ import {
   setCatSearchValue,
   setIsService,
 } from "../../../store/reducers/cat-search-reducer";
-// import io from 'socket.io-client'
-// import axios from 'axios';
+import io from 'socket.io-client'
+import axios from 'axios';
 
 const Header = () => {
   // const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
@@ -37,7 +37,7 @@ const Header = () => {
   const history = useHistory();
   const dispatch = useDispatch();
   // // const { notifications } = useContext(NotificationContext);
-  // const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadCount, setUnreadCount] = useState(0);
   const logout = () => {
     localStorage.clear();
     dispatch(setLoginStatus({ isLoggedIn: false }));
@@ -54,34 +54,44 @@ const Header = () => {
     authVerification(dispatch);
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   // Join the specific user room
-  //   socket.emit('join_room', authInfo.id);
 
-  //   // Fetch initial unread count
-  //   const fetchUnreadCount = async () => {
-  //     try {
-  //       const response = await axios.get(`/api/notifications/unread/${authInfo.id}`);
-  //       setUnreadCount(response.data.unreadCount);
-  //     } catch (error) {
-  //       console.error('Error fetching unread notifications:', error);
-  //     }
-  //   };
+  useEffect(() => {
+    const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
 
-  //   fetchUnreadCount();
+    if (authInfo && authInfo.id) {
+      socket.emit('allNotifications', { userID: authInfo.id });
+      console.log(`User with ID ${authInfo.id} joined their room.`);
 
-  //   // Listen for new notifications in real-time
-  //   socket.on('new_notification', (notification) => {
-  //     setUnreadCount((prevCount) => prevCount + 1);
-  //     // Optionally display a toast or alert for the new notification
-  //     console.log('New Notification:', notification.message);
-  //   });
+      axios.get(`front/notifications/${authInfo.id}`).then(response => {
+        console.log('Offline Notification data---:', response);
+        const offlineNotifications = response.data.data.filter(notification => !notification.isRead);
+        // offlineNotifications.filter(notification => !notification.isRead);
+        if (offlineNotifications && offlineNotifications.length > 0) {
+          offlineNotifications.forEach(notification => {
+            // Handle the notification
+            setUnreadCount((prevCount) => prevCount + 1);
+            console.log('Offline Notification:', notification.message);
+          });
+        }
+      });
+    }
 
-  //   // Cleanup the socket when the component unmounts
-  //   return () => {
-  //     socket.off('new_notification');
-  //   };
-  // }, [authInfo.id]);
+
+    socket.on('receive_notification', (notification) => {
+      if (!notification || !notification.message) {
+        console.error('Received invalid notification data:', notification);
+        return;
+      }
+
+      setUnreadCount((prevCount) => prevCount + 1);
+      console.log('New Notification:', notification.message);
+    });
+
+    return () => {
+      socket.off('receive_notification');
+      socket.disconnect(); // Ensure disconnection on unmount
+    };
+  }, [authInfo.id]);
 
   const removeBackdrop = () => {
     const elements = document.getElementsByClassName("offcanvas-backdrop");
@@ -91,6 +101,15 @@ const Header = () => {
     document.body.style.overflow = "unset";
     document.body.style.padding = 0;
   };
+
+  const handleNotificationClick = () => {
+    axios.put(`front/updateNotifications/${authInfo.id}`).then(response => {
+      //console.log('Offline Notification data---:', response);
+      const offlineNotifications = response.data.data;
+      console.log('offlineNotifications--', offlineNotifications)
+    });
+    setUnreadCount(0);
+  }
 
   return (
     <React.Fragment>
@@ -283,10 +302,10 @@ const Header = () => {
                           {/* <li className="nav-item"><Link to="/seller/add-product" className="btn custom_btn btn_yellow w-auto text-uppercase">add new product</Link></li> */}
                           {/* seller notification bell icon */}
                           <li className="nav-item">
-                            <Link className="nav-link" to="/seller/notifications">
+                            <Link className="nav-link" to="/seller/notifications" onClick={handleNotificationClick}>
                               <div className="sm_icon">
                                 <img src={blcakbellIcon} alt="" />
-                                {/* {unreadCount > 0 && <span className="notification-count">{unreadCount}</span>} */}
+                                {unreadCount > 0 && <span className="notification-count">{unreadCount}</span>}
                               </div>
                               <span>Notification</span>
                             </Link>

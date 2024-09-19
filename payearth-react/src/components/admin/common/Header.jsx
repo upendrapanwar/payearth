@@ -1,11 +1,12 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link,  useHistory } from "react-router-dom";
 import logo from "./../../../assets/images/logo.png";
 import smChatIcon from "./../../../assets/icons/sm_chat.svg";
 import smcommunityIcon from "./../../../assets/icons/sm_community.svg";
 import contactIcon from "./../../../assets/icons/sm_contact.svg";
 import smLogoutIcon from "./../../../assets/icons/sm_logout.svg";
 import homeIcon from "./../../../assets/icons/sm_home.svg";
+import userImg from './../../../assets/images/user.png'
 import shoppingBagIcon from "./../../../assets/icons/shopping-bag.svg";
 import creditCardIcon from "./../../../assets/icons/credit-card.svg";
 import notificationBellIcon from "./../../../assets/icons/notification-bell.svg";
@@ -22,14 +23,19 @@ import bannerIcon from "./../../../assets/icons/banners_icon.svg";
 import supportIcon from "./../../../assets/icons/support_icon.svg";
 import clostBtn from "./../../../assets/icons/close_icon.svg";
 import blackBellIcon from "../../../assets/icons/notification-black-bell-icon.svg";
-import { useDispatch } from "react-redux";
-import {
-  setLoginStatus,
-  setUserInfo,
-} from "./../../../store/reducers/auth-reducer";
+import { useSelector, useDispatch } from "react-redux";
+import {setLoginStatus, setUserInfo } from "./../../../store/reducers/auth-reducer";
+import io from 'socket.io-client';
+import axios from 'axios';
 
 function Header() {
+  const userInfo = useSelector(state => state.auth.userInfo);
+  const authInfo = useSelector(state => state.auth.authInfo);
+  const history = useHistory();
   const dispatch = useDispatch();
+  //const { notifications } = useContext(NotificationContext);
+  const [unreadCount, setUnreadCount] = useState(0);
+
   const logout = () => {
     localStorage.clear();
     dispatch(setLoginStatus({ isLoggedIn: false }));
@@ -37,6 +43,70 @@ function Header() {
     window.location.href = "/admin/login";
   };
   //**************** */
+
+  // useEffect(() => {
+  //   // Join the specific user room
+  //   socket.emit('follow', authInfo.id);
+
+  //   // Fetch initial unread count
+  //   // const fetchUnreadCount = async () => {
+  //   //   try {
+  //   //     const response = await axios.get(`/api/notifications/unread/${authInfo.id}`);
+  //   //     setUnreadCount(response.data.unreadCount);
+  //   //   } catch (error) {
+  //   //     console.error('Error fetching unread notifications:', error);
+  //   //   }
+  //   // };
+
+  //   // fetchUnreadCount();
+
+  //   // Listen for new notifications in real-time
+  //   socket.on('new_notification', (notification) => {
+  //     setUnreadCount((prevCount) => prevCount + 1);
+  //     // Optionally display a toast or alert for the new notification
+  //     console.log('New Notification:', notification.message);
+  //   });
+
+  //   // Cleanup the socket when the component unmounts
+  //   return () => {
+  //     socket.off('new_notification');
+  //   };
+  // }, [authInfo.id]);
+
+  useEffect(() => {
+    const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+
+    if (authInfo && authInfo.id) {
+      socket.emit('join', { userID: authInfo.id });
+      console.log(`User with ID ${authInfo.id} joined their room.`);
+
+      axios.get(`front/notifications/${authInfo.id}`).then(response => {
+        console.log('Offline Notification data---:', response);
+        const offlineNotifications = response.data.data.filter(notification => !notification.isRead);
+        if (offlineNotifications && offlineNotifications.length > 0) {
+          offlineNotifications.forEach(notification => {
+            setUnreadCount((prevCount) => prevCount + 1);
+            console.log('Offline Notification:', notification.message);
+          });
+        }
+      });
+    }
+
+    socket.on('receive_notification', (notification) => {
+      if (!notification || !notification.message) {
+        console.error('Received invalid notification data:', notification);
+        return;
+      }
+
+      setUnreadCount((prevCount) => prevCount + 1);
+      console.log('New Notification:', notification.message);
+    });
+
+    return () => {
+      socket.off('receive_notification');
+      socket.disconnect();
+    };
+  }, [authInfo.id]);
 
   const removeBackdrop = () => {
     const elements = document.getElementsByClassName("offcanvas-backdrop");
@@ -46,6 +116,15 @@ function Header() {
     document.body.style.overflow = "unset";
     document.body.style.padding = 0;
   };
+
+  const handleNotificationClick = () => {
+    axios.put(`front/updateNotifications/${authInfo.id}`).then(response => {
+      //console.log('Offline Notification data---:', response);
+      const offlineNotifications = response.data.data;
+      console.log('offlineNotifications--', offlineNotifications)
+    });
+    setUnreadCount(0);
+  }
 
   //*************** */
   return (
@@ -319,9 +398,10 @@ function Header() {
                       <div className="offcanvas-body d-block">
                         <ul className="seller_menu navbar-nav justify-content-end flex-grow-1 pe-0">
                           <li className="nav-item">
-                            <Link className="nav-link" to="/admin/manage-notifications">
+                            <Link className="nav-link" to="/admin/manage-notifications" onClick={handleNotificationClick}>
                               <div className="sm_icon">
                                 <img src={blackBellIcon} alt="" />
+                                {unreadCount > 0 && <span className="notification-count">{unreadCount}</span>}
                               </div>
                               <span>Notifications</span>
                             </Link>
@@ -367,6 +447,24 @@ function Header() {
                               </div>
                               <span>Logout</span>
                             </Link>
+                          </li>
+                          {/* Add admin acount */}
+                          <li className="nav-item dropdown">
+                            <Link className="nav-link dropdown-toggle" to="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                              <div className="com_user_acc">
+                                <div className="com_user_img"><img src={userInfo.imgUrl && userInfo.imgUrl.trim() !== '' ? userInfo.imgUrl : userImg} alt="" /></div>
+                                <div className="com_user_name">
+                                  <div className="cu_name">{userInfo.name}</div>
+                                  <div>{userInfo.role}</div>
+                                </div>
+                              </div>
+                            </Link>
+                            <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                              <li><Link className="dropdown-item" to="/admin-profile">Account</Link></li>
+                              {/* <li><Link className="dropdown-item" to="#">Setting</Link></li> */}
+                              <li><hr className="dropdown-divider" /></li>
+                              <li><Link className="dropdown-item" to="#" onClick={() => logout()} >Log Out</Link></li>
+                            </ul>
                           </li>
                         </ul>
                       </div>

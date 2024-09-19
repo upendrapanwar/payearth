@@ -13,6 +13,7 @@ const fs = require("fs");
 const { ChatMessage } = require("../payearth-api/app/helpers/db");
 // const setupSocket1 = require("./app/helpers/socket-io");
 const socketIo = require("socket.io");
+const NotificationController = require('./app/controllers/notification.controller');
 
 
 const ENV = config.app_env;
@@ -162,6 +163,27 @@ io.on("connection", function (socket) {
     // console.log("USER DISCONECT");
     socket.leave(userID)
   })
+
+  //***************************
+  socket.on('allNotifications', ({ userID }) => {
+    if (!userID) {
+      console.error('User ID is required to join room');
+      return;
+    }
+    socket.join(userID);
+    console.log(`User with ID ${userID} joined their room.`);
+  });
+
+  // Follow event
+  socket.on('follow', (data) => {
+    NotificationController.followUser(socket, data);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
+  });
+
+  //**********************************/
 
   // Disconnect event
   socket.on('disconnect', () => {

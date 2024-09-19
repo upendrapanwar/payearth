@@ -20,6 +20,8 @@ import SimpleImageSlider from "react-simple-image-slider";
 import ReactTimeAgo from 'react-time-ago'
 import TimeAgo from 'javascript-time-ago'
 
+import io from "socket.io-client";
+
 import en from 'javascript-time-ago/locale/en.json'
 import ru from 'javascript-time-ago/locale/ru.json'
 
@@ -309,6 +311,8 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
         const currentUserId = authInfo.id;
         const userIdToFollow = posts.userId === null ? posts.sellerId.id : posts.userId.id;
         const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
+        const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
+
         var reqBody = {
             role: role,
             currentUserId: currentUserId,
@@ -326,6 +330,42 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                 setIsFollowing(true);
                 // console.log("response", response.data.message);
                 toast.success(response.data.message);
+                const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+
+                // Emit follow notification to the followed user
+                socket.emit('follow', {
+                    follower: { id: currentUserId, name: userInfo.name },
+                    followed: { id: userIdToFollow, name: posts.userId === null ? posts.sellerId.name : posts.userId.name },
+                });
+
+                const notificationReqBody = {
+                    type: 'follow',
+                    sender: {
+                        id: currentUserId,
+                        type: 'user'
+
+                    },
+                    receiver: {
+                        id: userIdToFollow,
+                        type: receiverRole
+                    },
+                    message: `${userInfo.name} followed you.`,
+                    isRead: 'false',
+                    createdAt: new Date(),
+                };
+
+                // axios.post('community/notifications', notificationReqBody, {
+                axios.post('front/notifications', notificationReqBody, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': `Bearer ${authInfo.token}`
+                    }
+                }).then(response => {
+                    console.log("Notification saved:", response.data.message);
+                }).catch(error => {
+                    console.log("Error saving notification:", error);
+                });
 
             }
         }).catch(error => {

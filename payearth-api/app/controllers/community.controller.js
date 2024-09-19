@@ -79,8 +79,6 @@ router.get('/front/categories', getCategories);
 router.get('/front/products/:id', getProductsByCatId);
 
 
-
-
 module.exports = router;
 
 function getProfilePosts(req, res, next) {

@@ -143,6 +143,7 @@ module.exports = {
     updateGroupName,
 
     getAllPosts,
+    getAdminPosts,
     addPostComment,
     addPost,
     addPostImages,
@@ -3385,6 +3386,170 @@ async function getAllPosts(req) {
         console.log(error)
     }
 }
+
+
+async function getAdminPosts(req) {
+    const adminId = req.params.id;
+    console.log('adminId-----',adminId)
+    try {
+        const Allposts = await Post.find({ isActive: true ,adminId: adminId})
+            .sort({ createdAt: 'desc' })
+            .populate([
+                {
+                    path: "sellerId",
+                    model: Seller,
+                    select: "name image_url community role",
+                    match: { isActive: true },
+                },
+                {
+                    path: "userId",
+                    model: User,
+                    select: "name image_url community role",
+                    match: { isActive: true },
+                },
+                {
+                    path: "adminId",
+                    model: Admin,
+                    select: "name image_url community role",
+                    match: { isActive: true },
+                },
+                {
+                    path: "postImages",
+                    model: PostImages,
+                    select: "url",
+                    // match: { isActive: true }
+                },
+                {
+                    path: "postVideos",
+                    model: PostVideos,
+                    select: "url",
+                    match: { isActive: true }
+                },
+                {
+                    path: "categoryId",
+                    model: Category,
+                    select: "categoryName isService"
+                    //match: { isActive: true }
+                },
+                {
+                    path: "productId",
+                    model: Product,
+                    select: "name isService"
+                    //match: { isActive: true }
+                },
+                {
+                    path: "likes",
+                    model: PostLike,
+                    select: "isActive isSeller postId sellerId userId",
+                    // match: { isActive: true },
+                    populate: [
+                        {
+                            path: "sellerId",
+                            model: Seller,
+                            select: "name image_url",
+                            // match: { isActive: true },
+                        },
+                        {
+                            path: "userId",
+                            model: User,
+                            select: "name image_url",
+                            // match: { isActive: true },
+                        },
+                    ]
+                },
+                {
+                    path: "comments",
+                    model: PostComment,
+                    select: "-isActive -postId",
+                    match: { isActive: true },
+                    populate: [{
+                        path: "sellerId",
+                        model: Seller,
+                        select: "name image_url",
+                        match: { isActive: true },
+                    },
+                    {
+                        path: "userId",
+                        model: User,
+                        select: "name image_url",
+                        match: { isActive: true },
+                    },
+                    {
+                        path: "adminId",
+                        model: Admin,
+                        select: "name image_url",
+                        match: { isActive: true },
+                    },
+                    ]
+                },
+                {
+                    path: "parentId",
+                    model: Post,
+                    match: { isActive: true },
+                    populate: [{
+                        path: "postImages",
+                        model: PostImages,
+                        select: "url",
+                        match: { isActive: true }
+                    },
+                    {
+                        path: "postVideos",
+                        model: PostVideos,
+                        select: "url",
+                        match: { isActive: true }
+                    },
+                    {
+                        path: "categoryId",
+                        model: Category,
+                        select: "categoryName isService"
+                        //match: { isActive: true }
+                    },
+                    {
+                        path: "productId",
+                        model: Product,
+                        select: "name isService"
+                        //match: { isActive: true }
+                    },
+                    {
+                        path: "sellerId",
+                        model: Seller,
+                        select: "name image_url",
+                        match: { isActive: true },
+                    },
+                    {
+                        path: "userId",
+                        model: User,
+                        select: "name image_url",
+                        match: { isActive: true },
+                    },
+                    {
+                        path: "likes",
+                        model: PostLike,
+                        select: "-isActive -postId",
+                        match: { isActive: true },
+                        populate: [{
+                            path: "sellerId",
+                            model: Seller,
+                            select: "name image_url",
+                            match: { isActive: true },
+                        },
+                        {
+                            path: "userId",
+                            model: User,
+                            select: "name image_url",
+                            match: { isActive: true },
+                        },
+                        ]
+                    }
+                    ]
+                }
+            ]);
+        return Allposts;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 async function addPostComment(req) {
     const param = req.body;

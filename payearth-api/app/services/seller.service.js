@@ -4668,7 +4668,6 @@ async function supportReqCall(req) {
       call_status
     });
 
-    const result = await data.save();
 
 
     const mailOptions = {
@@ -4717,6 +4716,7 @@ async function supportReqCall(req) {
 
     await SendEmail(mailOptions);
 
+    const result = await data.save();
 
     return result;
   } catch (error) {

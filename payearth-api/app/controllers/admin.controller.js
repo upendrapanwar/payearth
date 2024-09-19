@@ -220,6 +220,7 @@ router.put("/updateGroupName", updateGroupName);
 
 //****community****/
 router.get("/all-posts", getAllPosts);
+router.get("/admin-posts/:id", getAdminPosts);
 router.post('/postComments/:id', addPostComment);
 router.post('/posts', addPost);
 router.post('/postImages/:id', addPostImages);
@@ -1008,6 +1009,14 @@ function userServiceOrders(req, res, next) {
 
 function getAllPosts(req, res, next) {
     adminService.getAllPosts(req)
+        .then((posts) => posts
+            ? res.status(200).json({ status: true, data: posts })
+            : res.status(400).json({ status: false, message: 'error messsage', data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function getAdminPosts(req, res, next) {
+    adminService.getAdminPosts(req)
         .then((posts) => posts
             ? res.status(200).json({ status: true, data: posts })
             : res.status(400).json({ status: false, message: 'error messsage', data: [] }))

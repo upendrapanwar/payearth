@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Footer from '../../components/common/Footer';
 import Header from '../../components/community/common/Header';
 import UserHeader from '../../components/user/common/Header';
@@ -48,10 +48,9 @@ const Community = () => {
     const [showPicker, setShowPicker] = useState(false);
     const [isUpdate, setIsUpdate] = useState(false);
     const [postUpdateId, setPostUpdateId] = useState(null)
-    const [selectFilterCategory, setSelectFilterCategory] = useState(null);
+    const [selectFilterCategory, setSelectFilterCategory] = useState("");
     const [showMostLiked, setShowMostLiked] = useState(false);
     const [showMostCommented, setShowMostCommented] = useState(false);
-    // const [filteredData, setFilteredData] = useState(postsData);
     const [filteredData, setFilteredData] = useState(null);
     const [userType, setUserType] = useState(null);
     const [showModal, setShowModal] = useState(false);
@@ -59,6 +58,7 @@ const Community = () => {
     const [blockedUser, setBlockedUser] = useState(null);
     const [followers, setFollowers] = useState(null);
     const [following, setFollowing] = useState(null);
+
 
     useEffect(() => {
         getUserorSellerData();
@@ -76,9 +76,9 @@ const Community = () => {
                     },
                 })
                 .then((response) => {
-                    console.log("response", response.data)
+                    // console.log("response", response.data)
                     const data = response.data.data;
-                    console.log("blocked", data.blocked)
+                    // console.log("blocked", data.blocked)
 
                     if (response.data.status === true) {
                         // setUserData(data);
@@ -171,6 +171,10 @@ const Community = () => {
         }, 0.001);
     }
     const createPost = async () => {
+        setSelectFilterCategory("");
+        setShowMostLiked(false);
+        setShowMostCommented(false);
+        // loadMoreItems();
         // console.log("authInfo Seller or User", authInfo.token);
         // console.log("postStatus", postStatus)
         const token = authInfo.token;
@@ -189,6 +193,7 @@ const Community = () => {
         };
 
         setInputStr('');
+
         try {
             dispatch(setLoading({ loading: true }));
             const postResponse = await axios.post('community/posts', reqBody, {
@@ -464,14 +469,8 @@ const Community = () => {
         setShowMostLiked(false);
         setShowMostCommented(false);
         const filtered = postsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
-        // console.log("Filtred", filtered)
-        // if (filtered.length === 0) {
-        //     toast("Data not found, Showing all data");
-        // }
         const dataToShow = filtered.length === 0 ? postsData : filtered;
         setFilteredData(dataToShow);
-        setSelectFilterCategory(null);
-
     }
 
     const handleUnblockUser = async (data) => {
@@ -503,6 +502,9 @@ const Community = () => {
         }
     }
 
+
+
+
     return (
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
@@ -511,7 +513,7 @@ const Community = () => {
                 <UserHeader />
                 {/* <Header /> */}
                 <div className="cumm_page_wrap pt-5 pb-5">
-                    <div className="container">
+                    <div className="container" >
                         <div className="row">
                             <div className="col-lg-12">
                                 <div className="comm_profile">
@@ -736,9 +738,10 @@ const Community = () => {
                                                         <Post key={index} posts={value} sendEditData={handleEdit} />
                                                     ))}
                                             </div>
-                                        ) : (
-                                            <NotFound msg="Data not found." />
                                         )
+                                            : (
+                                                <NotFound msg="Data not found." />
+                                            )
                                     ) : (
                                         filteredData.length > 0 ? (
                                             <div>
@@ -763,7 +766,7 @@ const Community = () => {
                                         )
                                     )
                                 }
-                            </div>
+                            </div >
 
                             {/* Filter */}
                             <div className="col-lg-3">
@@ -791,7 +794,7 @@ const Community = () => {
                                                 id="popularPost"
                                                 checked={showMostLiked}
                                                 onChange={(e) => {
-                                                    setShowMostLiked(e.target.checked)
+                                                    setShowMostLiked(e.target.checked);
                                                     setShowMostCommented(false);
                                                 }}
                                             />
@@ -831,6 +834,7 @@ const Community = () => {
                         </div>
                     </div>
                 </div>
+
                 <Footer />
             </div>
         </React.Fragment>

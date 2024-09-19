@@ -48,7 +48,7 @@ const SellerCommunity = () => {
     const [showPicker, setShowPicker] = useState(false);
     const [isUpdate, setIsUpdate] = useState(false);
     const [postUpdateId, setPostUpdateId] = useState(null)
-    const [selectFilterCategory, setSelectFilterCategory] = useState(null);
+    const [selectFilterCategory, setSelectFilterCategory] = useState("");
     const [showMostLiked, setShowMostLiked] = useState(false);
     const [showMostCommented, setShowMostCommented] = useState(false);
     const [filteredData, setFilteredData] = useState(null);
@@ -169,8 +169,10 @@ const SellerCommunity = () => {
         }, 0.001);
     }
     const createPost = async () => {
-        // console.log("authInfo Seller or User", authInfo.token);
-        // console.log("postStatus", postStatus)
+        setSelectFilterCategory("");
+        setShowMostLiked(false);
+        setShowMostCommented(false);
+        
         const token = authInfo.token;
         setAddMore(false);
         let reqBody = {
@@ -449,9 +451,9 @@ const SellerCommunity = () => {
         setShowMostLiked(false);
         setShowMostCommented(false);
         const filtered = SellerPostsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
-        console.log("Filtred", filtered)
         const dataToShow = filtered.length === 0 ? SellerPostsData : filtered;
         setFilteredData(dataToShow);
+        // setSelectFilterCategory("");
     }
 
     const handleUnblockUser = async (data) => {
@@ -730,8 +732,17 @@ const SellerCommunity = () => {
                                                         }
                                                     })
                                                     .map((value, index) => (
-                                                        <SellerPost key={index} posts={value} sendEditData={handleEdit} />
+
+                                                        <SellerPost key={value._id || index} posts={value} sendEditData={handleEdit} />
                                                     ))}
+
+                                                {/* .map((value, index) => {
+                                                //         console.log('value------%^&%$%&', value);
+                                                //         return (
+                                                //             <SellerPost key={value._id} posts={value} sendEditData={handleEdit} />
+                                                //         );
+                                                //     })
+                                                // } */}
                                             </div>
                                         ) : (
                                             <NotFound msg="Data not found." />
@@ -783,12 +794,14 @@ const SellerCommunity = () => {
                                         <div className="form-check mb-3">
                                             <input
                                                 className="form-check-input"
-                                                type="checkbox"
+                                                type="radio"
                                                 value=""
                                                 id="popularPost"
                                                 checked={showMostLiked}
-                                                onChange={(e) => setShowMostLiked(e.target.checked)}
-                                            // onChange={setShowMostLiked}
+                                                onChange={(e) => {
+                                                    setShowMostLiked(e.target.checked);
+                                                    setShowMostCommented(false);
+                                                }}
                                             />
                                             <label className="form-check-label" htmlFor="popularPost">
                                                 Most Popular Post
@@ -797,11 +810,14 @@ const SellerCommunity = () => {
                                         <div className="form-check mb-3">
                                             <input
                                                 className="form-check-input"
-                                                type="checkbox"
+                                                type="radio"
                                                 value=""
                                                 id="CommentedPost"
                                                 checked={showMostCommented}
-                                                onChange={(e) => setShowMostCommented(e.target.checked)}
+                                                onChange={(e) => {
+                                                    setShowMostCommented(e.target.checked);
+                                                    setShowMostLiked(false);
+                                                }}
                                             />
                                             <label className="form-check-label" htmlFor="CommentedPost">
                                                 Most Commented Post

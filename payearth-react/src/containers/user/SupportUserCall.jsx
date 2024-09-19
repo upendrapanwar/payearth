@@ -3,11 +3,14 @@ import { isLogin } from "../../helpers/login";
 import Header from './../../components/user/common/Header';
 import PageTitle from './../../components/user/common/PageTitle';
 import Footer from '../../components/common/Footer';
+import { Link } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import SupportCallSchema from '../../validation-schemas/supportCallSchemas';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
+import arrow_back from '../../assets/icons/arrow-back.svg'
+
 
 export const SupportUserCall = () => {
     const isLoged_In = isLogin();
@@ -67,6 +70,14 @@ export const SupportUserCall = () => {
                         <div className="bg-white rounded-3">
                             <div className="dash_inner_wrap contact_form_page">
                                 <div className="row">
+                                    <div className="noti_wrap">
+                                        <div className='d-flex justify-content-end'><span>
+                                            <Link className="btn custom_btn btn_yellow mx-auto mt-2" to="/user-support">
+                                                <img src={arrow_back} alt="linked-in" />&nbsp;
+                                                Back
+                                            </Link>
+                                        </span></div>
+                                    </div>
                                     <div className="col-lg-4 pt-5 pb-5 d-flex justify-content-center align-items-center">
                                         <div className="contact_info text-center">
                                             <ul className="cont">

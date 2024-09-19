@@ -21,7 +21,7 @@ import Picker from 'emoji-picker-react';
 import { toast } from 'react-toastify';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
 
-const SellerCommunity = () => {
+const AdminCommunity = () => {
     const userInfo = useSelector(state => state.auth.userInfo);
     const authInfo = useSelector(state => state.auth.authInfo);
     const loading = useSelector(state => state.global.loading);
@@ -50,7 +50,7 @@ const SellerCommunity = () => {
     const [showPicker, setShowPicker] = useState(false);
     const [isUpdate, setIsUpdate] = useState(false);
     const [postUpdateId, setPostUpdateId] = useState(null)
-    const [selectFilterCategory, setSelectFilterCategory] = useState(null);
+    const [selectFilterCategory, setSelectFilterCategory] = useState("");
     const [showMostLiked, setShowMostLiked] = useState(false);
     const [showMostCommented, setShowMostCommented] = useState(false);
     const [filteredData, setFilteredData] = useState(null);
@@ -104,8 +104,9 @@ const SellerCommunity = () => {
         }, 0.001);
     }
     const createPost = async () => {
-        // console.log("authInfo Seller or User", authInfo.token);
-        console.log("postStatus", postStatus)
+        setSelectFilterCategory("");
+        setShowMostLiked(false);
+        setShowMostCommented(false);
         const token = authInfo.token;
         setAddMore(false);
         let reqBody = {
@@ -114,7 +115,7 @@ const SellerCommunity = () => {
             product_id: productId,
             post_status: postStatus,
             user_id: null,
-            seller_id:null,
+            seller_id: null,
             admin_id: authInfo.id,
             is_seller: false,
             is_admin: true,
@@ -408,16 +409,17 @@ const SellerCommunity = () => {
     };
 
     const handleFilterCategory = () => {
+        setShowMostLiked(false);
+        setShowMostCommented(false);
         const filtered = SellerPostsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
-        console.log("Filtred", filtered)
         const dataToShow = filtered.length === 0 ? SellerPostsData : filtered;
         setFilteredData(dataToShow);
     }
 
     const getPosts = () => {
         let url = '/admin/all-posts';
-        // this.dispatch(setLoading({ loading: true }));
-        // this.dispatch(SpinnerLoader({ loading: true }));
+        dispatch(setLoading({ loading: true }));
+        //dispatch(SpinnerLoader({ loading: true }));
         axios.get(url, {
             headers: {
                 // 'Accept': 'application/json',
@@ -435,8 +437,8 @@ const SellerCommunity = () => {
                 }
             }).finally(() => {
                 setTimeout(() => {
-                    // this.dispatch(setLoading({ loading: false }));
-                    //  this.dispatch(SpinnerLoader({ loading: false }));
+                    dispatch(setLoading({ loading: false }));
+                    // dispatch(SpinnerLoader({ loading: false }));
                 }, 300);
             });
     }
@@ -479,21 +481,11 @@ const SellerCommunity = () => {
                                                     value={postStatus}
                                                     onChange={e => setPostStatus(e.target.value)}
                                                     className="form-select" name="" id="">
-                                                    {/* <option value="Followers">Followers</option> */}
                                                     <option value="Public">Public</option>
-                                                    {/* <option value="2">Only Me</option> */}
                                                 </select>
                                             </div>
                                         </div>
                                         <div className="create_post_input">
-                                            {/* <div>
-                                                <input type="text" className='form-control post_title' placeholder='Enter title' />
-                                            </div> */}
-                                            {/* <InputEmoji
-                                                value={text}
-                                                onChange={setText}
-                                                placeholder="What is on your mind ?"
-                                            /> */}
                                             <textarea
                                                 className="input-style"
                                                 value={inputStr}
@@ -614,7 +606,7 @@ const SellerCommunity = () => {
                                                 {[...SellerPostsData]
                                                     .sort((a, b) => {
                                                         if (showMostLiked && showMostCommented) {
-                                                            return b.likeCount - a.likeCount || b.commentCount- a.commentCount;
+                                                            return b.likeCount - a.likeCount || b.commentCount - a.commentCount;
                                                         } else if (showMostLiked) {
                                                             return b.likeCount - a.likeCount;
                                                         } else if (showMostCommented) {
@@ -679,12 +671,15 @@ const SellerCommunity = () => {
                                         <div className="form-check mb-3">
                                             <input
                                                 className="form-check-input"
-                                                type="checkbox"
+                                                type="radio"
                                                 value=""
                                                 id="popularPost"
                                                 checked={showMostLiked}
-                                                onChange={(e) => setShowMostLiked(e.target.checked)}
-                                            // onChange={setShowMostLiked}
+                                                onChange={(e) => {
+                                                    setShowMostLiked(e.target.checked);
+                                                    setShowMostCommented(false);
+                                                }}
+
                                             />
                                             <label className="form-check-label" htmlFor="popularPost">
                                                 Most Popular Post
@@ -693,11 +688,14 @@ const SellerCommunity = () => {
                                         <div className="form-check mb-3">
                                             <input
                                                 className="form-check-input"
-                                                type="checkbox"
+                                                type="radio"
                                                 value=""
                                                 id="CommentedPost"
                                                 checked={showMostCommented}
-                                                onChange={(e) => setShowMostCommented(e.target.checked)}
+                                                onChange={(e) => {
+                                                    setShowMostCommented(e.target.checked);
+                                                    setShowMostLiked(false);
+                                                }}
                                             />
                                             <label className="form-check-label" htmlFor="CommentedPost">
                                                 Most Commented Post
@@ -725,4 +723,4 @@ const SellerCommunity = () => {
     );
 }
 
-export default SellerCommunity;
+export default AdminCommunity;
