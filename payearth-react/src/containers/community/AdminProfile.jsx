@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Footer from '../../components/common/Footer';
 import Header from '../../components/admin/common/Header';
 import userImg from '../../assets/images/user.png'
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import InputEmoji from 'react-input-emoji'
 import Post from '../../components/community/common/Post';
 // import SellerPost from '../../components/community/common/SellerPost';
@@ -30,6 +30,10 @@ const AdminProfile = () => {
     const postCategories = useSelector(state => state.post.postCategories);
     const postProducts = useSelector(state => state.post.postProducts);
     const dispatch = useDispatch();
+    const location = useLocation();
+    const postRefs = useRef({});
+    const searchParams = new URLSearchParams(location.search);
+    const postId = searchParams.get("postId");
 
     const [SellerPostsData, setSellerPostsData] = useState([]);
     const [text, setText] = useState('');
@@ -334,6 +338,20 @@ const AdminProfile = () => {
         getCategories();
         getPosts();
     }, []);
+
+    useEffect(() => {
+        console.log("Post ID from URL:", postId);
+        if (postId) {
+            setTimeout(() => {
+                if (postRefs.current[postId]) {
+                   // console.log("Scrolling to post:", postId);
+                    postRefs.current[postId].scrollIntoView({ behavior: "smooth" });
+                } else {
+                    console.log("Post not found in postRefs:", postRefs);
+                }
+            }, 3000);
+        }
+    }, [postId]);
 
     const handleEdit = (data) => {
         console.log("Data for edit test ###$$#$$#$#$#", data)
@@ -661,10 +679,20 @@ const AdminProfile = () => {
                                                             return 0; // No sorting
                                                         }
                                                     })
-                                                    .map((value, index) => (
-                                                        //<SellerPost key={index} posts={value} sendEditData={handleEdit} />
-                                                        <ManageCommunityPost key={index} posts={value} sendEditData={handleEdit} getPosts={getPosts} />
-                                                    ))}
+                                                    // .map((value, index) => (
+                                                    //     //<SellerPost key={index} posts={value} sendEditData={handleEdit} />
+                                                    //     <ManageCommunityPost key={index} posts={value} sendEditData={handleEdit} getPosts={getPosts} />
+                                                    // ))}
+                                                    .map((value, index) => {
+                                                        //console.log('value------%^&%$%&', value);
+                                                        return (
+                                                            <ManageCommunityPost key={value._id} posts={value} sendEditData={handleEdit} getPosts={getPosts} ref={(el) => {
+                                                                postRefs.current[value._id] = el;
+                                                                //console.log(`Assigned ref for post ID: ${value._id}`, el);
+                                                            }} />
+                                                        );
+                                                    })
+                                                }
                                             </div>
                                         ) : (
                                             <NotFound msg="Data not found." />

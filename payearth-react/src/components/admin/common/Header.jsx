@@ -42,42 +42,12 @@ function Header() {
     dispatch(setUserInfo({ userInfo: [] }));
     window.location.href = "/admin/login";
   };
-  //**************** */
-
-  // useEffect(() => {
-  //   // Join the specific user room
-  //   socket.emit('follow', authInfo.id);
-
-  //   // Fetch initial unread count
-  //   // const fetchUnreadCount = async () => {
-  //   //   try {
-  //   //     const response = await axios.get(`/api/notifications/unread/${authInfo.id}`);
-  //   //     setUnreadCount(response.data.unreadCount);
-  //   //   } catch (error) {
-  //   //     console.error('Error fetching unread notifications:', error);
-  //   //   }
-  //   // };
-
-  //   // fetchUnreadCount();
-
-  //   // Listen for new notifications in real-time
-  //   socket.on('new_notification', (notification) => {
-  //     setUnreadCount((prevCount) => prevCount + 1);
-  //     // Optionally display a toast or alert for the new notification
-  //     console.log('New Notification:', notification.message);
-  //   });
-
-  //   // Cleanup the socket when the component unmounts
-  //   return () => {
-  //     socket.off('new_notification');
-  //   };
-  // }, [authInfo.id]);
 
   useEffect(() => {
     const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
 
     if (authInfo && authInfo.id) {
-      socket.emit('join', { userID: authInfo.id });
+      socket.emit('allNotifications', { userID: authInfo.id });
       console.log(`User with ID ${authInfo.id} joined their room.`);
 
       axios.get(`front/notifications/${authInfo.id}`).then(response => {

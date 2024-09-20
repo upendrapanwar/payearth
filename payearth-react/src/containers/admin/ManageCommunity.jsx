@@ -5,7 +5,6 @@ import userImg from '../../assets/images/user.png'
 import { Link } from 'react-router-dom';
 import InputEmoji from 'react-input-emoji'
 import Post from '../../components/community/common/Post';
-// import SellerPost from '../../components/community/common/SellerPost';
 import ManageCommunityPost from '../../containers/admin/ManageCommunityPost';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { setLoading } from '../../store/reducers/global-reducer';
@@ -15,7 +14,6 @@ import { useSelector } from 'react-redux';
 import config from '../.././config.json'
 import { useDispatch } from 'react-redux';
 import { NotFound } from '../../components/common/NotFound';
-// import { getSellerPostsData } from '../../helpers/sellerPost-listing';
 import Select from 'react-select';
 import Picker from 'emoji-picker-react';
 import { toast } from 'react-toastify';

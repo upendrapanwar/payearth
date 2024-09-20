@@ -179,6 +179,12 @@ io.on("connection", function (socket) {
     NotificationController.followUser(socket, data);
   });
 
+  // Follow event
+  socket.on('comment', (data) => {
+    NotificationController.commentUser(socket, data);
+    console.log('comment data---',data)
+  });
+
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
   });

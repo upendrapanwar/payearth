@@ -62,6 +62,7 @@ module.exports = {
   saveNotifications,
   getNotifications,
   updateNotifications,
+  setNotificationSeen,
 };
 
 async function getReviews(id) {
@@ -1035,11 +1036,11 @@ async function getServicesByCategory(req) {
 
 async function saveNotifications(req) {
   let data = req.body;
-  // console.log('notification data--',data)
-  const { type, receiver, sender, message } = data;
+  // console.log('notification data to save--',data)
+  const { type, receiver, sender, message, postId } = data;
 
-  if (!type || !receiver || !sender || !message) {
-    throw new Error('Missing required fields: type, receiver, sender, or message');
+  if (!type || !receiver || !sender || !message || !postId) {
+    throw new Error('Missing required fields: type, receiver,postId, sender, or message');
   }
 
   const newNotification = new Notification({
@@ -1052,6 +1053,7 @@ async function saveNotifications(req) {
       id: sender.id,
       type: sender.type
     },
+    postId,
     message,
     isRead: false,
     createdAt: new Date()
@@ -1106,6 +1108,30 @@ async function updateNotifications(req) {
       return { message: 'Notifications updated successfully' };
     } else {
       return { message: 'No unread notifications found for the given user' };
+    }
+  } catch (error) {
+    console.error('Error updating notification:', error);
+    throw new Error('Failed to update notification');
+  }
+}
+
+async function setNotificationSeen(req, res) {
+  const { notificationId } = req.body;
+
+  if (!notificationId) {
+    return { message: 'Notification ID is required' };
+  }
+
+  try {
+    const result = await Notification.updateOne(
+      { _id: notificationId, isSeen: false },
+      { $set: { isSeen: true } }
+    );
+
+    if (result.modifiedCount > 0) {
+      return { message: 'Notification updated successfully' };
+    } else {
+      return { message: 'No unread notification found with the given ID' };
     }
   } catch (error) {
     console.error('Error updating notification:', error);

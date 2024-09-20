@@ -54,6 +54,7 @@ router.get("/getServicesByCategory/:categoryId", getServicesByCategory);
 router.post('/notifications', saveNotifications);
 router.get('/notifications/:id', getNotifications);
 router.put('/updateNotifications/:id', updateNotifications);
+router.put('/setNotificationSeen', setNotificationSeen);
 
 
 module.exports = router;
@@ -247,6 +248,12 @@ function getNotifications(req, res, next) {
 
 function updateNotifications(req, res, next) {
     frontService.updateNotifications(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function setNotificationSeen(req, res, next) {
+    frontService.setNotificationSeen(req)
         .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }

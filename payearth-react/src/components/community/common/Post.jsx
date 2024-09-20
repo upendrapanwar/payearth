@@ -31,7 +31,7 @@ import ru from 'javascript-time-ago/locale/ru.json'
 
 const Post = ({ posts, sendEditData, sendShareData }) => {
 
-    console.log("all posts", posts)
+   // console.log("all posts", posts)
 
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
@@ -61,6 +61,11 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
     const [reportOption, setReportOption] = useState(null);
     const date = new Date(posts.createdAt);
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+    const currentUserId = authInfo.id;
+    const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId.id : posts.sellerId.id;
+    //const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
+    const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
 
     const handleComments = (e) => {
         setComments(e.target.value);
@@ -96,6 +101,48 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                 setCommentsCount(commentsCount + 1);
                 let res = response.data.data
                 getPostsData(dispatch);
+//***************** */
+                const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+                console.log('comments------',comments)
+                const notification = {
+                    message: `${userInfo.name} comment on your post: "${comments}"`,
+                    postId: postId,
+                    sender: { id: currentUserId, name: userInfo.name },
+                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name},
+                    type: 'comment'
+                };
+                // Emit follow notification to the followed user
+                socket.emit('comment', {
+                    notification
+                    // follower: { id: currentUserId, name: userInfo.name },
+                    // followed: { id: userIdToFollow, name: posts.userId === null ? posts.sellerId.name : posts.userId.name },
+                });
+
+                const notificationReqBody = {
+                    type: 'comment',
+                    sender: {
+                        id: currentUserId,
+                        type: 'user'
+
+                    },
+                    receiver: {
+                        id: userIdToSend,
+                        type: receiverRole
+                    },
+                    postId:postId,
+                    message: `${userInfo.name} comment on your post: "${comments}"`,
+                    isRead: 'false',
+                    createdAt: new Date(),
+                };
+
+                // axios.post('community/notifications', notificationReqBody, {
+                axios.post('front/notifications', notificationReqBody).then(response => {
+                    console.log("Notification saved:", response.data.message);
+                }).catch(error => {
+                    console.log("Error saving notification:", error);
+                });
+//***************** */
+
             }
         }).catch(error => {
             console.log(error);

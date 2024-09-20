@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Header from "../../components/user/common/Header";
 import PageTitle from "../../components/user/common/PageTitle";
 import Footer from "../../components/common/Footer";
@@ -12,12 +13,12 @@ import { useDispatch } from 'react-redux';
 const Notifications = () => {
   const [notification, setNotification] = useState([]);
   console.log('Allnotification---11', notification)
-  // const [itemsPerPage] = useState(4);
   //const [read, setRead] = useState(false);
-  // const [updatedId, setUpdatedId] = useState(null);
   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
   const loading = useSelector(state => state.global.loading);
   const dispatch = useDispatch();
+
+  // const { loading } = store.getState().global;
 
   useEffect(() => {
     fetchNotification(authInfo.id);
@@ -46,39 +47,23 @@ const Notifications = () => {
     }
   };
 
-  // const updateReadStatus = async (id) => {
-  //     if (!id) return;
-  //     try {
-  //         const { data } = await axios.patch(
-  //             `/user/update-notification/${id}`,
-  //             { read: true },
-  //             {
-  //                 headers: {
-  //                     "content-type": "application/json",
-  //                     Authorization: `Bearer ${authInfo.token}`,
-  //                 },
-  //             }
-  //         );
-  //         if (!data) {
-  //             throw new Error("No data received");
-  //         }
-  //         setRead(data.read);
-  //         fetchNotification(authInfo.id, authInfo.token);
-  //     } catch (error) {
-  //         console.log("Error updating read status:", error);
-  //     }
-  // };
+  const updateReadStatus = (notificationId) => {
+    axios.put('front/setNotificationSeen', { notificationId }).then(response => {
+        const updatedReadStatus = response.data.data;
+        //console.log('updatedReadStatus--', updatedReadStatus)
+        setNotification(prevState =>
+            prevState.map(notification =>
+                notification._id === notificationId
+                    ? { ...notification, isSeen: true }
+                    : notification
+            )
+        );
+    });
+}
 
-  // const handleRowClick = async (id) => {
-  //     setUpdatedId(id);
-  //     await updateReadStatus(updatedId);
-  // };
-
-  // const { loading } = store.getState().global;
   return (
     <>
       {loading === true ? <SpinnerLoader /> : ''}
-      {/* <Header readStatus={read} /> */}
       <Header />
       <PageTitle title="Notifications" />
       
@@ -88,7 +73,19 @@ const Notifications = () => {
             <div className="col-md-12">
               {Array.isArray(notification) && notification.length > 0 ? (
                 notification.map((notifications, index) => (
-                  <div key={index} className="card border border-2 border-info-subtle mb-1 mt-1">
+                  <Link
+                    key={index}
+                    to={
+                      notifications.type === 'comment'
+                        ?  `#`
+                        : '#' // for like or  other types of notifications
+                    }
+                    onClick={() => updateReadStatus(notifications._id)}
+                  >
+                    <div 
+                    className={`card border border-2 border-info-subtle mb-1 mt-1 ${!notifications.isSeen ?  'bg-info-subtle' : 'bg-light'
+                    }`}
+                    >
                     <div className="card-header  text-primary">
                       {notifications.type || "not available"}
                     </div>
@@ -98,7 +95,8 @@ const Notifications = () => {
                         {notifications.message || " No message."}
                       </p>
                     </div>
-                  </div>
+                    </div>
+                    </Link>
                 ))
               ) : (
                 <div className="alert alert-info" role="alert">
