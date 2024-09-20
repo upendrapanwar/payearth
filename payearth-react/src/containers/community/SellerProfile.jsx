@@ -134,8 +134,9 @@ const SellerProfile = () => {
         }, 0.001);
     }
     const createPost = async () => {
-        // console.log("authInfo Seller or User", authInfo.token);
-        // console.log("postStatus", postStatus)
+        setSelectFilterCategory("");
+        setShowMostLiked(false);
+        setShowMostCommented(false);
         const token = authInfo.token;
         setAddMore(false);
         let reqBody = {
@@ -413,8 +414,9 @@ const SellerProfile = () => {
     };
 
     const handleFilterCategory = () => {
+        setShowMostLiked(false);
+        setShowMostCommented(false);
         const filtered = SellerPostsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
-        //console.log("Filtred", filtered)
         const dataToShow = filtered.length === 0 ? SellerPostsData : filtered;
         setFilteredData(dataToShow);
     }
@@ -679,7 +681,6 @@ const SellerProfile = () => {
                                                     />
                                                 </div>
                                                 {isUpdate === true && <button className="btn custom_btn btn_yellow mx-auto" onClick={updatPost}> Update</button>}
-                                                {/* <button className="btn custom_btn btn_yellow mx-auto" onClick={() => createPost()} disabled={!inputStr.trim() && images.length === 0 && videos.length === 0 ? true : false} >Post</button> */}
                                             </div>
                                         </div>
                                     </div>
@@ -767,12 +768,14 @@ const SellerProfile = () => {
                                         <div className="form-check mb-3">
                                             <input
                                                 className="form-check-input"
-                                                type="checkbox"
+                                                type="radio"
                                                 value=""
                                                 id="popularPost"
                                                 checked={showMostLiked}
-                                                onChange={(e) => setShowMostLiked(e.target.checked)}
-                                            // onChange={setShowMostLiked}
+                                                onChange={(e) => {
+                                                    setShowMostLiked(e.target.checked);
+                                                    setShowMostCommented(false);
+                                                }}
                                             />
                                             <label className="form-check-label" htmlFor="popularPost">
                                                 Most Popular Post
@@ -781,11 +784,14 @@ const SellerProfile = () => {
                                         <div className="form-check mb-3">
                                             <input
                                                 className="form-check-input"
-                                                type="checkbox"
+                                                type="radio"
                                                 value=""
                                                 id="CommentedPost"
                                                 checked={showMostCommented}
-                                                onChange={(e) => setShowMostCommented(e.target.checked)}
+                                                onChange={(e) => {
+                                                    setShowMostCommented(e.target.checked);
+                                                    setShowMostLiked(false);
+                                                }}
                                             />
                                             <label className="form-check-label" htmlFor="CommentedPost">
                                                 Most Commented Post

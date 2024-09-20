@@ -31,7 +31,7 @@ import ru from 'javascript-time-ago/locale/ru.json'
 
 const Post = ({ posts, sendEditData, sendShareData }) => {
 
-   // console.log("all posts", posts)
+    // console.log("all posts", posts)
 
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
@@ -505,7 +505,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
 
     const handleFacebookShare = (postId) => {
         // const url = `https://pay.earth/share_community/${postId}`
-        const url = `https://localhost:3000/share_community/${postId}`
+        const url = `https://pay.earth/share_community/${postId}`
         const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
         // window.open(facebookShareUrl, '_blank');
         window.open(facebookShareUrl, '_blank');
@@ -587,32 +587,35 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
         }
     };
 
-    // const handleReportPost = async () => {
-    //     try {
-    //         const data = reportedPost;
-    //         console.log("reportedPost send to admin", data)
-    //         const headers = {
-    //             'Content-Type': 'application/json',
-    //             'Authorization': `Bearer ${authInfo.token}` // Replace authInfo.token with your actual token variable
-    //         };
-    //         const response = await axios.post('community/createPostReport', {
-    //             reportType: reportOption,
-    //             notes: reportNote,
-    //             reportData: {
-    //                 postId: data.id,
-    //                 postCreatedBy: data.userId === null ? data.sellerId.id : data.userId.id,
-    //             },
-    //             reportBy: authInfo.id
-    //         }, { headers });
-    //         // console.log("response", response.data)
+    const handleBlockUser = async (data) => {
+        console.log("data", data)
+        const selectedUserId = data.userId === null ? data.sellerId.id : data.userId.id
 
-    //         toast.success("Report Succesfully");
-    //         setIsReportOpen(false);
-    //         // alert(response.data.message);
-    //     } catch (error) {
-    //         console.error('Error reporting post:', error);
-    //     }
-    // }
+        try {
+            // const selectedUserId = "787875455454cczxcxczx"
+            const authorId = authInfo.id
+            const url = "community/communityUserBlock";
+            axios.put(url, { authorId, selectedUserId }, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${authInfo.token}`
+                }
+            }).then((response) => {
+                if (response.data.status === true) {
+                    
+                    getPostsData(dispatch);
+                    toast.success("user blocked..");
+                }
+            }).catch((error) => {
+                console.log("error", error)
+            })
+
+        } catch (error) {
+            console.error('Error', error);
+        }
+    }
+
 
     const handleNoteChange = (e) => {
         setReportNote(e.target.value);
@@ -827,13 +830,23 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                     </>
                                 ) :
                                     !posts.isAdmin && (
-                                        <Link
-                                            to="#"
-                                            onClick={() => handleReportPopup(posts)}
-                                            className="post_follow"
-                                        >
-                                            Report
-                                        </Link>
+                                        <>
+                                            <Link
+                                                to="#"
+                                                onClick={() => handleBlockUser(posts)}
+                                                className="post_follow"
+                                            >
+                                                Block
+                                            </Link>
+                                            <Link
+                                                to="#"
+                                                onClick={() => handleReportPopup(posts)}
+                                                className="post_follow"
+                                            >
+                                                Report
+                                            </Link>
+                                        </>
+
                                     )
                                 }
                                 <Link

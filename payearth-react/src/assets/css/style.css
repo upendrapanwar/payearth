@@ -4582,3 +4582,6 @@ h4 {
   overflow-y: auto; 
 }
 
+.pointer {
+  cursor: pointer;
+}

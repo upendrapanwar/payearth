@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Footer from '../../components/common/Footer';
 import Header from '../../components/community/common/Header';
 import UserHeader from '../../components/user/common/Header';
@@ -17,6 +17,7 @@ import { NotFound } from '../../components/common/NotFound';
 import { getPostsData } from '../../helpers/post-listing';
 import Select from 'react-select';
 import Picker from 'emoji-picker-react';
+import { Modal } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
 
@@ -47,13 +48,78 @@ const Community = () => {
     const [showPicker, setShowPicker] = useState(false);
     const [isUpdate, setIsUpdate] = useState(false);
     const [postUpdateId, setPostUpdateId] = useState(null)
-    const [selectFilterCategory, setSelectFilterCategory] = useState(null);
+    const [selectFilterCategory, setSelectFilterCategory] = useState("");
     const [showMostLiked, setShowMostLiked] = useState(false);
     const [showMostCommented, setShowMostCommented] = useState(false);
-    // const [filteredData, setFilteredData] = useState(postsData);
     const [filteredData, setFilteredData] = useState(null);
+    const [userType, setUserType] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+    const [modalContent, setModalContent] = useState([]);
+    const [blockedUser, setBlockedUser] = useState(null);
+    const [followers, setFollowers] = useState(null);
+    const [following, setFollowing] = useState(null);
 
 
+    useEffect(() => {
+        getUserorSellerData();
+    }, [postsData, modalContent])
+
+    const getUserorSellerData = async () => {
+        setLoading(true);
+        try {
+            await axios
+                .get(`/community/getUserorSellerData/${authInfo.id}`, {
+                    headers: {
+                        "content-type": "application/json",
+                        "Access-Control-Allow-Origin": "*",
+                        'Authorization': `Bearer ${authInfo.token}`
+                    },
+                })
+                .then((response) => {
+                    // console.log("response", response.data)
+                    const data = response.data.data;
+                    // console.log("blocked", data.blocked)
+
+                    if (response.data.status === true) {
+                        // setUserData(data);
+                        setBlockedUser(data.blocked);
+                        setFollowers(data.followers);
+                        setFollowing(data.following);
+                    }
+                    // setUserData(data);
+                })
+                .catch((error) => {
+                    console.log("Error", error);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        } catch (error) {
+            console.log("Error", error);
+            setLoading(false);
+        }
+    }
+
+    const handleClick = (type) => {
+        let data = [];
+        switch (type) {
+            case 'followers':
+                data = followers !== null ? { type: 'followers', data: followers } : [];
+                break;
+            case 'following':
+                data = following !== null ? { type: 'following', data: following } : [];
+                break;
+            case 'blockedUser':
+                data = blockedUser !== null ? { type: 'blockedUser', data: blockedUser } : [];
+                break;
+            default:
+                break;
+        }
+        console.log("under model data", data)
+        setModalContent(data.data);
+        setUserType(data.type)
+        setShowModal(true);
+    };
 
     const onEmojiClick = (event, emojiObject) => {
         setInputStr(prevInput => prevInput + emojiObject.emoji);
@@ -105,8 +171,12 @@ const Community = () => {
         }, 0.001);
     }
     const createPost = async () => {
+        setSelectFilterCategory("");
+        setShowMostLiked(false);
+        setShowMostCommented(false);
+        // loadMoreItems();
         // console.log("authInfo Seller or User", authInfo.token);
-        console.log("postStatus", postStatus)
+        // console.log("postStatus", postStatus)
         const token = authInfo.token;
         setAddMore(false);
         let reqBody = {
@@ -122,30 +192,8 @@ const Community = () => {
             parent_id: null
         };
 
-        // if (userInfo.role === 'user') {
-        //     reqBody = {
-        //         content: inputStr,
-        //         category_id: categoryId,
-        //         product_id: productId,
-        //         post_status: postStatus,
-        //         user_id: authInfo.id,
-        //         seller_id: null,
-        //         is_seller: false,
-        //         parent_id: null
-        //     }
-        // } else {
-        //     reqBody = {
-        //         content: inputStr,
-        //         category_id: categoryId,
-        //         product_id: productId,
-        //         post_status: postStatus,
-        //         user_id: null,
-        //         seller_id: authInfo.id,
-        //         is_seller: true,
-        //         parent_id: null
-        //     }
-        // }
         setInputStr('');
+
         try {
             dispatch(setLoading({ loading: true }));
             const postResponse = await axios.post('community/posts', reqBody, {
@@ -279,10 +327,6 @@ const Community = () => {
             }, 300);
         });
     }
-    // const handleCategories = (event) => {
-    //     getPostProducts(event.target.value);
-    //     setCategoryId(event.target.value);
-    // };
     const handleCategories = (selectedOption) => {
         console.log("HandleCategory select option", selectedOption)
         setDefaultCategoryOption(selectedOption);
@@ -295,10 +339,6 @@ const Community = () => {
             setProductOption([]);
         }
     }
-    // const handleProducts = (event) => {
-    //     setProductId(event.target.value);
-    //     console.log(event.target.value);
-    // }
     const handleProducts = (selectedOption) => {
         console.log("selectedProdOption", selectedOption)
         setDefaultProductOption(selectedOption);
@@ -332,8 +372,35 @@ const Community = () => {
         getCategories();
     }, []);
 
+    // const fetchNotification = async (userId, token) => {
+    //     try {
+    //         await axios
+    //             .get(`/user/get-notification/${userId}`, {
+    //                 headers: {
+    //                     "content-type": "application/json",
+    //                     "Access-Control-Allow-Origin": "*",
+    //                     Authorization: `Bearer ${token}`,
+    //                 },
+    //             })
+    //             .then((response) => {
+    //                 const data = response.data.data;
+    //                 setNotification(data);
+    //                 setRead(data.some((item) => item.read === false));
+    //             })
+    //             .catch((error) => {
+    //                 console.log("Error", error);
+    //             })
+    //             .finally(() => {
+    //                 setLoading(false);
+    //             });
+    //     } catch (error) {
+    //         console.log("Error", error);
+    //         setLoading(false);
+    //     }
+    // };
+
     const handleEdit = (data) => {
-        console.log("Data for edit test ###$$#$$#$#$#", data)
+        // console.log("Data for edit test ###$$#$$#$#$#", data)
         setIsUpdate(true);
         const selectedCatOption = {
             label: data.categoryId === null ? null : data.categoryId.categoryName,
@@ -374,11 +441,6 @@ const Community = () => {
             console.log(error);
         }).finally(() => {
             setTimeout(() => {
-                // dispatch(setLoading({ loading: false }));
-                // setPreview([]);
-                // setVideoPreview([]);
-                // setImages([]);
-                // setVideos([]);
                 setIsUpdate(false);
                 setPostStatus('');
                 setInputStr('');
@@ -404,14 +466,44 @@ const Community = () => {
     };
 
     const handleFilterCategory = () => {
+        setShowMostLiked(false);
+        setShowMostCommented(false);
         const filtered = postsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
-        // console.log("Filtred", filtered)
-        // if (filtered.length === 0) {
-        //     toast("Data not found, Showing all data");
-        // }
         const dataToShow = filtered.length === 0 ? postsData : filtered;
         setFilteredData(dataToShow);
     }
+
+    const handleUnblockUser = async (data) => {
+        console.log("data", data)
+        const selectedUserId = data.id
+
+        try {
+            const authorId = authInfo.id
+            const url = "community/communityUserUnblock";
+            axios.put(url, { authorId, selectedUserId }, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${authInfo.token}`
+                }
+            }).then((response) => {
+                if (response.data.status === true) {
+
+                    getPostsData(dispatch);
+                    toast.success("user unblocked..");
+                    // getUserorSellerData();
+                }
+            }).catch((error) => {
+                console.log("error", error)
+            })
+
+        } catch (error) {
+            console.error('Error', error);
+        }
+    }
+
+
+
 
     return (
         <React.Fragment>
@@ -421,8 +513,73 @@ const Community = () => {
                 <UserHeader />
                 {/* <Header /> */}
                 <div className="cumm_page_wrap pt-5 pb-5">
-                    <div className="container">
+                    <div className="container" >
                         <div className="row">
+                            <div className="col-lg-12">
+                                <div className="comm_profile">
+                                    <div className="post_by">
+                                        <Link to="/my-profile" className="pointer poster_img"><img src={userInfo.imgUrl} alt="" /></Link>
+                                        <div className="poster_info">
+                                            <div className="poster_name">{userInfo.name}</div>
+                                        </div>
+                                    </div>
+                                    <ul>
+                                        <li onClick={() => handleClick('followers')}>
+                                            <div className="fp_fc">{followers !== null ? followers.length : "0"}</div>
+                                            <small>Followers</small>
+                                        </li>
+                                        <li onClick={() => handleClick('following')}>
+                                            <div className="fp_fc">{following !== null ? following.length : "0"}</div>
+                                            <small>Following</small>
+                                        </li>
+                                        <li onClick={() => handleClick('blockedUser')}>
+                                            <div className="fp_fc">{blockedUser !== null ? blockedUser.length : "0"}</div>
+                                            <small>Blocked</small>
+                                        </li>
+                                    </ul>
+
+                                    <Modal
+                                        show={showModal}
+                                        onHide={() => setShowModal(false)}
+                                        size="md"
+                                        aria-labelledby="contained-modal-title-vcenter"
+                                        className='modal-dialog-scrollable'
+                                    >
+                                        {/* <Modal.Body> */}
+                                        {modalContent.length > 0 ? (
+                                            <ul>
+                                                {modalContent.map((item, index) => <>
+                                                    <div className="chat_user_item" key={index}>
+                                                        <a href="#" className="d-flex align-items-center chatUser_info">
+                                                            <div className="userInfo-col userThumb">
+                                                                <div className="user_thumb">
+                                                                    <img className="img-fluid" src={item.image_url} alt="user img" />
+                                                                </div>
+
+                                                            </div>
+                                                            <div className="userInfo-col userInfo">
+                                                                <h3>{item.name}</h3>
+                                                            </div>
+
+                                                            {userType === "blockedUser" ?
+                                                                <button
+                                                                    onClick={() => { handleUnblockUser(item) }}
+                                                                >
+                                                                    Unblock
+                                                                </button> : ""}
+                                                            {/* <button onClick={() => this.clickToAddUser(item)}>ADD</button> */}
+                                                        </a>
+                                                    </div>
+                                                </>
+                                                )}
+                                            </ul>
+                                        ) : (
+                                            <p>No users found</p>
+                                        )}
+
+                                    </Modal>
+                                </div>
+                            </div>
                             <div className="col-lg-9">
                                 <div className="createpost bg-white rounded-3">
                                     <div className="cp_top d-flex justify-content-between align-items-center">
@@ -581,9 +738,10 @@ const Community = () => {
                                                         <Post key={index} posts={value} sendEditData={handleEdit} />
                                                     ))}
                                             </div>
-                                        ) : (
-                                            <NotFound msg="Data not found." />
                                         )
+                                            : (
+                                                <NotFound msg="Data not found." />
+                                            )
                                     ) : (
                                         filteredData.length > 0 ? (
                                             <div>
@@ -608,7 +766,7 @@ const Community = () => {
                                         )
                                     )
                                 }
-                            </div>
+                            </div >
 
                             {/* Filter */}
                             <div className="col-lg-3">
@@ -628,38 +786,17 @@ const Community = () => {
                                             ))}
                                         </select>
 
-                                        {/* <select className="form-select mb-3" aria-label="Default select example">
-                                            <option >Product</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
-                                        </select> */}
-
-
-                                        {/* <div className="form-check mb-3 mt-4">
-                                            <input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                value=""
-                                                id="latestPost"
-                                                checked={showMostLiked}
-                                                onChange={(e) => setShowMostLiked(e.target.checked)}
-                                            />
-                                            <label className="form-check-label" htmlFor="latestPost">
-                                                Latest Post
-                                            </label>
-                                        </div> */}
-
-
                                         <div className="form-check mb-3">
                                             <input
                                                 className="form-check-input"
-                                                type="checkbox"
+                                                type="radio"
                                                 value=""
                                                 id="popularPost"
                                                 checked={showMostLiked}
-                                                onChange={(e) => setShowMostLiked(e.target.checked)}
-                                            // onChange={setShowMostLiked}
+                                                onChange={(e) => {
+                                                    setShowMostLiked(e.target.checked);
+                                                    setShowMostCommented(false);
+                                                }}
                                             />
                                             <label className="form-check-label" htmlFor="popularPost">
                                                 Most Popular Post
@@ -668,11 +805,14 @@ const Community = () => {
                                         <div className="form-check mb-3">
                                             <input
                                                 className="form-check-input"
-                                                type="checkbox"
+                                                type="radio"
                                                 value=""
                                                 id="CommentedPost"
                                                 checked={showMostCommented}
-                                                onChange={(e) => setShowMostCommented(e.target.checked)}
+                                                onChange={(e) => {
+                                                    setShowMostCommented(e.target.checked)
+                                                    setShowMostLiked(false);
+                                                }}
                                             />
                                             <label className="form-check-label" htmlFor="CommentedPost">
                                                 Most Commented Post
@@ -694,6 +834,7 @@ const Community = () => {
                         </div>
                     </div>
                 </div>
+
                 <Footer />
             </div>
         </React.Fragment>

@@ -605,6 +605,35 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
         }
     };
 
+    const handleBlockUser = async (data) => {
+        console.log("data", data)
+        const selectedUserId = data.userId === null ? data.sellerId.id : data.userId.id
+
+        try {
+            // const selectedUserId = "787875455454cczxcxczx"
+            const authorId = authInfo.id
+            const url = "seller/communityUserBlock";
+            axios.put(url, { authorId, selectedUserId }, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${authInfo.token}`
+                }
+            }).then((response) => {
+                if (response.data.status === true) {
+
+                    getPostsData(dispatch);
+                    toast.success("user blocked..");
+                }
+            }).catch((error) => {
+                console.log("error", error)
+            })
+
+        } catch (error) {
+            console.error('Error', error);
+        }
+    }
+
 
     const handleNoteChange = (e) => {
         setReportNote(e.target.value);
@@ -874,13 +903,23 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                                     </>
                                 ) :
                                     !posts.isAdmin && (
-                                        <Link
-                                            to="#"
-                                            onClick={() => handleReportPopup(posts)}
-                                            className="post_follow"
-                                        >
-                                            Report
-                                        </Link>
+                                        <>
+                                            <Link
+                                                to="#"
+                                                onClick={() => handleBlockUser(posts)}
+                                                className="post_follow"
+                                            >
+                                                Block
+                                            </Link>
+                                            <Link
+                                                to="#"
+                                                onClick={() => handleReportPopup(posts)}
+                                                className="post_follow"
+                                            >
+                                                Report
+                                            </Link>
+                                        </>
+
                                     )
                                 }
                                 <Link to="#"
