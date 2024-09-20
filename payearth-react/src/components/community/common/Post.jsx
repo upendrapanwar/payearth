@@ -20,6 +20,8 @@ import SimpleImageSlider from "react-simple-image-slider";
 import ReactTimeAgo from 'react-time-ago'
 import TimeAgo from 'javascript-time-ago'
 
+import io from "socket.io-client";
+
 import en from 'javascript-time-ago/locale/en.json'
 import ru from 'javascript-time-ago/locale/ru.json'
 
@@ -29,7 +31,7 @@ import ru from 'javascript-time-ago/locale/ru.json'
 
 const Post = ({ posts, sendEditData, sendShareData }) => {
 
-    console.log("all posts", posts)
+    // console.log("all posts", posts)
 
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
@@ -59,6 +61,11 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
     const [reportOption, setReportOption] = useState(null);
     const date = new Date(posts.createdAt);
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+    const currentUserId = authInfo.id;
+    const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId.id : posts.sellerId.id;
+    //const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
+    const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
 
     const handleComments = (e) => {
         setComments(e.target.value);
@@ -94,6 +101,48 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                 setCommentsCount(commentsCount + 1);
                 let res = response.data.data
                 getPostsData(dispatch);
+                //***************** */
+                const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+                console.log('comments------', comments)
+                const notification = {
+                    message: `${userInfo.name} comment on your post: "${comments}"`,
+                    postId: postId,
+                    sender: { id: currentUserId, name: userInfo.name },
+                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name },
+                    type: 'comment'
+                };
+                // Emit follow notification to the followed user
+                socket.emit('comment', {
+                    notification
+                    // follower: { id: currentUserId, name: userInfo.name },
+                    // followed: { id: userIdToFollow, name: posts.userId === null ? posts.sellerId.name : posts.userId.name },
+                });
+
+                const notificationReqBody = {
+                    type: 'comment',
+                    sender: {
+                        id: currentUserId,
+                        type: 'user'
+
+                    },
+                    receiver: {
+                        id: userIdToSend,
+                        type: receiverRole
+                    },
+                    postId: postId,
+                    message: `${userInfo.name} comment on your post: "${comments}"`,
+                    isRead: 'false',
+                    createdAt: new Date(),
+                };
+
+                // axios.post('community/notifications', notificationReqBody, {
+                axios.post('front/notifications', notificationReqBody).then(response => {
+                    console.log("Notification saved:", response.data.message);
+                }).catch(error => {
+                    console.log("Error saving notification:", error);
+                });
+                //***************** */
+
             }
         }).catch(error => {
             console.log(error);
@@ -309,6 +358,8 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
         const currentUserId = authInfo.id;
         const userIdToFollow = posts.userId === null ? posts.sellerId.id : posts.userId.id;
         const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
+        const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
+
         var reqBody = {
             role: role,
             currentUserId: currentUserId,
@@ -326,6 +377,42 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                 setIsFollowing(true);
                 // console.log("response", response.data.message);
                 toast.success(response.data.message);
+                const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+
+                // Emit follow notification to the followed user
+                socket.emit('follow', {
+                    follower: { id: currentUserId, name: userInfo.name },
+                    followed: { id: userIdToFollow, name: posts.userId === null ? posts.sellerId.name : posts.userId.name },
+                });
+
+                const notificationReqBody = {
+                    type: 'follow',
+                    sender: {
+                        id: currentUserId,
+                        type: 'user'
+
+                    },
+                    receiver: {
+                        id: userIdToFollow,
+                        type: receiverRole
+                    },
+                    message: `${userInfo.name} followed you.`,
+                    isRead: 'false',
+                    createdAt: new Date(),
+                };
+
+                // axios.post('community/notifications', notificationReqBody, {
+                axios.post('front/notifications', notificationReqBody, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': `Bearer ${authInfo.token}`
+                    }
+                }).then(response => {
+                    console.log("Notification saved:", response.data.message);
+                }).catch(error => {
+                    console.log("Error saving notification:", error);
+                });
 
             }
         }).catch(error => {
@@ -418,7 +505,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
 
     const handleFacebookShare = (postId) => {
         // const url = `https://pay.earth/share_community/${postId}`
-        const url = `https://localhost:3000/share_community/${postId}`
+        const url = `https://pay.earth/share_community/${postId}`
         const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
         // window.open(facebookShareUrl, '_blank');
         window.open(facebookShareUrl, '_blank');
@@ -500,32 +587,36 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
         }
     };
 
-    // const handleReportPost = async () => {
-    //     try {
-    //         const data = reportedPost;
-    //         console.log("reportedPost send to admin", data)
-    //         const headers = {
-    //             'Content-Type': 'application/json',
-    //             'Authorization': `Bearer ${authInfo.token}` // Replace authInfo.token with your actual token variable
-    //         };
-    //         const response = await axios.post('community/createPostReport', {
-    //             reportType: reportOption,
-    //             notes: reportNote,
-    //             reportData: {
-    //                 postId: data.id,
-    //                 postCreatedBy: data.userId === null ? data.sellerId.id : data.userId.id,
-    //             },
-    //             reportBy: authInfo.id
-    //         }, { headers });
-    //         // console.log("response", response.data)
+    const handleBlockUser = async (data) => {
+        console.log("data", data)
+        const selectedUserId = data.userId === null ? data.sellerId.id : data.userId.id
 
-    //         toast.success("Report Succesfully");
-    //         setIsReportOpen(false);
-    //         // alert(response.data.message);
-    //     } catch (error) {
-    //         console.error('Error reporting post:', error);
-    //     }
-    // }
+        try {
+            // const selectedUserId = "787875455454cczxcxczx"
+            const authorId = authInfo.id
+            const url = "community/communityUserBlock";
+            axios.put(url, { authorId, selectedUserId }, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${authInfo.token}`
+                }
+            }).then((response) => {
+                if (response.data.status === true) {
+
+                    getPostsData(dispatch);
+                    toast.success("user blocked..");
+                    handleUnfollow(data);
+                }
+            }).catch((error) => {
+                console.log("error", error)
+            })
+
+        } catch (error) {
+            console.error('Error', error);
+        }
+    }
+
 
     const handleNoteChange = (e) => {
         setReportNote(e.target.value);
@@ -740,13 +831,23 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                     </>
                                 ) :
                                     !posts.isAdmin && (
-                                        <Link
-                                            to="#"
-                                            onClick={() => handleReportPopup(posts)}
-                                            className="post_follow"
-                                        >
-                                            Report
-                                        </Link>
+                                        <>
+                                            <Link
+                                                to="#"
+                                                onClick={() => handleBlockUser(posts)}
+                                                className="post_follow"
+                                            >
+                                                Block
+                                            </Link>
+                                            <Link
+                                                to="#"
+                                                onClick={() => handleReportPopup(posts)}
+                                                className="post_follow"
+                                            >
+                                                Report
+                                            </Link>
+                                        </>
+
                                     )
                                 }
                                 <Link
@@ -781,35 +882,18 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                         <div className="collapse post_comments" id={`collapseComment${posts.id}`}>
                             <ul className="comnt_list">
                                 <li>
-                                    <div className="add_commnt">
-                                        <div className="avtar_img">
-                                            {/* <img className="img-fluid" src={userImg} alt="" /> */}
-                                            <img
-                                                src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
-                                                alt=""
-                                                className="img-fluid"
-                                            />
-                                        </div>
-                                        <div className="add_comnt">
-                                            <div className="ac_box">
-                                                <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
-                                                <button type="submit" className="btn btn_yellow custom_btn" onClick={() => addNewComment(posts.id)} disabled={!comments.trim()}>
-                                                    {/* <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}>
-                                                        Add Comment
-                                                    </Link> */}
-                                                    Add Comment
-                                                </button>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
                                     {posts.comments.slice(0, commentsToShow).map((val, id) => {
                                         return (
-                                            <div className="commnt_box" key={id}>
+                                            <div
+                                                className={`commnt_box d-flex mb-3 ${val.userId && val.userId.id === authInfo.id
+                                                    ? 'justify-content-end'
+                                                    : val.sellerId && val.sellerId.id === authInfo.id
+                                                        ? 'justify-content-end'
+                                                        : val.adminId && val.adminId.id === authInfo.id
+                                                            ? 'justify-content-end'
+                                                            : 'justify-content-start'
+                                                    }`} key={id}>
                                                 <div className="avtar_img">
-                                                    {/* <img className="img-fluid" src={userImg} alt="" /> */}
                                                     <img className="img-fluid" src={val.isSeller
                                                         ? (val.sellerId && val.sellerId.image_url ? val.sellerId.image_url : userImg)
                                                         : val.isAdmin
@@ -826,13 +910,10 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                                                     ? (val.adminId && val.adminId.name ? val.adminId.name : 'N/A')
                                                                     : (val.userId && val.userId.name ? val.userId.name : 'N/A')
                                                             }
-                                                            {/* <div className="cb_name">{val.isSeller ? val.sellerId.name : val.userId.name}</div> */}
-                                                            {/* <div className="cb_date">{`${new Date(val.createdAt).getDate() < 10 ? `0${new Date(val.createdAt).getDate()}` : `${new Date(val.createdAt).getDate()}`} - ${new Date(val.createdAt).getMonth() + 1 < 10 ? `0${new Date(val.createdAt).getMonth() + 1}` : `${new Date(val.createdAt).getMonth() + 1}`} - ${new Date(val.createdAt).getFullYear()}`}</div> */}
                                                             <div className="cb_date"> <ReactTimeAgo date={new Date(val.createdAt)} locale="en-US" timeStyle="round-minute" /></div>
                                                         </div>
                                                         <p>{val.content}</p>
                                                     </div>
-                                                    {/* <Link to="#" className="reply_link">Reply</Link> */}
                                                 </div>
                                             </div>
                                         )
@@ -840,6 +921,29 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                     {posts.commentCount == 0 ? '' :
                                         <button className={`btn load_more_post ${posts.comments.length === commentsToShow || posts.comments.length === commentsToShow - 1 ? 'd-none' : ''}`} onClick={() => viewMoreComments(posts.id)} >view more comments</button>
                                     }
+                                </li>
+
+                                <li>
+                                    <div className="add_commnt">
+                                        <div className="avtar_img">
+
+                                            <img
+                                                src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
+                                                alt=""
+                                                className="img-fluid"
+                                            />
+                                        </div>
+                                        <div className="add_comnt">
+                                            <div className="ac_box">
+                                                <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
+                                                <button type="submit" className="btn btn_yellow custom_btn" onClick={() => addNewComment(posts.id)} disabled={!comments.trim()}>
+
+                                                    Add Comment
+                                                </button>
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </li>
                             </ul>
                         </div>

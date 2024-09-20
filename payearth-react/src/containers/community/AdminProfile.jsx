@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Footer from '../../components/common/Footer';
-import Header from '../../components/community/common/Header';
-import UserHeader from '../../components/user/common/Header';
+import Header from '../../components/admin/common/Header';
 import userImg from '../../assets/images/user.png'
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import InputEmoji from 'react-input-emoji'
 import Post from '../../components/community/common/Post';
+// import SellerPost from '../../components/community/common/SellerPost';
+import ManageCommunityPost from '../../containers/admin/ManageCommunityPost';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { setLoading } from '../../store/reducers/global-reducer';
 import { setPostCategories, setPostProducts } from '../../store/reducers/post-reducer';
@@ -14,22 +15,27 @@ import { useSelector } from 'react-redux';
 import config from '../.././config.json'
 import { useDispatch } from 'react-redux';
 import { NotFound } from '../../components/common/NotFound';
-import { getPostsData } from '../../helpers/post-listing';
+// import { getSellerPostsData } from '../../helpers/sellerPost-listing';
 import Select from 'react-select';
 import Picker from 'emoji-picker-react';
-import { Modal } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
 
-const Community = () => {
+const AdminProfile = () => {
     const userInfo = useSelector(state => state.auth.userInfo);
     const authInfo = useSelector(state => state.auth.authInfo);
     const loading = useSelector(state => state.global.loading);
-    const postsData = useSelector(state => state.post.postsData);
+    // const SellerPostsData = useSelector(state => state.post.SellerPostsData);
+    //console.log("Posts Seller", SellerPostsData)
     const postCategories = useSelector(state => state.post.postCategories);
     const postProducts = useSelector(state => state.post.postProducts);
     const dispatch = useDispatch();
+    const location = useLocation();
+    const postRefs = useRef({});
+    const searchParams = new URLSearchParams(location.search);
+    const postId = searchParams.get("postId");
 
+    const [SellerPostsData, setSellerPostsData] = useState([]);
     const [text, setText] = useState('');
     const [images, setImages] = useState([]);
     const [videos, setVideos] = useState([]);
@@ -37,9 +43,9 @@ const Community = () => {
     const [videoPreview, setVideoPreview] = useState([]);
     const [productId, setProductId] = useState('');
     const [categoryId, setCategoryId] = useState('');
-    const [postStatus, setPostStatus] = useState('Followers');
+    const [postStatus, setPostStatus] = useState('Public');
     const [categoryOption, setCategoryOption] = useState([]);
-    const [defaultCategoryOption, setDefaultCategoryOption] = useState({ label: 'All', value: '' })
+    const [defaultCategoryOption, setDefaultCategoryOption] = useState({ label: 'Choose Category', value: '' })
     const [productOption, setProductOption] = useState([]);
     const [defaultProductOption, setDefaultProductOption] = useState({ label: 'Choose Product', value: '' })
     const [posts, setPosts] = useState([]);
@@ -48,84 +54,15 @@ const Community = () => {
     const [showPicker, setShowPicker] = useState(false);
     const [isUpdate, setIsUpdate] = useState(false);
     const [postUpdateId, setPostUpdateId] = useState(null)
-    const [selectFilterCategory, setSelectFilterCategory] = useState("");
+    const [selectFilterCategory, setSelectFilterCategory] = useState(null);
     const [showMostLiked, setShowMostLiked] = useState(false);
     const [showMostCommented, setShowMostCommented] = useState(false);
     const [filteredData, setFilteredData] = useState(null);
-    const [userType, setUserType] = useState(null);
-    const [showModal, setShowModal] = useState(false);
-    const [modalContent, setModalContent] = useState([]);
-    const [blockedUser, setBlockedUser] = useState(null);
-    const [followers, setFollowers] = useState(null);
-    const [following, setFollowing] = useState(null);
-
-
-    useEffect(() => {
-        getUserorSellerData();
-    }, [postsData, modalContent])
-
-    const getUserorSellerData = async () => {
-        setLoading(true);
-        try {
-            await axios
-                .get(`/community/getUserorSellerData/${authInfo.id}`, {
-                    headers: {
-                        "content-type": "application/json",
-                        "Access-Control-Allow-Origin": "*",
-                        'Authorization': `Bearer ${authInfo.token}`
-                    },
-                })
-                .then((response) => {
-                    // console.log("response", response.data)
-                    const data = response.data.data;
-                    // console.log("blocked", data.blocked)
-
-                    if (response.data.status === true) {
-                        // setUserData(data);
-                        setBlockedUser(data.blocked);
-                        setFollowers(data.followers);
-                        setFollowing(data.following);
-                    }
-                    // setUserData(data);
-                })
-                .catch((error) => {
-                    console.log("Error", error);
-                })
-                .finally(() => {
-                    setLoading(false);
-                });
-        } catch (error) {
-            console.log("Error", error);
-            setLoading(false);
-        }
-    }
-
-    const handleClick = (type) => {
-        let data = [];
-        switch (type) {
-            case 'followers':
-                data = followers !== null ? { type: 'followers', data: followers } : [];
-                break;
-            case 'following':
-                data = following !== null ? { type: 'following', data: following } : [];
-                break;
-            case 'blockedUser':
-                data = blockedUser !== null ? { type: 'blockedUser', data: blockedUser } : [];
-                break;
-            default:
-                break;
-        }
-        console.log("under model data", data)
-        setModalContent(data.data);
-        setUserType(data.type)
-        setShowModal(true);
-    };
 
     const onEmojiClick = (event, emojiObject) => {
         setInputStr(prevInput => prevInput + emojiObject.emoji);
         setShowPicker(false);
     };
-
 
     const handlePreview = (event) => {
         let previews = [];
@@ -171,12 +108,8 @@ const Community = () => {
         }, 0.001);
     }
     const createPost = async () => {
-        setSelectFilterCategory("");
-        setShowMostLiked(false);
-        setShowMostCommented(false);
-        // loadMoreItems();
         // console.log("authInfo Seller or User", authInfo.token);
-        // console.log("postStatus", postStatus)
+        console.log("postStatus", postStatus)
         const token = authInfo.token;
         setAddMore(false);
         let reqBody = {
@@ -184,19 +117,43 @@ const Community = () => {
             category_id: categoryId,
             product_id: productId,
             post_status: postStatus,
-            user_id: authInfo.id,
+            user_id: null,
             seller_id: null,
-            admin_id: null,
+            admin_id: authInfo.id,
             is_seller: false,
-            is_admin: false,
-            parent_id: null
+            is_admin: true,
+            parent_id: null,
+            postImages: images,
+            postVideos: videos,
         };
 
+        // if (userInfo.role === 'user') {
+        //     reqBody = {
+        //         content: inputStr,
+        //         category_id: categoryId,
+        //         product_id: productId,
+        //         post_status: postStatus,
+        //         user_id: authInfo.id,
+        //         seller_id: null,
+        //         is_seller: false,
+        //         parent_id: null
+        //     }
+        // } else {
+        //     reqBody = {
+        //         content: inputStr,
+        //         category_id: categoryId,
+        //         product_id: productId,
+        //         post_status: postStatus,
+        //         user_id: null,
+        //         seller_id: authInfo.id,
+        //         is_seller: true,
+        //         parent_id: null
+        //     }
+        // }
         setInputStr('');
-
         try {
             dispatch(setLoading({ loading: true }));
-            const postResponse = await axios.post('community/posts', reqBody, {
+            const postResponse = await axios.post('/admin/posts', reqBody, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
@@ -253,14 +210,14 @@ const Community = () => {
 
                 if (imageUrls.length > 0 && videoUrls.length > 0) {
                     await Promise.all([
-                        axios.post(`community/postImages/${postId}`, { images: imageUrls }, {
+                        axios.post(`admin/postImages/${postId}`, { images: imageUrls }, {
                             headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json; charset=UTF-8',
                                 'Authorization': `Bearer ${authInfo.token}`
                             }
                         }),
-                        axios.post(`community/postVideos/${postId}`, { videos: videoUrls }, {
+                        axios.post(`admin/postVideos/${postId}`, { videos: videoUrls }, {
                             headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json; charset=UTF-8',
@@ -270,7 +227,7 @@ const Community = () => {
                     ]);
                 } else {
                     if (imageUrls.length > 0) {
-                        await axios.post(`community/postImages/${postId}`, { images: imageUrls }, {
+                        await axios.post(`admin/postImages/${postId}`, { images: imageUrls }, {
                             headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json; charset=UTF-8',
@@ -279,7 +236,7 @@ const Community = () => {
                         });
                     }
                     if (videoUrls.length > 0) {
-                        await axios.post(`community/postVideos/${postId}`, { videos: videoUrls }, {
+                        await axios.post(`admin/postVideos/${postId}`, { videos: videoUrls }, {
                             headers: {
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json; charset=UTF-8',
@@ -288,7 +245,8 @@ const Community = () => {
                         });
                     }
                 }
-                getPostsData(dispatch);
+                getPosts();
+                // getSellerPostsData(dispatch);
             }
         } catch (error) {
             console.log(error);
@@ -302,7 +260,7 @@ const Community = () => {
                 setCategoryId(null);
                 setProductId(null);
                 setDefaultProductOption({ label: 'Choose Product', value: '' });
-                setDefaultCategoryOption({ label: 'All', value: '' });
+                setDefaultCategoryOption({ label: 'Choose Category', value: '' });
             }, 300);
         }
     };
@@ -313,7 +271,7 @@ const Community = () => {
             if (response.data.status) {
                 let res = response.data.data;
                 dispatch(setPostCategories({ postCategories: res }));
-                let catOptions = [{ label: 'All', value: '' }]
+                let catOptions = [{ label: 'Choose Category', value: '' }]
                 res.forEach((value) => {
                     catOptions.push({ label: value.categoryName, value: value.id });
                 });
@@ -327,6 +285,10 @@ const Community = () => {
             }, 300);
         });
     }
+    // const handleCategories = (event) => {
+    //     getPostProducts(event.target.value);
+    //     setCategoryId(event.target.value);
+    // };
     const handleCategories = (selectedOption) => {
         console.log("HandleCategory select option", selectedOption)
         setDefaultCategoryOption(selectedOption);
@@ -339,6 +301,10 @@ const Community = () => {
             setProductOption([]);
         }
     }
+    // const handleProducts = (event) => {
+    //     setProductId(event.target.value);
+    //     console.log(event.target.value);
+    // }
     const handleProducts = (selectedOption) => {
         console.log("selectedProdOption", selectedOption)
         setDefaultProductOption(selectedOption);
@@ -368,39 +334,27 @@ const Community = () => {
     }
 
     useEffect(() => {
-        getPostsData(dispatch);
+        // getSellerPostsData(dispatch);
         getCategories();
+        getPosts();
     }, []);
 
-    // const fetchNotification = async (userId, token) => {
-    //     try {
-    //         await axios
-    //             .get(`/user/get-notification/${userId}`, {
-    //                 headers: {
-    //                     "content-type": "application/json",
-    //                     "Access-Control-Allow-Origin": "*",
-    //                     Authorization: `Bearer ${token}`,
-    //                 },
-    //             })
-    //             .then((response) => {
-    //                 const data = response.data.data;
-    //                 setNotification(data);
-    //                 setRead(data.some((item) => item.read === false));
-    //             })
-    //             .catch((error) => {
-    //                 console.log("Error", error);
-    //             })
-    //             .finally(() => {
-    //                 setLoading(false);
-    //             });
-    //     } catch (error) {
-    //         console.log("Error", error);
-    //         setLoading(false);
-    //     }
-    // };
+    useEffect(() => {
+        console.log("Post ID from URL:", postId);
+        if (postId) {
+            setTimeout(() => {
+                if (postRefs.current[postId]) {
+                   // console.log("Scrolling to post:", postId);
+                    postRefs.current[postId].scrollIntoView({ behavior: "smooth" });
+                } else {
+                    console.log("Post not found in postRefs:", postRefs);
+                }
+            }, 3000);
+        }
+    }, [postId]);
 
     const handleEdit = (data) => {
-        // console.log("Data for edit test ###$$#$$#$#$#", data)
+        console.log("Data for edit test ###$$#$$#$#$#", data)
         setIsUpdate(true);
         const selectedCatOption = {
             label: data.categoryId === null ? null : data.categoryId.categoryName,
@@ -426,7 +380,7 @@ const Community = () => {
             post_status: postStatus,
         }
 
-        axios.put(`community/updatePost`, reqBody, {
+        axios.put(`admin/updatePost`, reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -435,19 +389,25 @@ const Community = () => {
         }).then(response => {
             if (response.data.status) {
                 toast.success(response.data.message);
-                getPostsData(dispatch);
+                getPosts();
+                // getSellerPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
         }).finally(() => {
             setTimeout(() => {
+                // dispatch(setLoading({ loading: false }));
+                // setPreview([]);
+                // setVideoPreview([]);
+                // setImages([]);
+                // setVideos([]);
                 setIsUpdate(false);
                 setPostStatus('');
                 setInputStr('');
                 setCategoryId(null);
                 setProductId(null);
                 setDefaultProductOption({ label: 'Choose Product', value: '' });
-                setDefaultCategoryOption({ label: 'All', value: '' });
+                setDefaultCategoryOption({ label: 'Choose Category', value: '' });
             }, 300);
         });
     }
@@ -456,133 +416,100 @@ const Community = () => {
         setInputStr('');
         setImages([]);
         setVideos([]);
-        setPostStatus('Followers');
+        setPostStatus('Public');
         // setShowPicker(false);
         setIsUpdate(false);
         setCategoryId(null);
         setProductId(null);
         setDefaultProductOption({ label: 'Choose Product', value: '' });
-        setDefaultCategoryOption({ label: 'All', value: '' });
+        setDefaultCategoryOption({ label: 'Choose Category', value: '' });
     };
 
     const handleFilterCategory = () => {
-        setShowMostLiked(false);
-        setShowMostCommented(false);
-        const filtered = postsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
-        const dataToShow = filtered.length === 0 ? postsData : filtered;
+        const filtered = SellerPostsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
+        console.log("Filtred", filtered)
+        const dataToShow = filtered.length === 0 ? SellerPostsData : filtered;
         setFilteredData(dataToShow);
     }
 
-    const handleUnblockUser = async (data) => {
-        console.log("data", data)
-        const selectedUserId = data.id
-
-        try {
-            const authorId = authInfo.id
-            const url = "community/communityUserUnblock";
-            axios.put(url, { authorId, selectedUserId }, {
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json;charset=UTF-8',
-                    'Authorization': `Bearer ${authInfo.token}`
+    const getPosts = () => {
+        let url = `/admin/admin-posts/${authInfo.id}`;
+        dispatch(setLoading({ loading: true }));
+        // this.dispatch(SpinnerLoader({ loading: true }));
+        axios.get(url, {
+            headers: {
+                // 'Accept': 'application/json',
+                // 'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${authInfo.token}`
+            }
+        }).then((response) => {
+            console.log("all posts for admin---", response);
+            const AllPosts = response.data.data;
+            setSellerPostsData(AllPosts);
+        })
+            .catch(error => {
+                if (error.response && error.response.data.status === false) {
+                    toast.error(error.response.data.message);
                 }
-            }).then((response) => {
-                if (response.data.status === true) {
-
-                    getPostsData(dispatch);
-                    toast.success("user unblocked..");
-                    // getUserorSellerData();
-                }
-            }).catch((error) => {
-                console.log("error", error)
-            })
-
-        } catch (error) {
-            console.error('Error', error);
-        }
+            }).finally(() => {
+                setTimeout(() => {
+                    dispatch(setLoading({ loading: false }));
+                    //  this.dispatch(SpinnerLoader({ loading: false }));
+                }, 300);
+            });
     }
-
 
 
 
     return (
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
-
             <div className='seller_body'>
-                <UserHeader />
-                {/* <Header /> */}
+                <Header />
                 <div className="cumm_page_wrap pt-5 pb-5">
-                    <div className="container" >
+                    <div className="container">
                         <div className="row">
                             <div className="col-lg-12">
                                 <div className="comm_profile">
                                     <div className="post_by">
-                                        <Link to="/my-profile" className="pointer poster_img"><img src={userInfo.imgUrl} alt="" /></Link>
+                                        <div className="poster_img position-relative d-inline-block">
+                                            <img
+                                                src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
+                                                alt=""
+                                                className="img-fluid"
+                                            />
+                                            {/* <img
+                                                src={imageEditIcon}
+                                                alt="Edit Icon"
+                                                className=" translate-middle w-25 h-25 bg-light rounded-circle border position-absolute bottom-0 end-0"
+                                                // className="position-absolute top-2 start-0 translate-middle p-1 bg-light rounded-circle"
+                                               // style={{ width: '5px', height: '5px' }}
+                                            /> */}
+                                        </div>
                                         <div className="poster_info">
                                             <div className="poster_name">{userInfo.name}</div>
+                                            <small>{userInfo.role}</small>
                                         </div>
                                     </div>
                                     <ul>
-                                        <li onClick={() => handleClick('followers')}>
-                                            <div className="fp_fc">{followers !== null ? followers.length : "0"}</div>
+                                        {/* <li>
+                                            <div className="fp_fc">{userInfo.community.followers}</div>
                                             <small>Followers</small>
                                         </li>
-                                        <li onClick={() => handleClick('following')}>
-                                            <div className="fp_fc">{following !== null ? following.length : "0"}</div>
+                                        <li>
+                                            <div className="fp_fc">{userInfo.community.following}</div>
                                             <small>Following</small>
-                                        </li>
-                                        <li onClick={() => handleClick('blockedUser')}>
-                                            <div className="fp_fc">{blockedUser !== null ? blockedUser.length : "0"}</div>
-                                            <small>Blocked</small>
+                                        </li> */}
+                                        <li>
+                                            <div className="fp_fc">{SellerPostsData.length}</div>
+                                            <small>Posts</small>
                                         </li>
                                     </ul>
-
-                                    <Modal
-                                        show={showModal}
-                                        onHide={() => setShowModal(false)}
-                                        size="md"
-                                        aria-labelledby="contained-modal-title-vcenter"
-                                        className='modal-dialog-scrollable'
-                                    >
-                                        {/* <Modal.Body> */}
-                                        {modalContent.length > 0 ? (
-                                            <ul>
-                                                {modalContent.map((item, index) => <>
-                                                    <div className="chat_user_item" key={index}>
-                                                        <a href="#" className="d-flex align-items-center chatUser_info">
-                                                            <div className="userInfo-col userThumb">
-                                                                <div className="user_thumb">
-                                                                    <img className="img-fluid" src={item.image_url} alt="user img" />
-                                                                </div>
-
-                                                            </div>
-                                                            <div className="userInfo-col userInfo">
-                                                                <h3>{item.name}</h3>
-                                                            </div>
-
-                                                            {userType === "blockedUser" ?
-                                                                <button
-                                                                    onClick={() => { handleUnblockUser(item) }}
-                                                                >
-                                                                    Unblock
-                                                                </button> : ""}
-                                                            {/* <button onClick={() => this.clickToAddUser(item)}>ADD</button> */}
-                                                        </a>
-                                                    </div>
-                                                </>
-                                                )}
-                                            </ul>
-                                        ) : (
-                                            <p>No users found</p>
-                                        )}
-
-                                    </Modal>
                                 </div>
                             </div>
                             <div className="col-lg-9">
                                 <div className="createpost bg-white rounded-3">
-                                    <div className="cp_top d-flex justify-content-between align-items-center">
+                                    <div className="cp_top  d-flex justify-content-between align-items-center">
                                         <div className="cumm_title">Create your post</div>
                                         {isUpdate && (
                                             <div className="close-icon" onClick={resetForm}>
@@ -593,7 +520,14 @@ const Community = () => {
                                     <div className="cp_body">
                                         <div className="com_user_acc">
                                             <Link to='/community-profile'>
-                                                <div className="com_user_img"><img src={userInfo.imgUrl !== null && userInfo.imgUrl !== '' ? config.apiURI + userInfo.imgUrl : userImg} alt="" /></div>
+                                                <div className="com_user_img">
+                                                    {/* <img src={userInfo.imgUrl !== null && userInfo.imgUrl !== '' ? config.apiURI + userInfo.imgUrl : userImg} alt="" /> */}
+                                                    <img
+                                                        src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
+                                                        alt=""
+                                                        className="img-fluid"
+                                                    />
+                                                </div>
                                             </Link>
                                             <div className="com_user_name">
                                                 <div className="cu_name">{userInfo.name}</div>
@@ -601,7 +535,7 @@ const Community = () => {
                                                     value={postStatus}
                                                     onChange={e => setPostStatus(e.target.value)}
                                                     className="form-select" name="" id="">
-                                                    <option value="Followers">Followers</option>
+                                                    {/* <option value="Followers">Followers</option> */}
                                                     <option value="Public">Public</option>
                                                     {/* <option value="2">Only Me</option> */}
                                                 </select>
@@ -717,12 +651,23 @@ const Community = () => {
                                         </div>
                                     </div>
                                 </div>
-
+                                {/* {
+                                    SellerPostsData.length > 0 ?
+                                        <div>
+                                            {SellerPostsData.map((value, index) => {
+                                                return (
+                                                    <SellerPost key={index} posts={value} sendEditData={handleEdit} />
+                                                )
+                                            })}
+                                        </div>
+                                        : <NotFound msg="Data not found." />
+                                } */}
+                                {/* <PostListing/> */}
                                 {
                                     filteredData === null ? (
-                                        postsData.length > 0 ? (
+                                        SellerPostsData.length > 0 ? (
                                             <div>
-                                                {[...postsData]
+                                                {[...SellerPostsData]
                                                     .sort((a, b) => {
                                                         if (showMostLiked && showMostCommented) {
                                                             return b.likeCount - a.likeCount || b.commentCount - a.commentCount;
@@ -734,14 +679,24 @@ const Community = () => {
                                                             return 0; // No sorting
                                                         }
                                                     })
-                                                    .map((value, index) => (
-                                                        <Post key={index} posts={value} sendEditData={handleEdit} />
-                                                    ))}
+                                                    // .map((value, index) => (
+                                                    //     //<SellerPost key={index} posts={value} sendEditData={handleEdit} />
+                                                    //     <ManageCommunityPost key={index} posts={value} sendEditData={handleEdit} getPosts={getPosts} />
+                                                    // ))}
+                                                    .map((value, index) => {
+                                                        //console.log('value------%^&%$%&', value);
+                                                        return (
+                                                            <ManageCommunityPost key={value._id} posts={value} sendEditData={handleEdit} getPosts={getPosts} ref={(el) => {
+                                                                postRefs.current[value._id] = el;
+                                                                //console.log(`Assigned ref for post ID: ${value._id}`, el);
+                                                            }} />
+                                                        );
+                                                    })
+                                                }
                                             </div>
+                                        ) : (
+                                            <NotFound msg="Data not found." />
                                         )
-                                            : (
-                                                <NotFound msg="Data not found." />
-                                            )
                                     ) : (
                                         filteredData.length > 0 ? (
                                             <div>
@@ -758,7 +713,8 @@ const Community = () => {
                                                         }
                                                     })
                                                     .map((value, index) => (
-                                                        <Post key={index} posts={value} sendEditData={handleEdit} />
+                                                        //<SellerPost key={index} posts={value} sendEditData={handleEdit} />
+                                                        <ManageCommunityPost key={index} posts={value} sendEditData={handleEdit} getPosts={getPosts} />
                                                     ))}
                                             </div>
                                         ) : (
@@ -766,7 +722,8 @@ const Community = () => {
                                         )
                                     )
                                 }
-                            </div >
+
+                            </div>
 
                             {/* Filter */}
                             <div className="col-lg-3">
@@ -785,18 +742,15 @@ const Community = () => {
                                                 </option>
                                             ))}
                                         </select>
-
                                         <div className="form-check mb-3">
                                             <input
                                                 className="form-check-input"
-                                                type="radio"
+                                                type="checkbox"
                                                 value=""
                                                 id="popularPost"
                                                 checked={showMostLiked}
-                                                onChange={(e) => {
-                                                    setShowMostLiked(e.target.checked);
-                                                    setShowMostCommented(false);
-                                                }}
+                                                onChange={(e) => setShowMostLiked(e.target.checked)}
+                                            // onChange={setShowMostLiked}
                                             />
                                             <label className="form-check-label" htmlFor="popularPost">
                                                 Most Popular Post
@@ -805,20 +759,16 @@ const Community = () => {
                                         <div className="form-check mb-3">
                                             <input
                                                 className="form-check-input"
-                                                type="radio"
+                                                type="checkbox"
                                                 value=""
                                                 id="CommentedPost"
                                                 checked={showMostCommented}
-                                                onChange={(e) => {
-                                                    setShowMostCommented(e.target.checked)
-                                                    setShowMostLiked(false);
-                                                }}
+                                                onChange={(e) => setShowMostCommented(e.target.checked)}
                                             />
                                             <label className="form-check-label" htmlFor="CommentedPost">
                                                 Most Commented Post
                                             </label>
                                         </div>
-
                                         <div className="filter_btn_box">
                                             <Link
                                                 to="#"
@@ -834,11 +784,10 @@ const Community = () => {
                         </div>
                     </div>
                 </div>
-
                 <Footer />
             </div>
         </React.Fragment>
     );
 }
 
-export default Community;
+export default AdminProfile;

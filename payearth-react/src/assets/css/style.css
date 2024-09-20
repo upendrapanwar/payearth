@@ -4599,3 +4599,6 @@ h4 {
   display: flex;
   gap: 15px;
 }
+.pointer {
+  cursor: pointer;
+}

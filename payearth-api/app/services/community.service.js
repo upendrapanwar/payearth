@@ -22,36 +22,75 @@ module.exports = {
     postDelete,
     updatePost,
     createPostReport,
+    getUserorSellerData,
     getPostById,
     // sendFollowRequest,
     setFollow,
     getCategories,
     getProductsByCatId,
+    communityUserBlock,
+    communityUserUnblock,
 };
 
 async function getPosts(req) {
     const authorId = req.params.id;
-   // console.log("authorId", authorId)
+
     const user = await User.findById(authorId).populate('community.followingData');
+    // const blockedUsers = await User.findById(authorId).populate('community.blockedUsers');
     // console.log("user", user)
     if (!user) {
         return { success: false, message: "User not found" };
     }
     const followerIds = user.community.followingData.map(follower => follower._id);
+    const blockedId = user.community.blockedUsers.map(blockedUser => blockedUser._id);
+
 
     const posts = await Post.find({
-        $or: [
-            { postStatus: "Public" },
+        // $or: [
+        //     { postStatus: "Public" },
+        //     {
+        //         postStatus: "Followers",
+        //         $or: [
+        //             { sellerId: { $in: followerIds } },
+        //             { userId: { $in: followerIds } }
+        //         ]
+        //     },
+        //     { userId: authorId }
+        // ],
+        // isActive: true
+
+        $and: [
+            { isActive: true },
             {
-                postStatus: "Followers",
                 $or: [
-                    { sellerId: { $in: followerIds } },
-                    { userId: { $in: followerIds } }
+                    { postStatus: "Public" },
+                    {
+                        postStatus: "Followers",
+                        $or: [
+                            { sellerId: { $in: followerIds } },
+                            { userId: { $in: followerIds } }
+                        ]
+                    },
+                    { userId: authorId }
                 ]
             },
-            { userId: authorId }
-        ],
-        isActive: true
+            {
+                $or: [
+                    {
+                        $and: [
+                            { userId: { $nin: blockedId } },
+                            { userId: { $ne: null } } // Ensures userId is not null
+                        ]
+                    },
+                    {
+                        $and: [
+                            { sellerId: { $nin: blockedId } },
+                            { userId: null } // Ensures userId is null, so it checks sellerId
+                        ]
+                    }
+                ]
+            }
+        ]
     })
         .sort({ createdAt: 'desc' })
         .populate([
@@ -699,6 +738,41 @@ async function createPostReport(req, res) {
     }
 }
 
+async function getUserorSellerData(req, res) {
+    try {
+        const authorId = req.params.id;
+        const user = await User.findById(authorId).populate('community.followingData');
+
+        if (!user) {
+            return { error: 'User not found' };
+        }
+
+        const separateUsersAndSellers = async (ids) => {
+            const users = await User.find({ _id: { $in: ids } }).select('name image_url id');
+            const sellers = await Seller.find({ _id: { $in: ids } }).select('name image_url id');
+            return { users, sellers };
+        };
+
+        const [followerData, followingData, blockedData] = await Promise.all([
+            separateUsersAndSellers(user.community.followerData),
+            separateUsersAndSellers(user.community.followingData),
+            separateUsersAndSellers(user.community.blockedUsers),
+        ]);
+
+        const result = {
+            followers: [...followerData.users.concat(followerData.sellers)],
+
+            following: [...followingData.users.concat(followingData.sellers)],
+
+            blocked: [...blockedData.users.concat(blockedData.sellers)],
+        };
+        return result
+
+    } catch (error) {
+        console.log('Error', error);
+    }
+}
+
 
 async function sendFollowRequest(req) {
 
@@ -1101,4 +1175,34 @@ async function getProfilePosts(req) {
         return posts;
     }
     return false;
+}
+
+async function communityUserBlock(req) {
+    const { authorId, selectedUserId } = req.body;
+    // console.log("authorId", authorId);
+    // console.log("selectedUserId", selectedUserId);
+    try {
+        const updated = await User.findByIdAndUpdate(
+            authorId,
+            { $addToSet: { "community.blockedUsers": selectedUserId } },
+            { new: true }
+        );
+        return updated;
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function communityUserUnblock(req) {
+    const { authorId, selectedUserId } = req.body;
+    try {
+        const updated = await User.findByIdAndUpdate(
+            authorId,
+            { $pull: { "community.blockedUsers": selectedUserId } },
+            { new: true }
+        );
+        return updated;
+    } catch (error) {
+        console.log(error);
+    }
 }

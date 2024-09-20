@@ -148,6 +148,9 @@ module.exports = {
   getCategories,
   getPostById,
   createPostReport,
+  getUserorSellerData,
+  communityUserBlock,
+  communityUserUnblock,
   editProfileImage,
   sellerSupportEmail,
   supportReqCall,
@@ -3347,49 +3350,6 @@ async function updateSubscriptionStatus(req) {
 }
 
 
-
-//**********CHAT*****************/
-
-
-//getAllUser
-// async function getAllUser(req) {
-//   const keyword = req.query.search
-//     ? {
-//       $or: [
-//         { name: { $regex: req.query.search, $options: "i" } },
-//         { email: { $regex: req.query.search, $options: "i" } },
-//       ],
-//     }
-//     : {};
-
-//   const [users, sellers] = await Promise.all([
-//     User.find(keyword).select("name email role image_url"),
-//     Seller.find(keyword).select("name email role image_url"),
-
-//   ]);
-
-//   let result = [];
-//   users.forEach((user) => {
-//     const correspondingSeller = sellers.find(
-//       (seller) => seller.email === user.email
-//     );
-//     result.push({
-//       user: user,
-//       seller: correspondingSeller || null,
-//     });
-//   });
-
-//   sellers.forEach((seller) => {
-//     if (!users.find((user) => user.email === seller.email)) {
-//       result.push({
-//         user: null,
-//         seller: seller,
-//       });
-//     }
-//   });
-//   return result;
-// }
-
 async function getAllUser(req) {
   const keyword = req.query.search
     ? {
@@ -3448,14 +3408,11 @@ async function getAllUser(req) {
   return result;
 }
 
-
-
 async function accessChat(req) {
   const { receiverId, authorId } = req.body;
   if (!receiverId) {
     console.log("receiverId not send in request")
   }
-  // const finalChatdata = await Chat.findOne({ authorId: authorId.name, receiverId: receiverId.name });
   var isChat = await Chat.find({
     isGroupChat: false,
     $or: [
@@ -3473,23 +3430,19 @@ async function accessChat(req) {
       }
     ]
   }).sort({ createdAt: "desc" }).populate("latestMessage");
-  // console.log("isChat", isChat.length)
 
   if (isChat.length > 0) {
     return isChat[0];
   } else {
     const newReceiverIds = [authorId, receiverId];
-    // console.log("newReceiverIds", newReceiverIds)
     var chatData = {
       chatName: "sender",
       isGroupChat: false,
       chatUsers: newReceiverIds,
     };
     try {
-      // console.log("chatData :  ", chatData)
       const createdChat = await Chat.create(chatData);
       const fullChat = await Chat.findOne({ _id: createdChat._id })
-      // console.log("fullChatData", fullChat)
       return fullChat;
     } catch (error) {
       console.log("error", error)
@@ -3505,15 +3458,10 @@ async function createGroupChat(req) {
     console.log("Please field add details....")
   }
 
-
-  // const finalChatdata = await Chat.findOne({ authorId: authorId.name, receiverId: receiverId.name });
-
   var isChat = await Chat.find({
     isGroupChat: true,
     chatName: groupName,
   }).sort({ createdAt: "desc" });
-
-  // console.log("isChat", isChat.length)
 
   if (isChat.length > 0) {
     return isChat[0];
@@ -3527,23 +3475,14 @@ async function createGroupChat(req) {
 
     receiverData.push(authorId)
 
-    // console.log("receiverData", receiverData);
-
     var chatData = {
       chatName: groupName,
       isGroupChat: true,
       chatUsers: receiverData,
-
-      // usersAll: [{
-      //   authorId: authorId,
-      //   users: receiverData
-      // }],
     };
     try {
-      // console.log("chatData :  ", chatData)
       const createdChat = await Chat.create(chatData);
       const fullChat = await Chat.findOne({ _id: createdChat._id })
-      // console.log("fullChatData", fullChat)
       return fullChat;
     } catch (error) {
       console.log("error", error)
@@ -3567,7 +3506,6 @@ async function fetchChat(req) {
         match: { isVisible: true },
         select: 'messageContent mediaContent timestamp'
       });
-    // console.log("result", result)
 
     result = result.sort((a, b) => {
       if (a.latestMessage && b.latestMessage) {
@@ -3597,7 +3535,6 @@ async function fetchBlockChat(req) {
 
     const fieldsToSelect = "id chatName isGroupChat isBlock blockByUser chatUsers";
     const result = await Chat.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect);
-    // console.log("result", result)
     return result;
   } catch (error) {
     console.log(error);
@@ -3625,10 +3562,6 @@ async function sendMessage(req) {
       path: "chat",
       model: Chat,
     })
-    // .populate({
-    //   path: "latestMessage",
-    //   model: ChatMessage,
-    // })
 
     await Chat.findByIdAndUpdate(chatId, {
       latestMessage: message,
@@ -3650,7 +3583,7 @@ async function allMessages(req) {
         path: "chat",
         model: Chat,
       })
-    // console.log("All message", message)
+
     return message
 
   } catch (error) {
@@ -3663,7 +3596,7 @@ async function userChatBlock(req) {
   const { isBlock, blockByUser } = req.body;
   try {
     const chat = await Chat.findByIdAndUpdate(chatId, { isBlock, blockByUser }, { new: true });
-    //  console.log("update banner", banner)
+
     return chat;
   } catch (error) {
     console.log(error)
@@ -3675,7 +3608,7 @@ async function userUnblockChat(req) {
   const { isBlock, blockByUser } = req.body;
   try {
     const chat = await Chat.findByIdAndUpdate(chatId, { isBlock, blockByUser }, { new: true });
-    //  console.log("update banner", banner)
+
     return chat;
   } catch (error) {
     console.log(error)
@@ -3688,7 +3621,7 @@ async function chatMessageDelete(req) {
   const { isVisible } = req.body;
   try {
     const chatMessage = await ChatMessage.findByIdAndUpdate(id, { isVisible }, { new: true });
-    //  console.log("update banner", banner)
+
     return chatMessage;
   } catch (error) {
     console.log(error)
@@ -3718,7 +3651,7 @@ async function addGroupMember(req) {
       chatId,
       { $push: { chatUsers: { id, name, image_url, isGroupAdmin } } },
       { new: true });
-    //  console.log("update banner", banner)
+
     return addUser;
   } catch (error) {
     console.log(error)
@@ -3727,13 +3660,9 @@ async function addGroupMember(req) {
 
 
 // Edit group name
-
 async function updateGroupName(req) {
-  // const chatId = req.params.id;
   const { chatId, groupName } = req.body;
 
-  // console.log("chatId", chatId);
-  // console.log("groupName", groupName);
   try {
     const chatData = await Chat.findByIdAndUpdate(chatId,
       { $set: { chatName: groupName } },
@@ -3818,13 +3747,10 @@ async function addPost(req) {
   };
 
   const post = new Post(input);
-
   const data = await post.save();
 
   if (data) {
-
     let res = await Post.findById(data.id).select();
-
     if (res) {
       return res;
     } else {
@@ -3837,28 +3763,59 @@ async function addPost(req) {
 
 async function getPosts(req) {
   const authorId = req.params.id;
-  console.log("authorId", authorId)
   const seller = await Seller.findById(authorId).populate('community.followingData');
-  // console.log('seller----%%%', seller)
   if (!seller) {
-    return { success: false, message: "seller not founddddddddd" };
+    return { success: false, message: "seller not found..." };
   }
   const followerIds = seller.community.followingData.map(follower => follower._id);
-  // console.log("followerIds", followerIds)
+  const blockedId = seller.community.blockedUsers.map(blockedUser => blockedUser._id);
 
   const posts = await Post.find({
-    $or: [
-      { postStatus: "Public" },
+    // $or: [
+    //   { postStatus: "Public" },
+    //   {
+    //     postStatus: "Followers",
+    //     $or: [
+    //       { sellerId: { $in: followerIds } },
+    //       { userId: { $in: followerIds } }
+    //     ]
+    //   },
+    //   { sellerId: authorId }
+    // ],
+    // isActive: true,
+
+    $and: [
+      { isActive: true },
       {
-        postStatus: "Followers",
         $or: [
-          { sellerId: { $in: followerIds } },
-          { userId: { $in: followerIds } }
+          { postStatus: "Public" },
+          {
+            postStatus: "Followers",
+            $or: [
+              { sellerId: { $in: followerIds } },
+              { userId: { $in: followerIds } }
+            ]
+          },
+          { sellerId: authorId }
         ]
       },
-      { sellerId: authorId }
-    ],
-    isActive: true,
+      {
+        $or: [
+          {
+            $and: [
+              { userId: { $nin: blockedId } },
+              { userId: { $ne: null } }
+            ]
+          },
+          {
+            $and: [
+              { sellerId: { $nin: blockedId } },
+              { userId: null }
+            ]
+          }
+        ]
+      }
+    ]
   })
     .sort({ createdAt: 'desc' })
     .populate([
@@ -3896,31 +3853,31 @@ async function getPosts(req) {
         path: "categoryId",
         model: Category,
         select: "categoryName isService"
-        //match: { isActive: true }
+
       },
       {
         path: "productId",
         model: Product,
         select: "name isService"
-        //match: { isActive: true }
+
       },
       {
         path: "likes",
         model: PostLike,
         select: "isActive isSeller postId sellerId userId",
-        // match: { isActive: true },
+
         populate: [
           {
             path: "sellerId",
             model: Seller,
             select: "name image_url",
-            // match: { isActive: true },
+
           },
           {
             path: "userId",
             model: User,
             select: "name image_url",
-            // match: { isActive: true },
+
           },
         ]
       },
@@ -3969,13 +3926,13 @@ async function getPosts(req) {
           path: "categoryId",
           model: Category,
           select: "categoryName isService"
-          //match: { isActive: true }
+
         },
         {
           path: "productId",
           model: Product,
           select: "name isService"
-          //match: { isActive: true }
+
         },
         {
           path: "sellerId",
@@ -4011,7 +3968,7 @@ async function getPosts(req) {
         ]
       }
     ]);
-  //console.log("postIn seller", posts)
+
   if (posts && posts.length > 0) {
     return posts;
   }
@@ -4042,7 +3999,7 @@ async function addPostImages(req) {
         postImages.push(data.id);
       } else {
         allImagesSaved = false;
-        break; // Exit loop if save fails
+        break;
       }
     }
     if (allImagesSaved) {
@@ -4060,7 +4017,6 @@ async function addPostImages(req) {
 }
 
 async function addPostLike(req) {
-  console.log('like api run----------------')
   const param = req.body;
   const postId = req.params.id;
   const isSeller = param.isSeller;
@@ -4085,7 +4041,7 @@ async function addPostLike(req) {
   }
 
   if (isLike == true) {
-    //add row into collection
+
     const postlike = new PostLike(input);
 
     const data = await postlike.save();
@@ -4143,7 +4099,6 @@ async function postDelete(req) {
 async function updatePost(req) {
   try {
     const param = req.body;
-    // console.log("param", param);
     const result = await Post.updateOne(
       { _id: param.postId },
       {
@@ -4165,9 +4120,7 @@ async function updatePost(req) {
 
 
 async function addPostComment(req) {
-  //console.log('addpostcoment api run----------------')
   const param = req.body;
-  // console.log('param   ---', param)
   const postId = req.params.id;
   const isSeller = param.isSeller;
   const content = param.content;
@@ -4528,6 +4481,41 @@ async function getPostById(req) {
   return false;
 }
 
+async function getUserorSellerData(req, res) {
+  try {
+    const authorId = req.params.id;
+    const user = await Seller.findById(authorId).populate('community.followingData');
+
+    if (!user) {
+      return { error: 'User not found' };
+    }
+
+    const separateUsersAndSellers = async (ids) => {
+      const users = await User.find({ _id: { $in: ids } }).select('name image_url id');
+      const sellers = await Seller.find({ _id: { $in: ids } }).select('name image_url id');
+      return { users, sellers };
+    };
+
+    const [followerData, followingData, blockedData] = await Promise.all([
+      separateUsersAndSellers(user.community.followerData),
+      separateUsersAndSellers(user.community.followingData),
+      separateUsersAndSellers(user.community.blockedUsers),
+    ]);
+
+    const result = {
+      followers: [...followerData.users.concat(followerData.sellers)],
+
+      following: [...followingData.users.concat(followingData.sellers)],
+
+      blocked: [...blockedData.users.concat(blockedData.sellers)],
+    };
+    return result
+
+  } catch (error) {
+    console.log('Error', error);
+  }
+}
+
 
 async function createPostReport(req, res) {
   try {
@@ -4546,6 +4534,34 @@ async function createPostReport(req, res) {
     return false;
   } catch (error) {
     console.log('Error', error);
+  }
+}
+
+async function communityUserBlock(req) {
+  const { authorId, selectedUserId } = req.body;
+  try {
+    const updated = await Seller.findByIdAndUpdate(
+      authorId,
+      { $addToSet: { "community.blockedUsers": selectedUserId } },
+      { new: true }
+    );
+    return updated;
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+async function communityUserUnblock(req) {
+  const { authorId, selectedUserId } = req.body;
+  try {
+    const updated = await Seller.findByIdAndUpdate(
+      authorId,
+      { $pull: { "community.blockedUsers": selectedUserId } },
+      { new: true }
+    );
+    return updated;
+  } catch (error) {
+    console.log(error);
   }
 }
 

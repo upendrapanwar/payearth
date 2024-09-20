@@ -51,6 +51,11 @@ router.get("/getServiceCategory", getServiceCategory);
 router.get("/getServicesByCategory/:categoryId", getServicesByCategory);
 
 // /seller/searchFilterServices?search=${this.state.search}
+router.post('/notifications', saveNotifications);
+router.get('/notifications/:id', getNotifications);
+router.put('/updateNotifications/:id', updateNotifications);
+router.put('/setNotificationSeen', setNotificationSeen);
+
 
 module.exports = router;
 
@@ -229,4 +234,26 @@ function getServicesByCategory(req, res, next) {
         .catch(err => next(res.json({ status: false, message: err })));
 }
 
+function saveNotifications(req, res, next) {
+    frontService.saveNotifications(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
 
+function getNotifications(req, res, next) {
+    frontService.getNotifications(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function updateNotifications(req, res, next) {
+    frontService.updateNotifications(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function setNotificationSeen(req, res, next) {
+    frontService.setNotificationSeen(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}

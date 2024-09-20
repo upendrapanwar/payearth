@@ -46,6 +46,7 @@ import heartIcon from "./../../../assets/icons/heart.svg";
 import logoutIcon from "./../../../assets/icons/logout.svg";
 import serviceIcon from "./../../../assets/icons/services_icon.svg";
 import { authVerification } from "../../../helpers/auth-verification";
+import io from 'socket.io-client';
 
 
 const subCategories = (catId, data) => {
@@ -114,6 +115,10 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
   }
   const [navbarExpanded, setNavbarExpanded] = useState(false);
   const [resetModal, setReset] = useState(param);
+
+  const [unreadCount, setUnreadCount] = useState(0);
+  const authInfo = JSON.parse(localStorage.getItem("authInfo"));
+
   const openmodalHandler = () => {
     setRegister(false);
     setForgot(false);
@@ -462,10 +467,6 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
       .catch((error) => {
         console.log(error);
       });
-    // if (loginStatus && userInfo.role === "user") {
-    //   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
-    //   fetchNotification(authInfo.id, authInfo.token);
-    // }
   }, [
     dispatch,
     productCategories,
@@ -478,6 +479,31 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
     userInfo.role,
     readStatus,
   ]);
+
+  useEffect(() => {
+    const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+    if (authInfo) {
+      socket.emit('allNotifications', { userID: authInfo.id });
+      console.log(`User with ID ${authInfo.id} joined their room.`);
+      fetchNotification(authInfo.id);
+    }
+
+    socket.on('receive_notification', (notification) => {
+      if (!notification || !notification.message) {  
+        console.error('Received invalid notification data:', notification);
+        return;
+      }
+
+      setUnreadCount((prevCount) => prevCount + 1);
+      console.log('New Notification:', notification.message);
+    });
+
+    return () => {
+      socket.off('receive_notification');
+      socket.disconnect();
+    };
+  }, []);
+
   const cart = useSelector((state) => state.cart);
   localStorage.setItem("cart", cart);
   const getTotalQuantity = () => {
@@ -496,38 +522,24 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
     localStorage.setItem("totalQuantity", total);
     return total;
   };
-  //get notification data to show on bell icon
-  const fetchNotification = async (userId, token) => {
+
+  const fetchNotification = async (userId) => {
     try {
-      await axios
-        .get(`/user/get-notification/${userId}`, {
-          headers: {
-            "content-type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((response) => {
-          const data = response.data.data;
-          const unreadNotifications = data.filter(
-            (notification) => !notification.read
-          );
-          // Sort notifications by timestamp in descending order
-          const sortedNotifications = data.sort(
-            (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-          );
-          // Take only the first two notifications
-          const currentNotifications = sortedNotifications.slice(0, 3);
-          setShowNotifi(currentNotifications);
-          setNotifiLength(unreadNotifications.length);
-        })
-        .catch((error) => {
-          console.log("Error", error);
-        });
+      axios.get(`front/notifications/${userId}`).then(response => {
+        console.log('Offline Notification data---:', response);
+        const offlineNotifications = response.data.data.filter(notification => !notification.isRead);
+        if (offlineNotifications && offlineNotifications.length > 0) {
+          offlineNotifications.forEach(notification => {
+            setUnreadCount((prevCount) => prevCount + 1);
+            console.log('Offline Notification:', notification.message);
+          });
+        }
+      });
     } catch (error) {
       console.log("Error", error);
     }
   };
+
   const truncateMessage = (message, maxLength = 1) => {
     if (message.length <= maxLength) {
       return message;
@@ -577,6 +589,18 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
       </li>
     ));
   };
+
+  const handleNotificationClick = () => {
+    if (loginStatus && userInfo.role === "user") {
+      const authInfo = JSON.parse(localStorage.getItem("authInfo"));
+      axios.put(`front/updateNotifications/${authInfo.id}`).then(response => {
+        //console.log('Offline Notification data---:', response);
+        const offlineNotifications = response.data.data;
+        console.log('offlineNotifications--', offlineNotifications)
+      });
+      setUnreadCount(0);
+    }
+  }
 
   return (
     <React.Fragment>
@@ -749,52 +773,18 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
                     </li>
                   </ul>
                   <ul>
-                    {/* <li className="login_links_wrapper me-3">
+                    <li className="login_links_wrapper me-3">
                       {loginStatus && userInfo.role === "user" ? (
-                        <div className="notification_head">
-                          <Link to="#">
-                            <i className="icon">
-                              <img
-                                src={notificationBellWhiteIcon}
-                                alt="notification-bell"
-                              />
-                            </i>
-                            <span className="not_count">{notifiLength}</span>
-                          </Link>
-                          <div className="login_options bell_login">
-                            {loginStatus && userInfo.role === "user" ? (
-                              <ul className="shadow">
-                                {showNotifi.map((notification) => (
-                                  <li
-                                    key={notification.id}
-                                    className="mx-1 my-1"
-                                  >
-                                    Zoom Meeting Link :
-                                    <p
-                                      onClick={() =>
-                                        history.push("/notifications")
-                                      }
-                                    >
-                                      {truncateMessage(notification.message)}
-                                    </p>
-                                  </li>
-                                ))}
-                                <p
-                                  className="btn custom_btn btn_yellow_bordered"
-                                  style={{ width: "245px", height: "42px" }}
-                                >
-                                  <Link to="/notifications">View All</Link>
-                                </p>
-                              </ul>
-                            ) : (
-                              ""
-                            )}
+                        <Link className="nav-link" to="/notifications" onClick={handleNotificationClick}>
+                          <div className="sm_icon">
+                            <img src={notificationBellWhiteIcon} alt="" />
+                            {unreadCount > 0 && <span className="notification-count text-warning">{unreadCount}</span>}
                           </div>
-                        </div>
+                        </Link>
                       ) : (
                         ""
                       )}
-                    </li> */}
+                    </li>
                     <li className="login_links_wrapper me-3">
                       {loginStatus && userInfo.role === "user" ? (
                         <>

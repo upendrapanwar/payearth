@@ -1,162 +1,108 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Header from "../../components/seller/common/Header";
 import PageTitle from "../../components/user/common/PageTitle";
 import Footer from "../../components/common/Footer";
 import axios from "axios";
 import SpinnerLoader from "../../components/common/SpinnerLoader";
-import DataTable from "react-data-table-component";
-import DataTableExtensions from "react-data-table-component-extensions";
-import "react-data-table-component-extensions/dist/index.css";
+import { setLoading } from '../../store/reducers/global-reducer';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 const SellerNotifications = () => {
-    const [notification, setNotification] = useState([]);
-    // const [loading, setLoading] = useState(true);
-    const [itemsPerPage] = useState(4);
-    const [read, setRead] = useState(false);
-    const [updatedId, setUpdatedId] = useState(null);
+  const [notification, setNotification] = useState([]);
+  const [read, setRead] = useState(false);
+  const authInfo = JSON.parse(localStorage.getItem("authInfo"));
+  const loading = useSelector(state => state.global.loading);
+  const dispatch = useDispatch();
 
-    const authInfo = JSON.parse(localStorage.getItem("authInfo"));
+  useEffect(() => {
+    fetchNotification(authInfo.id);
+  }, []
+  );
 
-    // useEffect(() => {
-    //     fetchNotification(authInfo.id, authInfo.token);
-    //     if (updatedId !== null) {
-    //         updateReadStatus(updatedId);
-    //         setUpdatedId(null);
-    //     }
-    // }, [updatedId]);
+  const fetchNotification = async (userId) => {
+    try {
+      dispatch(setLoading({ loading: true }));
+      await axios
+        // .get(`/user/get-notification/${userId}`)
+        .get(`front/notifications/${userId}`)
+        .then((response) => {
+          const data = response.data.data;
+          setNotification(data);
+        })
+        .catch((error) => {
+          console.log("Error", error);
+        })
+        .finally(() => {
+          dispatch(setLoading({ loading: false }));
+        });
+    } catch (error) {
+      console.log("Error", error);
+      dispatch(setLoading({ loading: false }));
+    }
+  };
 
-    // const fetchNotification = async (userId, token) => {
-    //     try {
-    //         await axios
-    //             .get(`/user/get-notification/${userId}`, {
-    //                 headers: {
-    //                     "content-type": "application/json",
-    //                     "Access-Control-Allow-Origin": "*",
-    //                     Authorization: `Bearer ${token}`,
-    //                 },
-    //             })
-    //             .then((response) => {
-    //                 const data = response.data.data;
-    //                 setNotification(data);
-    //                 setRead(data.some((item) => item.read === false));
-    //             })
-    //             .catch((error) => {
-    //                 console.log("Error", error);
-    //             })
-    //             .finally(() => {
-    //                 setLoading(false);
-    //             });
-    //     } catch (error) {
-    //         console.log("Error", error);
-    //         setLoading(false);
-    //     }
-    // };
+  const updateReadStatus = (notificationId) => {
+    axios.put('front/setNotificationSeen', { notificationId }).then(response => {
+      const updatedReadStatus = response.data.data;
+      //console.log('updatedReadStatus--', updatedReadStatus)
+      setNotification(prevState =>
+        prevState.map(notification =>
+          notification._id === notificationId
+            ? { ...notification, isSeen: true }
+            : notification
+        )
+      );
+    });
+  }
 
-    // const updateReadStatus = async (id) => {
-    //     if (!id) return;
-    //     try {
-    //         const { data } = await axios.patch(
-    //             `/user/update-notification/${id}`,
-    //             { read: true },
-    //             {
-    //                 headers: {
-    //                     "content-type": "application/json",
-    //                     Authorization: `Bearer ${authInfo.token}`,
-    //                 },
-    //             }
-    //         );
-    //         if (!data) {
-    //             throw new Error("No data received");
-    //         }
-    //         setRead(data.read);
-    //         fetchNotification(authInfo.id, authInfo.token);
-    //     } catch (error) {
-    //         console.log("Error updating read status:", error);
-    //     }
-    // };
+  return (
+    <>
+      {loading === true ? <SpinnerLoader /> : ''}
+      <Header readStatus={read} />
+      <PageTitle title=" Seller Notifications" />
 
-    // const handleRowClick = async (id) => {
-    //     setUpdatedId(id);
-    //     await updateReadStatus(updatedId);
-    // };
-
-    // const columns = [
-    //     {
-    //         name: "Notifications",
-    //         selector: (row) => row.message,
-    //         sortable: true,
-    //     },
-    //     {
-    //         name: "Date",
-    //         selector: (row) => new Date(row.createdAt).toLocaleDateString("en-IN"),
-    //         sortable: true,
-    //     },
-    //     {
-    //         name: "Time",
-    //         selector: (row) => new Date(row.createdAt).toLocaleTimeString("en-IN"),
-    //         sortable: true,
-    //     },
-    // ];
-
-    return (
-        <>
-            <Header readStatus={read} />
-            <PageTitle title=" Seller Notifications" />
-            {/* {loading ? (  */}
-                {/* <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "100vh",
-                        position: "fixed",
-                        top: "0",
-                        left: "0",
-                        width: "100%",
-                        background: "rgba(255, 255, 255, 0.8)",
-                        zIndex: "9999",
-                    }}
-                >
-                     <SpinnerLoader />
-             </div>*/}
-            {/* //  ) : ( 
-            //     <> */}
-                    <section className="inr_wrap">
-                        <div className="container">
-                            <div className="row">
-                                <div className="col-md-12">
-                                    <div className="cart wishlist">
-                                        <div className="cart_wrap">
-                                            <div className="items_incart"></div>
-                                        </div>
-                                        <div className="cart_list cart_wrap pb-5">
-                                            {/* <DataTableExtensions
-                                                columns={columns}
-                                                data={notification}
-                                                export={false}
-                                                print={false}
-                                            >
-                                                <DataTable
-                                                    pagination
-                                                    highlightOnHover
-                                                    noHeader
-                                                    defaultSortField="createdAt"
-                                                    defaultSortAsc={false}
-                                                    paginationPerPage={itemsPerPage}
-                                                    paginationRowsPerPageOptions={[4, 8, 12, 16]}
-                                                />
-                                            </DataTableExtensions> */}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                {/* </>
-            )}  */}
-            <Footer />
-        </>
-    );
+      <section className="inr_wrap">
+        <div className="container">
+          <div className="row">
+            <div className="col-md-12">
+              {Array.isArray(notification) && notification.length > 0 ? (
+                notification.map((notifications, index) => (
+                  <Link
+                    key={index}
+                    to={notifications.type === 'comment'
+                      ? `/seller-profile?postId=${notifications.postId}`
+                      : '#' //  for like and other types of notifications
+                    }
+                    onClick={() => updateReadStatus(notifications._id)}
+                  >
+                    <div className={`card border border-2 border-info-subtle mb-1 mt-1 ${!notifications.isSeen ? 'bg-info-subtle' : 'bg-light'}`} >
+                      <div className="card-header  text-primary">
+                        {notifications.type || "not available"}
+                      </div>
+                      <div className="card-body">
+                        <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5>
+                        <p className="card-text">
+                          {notifications.message || " No message."}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                <div className="alert alert-info" role="alert">
+                  Notification not available
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+      <Footer />
+    </>
+  );
 };
+
 
 export default SellerNotifications;

@@ -10,7 +10,6 @@ const getPostsData = async (dispatch) => {
         .then(response => {
             if (response.data.status) {
                 let res = response.data.data;
-                console.log("forntend post comminity response", res)
                 dispatch(setPostsData({ postsData: res }));
             }
         }).catch(error => {

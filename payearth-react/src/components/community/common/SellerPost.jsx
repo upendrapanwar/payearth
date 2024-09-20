@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, forwardRef } from 'react';
 import userImg from '../../../assets/images/user.png'
 import Modal from "react-bootstrap/Modal";
 import closeIcon from '../../../assets/icons/close_icon.svg'
@@ -21,6 +21,8 @@ import SimpleImageSlider from "react-simple-image-slider";
 import ReactTimeAgo from 'react-time-ago'
 import TimeAgo from 'javascript-time-ago'
 
+import io from "socket.io-client";
+
 import en from 'javascript-time-ago/locale/en.json'
 import ru from 'javascript-time-ago/locale/ru.json'
 
@@ -28,15 +30,17 @@ import ru from 'javascript-time-ago/locale/ru.json'
 // TimeAgo.addLocale(ru)
 
 
-const SellerPost = ({ posts, sendEditData }) => {
+// const SellerPost = ({ posts, sendEditData,  onFollowStatusChange }) => {
+const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, ref) => {
 
-    console.log("all posts of this page----------", posts)
+    // console.log("all posts of this page----------", posts)
 
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
     const loading = useSelector(state => state.global.loading);
     const dispatch = useDispatch();
-
+    // console.log('authInfo------',authInfo);
+    // console.log('userInfo------',userInfo);
     const [comments, setComments] = useState('');
     const [commentsArr, setCommentsArr] = useState(posts.comments);
     const [newCommentsArr, setNewCommentsArr] = useState([]);
@@ -58,10 +62,22 @@ const SellerPost = ({ posts, sendEditData }) => {
     const [reportedPost, setReportedPost] = useState(null);
     const [reportNote, setReportNote] = useState(null);
     const [reportOption, setReportOption] = useState(null);
+    const [isCommentOpen, setIsCommentOpen] = useState({});
 
+    const currentUserId = authInfo.id;
+    const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId.id : posts.sellerId.id;
+    //const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
+    const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
 
     const date = new Date(posts.createdAt);
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+    const toggleCommentCollapse = (postId) => {
+        setIsCommentOpen((prevState) => ({
+            ...prevState,
+            [postId]: !prevState[postId],
+        }));
+    };
 
     const handleComments = (e) => {
         setComments(e.target.value);
@@ -97,6 +113,49 @@ const SellerPost = ({ posts, sendEditData }) => {
                 setCommentsCount(commentsCount + 1);
                 let res = response.data.data
                 getSellerPostsData(dispatch);
+
+                //***************** */
+                const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+                console.log('comments------', comments)
+                const notification = {
+                    message: `${userInfo.name} comment on your post: "${comments}"`,
+                    postId: postId,
+                    sender: { id: currentUserId, name: userInfo.name },
+                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name },
+                    type: 'comment'
+                };
+                // Emit follow notification to the followed user
+                socket.emit('comment', {
+                    notification
+                    // follower: { id: currentUserId, name: userInfo.name },
+                    // followed: { id: userIdToFollow, name: posts.userId === null ? posts.sellerId.name : posts.userId.name },
+                });
+
+                const notificationReqBody = {
+                    type: 'comment',
+                    sender: {
+                        id: currentUserId,
+                        type: 'seller'
+
+                    },
+                    receiver: {
+                        id: userIdToSend,
+                        type: receiverRole
+                    },
+                    postId: postId,
+                    message: `${userInfo.name} comment on your post: "${comments}"`,
+                    isRead: 'false',
+                    createdAt: new Date(),
+                };
+
+                // axios.post('community/notifications', notificationReqBody, {
+                axios.post('front/notifications', notificationReqBody).then(response => {
+                    console.log("Notification saved:", response.data.message);
+                }).catch(error => {
+                    console.log("Error saving notification:", error);
+                });
+                //***************** */
+
             }
         }).catch(error => {
             console.log(error);
@@ -312,6 +371,8 @@ const SellerPost = ({ posts, sendEditData }) => {
         const currentUserId = authInfo.id;
         const userIdToFollow = posts.userId === null ? posts.sellerId.id : posts.userId.id;
         const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
+        const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
+
         var reqBody = {
             role: role,
             currentUserId: currentUserId,
@@ -329,11 +390,48 @@ const SellerPost = ({ posts, sendEditData }) => {
                 setIsFollowing(true);
                 // console.log("response", response.data.message);
                 toast.success(response.data.message);
+                const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+
+                // Emit follow notification to the followed user
+                socket.emit('follow', {
+                    follower: { id: currentUserId, name: userInfo.name },
+                    followed: { id: userIdToFollow, name: posts.userId === null ? posts.sellerId.name : posts.userId.name },
+                });
+
+                const notificationReqBody = {
+                    type: 'follow',
+                    sender: {
+                        id: currentUserId,
+                        type: 'seller'
+
+                    },
+                    receiver: {
+                        id: userIdToFollow,
+                        type: receiverRole
+                    },
+                    message: `${userInfo.name} followed you.`,
+                    isRead: 'false',
+                    createdAt: new Date(),
+                };
+
+                // axios.post('community/notifications', notificationReqBody, {
+                axios.post('front/notifications', notificationReqBody, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'Authorization': `Bearer ${authInfo.token}`
+                    }
+                }).then(response => {
+                    console.log("Notification saved:", response.data.message);
+                }).catch(error => {
+                    console.log("Error saving notification:", error);
+                });
 
             }
         }).catch(error => {
             console.log(error);
         });
+        setOpenModel(false);
     }
 
     const handleUnfollow = (posts) => {
@@ -358,10 +456,17 @@ const SellerPost = ({ posts, sendEditData }) => {
                 toast.success(response.data.message);
                 setIsFollowing(false);
                 getSellerPostsData(dispatch);
+                //     const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+                //      // Emit unfollow notification to the unfollowed user
+                // socket.emit('unfollow', {
+                //     follower: { id: currentUserId, name: authInfo.name },
+                //     unfollowed: { id: userIdToUnfollow, name: posts.userId === null ? posts.sellerId.name : posts.userId.name }
+                // });
             }
         }).catch(error => {
             console.log(error);
         });
+        setOpenModel(false);
     }
 
     const handleRemove = (postId) => {
@@ -500,6 +605,35 @@ const SellerPost = ({ posts, sendEditData }) => {
         }
     };
 
+    const handleBlockUser = async (data) => {
+        console.log("data", data)
+        const selectedUserId = data.userId === null ? data.sellerId.id : data.userId.id
+
+        try {
+            // const selectedUserId = "787875455454cczxcxczx"
+            const authorId = authInfo.id
+            const url = "seller/communityUserBlock";
+            axios.put(url, { authorId, selectedUserId }, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${authInfo.token}`
+                }
+            }).then((response) => {
+                if (response.data.status === true) {
+
+                    getPostsData(dispatch);
+                    toast.success("user blocked..");
+                }
+            }).catch((error) => {
+                console.log("error", error)
+            })
+
+        } catch (error) {
+            console.error('Error', error);
+        }
+    }
+
 
     const handleNoteChange = (e) => {
         setReportNote(e.target.value);
@@ -509,10 +643,24 @@ const SellerPost = ({ posts, sendEditData }) => {
         setReportOption(e.target.value);
     };
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (Object.keys(isCommentOpen).length > 0 && !event.target.closest(".post_comments")) {
+                setIsCommentOpen({});
+            }
+        };
+
+        document.addEventListener("click", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, [isCommentOpen]);
+
     return (
         <React.Fragment>
             {/* {loading === true ? <SpinnerLoader /> : ''} */}
-            <div className="post">
+            <div className="post" ref={ref}>
                 <div className="post_head">
                     <div className="post_by">
                         <div className="poster_img">
@@ -528,7 +676,12 @@ const SellerPost = ({ posts, sendEditData }) => {
                         </div>
                         <div className="poster_info">
                             <div className="poster_name">
-                                {posts.isAdmin ? posts.adminId.name : posts.isSeller ? posts.sellerId.name : posts.userId.name}
+                                {/* {posts.isAdmin ? posts.adminId.name : posts.isSeller ? posts.sellerId.name : posts.userId.name} */}
+                                {posts.isAdmin
+                                    ? posts.adminId?.name || 'N/A'
+                                    : posts.isSeller
+                                        ? posts.sellerId?.name || 'N/A'
+                                        : posts.userId?.name || 'N/A'}
                             </div>
                             <ReactTimeAgo date={date} locale="en-US" timeStyle="round-minute" />
                             {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseFollow${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseFollow${posts.id}`}>
@@ -588,6 +741,9 @@ const SellerPost = ({ posts, sendEditData }) => {
                                                 <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleUnfollow(posts)}>Unfollow</Link>
                                                 :
                                                 <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleFollow(posts)}>Follow</Link>
+                                                // <Link to="#" className="btn custom_btn btn_yellow" onClick={(e) => { e.preventDefault(); handleFollow(posts); }}>
+                                                //     Follow
+                                                // </Link>
                                             }
 
                                         </div>
@@ -723,7 +879,20 @@ const SellerPost = ({ posts, sendEditData }) => {
                                 <Link to="#" onClick={() => filteredLikes.length !== 0 && filteredLikes.includes(authInfo.id) ? removeFromLiked(posts.id) : addToLiked(posts.id)}>
                                     <img src={filteredLikes.length !== 0 && filteredLikes.includes(authInfo.id) ? redHeartIcon : heartIconBordered} /> {posts.likeCount}
                                 </Link>
-                                <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}><i className="post_icon ps_comment"></i> {posts.commentCount} Comments</Link>
+                                {/* <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}><i className="post_icon ps_comment"></i> {posts.commentCount} Comments</Link> */}
+                                <Link
+                                    //data-bs-toggle="collapse"
+                                    to={`#collapseComment${posts.id}`}
+                                    role="button"
+                                    //aria-expanded="false"
+                                    aria-expanded={isCommentOpen[posts.id] ? "true" : "false"}
+                                    aria-controls={`collapseComment${posts.id}`}
+                                    //onClick={() => toggleCommentCollapse(posts.id)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleCommentCollapse(posts.id);
+                                    }}
+                                ><i className="post_icon ps_comment"></i> {posts.commentCount} Comments</Link>
                             </li>
 
                             <li className="ms-auto">
@@ -734,13 +903,23 @@ const SellerPost = ({ posts, sendEditData }) => {
                                     </>
                                 ) :
                                     !posts.isAdmin && (
-                                        <Link
-                                            to="#"
-                                            onClick={() => handleReportPopup(posts)}
-                                            className="post_follow"
-                                        >
-                                            Report
-                                        </Link>
+                                        <>
+                                            <Link
+                                                to="#"
+                                                onClick={() => handleBlockUser(posts)}
+                                                className="post_follow"
+                                            >
+                                                Block
+                                            </Link>
+                                            <Link
+                                                to="#"
+                                                onClick={() => handleReportPopup(posts)}
+                                                className="post_follow"
+                                            >
+                                                Report
+                                            </Link>
+                                        </>
+
                                     )
                                 }
                                 <Link to="#"
@@ -768,29 +947,20 @@ const SellerPost = ({ posts, sendEditData }) => {
                                     : ''
                             }
                         </div>
-                        <div className="collapse post_comments" id={`collapseComment${posts.id}`}>
+                        <div className={`collapse post_comments ${isCommentOpen[posts.id] ? 'show' : ''}`}
+                            id={`collapseComment${posts.id}`}>
                             <ul className="comnt_list">
-                                <li>
-                                    <div className="add_commnt">
-                                        <div className="avtar_img"><img className="img-fluid" src={userImg} alt="" /></div>
-                                        <div className="add_comnt">
-                                            <div className="ac_box">
-                                                <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
-                                                <button type="submit" className="btn btn_yellow custom_btn" onClick={() => addNewComment(posts.id)} disabled={!comments.trim()}>
-                                                    {/* <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}>
-                                                        Add Comment
-                                                    </Link> */}
-                                                    Add Comment
-                                                </button>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
                                 <li>
                                     {posts.comments.slice(0, commentsToShow).map((val, id) => {
                                         return (
-                                            <div className="commnt_box" key={id}>
+                                            <div className={`commnt_box d-flex mb-3 ${val.userId && val.userId.id === authInfo.id
+                                                ? 'justify-content-end'
+                                                : val.sellerId && val.sellerId.id === authInfo.id
+                                                    ? 'justify-content-end'
+                                                    : val.adminId && val.adminId.id === authInfo.id
+                                                        ? 'justify-content-end'
+                                                        : 'justify-content-start'
+                                                }`} key={id}>
                                                 <div className="avtar_img"><img className="img-fluid" src={userImg} alt="" /></div>
                                                 <div className="commnt_text">
                                                     <div className="commnt_body">
@@ -810,6 +980,21 @@ const SellerPost = ({ posts, sendEditData }) => {
                                     {posts.commentCount == 0 ? '' :
                                         <button className={`btn load_more_post ${posts.comments.length === commentsToShow || posts.comments.length === commentsToShow - 1 ? 'd-none' : ''}`} onClick={() => viewMoreComments(posts.id)} >view more comments</button>
                                     }
+                                </li>
+                                <li>
+                                    <div className="add_commnt">
+                                        <div className="avtar_img"><img className="img-fluid" src={userImg} alt="" /></div>
+                                        <div className="add_comnt">
+                                            <div className="ac_box">
+                                                <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
+                                                <button type="submit" className="btn btn_yellow custom_btn" onClick={() => addNewComment(posts.id)} disabled={!comments.trim()}>
+
+                                                    Add Comment
+                                                </button>
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </li>
                             </ul>
                         </div>
@@ -898,6 +1083,6 @@ const SellerPost = ({ posts, sendEditData }) => {
             </Modal>
         </React.Fragment>
     );
-};
+});
 
 export default SellerPost;

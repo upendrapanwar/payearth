@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,  useRef, useLayoutEffect  } from 'react';
 import Footer from '../../components/common/Footer';
 import Header from '../../components/seller/common/Header';
 import userImg from '../../assets/images/user.png';
 import imageEditIcon from '../../assets/icons/pencil-square-outline-icon.svg';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import InputEmoji from 'react-input-emoji'
 import Post from '../../components/community/common/Post';
 import SellerPost from '../../components/community/common/SellerPost';
@@ -34,6 +34,10 @@ const SellerProfile = () => {
     const postCategories = useSelector(state => state.post.postCategories);
     const postProducts = useSelector(state => state.post.postProducts);
     const dispatch = useDispatch();
+    const location = useLocation();
+    const postRefs = useRef({});
+    const searchParams = new URLSearchParams(location.search);
+    const postId = searchParams.get("postId");
 
     const [text, setText] = useState('');
     const [images, setImages] = useState([]);
@@ -62,6 +66,21 @@ const SellerProfile = () => {
     const [imageFile, setImageFile] = useState(null);
     const [image, setImage] = useState('');
 
+
+    useEffect(() => {
+        //console.log("Post ID from URL:", postId);
+        if (postId) {
+            setTimeout(() => {
+                if (postRefs.current[postId]) {
+                    console.log("Post not found in postRefs:", postRefs);
+                    console.log("Scrolling to post:", postId);
+                    postRefs.current[postId].scrollIntoView({ behavior: "smooth" });
+                } else {
+                    console.log("Post not found in postRefs:", postRefs);
+                }
+            }, 300);
+        }
+    }, [postId]);
 
     const handleShow = () => setShowModal(true);
     const handleClose = () => setShowModal(false);
@@ -115,8 +134,9 @@ const SellerProfile = () => {
         }, 0.001);
     }
     const createPost = async () => {
-        // console.log("authInfo Seller or User", authInfo.token);
-        // console.log("postStatus", postStatus)
+        setSelectFilterCategory("");
+        setShowMostLiked(false);
+        setShowMostCommented(false);
         const token = authInfo.token;
         setAddMore(false);
         let reqBody = {
@@ -394,8 +414,9 @@ const SellerProfile = () => {
     };
 
     const handleFilterCategory = () => {
+        setShowMostLiked(false);
+        setShowMostCommented(false);
         const filtered = SellerPostsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
-        //console.log("Filtred", filtered)
         const dataToShow = filtered.length === 0 ? SellerPostsData : filtered;
         setFilteredData(dataToShow);
     }
@@ -497,8 +518,8 @@ const SellerProfile = () => {
                                                 src={imageEditIcon}
                                                 alt="Edit Icon"
                                                 className=" translate-middle w-25 h-25 bg-light rounded-circle border position-absolute bottom-0 end-0"
-                                                // className="position-absolute top-2 start-0 translate-middle p-1 bg-light rounded-circle"
-                                               // style={{ width: '5px', height: '5px' }}
+                                            // className="position-absolute top-2 start-0 translate-middle p-1 bg-light rounded-circle"
+                                            // style={{ width: '5px', height: '5px' }}
                                             />
                                         </div>
                                         {/* <div className="poster_img">
@@ -660,7 +681,6 @@ const SellerProfile = () => {
                                                     />
                                                 </div>
                                                 {isUpdate === true && <button className="btn custom_btn btn_yellow mx-auto" onClick={updatPost}> Update</button>}
-                                                {/* <button className="btn custom_btn btn_yellow mx-auto" onClick={() => createPost()} disabled={!inputStr.trim() && images.length === 0 && videos.length === 0 ? true : false} >Post</button> */}
                                             </div>
                                         </div>
                                     </div>
@@ -704,9 +724,20 @@ const SellerProfile = () => {
                                                             return 0; // No sorting
                                                         }
                                                     })
-                                                    .map((value, index) => (
-                                                        <SellerPost key={index} posts={value} sendEditData={handleEdit} />
-                                                    ))}
+                                                    // .map((value, index) => (
+                                                    //     <SellerPost key={index} posts={value} sendEditData={handleEdit} />
+                                                    // ))}
+
+                                                    .map((value, index) => {
+                                                        // console.log('value------%^&%$%&', value);
+                                                        return (
+                                                            <SellerPost key={value._id} posts={value} sendEditData={handleEdit} ref={(el) => {
+                                                                postRefs.current[value._id] = el;
+                                                                //console.log(`Assigned ref for post ID: ${value._id}`, el);
+                                                            }} />
+                                                        );
+                                                    })
+                                                }
                                             </div>
                                         ) : (
                                             <NotFound msg="Data not found." />
@@ -737,12 +768,14 @@ const SellerProfile = () => {
                                         <div className="form-check mb-3">
                                             <input
                                                 className="form-check-input"
-                                                type="checkbox"
+                                                type="radio"
                                                 value=""
                                                 id="popularPost"
                                                 checked={showMostLiked}
-                                                onChange={(e) => setShowMostLiked(e.target.checked)}
-                                            // onChange={setShowMostLiked}
+                                                onChange={(e) => {
+                                                    setShowMostLiked(e.target.checked);
+                                                    setShowMostCommented(false);
+                                                }}
                                             />
                                             <label className="form-check-label" htmlFor="popularPost">
                                                 Most Popular Post
@@ -751,11 +784,14 @@ const SellerProfile = () => {
                                         <div className="form-check mb-3">
                                             <input
                                                 className="form-check-input"
-                                                type="checkbox"
+                                                type="radio"
                                                 value=""
                                                 id="CommentedPost"
                                                 checked={showMostCommented}
-                                                onChange={(e) => setShowMostCommented(e.target.checked)}
+                                                onChange={(e) => {
+                                                    setShowMostCommented(e.target.checked);
+                                                    setShowMostLiked(false);
+                                                }}
                                             />
                                             <label className="form-check-label" htmlFor="CommentedPost">
                                                 Most Commented Post

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, forwardRef } from 'react';
 import userImg from '../../assets/images/user.png'
 import Modal from "react-bootstrap/Modal";
 import closeIcon from '../../assets/icons/close_icon.svg'
@@ -9,6 +9,7 @@ import videoPlay from '../../assets/icons/video_play_icon.svg'
 import redHeartIcon from '../../assets/icons/red-heart-icon-filled.svg'
 import heartIconBordered from '../../assets/icons/heart-icon-bordered.svg';
 import axios from 'axios';
+import ellipsis from './../../assets/images/ellipsis.png';
 import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
@@ -21,6 +22,8 @@ import SimpleImageSlider from "react-simple-image-slider";
 import ReactTimeAgo from 'react-time-ago'
 import TimeAgo from 'javascript-time-ago'
 
+import io from "socket.io-client";
+
 import en from 'javascript-time-ago/locale/en.json'
 import ru from 'javascript-time-ago/locale/ru.json'
 
@@ -28,9 +31,10 @@ TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
 
 
-const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
+const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) => {
+   // const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, ref) => {
 
-    console.log("all posts of this page----------", posts)
+    // console.log("all posts of this page----------", posts)
 
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
@@ -38,6 +42,7 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
     const dispatch = useDispatch();
 
     const [comments, setComments] = useState('');
+    const [selectedMenu, setSelectedMenu] = useState([]);
     const [commentsArr, setCommentsArr] = useState(posts.comments);
     const [newCommentsArr, setNewCommentsArr] = useState([]);
     const [commentsCount, setCommentsCount] = useState(posts.commentCount);
@@ -59,6 +64,10 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
     const [reportNote, setReportNote] = useState(null);
     const [reportOption, setReportOption] = useState(null);
 
+    const currentUserId = authInfo.id;
+    const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId.id : posts.sellerId.id;
+    //const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
+    const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
 
     const date = new Date(posts.createdAt);
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -115,6 +124,47 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
                 let res = response.data.data
                 getPosts();
                 // getSellerPostsData(dispatch);
+
+                //***************** */
+                const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+                console.log('comments------', comments)
+                const notification = {
+                    message: `${userInfo.name} comment on your post: "${comments}"`,
+                    postId: postId,
+                    sender: { id: currentUserId, name: userInfo.name },
+                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name },
+                    type: 'comment'
+                };
+
+                socket.emit('comment', {
+                    notification
+                });
+
+                const notificationReqBody = {
+                    type: 'comment',
+                    sender: {
+                        id: currentUserId,
+                        type: 'admin'
+
+                    },
+                    receiver: {
+                        id: userIdToSend,
+                        type: receiverRole
+                    },
+                    postId: postId,
+                    message: `${userInfo.name} comment on your post: "${comments}"`,
+                    isRead: 'false',
+                    createdAt: new Date(),
+                };
+
+                // axios.post('community/notifications', notificationReqBody, {
+                axios.post('front/notifications', notificationReqBody).then(response => {
+                    console.log("Notification saved:", response.data.message);
+                }).catch(error => {
+                    console.log("Error saving notification:", error);
+                });
+                //***************** */
+
             }
         }).catch(error => {
             console.log(error);
@@ -163,6 +213,16 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
         });
 
     }
+
+    const onClickMenu = (e) => {
+        e.preventDefault();
+        setSelectedMenu(e.target.alt)
+        // this.setState({
+        //     selectedMenu: e.target.alt
+        // }, () => console.log(this.state.selectedMenu));
+        //this.state.selectedMenu = e.target.alt;
+        //console.log(typeof(this.state.selectedMenu));
+    };
     const addToLiked = (postId) => {
         let liked = filteredLikes
         liked.push(authInfo.id);
@@ -523,7 +583,7 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
     return (
         <React.Fragment>
             {/* {loading === true ? <SpinnerLoader /> : ''} */}
-            <div className="post">
+            <div className="post" ref={ref}>
                 <div className="post_head">
                     <div className="post_by">
                         <div className="poster_img">
@@ -560,6 +620,24 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
                                 </Link>
                             }
                         </div>
+                        {/* <div className="post_action">
+                            <div className="post-opts">
+                                <a href="#" title="" className="ed-opts-open">
+                                    <img
+                                        src={ellipsis}
+                                        alt="1"
+                                        onClick={onClickMenu}
+                                    />
+                                </a>
+                                <ul className={(selectedMenu === "1") ? 'ed-options showEmoji' : 'ed-options hideEmoji'}>
+                                    <li><a href="#" title={selectedMenu}>Block user</a></li>
+                                    <li><a href="#" title="test">Ban user</a></li>
+                                    <li><a href="#" title="">Hide Post</a></li>
+                                    <li><a href="#" title="">Report Abuse</a></li>
+                                    <li><a href="#" title="">Unfollow User</a></li>
+                                </ul>
+                            </div>
+                        </div> */}
                     </div>
                     {/* <div className={`${openModal ? '' : 'collapse'} post_follow_pop collapse`} id={`collapseFollow${posts.id}`}> */}
                     <div ref={followRef}>
@@ -726,10 +804,28 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
                     <div className="post_actions">
                         <ul className="ps_links">
                             <li>
-                                <Link to="#" onClick={() => filteredLikes.length !== 0 && filteredLikes.includes(authInfo.id) ? removeFromLiked(posts.id) : addToLiked(posts.id)}>
+                                {/* <Link to="#" onClick={() => filteredLikes.length !== 0 && filteredLikes.includes(authInfo.id) ? removeFromLiked(posts.id) : addToLiked(posts.id)}>
                                     <img src={filteredLikes.length !== 0 && filteredLikes.includes(authInfo.id) ? redHeartIcon : heartIconBordered} /> {posts.likeCount}
+                                </Link> */}
+                                <Link to="#">
+                                    <img src={ redHeartIcon } /> {posts.likeCount}
                                 </Link>
                                 <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}><i className="post_icon ps_comment"></i> {posts.commentCount} Comments</Link>
+                                {/* <Link
+                                    //data-bs-toggle="collapse"
+                                    to={`#collapseComment${posts.id}`}
+                                    role="button"
+                                    //aria-expanded="false"
+                                    aria-expanded={isCommentOpen[posts.id] ? "true" : "false"}
+                                    aria-controls={`collapseComment${posts.id}`}
+                                    //onClick={() => toggleCommentCollapse(posts.id)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleCommentCollapse(posts.id);
+                                    }}
+                                >
+                                    <i className="post_icon ps_comment"></i> {posts.commentCount} Comments
+                                </Link> */}
                             </li>
 
                             <li className="ms-auto">
@@ -783,34 +879,18 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
                             }
                         </div>
                         <div className="collapse post_comments" id={`collapseComment${posts.id}`}>
-                            <ul className="comnt_list">
-                                <li>
-                                    <div className="add_commnt">
-                                        <div className="avtar_img">
-                                            {/* <img className="img-fluid" src={userImg} alt="" /> */}
-                                            <img
-                                                src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
-                                                alt=""
-                                                className="img-fluid"
-                                            />
-                                        </div>
-                                        <div className="add_comnt">
-                                            <div className="ac_box">
-                                                <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
-                                                <button type="submit" className="btn btn_yellow custom_btn" onClick={() => addNewComment(posts.id)} disabled={!comments.trim()}>
-                                                    {/* <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}>
-                                                        Add Comment
-                                                    </Link> */}
-                                                    Add Comment
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
+                            <ul className="comnt_list">                             
                                 <li>
                                     {posts.comments.slice(0, commentsToShow).map((val, id) => {
                                         return (
-                                            <div className="commnt_box" key={id}>
+                                            <div className={`commnt_box d-flex mb-3 ${val.userId && val.userId.id === authInfo.id
+                                                ? 'justify-content-end'
+                                                : val.sellerId && val.sellerId.id === authInfo.id
+                                                    ? 'justify-content-end'
+                                                    : val.adminId && val.adminId.id === authInfo.id
+                                                        ? 'justify-content-end'
+                                                        : 'justify-content-start'
+                                                }`} key={id}>
                                                 <div className="avtar_img"><img className="img-fluid" src={userImg} alt="" /></div>
                                                 <div className="commnt_text">
                                                     <div className="commnt_body">
@@ -838,6 +918,30 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
                                     {posts.commentCount == 0 ? '' :
                                         <button className={`btn load_more_post ${posts.comments.length === commentsToShow || posts.comments.length === commentsToShow - 1 ? 'd-none' : ''}`} onClick={() => viewMoreComments(posts.id)} >view more comments</button>
                                     }
+                                </li>
+
+                                <li>
+                                    <div className="add_commnt">
+                                        <div className="avtar_img">
+                                            {/* <img className="img-fluid" src={userImg} alt="" /> */}
+                                            <img
+                                                src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
+                                                alt=""
+                                                className="img-fluid"
+                                            />
+                                        </div>
+                                        <div className="add_comnt">
+                                            <div className="ac_box">
+                                                <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
+                                                <button type="submit" className="btn btn_yellow custom_btn" onClick={() => addNewComment(posts.id)} disabled={!comments.trim()}>
+                                                    {/* <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}>
+                                                        Add Comment
+                                                    </Link> */}
+                                                    Add Comment
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </li>
                             </ul>
                         </div>
@@ -926,6 +1030,6 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
             </Modal>
         </React.Fragment>
     );
-};
+});
 
 export default ManageCommunityPost;

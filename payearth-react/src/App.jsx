@@ -141,6 +141,7 @@ import StripePaymentForm from "./containers/user/paymentCheckoutStripe";
 import ServiceOrder from "./containers/user/service/ServiceOrder";
 import adminAddService from './containers/admin/AddService';
 import ManageCategories from "./containers/admin/ManageCategories";
+import AdminProfile from "./containers/community/AdminProfile";
 import SupportUser from "./containers/user/SupportUser";
 import SupportSeller from "./containers/seller/SupportSeller";
 import SupportUserEmail from "./containers/user/SupportUserEmail";
@@ -971,6 +972,13 @@ function App() {
             currentUserRole={userInfo.role}
             component={AdminSharePostData}
             exact
+          />   
+          
+          <PublicRoute
+            path="/admin-profile"
+            restricted={false}
+            component={AdminProfile}
+            exact
           />
 
           {/* Blog */}
@@ -1000,6 +1008,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           {/* Not found */}
           <Route component={PageNotFound} />
         </Switch>
