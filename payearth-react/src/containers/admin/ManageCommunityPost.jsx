@@ -9,6 +9,7 @@ import videoPlay from '../../assets/icons/video_play_icon.svg'
 import redHeartIcon from '../../assets/icons/red-heart-icon-filled.svg'
 import heartIconBordered from '../../assets/icons/heart-icon-bordered.svg';
 import axios from 'axios';
+import ellipsis from './../../assets/images/ellipsis.png';
 import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
@@ -30,7 +31,7 @@ TimeAgo.addLocale(ru)
 
 const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
 
-    console.log("all posts of this page----------", posts)
+    // console.log("all posts of this page----------", posts)
 
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
@@ -38,6 +39,7 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
     const dispatch = useDispatch();
 
     const [comments, setComments] = useState('');
+    const [selectedMenu, setSelectedMenu] = useState([]);
     const [commentsArr, setCommentsArr] = useState(posts.comments);
     const [newCommentsArr, setNewCommentsArr] = useState([]);
     const [commentsCount, setCommentsCount] = useState(posts.commentCount);
@@ -163,6 +165,16 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
         });
 
     }
+
+    const onClickMenu = (e) => {
+        e.preventDefault();
+        setSelectedMenu(e.target.alt)
+        // this.setState({
+        //     selectedMenu: e.target.alt
+        // }, () => console.log(this.state.selectedMenu));
+        //this.state.selectedMenu = e.target.alt;
+        //console.log(typeof(this.state.selectedMenu));
+    };
     const addToLiked = (postId) => {
         let liked = filteredLikes
         liked.push(authInfo.id);
@@ -560,6 +572,24 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
                                 </Link>
                             }
                         </div>
+                        {/* <div className="post_action">
+                            <div className="post-opts">
+                                <a href="#" title="" className="ed-opts-open">
+                                    <img
+                                        src={ellipsis}
+                                        alt="1"
+                                        onClick={onClickMenu}
+                                    />
+                                </a>
+                                <ul className={(selectedMenu === "1") ? 'ed-options showEmoji' : 'ed-options hideEmoji'}>
+                                    <li><a href="#" title={selectedMenu}>Block user</a></li>
+                                    <li><a href="#" title="test">Ban user</a></li>
+                                    <li><a href="#" title="">Hide Post</a></li>
+                                    <li><a href="#" title="">Report Abuse</a></li>
+                                    <li><a href="#" title="">Unfollow User</a></li>
+                                </ul>
+                            </div>
+                        </div> */}
                     </div>
                     {/* <div className={`${openModal ? '' : 'collapse'} post_follow_pop collapse`} id={`collapseFollow${posts.id}`}> */}
                     <div ref={followRef}>
@@ -786,34 +816,18 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
                             }
                         </div>
                         <div className="collapse post_comments" id={`collapseComment${posts.id}`}>
-                            <ul className="comnt_list">
-                                <li>
-                                    <div className="add_commnt">
-                                        <div className="avtar_img">
-                                            {/* <img className="img-fluid" src={userImg} alt="" /> */}
-                                            <img
-                                                src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
-                                                alt=""
-                                                className="img-fluid"
-                                            />
-                                        </div>
-                                        <div className="add_comnt">
-                                            <div className="ac_box">
-                                                <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
-                                                <button type="submit" className="btn btn_yellow custom_btn" onClick={() => addNewComment(posts.id)} disabled={!comments.trim()}>
-                                                    {/* <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}>
-                                                        Add Comment
-                                                    </Link> */}
-                                                    Add Comment
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
+                            <ul className="comnt_list">                             
                                 <li>
                                     {posts.comments.slice(0, commentsToShow).map((val, id) => {
                                         return (
-                                            <div className="commnt_box" key={id}>
+                                            <div className={`commnt_box d-flex mb-3 ${val.userId && val.userId.id === authInfo.id
+                                                ? 'justify-content-end'
+                                                : val.sellerId && val.sellerId.id === authInfo.id
+                                                    ? 'justify-content-end'
+                                                    : val.adminId && val.adminId.id === authInfo.id
+                                                        ? 'justify-content-end'
+                                                        : 'justify-content-start'
+                                                }`} key={id}>
                                                 <div className="avtar_img"><img className="img-fluid" src={userImg} alt="" /></div>
                                                 <div className="commnt_text">
                                                     <div className="commnt_body">
@@ -841,6 +855,30 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
                                     {posts.commentCount == 0 ? '' :
                                         <button className={`btn load_more_post ${posts.comments.length === commentsToShow || posts.comments.length === commentsToShow - 1 ? 'd-none' : ''}`} onClick={() => viewMoreComments(posts.id)} >view more comments</button>
                                     }
+                                </li>
+
+                                <li>
+                                    <div className="add_commnt">
+                                        <div className="avtar_img">
+                                            {/* <img className="img-fluid" src={userImg} alt="" /> */}
+                                            <img
+                                                src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
+                                                alt=""
+                                                className="img-fluid"
+                                            />
+                                        </div>
+                                        <div className="add_comnt">
+                                            <div className="ac_box">
+                                                <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
+                                                <button type="submit" className="btn btn_yellow custom_btn" onClick={() => addNewComment(posts.id)} disabled={!comments.trim()}>
+                                                    {/* <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}>
+                                                        Add Comment
+                                                    </Link> */}
+                                                    Add Comment
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </li>
                             </ul>
                         </div>

@@ -865,28 +865,18 @@ const SellerPost = ({ posts, sendEditData }) => {
                             }
                         </div>
                         <div className="collapse post_comments" id={`collapseComment${posts.id}`}>
-                            <ul className="comnt_list">
-                                <li>
-                                    <div className="add_commnt">
-                                        <div className="avtar_img"><img className="img-fluid" src={userImg} alt="" /></div>
-                                        <div className="add_comnt">
-                                            <div className="ac_box">
-                                                <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
-                                                <button type="submit" className="btn btn_yellow custom_btn" onClick={() => addNewComment(posts.id)} disabled={!comments.trim()}>
-                                                    {/* <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}>
-                                                        Add Comment
-                                                    </Link> */}
-                                                    Add Comment
-                                                </button>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
+                            <ul className="comnt_list">                       
                                 <li>
                                     {posts.comments.slice(0, commentsToShow).map((val, id) => {
                                         return (
-                                            <div className="commnt_box" key={id}>
+                                            <div className={`commnt_box d-flex mb-3 ${val.userId && val.userId.id === authInfo.id
+                                                ? 'justify-content-end'
+                                                : val.sellerId && val.sellerId.id === authInfo.id
+                                                    ? 'justify-content-end'
+                                                    : val.adminId && val.adminId.id === authInfo.id
+                                                        ? 'justify-content-end'
+                                                        : 'justify-content-start'
+                                                }`} key={id}>
                                                 <div className="avtar_img"><img className="img-fluid" src={userImg} alt="" /></div>
                                                 <div className="commnt_text">
                                                     <div className="commnt_body">
@@ -906,6 +896,21 @@ const SellerPost = ({ posts, sendEditData }) => {
                                     {posts.commentCount == 0 ? '' :
                                         <button className={`btn load_more_post ${posts.comments.length === commentsToShow || posts.comments.length === commentsToShow - 1 ? 'd-none' : ''}`} onClick={() => viewMoreComments(posts.id)} >view more comments</button>
                                     }
+                                </li>
+                                <li>
+                                    <div className="add_commnt">
+                                        <div className="avtar_img"><img className="img-fluid" src={userImg} alt="" /></div>
+                                        <div className="add_comnt">
+                                            <div className="ac_box">
+                                                <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
+                                                <button type="submit" className="btn btn_yellow custom_btn" onClick={() => addNewComment(posts.id)} disabled={!comments.trim()}>
+
+                                                    Add Comment
+                                                </button>
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </li>
                             </ul>
                         </div>

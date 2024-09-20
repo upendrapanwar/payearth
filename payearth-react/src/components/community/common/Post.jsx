@@ -556,9 +556,10 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                 }
             }).then((response) => {
                 if (response.data.status === true) {
-                    
+
                     getPostsData(dispatch);
                     toast.success("user blocked..");
+                    handleUnfollow(data);
                 }
             }).catch((error) => {
                 console.log("error", error)
@@ -834,35 +835,18 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                         <div className="collapse post_comments" id={`collapseComment${posts.id}`}>
                             <ul className="comnt_list">
                                 <li>
-                                    <div className="add_commnt">
-                                        <div className="avtar_img">
-                                            {/* <img className="img-fluid" src={userImg} alt="" /> */}
-                                            <img
-                                                src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
-                                                alt=""
-                                                className="img-fluid"
-                                            />
-                                        </div>
-                                        <div className="add_comnt">
-                                            <div className="ac_box">
-                                                <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
-                                                <button type="submit" className="btn btn_yellow custom_btn" onClick={() => addNewComment(posts.id)} disabled={!comments.trim()}>
-                                                    {/* <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}>
-                                                        Add Comment
-                                                    </Link> */}
-                                                    Add Comment
-                                                </button>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
                                     {posts.comments.slice(0, commentsToShow).map((val, id) => {
                                         return (
-                                            <div className="commnt_box" key={id}>
+                                            <div
+                                                className={`commnt_box d-flex mb-3 ${val.userId && val.userId.id === authInfo.id
+                                                    ? 'justify-content-end'
+                                                    : val.sellerId && val.sellerId.id === authInfo.id
+                                                        ? 'justify-content-end'
+                                                        : val.adminId && val.adminId.id === authInfo.id
+                                                            ? 'justify-content-end'
+                                                            : 'justify-content-start'
+                                                    }`} key={id}>
                                                 <div className="avtar_img">
-                                                    {/* <img className="img-fluid" src={userImg} alt="" /> */}
                                                     <img className="img-fluid" src={val.isSeller
                                                         ? (val.sellerId && val.sellerId.image_url ? val.sellerId.image_url : userImg)
                                                         : val.isAdmin
@@ -879,13 +863,10 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                                                     ? (val.adminId && val.adminId.name ? val.adminId.name : 'N/A')
                                                                     : (val.userId && val.userId.name ? val.userId.name : 'N/A')
                                                             }
-                                                            {/* <div className="cb_name">{val.isSeller ? val.sellerId.name : val.userId.name}</div> */}
-                                                            {/* <div className="cb_date">{`${new Date(val.createdAt).getDate() < 10 ? `0${new Date(val.createdAt).getDate()}` : `${new Date(val.createdAt).getDate()}`} - ${new Date(val.createdAt).getMonth() + 1 < 10 ? `0${new Date(val.createdAt).getMonth() + 1}` : `${new Date(val.createdAt).getMonth() + 1}`} - ${new Date(val.createdAt).getFullYear()}`}</div> */}
                                                             <div className="cb_date"> <ReactTimeAgo date={new Date(val.createdAt)} locale="en-US" timeStyle="round-minute" /></div>
                                                         </div>
                                                         <p>{val.content}</p>
                                                     </div>
-                                                    {/* <Link to="#" className="reply_link">Reply</Link> */}
                                                 </div>
                                             </div>
                                         )
@@ -893,6 +874,29 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                     {posts.commentCount == 0 ? '' :
                                         <button className={`btn load_more_post ${posts.comments.length === commentsToShow || posts.comments.length === commentsToShow - 1 ? 'd-none' : ''}`} onClick={() => viewMoreComments(posts.id)} >view more comments</button>
                                     }
+                                </li>
+
+                                <li>
+                                    <div className="add_commnt">
+                                        <div className="avtar_img">
+
+                                            <img
+                                                src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
+                                                alt=""
+                                                className="img-fluid"
+                                            />
+                                        </div>
+                                        <div className="add_comnt">
+                                            <div className="ac_box">
+                                                <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
+                                                <button type="submit" className="btn btn_yellow custom_btn" onClick={() => addNewComment(posts.id)} disabled={!comments.trim()}>
+
+                                                    Add Comment
+                                                </button>
+
+                                            </div>
+                                        </div>
+                                    </div>
                                 </li>
                             </ul>
                         </div>
