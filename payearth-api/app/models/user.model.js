@@ -34,7 +34,10 @@ const schema = new Schema({
         country: String,
         zip: Number
     },
+    original_image_url: { type: String, required: false, default: null },
+    original_image_id: { type: String, required: false, default: null },
     image_url: { type: String, required: false, default: null },
+    image_id: { type: String, required: false, default: null },
     isActive: { type: Boolean, required: false, default: true },
     reset_password: {
         verif_code: { type: String, required: false, default: null },

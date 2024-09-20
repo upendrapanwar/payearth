@@ -284,7 +284,7 @@ router.delete("/delete-notification/:id", deleteNotification);
 router.post("/user-contact-us", userContactUs);
 router.post("/user-support-email", userSupportEmail);
 router.post("/support/request-call", supportReqCall);
-
+router.put("/save-user-myprofile/:id", saveMyProfile);
 
 
 module.exports = router;
@@ -1599,5 +1599,13 @@ function userSupportEmail(req, res, next) {
 function supportReqCall(req, res, next) {
   userService.supportReqCall(req)
     .then((result) => result ? res.json({ status: true, message: "Support request created successfully." }) : res.json({ status: false, message: "Error creating support request." }))
+    .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+
+//saveMyProfile
+function saveMyProfile(req, res, next) {
+  userService.saveMyProfile(req)
+    .then((data) => data ? res.json({ status: true, data: data, message: "Profile saved successfully." }) : res.json({ status: false, data: {}, message: "Error saving Profile request." }))
     .catch((err) => next(res.json({ status: false, message: err.message })));
 }

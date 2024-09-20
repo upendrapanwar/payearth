@@ -148,6 +148,7 @@ module.exports = {
   userContactUs,
   userSupportEmail,
   supportReqCall,
+  saveMyProfile,
 };
 
 // function sendMail(mailOptions) {
@@ -649,7 +650,7 @@ async function getProducts() {
 
 async function getProfileById(id) {
   const user = await User.findById(id).select(
-    "id name email role purchase_type community"
+    "id name email role original_image_url original_image_id image_url image_id purchase_type community"
   );
   if (!user) return false;
   return user;
@@ -674,14 +675,14 @@ async function editProfile(id, param) {
       name: param.name,
       email: param.email,
       role: param.role,
-      purchase_type: param.purchase_type,
+      // purchase_type: param.purchase_type,
     };
 
     Object.assign(user, input);
 
     if (await user.save()) {
       return await User.findById(id).select(
-        "id name email role purchase_type community"
+        "id name email role community"
       );
     } else {
       return false;
@@ -4004,5 +4005,47 @@ async function supportReqCall(req) {
   } catch (error) {
     console.error("Error:", error);
     return false;
+  }
+}
+
+
+//Save My Profile
+async function saveMyProfile(req) {
+  const _id = req.params.id;
+  const { original_image_url, original_image_id, image_url, image_id } = req.body;
+
+  try {
+    if (!original_image_url && !original_image_id && !image_url && !image_id) {
+      console.error("Image not found.");
+      return false;
+    }
+
+    const user = await User.findById(_id);
+    if (!user) {
+      console.error("User not found.");
+      return false;
+    }
+
+    const updateData = {};
+    if (original_image_url) updateData.original_image_url = original_image_url;
+    if (original_image_id) updateData.original_image_id = original_image_id;
+    if (image_url) updateData.image_url = image_url;
+    if (image_id) updateData.image_id = image_id;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      _id,
+      { $set: updateData },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      console.error("Failed to update user.");
+      return false;
+    }
+
+    return updatedUser;
+  } catch (error) {
+    console.error("Error:", error);
+    throw new Error("Error updating profile data.");
   }
 }

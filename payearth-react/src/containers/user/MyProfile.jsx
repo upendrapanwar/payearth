@@ -13,11 +13,20 @@ import SpinnerLoader from './../../components/common/SpinnerLoader';
 import store from '../../store/index';
 import userImg from '../../assets/images/user.png'
 import * as Yup from 'yup';
+import emptyImg from '../../assets/images/emptyimage.png'
+import 'bootstrap-icons/font/bootstrap-icons.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Modal } from 'react-bootstrap';
+import UploadMyprofile from './UploadMyprofile';
 
 class MyProfile extends Component {
     constructor(props) {
         super(props);
         this.authInfo = JSON.parse(localStorage.getItem('authInfo'));
+        this.cloudName = process.env.REACT_APP_CLOUD_NAME;
+        this.apiKey = process.env.REACT_APP_CLOUD_API_KEY;
+        this.apiSecret = process.env.REACT_APP_CLOUD_API_SECRET;
+        this.fileInputRef = React.createRef();
         var editProfile;
 
         if (localStorage.getItem('editProfile') !== null) {
@@ -30,20 +39,26 @@ class MyProfile extends Component {
             editProfile = true;
         }
 
+
+
         this.state = {
+            emptyImg: emptyImg,
             userDetails: [],
             accountTypeOptions: [
-                {label: 'Buyer', value: 'user'},
-                // {label: 'Seller', value: 'seller'}
+                { label: 'Buyer', value: 'user' },
             ],
             purchaseTypeOptions: [
-                {label: 'Retailer', value: 'retail'},
-                {label: 'Wholesale', value: 'wholesale'}
+                { label: 'Retailer', value: 'retail' },
+                { label: 'Wholesale', value: 'wholesale' }
             ],
-            selectedAccountType: {label: 'Buyer', value: 'user'},
-            selectedPurchaseType: {label: 'Retailer', value: 'retail'},
-            editProfile: editProfile
+            selectedAccountType: { label: 'Buyer', value: 'user' },
+            selectedPurchaseType: { label: 'Retailer', value: 'retail' },
+            editProfile: editProfile,
+            showModal: false,
+            showImageModal: false,
+            imageToView: '',
         };
+        this.imageRef = null;
 
         if (localStorage.getItem('editProfile') === null) {
             localStorage.setItem('editProfile', false);
@@ -54,7 +69,7 @@ class MyProfile extends Component {
 
     componentDidMount() {
         const { dispatch } = this.props;
-        dispatch(setLoading({loading: true}));
+        dispatch(setLoading({ loading: true }));
         axios.get('user/my-profile/' + this.authInfo.id, {
             headers: {
                 'Accept': 'application/json',
@@ -68,15 +83,15 @@ class MyProfile extends Component {
                 let selectedPurchaseType = '';
 
                 if (resData.role === 'user') {
-                    selectedAccountType = {label: 'Buyer', value: 'user'};
+                    selectedAccountType = { label: 'Buyer', value: 'user' };
                 } else {
-                    selectedAccountType = {label: 'Seller', value: 'seller'};
+                    selectedAccountType = { label: 'Seller', value: 'seller' };
                 }
 
                 if (resData.purchase_type === 'retail') {
-                    selectedPurchaseType = {label: 'Retailer', value: 'retail'};
+                    selectedPurchaseType = { label: 'Retailer', value: 'retail' };
                 } else {
-                    selectedPurchaseType = {label: 'Wholesale', value: 'wholesale'};
+                    selectedPurchaseType = { label: 'Wholesale', value: 'wholesale' };
                 }
 
                 this.setState({
@@ -89,27 +104,27 @@ class MyProfile extends Component {
             console.log(error)
         }).finally(() => {
             setTimeout(() => {
-                dispatch(setLoading({loading: false}));
+                dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
 
-    handleChangeAccount = selectedOption => this.setState({selectedAccountType: selectedOption});
-    handlePurchaseType = selectedOption => this.setState({selectedPurchaseType: selectedOption});
+    handleChangeAccount = selectedOption => this.setState({ selectedAccountType: selectedOption });
+    handlePurchaseType = selectedOption => this.setState({ selectedPurchaseType: selectedOption });
 
     handleSubmit = (values) => {
         const { dispatch } = this.props;
-        dispatch(setLoading({loading: true}));
+        dispatch(setLoading({ loading: true }));
         axios.put(`user/edit-profile/${this.authInfo.id}`, values, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
-                "Authorization" : `Bearer ${this.authInfo.token}`
+                "Authorization": `Bearer ${this.authInfo.token}`
             }
         }).then((response) => {
             toast.dismiss();
             if (response.data.status) {
-                toast.success(response.data.message, {autoClose:3000});
+                toast.success(response.data.message, { autoClose: 3000 });
                 let userInfo = {
                     name: response.data.data.name,
                     email: response.data.data.email,
@@ -117,52 +132,95 @@ class MyProfile extends Component {
                     role: response.data.data.role
                 };
                 localStorage.setItem('userInfo', JSON.stringify(userInfo));
-                dispatch(setUserInfo({userInfo}));
+                dispatch(setUserInfo({ userInfo }));
             }
         }).catch(error => {
             toast.dismiss();
-            if(error.response && error.response.data.status === false) {
-                toast.error(error.response.data.message, {autoClose:3000});
+            if (error.response && error.response.data.status === false) {
+                toast.error(error.response.data.message, { autoClose: 3000 });
             }
         }).finally(() => {
             setTimeout(() => {
-                dispatch(setLoading({loading: false}));
+                dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
 
     handleEdit = () => {
-        // console.log(this.state.userDetails)
-        this.setState({userDetails: this.state.userDetails})
+        this.setState({ userDetails: this.state.userDetails })
         let editProfile = localStorage.getItem('editProfile');
         if (editProfile !== null && editProfile === 'false') {
             localStorage.setItem('editProfile', true);
-            this.setState({editProfile: true});
+            this.setState({ editProfile: true });
         } else {
             localStorage.setItem('editProfile', false);
-            this.setState({editProfile: false});
+            this.setState({ editProfile: false });
         }
     }
 
+    // Function to toggle modal visibility
+    handleModalToggle = () => {
+        this.setState(prevState => ({
+            showModal: !prevState.showModal,
+        }));
+    };
+
+
+    handleImageModalToggle = (original_image_url) => {
+        this.setState(prevState => ({
+            showImageModal: !prevState.showImageModal,
+            imageToView: original_image_url || prevState.imageToView
+        }));
+    };
+
+
+    // Method to update the user's profile image URL and image_id
+    updateProfileImage = (original_image_url, original_image_id, image_url, image_id) => {
+        this.setState(prevState => ({
+            userDetails: {
+                ...prevState.userDetails,
+                original_image_url: original_image_url,
+                original_image_id: original_image_id,
+                image_url: image_url,
+                image_id: image_id,
+            }
+        }));
+    };
+
+
     render() {
         const { loading } = store.getState().global;
-        const { editProfile } = this.state;
-// console.log('this.state.userDetails----',this.state.userDetails)
+        const { editProfile, userDetails, showImageModal, imageToView } = this.state;
+        const profileImageUrl = userDetails.image_url || userImg;
+
         return (
             <React.Fragment>
-                { loading === true ? <SpinnerLoader /> : '' }
+                {loading === true ? <SpinnerLoader /> : ''}
                 <Header />
                 <PageTitle title="My Profile" />
                 <section className="inr_wrap">
                     <div className="container">
                         <div className="row">
-                        <div className="col-lg-12">
+                            <div className="col-lg-12">
                                 <div className="comm_profile">
                                     <div className="post_by">
-                                        <div className="poster_img"><img src={userImg} alt="" /></div>
+                                        <div className="poster_img" style={{ cursor: "pointer" }} onClick={() => this.handleImageModalToggle(profileImageUrl)}>
+                                            <img src={profileImageUrl} alt="Profile" />
+                                        </div>
+                                        <input
+                                            type="file"
+                                            ref={this.fileInputRef}
+                                            style={{ display: 'none' }}
+                                            onChange={this.uploadProfileOnClodinary}
+                                        />
                                         <div className="poster_info">
-                                            <div className="poster_name">{ this.state.userDetails.name}</div>
-                                            {/* <small>{userInfo.role}</small> */}
+                                            <div className="poster_name">{this.state.userDetails.name}</div>
+                                            <button className="btn btn-primary" onClick={this.handleModalToggle}>
+                                                <i className="bi bi-pencil"></i>
+                                            </button>
+                                            <button className="btn btn-success" onClick={() => this.handleImageModalToggle(userDetails.original_image_url)}>
+                                                <i className="bi bi-eye"></i>
+                                            </button>
                                         </div>
                                     </div>
                                     <ul>
@@ -174,10 +232,10 @@ class MyProfile extends Component {
                                             <div className="fp_fc">{this.state.userDetails?.community?.following || 0}</div>
                                             <small>Following</small>
                                         </li>
-                                        {/* <li>
-                                            <div className="fp_fc">{SellerPostsData.length}</div>
-                                            <small>Posts</small>
-                                        </li> */}
+                                        <li>
+                                            <div className="fp_fc">{this.state.userDetails?.community?.blockedUsers.length || 0}</div>
+                                            <small>Blocked</small>
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -253,7 +311,7 @@ class MyProfile extends Component {
                                                                         maxLength="50"
                                                                     />
                                                                     {touched.email && errors.email ? (
-                                                                            <small className="text-danger">{errors.email}</small>
+                                                                        <small className="text-danger">{errors.email}</small>
                                                                     ) : null}
                                                                 </div>
                                                             </div>
@@ -267,16 +325,7 @@ class MyProfile extends Component {
                                                                     isDisabled={editProfile === true ? false : true}
                                                                 />
                                                             </div>
-                                                            <div className="form-group">
-                                                                <label htmlFor="">Purchase <span className="text-danger">*</span></label>
-                                                                <Select
-                                                                    className="form-control p-0 h-100 border-0"
-                                                                    options={this.state.purchaseTypeOptions}
-                                                                    value={this.state.selectedPurchaseType}
-                                                                    onChange={this.handlePurchaseType}
-                                                                    isDisabled={editProfile === true ? false : true}
-                                                                />
-                                                            </div>
+
                                                             <div className="form-group">
                                                                 <label htmlFor="" className="invisible">btn</label>
                                                                 {editProfile ?
@@ -284,19 +333,11 @@ class MyProfile extends Component {
                                                                         <button type="submit" className="btn custom_btn btn_yellow_bordered">Save</button>
                                                                         <button type="button" className="btn custom_btn btn_yellow_bordered ms-2" onClick={this.handleEdit}>Cancel</button>
                                                                     </div>
-                                                                : <button type="button" className="btn custom_btn btn_yellow_bordered" onClick={this.handleEdit}>Edit Profile</button>}
+                                                                    : <button type="button" className="btn custom_btn btn_yellow_bordered" onClick={this.handleEdit}>Edit Profile</button>}
                                                             </div>
                                                         </form>
                                                     )}
                                                 </Formik>
-                                            </div>
-                                            <div className="col-md-5">
-                                                <div className="my_flw">
-                                                    <label htmlFor="">Followers</label><span>{this.state.userDetails.community ? this.state.userDetails.community.followers : 0}</span>
-                                                </div>
-                                                <div className="my_flw">
-                                                    <label htmlFor="">Following</label><span>{this.state.userDetails.community ? this.state.userDetails.community.following : 0}</span>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -306,9 +347,31 @@ class MyProfile extends Component {
                     </div>
                 </section>
                 <Footer />
+
+                <Modal show={this.state.showModal} onHide={this.handleModalToggle} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Upload Profile</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <UploadMyprofile image_id={this.state.userDetails.image_id} original_image_id={this.state.userDetails.original_image_id} onProfileUpdate={this.updateProfileImage} onSaveComplete={this.handleModalToggle} />
+                        {/* <UploadMyprofile onProfileUpdate={this.updateProfileImage} onSaveComplete={this.handleModalToggle} /> */}
+
+                    </Modal.Body>
+                </Modal>
+
+                {/* Modal for viewing profile image */}
+                <Modal show={showImageModal} onHide={() => this.handleImageModalToggle('')} centered>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Profile Image</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <img src={imageToView} alt="Profile" className="img-fluid" />
+                    </Modal.Body>
+                </Modal>
+
             </React.Fragment>
         );
     }
 }
 
-export default connect(setLoading) (MyProfile);
+export default connect(setLoading)(MyProfile);

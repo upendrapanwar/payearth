@@ -4582,3 +4582,20 @@ h4 {
   overflow-y: auto; 
 }
 
+.crop_modal_panel_filter_pb50{
+  padding-bottom: 50px;
+}
+
+.crop_modal_panel_filter {
+  width: 100%;
+  position: absolute;
+  bottom: -60px;
+  left: 10px;
+  /* margin-top: 143px; */
+  kground-color: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 5px;
+  top: auto;
+  display: flex;
+  gap: 15px;
+}
