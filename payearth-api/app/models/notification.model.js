@@ -57,14 +57,26 @@ const schema = new Schema(
       type: String,
       required: true
     },
+    postId: {
+      type: Schema.Types.ObjectId,
+      ref: "Post",
+      required: false,
+      default: null
+    },
     isRead: {
       type: Boolean,
+      required: false,
       default: false
+    },
+    isSeen: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
     createdAt: {
       type: Date,
       default: Date.now
-  },
+    },
   }, { timestamps: true }
 );
 

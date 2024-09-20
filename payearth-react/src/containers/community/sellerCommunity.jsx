@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Footer from '../../components/common/Footer';
 import Header from '../../components/seller/common/Header';
 import userImg from '../../assets/images/user.png'
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import InputEmoji from 'react-input-emoji'
 import Post from '../../components/community/common/Post';
 import SellerPost from '../../components/community/common/SellerPost';
@@ -29,6 +29,10 @@ const SellerCommunity = () => {
     const postCategories = useSelector(state => state.post.postCategories);
     const postProducts = useSelector(state => state.post.postProducts);
     const dispatch = useDispatch();
+    const location = useLocation();
+    const postRefs = useRef({});
+    const searchParams = new URLSearchParams(location.search);
+    const postId = searchParams.get("postId");
 
     const [text, setText] = useState('');
     const [images, setImages] = useState([]);
@@ -119,6 +123,22 @@ const SellerCommunity = () => {
         setUserType(data.type)
         setShowModal(true);
     };
+
+
+    useEffect(() => {
+        //console.log("Post ID from URL:", postId);
+
+        if (postId) {
+            setTimeout(() => {
+                if (postRefs.current[postId]) {
+                   // console.log("Scrolling to post:", postId);
+                    postRefs.current[postId].scrollIntoView({ behavior: "smooth" });
+                } else {
+                    //console.log("Post not found in postRefs:", postRefs);
+                }
+            }, 300);
+        }
+    }, [postId]);
 
     const onEmojiClick = (event, emojiObject) => {
         setInputStr(prevInput => prevInput + emojiObject.emoji);
@@ -731,18 +751,21 @@ const SellerCommunity = () => {
                                                             return 0; // No sorting
                                                         }
                                                     })
-                                                    .map((value, index) => (
+                                                    // .map((value, index) => (
 
-                                                        <SellerPost key={value._id || index} posts={value} sendEditData={handleEdit} />
-                                                    ))}
+                                                    //     <SellerPost key={value._id} posts={value} sendEditData={handleEdit} ref={(el) => (postRefs.current[value._id] = el)} />
+                                                    // ))}
 
-                                                {/* .map((value, index) => {
-                                                //         console.log('value------%^&%$%&', value);
-                                                //         return (
-                                                //             <SellerPost key={value._id} posts={value} sendEditData={handleEdit} />
-                                                //         );
-                                                //     })
-                                                // } */}
+                                                    .map((value, index) => {
+                                                        // console.log('value------%^&%$%&', value);
+                                                        return (
+                                                            <SellerPost key={value._id} posts={value} sendEditData={handleEdit} ref={(el) => {
+                                                                postRefs.current[value._id] = el;
+                                                                // console.log(`Assigned ref for post ID: ${value._id}`, el);
+                                                            }} />
+                                                        );
+                                                    })
+                                                }
                                             </div>
                                         ) : (
                                             <NotFound msg="Data not found." />

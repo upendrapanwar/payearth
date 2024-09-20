@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, forwardRef } from 'react';
 import userImg from '../../../assets/images/user.png'
 import Modal from "react-bootstrap/Modal";
 import closeIcon from '../../../assets/icons/close_icon.svg'
@@ -30,7 +30,8 @@ import ru from 'javascript-time-ago/locale/ru.json'
 // TimeAgo.addLocale(ru)
 
 
-const SellerPost = ({ posts, sendEditData }) => {
+// const SellerPost = ({ posts, sendEditData,  onFollowStatusChange }) => {
+const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, ref) => {
 
     // console.log("all posts of this page----------", posts)
 
@@ -61,10 +62,22 @@ const SellerPost = ({ posts, sendEditData }) => {
     const [reportedPost, setReportedPost] = useState(null);
     const [reportNote, setReportNote] = useState(null);
     const [reportOption, setReportOption] = useState(null);
+    const [isCommentOpen, setIsCommentOpen] = useState({});
 
+    const currentUserId = authInfo.id;
+    const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId.id : posts.sellerId.id;
+    //const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
+    const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
 
     const date = new Date(posts.createdAt);
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+    const toggleCommentCollapse = (postId) => {
+        setIsCommentOpen((prevState) => ({
+            ...prevState,
+            [postId]: !prevState[postId],
+        }));
+    };
 
     const handleComments = (e) => {
         setComments(e.target.value);
@@ -100,6 +113,49 @@ const SellerPost = ({ posts, sendEditData }) => {
                 setCommentsCount(commentsCount + 1);
                 let res = response.data.data
                 getSellerPostsData(dispatch);
+
+                //***************** */
+                const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+                console.log('comments------', comments)
+                const notification = {
+                    message: `${userInfo.name} comment on your post: "${comments}"`,
+                    postId: postId,
+                    sender: { id: currentUserId, name: userInfo.name },
+                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name },
+                    type: 'comment'
+                };
+                // Emit follow notification to the followed user
+                socket.emit('comment', {
+                    notification
+                    // follower: { id: currentUserId, name: userInfo.name },
+                    // followed: { id: userIdToFollow, name: posts.userId === null ? posts.sellerId.name : posts.userId.name },
+                });
+
+                const notificationReqBody = {
+                    type: 'comment',
+                    sender: {
+                        id: currentUserId,
+                        type: 'seller'
+
+                    },
+                    receiver: {
+                        id: userIdToSend,
+                        type: receiverRole
+                    },
+                    postId: postId,
+                    message: `${userInfo.name} comment on your post: "${comments}"`,
+                    isRead: 'false',
+                    createdAt: new Date(),
+                };
+
+                // axios.post('community/notifications', notificationReqBody, {
+                axios.post('front/notifications', notificationReqBody).then(response => {
+                    console.log("Notification saved:", response.data.message);
+                }).catch(error => {
+                    console.log("Error saving notification:", error);
+                });
+                //***************** */
+
             }
         }).catch(error => {
             console.log(error);
@@ -587,10 +643,24 @@ const SellerPost = ({ posts, sendEditData }) => {
         setReportOption(e.target.value);
     };
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (Object.keys(isCommentOpen).length > 0 && !event.target.closest(".post_comments")) {
+                setIsCommentOpen({});
+            }
+        };
+
+        document.addEventListener("click", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("click", handleClickOutside);
+        };
+    }, [isCommentOpen]);
+
     return (
         <React.Fragment>
             {/* {loading === true ? <SpinnerLoader /> : ''} */}
-            <div className="post">
+            <div className="post" ref={ref}>
                 <div className="post_head">
                     <div className="post_by">
                         <div className="poster_img">
@@ -809,7 +879,20 @@ const SellerPost = ({ posts, sendEditData }) => {
                                 <Link to="#" onClick={() => filteredLikes.length !== 0 && filteredLikes.includes(authInfo.id) ? removeFromLiked(posts.id) : addToLiked(posts.id)}>
                                     <img src={filteredLikes.length !== 0 && filteredLikes.includes(authInfo.id) ? redHeartIcon : heartIconBordered} /> {posts.likeCount}
                                 </Link>
-                                <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}><i className="post_icon ps_comment"></i> {posts.commentCount} Comments</Link>
+                                {/* <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}><i className="post_icon ps_comment"></i> {posts.commentCount} Comments</Link> */}
+                                <Link
+                                    //data-bs-toggle="collapse"
+                                    to={`#collapseComment${posts.id}`}
+                                    role="button"
+                                    //aria-expanded="false"
+                                    aria-expanded={isCommentOpen[posts.id] ? "true" : "false"}
+                                    aria-controls={`collapseComment${posts.id}`}
+                                    //onClick={() => toggleCommentCollapse(posts.id)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleCommentCollapse(posts.id);
+                                    }}
+                                ><i className="post_icon ps_comment"></i> {posts.commentCount} Comments</Link>
                             </li>
 
                             <li className="ms-auto">
@@ -864,8 +947,9 @@ const SellerPost = ({ posts, sendEditData }) => {
                                     : ''
                             }
                         </div>
-                        <div className="collapse post_comments" id={`collapseComment${posts.id}`}>
-                            <ul className="comnt_list">                       
+                        <div className={`collapse post_comments ${isCommentOpen[posts.id] ? 'show' : ''}`}
+                            id={`collapseComment${posts.id}`}>
+                            <ul className="comnt_list">
                                 <li>
                                     {posts.comments.slice(0, commentsToShow).map((val, id) => {
                                         return (
@@ -999,6 +1083,6 @@ const SellerPost = ({ posts, sendEditData }) => {
             </Modal>
         </React.Fragment>
     );
-};
+});
 
 export default SellerPost;

@@ -10,8 +10,18 @@ const NotificationController = {
         console.log('Follower:', follower);
         console.log('Followed:', followed);
 
-        // Use the NotificationService to send a notification
         NotificationService.sendFollowNotification(socket, followed.id, follower);
+    },
+
+    commentUser: (socket, data ) => {
+        if (!data) {
+            console.error('Invalid data received in comment event:', { data });
+            return;
+        }
+        const Notification = data.notification
+       // console.log('notification daata:', Notification);
+
+        NotificationService.sendCommentNotification(socket,Notification);
     },
 };
 

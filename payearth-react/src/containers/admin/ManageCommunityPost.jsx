@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, forwardRef } from 'react';
 import userImg from '../../assets/images/user.png'
 import Modal from "react-bootstrap/Modal";
 import closeIcon from '../../assets/icons/close_icon.svg'
@@ -22,6 +22,8 @@ import SimpleImageSlider from "react-simple-image-slider";
 import ReactTimeAgo from 'react-time-ago'
 import TimeAgo from 'javascript-time-ago'
 
+import io from "socket.io-client";
+
 import en from 'javascript-time-ago/locale/en.json'
 import ru from 'javascript-time-ago/locale/ru.json'
 
@@ -29,7 +31,8 @@ TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
 
 
-const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
+const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) => {
+   // const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, ref) => {
 
     // console.log("all posts of this page----------", posts)
 
@@ -61,6 +64,10 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
     const [reportNote, setReportNote] = useState(null);
     const [reportOption, setReportOption] = useState(null);
 
+    const currentUserId = authInfo.id;
+    const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId.id : posts.sellerId.id;
+    //const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
+    const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
 
     const date = new Date(posts.createdAt);
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
@@ -117,6 +124,47 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
                 let res = response.data.data
                 getPosts();
                 // getSellerPostsData(dispatch);
+
+                //***************** */
+                const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+                console.log('comments------', comments)
+                const notification = {
+                    message: `${userInfo.name} comment on your post: "${comments}"`,
+                    postId: postId,
+                    sender: { id: currentUserId, name: userInfo.name },
+                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name },
+                    type: 'comment'
+                };
+
+                socket.emit('comment', {
+                    notification
+                });
+
+                const notificationReqBody = {
+                    type: 'comment',
+                    sender: {
+                        id: currentUserId,
+                        type: 'admin'
+
+                    },
+                    receiver: {
+                        id: userIdToSend,
+                        type: receiverRole
+                    },
+                    postId: postId,
+                    message: `${userInfo.name} comment on your post: "${comments}"`,
+                    isRead: 'false',
+                    createdAt: new Date(),
+                };
+
+                // axios.post('community/notifications', notificationReqBody, {
+                axios.post('front/notifications', notificationReqBody).then(response => {
+                    console.log("Notification saved:", response.data.message);
+                }).catch(error => {
+                    console.log("Error saving notification:", error);
+                });
+                //***************** */
+
             }
         }).catch(error => {
             console.log(error);
@@ -535,7 +583,7 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
     return (
         <React.Fragment>
             {/* {loading === true ? <SpinnerLoader /> : ''} */}
-            <div className="post">
+            <div className="post" ref={ref}>
                 <div className="post_head">
                     <div className="post_by">
                         <div className="poster_img">
@@ -763,6 +811,21 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
                                     <img src={ redHeartIcon } /> {posts.likeCount}
                                 </Link>
                                 <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}><i className="post_icon ps_comment"></i> {posts.commentCount} Comments</Link>
+                                {/* <Link
+                                    //data-bs-toggle="collapse"
+                                    to={`#collapseComment${posts.id}`}
+                                    role="button"
+                                    //aria-expanded="false"
+                                    aria-expanded={isCommentOpen[posts.id] ? "true" : "false"}
+                                    aria-controls={`collapseComment${posts.id}`}
+                                    //onClick={() => toggleCommentCollapse(posts.id)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleCommentCollapse(posts.id);
+                                    }}
+                                >
+                                    <i className="post_icon ps_comment"></i> {posts.commentCount} Comments
+                                </Link> */}
                             </li>
 
                             <li className="ms-auto">
@@ -967,6 +1030,6 @@ const ManageCommunityPost = ({ posts, sendEditData, getPosts }) => {
             </Modal>
         </React.Fragment>
     );
-};
+});
 
 export default ManageCommunityPost;
