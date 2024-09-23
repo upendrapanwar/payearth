@@ -49,24 +49,24 @@ const Notifications = () => {
 
   const updateReadStatus = (notificationId) => {
     axios.put('front/setNotificationSeen', { notificationId }).then(response => {
-        const updatedReadStatus = response.data.data;
-        //console.log('updatedReadStatus--', updatedReadStatus)
-        setNotification(prevState =>
-            prevState.map(notification =>
-                notification._id === notificationId
-                    ? { ...notification, isSeen: true }
-                    : notification
-            )
-        );
+      const updatedReadStatus = response.data.data;
+      //console.log('updatedReadStatus--', updatedReadStatus)
+      setNotification(prevState =>
+        prevState.map(notification =>
+          notification._id === notificationId
+            ? { ...notification, isSeen: true }
+            : notification
+        )
+      );
     });
-}
+  }
 
   return (
     <>
       {loading === true ? <SpinnerLoader /> : ''}
       <Header />
       <PageTitle title="Notifications" />
-      
+
       <section className="inr_wrap">
         <div className="container">
           <div className="row">
@@ -77,26 +77,26 @@ const Notifications = () => {
                     key={index}
                     to={
                       notifications.type === 'comment'
-                        ?  `#`
+                        ? `#`
                         : '#' // for like or  other types of notifications
                     }
                     onClick={() => updateReadStatus(notifications._id)}
                   >
-                    <div 
-                    className={`card border border-2 border-info-subtle mb-1 mt-1 ${!notifications.isSeen ?  'bg-info-subtle' : 'bg-light'
-                    }`}
+                    <div
+                      className={`card border border-2 border-info-subtle mb-1 mt-1 ${!notifications.isSeen ? 'bg-info-subtle' : 'bg-light'
+                        }`}
                     >
-                    <div className="card-header  text-primary">
-                      {notifications.type || "not available"}
+                      <div className="card-header  text-primary">
+                        {notifications.type || "not available"}
+                      </div>
+                      <div className="card-body">
+                        <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5>
+                        <p className="card-text">
+                          {notifications.message || " No message."}
+                        </p>
+                      </div>
                     </div>
-                    <div className="card-body">
-                      <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5>
-                      <p className="card-text">
-                        {notifications.message || " No message."}
-                      </p>
-                    </div>
-                    </div>
-                    </Link>
+                  </Link>
                 ))
               ) : (
                 <div className="alert alert-info" role="alert">

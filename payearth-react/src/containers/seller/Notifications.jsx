@@ -71,7 +71,7 @@ const SellerNotifications = () => {
                 notification.map((notifications, index) => (
                   <Link
                     key={index}
-                    to={notifications.type === 'comment'
+                    to={notifications.type === 'comment' || notifications.type === 'like'
                       ? `/seller-profile?postId=${notifications.postId}`
                       : '#' //  for like and other types of notifications
                     }

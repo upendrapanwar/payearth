@@ -233,6 +233,46 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
         }).then(response => {
             if (response.data.status) {
                 getSellerPostsData(dispatch);
+
+                //***************** */
+                const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+                const notification = {
+                    message: `${userInfo.name} likes your post`,
+                    postId: postId,
+                    sender: { id: currentUserId, name: userInfo.name },
+                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name },
+                    type: 'like'
+                };
+                console.log('liked notification---', notification)
+                // Emit liked notification to the user
+                socket.emit('liked', {
+                    notification
+                });
+
+                const notificationReqBody = {
+                    type: 'like',
+                    sender: {
+                        id: currentUserId,
+                        type: 'seller'
+
+                    },
+                    receiver: {
+                        id: userIdToSend,
+                        type: receiverRole
+                    },
+                    postId: postId,
+                    message: `${userInfo.name} likes on your post`,
+                    isRead: 'false',
+                    createdAt: new Date(),
+                };
+
+                axios.post('front/notifications', notificationReqBody).then(response => {
+                    console.log("Notification saved:", response.data.message);
+                }).catch(error => {
+                    console.log("Error saving notification:", error);
+                });
+                //***************** */
+
             }
         }).catch(error => {
             console.log(error);

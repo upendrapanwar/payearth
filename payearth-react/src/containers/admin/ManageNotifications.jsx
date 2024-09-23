@@ -14,7 +14,7 @@ import SpinnerLoader from "../../components/common/SpinnerLoader";
 import { useSelector, useDispatch } from 'react-redux';
 
 
-const ManageNotifications = () => { 
+const ManageNotifications = () => {
     const [notification, setNotification] = useState([]);
     const [read, setRead] = useState(false);
     const [highlighted, setHighlighted] = useState(null);
@@ -77,18 +77,18 @@ const ManageNotifications = () => {
                         <div className="col-md-12">
                             {Array.isArray(notification) && notification.length > 0 ? (
                                 notification.map((notifications, index) => {
-                                   // console.log('Notification:', notifications); 
+                                    // console.log('Notification:', notifications); 
                                     return (
                                         <Link
                                             key={index}
                                             to={
-                                                notifications.type === 'comment'
+                                                notifications.type === 'comment' || notifications.type === 'like'
                                                     ? `/admin-profile?postId=${notifications.postId}`
                                                     : '#' //  for like and other types of notifications
                                             }
                                             onClick={() => updateReadStatus(notifications._id)}
                                         >
-                                            <div className={`card border border-2 border-info-subtle mb-2 mt-2 ${!notifications.isSeen ?  'bg-info-subtle' : 'bg-light' }`} >
+                                            <div className={`card border border-2 border-info-subtle mb-2 mt-2 ${!notifications.isSeen ? 'bg-info-subtle' : 'bg-light'}`} >
                                                 <div className="card-header  text-primary">
                                                     {notifications.type || "not available"}
                                                 </div>

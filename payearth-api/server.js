@@ -182,7 +182,12 @@ io.on("connection", function (socket) {
   // Follow event
   socket.on('comment', (data) => {
     NotificationController.commentUser(socket, data);
-    console.log('comment data---',data)
+    //console.log('comment data---',data)
+  });
+
+  socket.on('liked', (data) => {
+    NotificationController.liked(socket, data);
+    //console.log('liked data---',data)
   });
 
   socket.on('disconnect', () => {

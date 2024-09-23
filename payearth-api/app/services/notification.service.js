@@ -17,6 +17,15 @@ const NotificationService = {
         socket.in(notification.receiver.id).emit('receive_notification', notification);
         console.log(`Notification sent to user with ID ${notification.receiver.id}`);
     },
+
+    sendLikedNotification: (socket,Notification) => {
+       // console.log('notification data-----',Notification);
+        const notification = Notification;
+
+        socket.in(notification.receiver.id).emit('receive_notification', notification);
+        console.log(`Notification sent to user with ID ${notification.receiver.id}`);
+    },
+
 };
 
 module.exports = NotificationService;

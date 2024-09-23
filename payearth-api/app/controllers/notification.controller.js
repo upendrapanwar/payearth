@@ -23,6 +23,18 @@ const NotificationController = {
 
         NotificationService.sendCommentNotification(socket,Notification);
     },
+
+    liked: (socket, data ) => {
+        if (!data) {
+            console.error('Invalid data received in comment event:', { data });
+            return;
+        }
+        const Notification = data.notification
+        //console.log('liked daata:', Notification);
+
+        NotificationService.sendLikedNotification(socket,Notification);
+    },
+
 };
 
 module.exports = NotificationController;
