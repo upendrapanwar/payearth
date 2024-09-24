@@ -148,13 +148,10 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                     createdAt: new Date(),
                 };
 
-                // axios.post('community/notifications', notificationReqBody, {
                 axios.post('front/notifications', notificationReqBody).then(response => {
-                    console.log("Notification saved:", response.data.message);
                 }).catch(error => {
                     console.log("Error saving notification:", error);
                 });
-                //***************** */
 
             }
         }).catch(error => {

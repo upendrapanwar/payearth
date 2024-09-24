@@ -3,15 +3,15 @@ import Header from '../../components/admin/common/Header';
 import Footer from '../../components/common/Footer';
 import { Link } from 'react-router-dom';
 import arrow_back from '../../assets/icons/arrow-back.svg'
-
+import { Helmet } from 'react-helmet';
+import PageTitle from './../../components/user/common/PageTitle';
 
 const SupportAdmin = () => {
     return (
         <React.Fragment>
             <Header />
-            <div className="inr_top_page_title">
-                <h2>Support</h2>
-            </div>
+            <PageTitle title="Support" />
+            <Helmet><title>{"Support - Pay Earth"}</title></Helmet>
             <section className="admin-dashboard-wrapper">
                 <div className="inr_wrap dash_inner_wrap support_manager_wrapper">
                     <div className="col-md-12">

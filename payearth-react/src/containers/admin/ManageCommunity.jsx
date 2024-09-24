@@ -17,6 +17,8 @@ import { NotFound } from '../../components/common/NotFound';
 import Select from 'react-select';
 import Picker from 'emoji-picker-react';
 import { toast } from 'react-toastify';
+import PageTitle from './../../components/user/common/PageTitle';
+import { Helmet } from 'react-helmet';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
 
 const AdminCommunity = () => {
@@ -442,12 +444,13 @@ const AdminCommunity = () => {
     }
 
 
-
     return (
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
             <div className='seller_body'>
                 <Header />
+                <PageTitle title="Community" />
+                <Helmet><title>{"Community - Pay Earth"}</title></Helmet>
                 <div className="cumm_page_wrap pt-5 pb-5">
                     <div className="container">
                         <div className="row">

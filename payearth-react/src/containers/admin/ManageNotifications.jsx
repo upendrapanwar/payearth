@@ -12,7 +12,7 @@ import axios from 'axios';
 import addCouponSchema from '../../validation-schemas/addCouponSchema';
 import SpinnerLoader from "../../components/common/SpinnerLoader";
 import { useSelector, useDispatch } from 'react-redux';
-
+import { Helmet } from 'react-helmet';
 
 const ManageNotifications = () => {
     const [notification, setNotification] = useState([]);
@@ -70,7 +70,8 @@ const ManageNotifications = () => {
             {loading === true ? <SpinnerLoader /> : ''}
             {/* <Header readStatus={read} /> */}
             <Header />
-            <PageTitle title=" Admin Notifications" />
+            <PageTitle title="Notifications" />
+            <Helmet><title>{"Notification - Pay Earth"}</title></Helmet>
             <section className="inr_wrap">
                 <div className="container">
                     <div className="row">

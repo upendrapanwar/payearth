@@ -3,7 +3,7 @@ import { Link,  useHistory } from "react-router-dom";
 import logo from "./../../../assets/images/logo.png";
 import smChatIcon from "./../../../assets/icons/sm_chat.svg";
 import smcommunityIcon from "./../../../assets/icons/sm_community.svg";
-import contactIcon from "./../../../assets/icons/sm_contact.svg";
+import supports_Icon from "./../../../assets/icons/supports.svg";
 import smLogoutIcon from "./../../../assets/icons/sm_logout.svg";
 import homeIcon from "./../../../assets/icons/sm_home.svg";
 import userImg from './../../../assets/images/user.png'
@@ -401,9 +401,9 @@ function Header() {
                               to="/admin/manage-support"
                             >
                               <div className="sm_icon">
-                                <img src={contactIcon} alt="" />
+                                <img src={supports_Icon} alt="" />
                               </div>
-                              <span>Contact</span>
+                              <span>Support</span>
                             </Link>
                           </li>
                           <li className="nav-item">

@@ -8,11 +8,10 @@ import SpinnerLoader from "../../components/common/SpinnerLoader";
 import { setLoading } from '../../store/reducers/global-reducer';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-
+import { Helmet } from 'react-helmet';
 
 const Notifications = () => {
   const [notification, setNotification] = useState([]);
-  console.log('Allnotification---11', notification)
   //const [read, setRead] = useState(false);
   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
   const loading = useSelector(state => state.global.loading);
@@ -66,7 +65,7 @@ const Notifications = () => {
       {loading === true ? <SpinnerLoader /> : ''}
       <Header />
       <PageTitle title="Notifications" />
-
+      <Helmet><title>{"Notification - Pay Earth"}</title></Helmet>
       <section className="inr_wrap">
         <div className="container">
           <div className="row">
