@@ -102,7 +102,7 @@ const io = require('socket.io')(httpsServer, {
   pingTimeout: 60000,
 
   cors: {
-    origin: ["*", "http://localhost:3000", "https://localhost:3000"], // for local
+     origin: ["*", "http://localhost:3000", "https://localhost:3000"], // for local
     // origin: ["*", "http://pay.earth:7700", "https://www.pay.earth", "https://pay.earth"], // for Live
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -115,10 +115,7 @@ io.on("connection", function (socket) {
 
   socket.on('setup', function (userID) {
     socket.join(userID);
-    // console.log("userID setup", userID)
     socket.emit("connected");
-
-    // io.emit('user_online', userID)
   });
 
   socket.on('active', function (userID) {
@@ -127,40 +124,27 @@ io.on("connection", function (socket) {
 
   socket.on('join chat', function (room) {
     socket.join(room)
-    // console.log("User join room " + room);
   });
 
   socket.on('send_notification', function (notification) {
     console.log("notification", notification);
-    // console.log("receive_notification", notification.data.chat.chatUsers[1].id)
-    // const data = notification.data.chat.chatUsers[1].id;
-    // console.log("Notification send to this id : ", data)
     io.emit('receive_notification', notification);
-
-    // io.in(id).emit("message_recieved", message);
   })
 
   socket.on('new message', function (msg) {
-    // console.log("msg", msg)
     var chat = msg.chat;
-    // console.log("chat", chat)
-    // console.log("recieve msg", msg)
-
     if (!chat.chatUsers) {
       return console.log("Chat user not defined");
     }
 
     chat.chatUsers.forEach((user) => {
-      // console.log("user", user)
       if (user.id === msg.sender.id) {
         socket.in(user.id).emit("message_recieved", msg);
-        // console.log("message_recieved", msg)
       }
     });
   });
 
   socket.off("setup", function () {
-    // console.log("USER DISCONECT");
     socket.leave(userID)
   })
 

@@ -1002,26 +1002,23 @@ function App() {
             exact
           /> */}
 
-          <PrivateRoute
+          <PublicRoute
             path="/share_community/:id"
-            roles={[Role.user]}
-            currentUserRole={userInfo.role}
+            restricted={false}
             component={SharePostData}
             exact
           />
 
-          <PrivateRoute
+          <PublicRoute
             path="/seller_share_community/:id"
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
+            restricted={false}
             component={SellerSharePostData}
             exact
           />
 
-          <PrivateRoute
+          <PublicRoute
             path="/admin_share_community/:id"
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
+            restricted={false}
             component={AdminSharePostData}
             exact
           />
@@ -1070,7 +1067,7 @@ function App() {
             component={PageDetail}
             exact
           />
-          
+
           <PrivateRoute
             path="/zoom-authentication"
             component={Zoom}

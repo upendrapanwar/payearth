@@ -460,9 +460,9 @@ const AdminCommunity = () => {
                                         <div className="cumm_title">Create your post</div>
                                         {isUpdate && (
                                             <div className="close-icon" onClick={resetForm}>
-                                                <button type="button" class="btn-close" aria-label="Close"></button>
+                                                <button type="button" className="btn-close" aria-label="Close"></button>
                                             </div>
-                                        )}
+                                        )} 
                                     </div>
                                     <div className="cp_body">
                                         <div className="com_user_acc">

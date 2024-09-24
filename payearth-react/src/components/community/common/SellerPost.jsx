@@ -703,6 +703,7 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
 
                     getPostsData(dispatch);
                     toast.success("user blocked..");
+                    handleUnfollow(data)
                 }
             }).catch((error) => {
                 console.log("error", error)
