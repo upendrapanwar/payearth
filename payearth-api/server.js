@@ -190,6 +190,11 @@ io.on("connection", function (socket) {
     //console.log('liked data---',data)
   });
 
+  socket.on('Report', (data) => {
+    NotificationController.reportPost(socket, data);
+    //console.log('liked data---',data)
+  });
+
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
   });

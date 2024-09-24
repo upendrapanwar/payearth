@@ -516,20 +516,7 @@ const SellerProfile = () => {
                                                 alt=""
                                                 className="img-fluid"
                                             />
-
-                                            {/* Edit icon positioned over the user profile image */}
-                                            <img
-                                                src={imageEditIcon}
-                                                alt="Edit Icon"
-                                                className=" translate-middle w-25 h-25 bg-light rounded-circle border position-absolute bottom-0 end-0"
-                                            // className="position-absolute top-2 start-0 translate-middle p-1 bg-light rounded-circle"
-                                            // style={{ width: '5px', height: '5px' }}
-                                            />
                                         </div>
-                                        {/* <div className="poster_img">
-                                            <img src={imageEditIcon} alt="" />
-                                            <img src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg} alt="" />
-                                        </div> */}
                                         <div className="poster_info">
                                             <div className="poster_name">{userInfo.name}</div>
                                             <small>{userInfo.role}</small>
