@@ -82,7 +82,13 @@ const SellerNotifications = () => {
                         {notifications.type || "not available"}
                       </div>
                       <div className="card-body">
-                        <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5>
+                        {/* <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5> */}
+                        <div className="d-flex justify-content-between">
+                          <h5 className="card-title mb-0">
+                            {notifications.sender.id?.name || "Special title not defined"}
+                          </h5>
+                          <small className="text-muted">{new Date(notifications.createdAt).toLocaleString() || "Just now"}</small>
+                        </div>
                         <p className="card-text">
                           {notifications.message || " No message."}
                         </p>
