@@ -63,7 +63,7 @@ const Community = () => {
 
 
     useEffect(() => {
-        getUserorSellerData();
+        getUserorSellerData(); 
     }, [postsData, modalContent])
 
     const getUserorSellerData = async () => {
