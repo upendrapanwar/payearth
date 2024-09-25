@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link,  useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import logo from "./../../../assets/images/logo.png";
 import smChatIcon from "./../../../assets/icons/sm_chat.svg";
 import smcommunityIcon from "./../../../assets/icons/sm_community.svg";
@@ -24,7 +24,7 @@ import supportIcon from "./../../../assets/icons/support_icon.svg";
 import clostBtn from "./../../../assets/icons/close_icon.svg";
 import blackBellIcon from "../../../assets/icons/notification-black-bell-icon.svg";
 import { useSelector, useDispatch } from "react-redux";
-import {setLoginStatus, setUserInfo } from "./../../../store/reducers/auth-reducer";
+import { setLoginStatus, setUserInfo } from "./../../../store/reducers/auth-reducer";
 import io from 'socket.io-client';
 import axios from 'axios';
 
@@ -33,30 +33,60 @@ function Header() {
   const authInfo = useSelector(state => state.auth.authInfo);
   const history = useHistory();
   const dispatch = useDispatch();
-  //const { notifications } = useContext(NotificationContext);
   const [unreadCount, setUnreadCount] = useState(0);
 
   const logout = () => {
-    localStorage.clear();
     dispatch(setLoginStatus({ isLoggedIn: false }));
+    localStorage.clear();
     dispatch(setUserInfo({ userInfo: [] }));
     window.location.href = "/admin/login";
   };
 
+  const getAdminProfile = async () => {
+    try {
+      const response = await axios.get(`admin/my-profile/${authInfo.id}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Authorization': `Bearer ${authInfo.token}`
+        }
+      });
+      console.log("response Header", response);
+
+      if (response.data.status === true) {
+        const adminInfo = response.data.data;
+        console.log("adminInfo Header", adminInfo);
+
+        if (adminInfo.image_url && adminInfo.image_url !== '') {
+          console.log("Image URL is available:", adminInfo.image_url);
+          const userInfo = {
+            name: adminInfo.name,
+            email: adminInfo.email,
+            role: adminInfo.role,
+            imgUrl: adminInfo.image_url,
+          }
+          dispatch(setUserInfo({ userInfo }));
+          localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        }
+      }
+    } catch (error) {
+      console.error()
+    }
+  };
+
+
   useEffect(() => {
+    getAdminProfile();
     const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
 
     if (authInfo && authInfo.id) {
       socket.emit('allNotifications', { userID: authInfo.id });
-      console.log(`User with ID ${authInfo.id} joined their room.`);
 
       axios.get(`front/notifications/${authInfo.id}`).then(response => {
-        console.log('Offline Notification data---:', response);
         const offlineNotifications = response.data.data.filter(notification => !notification.isRead);
         if (offlineNotifications && offlineNotifications.length > 0) {
           offlineNotifications.forEach(notification => {
             setUnreadCount((prevCount) => prevCount + 1);
-            console.log('Offline Notification:', notification.message);
           });
         }
       });
@@ -69,7 +99,6 @@ function Header() {
       }
 
       setUnreadCount((prevCount) => prevCount + 1);
-      console.log('New Notification:', notification.message);
     });
 
     return () => {
@@ -89,14 +118,11 @@ function Header() {
 
   const handleNotificationClick = () => {
     axios.put(`front/updateNotifications/${authInfo.id}`).then(response => {
-      //console.log('Offline Notification data---:', response);
       const offlineNotifications = response.data.data;
-      console.log('offlineNotifications--', offlineNotifications)
     });
     setUnreadCount(0);
   }
 
-  //*************** */
   return (
     <React.Fragment>
       <div
@@ -430,6 +456,8 @@ function Header() {
                               </div>
                             </Link>
                             <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                              <li><Link className="dropdown-item" to="/admin-MyProfile">My Profile</Link></li>
+                              <li><hr className="dropdown-divider" /></li>
                               <li><Link className="dropdown-item" to="/admin-profile">Account</Link></li>
                               {/* <li><Link className="dropdown-item" to="#">Setting</Link></li> */}
                               <li><hr className="dropdown-divider" /></li>

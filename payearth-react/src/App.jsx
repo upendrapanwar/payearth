@@ -150,6 +150,8 @@ import { SupportUserCall } from "./containers/user/SupportUserCall";
 import { SupportSellerCall } from "./containers/seller/SupportSellerCall";
 import { SupportAdminCall } from "./containers/admin/SupportAdminCall";
 import SupportAdmin from "./containers/admin/SupportAdmin";
+import { SellerMyProfile } from "./containers/seller/SellerMyProfile";
+import AdminMyProfile from "./containers/admin/AdminMyProfile";
 
 
 function App() {
@@ -972,12 +974,30 @@ function App() {
             currentUserRole={userInfo.role}
             component={AdminSharePostData}
             exact
-          />   
-          
+          />
+
+
+
+          <PrivateRoute
+            path="/Seller-MyProfile"
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            component={SellerMyProfile}
+            exact
+          />
+
           <PublicRoute
             path="/admin-profile"
             restricted={false}
             component={AdminProfile}
+            exact
+          />
+
+
+          <PublicRoute
+            path="/admin-MyProfile"
+            restricted={false}
+            component={AdminMyProfile}
             exact
           />
 

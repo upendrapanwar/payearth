@@ -12,7 +12,11 @@ const schema = new Schema({
     },
     role: { type: String, required: false, default: 'admin' },
     isAdmin: { type: Boolean, required: false, default: false },
-    isActive: { type: Boolean, required: false, default: false }
+    isActive: { type: Boolean, required: false, default: false },
+    original_image_url: { type: String, required: false, default: null },
+    original_image_id: { type: String, required: false, default: null },
+    image_url: { type: String, required: false, default: null },
+    image_id: { type: String, required: false, default: null },
 }, {
     timestamps: true
 });

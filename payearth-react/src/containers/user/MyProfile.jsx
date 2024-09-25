@@ -354,8 +354,6 @@ class MyProfile extends Component {
                     </Modal.Header>
                     <Modal.Body>
                         <UploadMyprofile image_id={this.state.userDetails.image_id} original_image_id={this.state.userDetails.original_image_id} onProfileUpdate={this.updateProfileImage} onSaveComplete={this.handleModalToggle} />
-                        {/* <UploadMyprofile onProfileUpdate={this.updateProfileImage} onSaveComplete={this.handleModalToggle} /> */}
-
                     </Modal.Body>
                 </Modal>
 

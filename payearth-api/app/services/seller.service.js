@@ -154,6 +154,8 @@ module.exports = {
   editProfileImage,
   sellerSupportEmail,
   supportReqCall,
+  getProfileById,
+  saveMyProfile,
 };
 
 // function sendMail(mailOptions) {
@@ -4722,5 +4724,56 @@ async function supportReqCall(req) {
   } catch (error) {
     console.error("Error:", error);
     return false;
+  }
+}
+
+
+//get Seller Profile
+async function getProfileById(id) {
+  const seller = await Seller.findById(id).select(
+    "id name email role seller_type want_to_sell original_image_url original_image_id image_url image_id purchase_type community"
+  );
+  if (!seller) return false;
+  return seller;
+}
+
+
+async function saveMyProfile(req) {
+  const _id = req.params.id;
+  const { original_image_url, original_image_id, image_url, image_id } = req.body;
+
+  try {
+    if (!original_image_url && !original_image_id && !image_url && !image_id) {
+      console.error("Image not found.");
+      return false;
+    }
+
+    const seller = await Seller.findById(_id);
+    if (!seller) {
+      console.error("seller not found.");
+      return false;
+    }
+
+    const updateData = {};
+    if (original_image_url) updateData.original_image_url = original_image_url;
+    if (original_image_id) updateData.original_image_id = original_image_id;
+    if (image_url) updateData.image_url = image_url;
+    if (image_id) updateData.image_id = image_id;
+
+    const updatedSeller = await Seller.findByIdAndUpdate(
+      _id,
+      { $set: updateData },
+      { new: true }
+    );
+
+    if (!updatedSeller) {
+      console.error("Failed to update seller.");
+      return false;
+    }
+
+    return updatedSeller;
+  } catch (error) {
+    console.error("Error:", error);
+    throw new Error("Error updating profile data.");
   }
 }

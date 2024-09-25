@@ -36,7 +36,10 @@ const schema = new Schema({
         state: { type: String, required: false, default: '' },
         country: { type: String, required: false, default: '' },
     },
-    image_url: { type: String, required: false, default: '' },
+    original_image_url: { type: String, required: false, default: null },
+    original_image_id: { type: String, required: false, default: null },
+    image_url: { type: String, required: false, default: null },
+    image_id: { type: String, required: false, default: null },
     pdf_url: { type: String, required: false, default: '' },
     reset_password: {
         verif_code: { type: String, required: false, default: null },

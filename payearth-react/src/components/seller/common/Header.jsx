@@ -60,17 +60,13 @@ const Header = () => {
 
     if (authInfo && authInfo.id) {
       socket.emit('allNotifications', { userID: authInfo.id });
-      console.log(`User with ID ${authInfo.id} joined their room.`);
-
       axios.get(`front/notifications/${authInfo.id}`).then(response => {
-        console.log('Offline Notification data---:', response);
         const offlineNotifications = response.data.data.filter(notification => !notification.isRead);
         // offlineNotifications.filter(notification => !notification.isRead);
         if (offlineNotifications && offlineNotifications.length > 0) {
           offlineNotifications.forEach(notification => {
             // Handle the notification
             setUnreadCount((prevCount) => prevCount + 1);
-            console.log('Offline Notification:', notification.message);
           });
         }
       });
@@ -84,7 +80,6 @@ const Header = () => {
       }
 
       setUnreadCount((prevCount) => prevCount + 1);
-      console.log('New Notification:', notification.message);
     });
 
     return () => {
@@ -104,9 +99,7 @@ const Header = () => {
 
   const handleNotificationClick = () => {
     axios.put(`front/updateNotifications/${authInfo.id}`).then(response => {
-      //console.log('Offline Notification data---:', response);
       const offlineNotifications = response.data.data;
-      console.log('offlineNotifications--', offlineNotifications)
     });
     setUnreadCount(0);
   }
@@ -359,6 +352,8 @@ const Header = () => {
                               </div>
                             </Link>
                             <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                              <li><Link className="dropdown-item" to="/Seller-MyProfile">My Profile</Link></li>
+                              <li><hr className="dropdown-divider" /></li>
                               <li><Link className="dropdown-item" to="/seller-profile">Account</Link></li>
                               {/* <li><Link className="dropdown-item" to="#">Setting</Link></li> */}
                               <li><hr className="dropdown-divider" /></li>

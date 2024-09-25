@@ -152,6 +152,8 @@ module.exports = {
     updatePost,
     getSupportCallReq,
     updateSupportCallReqStatus,
+    getProfileById,
+    saveMyProfile,
 };
 
 // Validator function
@@ -3390,9 +3392,9 @@ async function getAllPosts(req) {
 
 async function getAdminPosts(req) {
     const adminId = req.params.id;
-    console.log('adminId-----',adminId)
+    console.log('adminId-----', adminId)
     try {
-        const Allposts = await Post.find({ isActive: true ,adminId: adminId})
+        const Allposts = await Post.find({ isActive: true, adminId: adminId })
             .sort({ createdAt: 'desc' })
             .populate([
                 {
@@ -3812,5 +3814,55 @@ async function updateSupportCallReqStatus(req) {
     } catch (err) {
         console.log('Error', err);
         return false;
+    }
+}
+
+//get profile data
+async function getProfileById(id) {
+    const admin = await Admin.findById(id).select(
+        "id name email role original_image_url original_image_id image_url image_id"
+    );
+    if (!admin) return false;
+    return admin;
+}
+
+//save myprofile
+async function saveMyProfile(req) {
+    const _id = req.params.id;
+    const { original_image_url, original_image_id, image_url, image_id } = req.body;
+
+    try {
+        if (!original_image_url && !original_image_id && !image_url && !image_id) {
+            console.error("Image not found.");
+            return false;
+        }
+
+        const admin = await Admin.findById(_id);
+        if (!admin) {
+            console.error("admin not found.");
+            return false;
+        }
+
+        const updateData = {};
+        if (original_image_url) updateData.original_image_url = original_image_url;
+        if (original_image_id) updateData.original_image_id = original_image_id;
+        if (image_url) updateData.image_url = image_url;
+        if (image_id) updateData.image_id = image_id;
+
+        const updatedAdmin = await Admin.findByIdAndUpdate(
+            _id,
+            { $set: updateData },
+            { new: true }
+        );
+
+        if (!updatedAdmin) {
+            console.error("Failed to update admin.");
+            return false;
+        }
+
+        return updatedAdmin;
+    } catch (error) {
+        console.error("Error:", error);
+        throw new Error("Error updating profile data.");
     }
 }

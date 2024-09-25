@@ -1,18 +1,25 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Cropper from 'react-easy-crop';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import CryptoJS from 'crypto-js';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { setUserInfo } from '../../store/reducers/auth-reducer';
 
-const UploadMyprofile = (props) => {
+
+const UploadSellerProfile = (props) => {
+    //cloudinary credential
     const cloudName = process.env.REACT_APP_CLOUD_NAME;
     const apiKey = process.env.REACT_APP_CLOUD_API_KEY;
     const apiSecret = process.env.REACT_APP_CLOUD_API_SECRET;
 
+    //global variable
     const authInfo = JSON.parse(localStorage.getItem('authInfo'));
+    const fileInputRef = useRef(null);
+    const dispatch = useDispatch();
 
-
+    //states
     const [imageSrc, setImageSrc] = useState('');
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
@@ -23,13 +30,33 @@ const UploadMyprofile = (props) => {
     const [loading, setLoading] = useState(false);
     const [croppedBlob, setCroppedBlob] = useState(null);
 
+
+    // Reset function to clear states from SellerMyProfile Component on close model
+    const resetState = () => {
+        setImageSrc('');
+        setCroppedImage(null);
+        setIsCropped(false);
+        setLoading(false);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
+    // Effect to reset state when modal is closed
+    useEffect(() => {
+        if (!props.isModalOpen) {
+            resetState();
+        }
+    }, [props.isModalOpen]);
+
+    //image file holder
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (file && file.size <= 5 * 1024 * 1024) {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onloadend = () => {
-                setImageSrc(reader.result);
+                setImageSrc(reader.result || '');
                 setIsCropped(false);
                 setCroppedImage(null);
             };
@@ -39,6 +66,7 @@ const UploadMyprofile = (props) => {
         }
     };
 
+    //image croped functionality
     const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
         setCroppedAreaPixels(croppedAreaPixels);
     }, []);
@@ -67,7 +95,6 @@ const UploadMyprofile = (props) => {
                 croppedAreaPixels.height
             );
 
-            // Save cropped image blob
             canvas.toBlob((blob) => {
                 const croppedImageUrl = URL.createObjectURL(blob);
                 setCroppedImage(croppedImageUrl);
@@ -77,37 +104,39 @@ const UploadMyprofile = (props) => {
         };
     }, [imageSrc, croppedAreaPixels]);
 
-
-    const deleteImageFromCloudinary = async (imageIds) => {
-
+    //delete image from cloudinary
+    const deleteImageFromCloudinary = async (imageId) => {
         const timestamp = Math.round(new Date().getTime() / 1000);
-        const signature = CryptoJS.SHA1(`public_id=${imageIds}&timestamp=${timestamp}${apiSecret}`).toString(CryptoJS.enc.Hex);
+        const signature = CryptoJS.SHA1(`public_id=${imageId}&timestamp=${timestamp}${apiSecret}`).toString(CryptoJS.enc.Hex);
+
         try {
             const formData = new FormData();
-            formData.append('public_id', imageIds);
+            formData.append('public_id', imageId);
             formData.append('api_key', apiKey);
             formData.append('timestamp', timestamp);
             formData.append('signature', signature);
 
             const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/destroy`, {
                 method: 'POST',
-                body: formData
+                body: formData,
             });
 
-            if (response.ok === true && response.status === 200) {
-                console.log("Image Deleted success fully");
+            if (response.ok) {
+                console.log("Image deleted successfully");
             }
         } catch (err) {
             console.error('Error in image deletion process:', err);
         }
     };
 
+    const uploadImageOnCloudinary = async (blob) => {
+        if (!blob) {
+            return toast.error("No image to upload.");
+        }
 
-
-    const uploadOriginalImageOnCloudinary = async () => {
         try {
             const data = new FormData();
-            data.append("file", imageSrc);
+            data.append("file", blob);
             data.append("upload_preset", "pay-earth-images");
             data.append("cloud_name", cloudName);
 
@@ -124,71 +153,35 @@ const UploadMyprofile = (props) => {
                     imageId: imageData.public_id,
                 };
             } else {
-                console.error("Error uploading original image:", imageData);
+                console.error("Error uploading image:", imageData);
                 return null;
             }
         } catch (err) {
-            console.error("Error in original image upload process:", err);
+            console.error("Error in image upload process:", err);
             return null;
         }
     };
 
-    // Upload the cropped image
-    const uploadCroppedImageOnCloudinary = async () => {
-        if (!croppedBlob) {
-            return toast.error("No cropped image to upload.");
-        }
-
-        try {
-            const data = new FormData();
-            data.append("file", croppedBlob);
-            data.append("upload_preset", "pay-earth-images");
-            data.append("cloud_name", cloudName);
-
-            const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-                method: "POST",
-                body: data,
-            });
-
-            const imageData = await response.json();
-
-            if (response.ok) {
-                return {
-                    imageUrl: imageData.secure_url,
-                    image_id: imageData.public_id,
-                };
-            } else {
-                console.error("Error uploading cropped image:", imageData);
-                return null;
-            }
-        } catch (err) {
-            console.error("Error in cropped image upload process:", err);
-            return null;
-        }
-    };
-
-    // Upload both images (original and cropped) at the same time
     const uploadProfileOnCloudinary = async () => {
         try {
-            // Delete existing images if their IDs are available
-            if (props.original_image_id != null && props.image_id != null) {
-                const imageIds = [props.original_image_id, props.image_id]
-
-                for (let i = 0; i < imageIds.length; i++) {
-                    await deleteImageFromCloudinary(imageIds[i]);
-                }
-
+            // Step 1: Upload the original image
+            const originalImageBlob = await fetch(imageSrc).then(res => res.blob());
+            const originalImageInfo = await uploadImageOnCloudinary(originalImageBlob);
+            if (!originalImageInfo) {
+                return toast.error("Failed to upload original image.");
             }
 
-            // Upload original and cropped images concurrently
-            const [originalImageInfo, croppedImageInfo] = await Promise.all([
-                uploadOriginalImageOnCloudinary(),
-                uploadCroppedImageOnCloudinary(),
-            ]);
+            // Step 2: Delete existing images if their IDs are available
+            if (props.original_image_id && props.image_id) {
+                console.log("check delete function")
+                await deleteImageFromCloudinary(props.original_image_id);
+                await deleteImageFromCloudinary(props.image_id);
+            }
 
-            // Check if both uploads were successful
-            if (!originalImageInfo || !croppedImageInfo) {
-                return toast.error("Failed to upload both original and cropped images.");
+            // Step 3: Upload the cropped image
+            const croppedImageInfo = await uploadImageOnCloudinary(croppedBlob);
+            if (!croppedImageInfo) {
+                return toast.error("Failed to upload cropped image.");
             }
 
             // Prepare form data with both original and cropped image info
@@ -196,23 +189,22 @@ const UploadMyprofile = (props) => {
                 original_image_url: originalImageInfo.imageUrl,
                 original_image_id: originalImageInfo.imageId,
                 image_url: croppedImageInfo.imageUrl,
-                image_id: croppedImageInfo.image_id,
+                image_id: croppedImageInfo.imageId,
             };
 
-            // Save profile with the uploaded image information
-            saveProfile(formData);
+            // Save seller profile with the uploaded image information
+            saveSellerProfile(formData);
 
         } catch (error) {
             console.error("Error in image upload process:", error);
-            toast.error("Error uploading images. Please try again.");
+            toast.error("Error uploading image. Please try again.");
         }
     };
 
-    // Function to save profile data to the backend
-    const saveProfile = async (data) => {
+    const saveSellerProfile = async (data) => {
         try {
             const response = await axios.put(
-                `user/save-user-myprofile/${authInfo.id}`,
+                `seller/save-seller-profile/${authInfo.id}`,
                 data,
                 {
                     headers: {
@@ -223,18 +215,49 @@ const UploadMyprofile = (props) => {
                 }
             );
 
-            if (response.status === 200 && response.data.status === true) {
-                const updatedUserInfo = response.data.data;
-                localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
+            if (response.status === 200 && response.data.status) {
+                const data = response.data.data;
+                const updatedSellerInfo = {
+                    community: data.community,
+                    name: data.name,
+                    email: data.email,
+                    role: data.role,
+                    image_url: data.image_url,
+                    seller_type: data.seller_type
+                };
+
+                const userInfo = {
+                    community: data.community,
+                    name: data.name,
+                    email: data.email,
+                    role: data.role,
+                    imgUrl: data.image_url,
+                    seller_type: data.seller_type
+                };
+
+                dispatch(setUserInfo({ userInfo }));
+                localStorage.setItem('userInfo', JSON.stringify(updatedSellerInfo));
 
                 if (props.onProfileUpdate) {
-                    props.onProfileUpdate(updatedUserInfo.original_image_url, updatedUserInfo.original_image_id, updatedUserInfo.image_url, updatedUserInfo.image_id);
+                    props.onProfileUpdate(
+                        data.original_image_url,
+                        data.original_image_id,
+                        data.image_url,
+                        data.image_id);
                 }
-                toast.success("Profile updated successfully.")
-                props.onSaveComplete();
+
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                }
+                setImageSrc('');
+                setCroppedImage(null);
+                setIsCropped(false);
+                setLoading(false);
+                props.closeModel();
+                toast.success("Seller profile updated successfully.");
             }
         } catch (error) {
-            console.error("Error saving profile:", error);
+            console.error("Error saving seller profile:", error);
         }
     };
 
@@ -256,7 +279,6 @@ const UploadMyprofile = (props) => {
                                 type="file"
                                 accept="image/*"
                                 onChange={handleFileChange}
-                                value={imageSrc ? imageSrc : ""}
                             />
                         </div>
                     </div>
@@ -323,4 +345,4 @@ const UploadMyprofile = (props) => {
     );
 };
 
-export default UploadMyprofile;
+export default UploadSellerProfile;

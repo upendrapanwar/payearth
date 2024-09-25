@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import logo from '../../assets/images/logo.png'
-import { Link  } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import invisibleIcon from '../../assets/icons/invisible-icon.svg';
 import visibleIcon from '../../assets/icons/eye-icon.svg';
 import { setLoginStatus, setAuthInfo, setUserInfo } from '../../store/reducers/auth-reducer';
@@ -90,7 +90,7 @@ class Login extends Component {
                                     <Link to="/" className="navbar-brand py-0"><img src={logo} alt="logo" className="img-fluid" /></Link>
                                     <div className="sel_register">
                                         <div className="form_wrapper">
-                                            <button onClick={this.handleClose} type="button" className="btn-close mo_btn" style={{float:"right"}} aria-label="Close"></button>
+                                            <button onClick={this.handleClose} type="button" className="btn-close mo_btn" style={{ float: "right" }} aria-label="Close"></button>
                                             <h4 className="form_title mb-4">Seller Login</h4>
                                             <Formik
                                                 initialValues={{
@@ -172,7 +172,7 @@ class Login extends Component {
                                                 )}
                                             </Formik>
                                         </div>
-                                        
+
                                     </div>
                                 </div>
                             </div>

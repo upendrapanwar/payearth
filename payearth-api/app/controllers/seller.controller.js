@@ -267,6 +267,10 @@ router.get("/getPostById/:id", getPostById);
 router.put("/editProfileImage/:id", editProfileImage);
 router.post("/support/request-call", supportReqCall)
 
+//myProfile
+router.get("/my-profile/:id", getProfileById);
+router.put("/save-seller-profile/:id", saveMyProfile);
+
 
 
 module.exports = router;
@@ -1440,9 +1444,31 @@ function sellerSupportEmail(req, res, next) {
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 
-
+//seller support-call request
 function supportReqCall(req, res, next) {
   sellerService.supportReqCall(req)
     .then((result) => result ? res.json({ status: true, message: "Support request created successfully." }) : res.json({ status: false, message: "Error creating support request." }))
+    .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+//get Seller Profile
+function getProfileById(req, res, next) {
+  sellerService
+    .getProfileById(req.params.id)
+    .then((seller) =>
+      seller
+        ? res.status(200).json({ status: true, data: seller })
+        : res
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: [] })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+//save seller profile
+
+function saveMyProfile(req, res, next) {
+  sellerService.saveMyProfile(req)
+    .then((data) => data ? res.json({ status: true, data: data, message: "Profile saved successfully." }) : res.json({ status: false, data: {}, message: "Error saving Profile request." }))
     .catch((err) => next(res.json({ status: false, message: err.message })));
 }
