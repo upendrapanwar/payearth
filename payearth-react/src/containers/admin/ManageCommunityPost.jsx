@@ -14,10 +14,7 @@ import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-// import SpinnerLoader from '../../common/SpinnerLoader';
 import { setLoading } from '../../store/reducers/global-reducer';
-// import { getPostsData } from '../../../helpers/post-listing';
-// import { getSellerPostsData } from '../../helpers/sellerPost-listing';
 import SimpleImageSlider from "react-simple-image-slider";
 import ReactTimeAgo from 'react-time-ago'
 import TimeAgo from 'javascript-time-ago'
@@ -32,10 +29,6 @@ TimeAgo.addLocale(ru)
 
 
 const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) => {
-    // const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, ref) => {
-
-    // console.log("all posts of this page----------", posts)
-
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
     const loading = useSelector(state => state.global.loading);
@@ -66,9 +59,7 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
 
     const currentUserId = authInfo.id;
     const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId.id : posts.sellerId.id;
-    //const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
     const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
-
     const date = new Date(posts.createdAt);
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
@@ -123,7 +114,6 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                 setCommentsCount(commentsCount + 1);
                 let res = response.data.data
                 getPosts();
-                // getSellerPostsData(dispatch);
 
                 //***************** */
                 const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
@@ -156,8 +146,6 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                     isRead: 'false',
                     createdAt: new Date(),
                 };
-
-                // axios.post('community/notifications', notificationReqBody, {
                 axios.post('front/notifications', notificationReqBody).then(response => {
                     console.log("Notification saved:", response.data.message);
                 }).catch(error => {
@@ -205,7 +193,6 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
             }
         }).then(response => {
             if (response.data.status) {
-                // getSellerPostsData(dispatch);
                 getPosts();
             }
         }).catch(error => {
@@ -217,11 +204,6 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
     const onClickMenu = (e) => {
         e.preventDefault();
         setSelectedMenu(e.target.alt)
-        // this.setState({
-        //     selectedMenu: e.target.alt
-        // }, () => console.log(this.state.selectedMenu));
-        //this.state.selectedMenu = e.target.alt;
-        //console.log(typeof(this.state.selectedMenu));
     };
     const addToLiked = (postId) => {
         let liked = filteredLikes
@@ -251,49 +233,8 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                 'Authorization': `Bearer ${authInfo.token}`
             }
         }).then(response => {
-            if (response.data.status) {
-                // getSellerPostsData(dispatch);
+            if (response.data.status) {              
                 getPosts();
-
-                // //***************** */
-                // const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
-                // const notification = {
-                //     message: `${userInfo.name} likes your post`,
-                //     postId: postId,
-                //     sender: { id: currentUserId, name: userInfo.name },
-                //     receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name },
-                //     type: 'like'
-                // };
-                // console.log('liked notification---', notification)
-                // // Emit liked notification to the user
-                // socket.emit('liked', {
-                //     notification
-                // });
-
-                // const notificationReqBody = {
-                //     type: 'like',
-                //     sender: {
-                //         id: currentUserId,
-                //         type: 'admin'
-
-                //     },
-                //     receiver: {
-                //         id: userIdToSend,
-                //         type: receiverRole
-                //     },
-                //     postId: postId,
-                //     message: `${userInfo.name} likes on your post`,
-                //     isRead: 'false',
-                //     createdAt: new Date(),
-                // };
-
-                // axios.post('front/notifications', notificationReqBody).then(response => {
-                //     console.log("Notification saved:", response.data.message);
-                // }).catch(error => {
-                //     console.log("Error saving notification:", error);
-                // });
-                // //***************** */
-
             }
         }).catch(error => {
             console.log(error);
@@ -325,7 +266,6 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
             posts.postVideos.forEach((value) => {
                 sliderVideos.push({ url: value.url });
             });
-            // console.log("sliderVideos", sliderVideos)
             setSliderVideos(sliderVideos);
         }
         setShowSlider(true)
@@ -390,44 +330,6 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
         }
     });
 
-
-    // const handleFollow = (posts) => {
-    //     const userId = posts.userId.id;
-    //     console.log("userId", userId)
-
-
-    //     // const response = await axios.post(url, {
-    //     //     headers: {
-    //     //         'Accept': 'application/json',
-    //     //         'Content-Type': 'application/json;charset=UTF-8',
-    //     //         'Authorization': `Bearer ${authInfo.token}`
-    //     //     }
-    //     // });
-    //     // console.log("response", response)
-
-    //     const url = "community/follow-user";
-    //     // const categoryData = {
-    //     //     names,
-    //     //     slug,
-    //     //     description,
-    //     // }
-    //     axios.post(url, {
-    //         headers: {
-    //             'Accept': 'application/json',
-    //             "access-control-allow-origin": "https://localhost:3000",
-    //             'Content-Type': 'application/json;charset=UTF-8',
-    //             'Authorization': `Bearer ${authInfo.token}`
-    //         }
-    //     })
-    //         .then((response) => {
-    //             // this.getCategory();
-    //             console.log("Follow Succesfully", response);
-    //         })
-    //         .catch((error) => {
-    //             console.error('Error in saving category:', error);
-    //         });
-    // }
-
     const handleFollow = (posts) => {
         const currentUserId = authInfo.id;
         const userIdToFollow = posts.userId === null ? posts.sellerId.id : posts.userId.id;
@@ -445,12 +347,9 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
             }
         }).then(response => {
             if (response.data.status) {
-                // getSellerPostsData(dispatch);
                 getPosts();
                 setIsFollowing(true);
-                // console.log("response", response.data.message);
                 toast.success(response.data.message);
-
             }
         }).catch(error => {
             console.log(error);
@@ -459,7 +358,6 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
 
     const handleUnfollow = (posts) => {
         const currentUserId = authInfo.id;
-        // const userIdToUnfollow = posts.userId.id;
         const userIdToUnfollow = posts.userId === null ? posts.sellerId.id : posts.userId.id;
         const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
         var reqBody = {
@@ -475,11 +373,9 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
             }
         }).then(response => {
             if (response.data.status) {
-                // console.log("response", response.data.message);
                 toast.success(response.data.message);
                 setIsFollowing(false);
                 getPosts();
-                // getSellerPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
@@ -499,7 +395,6 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
         }).then(response => {
             if (response.data.status) {
                 toast.success(response.data.message);
-                // getSellerPostsData(dispatch);
                 getPosts();
             }
         }).catch(error => {
@@ -508,20 +403,13 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
     }
 
     const handleEdit = (postEditData) => {
-        // console.log("postEditData", postEditData)
         sendEditData(postEditData);
     }
-
-    // const isFollowing = posts.userId !== null ? posts.userId.community.followerData.includes(authInfo.id) : false;
-
-    // const isFollowing = posts.userId.community.followerData.includes(authInfo.id);
-    // console.log("isFollowing", isFollowing);
 
     useEffect(() => {
         // Function to fetch data
         const fetchData = () => {
             let response = false;
-
             if (posts.userId?.community?.followerData) {
                 response = posts.userId.community.followerData.includes(authInfo.id);
             } else if (posts.sellerId?.community?.followerData) {
@@ -529,13 +417,9 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
             } else if (posts.adminId?.community?.followerData) {
                 response = posts.adminId.community.followerData.includes(authInfo.id);
             }
-
-            // console.log("response", response);
             setIsFollowing(response);
-
         };
         fetchData();
-        // getSellerPostsData(dispatch);
     }, []);
 
     const handleShare = () => {
@@ -543,8 +427,7 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
     }
 
     const handleFacebookShare = (postId) => {
-        // const url = `https://pay.earth/share_community/${postId}`
-        const url = `https://localhost:3000/share_community/${postId}`
+        const url = `https://pay.earth/share_community/${postId}`
         const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
         // window.open(facebookShareUrl, '_blank');
         window.open(facebookShareUrl, '_blank');
@@ -575,7 +458,6 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
     }
 
     const handleReportPopup = (post) => {
-        // alert(`Repost this post id : ${postId}`)
         setIsReportOpen(true);
         setReportedPost(post)
     }
@@ -588,10 +470,9 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
     const handleReportPost = async () => {
         try {
             const data = reportedPost;
-            //console.log("reportedPost send to admin", data)
             const headers = {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authInfo.token}` // Replace authInfo.token with your actual token variable
+                'Authorization': `Bearer ${authInfo.token}`
             };
             const response = await axios.post('seller/createPostReport', {
                 reportType: reportOption,
@@ -601,12 +482,9 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                     postCreatedBy: data.userId === null ? data.sellerId.id : data.userId.id,
                 },
                 reportBy: authInfo.id
-            }, { headers });
-            // console.log("response", response.data)
-
+            }, { headers });      
             toast.success("Report Succesfully");
             setIsReportOpen(false);
-            // alert(response.data.message);
         } catch (error) {
             console.error('Error reporting post:', error);
         }
@@ -820,25 +698,6 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
 
                         </div>
                     </div>
-                    {/* post videos */}
-                    {/* <div className='post_img_box container'>
-                        <div className='row'>
-                            {posts.postVideos.map((video, ind) => {
-                                return (
-                                    <div className={`post_main_div ${posts.postVideos.length === 1 ? 'col-12' : 'col-md-4 '}`} key={ind}>
-                                        <Link to="#" className='cp_video_play' >
-                                            <img src={videoPlay} />
-                                        </Link>
-                                        <div className="post_img mb-3 ">
-                                            <video controls>
-                                                <source src={config.apiURI + video.url} type="video/mp4" />
-                                            </video>
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </div> */}
                 </div>
                 <div className="post_foot">
                     <div className="post_actions">
