@@ -1,4 +1,4 @@
-import React, { useEffect, useState,  useRef, useLayoutEffect  } from 'react';
+import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import Footer from '../../components/common/Footer';
 import Header from '../../components/seller/common/Header';
 import userImg from '../../assets/images/user.png';
@@ -20,6 +20,7 @@ import Select from 'react-select';
 import Picker from 'emoji-picker-react';
 import { toast } from 'react-toastify';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
+import { Modal } from 'react-bootstrap';
 
 
 const SellerProfile = () => {
@@ -62,18 +63,29 @@ const SellerProfile = () => {
     const [showMostCommented, setShowMostCommented] = useState(false);
     const [filteredData, setFilteredData] = useState(SellerPostsData);
     const [showModal, setShowModal] = useState(false);
+    const [AccountshowModal, setAccountShowModal] = useState(false);
     // const [profileImage, setProfileImage] = useState("");
     const [imageFile, setImageFile] = useState(null);
     const [image, setImage] = useState('');
+    const [userType, setUserType] = useState(null);
+    const [modalContent, setModalContent] = useState([]);
+    const [blockedUser, setBlockedUser] = useState(null);
+    const [followers, setFollowers] = useState(null);
+    const [following, setFollowing] = useState(null);
 
+
+    useEffect(() => {
+        getSellerPostsData(dispatch);
+        getCategories();
+    }, []);
 
     useEffect(() => {
         //console.log("Post ID from URL:", postId);
         if (postId) {
             setTimeout(() => {
                 if (postRefs.current[postId]) {
-                    console.log("Post not found in postRefs:", postRefs);
-                    console.log("Scrolling to post:", postId);
+                    //console.log("Post not found in postRefs:", postRefs);
+                    // console.log("Scrolling to post:", postId);
                     postRefs.current[postId].scrollIntoView({ behavior: "smooth" });
                 } else {
                     console.log("Post not found in postRefs:", postRefs);
@@ -337,10 +349,6 @@ const SellerProfile = () => {
         });
     }
 
-    useEffect(() => {
-        getSellerPostsData(dispatch);
-        getCategories();
-    }, []);
 
     const handleEdit = (data) => {
         //console.log("Data for edit test ###$$#$$#$#$#", data)
@@ -493,6 +501,96 @@ const SellerProfile = () => {
         handleClose();
     };
 
+    useEffect(() => {
+        getUserorSellerData();
+    }, [SellerPostsData, modalContent])
+
+    const getUserorSellerData = async () => {
+        setLoading(true);
+        try {
+            await axios
+                .get(`/seller/getUserorSellerData/${authInfo.id}`, {
+                    headers: {
+                        "content-type": "application/json",
+                        "Access-Control-Allow-Origin": "*",
+                        'Authorization': `Bearer ${authInfo.token}`
+                    },
+                })
+                .then((response) => {
+                    // console.log("response", response.data)
+                    const data = response.data.data;
+                    // console.log("blocked", data.blocked)
+
+                    if (response.data.status === true) {
+                        // setUserData(data);
+                        setBlockedUser(data.blocked);
+                        setFollowers(data.followers);
+                        setFollowing(data.following);
+                    }
+                    // setUserData(data);
+                })
+                .catch((error) => {
+                    console.log("Error", error);
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        } catch (error) {
+            console.log("Error", error);
+            setLoading(false);
+        }
+    }
+
+    const handleClick = (type) => {
+        let data = [];
+        switch (type) {
+            case 'followers':
+                data = followers !== null ? { type: 'followers', data: followers } : [];
+                break;
+            case 'following':
+                data = following !== null ? { type: 'following', data: following } : [];
+                break;
+            case 'blockedUser':
+                data = blockedUser !== null ? { type: 'blockedUser', data: blockedUser } : [];
+                break;
+            default:
+                break;
+        }
+        // console.log("under model data", data)
+        setModalContent(data.data);
+        setUserType(data.type)
+        setAccountShowModal(true);
+    };
+
+    const handleUnblockUser = async (data) => {
+        // console.log("data", data)
+        const selectedUserId = data.id
+
+        try {
+            const authorId = authInfo.id
+            const url = "seller/communityUserUnblock";
+            axios.put(url, { authorId, selectedUserId }, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${authInfo.token}`
+                }
+            }).then((response) => {
+                if (response.data.status === true) {
+
+                    getSellerPostsData(dispatch);
+                    toast.success("user unblocked..");
+                    // getUserorSellerData();
+                }
+            }).catch((error) => {
+                console.log("error", error)
+            })
+
+        } catch (error) {
+            console.error('Error', error);
+        }
+    }
+
     //console.log("user imfo", userInfo)
     return (
         <React.Fragment>
@@ -519,19 +617,72 @@ const SellerProfile = () => {
                                         </div>
                                     </div>
                                     <ul>
-                                        <li>
+                                        {/* <li>
                                             <div className="fp_fc">{userInfo.community.followers}</div>
                                             <small>Followers</small>
                                         </li>
                                         <li>
                                             <div className="fp_fc">{userInfo.community.following}</div>
                                             <small>Following</small>
+                                        </li> */}
+                                        <li onClick={() => handleClick('followers')}>
+                                            <div className="fp_fc">{followers !== null ? followers.length : "0"}</div>
+                                            <small>Followers</small>
+                                        </li>
+                                        <li onClick={() => handleClick('following')}>
+                                            <div className="fp_fc">{following !== null ? following.length : "0"}</div>
+                                            <small>Following</small>
+                                        </li>
+                                        <li onClick={() => handleClick('blockedUser')}>
+                                            <div className="fp_fc">{blockedUser !== null ? blockedUser.length : "0"}</div>
+                                            <small>Blocked</small>
                                         </li>
                                         <li>
                                             <div className="fp_fc">{SellerPostsData.length}</div>
                                             <small>Posts</small>
                                         </li>
                                     </ul>
+
+                                    <Modal
+                                        show={AccountshowModal}
+                                        onHide={() => setAccountShowModal(false)}
+                                        size="md"
+                                        aria-labelledby="contained-modal-title-vcenter"
+                                        className='modal-dialog-scrollable'
+                                    >
+                                        {/* <Modal.Body> */}
+                                        {modalContent.length > 0 ? (
+                                            <ul>
+                                                {modalContent.map((item, index) => <>
+                                                    <div className="chat_user_item" key={index}>
+                                                        <a href="#" className="d-flex align-items-center chatUser_info">
+                                                            <div className="userInfo-col userThumb">
+                                                                <div className="user_thumb">
+                                                                    <img className="img-fluid" src={item.image_url} alt="user img" />
+                                                                </div>
+
+                                                            </div>
+                                                            <div className="userInfo-col userInfo">
+                                                                <h3>{item.name}</h3>
+                                                            </div>
+
+                                                            {userType === "blockedUser" ?
+                                                                <button
+                                                                    onClick={() => { handleUnblockUser(item) }}
+                                                                >
+                                                                    Unblock
+                                                                </button> : ""}
+                                                            {/* <button onClick={() => this.clickToAddUser(item)}>ADD</button> */}
+                                                        </a>
+                                                    </div>
+                                                </>
+                                                )}
+                                            </ul>
+                                        ) : (
+                                            <p>No users found</p>
+                                        )}
+
+                                    </Modal>
                                 </div>
                             </div>
                             <div className="col-lg-9">

@@ -76,12 +76,12 @@ const Notifications = () => {
                   <Link
                     key={index}
                     to={
-                      notifications.type === 'comment'
-                        ? `#`
-                        : '#' // for like or  other types of notifications
-                    }
+                      notifications.type === 'comment' || notifications.type === 'like'
+                        ? '#'
+                        : '#' // for follow or  other types of notifications
+                      }
                     onClick={() => updateReadStatus(notifications._id)}
-                  >
+                  > 
                     <div
                       className={`card border border-2 border-info-subtle mb-1 mt-1 ${!notifications.isSeen ? 'bg-info-subtle' : 'bg-light'
                         }`}

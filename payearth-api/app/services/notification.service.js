@@ -7,7 +7,7 @@ const NotificationService = {
         };
 
         socket.in(followedId).emit('receive_notification', notification);
-        console.log(`Notification sent to user with ID ${followedId}`);
+        // console.log(`Notification sent to user with ID ${followedId}`);
     },
 
     sendCommentNotification: (socket,Notification) => {
@@ -15,7 +15,7 @@ const NotificationService = {
         const notification = Notification;
 
         socket.in(notification.receiver.id).emit('receive_notification', notification);
-        console.log(`Notification sent to user with ID ${notification.receiver.id}`);
+       // console.log(`Notification sent to user with ID ${notification.receiver.id}`);
     },
 
     sendLikedNotification: (socket,Notification) => {
@@ -23,7 +23,7 @@ const NotificationService = {
         const notification = Notification;
 
         socket.in(notification.receiver.id).emit('receive_notification', notification);
-        console.log(`Notification sent to user with ID ${notification.receiver.id}`);
+       // console.log(`Notification sent to user with ID ${notification.receiver.id}`);
     },
 
     sendReportPostNotification: (socket,Notification) => {
@@ -31,7 +31,15 @@ const NotificationService = {
         const notification = Notification;
 
         socket.in(notification.receiver.id).emit('receive_notification', notification);
-        console.log(`Notification sent to user with ID ${notification.receiver.id}`);
+       // console.log(`Notification sent to user with ID ${notification.receiver.id}`);
+    },
+
+    chatNotification: (socket,Notification) => {
+        //console.log('notification data-----',Notification);
+        const notification = Notification;
+
+        socket.in(notification.receiver.id).emit('receive_notification', notification);
+       // console.log(`Notification sent to user with ID ${notification.receiver.id}`);
     },
 
 };

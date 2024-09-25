@@ -171,7 +171,7 @@ io.on("connection", function (socket) {
       return;
     }
     socket.join(userID);
-    console.log(`User with ID ${userID} joined their room.`);
+   // console.log(`User with ID ${userID} joined their room.`);
   });
 
   // Follow event
@@ -195,8 +195,13 @@ io.on("connection", function (socket) {
     //console.log('liked data---',data)
   });
 
+  socket.on('chatNotification', (data) => {
+    NotificationController.chatNotification(socket, data);
+    //console.log('liked data---',data)
+  });
+
   socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
+   // console.log('Client disconnected:', socket.id);
   });
 
   //**********************************/

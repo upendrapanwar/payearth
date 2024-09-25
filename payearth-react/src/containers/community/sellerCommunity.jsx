@@ -131,7 +131,7 @@ const SellerCommunity = () => {
         if (postId) {
             setTimeout(() => {
                 if (postRefs.current[postId]) {
-                   // console.log("Scrolling to post:", postId);
+                    // console.log("Scrolling to post:", postId);
                     postRefs.current[postId].scrollIntoView({ behavior: "smooth" });
                 } else {
                     //console.log("Post not found in postRefs:", postRefs);
@@ -192,7 +192,7 @@ const SellerCommunity = () => {
         setSelectFilterCategory("");
         setShowMostLiked(false);
         setShowMostCommented(false);
-        
+
         const token = authInfo.token;
         setAddMore(false);
         let reqBody = {
@@ -477,12 +477,12 @@ const SellerCommunity = () => {
     }
 
     const handleUnblockUser = async (data) => {
-        console.log("data", data)
+        // console.log("data", data)
         const selectedUserId = data.id
 
         try {
             const authorId = authInfo.id
-            const url = "community/communityUserUnblock";
+            const url = "seller/communityUserUnblock";
             axios.put(url, { authorId, selectedUserId }, {
                 headers: {
                     'Accept': 'application/json',
