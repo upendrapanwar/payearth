@@ -41,7 +41,7 @@ const Community = () => {
     const [categoryId, setCategoryId] = useState('');
     const [postStatus, setPostStatus] = useState('Followers');
     const [categoryOption, setCategoryOption] = useState([]);
-    const [defaultCategoryOption, setDefaultCategoryOption] = useState({ label: 'All', value: '' })
+    const [defaultCategoryOption, setDefaultCategoryOption] = useState({ label: 'All Category', value: '' })
     const [productOption, setProductOption] = useState([]);
     const [defaultProductOption, setDefaultProductOption] = useState({ label: 'Choose Product', value: '' })
     const [posts, setPosts] = useState([]);
@@ -63,7 +63,7 @@ const Community = () => {
 
 
     useEffect(() => {
-        getUserorSellerData(); 
+        getUserorSellerData();
     }, [postsData, modalContent])
 
     const getUserorSellerData = async () => {
@@ -128,7 +128,6 @@ const Community = () => {
         setShowPicker(false);
     };
 
-
     const handlePreview = (event) => {
         let previews = [];
         let images = [];
@@ -136,8 +135,6 @@ const Community = () => {
             previews.push(URL.createObjectURL(event.target.files[i]));
             images.push(event.target.files[i]);
         }
-        // console.log("Image community : ", images)
-        // console.log("Image community preview: ", previews)
         setPreview(previews);
         setImages(images);
     };
@@ -146,6 +143,7 @@ const Community = () => {
         preview.splice(index, 1);
         images.splice(index, 1);
     };
+
     const handleVideoPreview = (event) => {
         let videoPreviews = [];
         let video = [];
@@ -155,7 +153,6 @@ const Community = () => {
         }
         setVideoPreview(videoPreviews);
         setVideos(video);
-        // console.log(video);
 
     };
     const deleteVideoPreview = (vid) => {
@@ -304,7 +301,7 @@ const Community = () => {
                 setCategoryId(null);
                 setProductId(null);
                 setDefaultProductOption({ label: 'Choose Product', value: '' });
-                setDefaultCategoryOption({ label: 'All', value: '' });
+                setDefaultCategoryOption({ label: 'All Category', value: '' });
             }, 300);
         }
     };
@@ -315,7 +312,7 @@ const Community = () => {
             if (response.data.status) {
                 let res = response.data.data;
                 dispatch(setPostCategories({ postCategories: res }));
-                let catOptions = [{ label: 'All', value: '' }]
+                let catOptions = [{ label: 'All Category', value: '' }]
                 res.forEach((value) => {
                     catOptions.push({ label: value.categoryName, value: value.id });
                 });
@@ -449,7 +446,7 @@ const Community = () => {
                 setCategoryId(null);
                 setProductId(null);
                 setDefaultProductOption({ label: 'Choose Product', value: '' });
-                setDefaultCategoryOption({ label: 'All', value: '' });
+                setDefaultCategoryOption({ label: 'All Category', value: '' });
             }, 300);
         });
     }
@@ -464,7 +461,7 @@ const Community = () => {
         setCategoryId(null);
         setProductId(null);
         setDefaultProductOption({ label: 'Choose Product', value: '' });
-        setDefaultCategoryOption({ label: 'All', value: '' });
+        setDefaultCategoryOption({ label: 'All Category', value: '' });
     };
 
     const handleFilterCategory = () => {
@@ -510,7 +507,7 @@ const Community = () => {
             <div className='seller_body'>
                 <UserHeader />
                 <PageTitle title="Community" />
-                <Helmet><title>{"Community - Pay Earth"}</title></Helmet>             
+                <Helmet><title>{"Community - Pay Earth"}</title></Helmet>
                 <div className="cumm_page_wrap pt-2 pb-5">
                     <div className="container" >
                         <div className="row">

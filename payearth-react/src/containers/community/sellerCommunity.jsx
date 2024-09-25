@@ -315,7 +315,7 @@ const SellerCommunity = () => {
                 setCategoryId(null);
                 setProductId(null);
                 setDefaultProductOption({ label: 'Choose Product', value: '' });
-                setDefaultCategoryOption({ label: 'Choose Category', value: '' });
+                setDefaultCategoryOption({ label: 'All Category', value: '' });
             }, 300);
         }
     };
@@ -326,7 +326,7 @@ const SellerCommunity = () => {
             if (response.data.status) {
                 let res = response.data.data;
                 dispatch(setPostCategories({ postCategories: res }));
-                let catOptions = [{ label: 'Choose Category', value: '' }]
+                let catOptions = [{ label: 'All Category', value: '' }]
                 res.forEach((value) => {
                     catOptions.push({ label: value.categoryName, value: value.id });
                 });
