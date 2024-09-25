@@ -299,6 +299,7 @@ class Chat extends Component {
     }
 
     accessChat = (data) => {
+       // console.log('data---$%$%#$%@#$%---', data)
         try {
             const url = '/seller/accessChat';
             // const data = { receiverId, authorId }
@@ -321,9 +322,31 @@ class Chat extends Component {
                 }
             }).then((response) => {
                 const datas = response.data.data
-                // console.log("accessChat function ", data.id);
+                // console.log("accessChat function------------- ", datas);
                 // console.log("Join room ", datas._id)
-                this.socket.emit('join chat', datas._id);
+                this.socket.emit('join chat', datas._id)
+
+                //***************** */
+                const notification = {
+                    message: `${this.userInfo.name} start chat with you `,
+                    // postId: postId,
+                    sender: { id: this.authInfo.id, name: this.userInfo.name, type: 'seller' },
+                    receiver: { id: data.id, type: data.role, name: data.name },
+                    type: 'chat',
+                    isRead: 'false',
+                    createdAt: new Date(),
+                };
+                //console.log('chat notification---', notification)
+                this.socket.emit('chatNotification', { notification });
+
+                axios.post('front/notifications', notification).then(response => {
+                    // console.log("Notification saved:", response.data.message);
+                }).catch(error => {
+                    console.log("Error saving notification:", error);
+                });
+                //***************** */
+
+
                 // this.socket.emit("setup", data.id);
 
                 // this.socket.emit("send_notification", data)
@@ -332,7 +355,7 @@ class Chat extends Component {
 
                 // this.sendNotification(data.id, datas)
                 if (response.data.status === true) {
-                    // toast.success("New Chat Created.....", { autoClose: 3000 })
+                    toast.success("New Chat Created.....", { autoClose: 3000 })
                     this.fetchAllMessage(datas)
                     this.fetchAllUserData();
                 }
@@ -571,8 +594,8 @@ class Chat extends Component {
 
     handleUpdateGroupName = () => {
         const { groupEditData, groupName } = this.state;
-        console.log("groupName", groupName);
-        console.log("groupEditData", groupEditData.chatId);
+       // console.log("groupName", groupName);
+       // console.log("groupEditData", groupEditData.chatId);
 
         try {
             const url = "/seller/updateGroupName/";
@@ -584,7 +607,7 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             }).then((response) => {
-                console.log("Update successfully.....", response)
+               // console.log("Update successfully.....", response)
                 this.fetchAllUserData();
                 this.setState({ sendChatData: "" });
                 this.setState({ groupName: "" });
@@ -672,7 +695,7 @@ class Chat extends Component {
 
     handleMessageDelete = (id) => {
         const { sendChatData } = this.state;
-        console.log("selected chat message id", id)
+       // console.log("selected chat message id", id)
         axios.put(`/seller/messageDelete/${id}`, { isVisible: false }, {
             headers: {
                 'Accept': 'application/json',
@@ -828,7 +851,7 @@ class Chat extends Component {
 
     supportAdminChat = () => {
         const { allChatUsers } = this.state
-        console.log("allChatUsers", allChatUsers)
+       // console.log("allChatUsers", allChatUsers)
 
         const supportAdminId = process.env.REACT_APP_SUPPORT_ADMIN_ID;
         const result = allChatUsers.find((chat) =>
@@ -837,7 +860,7 @@ class Chat extends Component {
 
         this.fetchAllMessage(result)
 
-        console.log("support chat Admin", result)
+       // console.log("support chat Admin", result)
     }
 
 

@@ -358,6 +358,27 @@ class Chat extends Component {
                     // toast.success("New Chat Created.....", { autoClose: 3000 })
                     this.fetchAllMessage(datas)
                     this.fetchAllUserData();
+
+                    //***************** */
+                    const notification = {
+                        message: `${this.userInfo.name} start chat with you `,
+                        // postId: postId,
+                        sender: { id: this.authInfo.id, name: this.userInfo.name, type: 'user' },
+                        receiver: { id: data.id, type: data.role, name: data.name },
+                        type: 'chat',
+                        isRead: 'false',
+                        createdAt: new Date(),
+                    };
+                    //console.log('chat notification---', notification)
+                    this.socket.emit('chatNotification', { notification });
+
+                    axios.post('front/notifications', notification).then(response => {
+                       // console.log("Notification saved:", response.data.message);
+                    }).catch(error => {
+                        console.log("Error saving notification:", error);
+                    });
+                    //***************** */
+
                 }
             }).catch((error) => {
                 console.log("error", error);
@@ -842,7 +863,7 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             }).then((response) => {
-                console.log("response remove from group..", response)
+               // console.log("response remove from group..", response)
                 this.fetchAllUserData();
                 this.setState({ sendChatData: "" });
             }).catch((error) => {

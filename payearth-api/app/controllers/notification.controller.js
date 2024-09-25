@@ -7,8 +7,8 @@ const NotificationController = {
             return;
         }
 
-        console.log('Follower:', follower);
-        console.log('Followed:', followed);
+       // console.log('Follower:', follower);
+       // console.log('Followed:', followed);
 
         NotificationService.sendFollowNotification(socket, followed.id, follower);
     },
@@ -23,6 +23,40 @@ const NotificationController = {
 
         NotificationService.sendCommentNotification(socket,Notification);
     },
+
+    liked: (socket, data ) => {
+        if (!data) {
+            console.error('Invalid data received in liked event:', { data });
+            return;
+        }
+        const Notification = data.notification
+        //console.log('liked daata:', Notification);
+
+        NotificationService.sendLikedNotification(socket,Notification);
+    },
+
+    reportPost: (socket, data ) => {
+        if (!data) {
+            console.error('Invalid data received in reportPost event:', { data });
+            return;
+        }
+        const Notification = data.notification
+        //console.log('liked daata:', Notification);
+
+        NotificationService.sendReportPostNotification(socket,Notification);
+    },
+
+    chatNotification: (socket, data ) => {
+        if (!data) {
+            console.error('Invalid data received in chatNotification event:', { data });
+            return;
+        }
+        const Notification = data.notification
+        //console.log('liked daata:', Notification);
+
+        NotificationService.chatNotification(socket,Notification);
+    },
+
 };
 
 module.exports = NotificationController;

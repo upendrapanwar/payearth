@@ -66,6 +66,7 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
 
     const currentUserId = authInfo.id;
     const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId.id : posts.sellerId.id;
+    const adminIdToSend = "611a7bdfab71701f942f84ee";
     //const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
     const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
 
@@ -148,13 +149,10 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                     createdAt: new Date(),
                 };
 
-                // axios.post('community/notifications', notificationReqBody, {
                 axios.post('front/notifications', notificationReqBody).then(response => {
-                    console.log("Notification saved:", response.data.message);
                 }).catch(error => {
                     console.log("Error saving notification:", error);
                 });
-                //***************** */
 
             }
         }).catch(error => {
@@ -233,6 +231,46 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
         }).then(response => {
             if (response.data.status) {
                 getSellerPostsData(dispatch);
+
+                //***************** */
+                const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+                const notification = {
+                    message: `${userInfo.name} likes your post`,
+                    postId: postId,
+                    sender: { id: currentUserId, name: userInfo.name },
+                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name },
+                    type: 'like'
+                };
+                console.log('liked notification---', notification)
+                // Emit liked notification to the user
+                socket.emit('liked', {
+                    notification
+                });
+
+                const notificationReqBody = {
+                    type: 'like',
+                    sender: {
+                        id: currentUserId,
+                        type: 'seller'
+
+                    },
+                    receiver: {
+                        id: userIdToSend,
+                        type: receiverRole
+                    },
+                    postId: postId,
+                    message: `${userInfo.name} likes on your post`,
+                    isRead: 'false',
+                    createdAt: new Date(),
+                };
+
+                axios.post('front/notifications', notificationReqBody).then(response => {
+                    console.log("Notification saved:", response.data.message);
+                }).catch(error => {
+                    console.log("Error saving notification:", error);
+                });
+                //***************** */
+
             }
         }).catch(error => {
             console.log(error);
@@ -570,6 +608,7 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
     const handleReportPost = async () => {
         try {
             const data = reportedPost;
+            const postUserName =  data.userId ? data.userId.name : data.sellerId.name;
             console.log("Reported post sent to admin:", data);
 
             const headers = {
@@ -596,6 +635,46 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                 toast.success("Report Successfully sent");
                 setIsReportOpen(false);
                 setReportedPost(null);
+
+                //***************** */
+                const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+                const notification = {
+                    message: `${userInfo.name} Report on "${postUserName}" post : "${reportOption}"`,
+                    postId: data.id,
+                    sender: { id: currentUserId, name: userInfo.name },
+                    receiver: { id: adminIdToSend },
+                    type: 'report'
+                };
+                console.log('Report notification---', notification)
+                // Emit Report notification to the user
+                socket.emit('Report', {
+                    notification
+                });
+
+                const notificationReqBody = {
+                    type: 'report',
+                    sender: {
+                        id: currentUserId,
+                        type: 'seller'
+
+                    },
+                    receiver: {
+                        id: adminIdToSend,
+                        type: 'admin'
+                    },
+                    postId:  data.id,
+                    message:`${userInfo.name} Report on "${postUserName}" post : "${reportOption}"`,
+                    isRead: 'false',
+                    createdAt: new Date(),
+                };
+
+                axios.post('front/notifications', notificationReqBody).then(response => {
+                    console.log("Notification saved:", response.data.message);
+                }).catch(error => {
+                    console.log("Error saving notification:", error);
+                });
+                //***************** */
+
             } else {
                 toast.error("Failed to send report. Please try again.");
             }
@@ -624,6 +703,7 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
 
                     getPostsData(dispatch);
                     toast.success("user blocked..");
+                    handleUnfollow(data)
                 }
             }).catch((error) => {
                 console.log("error", error)

@@ -32,7 +32,7 @@ TimeAgo.addLocale(ru)
 
 
 const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) => {
-   // const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, ref) => {
+    // const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, ref) => {
 
     // console.log("all posts of this page----------", posts)
 
@@ -254,6 +254,46 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
             if (response.data.status) {
                 // getSellerPostsData(dispatch);
                 getPosts();
+
+                // //***************** */
+                // const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
+                // const notification = {
+                //     message: `${userInfo.name} likes your post`,
+                //     postId: postId,
+                //     sender: { id: currentUserId, name: userInfo.name },
+                //     receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name },
+                //     type: 'like'
+                // };
+                // console.log('liked notification---', notification)
+                // // Emit liked notification to the user
+                // socket.emit('liked', {
+                //     notification
+                // });
+
+                // const notificationReqBody = {
+                //     type: 'like',
+                //     sender: {
+                //         id: currentUserId,
+                //         type: 'admin'
+
+                //     },
+                //     receiver: {
+                //         id: userIdToSend,
+                //         type: receiverRole
+                //     },
+                //     postId: postId,
+                //     message: `${userInfo.name} likes on your post`,
+                //     isRead: 'false',
+                //     createdAt: new Date(),
+                // };
+
+                // axios.post('front/notifications', notificationReqBody).then(response => {
+                //     console.log("Notification saved:", response.data.message);
+                // }).catch(error => {
+                //     console.log("Error saving notification:", error);
+                // });
+                // //***************** */
+
             }
         }).catch(error => {
             console.log(error);
@@ -808,7 +848,7 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                                     <img src={filteredLikes.length !== 0 && filteredLikes.includes(authInfo.id) ? redHeartIcon : heartIconBordered} /> {posts.likeCount}
                                 </Link> */}
                                 <Link to="#">
-                                    <img src={ redHeartIcon } /> {posts.likeCount}
+                                    <img src={redHeartIcon} /> {posts.likeCount}
                                 </Link>
                                 <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}><i className="post_icon ps_comment"></i> {posts.commentCount} Comments</Link>
                                 {/* <Link
@@ -829,7 +869,11 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                             </li>
 
                             <li className="ms-auto">
-                                {(posts.userId?.id === authInfo.id || posts.sellerId?.id === authInfo.id || posts.adminId?.id === authInfo.id) ? (
+                                {posts.userId?.id === authInfo.id || posts.sellerId?.id === authInfo.id || posts.adminId?.id === authInfo.id ? <>
+                                    <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => { handleEdit(posts); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>Edit</button>
+                                </> : ""}
+                                <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
+                                {/* {(posts.userId?.id === authInfo.id || posts.sellerId?.id === authInfo.id || posts.adminId?.id === authInfo.id) ? (
                                     <>
                                         <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => { handleEdit(posts); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>Edit</button>
                                         <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
@@ -842,7 +886,7 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                                         className="post_follow">
                                         Report
                                     </Link>
-                                }
+                                } */}
                                 {/* {posts.userId.id === authInfo.id ? <>
                                     <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleEdit(posts)}>Edit</button>
                                     <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => handleRemove(posts.id)}>Delete</button>
@@ -879,7 +923,7 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                             }
                         </div>
                         <div className="collapse post_comments" id={`collapseComment${posts.id}`}>
-                            <ul className="comnt_list">                             
+                            <ul className="comnt_list">
                                 <li>
                                     {posts.comments.slice(0, commentsToShow).map((val, id) => {
                                         return (

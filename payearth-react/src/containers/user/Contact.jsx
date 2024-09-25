@@ -12,7 +12,7 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import userContactSchema from '../../validation-schemas/userContactSchema'
 import SpinnerLoader from '../../components/common/SpinnerLoader';
-
+import { Helmet } from 'react-helmet';
 
 
 const UserContact = () => {
@@ -68,6 +68,7 @@ const UserContact = () => {
             <div className="seller_body">
                 <Header />
                 <PageTitle title="Contact" />
+                <Helmet><title>{"Contact - Pay Earth"}</title></Helmet>
                 <div className="seller_dash_wrap pt-5 pb-5">
                     <div className="container ">
                         <div className="bg-white rounded-3">

@@ -8,6 +8,7 @@ import SpinnerLoader from "../../components/common/SpinnerLoader";
 import { setLoading } from '../../store/reducers/global-reducer';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
+import { Helmet } from 'react-helmet';
 
 const SellerNotifications = () => {
   const [notification, setNotification] = useState([]);
@@ -61,8 +62,8 @@ const SellerNotifications = () => {
     <>
       {loading === true ? <SpinnerLoader /> : ''}
       <Header readStatus={read} />
-      <PageTitle title=" Seller Notifications" />
-
+      <PageTitle title="Notifications" />
+      <Helmet><title>{"Notification - Pay Earth"}</title></Helmet>
       <section className="inr_wrap">
         <div className="container">
           <div className="row">
@@ -71,7 +72,7 @@ const SellerNotifications = () => {
                 notification.map((notifications, index) => (
                   <Link
                     key={index}
-                    to={notifications.type === 'comment'
+                    to={notifications.type === 'comment' || notifications.type === 'like'
                       ? `/seller-profile?postId=${notifications.postId}`
                       : '#' //  for like and other types of notifications
                     }
@@ -82,7 +83,13 @@ const SellerNotifications = () => {
                         {notifications.type || "not available"}
                       </div>
                       <div className="card-body">
-                        <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5>
+                        {/* <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5> */}
+                        <div className="d-flex justify-content-between">
+                          <h5 className="card-title mb-0">
+                            {notifications.sender.id?.name || "Special title not defined"}
+                          </h5>
+                          <small className="text-muted">{new Date(notifications.createdAt).toLocaleString() || "Just now"}</small>
+                        </div>
                         <p className="card-text">
                           {notifications.message || " No message."}
                         </p>

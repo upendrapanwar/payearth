@@ -4,6 +4,7 @@ import config from "./../../../config.json";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
+import { Helmet } from 'react-helmet';
 import { setLoginStatus, setUserInfo } from "../../../store/reducers/auth-reducer";
 import {
   setProducts,
@@ -604,6 +605,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
 
   return (
     <React.Fragment>
+       <Helmet><title>{"Home - Pay Earth"}</title></Helmet>
       {loginModal && (
         <LoginModal
           onloginHide={closemodalHandler}

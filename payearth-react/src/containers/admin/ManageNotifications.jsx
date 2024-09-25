@@ -12,9 +12,9 @@ import axios from 'axios';
 import addCouponSchema from '../../validation-schemas/addCouponSchema';
 import SpinnerLoader from "../../components/common/SpinnerLoader";
 import { useSelector, useDispatch } from 'react-redux';
+import { Helmet } from 'react-helmet';
 
-
-const ManageNotifications = () => { 
+const ManageNotifications = () => {
     const [notification, setNotification] = useState([]);
     const [read, setRead] = useState(false);
     const [highlighted, setHighlighted] = useState(null);
@@ -70,30 +70,37 @@ const ManageNotifications = () => {
             {loading === true ? <SpinnerLoader /> : ''}
             {/* <Header readStatus={read} /> */}
             <Header />
-            <PageTitle title=" Admin Notifications" />
+            <PageTitle title="Notifications" />
+            <Helmet><title>{"Notification - Pay Earth"}</title></Helmet>
             <section className="inr_wrap">
                 <div className="container">
                     <div className="row">
                         <div className="col-md-12">
                             {Array.isArray(notification) && notification.length > 0 ? (
                                 notification.map((notifications, index) => {
-                                   // console.log('Notification:', notifications); 
+                                    // console.log('Notification:', notifications); 
                                     return (
                                         <Link
                                             key={index}
                                             to={
-                                                notifications.type === 'comment'
+                                                notifications.type === 'comment' || notifications.type === 'like'
                                                     ? `/admin-profile?postId=${notifications.postId}`
                                                     : '#' //  for like and other types of notifications
                                             }
                                             onClick={() => updateReadStatus(notifications._id)}
                                         >
-                                            <div className={`card border border-2 border-info-subtle mb-2 mt-2 ${!notifications.isSeen ?  'bg-info-subtle' : 'bg-light' }`} >
+                                            <div className={`card border border-2 border-info-subtle mb-2 mt-2 ${!notifications.isSeen ? 'bg-info-subtle' : 'bg-light'}`} >
                                                 <div className="card-header  text-primary">
                                                     {notifications.type || "not available"}
                                                 </div>
                                                 <div className="card-body">
-                                                    <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5>
+                                                    {/* <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5> */}
+                                                    <div className="d-flex justify-content-between">
+                                                        <h5 className="card-title mb-0">
+                                                            {notifications.sender.id?.name || "Special title not defined"}
+                                                        </h5>
+                                                        <small className="text-muted">{new Date(notifications.createdAt).toLocaleString() || "Just now"}</small>
+                                                    </div>
                                                     <p className="card-text">
                                                         {notifications.message || " No message."}
                                                     </p>

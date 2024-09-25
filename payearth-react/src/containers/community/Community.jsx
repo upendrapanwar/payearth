@@ -15,10 +15,12 @@ import config from '../.././config.json'
 import { useDispatch } from 'react-redux';
 import { NotFound } from '../../components/common/NotFound';
 import { getPostsData } from '../../helpers/post-listing';
+import PageTitle from './../../components/user/common/PageTitle';
 import Select from 'react-select';
 import Picker from 'emoji-picker-react';
 import { Modal } from 'react-bootstrap';
 import { toast } from 'react-toastify';
+import { Helmet } from 'react-helmet';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
 
 const Community = () => {
@@ -39,7 +41,7 @@ const Community = () => {
     const [categoryId, setCategoryId] = useState('');
     const [postStatus, setPostStatus] = useState('Followers');
     const [categoryOption, setCategoryOption] = useState([]);
-    const [defaultCategoryOption, setDefaultCategoryOption] = useState({ label: 'All', value: '' })
+    const [defaultCategoryOption, setDefaultCategoryOption] = useState({ label: 'All Category', value: '' })
     const [productOption, setProductOption] = useState([]);
     const [defaultProductOption, setDefaultProductOption] = useState({ label: 'Choose Product', value: '' })
     const [posts, setPosts] = useState([]);
@@ -126,7 +128,6 @@ const Community = () => {
         setShowPicker(false);
     };
 
-
     const handlePreview = (event) => {
         let previews = [];
         let images = [];
@@ -134,8 +135,6 @@ const Community = () => {
             previews.push(URL.createObjectURL(event.target.files[i]));
             images.push(event.target.files[i]);
         }
-        // console.log("Image community : ", images)
-        // console.log("Image community preview: ", previews)
         setPreview(previews);
         setImages(images);
     };
@@ -144,6 +143,7 @@ const Community = () => {
         preview.splice(index, 1);
         images.splice(index, 1);
     };
+
     const handleVideoPreview = (event) => {
         let videoPreviews = [];
         let video = [];
@@ -153,7 +153,6 @@ const Community = () => {
         }
         setVideoPreview(videoPreviews);
         setVideos(video);
-        // console.log(video);
 
     };
     const deleteVideoPreview = (vid) => {
@@ -302,7 +301,7 @@ const Community = () => {
                 setCategoryId(null);
                 setProductId(null);
                 setDefaultProductOption({ label: 'Choose Product', value: '' });
-                setDefaultCategoryOption({ label: 'All', value: '' });
+                setDefaultCategoryOption({ label: 'All Category', value: '' });
             }, 300);
         }
     };
@@ -313,7 +312,7 @@ const Community = () => {
             if (response.data.status) {
                 let res = response.data.data;
                 dispatch(setPostCategories({ postCategories: res }));
-                let catOptions = [{ label: 'All', value: '' }]
+                let catOptions = [{ label: 'All Category', value: '' }]
                 res.forEach((value) => {
                     catOptions.push({ label: value.categoryName, value: value.id });
                 });
@@ -447,7 +446,7 @@ const Community = () => {
                 setCategoryId(null);
                 setProductId(null);
                 setDefaultProductOption({ label: 'Choose Product', value: '' });
-                setDefaultCategoryOption({ label: 'All', value: '' });
+                setDefaultCategoryOption({ label: 'All Category', value: '' });
             }, 300);
         });
     }
@@ -462,7 +461,7 @@ const Community = () => {
         setCategoryId(null);
         setProductId(null);
         setDefaultProductOption({ label: 'Choose Product', value: '' });
-        setDefaultCategoryOption({ label: 'All', value: '' });
+        setDefaultCategoryOption({ label: 'All Category', value: '' });
     };
 
     const handleFilterCategory = () => {
@@ -502,17 +501,14 @@ const Community = () => {
         }
     }
 
-
-
-
     return (
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
-
             <div className='seller_body'>
                 <UserHeader />
-                {/* <Header /> */}
-                <div className="cumm_page_wrap pt-5 pb-5">
+                <PageTitle title="Community" />
+                <Helmet><title>{"Community - Pay Earth"}</title></Helmet>
+                <div className="cumm_page_wrap pt-2 pb-5">
                     <div className="container" >
                         <div className="row">
                             <div className="col-lg-12">
@@ -593,7 +589,7 @@ const Community = () => {
                                     <div className="cp_body">
                                         <div className="com_user_acc">
                                             <Link to='/community-profile'>
-                                                <div className="com_user_img"><img src={userInfo.imgUrl !== null && userInfo.imgUrl !== '' ? config.apiURI + userInfo.imgUrl : userImg} alt="" /></div>
+                                                <div className="com_user_img"><img src={userInfo.imgUrl !== null && userInfo.imgUrl !== '' ? userInfo.imgUrl : userImg} alt="" /></div>
                                             </Link>
                                             <div className="com_user_name">
                                                 <div className="cu_name">{userInfo.name}</div>

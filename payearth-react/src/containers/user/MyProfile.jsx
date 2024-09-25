@@ -18,6 +18,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal } from 'react-bootstrap';
 import UploadMyprofile from './UploadMyprofile';
+import { Helmet } from 'react-helmet';
 
 class MyProfile extends Component {
     constructor(props) {
@@ -199,6 +200,7 @@ class MyProfile extends Component {
                 <Header />
                 <PageTitle title="My Profile" />
                 <section className="inr_wrap">
+                    <Helmet><title>{"Profile - Pay Earth"}</title></Helmet>
                     <div className="container">
                         <div className="row">
                             <div className="col-lg-12">
