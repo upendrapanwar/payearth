@@ -7,6 +7,8 @@ import Header from '../../components/seller/common/Header';
 import Footer from '../../components/common/Footer';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
+import PageTitle from "../../components/user/common/PageTitle";
+import { Helmet } from 'react-helmet';
 import axios from 'axios';
 import sellerContactSchema from '../../validation-schemas/sellerContactSchema';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
@@ -52,7 +54,9 @@ const SellerContact = () => {
             {loading && <SpinnerLoader />}
             <div className="seller_body">
                 <Header />
-                <div className="seller_dash_wrap pt-5 pb-5">
+                <PageTitle title="Contact" />
+                <Helmet><title>{"Contact - Pay Earth"}</title></Helmet>
+                <div className="seller_dash_wrap pt-2 pb-5">
                     <div className="container">
                         <div className="bg-white rounded-3">
                             <div className="dash_inner_wrap contact_form_page">

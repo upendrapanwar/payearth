@@ -15,10 +15,12 @@ import config from '../.././config.json'
 import { useDispatch } from 'react-redux';
 import { NotFound } from '../../components/common/NotFound';
 import { getPostsData } from '../../helpers/post-listing';
+import PageTitle from './../../components/user/common/PageTitle';
 import Select from 'react-select';
 import Picker from 'emoji-picker-react';
 import { Modal } from 'react-bootstrap';
 import { toast } from 'react-toastify';
+import { Helmet } from 'react-helmet';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
 
 const Community = () => {
@@ -61,7 +63,7 @@ const Community = () => {
 
 
     useEffect(() => {
-        getUserorSellerData();
+        getUserorSellerData(); 
     }, [postsData, modalContent])
 
     const getUserorSellerData = async () => {
@@ -502,17 +504,14 @@ const Community = () => {
         }
     }
 
-
-
-
     return (
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
-
             <div className='seller_body'>
                 <UserHeader />
-                {/* <Header /> */}
-                <div className="cumm_page_wrap pt-5 pb-5">
+                <PageTitle title="Community" />
+                <Helmet><title>{"Community - Pay Earth"}</title></Helmet>             
+                <div className="cumm_page_wrap pt-2 pb-5">
                     <div className="container" >
                         <div className="row">
                             <div className="col-lg-12">
@@ -593,7 +592,7 @@ const Community = () => {
                                     <div className="cp_body">
                                         <div className="com_user_acc">
                                             <Link to='/community-profile'>
-                                                <div className="com_user_img"><img src={userInfo.imgUrl !== null && userInfo.imgUrl !== '' ? config.apiURI + userInfo.imgUrl : userImg} alt="" /></div>
+                                                <div className="com_user_img"><img src={userInfo.imgUrl !== null && userInfo.imgUrl !== '' ? userInfo.imgUrl : userImg} alt="" /></div>
                                             </Link>
                                             <div className="com_user_name">
                                                 <div className="cu_name">{userInfo.name}</div>

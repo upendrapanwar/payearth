@@ -19,6 +19,8 @@ import Select from 'react-select';
 import Picker from 'emoji-picker-react';
 import { Modal } from 'react-bootstrap';
 import { toast } from 'react-toastify';
+import { Helmet } from 'react-helmet';
+import PageTitle from './../../components/user/common/PageTitle';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
 
 const SellerCommunity = () => {
@@ -126,8 +128,6 @@ const SellerCommunity = () => {
 
 
     useEffect(() => {
-        //console.log("Post ID from URL:", postId);
-
         if (postId) {
             setTimeout(() => {
                 if (postRefs.current[postId]) {
@@ -152,8 +152,6 @@ const SellerCommunity = () => {
             previews.push(URL.createObjectURL(event.target.files[i]));
             images.push(event.target.files[i]);
         }
-        // console.log("Image community : ", images)
-        // console.log("Image community preview: ", previews)
         setPreview(previews);
         setImages(images);
     };
@@ -171,9 +169,8 @@ const SellerCommunity = () => {
         }
         setVideoPreview(videoPreviews);
         setVideos(video);
-        // console.log(video);
-
     };
+
     const deleteVideoPreview = (vid) => {
         let videoPreviews = [...videoPreview];
         let video = [...videos];
@@ -236,7 +233,6 @@ const SellerCommunity = () => {
 
                     const data = await response.json();
                     if (data.secure_url) {
-                        // console.log("image upload", data.secure_url);
                         return { url: data.secure_url };
                     } else {
                         throw new Error("Image upload failed");
@@ -344,12 +340,8 @@ const SellerCommunity = () => {
             }, 300);
         });
     }
-    // const handleCategories = (event) => {
-    //     getPostProducts(event.target.value);
-    //     setCategoryId(event.target.value);
-    // };
+  
     const handleCategories = (selectedOption) => {
-        // console.log("HandleCategory select option", selectedOption)
         setDefaultCategoryOption(selectedOption);
         setDefaultProductOption({ label: 'Choose Product', value: '' });
         setCategoryId(selectedOption.value);
@@ -360,15 +352,12 @@ const SellerCommunity = () => {
             setProductOption([]);
         }
     }
-    // const handleProducts = (event) => {
-    //     setProductId(event.target.value);
-    //     console.log(event.target.value);
-    // }
+
     const handleProducts = (selectedOption) => {
-        // console.log("selectedProdOption", selectedOption)
         setDefaultProductOption(selectedOption);
         setProductId(selectedOption.value);
     }
+
     const getPostProducts = (catId) => {
         dispatch(setLoading({ loading: true }))
         axios.get(`community/front/products/${catId}`).then(response => {
@@ -438,11 +427,6 @@ const SellerCommunity = () => {
             console.log(error);
         }).finally(() => {
             setTimeout(() => {
-                // dispatch(setLoading({ loading: false }));
-                // setPreview([]);
-                // setVideoPreview([]);
-                // setImages([]);
-                // setVideos([]);
                 setIsUpdate(false);
                 setPostStatus('');
                 setInputStr('');
@@ -473,13 +457,10 @@ const SellerCommunity = () => {
         const filtered = SellerPostsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
         const dataToShow = filtered.length === 0 ? SellerPostsData : filtered;
         setFilteredData(dataToShow);
-        // setSelectFilterCategory("");
     }
 
     const handleUnblockUser = async (data) => {
-        // console.log("data", data)
         const selectedUserId = data.id
-
         try {
             const authorId = authInfo.id
             const url = "seller/communityUserUnblock";
@@ -491,7 +472,6 @@ const SellerCommunity = () => {
                 }
             }).then((response) => {
                 if (response.data.status === true) {
-
                     getSellerPostsData(dispatch);
                     toast.success("user unblocked..");
                     // getUserorSellerData();
@@ -499,7 +479,6 @@ const SellerCommunity = () => {
             }).catch((error) => {
                 console.log("error", error)
             })
-
         } catch (error) {
             console.error('Error', error);
         }
@@ -511,7 +490,9 @@ const SellerCommunity = () => {
             {loading === true ? <SpinnerLoader /> : ''}
             <div className='seller_body'>
                 <Header />
-                <div className="cumm_page_wrap pt-5 pb-5">
+                <PageTitle title="Community" />
+                <Helmet><title>{"Community - Pay Earth"}</title></Helmet>
+                <div className="cumm_page_wrap pt-2 pb-5">
                     <div className="container">
                         <div className="row">
                             <div className="col-lg-12">

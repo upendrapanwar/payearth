@@ -344,7 +344,7 @@ const AdminProfile = () => {
         if (postId) {
             setTimeout(() => {
                 if (postRefs.current[postId]) {
-                   // console.log("Scrolling to post:", postId);
+                    // console.log("Scrolling to post:", postId);
                     postRefs.current[postId].scrollIntoView({ behavior: "smooth" });
                 } else {
                     console.log("Post not found in postRefs:", postRefs);
@@ -426,8 +426,9 @@ const AdminProfile = () => {
     };
 
     const handleFilterCategory = () => {
+        setShowMostLiked(false);
+        setShowMostCommented(false);
         const filtered = SellerPostsData.filter(item => item.categoryId && item.categoryId.id === selectFilterCategory || categoryId === null);
-        console.log("Filtred", filtered)
         const dataToShow = filtered.length === 0 ? SellerPostsData : filtered;
         setFilteredData(dataToShow);
     }
@@ -745,12 +746,15 @@ const AdminProfile = () => {
                                         <div className="form-check mb-3">
                                             <input
                                                 className="form-check-input"
-                                                type="checkbox"
+                                                type="radio"
                                                 value=""
                                                 id="popularPost"
                                                 checked={showMostLiked}
-                                                onChange={(e) => setShowMostLiked(e.target.checked)}
-                                            // onChange={setShowMostLiked}
+                                                onChange={(e) => {
+                                                    setShowMostLiked(e.target.checked);
+                                                    setShowMostCommented(false);
+                                                }}
+
                                             />
                                             <label className="form-check-label" htmlFor="popularPost">
                                                 Most Popular Post
@@ -759,11 +763,14 @@ const AdminProfile = () => {
                                         <div className="form-check mb-3">
                                             <input
                                                 className="form-check-input"
-                                                type="checkbox"
+                                                type="radio"
                                                 value=""
                                                 id="CommentedPost"
                                                 checked={showMostCommented}
-                                                onChange={(e) => setShowMostCommented(e.target.checked)}
+                                                onChange={(e) => {
+                                                    setShowMostCommented(e.target.checked)
+                                                    setShowMostLiked(false);
+                                                }}
                                             />
                                             <label className="form-check-label" htmlFor="CommentedPost">
                                                 Most Commented Post

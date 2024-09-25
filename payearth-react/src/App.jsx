@@ -160,43 +160,75 @@ function App() {
       <Router>
         <ScrollToTopButton />
         <Switch>
-          <PublicRoute path="/" restricted={false} component={Home} exact />
-          <PublicRoute path="/product-listing" restricted={false} component={ProductListing} exact />
+          <PublicRoute
+            path="/"
+            restricted={false}
+            component={Home}
+            exact
+          />
+
+          <PublicRoute
+            path="/product-listing"
+            restricted={false}
+            component={ProductListing}
+            exact
+          />
+
           <PublicRoute
             path="/product-detail/:id"
             restricted={false}
             component={ProductDetail}
             exact
           />
-          <PublicRoute path="/service-display" restricted={false} component={ServicesDisplay} exact />
-          <PublicRoute path="/service-listing" restricted={false} component={ServiceListing} exact />
+
+          <PublicRoute
+            path="/service-display"
+            restricted={false}
+            component={ServicesDisplay}
+            exact
+          />
+
+          <PublicRoute
+            path="/service-listing"
+            restricted={false}
+            component={ServiceListing}
+            exact
+          />
+
           <PublicRoute
             path="/service-detail/:id"
             restricted={false}
             component={ServiceDetail}
             exact
           />
+
           <PublicRoute
             path="/my-cart"
             restricted={false}
             component={MyCart}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/checkout"
             restricted={false}
             component={CheckOut}
             exact
           />
 
-          <PublicRoute
+          <PrivateRoute
             path="/notifications"
             restricted={false}
             component={Notifications}
             exact
           />
 
-          <PublicRoute path="/chat" restricted={false} component={Chat} exact />
+          <PrivateRoute
+            path="/chat"
+            restricted={false}
+            component={Chat}
+            exact
+          />
 
           <PublicRoute
             path="/user-contact"
@@ -205,20 +237,19 @@ function App() {
             exact
           />
 
-          <PublicRoute
+          <PrivateRoute
             path="/user-support"
             restricted={false}
             component={SupportUser}
             exact
           />
 
-          <PublicRoute
+          <PrivateRoute
             path="/user-support-email"
             restricted={false}
             component={SupportUserEmail}
             exact
           />
-
 
           <PrivateRoute
             path="/my-profile"
@@ -227,6 +258,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/my-coupons"
             component={MyCoupons}
@@ -291,7 +323,7 @@ function App() {
             exact
           /> */}
 
-          <PublicRoute
+          <PrivateRoute
             path="/service_Charge_Checkout"
             restricted={false}
             component={StripePaymentForm}
@@ -312,7 +344,6 @@ function App() {
             currentUserRole={userInfo.role}
             exact />
 
-
           <PrivateRoute
             path="/order-detail/:id"
             component={OrderDetail}
@@ -320,6 +351,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/my-payments"
             component={MyPayments}
@@ -327,6 +359,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/order-summary/:id"
             component={OrderSummary}
@@ -342,26 +375,35 @@ function App() {
             component={SellerLogin}
             exact
           />
+
           <PublicRoute
             path="/seller/register"
             restricted={false}
             component={SellerRegister}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/seller/reset-password"
             restricted={false}
             component={SellerResetPwd}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/seller/forgot-password"
             restricted={false}
             component={SellerForgotPwd}
             exact
           />
 
-          <PrivateRoute path="/seller/dashboard" component={SellerDashboard} roles={[Role.seller]} currentUserRole={userInfo.role} exact />
+          <PrivateRoute
+            path="/seller/dashboard"
+            component={SellerDashboard}
+            roles={[Role.seller]}
+            currentUserRole={userInfo.role}
+            exact
+          />
 
           {/* SellerManageSubscription */}
           <PrivateRoute
@@ -395,7 +437,6 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
-
 
           <PrivateRoute
             path="/seller/product-stock-management"
@@ -541,7 +582,6 @@ function App() {
             exact
           />
 
-
           <PrivateRoute
             path="/seller/seller-support-email"
             component={SupportSellerEmail}
@@ -566,31 +606,36 @@ function App() {
             component={AdminLogin}
             exact
           />
+
           <PublicRoute
             path="/admin/register"
             restricted={false}
             component={AdminRegister}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/admin/forgot-password"
             restricted={false}
             component={AdminForgotPwd}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/admin/reset-password"
             restricted={false}
             component={AdminResetPwd}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/admin/payments"
             restricted={false}
             component={AdminPayments}
             exact
           />
-          <PublicRoute
+
+          <PrivateRoute
             path="/admin/manage-community-post"
             restricted={false}
             component={ManageCommunityPost}
@@ -774,6 +819,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
+
           <PrivateRoute
             path="/admin/manage-reports-services"
             component={ManageReportsServices}
@@ -856,7 +902,13 @@ function App() {
             exact
           /> */}
 
-          <PrivateRoute path="/admin/add-service" component={adminAddService} roles={[Role.admin]} currentUserRole={userInfo.role} exact />
+          <PrivateRoute
+            path="/admin/add-service"
+            component={adminAddService}
+            roles={[Role.admin]}
+            currentUserRole={userInfo.role}
+            exact
+          />
           {/* Community Routes */}
           <PrivateRoute
             path="/admin/manage-banner-advertisement"
@@ -914,28 +966,28 @@ function App() {
             exact
           />
 
-          <PublicRoute
+          <PrivateRoute
             path="/community"
             restricted={false}
             component={Community}
             exact
           />
 
-          <PublicRoute
+          <PrivateRoute
             path="/seller_community"
             restricted={false}
             component={SellerCommunity}
             exact
           />
 
-          <PublicRoute
+          <PrivateRoute
             path="/community-profile"
             restricted={false}
             component={CommunityProfile}
             exact
           />
 
-          <PublicRoute
+          <PrivateRoute
             path="/seller-profile"
             restricted={false}
             component={SellerProfile}
@@ -950,31 +1002,28 @@ function App() {
             exact
           /> */}
 
-          <PrivateRoute
+          <PublicRoute
             path="/share_community/:id"
-            roles={[Role.user]}
-            currentUserRole={userInfo.role}
+            restricted={false}
             component={SharePostData}
             exact
           />
 
-          <PrivateRoute
+          <PublicRoute
             path="/seller_share_community/:id"
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
+            restricted={false}
             component={SellerSharePostData}
             exact
           />
 
-          <PrivateRoute
+          <PublicRoute
             path="/admin_share_community/:id"
-            roles={[Role.seller]}
-            currentUserRole={userInfo.role}
+            restricted={false}
             component={AdminSharePostData}
             exact
-          />   
-          
-          <PublicRoute
+          />
+
+          <PrivateRoute
             path="/admin-profile"
             restricted={false}
             component={AdminProfile}
@@ -982,11 +1031,27 @@ function App() {
           />
 
           {/* Blog */}
-          <PublicRoute path="/blog" restricted={false} component={Blog} exact />
-          <PublicRoute path="/blog-detail/:slug" restricted={false} component={BlogDetail} exact />
+          <PublicRoute
+            path="/blog"
+            restricted={false}
+            component={Blog}
+            exact
+          />
+
+          <PublicRoute
+            path="/blog-detail/:slug"
+            restricted={false}
+            component={BlogDetail}
+            exact
+          />
 
           {/* Advertise Share */}
-          <PublicRoute path="/advertisement/:slug" restricted={false} component={AdvertiseShare} exact />
+          <PublicRoute
+            path="/advertisement/:slug"
+            restricted={false}
+            component={AdvertiseShare}
+            exact
+          />
 
           {/* PageDetail */}
           <PublicRoute
@@ -995,12 +1060,14 @@ function App() {
             component={PageModel}
             exact
           />
+
           <PublicRoute
             path="/page/:slug"
             restricted={false}
             component={PageDetail}
             exact
           />
+
           <PrivateRoute
             path="/zoom-authentication"
             component={Zoom}

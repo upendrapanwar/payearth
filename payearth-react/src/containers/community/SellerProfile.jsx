@@ -19,6 +19,8 @@ import { getSellerPostsData } from '../../helpers/sellerPost-listing';
 import Select from 'react-select';
 import Picker from 'emoji-picker-react';
 import { toast } from 'react-toastify';
+import { Helmet } from 'react-helmet';
+import PageTitle from './../../components/user/common/PageTitle';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
 import { Modal } from 'react-bootstrap';
 
@@ -597,7 +599,9 @@ const SellerProfile = () => {
             {loading === true ? <SpinnerLoader /> : ''}
             <div className='seller_body'>
                 <Header />
-                <div className="cumm_page_wrap pt-5 pb-5">
+                <PageTitle title="Account" />
+                <Helmet><title>{"Account - Pay Earth"}</title></Helmet>
+                <div className="cumm_page_wrap pt-2 pb-5">
                     <div className="container">
                         <div className="row">
                             <div className="col-lg-12">

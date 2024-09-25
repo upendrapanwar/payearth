@@ -8,6 +8,7 @@ import SpinnerLoader from "../../components/common/SpinnerLoader";
 import { setLoading } from '../../store/reducers/global-reducer';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
+import { Helmet } from 'react-helmet';
 
 const SellerNotifications = () => {
   const [notification, setNotification] = useState([]);
@@ -61,8 +62,8 @@ const SellerNotifications = () => {
     <>
       {loading === true ? <SpinnerLoader /> : ''}
       <Header readStatus={read} />
-      <PageTitle title=" Seller Notifications" />
-
+      <PageTitle title="Notifications" />
+      <Helmet><title>{"Notification - Pay Earth"}</title></Helmet>
       <section className="inr_wrap">
         <div className="container">
           <div className="row">
