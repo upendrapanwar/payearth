@@ -485,12 +485,12 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
     const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
     if (authInfo) {
       socket.emit('allNotifications', { userID: authInfo.id });
-      console.log(`User with ID ${authInfo.id} joined their room.`);
+     // console.log(`User with ID ${authInfo.id} joined their room.`);
       fetchNotification(authInfo.id);
     }
 
     socket.on('receive_notification', (notification) => {
-      if (!notification || !notification.message) {  
+      if (!notification || !notification.message) {
         console.error('Received invalid notification data:', notification);
         return;
       }
@@ -527,13 +527,17 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
   const fetchNotification = async (userId) => {
     try {
       axios.get(`front/notifications/${userId}`).then(response => {
-        console.log('Offline Notification data---:', response);
-        const offlineNotifications = response.data.data.filter(notification => !notification.notification.isRead);
-        if (offlineNotifications && offlineNotifications.length > 0) {
-          offlineNotifications.forEach(notification => {
-            setUnreadCount((prevCount) => prevCount + 1);
-            console.log('Offline Notification:', notification.message);
-          });
+        const responseData = response.data.data
+        if (Array.isArray(responseData) && responseData.length > 0) {
+          const offlineNotifications = response.data.data.filter(notification => !notification.notification.isRead);
+          if (offlineNotifications && offlineNotifications.length > 0) {
+            offlineNotifications.forEach(notification => {
+              setUnreadCount((prevCount) => prevCount + 1);
+              console.log('Offline Notification:', notification.message);
+            });
+          }
+        } else {
+          console.log('No notifications found.');
         }
       });
     } catch (error) {
@@ -605,7 +609,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
 
   return (
     <React.Fragment>
-       <Helmet><title>{"Home - Pay Earth"}</title></Helmet>
+      <Helmet><title>{"Home - Pay Earth"}</title></Helmet>
       {loginModal && (
         <LoginModal
           onloginHide={closemodalHandler}

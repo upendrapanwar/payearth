@@ -461,7 +461,7 @@ const AdminCommunity = () => {
                                     </div>
                                     <div className="cp_body">
                                         <div className="com_user_acc">
-                                            <Link to='/community-profile'>
+                                            <Link to='/admin-MyProfile'>
                                                 <div className="com_user_img">
                                                     <img
                                                         src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}

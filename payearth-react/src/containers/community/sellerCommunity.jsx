@@ -498,7 +498,7 @@ const SellerCommunity = () => {
                             <div className="col-lg-12">
                                 <div className="comm_profile">
                                     <div className="post_by">
-                                        <Link to="/my-profile" className="pointer poster_img"><img src={userInfo.imgUrl} alt="" /></Link>
+                                        <Link to="/Seller-MyProfile" className="pointer poster_img"><img src={userInfo.imgUrl} alt="" /></Link>
                                         <div className="poster_info">
                                             <div className="poster_name">{userInfo.name}</div>
                                         </div>
@@ -572,7 +572,7 @@ const SellerCommunity = () => {
                                     </div>
                                     <div className="cp_body">
                                         <div className="com_user_acc">
-                                            <Link to='/community-profile'>
+                                            <Link to='/Seller-MyProfile'>
                                                 <div className="com_user_img">
                                                     {/* <img src={userInfo.imgUrl !== null && userInfo.imgUrl !== '' ? config.apiURI + userInfo.imgUrl : userImg} alt="" /> */}
                                                     <img
