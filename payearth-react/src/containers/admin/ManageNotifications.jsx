@@ -37,6 +37,7 @@ const ManageNotifications = () => {
                 .get(`front/notifications/${userId}`)
                 .then((response) => {
                     const data = response.data.data;
+                    console.log("data", data)
                     setNotification(data);
                 })
                 .catch((error) => {
@@ -83,26 +84,26 @@ const ManageNotifications = () => {
                                         <Link
                                             key={index}
                                             to={
-                                                notifications.type === 'comment' || notifications.type === 'like'
-                                                    ? `/admin-profile?postId=${notifications.postId}`
+                                                notifications.notification.type === 'comment' || notifications.notification.type === 'like'
+                                                    ? `/admin-profile?postId=${notifications.notification.postId}`
                                                     : '#' //  for like and other types of notifications
                                             }
-                                            onClick={() => updateReadStatus(notifications._id)}
+                                            onClick={() => updateReadStatus(notifications.notification._id)}
                                         >
-                                            <div className={`card border border-2 border-info-subtle mb-2 mt-2 ${!notifications.isSeen ? 'bg-info-subtle' : 'bg-light'}`} >
+                                            <div className={`card border border-2 border-info-subtle mb-2 mt-2 ${!notifications.notification.isSeen ? 'bg-info-subtle' : 'bg-light'}`} >
                                                 <div className="card-header  text-primary">
-                                                    {notifications.type || "not available"}
+                                                    {notifications.notification.type || "not available"}
                                                 </div>
                                                 <div className="card-body">
                                                     {/* <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5> */}
                                                     <div className="d-flex justify-content-between">
                                                         <h5 className="card-title mb-0">
-                                                            {notifications.sender.id?.name || "Special title not defined"}
+                                                            {notifications.senderDetails.name || "Special title not defined"}
                                                         </h5>
-                                                        <small className="text-muted">{new Date(notifications.createdAt).toLocaleString() || "Just now"}</small>
+                                                        <small className="text-muted">{new Date(notifications.notification.createdAt).toLocaleString() || "Just now"}</small>
                                                     </div>
                                                     <p className="card-text">
-                                                        {notifications.message || " No message."}
+                                                        {notifications.notification.message || " No message."}
                                                     </p>
                                                 </div>
                                             </div>

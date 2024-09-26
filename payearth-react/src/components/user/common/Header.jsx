@@ -528,7 +528,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
     try {
       axios.get(`front/notifications/${userId}`).then(response => {
         console.log('Offline Notification data---:', response);
-        const offlineNotifications = response.data.data.filter(notification => !notification.isRead);
+        const offlineNotifications = response.data.data.filter(notification => !notification.notification.isRead);
         if (offlineNotifications && offlineNotifications.length > 0) {
           offlineNotifications.forEach(notification => {
             setUnreadCount((prevCount) => prevCount + 1);
