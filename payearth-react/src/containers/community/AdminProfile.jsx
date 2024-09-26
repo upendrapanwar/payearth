@@ -492,7 +492,7 @@ const AdminProfile = () => {
                                             <small>{userInfo.role}</small>
                                         </div>
                                     </div>
-                                    <ul>
+                                    <ul className=' text-center '>
                                         {/* <li>
                                             <div className="fp_fc">{userInfo.community.followers}</div>
                                             <small>Followers</small>
@@ -501,7 +501,7 @@ const AdminProfile = () => {
                                             <div className="fp_fc">{userInfo.community.following}</div>
                                             <small>Following</small>
                                         </li> */}
-                                        <li>
+                                        <li className='w-100'>
                                             <div className="fp_fc">{SellerPostsData.length}</div>
                                             <small>Posts</small>
                                         </li>

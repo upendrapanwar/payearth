@@ -30,17 +30,11 @@ import ru from 'javascript-time-ago/locale/ru.json'
 // TimeAgo.addLocale(ru)
 
 
-// const SellerPost = ({ posts, sendEditData,  onFollowStatusChange }) => {
 const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, ref) => {
-
-    // console.log("all posts of this page----------", posts)
-
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
     const loading = useSelector(state => state.global.loading);
     const dispatch = useDispatch();
-    // console.log('authInfo------',authInfo);
-    // console.log('userInfo------',userInfo);
     const [comments, setComments] = useState('');
     const [commentsArr, setCommentsArr] = useState(posts.comments);
     const [newCommentsArr, setNewCommentsArr] = useState([]);
@@ -66,10 +60,8 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
 
     const currentUserId = authInfo.id;
     const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId.id : posts.sellerId.id;
-    const adminIdToSend = "611a7bdfab71701f942f84ee";
-    //const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
+    const adminIdToSend = process.env.REACT_APP_SUPPER_ADMIN_ID;
     const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
-
     const date = new Date(posts.createdAt);
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
@@ -302,7 +294,6 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
             posts.postVideos.forEach((value) => {
                 sliderVideos.push({ url: value.url });
             });
-            // console.log("sliderVideos", sliderVideos)
             setSliderVideos(sliderVideos);
         }
         setShowSlider(true)
@@ -367,44 +358,6 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
         }
     });
 
-
-    // const handleFollow = (posts) => {
-    //     const userId = posts.userId.id;
-    //     console.log("userId", userId)
-
-
-    //     // const response = await axios.post(url, {
-    //     //     headers: {
-    //     //         'Accept': 'application/json',
-    //     //         'Content-Type': 'application/json;charset=UTF-8',
-    //     //         'Authorization': `Bearer ${authInfo.token}`
-    //     //     }
-    //     // });
-    //     // console.log("response", response)
-
-    //     const url = "community/follow-user";
-    //     // const categoryData = {
-    //     //     names,
-    //     //     slug,
-    //     //     description,
-    //     // }
-    //     axios.post(url, {
-    //         headers: {
-    //             'Accept': 'application/json',
-    //             "access-control-allow-origin": "https://localhost:3000",
-    //             'Content-Type': 'application/json;charset=UTF-8',
-    //             'Authorization': `Bearer ${authInfo.token}`
-    //         }
-    //     })
-    //         .then((response) => {
-    //             // this.getCategory();
-    //             console.log("Follow Succesfully", response);
-    //         })
-    //         .catch((error) => {
-    //             console.error('Error in saving category:', error);
-    //         });
-    // }
-
     const handleFollow = (posts) => {
         const currentUserId = authInfo.id;
         const userIdToFollow = posts.userId === null ? posts.sellerId.id : posts.userId.id;
@@ -426,10 +379,8 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
             if (response.data.status) {
                 getSellerPostsData(dispatch);
                 setIsFollowing(true);
-                // console.log("response", response.data.message);
                 toast.success(response.data.message);
                 const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
-
                 // Emit follow notification to the followed user
                 socket.emit('follow', {
                     follower: { id: currentUserId, name: userInfo.name },
@@ -451,8 +402,6 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                     isRead: 'false',
                     createdAt: new Date(),
                 };
-
-                // axios.post('community/notifications', notificationReqBody, {
                 axios.post('front/notifications', notificationReqBody, {
                     headers: {
                         'Accept': 'application/json',
@@ -464,7 +413,6 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                 }).catch(error => {
                     console.log("Error saving notification:", error);
                 });
-
             }
         }).catch(error => {
             console.log(error);
@@ -474,7 +422,6 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
 
     const handleUnfollow = (posts) => {
         const currentUserId = authInfo.id;
-        // const userIdToUnfollow = posts.userId.id;
         const userIdToUnfollow = posts.userId === null ? posts.sellerId.id : posts.userId.id;
         const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
         var reqBody = {
@@ -490,16 +437,9 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
             }
         }).then(response => {
             if (response.data.status) {
-                // console.log("response", response.data.message);
                 toast.success(response.data.message);
                 setIsFollowing(false);
                 getSellerPostsData(dispatch);
-                //     const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
-                //      // Emit unfollow notification to the unfollowed user
-                // socket.emit('unfollow', {
-                //     follower: { id: currentUserId, name: authInfo.name },
-                //     unfollowed: { id: userIdToUnfollow, name: posts.userId === null ? posts.sellerId.name : posts.userId.name }
-                // });
             }
         }).catch(error => {
             console.log(error);
@@ -528,14 +468,8 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
     }
 
     const handleEdit = (postEditData) => {
-        // console.log("postEditData", postEditData)
         sendEditData(postEditData);
     }
-
-    // const isFollowing = posts.userId !== null ? posts.userId.community.followerData.includes(authInfo.id) : false;
-
-    // const isFollowing = posts.userId.community.followerData.includes(authInfo.id);
-    // console.log("isFollowing", isFollowing);
 
     useEffect(() => {
         // Function to fetch data
@@ -549,10 +483,7 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
             } else if (posts.adminId?.community?.followerData) {
                 response = posts.adminId.community.followerData.includes(authInfo.id);
             }
-
-            // console.log("response", response);
             setIsFollowing(response);
-
         };
         fetchData();
         getSellerPostsData(dispatch);
@@ -563,10 +494,8 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
     }
 
     const handleFacebookShare = (postId) => {
-        // const url = `https://pay.earth/share_community/${postId}`
-        const url = `https://localhost:3000/share_community/${postId}`
+        const url = `https://pay.earth/share_community/${postId}`
         const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-        // window.open(facebookShareUrl, '_blank');
         window.open(facebookShareUrl, '_blank');
     };
 
@@ -595,7 +524,6 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
     }
 
     const handleReportPopup = (post) => {
-        // alert(`Repost this post id : ${postId}`)
         setIsReportOpen(true);
         setReportedPost(post)
     }
@@ -608,17 +536,17 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
     const handleReportPost = async () => {
         try {
             const data = reportedPost;
-            const postUserName =  data.userId ? data.userId.name : data.sellerId.name;
+            const postUserName = data.userId ? data.userId.name : data.sellerId.name;
             console.log("Reported post sent to admin:", data);
 
             const headers = {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authInfo.token}` // Ensure authInfo.token is correctly set
+                'Authorization': `Bearer ${authInfo.token}`
             };
 
             const reportData = {
                 postId: data.id,
-                postCreatedBy: data.userId ? data.userId.id : data.sellerId.id, // Use a more concise conditional expression
+                postCreatedBy: data.userId ? data.userId.id : data.sellerId.id,
             };
 
             const response = await axios.post(
@@ -662,8 +590,8 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                         id: adminIdToSend,
                         type: 'admin'
                     },
-                    postId:  data.id,
-                    message:`${userInfo.name} Report on "${postUserName}" post : "${reportOption}"`,
+                    postId: data.id,
+                    message: `${userInfo.name} Report on "${postUserName}" post : "${reportOption}"`,
                     isRead: 'false',
                     createdAt: new Date(),
                 };
@@ -685,11 +613,8 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
     };
 
     const handleBlockUser = async (data) => {
-        console.log("data", data)
         const selectedUserId = data.userId === null ? data.sellerId.id : data.userId.id
-
         try {
-            // const selectedUserId = "787875455454cczxcxczx"
             const authorId = authInfo.id
             const url = "seller/communityUserBlock";
             axios.put(url, { authorId, selectedUserId }, {
@@ -700,7 +625,6 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                 }
             }).then((response) => {
                 if (response.data.status === true) {
-
                     getPostsData(dispatch);
                     toast.success("user blocked..");
                     handleUnfollow(data)
@@ -708,7 +632,6 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
             }).catch((error) => {
                 console.log("error", error)
             })
-
         } catch (error) {
             console.error('Error', error);
         }
@@ -756,7 +679,6 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                         </div>
                         <div className="poster_info">
                             <div className="poster_name">
-                                {/* {posts.isAdmin ? posts.adminId.name : posts.isSeller ? posts.sellerId.name : posts.userId.name} */}
                                 {posts.isAdmin
                                     ? posts.adminId?.name || 'N/A'
                                     : posts.isSeller
@@ -786,7 +708,7 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                             }
                         </div>
                     </div>
-                    {/* <div className={`${openModal ? '' : 'collapse'} post_follow_pop collapse`} id={`collapseFollow${posts.id}`}> */}
+
                     <div ref={followRef}>
                         {
                             openModal ?
@@ -801,31 +723,20 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                                         </div>
                                         <ul>
                                             <li>
-                                                {/* <div className="fp_fc">{posts.userId.community.followers}</div> */}
                                                 <div className="fp_fc">{posts.userId === null ? posts.sellerId.community.followers : posts.userId.community.followers}</div>
                                                 <small>Followes</small>
                                             </li>
                                             <li>
-                                                {/* <div className="fp_fc">{posts.userId.community.following}</div> */}
                                                 <div className="fp_fc">{posts.userId === null ? posts.sellerId.community.following : posts.userId.community.following}</div>
                                                 <small>Following</small>
                                             </li>
-                                            {/* <li>
-                                                <div className="fp_fc">00</div>
-                                                <small>Posts</small>
-                                            </li> */}
-
                                         </ul>
                                         <div className="text-center">
                                             {isFollowing ?
                                                 <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleUnfollow(posts)}>Unfollow</Link>
                                                 :
                                                 <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleFollow(posts)}>Follow</Link>
-                                                // <Link to="#" className="btn custom_btn btn_yellow" onClick={(e) => { e.preventDefault(); handleFollow(posts); }}>
-                                                //     Follow
-                                                // </Link>
                                             }
-
                                         </div>
 
                                     </div>
@@ -873,7 +784,6 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                                 width={1000}
                                 height={800}
                                 images={sliderImages}
-                                // showBullets={true}
                                 showNavs={true}
                                 style={{ backgroundRepeat: 'no-repeat', backgroundSize: 'contain' }}
                             />
@@ -932,25 +842,6 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
 
                         </div>
                     </div>
-                    {/* post videos */}
-                    {/* <div className='post_img_box container'>
-                        <div className='row'>
-                            {posts.postVideos.map((video, ind) => {
-                                return (
-                                    <div className={`post_main_div ${posts.postVideos.length === 1 ? 'col-12' : 'col-md-4 '}`} key={ind}>
-                                        <Link to="#" className='cp_video_play' >
-                                            <img src={videoPlay} />
-                                        </Link>
-                                        <div className="post_img mb-3 ">
-                                            <video controls>
-                                                <source src={config.apiURI + video.url} type="video/mp4" />
-                                            </video>
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </div> */}
                 </div>
                 <div className="post_foot">
                     <div className="post_actions">
@@ -1003,15 +894,13 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                                     )
                                 }
                                 <Link to="#"
-                                    // onClick={() => setOpenShare(true)}
                                     onClick={() => handleShare(posts)}
                                     className="post_follow">
                                     <i className="post_icon ps_share"></i> Share
                                 </Link>
                             </li>
-
                         </ul>
-                        {/* <div className="collapse collapse_pop" id={`collapseShareTo${posts.id}`}> */}
+
                         <div ref={shareRef}>
                             {
                                 openShare ?
@@ -1045,14 +934,11 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                                                 <div className="commnt_text">
                                                     <div className="commnt_body">
                                                         <div className="commnt_by">
-                                                            {/* <div className="cb_name">{val.isSeller===true ? val.sellerId.name : val.userId.name}</div> */}
                                                             <div className="cb_name">{val.isSeller ? (val.sellerId && val.sellerId.name ? val.sellerId.name : 'N/A') : (val.userId && val.userId.name ? val.userId.name : 'N/A')}</div>
-                                                            {/* <div className="cb_date">{`${new Date(val.createdAt).getDate() < 10 ? `0${new Date(val.createdAt).getDate()}` : `${new Date(val.createdAt).getDate()}`} - ${new Date(val.createdAt).getMonth() + 1 < 10 ? `0${new Date(val.createdAt).getMonth() + 1}` : `${new Date(val.createdAt).getMonth() + 1}`} - ${new Date(val.createdAt).getFullYear()}`}</div> */}
                                                             <div className="cb_date"> <ReactTimeAgo date={new Date(val.createdAt)} locale="en-US" timeStyle="round-minute" /></div>
                                                         </div>
                                                         <p>{val.content}</p>
                                                     </div>
-                                                    {/* <Link to="#" className="reply_link">Reply</Link> */}
                                                 </div>
                                             </div>
                                         )
@@ -1068,10 +954,8 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                                             <div className="ac_box">
                                                 <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
                                                 <button type="submit" className="btn btn_yellow custom_btn" onClick={() => addNewComment(posts.id)} disabled={!comments.trim()}>
-
                                                     Add Comment
                                                 </button>
-
                                             </div>
                                         </div>
                                     </div>
@@ -1083,8 +967,7 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
             </div>
 
             <Modal
-                show={isReportOpen}
-                // onHide={() => this.setState({ isShareOpen: false })}
+                show={isReportOpen}             
                 onHide={() => setIsReportOpen(false)}
                 size="md"
                 aria-labelledby="contained-modal-title-vcenter"

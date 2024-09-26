@@ -588,7 +588,7 @@ const Community = () => {
                                     </div>
                                     <div className="cp_body">
                                         <div className="com_user_acc">
-                                            <Link to='/community-profile'>
+                                            <Link to='/my-profile'>
                                                 <div className="com_user_img"><img src={userInfo.imgUrl !== null && userInfo.imgUrl !== '' ? userInfo.imgUrl : userImg} alt="" /></div>
                                             </Link>
                                             <div className="com_user_name">

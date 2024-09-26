@@ -897,16 +897,13 @@ class Chat extends Component {
 
     supportAdminChat = () => {
         const { allChatUsers } = this.state
-        console.log("allChatUsers", allChatUsers)
-
-        const supportAdminId = process.env.REACT_APP_SUPPORT_ADMIN_ID;
-        const result = allChatUsers.find((chat) =>
-            chat.chatUsers.some(user => user.id === supportAdminId)
-        );
-
-        this.fetchAllMessage(result)
-
-        console.log("support chat Admin", result)
+        const { supportAdminId } = this.props.location.state || {};
+        if (supportAdminId) {
+            const result = allChatUsers.find((chat) =>
+                chat.chatUsers.some(user => user.id === supportAdminId)
+            );
+            this.fetchAllMessage(result)
+        }
     }
 
 

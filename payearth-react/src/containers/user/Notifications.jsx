@@ -47,12 +47,13 @@ const Notifications = () => {
   };
 
   const updateReadStatus = (notificationId) => {
+    console.log("notificationId", notificationId)
     axios.put('front/setNotificationSeen', { notificationId }).then(response => {
       const updatedReadStatus = response.data.data;
       //console.log('updatedReadStatus--', updatedReadStatus)
       setNotification(prevState =>
         prevState.map(notification =>
-          notification._id === notificationId
+          notification.notification._id === notificationId
             ? { ...notification, isSeen: true }
             : notification
         )
@@ -75,29 +76,28 @@ const Notifications = () => {
                   <Link
                     key={index}
                     to={
-                      notifications.type === 'comment' || notifications.type === 'like'
+                      notifications.notification.type === 'comment' || notifications.notification.type === 'like'
                         ? '#'
                         : '#' // for follow or  other types of notifications
-                      }
-                    onClick={() => updateReadStatus(notifications._id)}
-                  > 
+                    }
+                    onClick={() => updateReadStatus(notifications.notification._id)}
+                  >
                     <div
-                      className={`card border border-2 border-info-subtle mb-1 mt-1 ${!notifications.isSeen ? 'bg-info-subtle' : 'bg-light'
-                        }`}
+                      className={`card border border-2 border-info-subtle mb-1 mt-1 ${!notifications.notification.isSeen ? 'bg-info-subtle' : 'bg-light'}`}
                     >
                       <div className="card-header  text-primary">
-                        {notifications.type || "not available"}
+                        {notifications.notification.type || "not available"}
                       </div>
                       <div className="card-body">
                         {/* <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5> */}
                         <div className="d-flex justify-content-between">
                           <h5 className="card-title mb-0">
-                            {notifications.sender.id?.name || "Special title not defined"}
+                            {notifications.senderDetails.name || "Special title not defined"}
                           </h5>
-                          <small className="text-muted">{new Date(notifications.createdAt).toLocaleString() || "Just now"}</small>
+                          <small className="text-muted">{new Date(notifications.notification.createdAt).toLocaleString() || "Just now"}</small>
                         </div>
                         <p className="card-text">
-                          {notifications.message || " No message."}
+                          {notifications.notification.message || " No message."}
                         </p>
                       </div>
                     </div>

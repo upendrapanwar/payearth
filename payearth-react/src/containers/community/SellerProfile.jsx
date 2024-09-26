@@ -620,28 +620,20 @@ const SellerProfile = () => {
                                             <small>{userInfo.role}</small>
                                         </div>
                                     </div>
-                                    <ul>
-                                        {/* <li>
-                                            <div className="fp_fc">{userInfo.community.followers}</div>
-                                            <small>Followers</small>
-                                        </li>
-                                        <li>
-                                            <div className="fp_fc">{userInfo.community.following}</div>
-                                            <small>Following</small>
-                                        </li> */}
-                                        <li onClick={() => handleClick('followers')}>
+                                    <ul className='text-center' >
+                                        <li className="w-25" onClick={() => handleClick('followers')}>
                                             <div className="fp_fc">{followers !== null ? followers.length : "0"}</div>
                                             <small>Followers</small>
                                         </li>
-                                        <li onClick={() => handleClick('following')}>
+                                        <li className="w-25" onClick={() => handleClick('following')}>
                                             <div className="fp_fc">{following !== null ? following.length : "0"}</div>
                                             <small>Following</small>
                                         </li>
-                                        <li onClick={() => handleClick('blockedUser')}>
+                                        <li className="w-25" onClick={() => handleClick('blockedUser')}>
                                             <div className="fp_fc">{blockedUser !== null ? blockedUser.length : "0"}</div>
                                             <small>Blocked</small>
                                         </li>
-                                        <li>
+                                        <li className="w-25" >
                                             <div className="fp_fc">{SellerPostsData.length}</div>
                                             <small>Posts</small>
                                         </li>
@@ -658,7 +650,7 @@ const SellerProfile = () => {
                                         {modalContent.length > 0 ? (
                                             <ul>
                                                 {modalContent.map((item, index) => <>
-                                                    <div className="chat_user_item" key={index}>
+                                                    <div className="chat_user_item" key={item.id||index}>
                                                         <a href="#" className="d-flex align-items-center chatUser_info">
                                                             <div className="userInfo-col userThumb">
                                                                 <div className="user_thumb">

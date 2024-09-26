@@ -25,8 +25,6 @@ const AdminCommunity = () => {
     const userInfo = useSelector(state => state.auth.userInfo);
     const authInfo = useSelector(state => state.auth.authInfo);
     const loading = useSelector(state => state.global.loading);
-    // const SellerPostsData = useSelector(state => state.post.SellerPostsData);
-    //console.log("Posts Seller", SellerPostsData)
     const postCategories = useSelector(state => state.post.postCategories);
     const postProducts = useSelector(state => state.post.postProducts);
     const dispatch = useDispatch();
@@ -331,7 +329,6 @@ const AdminCommunity = () => {
     }
 
     useEffect(() => {
-        // getSellerPostsData(dispatch);
         getCategories();
         getPosts();
     }, []);
@@ -419,7 +416,6 @@ const AdminCommunity = () => {
     const getPosts = () => {
         let url = '/admin/all-posts';
         dispatch(setLoading({ loading: true }));
-        //dispatch(SpinnerLoader({ loading: true }));
         axios.get(url, {
             headers: {
                 // 'Accept': 'application/json',
@@ -438,7 +434,6 @@ const AdminCommunity = () => {
             }).finally(() => {
                 setTimeout(() => {
                     dispatch(setLoading({ loading: false }));
-                    // dispatch(SpinnerLoader({ loading: false }));
                 }, 300);
             });
     }
@@ -466,9 +461,8 @@ const AdminCommunity = () => {
                                     </div>
                                     <div className="cp_body">
                                         <div className="com_user_acc">
-                                            <Link to='/community-profile'>
+                                            <Link to='/admin-MyProfile'>
                                                 <div className="com_user_img">
-                                                    {/* <img src={userInfo.imgUrl !== null && userInfo.imgUrl !== '' ? config.apiURI + userInfo.imgUrl : userImg} alt="" /> */}
                                                     <img
                                                         src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
                                                         alt=""
@@ -584,22 +578,10 @@ const AdminCommunity = () => {
                                                 />
                                             </div>
                                             {isUpdate === true ? <button className="btn custom_btn btn_yellow mx-auto" onClick={updatPost}> Update</button> : <button className="btn custom_btn btn_yellow mx-auto" onClick={() => createPost()} disabled={!inputStr.trim() && images.length === 0 && videos.length === 0 ? true : false} >Post</button>}
-                                            {/* <button className="btn custom_btn btn_yellow mx-auto" onClick={() => createPost()} disabled={!inputStr.trim() && images.length === 0 && videos.length === 0 ? true : false} >Post</button> */}
                                         </div>
                                     </div>
                                 </div>
-                                {/* {
-                                    SellerPostsData.length > 0 ?
-                                        <div>
-                                            {SellerPostsData.map((value, index) => {
-                                                return (
-                                                    <SellerPost key={index} posts={value} sendEditData={handleEdit} />
-                                                )
-                                            })}
-                                        </div>
-                                        : <NotFound msg="Data not found." />
-                                } */}
-                                {/* <PostListing/> */}
+                                
                                 {
                                     filteredData === null ? (
                                         SellerPostsData.length > 0 ? (
@@ -613,11 +595,10 @@ const AdminCommunity = () => {
                                                         } else if (showMostCommented) {
                                                             return b.commentCount - a.commentCount;
                                                         } else {
-                                                            return 0; // No sorting
+                                                            return 0;
                                                         }
                                                     })
-                                                    .map((value, index) => (
-                                                        //<SellerPost key={index} posts={value} sendEditData={handleEdit} />
+                                                    .map((value, index) => (                                              
                                                         <ManageCommunityPost key={index} posts={value} sendEditData={handleEdit} getPosts={getPosts} />
                                                     ))}
                                             </div>
@@ -636,11 +617,10 @@ const AdminCommunity = () => {
                                                         } else if (showMostCommented) {
                                                             return b.commentCount - a.commentCount;
                                                         } else {
-                                                            return 0; // No sorting
+                                                            return 0;
                                                         }
                                                     })
-                                                    .map((value, index) => (
-                                                        //<SellerPost key={index} posts={value} sendEditData={handleEdit} />
+                                                    .map((value, index) => (   
                                                         <ManageCommunityPost key={index} posts={value} sendEditData={handleEdit} getPosts={getPosts} />
                                                     ))}
                                             </div>

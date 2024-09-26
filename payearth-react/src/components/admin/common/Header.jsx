@@ -83,11 +83,14 @@ function Header() {
       socket.emit('allNotifications', { userID: authInfo.id });
 
       axios.get(`front/notifications/${authInfo.id}`).then(response => {
-        const offlineNotifications = response.data.data.filter(notification => !notification.isRead);
-        if (offlineNotifications && offlineNotifications.length > 0) {
-          offlineNotifications.forEach(notification => {
-            setUnreadCount((prevCount) => prevCount + 1);
-          });
+        const responseData = response.data.data
+        if (responseData > 0) {
+          const offlineNotifications = responseData.filter(notification => !notification.notification.isRead);
+          if (offlineNotifications && offlineNotifications.length > 0) {
+            offlineNotifications.forEach(notification => {
+              setUnreadCount((prevCount) => prevCount + 1);
+            });
+          }
         }
       });
     }

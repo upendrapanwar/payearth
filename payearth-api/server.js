@@ -111,7 +111,7 @@ const io = require('socket.io')(httpsServer, {
 });
 
 io.on("connection", function (socket) {
-  console.log("Connected to socket.io");
+ // console.log("Connected to socket.io");
 
   socket.on('setup', function (userID) {
     socket.join(userID);
@@ -192,7 +192,7 @@ io.on("connection", function (socket) {
 
   // Disconnect event
   socket.on('disconnect', () => {
-    console.log('Client disconnected');
+    //console.log('Client disconnected');
     io.emit('user_offline', socket.id);
   });
 

@@ -1068,34 +1068,81 @@ async function saveNotifications(req) {
   }
 }
 
+// async function getNotifications(req) {
+//   let id = req.params.id;
+//   //console.log('notification da--', id)
+//   try {
+//     const notifications = await Notification.find({ 'receiver.id': mongoose.Types.ObjectId(id) }) .sort({ createdAt: 'desc' });
+
+//     for (let notification of notifications) {
+//       let modelName = '';
+
+//       if (notification.sender.type === 'seller') {
+//         modelName = 'Seller';
+//       } else if (notification.sender.type === 'user') {
+//         modelName = 'User';
+//       } else if (notification.sender.type === 'admin') {
+//         modelName = 'Admin';
+//       }
+
+//       await notification.populate({
+//         path: 'sender.id',
+//         model: modelName,
+//         select: 'name'
+//       });
+//     }
+
+//     return notifications;
+//   } catch (error) {
+//     console.error('Error getting notifications:', error);
+//     throw new Error('Failed to get notifications');
+//   }
+// }
+
 async function getNotifications(req) {
-  let id = req.params.id;
-  //console.log('notification da--', id)
   try {
-    const notifications = await Notification.find({ 'receiver.id': mongoose.Types.ObjectId(id) }) .sort({ createdAt: 'desc' });
-  
-    for (let notification of notifications) {
-      let modelName = '';
-      
-      if (notification.sender.type === 'seller') {
-        modelName = 'Seller';
-      } else if (notification.sender.type === 'user') {
-        modelName = 'User';
-      } else if (notification.sender.type === 'admin') {
-        modelName = 'Admin';
-      }
-  
-      await notification.populate({
-        path: 'sender.id',
-        model: modelName,
-        select: 'name'
-      });
+    const authUserId = req.params.id;
+
+    // Step 1: Find notifications where receiver.id matches authUserId
+    const notifications = await Notification.find({
+      "receiver.id": mongoose.Types.ObjectId(authUserId)
+    }).sort({ createdAt: 'desc' });
+
+    if (!notifications || notifications.length === 0) {
+      return { message: "No notifications found" };
     }
-  
-    return notifications;
+
+    // Iterate over notifications to get sender details for each notification
+    const notificationDetails = await Promise.all(
+      notifications.map(async (notification) => {
+        const senderId = notification.sender.id;
+        let senderDetails = null;
+
+        // Step 2: Query user model
+        senderDetails = await User.findOne({ _id: senderId }).select('name');
+
+        if (!senderDetails) {
+          // Step 3: Query seller model if not found in user
+          senderDetails = await Seller.findOne({ _id: senderId }).select('name');
+        }
+
+        if (!senderDetails) {
+          // Step 4: Query admin model if not found in seller
+          senderDetails = await Admin.findOne({ _id: senderId }).select('name');
+        }
+
+        // Return notification and corresponding senderDetails
+        return {
+          notification,
+          senderDetails: senderDetails || { message: "Sender details not found" }
+        };
+      })
+    );
+    return notificationDetails;
+
   } catch (error) {
-    console.error('Error getting notifications:', error);
-    throw new Error('Failed to get notifications');
+    console.error(error);
+    return { message: "An error occurred while fetching notifications" };
   }
 }
 
@@ -1103,7 +1150,7 @@ async function updateNotifications(req) {
   let id = req.params.id;
   //console.log('notification da--', id)
   try {
-    const notification = await Notification.updateMany( { 'receiver.id': id, isRead: false },{ $set: { isRead: true } } );
+    const notification = await Notification.updateMany({ 'receiver.id': id, isRead: false }, { $set: { isRead: true } });
     if (notification.modifiedCount > 0) {
       return { message: 'Notifications updated successfully' };
     } else {

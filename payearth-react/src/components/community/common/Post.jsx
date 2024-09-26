@@ -30,14 +30,10 @@ import ru from 'javascript-time-ago/locale/ru.json'
 
 
 const Post = ({ posts, sendEditData, sendShareData }) => {
-
-    // console.log("all posts", posts)
-
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
     const loading = useSelector(state => state.global.loading);
     const dispatch = useDispatch();
-
     const [comments, setComments] = useState('');
     const [commentsArr, setCommentsArr] = useState(posts.comments);
     const [newCommentsArr, setNewCommentsArr] = useState([]);
@@ -64,8 +60,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
 
     const currentUserId = authInfo.id;
     const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId.id : posts.sellerId.id;
-    const adminIdToSend = "611a7bdfab71701f942f84ee";
-    //const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
+    const adminIdToSend = process.env.REACT_APP_SUPPER_ADMIN_ID;
     const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
 
     const handleComments = (e) => {
@@ -135,8 +130,6 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                     isRead: 'false',
                     createdAt: new Date(),
                 };
-
-                // axios.post('community/notifications', notificationReqBody, {
                 axios.post('front/notifications', notificationReqBody).then(response => {
                     console.log("Notification saved:", response.data.message);
                 }).catch(error => {
@@ -231,7 +224,6 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                     receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name },
                     type: 'like'
                 };
-                console.log('liked notification---', notification)
                 // Emit liked notification to the user
                 socket.emit('liked', {
                     notification
@@ -292,7 +284,6 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             posts.postVideos.forEach((value) => {
                 sliderVideos.push({ url: value.url });
             });
-            // console.log("sliderVideos", sliderVideos)
             setSliderVideos(sliderVideos);
         }
         setShowSlider(true)
@@ -356,44 +347,6 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             document.removeEventListener("mousedown", shareHandler)
         }
     });
-
-
-    // const handleFollow = (posts) => {
-    //     const userId = posts.userId.id;
-    //     console.log("userId", userId)
-
-
-    //     // const response = await axios.post(url, {
-    //     //     headers: {
-    //     //         'Accept': 'application/json',
-    //     //         'Content-Type': 'application/json;charset=UTF-8',
-    //     //         'Authorization': `Bearer ${authInfo.token}`
-    //     //     }
-    //     // });
-    //     // console.log("response", response)
-
-    //     const url = "community/follow-user";
-    //     // const categoryData = {
-    //     //     names,
-    //     //     slug,
-    //     //     description,
-    //     // }
-    //     axios.post(url, {
-    //         headers: {
-    //             'Accept': 'application/json',
-    //             "access-control-allow-origin": "https://localhost:3000",
-    //             'Content-Type': 'application/json;charset=UTF-8',
-    //             'Authorization': `Bearer ${authInfo.token}`
-    //         }
-    //     })
-    //         .then((response) => {
-    //             // this.getCategory();
-    //             console.log("Follow Succesfully", response);
-    //         })
-    //         .catch((error) => {
-    //             console.error('Error in saving category:', error);
-    //         });
-    // }
 
     const handleFollow = (posts) => {
         const currentUserId = authInfo.id;
@@ -510,20 +463,13 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
     }
 
     const handleEdit = (postEditData) => {
-        // console.log("postEditData", postEditData)
         sendEditData(postEditData);
     }
-
-    // const isFollowing = posts.userId !== null ? posts.userId.community.followerData.includes(authInfo.id) : false;
-
-    // const isFollowing = posts.userId.community.followerData.includes(authInfo.id);
-    // console.log("isFollowing", isFollowing);
 
     useEffect(() => {
         // Function to fetch data
         const fetchData = () => {
             let response = false;
-
             if (posts.userId?.community?.followerData) {
                 response = posts.userId.community.followerData.includes(authInfo.id);
             } else if (posts.sellerId?.community?.followerData) {
@@ -531,10 +477,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             } else if (posts.adminId?.community?.followerData) {
                 response = posts.adminId.community.followerData.includes(authInfo.id);
             }
-
-            // console.log("response", response);
             setIsFollowing(response);
-
         };
         fetchData();
         getPostsData(dispatch);
@@ -548,7 +491,6 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
         // const url = `https://pay.earth/share_community/${postId}`
         const url = `https://pay.earth/share_community/${postId}`
         const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-        // window.open(facebookShareUrl, '_blank');
         window.open(facebookShareUrl, '_blank');
     };
 
@@ -577,7 +519,6 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
     }
 
     const handleReportPopup = (post) => {
-        // alert(`Repost this post id : ${postId}`)
         setIsReportOpen(true);
         setReportedPost(post)
     }
@@ -590,17 +531,17 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
     const handleReportPost = async () => {
         try {
             const data = reportedPost;
-            const postUserName = data.userId ? data.userId.name : data.sellerId.name ;
+            const postUserName = data.userId ? data.userId.name : data.sellerId.name;
             console.log("Reported post sent to admin:", data);
 
             const headers = {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authInfo.token}` // Ensure authInfo.token is correctly set
+                'Authorization': `Bearer ${authInfo.token}`
             };
 
             const reportData = {
                 postId: data.id,
-                postCreatedBy: data.userId ? data.userId.id : data.sellerId.id, // Use a more concise conditional expression
+                postCreatedBy: data.userId ? data.userId.id : data.sellerId.id,
             };
 
             const response = await axios.post(
@@ -625,7 +566,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                 //***************** */
                 const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
                 const notification = {
-                    message:`${userInfo.name} Report on "${postUserName}" post : "${reportOption}"`,
+                    message: `${userInfo.name} Report on "${postUserName}" post : "${reportOption}"`,
                     postId: data.id,
                     sender: { id: currentUserId, name: userInfo.name },
                     receiver: { id: adminIdToSend },
@@ -648,8 +589,8 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                         id: adminIdToSend,
                         type: 'admin'
                     },
-                    postId:  data.id,
-                    message:`${userInfo.name} Report on "${postUserName}" post : "${reportOption}"`,
+                    postId: data.id,
+                    message: `${userInfo.name} Report on "${postUserName}" post : "${reportOption}"`,
                     isRead: 'false',
                     createdAt: new Date(),
                 };
@@ -672,11 +613,8 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
     };
 
     const handleBlockUser = async (data) => {
-        console.log("data", data)
         const selectedUserId = data.userId === null ? data.sellerId.id : data.userId.id
-
         try {
-            // const selectedUserId = "787875455454cczxcxczx"
             const authorId = authInfo.id
             const url = "community/communityUserBlock";
             axios.put(url, { authorId, selectedUserId }, {
@@ -754,7 +692,6 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                             }
                         </div>
                     </div>
-                    {/* <div className={`${openModal ? '' : 'collapse'} post_follow_pop collapse`} id={`collapseFollow${posts.id}`}> */}
                     <div ref={followRef}>
                         {
                             openModal ?
@@ -769,20 +706,13 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                         </div>
                                         <ul>
                                             <li>
-                                                {/* <div className="fp_fc">{posts.userId.community.followers}</div> */}
                                                 <div className="fp_fc">{posts.userId === null ? posts.sellerId.community.followers : posts.userId.community.followers}</div>
                                                 <small>Followes</small>
                                             </li>
                                             <li>
-                                                {/* <div className="fp_fc">{posts.userId.community.following}</div> */}
                                                 <div className="fp_fc">{posts.userId === null ? posts.sellerId.community.following : posts.userId.community.following}</div>
                                                 <small>Following</small>
                                             </li>
-                                            {/* <li>
-                                                <div className="fp_fc">02</div>
-                                                <small>Posts</small>
-                                            </li> */}
-
                                         </ul>
                                         <div className="text-center">
                                             {isFollowing ?
@@ -790,7 +720,6 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                                 :
                                                 <Link to="#" className="btn custom_btn btn-info" onClick={() => handleFollow(posts)}>Follow</Link>
                                             }
-
                                         </div>
                                     </div>
                                 </div>
@@ -936,15 +865,13 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                 }
                                 <Link
                                     to="#"
-                                    // onClick={() => setOpenShare(true)}
                                     onClick={() => handleShare(posts)}
                                     className="post_follow">
                                     <i className="post_icon ps_share"></i> Share
                                 </Link>
                             </li>
-
                         </ul>
-                        {/* <div className="collapse collapse_pop" id={`collapseShareTo${posts.id}`}> */}
+
                         <div ref={shareRef}>
                             {
                                 openShare ?
@@ -1021,10 +948,8 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                             <div className="ac_box">
                                                 <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
                                                 <button type="submit" className="btn btn_yellow custom_btn" onClick={() => addNewComment(posts.id)} disabled={!comments.trim()}>
-
                                                     Add Comment
                                                 </button>
-
                                             </div>
                                         </div>
                                     </div>
@@ -1036,7 +961,6 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
             </div>
             <Modal
                 show={isReportOpen}
-                // onHide={() => this.setState({ isShareOpen: false })}
                 onHide={() => setIsReportOpen(false)}
                 size="md"
                 aria-labelledby="contained-modal-title-vcenter"
