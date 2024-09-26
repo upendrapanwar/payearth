@@ -143,7 +143,7 @@ export const SellerMyProfile = () => {
                             </div>
                             <div className="profile_edit_wrap">
                                 <div className="row">
-                                    <div className="col-md-6 mb-5">
+                                    <div className="col-md-12 mb-5">
                                         <Formik
                                             initialValues={{
                                                 name: sellerDetails.name || '',
@@ -168,62 +168,69 @@ export const SellerMyProfile = () => {
                                                 isSubmitting
                                             }) => (
                                                 <form className="in_form" onSubmit={handleSubmit}>
-                                                    <div className="form-group">
-                                                        <label>Name <span className="text-danger">*</span></label>
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            name="name"
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            value={values.name}
-                                                            disabled={!editProfile}
-                                                        />
-                                                        {touched.name && errors.name && (
-                                                            <small className="text-danger">{errors.name}</small>
-                                                        )}
+                                                    <div className="form-row row">
+                                                        <div className="form-group col-md-6">
+                                                            <label>Name <span className="text-danger">*</span></label>
+                                                            <input
+                                                                type="text"
+                                                                className="form-control"
+                                                                name="name"
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                value={values.name}
+                                                                disabled={!editProfile}
+                                                            />
+                                                            {touched.name && errors.name && (
+                                                                <small className="text-danger">{errors.name}</small>
+                                                            )}
+                                                        </div>
+                                                        <div className="form-group col-md-6">
+                                                            <label>Email <span className="text-danger">*</span></label>
+                                                            <input
+                                                                type="email"
+                                                                className="form-control"
+                                                                name="email"
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                value={values.email}
+                                                                disabled={!editProfile}
+                                                            />
+                                                            {touched.email && errors.email && (
+                                                                <small className="text-danger">{errors.email}</small>
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                    <div className="form-group">
-                                                        <label>Email <span className="text-danger">*</span></label>
-                                                        <input
-                                                            type="email"
-                                                            className="form-control"
-                                                            name="email"
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            value={values.email}
-                                                            disabled={!editProfile}
-                                                        />
-                                                        {touched.email && errors.email && (
-                                                            <small className="text-danger">{errors.email}</small>
-                                                        )}
+
+                                                    <div className="form-row row">
+                                                        <div className="form-group col-md-6">
+                                                            <label>Seller Type <span className="text-danger">*</span></label>
+                                                            <Select className="form-control p-0 h-100 border-0"
+                                                                options={sellerTypeOptions}
+                                                                name="seller_type"
+                                                                onChange={(selected) => handleChange({ target: { name: 'seller_type', value: selected.value } })}
+                                                                onBlur={handleBlur}
+                                                                isDisabled={!editProfile}
+                                                            />
+                                                            {touched.seller_type && errors.seller_type && (
+                                                                <small className="text-danger">{errors.seller_type}</small>
+                                                            )}
+                                                        </div>
+                                                        <div className="form-group col-md-6">
+                                                            <label>want to sell? <span className="text-danger">*</span></label>
+                                                            <Select className="form-control p-0 h-100 border-0"
+                                                                options={wantToSellOptions}
+                                                                name="want_to_sell"
+                                                                onChange={(selected) => handleChange({ target: { name: 'want_to_sell', value: selected.value } })}
+                                                                onBlur={handleBlur}
+                                                                isDisabled={!editProfile}
+                                                            />
+                                                            {touched.want_to_sell && errors.want_to_sell && (
+                                                                <small className="text-danger">{errors.want_to_sell}</small>
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                    <div className="form-group">
-                                                        <label>Seller Type <span className="text-danger">*</span></label>
-                                                        <Select
-                                                            options={sellerTypeOptions}
-                                                            name="seller_type"
-                                                            onChange={(selected) => handleChange({ target: { name: 'seller_type', value: selected.value } })}
-                                                            onBlur={handleBlur}
-                                                            isDisabled={!editProfile}
-                                                        />
-                                                        {touched.seller_type && errors.seller_type && (
-                                                            <small className="text-danger">{errors.seller_type}</small>
-                                                        )}
-                                                    </div>
-                                                    <div className="form-group">
-                                                        <label>want to sell? <span className="text-danger">*</span></label>
-                                                        <Select
-                                                            options={wantToSellOptions}
-                                                            name="want_to_sell"
-                                                            onChange={(selected) => handleChange({ target: { name: 'want_to_sell', value: selected.value } })}
-                                                            onBlur={handleBlur}
-                                                            isDisabled={!editProfile}
-                                                        />
-                                                        {touched.want_to_sell && errors.want_to_sell && (
-                                                            <small className="text-danger">{errors.want_to_sell}</small>
-                                                        )}
-                                                    </div>
+
+
                                                     <div className="form-group">
                                                         <button type="button" className="btn custom_btn btn_yellow_bordered" onClick={handleEdit}>
                                                             {editProfile ? "Cancel" : "Edit Profile"}

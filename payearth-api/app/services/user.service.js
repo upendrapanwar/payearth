@@ -650,7 +650,7 @@ async function getProducts() {
 
 async function getProfileById(id) {
   const user = await User.findById(id).select(
-    "id name email role original_image_url original_image_id image_url image_id purchase_type community"
+    "id name email phone address role original_image_url original_image_id image_url image_id purchase_type community"
   );
   if (!user) return false;
   return user;
@@ -675,14 +675,21 @@ async function editProfile(id, param) {
       name: param.name,
       email: param.email,
       role: param.role,
-      // purchase_type: param.purchase_type,
+      phone: param.phone,
+      address: {
+        street: param.address?.street,
+        city: param.address?.city,
+        state: param.address?.state,
+        country: param.address?.country,
+        zip: param.address?.zip,
+      }
     };
 
     Object.assign(user, input);
 
     if (await user.save()) {
       return await User.findById(id).select(
-        "id name email role community"
+        "id name email role address community"
       );
     } else {
       return false;

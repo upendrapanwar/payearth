@@ -4,6 +4,8 @@ import SpinnerLoader from '../../components/common/SpinnerLoader';
 import CryptoJS from 'crypto-js';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { setUserInfo } from '../../store/reducers/auth-reducer';
 
 const UploadMyprofile = (props) => {
     const cloudName = process.env.REACT_APP_CLOUD_NAME;
@@ -11,7 +13,7 @@ const UploadMyprofile = (props) => {
     const apiSecret = process.env.REACT_APP_CLOUD_API_SECRET;
 
     const authInfo = JSON.parse(localStorage.getItem('authInfo'));
-
+    const dispatch = useDispatch();
 
     const [imageSrc, setImageSrc] = useState('');
     const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -224,11 +226,34 @@ const UploadMyprofile = (props) => {
             );
 
             if (response.status === 200 && response.data.status === true) {
-                const updatedUserInfo = response.data.data;
+                const data = response.data.data;
+                console.log("updatedUserInfo", data)
+
+                const updatedUserInfo = {
+                    community: data.community,
+                    name: data.name,
+                    email: data.email,
+                    role: data.role,
+                    image_url: data.image_url,
+                    phone: data.phone,
+                    address: data.address,
+                };
+
+                const userInfo = {
+                    community: data.community,
+                    name: data.name,
+                    email: data.email,
+                    role: data.role,
+                    imgUrl: data.image_url,
+                    phone: data.phone,
+                    address: data.address,
+                };
+
+                dispatch(setUserInfo({ userInfo }));
                 localStorage.setItem('userInfo', JSON.stringify(updatedUserInfo));
 
                 if (props.onProfileUpdate) {
-                    props.onProfileUpdate(updatedUserInfo.original_image_url, updatedUserInfo.original_image_id, updatedUserInfo.image_url, updatedUserInfo.image_id);
+                    props.onProfileUpdate(data.original_image_url, data.original_image_id, data.image_url, data.image_id);
                 }
                 toast.success("Profile updated successfully.")
                 props.onSaveComplete();
