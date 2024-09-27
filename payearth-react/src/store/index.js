@@ -13,31 +13,31 @@ import { cartReducer } from "./reducers/cart-slice-reducer";
 import { loadState, saveState } from "../helpers/localstorage";
 
 import storage from "redux-persist/lib/storage";
-import throttle from "lodash.throttle"; 
+import throttle from "lodash.throttle";
 
 import {
-    persistStore,
-    persistReducer,
-    FLUSH,
-    REHYDRATE,
-    PAUSE,
-    PERSIST,
-    PURGE,
-    REGISTER,
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
 } from "redux-persist"
 
 
 const persistConfig = {
-    key: 'root',
-    storage: storage,
-    blacklist: []
+  key: 'root',
+  storage: storage,
+  blacklist: []
 }
 
 
 
 const persistedState = loadState();
 
-export const rootReducer = combineReducers({ 
+export const rootReducer = combineReducers({
   auth: authSlice,
   catSearch: catSearchSlice,
   product: productSlice,
@@ -48,26 +48,28 @@ export const rootReducer = combineReducers({
   savelater: savelaterlistSlice,
   post: postSlice,
   cart: cartReducer,
-  //persistedReducer: persistedReducer,
+  // persistedReducer: persistedReducer,
 })
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 export const store = configureStore({
-    reducer: persistedReducer,
-    persistedState,
-    middleware: (getDefaultMiddleware) =>
+  reducer: persistedReducer,
+  persistedState,
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
-    
+
 })
+
+console.log("store", store)
 
 store.subscribe(throttle(() => {
   saveState({
     todos: store.getState().todos
   });
-},1000));
+}, 1000));
 export const persistor = persistStore(store);
 
 export default store;

@@ -71,58 +71,58 @@ class Chat extends Component {
 
 
 
-    //     this.socket.on('receive_notification', (notification) => {
-    //         // console.log("receive_notification", notification)
+        //     this.socket.on('receive_notification', (notification) => {
+        //         // console.log("receive_notification", notification)
 
-    //         if (notification.id === this.authInfo.id) {
-    //             this.setState({
-    //                 notification: notification
-    //             })
-    //         }
-    //     })
-
-
-    //     this.socket.on('user_online', (userID) => {
-    //         // console.log("userId", userID)
-    //         this.setState(prevState => ({
-    //             onlineUsers: [...prevState.onlineUsers, userID]
-    //         }));
-    //         // setOnlineUsers(prevUsers => ({ ...prevUsers, [userID]: true }));
-    //     });
-
-    //     // Main code...
-    //     // this.setState(prevState => ({
-    //     //     userChat: [...prevState.userChat, data]
-    //     // }));
+        //         if (notification.id === this.authInfo.id) {
+        //             this.setState({
+        //                 notification: notification
+        //             })
+        //         }
+        //     })
 
 
-    //     this.socket.on('message_recieved', (data) => {
+        //     this.socket.on('user_online', (userID) => {
+        //         // console.log("userId", userID)
+        //         this.setState(prevState => ({
+        //             onlineUsers: [...prevState.onlineUsers, userID]
+        //         }));
+        //         // setOnlineUsers(prevUsers => ({ ...prevUsers, [userID]: true }));
+        //     });
 
-    //         // console.log("chat select id ", this.state.sendChatData.chatId);
-    //         // console.log(" msg reciving chat id", data.chat._id);
-
-
-    //         if (data.chat._id === this.state.sendChatData.chatId) {
-    //             this.fetchAllUserData();
-
-    //             this.setState(prevState => ({
-    //                 userChat: [...prevState.userChat, data]
-    //             }));
-    //         }
-    //         this.fetchAllUserData();
-    //     })
-    // }
+        //     // Main code...
+        //     // this.setState(prevState => ({
+        //     //     userChat: [...prevState.userChat, data]
+        //     // }));
 
 
-    // componentDidMount() {
-    //     this.fetchAllUserData();
-    //     this.socket.emit("active", this.authInfo.id);
-    //     document.addEventListener('mousedown', this.handleClickOutside);
-    // }
+        //     this.socket.on('message_recieved', (data) => {
 
-    // componentWillUnmount() {
-    //     document.removeEventListener('mousedown', this.handleClickOutside);
-    // }
+        //         // console.log("chat select id ", this.state.sendChatData.chatId);
+        //         // console.log(" msg reciving chat id", data.chat._id);
+
+
+        //         if (data.chat._id === this.state.sendChatData.chatId) {
+        //             this.fetchAllUserData();
+
+        //             this.setState(prevState => ({
+        //                 userChat: [...prevState.userChat, data]
+        //             }));
+        //         }
+        //         this.fetchAllUserData();
+        //     })
+        // }
+
+
+        // componentDidMount() {
+        //     this.fetchAllUserData();
+        //     this.socket.emit("active", this.authInfo.id);
+        //     document.addEventListener('mousedown', this.handleClickOutside);
+        // }
+
+        // componentWillUnmount() {
+        //     document.removeEventListener('mousedown', this.handleClickOutside);
+        // }
 
     };
 
@@ -144,13 +144,12 @@ class Chat extends Component {
         // });
 
         this.socket.on('user_online', (userID) => {
-                    console.log("userId------", userID)
-                    this.setState(prevState => ({
-                        onlineUsers: [...prevState.onlineUsers, userID]
-                    }));
-                    // setOnlineUsers(prevUsers => ({ ...prevUsers, [userID]: true }));
-                });
-    
+            this.setState(prevState => ({
+                onlineUsers: [...prevState.onlineUsers, userID]
+            }));
+            // setOnlineUsers(prevUsers => ({ ...prevUsers, [userID]: true }));
+        });
+
         this.socket.on('message_recieved', (data) => {
             if (data.chat._id === this.state.sendChatData.chatId) {
                 this.fetchAllUserData();
@@ -159,16 +158,16 @@ class Chat extends Component {
                 }));
             }
         });
-    
+
         document.addEventListener('mousedown', this.handleClickOutside);
     }
-    
+
     componentWillUnmount() {
         // Proper cleanup
         this.socket.off('receive_notification');
         this.socket.off('user_online');
         this.socket.off('message_recieved');
-    
+
         document.removeEventListener('mousedown', this.handleClickOutside);
     }
 
@@ -345,9 +344,9 @@ class Chat extends Component {
     }
 
     accessChat = (data) => {
-       // console.log("User selected data", data);
+        // console.log("User selected data", data);
         try {
-            const url = '/admin/accessChat'; 
+            const url = '/admin/accessChat';
             // const data = { receiverId, authorId }
             axios.post(url, {
                 receiverId: {
@@ -397,7 +396,7 @@ class Chat extends Component {
                     this.socket.emit('chatNotification', { notification });
 
                     axios.post('front/notifications', notification).then(response => {
-                      //  console.log("Notification saved:", response.data.message);
+                        //  console.log("Notification saved:", response.data.message);
                     }).catch(error => {
                         console.log("Error saving notification:", error);
                     });
@@ -617,7 +616,7 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 },
             });
-           // console.log("All users : ", response.data.data)
+            // console.log("All users : ", response.data.data)
             // this.setState({ allChatUsers: response.data.data });
             this.setState({ users: response.data.data });
             // this.setState({ search: "" });
@@ -630,7 +629,6 @@ class Chat extends Component {
     };
 
     handleEditGroupName = (data) => {
-        // console.log("ChatID", data)
         this.setState({ showEdit: true });
         this.setState({ groupEditData: data });
         this.setState({ groupName: data.name });
@@ -651,7 +649,6 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             }).then((response) => {
-                console.log("Update successfully.....", response)
                 this.fetchAllUserData();
                 this.setState({ sendChatData: "" });
                 this.setState({ groupName: "" });
@@ -721,7 +718,6 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             }).then((response) => {
-                console.log("response", response)
                 toast.success(response.data.message, { autoClose: 3000 });
                 this.getAllMessage(sendChatData.chatId);
                 this.fetchAllUserData();
@@ -736,7 +732,6 @@ class Chat extends Component {
 
     handleMessageDelete = (id) => {
         const { sendChatData } = this.state;
-        console.log("selected chat message id", id)
         axios.put(`/admin/messageDelete/${id}`, { isVisible: false }, {
             headers: {
                 'Accept': 'application/json',
@@ -876,7 +871,6 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             }).then((response) => {
-                console.log("response remove from group..", response)
                 // this.getAllMessage(sendChatData.chatId);
                 this.fetchAllUserData();
                 this.setState({ sendChatData: "" });

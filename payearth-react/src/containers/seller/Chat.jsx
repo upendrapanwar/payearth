@@ -234,7 +234,6 @@ class Chat extends Component {
     createGroupChat = () => {
         // const selectedUsers = this.convertArrayToObject();
         const { groupName, selectedUsers } = this.state;
-        console.log("User selected data", selectedUsers)
         // console.log("groupName", groupName)
 
         if (selectedUsers.length > 1) {
@@ -362,7 +361,6 @@ class Chat extends Component {
     // };
 
     fetchAllMessage = (data) => {
-        console.log("fetchAllMessage function ", data)
         if (data && data.isGroupChat === false) {
             const userID = data.chatUsers[0].id !== this.authInfo.id ? data.chatUsers[0].id : data.chatUsers[1].id;
             this.setState({ selectUserId: userID });
@@ -380,7 +378,6 @@ class Chat extends Component {
             this.setState({ sendChatData: result })
 
         } else {
-            console.log(" group data", data);
             const groupData = data.chatUsers
             const groupUsers = groupData.map(item => item.id);
             this.socket.emit("setup", groupUsers);
@@ -554,7 +551,6 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 },
             });
-            console.log("All users : ", response.data.data)
             // this.setState({ allChatUsers: response.data.data });
             this.setState({ users: response.data.data });
             // this.setState({ search: "" });
@@ -568,7 +564,6 @@ class Chat extends Component {
     };
 
     handleEditGroupName = (data) => {
-        console.log("ChatID", data)
         this.setState({ showEdit: true });
         this.setState({ groupEditData: data })
         this.setState({ groupName: data.name });
@@ -640,7 +635,6 @@ class Chat extends Component {
             });
             const allUsers = response.data.data;
 
-            console.log("notAddedUsers check", allUsers)
             // const data = allUsers.map(item => item.seller === null ? item.user : item.seller);
             const data = allUsers.map(item => item.admin || item.seller || item.user);
             const notAddedUser = data.filter(obj1 => !groupData.some(obj2 => obj2.id === obj1.id));
@@ -662,7 +656,6 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             }).then((response) => {
-                console.log("response", response)
                 toast.success(response.data.message, { autoClose: 3000 });
                 this.getAllMessage(sendChatData.chatId);
                 this.fetchAllUserData();
@@ -817,7 +810,6 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             }).then((response) => {
-                console.log("response remove from group..", response)
                 // this.getAllMessage(sendChatData.chatId);
                 this.fetchAllUserData();
                 this.setState({ sendChatData: "" });
@@ -846,7 +838,6 @@ class Chat extends Component {
     render() {
         const { showChatUsers, users, allChatUsers, sendChatData, userChat, notAddedUser, selectedUsers, selectedFile, onlineUsers, showEmojiPicker } = this.state;
         const { loading } = store.getState().global;
-        console.log("allChatUsers in render() :-", allChatUsers)
         // console.log(" notAddedUser", notAddedUser)
         // console.log("selectedFile : ", selectedFile)
         // console.log("users:>>>>", users)
