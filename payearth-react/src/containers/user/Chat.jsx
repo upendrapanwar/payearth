@@ -77,68 +77,99 @@ class Chat extends Component {
         // });
 
 
+        // this.socket.on('user_online', (userID) => {
+        //     console.log("userId", userID)
+        //     this.setState(prevState => ({
+        //         onlineUsers: [...prevState.onlineUsers, userID]
+        //     }));
+        //     // setOnlineUsers(prevUsers => ({ ...prevUsers, [userID]: true }));
+        // });
+
+        // // this.socket.on('user_offline', (userID) => {
+        // //     this.setState(prevState => {
+        // //       const updatedUsers = { ...prevState.onlineUsers };
+        // //       delete updatedUsers[userID];
+        // //       return { onlineUsers: updatedUsers };
+        // //     });
+        // //   });
+
+        // this.socket.on('message_recieved', (data) => {
+
+        //     // console.log("chat select id ", this.state.sendChatData.chatId);
+        //     // console.log(" msg reciving chat id", data.chat._id);
+
+        //     if (data.chat._id === this.state.sendChatData.chatId) {
+        //         this.fetchAllUserData();
+        //         // this.notify();   Waiting for notification task..
+        //         this.setState(prevState => ({
+        //             userChat: [...prevState.userChat, data]
+        //         }));
+        //     }
+        //     this.fetchAllUserData();
+
+        //     // if (data) { data.chat._id !== this.state.allChatUsers._id ? <> No NOTIFICATION </> : <> YES NOTIFICATION</> }
+
+
+
+        //     // if (this.allChatUsers.id !== data.chat.id) {
+        //     //     if (!this.notification.includes(data)) {
+        //     //         this.setState({
+        //     //             notification: [data, ...this.notification]
+        //     //         })
+        //     //         // update list of chat
+        //     //     }
+        //     // } else {
+        //     //     this.setState(prevState => ({
+        //     //         userChat: [...prevState.userChat, data]
+        //     //     }));
+
+        //     // }
+
+        //     // if (this.allChatUsers._id === data.chat._id) {
+        //     //     console.log(`chatID is match ${this.allChatUsers._id} or ${data.chat._id}`)
+        //     // }
+
+        //     // this.setState(prevState => ({
+        //     //     userChat: [...prevState.userChat, data]
+        //     // }));
+        // })
+    }
+
+    
+    componentDidMount() {
+        this.fetchAllUserData();
+        this.socket.emit("active", this.authInfo.id);
+
+        this.socket.on('receive_notification', (notification) => {
+            if (notification.id === this.authInfo.id) {
+                this.setState({ notification });
+            }
+        });
+
         this.socket.on('user_online', (userID) => {
-            console.log("userId", userID)
             this.setState(prevState => ({
                 onlineUsers: [...prevState.onlineUsers, userID]
             }));
-            // setOnlineUsers(prevUsers => ({ ...prevUsers, [userID]: true }));
         });
 
-        // this.socket.on('user_offline', (userID) => {
-        //     this.setState(prevState => {
-        //       const updatedUsers = { ...prevState.onlineUsers };
-        //       delete updatedUsers[userID];
-        //       return { onlineUsers: updatedUsers };
-        //     });
-        //   });
-
         this.socket.on('message_recieved', (data) => {
-
-            // console.log("chat select id ", this.state.sendChatData.chatId);
-            // console.log(" msg reciving chat id", data.chat._id);
-
             if (data.chat._id === this.state.sendChatData.chatId) {
                 this.fetchAllUserData();
-                // this.notify();   Waiting for notification task..
                 this.setState(prevState => ({
                     userChat: [...prevState.userChat, data]
                 }));
             }
-            this.fetchAllUserData();
+        });
 
-            // if (data) { data.chat._id !== this.state.allChatUsers._id ? <> No NOTIFICATION </> : <> YES NOTIFICATION</> }
-
-
-
-            // if (this.allChatUsers.id !== data.chat.id) {
-            //     if (!this.notification.includes(data)) {
-            //         this.setState({
-            //             notification: [data, ...this.notification]
-            //         })
-            //         // update list of chat
-            //     }
-            // } else {
-            //     this.setState(prevState => ({
-            //         userChat: [...prevState.userChat, data]
-            //     }));
-
-            // }
-
-            // if (this.allChatUsers._id === data.chat._id) {
-            //     console.log(`chatID is match ${this.allChatUsers._id} or ${data.chat._id}`)
-            // }
-
-            // this.setState(prevState => ({
-            //     userChat: [...prevState.userChat, data]
-            // }));
-        })
+        document.addEventListener('mousedown', this.handleClickOutside);
     }
 
-
-    componentDidMount() {
-        this.fetchAllUserData();
-        this.socket.emit("active", this.authInfo.id);
+    componentWillUnmount() {
+        // Proper cleanup
+        this.socket.off('receive_notification');
+        this.socket.off('user_online');
+        this.socket.off('message_recieved');
+        document.removeEventListener('mousedown', this.handleClickOutside);
     }
 
     onEmojiClick(event, emojiObject) {
