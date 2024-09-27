@@ -71,56 +71,104 @@ class Chat extends Component {
 
 
 
+    //     this.socket.on('receive_notification', (notification) => {
+    //         // console.log("receive_notification", notification)
+
+    //         if (notification.id === this.authInfo.id) {
+    //             this.setState({
+    //                 notification: notification
+    //             })
+    //         }
+    //     })
+
+
+    //     this.socket.on('user_online', (userID) => {
+    //         // console.log("userId", userID)
+    //         this.setState(prevState => ({
+    //             onlineUsers: [...prevState.onlineUsers, userID]
+    //         }));
+    //         // setOnlineUsers(prevUsers => ({ ...prevUsers, [userID]: true }));
+    //     });
+
+    //     // Main code...
+    //     // this.setState(prevState => ({
+    //     //     userChat: [...prevState.userChat, data]
+    //     // }));
+
+
+    //     this.socket.on('message_recieved', (data) => {
+
+    //         // console.log("chat select id ", this.state.sendChatData.chatId);
+    //         // console.log(" msg reciving chat id", data.chat._id);
+
+
+    //         if (data.chat._id === this.state.sendChatData.chatId) {
+    //             this.fetchAllUserData();
+
+    //             this.setState(prevState => ({
+    //                 userChat: [...prevState.userChat, data]
+    //             }));
+    //         }
+    //         this.fetchAllUserData();
+    //     })
+    // }
+
+
+    // componentDidMount() {
+    //     this.fetchAllUserData();
+    //     this.socket.emit("active", this.authInfo.id);
+    //     document.addEventListener('mousedown', this.handleClickOutside);
+    // }
+
+    // componentWillUnmount() {
+    //     document.removeEventListener('mousedown', this.handleClickOutside);
+    // }
+
+    };
+
+    componentDidMount() {
+        this.fetchAllUserData();
+
+        this.socket.emit("active", this.authInfo.id);
+    
         this.socket.on('receive_notification', (notification) => {
-            // console.log("receive_notification", notification)
-
             if (notification.id === this.authInfo.id) {
-                this.setState({
-                    notification: notification
-                })
+                this.setState({ notification });
             }
-        })
-
+        });
+    
+        // this.socket.on('user_online', (userID) => {
+        //     this.setState(prevState => ({
+        //         onlineUsers: [...prevState.onlineUsers, userID]
+        //     }));
+        // });
 
         this.socket.on('user_online', (userID) => {
-            // console.log("userId", userID)
-            this.setState(prevState => ({
-                onlineUsers: [...prevState.onlineUsers, userID]
-            }));
-            // setOnlineUsers(prevUsers => ({ ...prevUsers, [userID]: true }));
-        });
-
-        // Main code...
-        // this.setState(prevState => ({
-        //     userChat: [...prevState.userChat, data]
-        // }));
-
-
+                    console.log("userId------", userID)
+                    this.setState(prevState => ({
+                        onlineUsers: [...prevState.onlineUsers, userID]
+                    }));
+                    // setOnlineUsers(prevUsers => ({ ...prevUsers, [userID]: true }));
+                });
+    
         this.socket.on('message_recieved', (data) => {
-
-            // console.log("chat select id ", this.state.sendChatData.chatId);
-            // console.log(" msg reciving chat id", data.chat._id);
-
-
             if (data.chat._id === this.state.sendChatData.chatId) {
                 this.fetchAllUserData();
-
                 this.setState(prevState => ({
                     userChat: [...prevState.userChat, data]
                 }));
             }
-            this.fetchAllUserData();
-        })
-    }
-
-
-    componentDidMount() {
-        this.fetchAllUserData();
-        this.socket.emit("active", this.authInfo.id);
+        });
+    
         document.addEventListener('mousedown', this.handleClickOutside);
     }
-
+    
     componentWillUnmount() {
+        // Proper cleanup
+        this.socket.off('receive_notification');
+        this.socket.off('user_online');
+        this.socket.off('message_recieved');
+    
         document.removeEventListener('mousedown', this.handleClickOutside);
     }
 
@@ -569,7 +617,7 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 },
             });
-            console.log("All users : ", response.data.data)
+           // console.log("All users : ", response.data.data)
             // this.setState({ allChatUsers: response.data.data });
             this.setState({ users: response.data.data });
             // this.setState({ search: "" });

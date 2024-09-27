@@ -65,62 +65,44 @@ class Chat extends Component {
         this.handleClickOutside = this.handleClickOutside.bind(this);
         this.isComponentMounted = false;
         this.socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
-        this.handleMessageContent = this.handleMessageContent.bind(this)
-        // this.accessChat = this.accessChat.bind(this)
-        this.sendMessage = this.sendMessage.bind(this)
-
-
-
-        this.socket.on('receive_notification', (notification) => {
-            // console.log("receive_notification", notification)
-
-            if (notification.id === this.authInfo.id) {
-                this.setState({
-                    notification: notification
-                })
-            }
-        });
-
-
-        this.socket.on('user_online', (userID) => {
-            // console.log("userId", userID)
-            this.setState(prevState => ({
-                onlineUsers: [...prevState.onlineUsers, userID]
-            }));
-            // setOnlineUsers(prevUsers => ({ ...prevUsers, [userID]: true }));
-        });
-
-        // Main code...
-        // this.setState(prevState => ({
-        //     userChat: [...prevState.userChat, data]
-        // }));
-
-
-        this.socket.on('message_recieved', (data) => {
-
-            // console.log("chat select id ", this.state.sendChatData.chatId);
-            // console.log(" msg reciving chat id", data.chat._id);
-
-
-            if (data.chat._id === this.state.sendChatData.chatId) {
-                this.fetchAllUserData();
-
-                this.setState(prevState => ({
-                    userChat: [...prevState.userChat, data]
-                }));
-            }
-            this.fetchAllUserData();
-        })
+        this.handleMessageContent = this.handleMessageContent.bind(this);
+        // this.accessChat = this.accessChat.bind(this);
+        this.sendMessage = this.sendMessage.bind(this);
     }
-
 
     componentDidMount() {
         this.fetchAllUserData();
         this.socket.emit("active", this.authInfo.id);
+
+        this.socket.on('receive_notification', (notification) => {
+            if (notification.id === this.authInfo.id) {
+                this.setState({ notification });
+            }
+        });
+
+        this.socket.on('user_online', (userID) => {
+            this.setState(prevState => ({
+                onlineUsers: [...prevState.onlineUsers, userID]
+            }));
+        });
+
+        this.socket.on('message_recieved', (data) => {
+            if (data.chat._id === this.state.sendChatData.chatId) {
+                this.fetchAllUserData();
+                this.setState(prevState => ({
+                    userChat: [...prevState.userChat, data]
+                }));
+            }
+        });
+
         document.addEventListener('mousedown', this.handleClickOutside);
     }
 
     componentWillUnmount() {
+        // Proper cleanup
+        this.socket.off('receive_notification');
+        this.socket.off('user_online');
+        this.socket.off('message_recieved');
         document.removeEventListener('mousedown', this.handleClickOutside);
     }
 
@@ -299,7 +281,7 @@ class Chat extends Component {
     }
 
     accessChat = (data) => {
-       // console.log('data---$%$%#$%@#$%---', data)
+        // console.log('data---$%$%#$%@#$%---', data)
         try {
             const url = '/seller/accessChat';
             // const data = { receiverId, authorId }
@@ -381,7 +363,7 @@ class Chat extends Component {
 
     fetchAllMessage = (data) => {
         console.log("fetchAllMessage function ", data)
-        if (data.isGroupChat === false) {
+        if (data && data.isGroupChat === false) {
             const userID = data.chatUsers[0].id !== this.authInfo.id ? data.chatUsers[0].id : data.chatUsers[1].id;
             this.setState({ selectUserId: userID });
             this.socket.emit("setup", userID);
@@ -398,7 +380,7 @@ class Chat extends Component {
             this.setState({ sendChatData: result })
 
         } else {
-            // console.log(" group data", data);
+            console.log(" group data", data);
             const groupData = data.chatUsers
             const groupUsers = groupData.map(item => item.id);
             this.socket.emit("setup", groupUsers);
@@ -594,8 +576,8 @@ class Chat extends Component {
 
     handleUpdateGroupName = () => {
         const { groupEditData, groupName } = this.state;
-       // console.log("groupName", groupName);
-       // console.log("groupEditData", groupEditData.chatId);
+        // console.log("groupName", groupName);
+        // console.log("groupEditData", groupEditData.chatId);
 
         try {
             const url = "/seller/updateGroupName/";
@@ -607,7 +589,7 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             }).then((response) => {
-               // console.log("Update successfully.....", response)
+                // console.log("Update successfully.....", response)
                 this.fetchAllUserData();
                 this.setState({ sendChatData: "" });
                 this.setState({ groupName: "" });
@@ -695,7 +677,7 @@ class Chat extends Component {
 
     handleMessageDelete = (id) => {
         const { sendChatData } = this.state;
-       // console.log("selected chat message id", id)
+        // console.log("selected chat message id", id)
         axios.put(`/seller/messageDelete/${id}`, { isVisible: false }, {
             headers: {
                 'Accept': 'application/json',
@@ -851,16 +833,13 @@ class Chat extends Component {
 
     supportAdminChat = () => {
         const { allChatUsers } = this.state
-       // console.log("allChatUsers", allChatUsers)
-
-        const supportAdminId = process.env.REACT_APP_SUPPORT_ADMIN_ID;
-        const result = allChatUsers.find((chat) =>
-            chat.chatUsers.some(user => user.id === supportAdminId)
-        );
-
-        this.fetchAllMessage(result)
-
-       // console.log("support chat Admin", result)
+        const { supportAdminId } = this.props.location.state || {};
+        if (supportAdminId) {
+            const result = allChatUsers.find((chat) =>
+                chat.chatUsers.some(user => user.id === supportAdminId)
+            );
+            this.fetchAllMessage(result)
+        }
     }
 
 
@@ -871,6 +850,7 @@ class Chat extends Component {
         // console.log(" notAddedUser", notAddedUser)
         // console.log("selectedFile : ", selectedFile)
         // console.log("users:>>>>", users)
+        // console.log("onlineUsers:>>>>", onlineUsers)
 
         return (
             <React.Fragment>
