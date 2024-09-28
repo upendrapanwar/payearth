@@ -270,6 +270,7 @@ router.post("/support/request-call", supportReqCall)
 //myProfile
 router.get("/my-profile/:id", getProfileById);
 router.put("/save-seller-profile/:id", saveMyProfile);
+router.put("/edit-profile/:id", editProfile);
 
 
 
@@ -1472,3 +1473,12 @@ function saveMyProfile(req, res, next) {
     .then((data) => data ? res.json({ status: true, data: data, message: "Profile saved successfully." }) : res.json({ status: false, data: {}, message: "Error saving Profile request." }))
     .catch((err) => next(res.json({ status: false, message: err.message })));
 }
+
+
+
+function editProfile(req, res, next) {
+  sellerService.editProfile(req)
+    .then((data) => data ? res.json({ status: true, data: data, message: "Personal information updated successfully." }) : res.json({ status: false, data: {}, message: "Error updating personal information." }))
+    .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+

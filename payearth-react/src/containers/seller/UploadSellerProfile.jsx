@@ -277,6 +277,7 @@ const UploadSellerProfile = (props) => {
                             <input
                                 className="form-control"
                                 type="file"
+                                ref={fileInputRef}
                                 accept="image/*"
                                 onChange={handleFileChange}
                             />

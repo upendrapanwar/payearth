@@ -168,7 +168,6 @@ router.put("/reset-password", resetPassValidation, resetPass);
 router.put("/change-password/:id", changePassValidation, changePass);
 router.get("/my-profile/:id", getProfileById);
 router.put("/edit-profile/:id", editProfile);
-// router.put("/edit-profile/:id", editProfileValidation, editProfile);
 router.get("/products", getProducts);
 router.post("/wishlist/:id", getWishList);
 router.delete("/wishlist/:id", deleteWishlist);

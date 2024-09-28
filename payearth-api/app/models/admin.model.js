@@ -5,6 +5,13 @@ const schema = new Schema({
     email: { type: String, unique: true, required: true, index: true },
     password: { type: String, required: false, default: '' },
     phone: { type: String, required: false, default: null },
+    address: {
+        street: String,
+        city: String,
+        state: String,
+        country: String,
+        zip: Number
+    },
     reset_password: {
         verif_code: { type: String, required: false, default: null },
         code_valid_at: { type: Date, required: false, default: null },

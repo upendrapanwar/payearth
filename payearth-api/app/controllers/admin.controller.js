@@ -235,6 +235,7 @@ router.put("/update/support-call-status/:id", updateSupportCallReqStatus);
 //MyProfile
 router.get("/my-profile/:id", getProfileById);
 router.put("/save-admin-profile/:id", saveMyProfile);
+router.put("/edit-profile/:id", editProfile);
 
 
 module.exports = router;
@@ -1102,5 +1103,11 @@ function getProfileById(req, res, next) {
 function saveMyProfile(req, res, next) {
     adminService.saveMyProfile(req)
         .then((data) => data ? res.json({ status: true, data: data, message: "Profile saved successfully." }) : res.json({ status: false, data: {}, message: "Error saving Profile request." }))
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function editProfile(req, res, next) {
+    adminService.editProfile(req)
+        .then((data) => data ? res.json({ status: true, data: data, message: "Personal information updated successfully." }) : res.json({ status: false, data: {}, message: "Error updating personal information." }))
         .catch((err) => next(res.json({ status: false, message: err.message })));
 }

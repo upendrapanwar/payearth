@@ -689,7 +689,7 @@ async function editProfile(id, param) {
 
     if (await user.save()) {
       return await User.findById(id).select(
-        "id name email role address community"
+        "id name phone email role address community"
       );
     } else {
       return false;
