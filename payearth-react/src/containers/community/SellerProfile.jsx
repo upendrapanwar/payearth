@@ -71,9 +71,9 @@ const SellerProfile = () => {
     const [image, setImage] = useState('');
     const [userType, setUserType] = useState(null);
     const [modalContent, setModalContent] = useState([]);
-    const [blockedUser, setBlockedUser] = useState(null);
-    const [followers, setFollowers] = useState(null);
-    const [following, setFollowing] = useState(null);
+    const [blockedUser, setBlockedUser] = useState([]);
+    const [followers, setFollowers] = useState([]);
+    const [following, setFollowing] = useState([]);
 
 
     useEffect(() => {
@@ -504,44 +504,41 @@ const SellerProfile = () => {
     };
 
     useEffect(() => {
-        getUserorSellerData();
-    }, [SellerPostsData, modalContent])
-
-    const getUserorSellerData = async () => {
-        setLoading(true);
-        try {
-            await axios
-                .get(`/seller/getUserorSellerData/${authInfo.id}`, {
+        let isMounted = true;
+        const getUserorSellerData = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get(`/seller/getUserorSellerData/${authInfo.id}`, {
                     headers: {
                         "content-type": "application/json",
                         "Access-Control-Allow-Origin": "*",
                         'Authorization': `Bearer ${authInfo.token}`
                     },
-                })
-                .then((response) => {
-                    // console.log("response", response.data)
-                    const data = response.data.data;
-                    // console.log("blocked", data.blocked)
-
-                    if (response.data.status === true) {
-                        // setUserData(data);
-                        setBlockedUser(data.blocked);
-                        setFollowers(data.followers);
-                        setFollowing(data.following);
-                    }
-                    // setUserData(data);
-                })
-                .catch((error) => {
-                    console.log("Error", error);
-                })
-                .finally(() => {
-                    setLoading(false);
                 });
-        } catch (error) {
-            console.log("Error", error);
-            setLoading(false);
-        }
-    }
+
+                if (isMounted && response.data.status === true) {
+                    const data = response.data.data;
+                    setBlockedUser(data.blocked);
+                    setFollowers(data.followers);
+                    setFollowing(data.following);
+                }
+            } catch (error) {
+                if (isMounted) {
+                    console.log("Error", error);
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+        getUserorSellerData();
+
+        return () => {
+            isMounted = false;
+        };
+
+    }, [SellerPostsData, modalContent])
 
     const handleClick = (type) => {
         let data = [];
@@ -558,16 +555,13 @@ const SellerProfile = () => {
             default:
                 break;
         }
-        // console.log("under model data", data)
         setModalContent(data.data);
         setUserType(data.type)
         setAccountShowModal(true);
     };
 
     const handleUnblockUser = async (data) => {
-        // console.log("data", data)
         const selectedUserId = data.id
-
         try {
             const authorId = authInfo.id
             const url = "seller/communityUserUnblock";
@@ -579,21 +573,17 @@ const SellerProfile = () => {
                 }
             }).then((response) => {
                 if (response.data.status === true) {
-
                     getSellerPostsData(dispatch);
                     toast.success("user unblocked..");
-                    // getUserorSellerData();
                 }
             }).catch((error) => {
                 console.log("error", error)
             })
-
         } catch (error) {
             console.error('Error', error);
         }
     }
 
-    //console.log("user imfo", userInfo)
     return (
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
@@ -650,7 +640,7 @@ const SellerProfile = () => {
                                         {modalContent.length > 0 ? (
                                             <ul>
                                                 {modalContent.map((item, index) => <>
-                                                    <div className="chat_user_item" key={item.id||index}>
+                                                    <div className="chat_user_item" key={item.id || index}>
                                                         <a href="#" className="d-flex align-items-center chatUser_info">
                                                             <div className="userInfo-col userThumb">
                                                                 <div className="user_thumb">
