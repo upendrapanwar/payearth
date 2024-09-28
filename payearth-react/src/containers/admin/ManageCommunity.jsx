@@ -39,7 +39,7 @@ const AdminCommunity = () => {
     const [categoryId, setCategoryId] = useState('');
     const [postStatus, setPostStatus] = useState('Public');
     const [categoryOption, setCategoryOption] = useState([]);
-    const [defaultCategoryOption, setDefaultCategoryOption] = useState({ label: 'Choose Category', value: '' })
+    const [defaultCategoryOption, setDefaultCategoryOption] = useState({ label: 'All Category', value: '' })
     const [productOption, setProductOption] = useState([]);
     const [defaultProductOption, setDefaultProductOption] = useState({ label: 'Choose Product', value: '' })
     const [posts, setPosts] = useState([]);
@@ -65,8 +65,6 @@ const AdminCommunity = () => {
             previews.push(URL.createObjectURL(event.target.files[i]));
             images.push(event.target.files[i]);
         }
-        // console.log("Image community : ", images)
-        // console.log("Image community preview: ", previews)
         setPreview(previews);
         setImages(images);
     };
@@ -83,10 +81,9 @@ const AdminCommunity = () => {
             video.push(event.target.files[i]);
         }
         setVideoPreview(videoPreviews);
-        setVideos(video);
-        // console.log(video);
-
+        setVideos(video);;
     };
+
     const deleteVideoPreview = (vid) => {
         let videoPreviews = [...videoPreview];
         let video = [...videos];
@@ -122,29 +119,6 @@ const AdminCommunity = () => {
             postVideos: videos,
         };
 
-        // if (userInfo.role === 'user') {
-        //     reqBody = {
-        //         content: inputStr,
-        //         category_id: categoryId,
-        //         product_id: productId,
-        //         post_status: postStatus,
-        //         user_id: authInfo.id,
-        //         seller_id: null,
-        //         is_seller: false,
-        //         parent_id: null
-        //     }
-        // } else {
-        //     reqBody = {
-        //         content: inputStr,
-        //         category_id: categoryId,
-        //         product_id: productId,
-        //         post_status: postStatus,
-        //         user_id: null,
-        //         seller_id: authInfo.id,
-        //         is_seller: true,
-        //         parent_id: null
-        //     }
-        // }
         setInputStr('');
         try {
             dispatch(setLoading({ loading: true }));
@@ -171,7 +145,6 @@ const AdminCommunity = () => {
 
                     const data = await response.json();
                     if (data.secure_url) {
-                        // console.log("image upload", data.secure_url);
                         return { url: data.secure_url };
                     } else {
                         throw new Error("Image upload failed");
@@ -191,7 +164,6 @@ const AdminCommunity = () => {
 
                     const data = await response.json();
                     if (data.secure_url) {
-                        // console.log("video upload", data.secure_url);
                         return { url: data.secure_url };
                     } else {
                         throw new Error("Video upload failed");
@@ -241,7 +213,6 @@ const AdminCommunity = () => {
                     }
                 }
                 getPosts();
-                // getSellerPostsData(dispatch);
             }
         } catch (error) {
             console.log(error);
@@ -255,7 +226,7 @@ const AdminCommunity = () => {
                 setCategoryId(null);
                 setProductId(null);
                 setDefaultProductOption({ label: 'Choose Product', value: '' });
-                setDefaultCategoryOption({ label: 'Choose Category', value: '' });
+                setDefaultCategoryOption({ label: 'All Category', value: '' });
             }, 300);
         }
     };
@@ -266,7 +237,7 @@ const AdminCommunity = () => {
             if (response.data.status) {
                 let res = response.data.data;
                 dispatch(setPostCategories({ postCategories: res }));
-                let catOptions = [{ label: 'Choose Category', value: '' }]
+                let catOptions = [{ label: 'All Category', value: '' }]
                 res.forEach((value) => {
                     catOptions.push({ label: value.categoryName, value: value.id });
                 });
@@ -280,12 +251,8 @@ const AdminCommunity = () => {
             }, 300);
         });
     }
-    // const handleCategories = (event) => {
-    //     getPostProducts(event.target.value);
-    //     setCategoryId(event.target.value);
-    // };
+
     const handleCategories = (selectedOption) => {
-        console.log("HandleCategory select option", selectedOption)
         setDefaultCategoryOption(selectedOption);
         setDefaultProductOption({ label: 'Choose Product', value: '' });
         setCategoryId(selectedOption.value);
@@ -296,12 +263,8 @@ const AdminCommunity = () => {
             setProductOption([]);
         }
     }
-    // const handleProducts = (event) => {
-    //     setProductId(event.target.value);
-    //     console.log(event.target.value);
-    // }
+
     const handleProducts = (selectedOption) => {
-        console.log("selectedProdOption", selectedOption)
         setDefaultProductOption(selectedOption);
         setProductId(selectedOption.value);
     }
@@ -334,7 +297,6 @@ const AdminCommunity = () => {
     }, []);
 
     const handleEdit = (data) => {
-        console.log("Data for edit test ###$$#$$#$#$#", data)
         setIsUpdate(true);
         const selectedCatOption = {
             label: data.categoryId === null ? null : data.categoryId.categoryName,
@@ -370,24 +332,18 @@ const AdminCommunity = () => {
             if (response.data.status) {
                 toast.success(response.data.message);
                 getPosts();
-                // getSellerPostsData(dispatch);
             }
         }).catch(error => {
             console.log(error);
         }).finally(() => {
-            setTimeout(() => {
-                // dispatch(setLoading({ loading: false }));
-                // setPreview([]);
-                // setVideoPreview([]);
-                // setImages([]);
-                // setVideos([]);
+            setTimeout(() => {               
                 setIsUpdate(false);
                 setPostStatus('');
                 setInputStr('');
                 setCategoryId(null);
                 setProductId(null);
                 setDefaultProductOption({ label: 'Choose Product', value: '' });
-                setDefaultCategoryOption({ label: 'Choose Category', value: '' });
+                setDefaultCategoryOption({ label: 'All Category', value: '' });
             }, 300);
         });
     }
@@ -397,12 +353,11 @@ const AdminCommunity = () => {
         setImages([]);
         setVideos([]);
         setPostStatus('Public');
-        // setShowPicker(false);
         setIsUpdate(false);
         setCategoryId(null);
         setProductId(null);
         setDefaultProductOption({ label: 'Choose Product', value: '' });
-        setDefaultCategoryOption({ label: 'Choose Category', value: '' });
+        setDefaultCategoryOption({ label: 'All Category', value: '' });
     };
 
     const handleFilterCategory = () => {
@@ -423,7 +378,6 @@ const AdminCommunity = () => {
                 'Authorization': `Bearer ${authInfo.token}`
             }
         }).then((response) => {
-            console.log("all posts for admin---", response);
             const AllPosts = response.data.data;
             setSellerPostsData(AllPosts);
         })
@@ -446,7 +400,7 @@ const AdminCommunity = () => {
                 <Header />
                 <PageTitle title="Community" />
                 <Helmet><title>{"Community - Pay Earth"}</title></Helmet>
-                <div className="cumm_page_wrap pt-5 pb-5">
+                <div className="cumm_page_wrap pt-2 pb-5">
                     <div className="container">
                         <div className="row">
                             <div className="col-lg-9">
@@ -457,7 +411,7 @@ const AdminCommunity = () => {
                                             <div className="close-icon" onClick={resetForm}>
                                                 <button type="button" className="btn-close" aria-label="Close"></button>
                                             </div>
-                                        )} 
+                                        )}
                                     </div>
                                     <div className="cp_body">
                                         <div className="com_user_acc">
@@ -499,10 +453,7 @@ const AdminCommunity = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className='cp_box'>
-                                        {/* <div className='d-flex justify-content-center'>
-                                            <button className="btn  add_more_post" onClick={() => setAddMore(!addMore)}>{addMore ? 'Hide' : 'Add more to post'}</button>
-                                        </div> */}
+                                    <div className='cp_box'>                                      
                                         <div className="cp_preview_box">
                                             <div className='mb-2 mt-2 video_preview'>
                                                 <ul className="load_imgs">
@@ -539,27 +490,7 @@ const AdminCommunity = () => {
                                                             <input type="file" id='post_video' accept="video/*" multiple onChange={(event) => handleVideoPreview(event)} />
                                                         </div>
                                                     </>
-                                                )}
-                                                {/* <select className="form-select form-select-lg cp_select mb-3" aria-label=".form-select category"  onChange={(event) => handleCategories(event)}>
-                                                    {
-                                                        postCategories.map((value, index) => {
-                                                            return (
-                                                                <option value={value.id} key={index}>{value.categoryName}</option>
-                                                            )
-                                                        })
-                                                    }
-                                                </select>
-                                                <select  className="form-select form-select-lg cp_select mb-3" aria-label=".form-select Product" onChange={(event) => handleProducts(event)}>
-                                                    {
-                                                     postProducts.length>0?
-                                                     postProducts.map((value,index)=>{
-                                                        return(
-                                                            <option value={value.id} >{value.name}</option>
-                                                        )
-                                                    })
-                                                    :<option value='' >Products</option>  
-                                                    }
-                                                </select> */}
+                                                )}                                               
                                                 <Select
                                                     className="sort_select text-normal "
                                                     options={categoryOption}
@@ -581,7 +512,7 @@ const AdminCommunity = () => {
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 {
                                     filteredData === null ? (
                                         SellerPostsData.length > 0 ? (
@@ -598,7 +529,7 @@ const AdminCommunity = () => {
                                                             return 0;
                                                         }
                                                     })
-                                                    .map((value, index) => (                                              
+                                                    .map((value, index) => (
                                                         <ManageCommunityPost key={index} posts={value} sendEditData={handleEdit} getPosts={getPosts} />
                                                     ))}
                                             </div>
@@ -620,7 +551,7 @@ const AdminCommunity = () => {
                                                             return 0;
                                                         }
                                                     })
-                                                    .map((value, index) => (   
+                                                    .map((value, index) => (
                                                         <ManageCommunityPost key={index} posts={value} sendEditData={handleEdit} getPosts={getPosts} />
                                                     ))}
                                             </div>

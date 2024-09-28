@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Footer from '../../components/common/Footer';
-import Header from '../../components/community/common/Header';
-import UserHeader from '../../components/user/common/Header';
+import Header from '../../components/user/common/Header';
 import userImg from '../../assets/images/user.png'
 import { Link } from 'react-router-dom';
 import InputEmoji from 'react-input-emoji'
@@ -63,44 +62,41 @@ const Community = () => {
 
 
     useEffect(() => {
-        getUserorSellerData();
-    }, [postsData, modalContent])
-
-    const getUserorSellerData = async () => {
-        setLoading(true);
-        try {
-            await axios
-                .get(`/community/getUserorSellerData/${authInfo.id}`, {
+        let isMounted = true;
+        const getUserorSellerData = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get(`/community/getUserorSellerData/${authInfo.id}`, {
                     headers: {
                         "content-type": "application/json",
                         "Access-Control-Allow-Origin": "*",
                         'Authorization': `Bearer ${authInfo.token}`
                     },
-                })
-                .then((response) => {
-                    // console.log("response", response.data)
-                    const data = response.data.data;
-                    // console.log("blocked", data.blocked)
-
-                    if (response.data.status === true) {
-                        // setUserData(data);
-                        setBlockedUser(data.blocked);
-                        setFollowers(data.followers);
-                        setFollowing(data.following);
-                    }
-                    // setUserData(data);
-                })
-                .catch((error) => {
-                    console.log("Error", error);
-                })
-                .finally(() => {
-                    setLoading(false);
                 });
-        } catch (error) {
-            console.log("Error", error);
-            setLoading(false);
-        }
-    }
+
+                if (isMounted && response.data.status === true) {
+                    const data = response.data.data;
+                    setBlockedUser(data.blocked);
+                    setFollowers(data.followers);
+                    setFollowing(data.following);
+                }
+            } catch (error) {
+                if (isMounted) {
+                    console.log("Error", error);
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+        getUserorSellerData();
+
+        return () => {
+            isMounted = false;
+        };
+
+    }, [postsData, modalContent])
 
     const handleClick = (type) => {
         let data = [];
@@ -173,9 +169,6 @@ const Community = () => {
         setSelectFilterCategory("");
         setShowMostLiked(false);
         setShowMostCommented(false);
-        // loadMoreItems();
-        // console.log("authInfo Seller or User", authInfo.token);
-        // console.log("postStatus", postStatus)
         const token = authInfo.token;
         setAddMore(false);
         let reqBody = {
@@ -190,9 +183,7 @@ const Community = () => {
             is_admin: false,
             parent_id: null
         };
-
         setInputStr('');
-
         try {
             dispatch(setLoading({ loading: true }));
             const postResponse = await axios.post('community/posts', reqBody, {
@@ -218,7 +209,6 @@ const Community = () => {
 
                     const data = await response.json();
                     if (data.secure_url) {
-                        // console.log("image upload", data.secure_url);
                         return { url: data.secure_url };
                     } else {
                         throw new Error("Image upload failed");
@@ -238,7 +228,6 @@ const Community = () => {
 
                     const data = await response.json();
                     if (data.secure_url) {
-                        // console.log("video upload", data.secure_url);
                         return { url: data.secure_url };
                     } else {
                         throw new Error("Video upload failed");
@@ -371,35 +360,7 @@ const Community = () => {
         getCategories();
     }, []);
 
-    // const fetchNotification = async (userId, token) => {
-    //     try {
-    //         await axios
-    //             .get(`/user/get-notification/${userId}`, {
-    //                 headers: {
-    //                     "content-type": "application/json",
-    //                     "Access-Control-Allow-Origin": "*",
-    //                     Authorization: `Bearer ${token}`,
-    //                 },
-    //             })
-    //             .then((response) => {
-    //                 const data = response.data.data;
-    //                 setNotification(data);
-    //                 setRead(data.some((item) => item.read === false));
-    //             })
-    //             .catch((error) => {
-    //                 console.log("Error", error);
-    //             })
-    //             .finally(() => {
-    //                 setLoading(false);
-    //             });
-    //     } catch (error) {
-    //         console.log("Error", error);
-    //         setLoading(false);
-    //     }
-    // };
-
     const handleEdit = (data) => {
-        // console.log("Data for edit test ###$$#$$#$#$#", data)
         setIsUpdate(true);
         const selectedCatOption = {
             label: data.categoryId === null ? null : data.categoryId.categoryName,
@@ -456,7 +417,6 @@ const Community = () => {
         setImages([]);
         setVideos([]);
         setPostStatus('Followers');
-        // setShowPicker(false);
         setIsUpdate(false);
         setCategoryId(null);
         setProductId(null);
@@ -487,15 +447,12 @@ const Community = () => {
                 }
             }).then((response) => {
                 if (response.data.status === true) {
-
                     getPostsData(dispatch);
                     toast.success("user unblocked..");
-                    // getUserorSellerData();
                 }
             }).catch((error) => {
                 console.log("error", error)
             })
-
         } catch (error) {
             console.error('Error', error);
         }
@@ -505,7 +462,7 @@ const Community = () => {
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
             <div className='seller_body'>
-                <UserHeader />
+                <Header />
                 <PageTitle title="Community" />
                 <Helmet><title>{"Community - Pay Earth"}</title></Helmet>
                 <div className="cumm_page_wrap pt-2 pb-5">
@@ -563,7 +520,6 @@ const Community = () => {
                                                                 >
                                                                     Unblock
                                                                 </button> : ""}
-                                                            {/* <button onClick={() => this.clickToAddUser(item)}>ADD</button> */}
                                                         </a>
                                                     </div>
                                                 </>
@@ -599,19 +555,10 @@ const Community = () => {
                                                     className="form-select" name="" id="">
                                                     <option value="Followers">Followers</option>
                                                     <option value="Public">Public</option>
-                                                    {/* <option value="2">Only Me</option> */}
                                                 </select>
                                             </div>
                                         </div>
                                         <div className="create_post_input">
-                                            {/* <div>
-                                                <input type="text" className='form-control post_title' placeholder='Enter title' />
-                                            </div> */}
-                                            {/* <InputEmoji
-                                                value={text}
-                                                onChange={setText}
-                                                placeholder="What is on your mind ?"
-                                            /> */}
                                             <textarea
                                                 className="input-style"
                                                 value={inputStr}
@@ -631,9 +578,6 @@ const Community = () => {
                                         </div>
                                     </div>
                                     <div className='cp_box'>
-                                        {/* <div className='d-flex justify-content-center'>
-                                            <button className="btn  add_more_post" onClick={() => setAddMore(!addMore)}>{addMore ? 'Hide' : 'Add more to post'}</button>
-                                        </div> */}
                                         <div className="cp_preview_box">
                                             <div className='mb-2 mt-2 video_preview'>
                                                 <ul className="load_imgs">
@@ -671,26 +615,6 @@ const Community = () => {
                                                         </div>
                                                     </>
                                                 )}
-                                                {/* <select className="form-select form-select-lg cp_select mb-3" aria-label=".form-select category"  onChange={(event) => handleCategories(event)}>
-                                                    {
-                                                        postCategories.map((value, index) => {
-                                                            return (
-                                                                <option value={value.id} key={index}>{value.categoryName}</option>
-                                                            )
-                                                        })
-                                                    }
-                                                </select>
-                                                <select  className="form-select form-select-lg cp_select mb-3" aria-label=".form-select Product" onChange={(event) => handleProducts(event)}>
-                                                    {
-                                                     postProducts.length>0?
-                                                     postProducts.map((value,index)=>{
-                                                        return(
-                                                            <option value={value.id} >{value.name}</option>
-                                                        )
-                                                    })
-                                                    :<option value='' >Products</option>  
-                                                    }
-                                                </select> */}
                                                 <Select
                                                     className="sort_select text-normal "
                                                     options={categoryOption}
@@ -709,7 +633,6 @@ const Community = () => {
                                                 />
                                             </div>
                                             {isUpdate === true ? <button className="btn custom_btn btn_yellow mx-auto" onClick={updatPost}> Update</button> : <button className="btn custom_btn btn_yellow mx-auto" onClick={() => createPost()} disabled={!inputStr.trim() && images.length === 0 && videos.length === 0 ? true : false} >Post</button>}
-                                            {/* <button className="btn custom_btn btn_yellow mx-auto" onClick={() => createPost()} disabled={!inputStr.trim() && images.length === 0 && videos.length === 0 ? true : false} >Post</button> */}
                                         </div>
                                     </div>
                                 </div>
@@ -727,7 +650,7 @@ const Community = () => {
                                                         } else if (showMostCommented) {
                                                             return b.commentCount - a.commentCount;
                                                         } else {
-                                                            return 0; // No sorting
+                                                            return 0;
                                                         }
                                                     })
                                                     .map((value, index) => (
@@ -750,7 +673,7 @@ const Community = () => {
                                                         } else if (showMostCommented) {
                                                             return b.commentCount - a.commentCount;
                                                         } else {
-                                                            return 0; // No sorting
+                                                            return 0;
                                                         }
                                                     })
                                                     .map((value, index) => (

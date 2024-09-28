@@ -778,39 +778,33 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                         <div className='row post_img_internal_box'>
                             {posts.postImages.slice(0, 2).map((image, ind) => {
                                 return (
-                                    <>
-                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-6'}`} key={ind} onClick={() => handleSliderShow(image)}>
-                                            <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
-                                        </div>
-                                    </>
-                                )
+                                    <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-6'}`} key={ind} onClick={() => handleSliderShow(image)}>
+                                        <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
+                                    </div>
+                                );
                             })}
                             {posts.postImages.slice(2, 4).map((image, ind) => {
                                 return (
-                                    <>
-                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(image)}>
-                                            <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
-                                        </div>
-                                    </>
-                                )
+                                    <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind + 2} onClick={() => handleSliderShow(image)}>
+                                        <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
+                                    </div>
+                                );
                             })}
                             {posts.postImages.slice(4, 5).map((image, ind) => {
                                 return (
-                                    <>
-                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(image)}>
-                                            {
-                                                posts.postImages.length > 5 &&
-                                                <span>{`${posts.postImages.length - 5}+`}</span>
-                                            }
-                                            <div className="post_img mb-3 " ><img src={image.url} alt="" /></div>
-                                        </div>
-                                    </>
-                                )
+                                    <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind + 4} onClick={() => handleSliderShow(image)}>
+                                        {
+                                            posts.postImages.length > 5 &&
+                                            <span>{`${posts.postImages.length - 5}+`}</span>
+                                        }
+                                        <div className="post_img mb-3 " ><img src={image.url} alt="" /></div>
+                                    </div>
+                                );
                             })}
 
                             {posts.postVideos.map((video, ind) => {
                                 return (
-                                    <div className={`post_main_div ${posts.postVideos.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind} onClick={() => handleSliderShow(video)} >
+                                    <div className={`post_main_div ${posts.postVideos.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind + 5} onClick={() => handleSliderShow(video)} >
                                         <Link to="#" className='cp_video_play' >
                                             <img src={videoPlay} />
                                         </Link>
@@ -923,7 +917,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                                             }
                                                             <div className="cb_date"> <ReactTimeAgo date={new Date(val.createdAt)} locale="en-US" timeStyle="round-minute" /></div>
                                                         </div>
-                                                        <p>{val.content}</p>
+                                                        <p><b>{val.content}</b></p>
                                                     </div>
                                                 </div>
                                             </div>

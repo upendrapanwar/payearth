@@ -45,7 +45,7 @@ const SellerCommunity = () => {
     const [categoryId, setCategoryId] = useState('');
     const [postStatus, setPostStatus] = useState('Followers');
     const [categoryOption, setCategoryOption] = useState([]);
-    const [defaultCategoryOption, setDefaultCategoryOption] = useState({ label: 'Choose Category', value: '' })
+    const [defaultCategoryOption, setDefaultCategoryOption] = useState({ label: 'All Category', value: '' })
     const [productOption, setProductOption] = useState([]);
     const [defaultProductOption, setDefaultProductOption] = useState({ label: 'Choose Product', value: '' })
     const [posts, setPosts] = useState([]);
@@ -61,49 +61,48 @@ const SellerCommunity = () => {
     const [userType, setUserType] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [modalContent, setModalContent] = useState([]);
-    const [blockedUser, setBlockedUser] = useState(null);
-    const [followers, setFollowers] = useState(null);
-    const [following, setFollowing] = useState(null);
+    const [blockedUser, setBlockedUser] = useState([]);
+    const [followers, setFollowers] = useState([]);
+    const [following, setFollowing] = useState([]);
 
     useEffect(() => {
-        getUserorSellerData();
-    }, [SellerPostsData, modalContent])
-
-    const getUserorSellerData = async () => {
-        setLoading(true);
-        try {
-            await axios
-                .get(`/seller/getUserorSellerData/${authInfo.id}`, {
+        let isMounted = true;
+        const getUserorSellerData = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get(`/seller/getUserorSellerData/${authInfo.id}`, {
                     headers: {
                         "content-type": "application/json",
                         "Access-Control-Allow-Origin": "*",
                         'Authorization': `Bearer ${authInfo.token}`
                     },
-                })
-                .then((response) => {
-                    // console.log("response", response.data)
-                    const data = response.data.data;
-                    // console.log("blocked", data.blocked)
-
-                    if (response.data.status === true) {
-                        // setUserData(data);
-                        setBlockedUser(data.blocked);
-                        setFollowers(data.followers);
-                        setFollowing(data.following);
-                    }
-                    // setUserData(data);
-                })
-                .catch((error) => {
-                    console.log("Error", error);
-                })
-                .finally(() => {
-                    setLoading(false);
                 });
-        } catch (error) {
-            console.log("Error", error);
-            setLoading(false);
-        }
-    }
+
+                if (isMounted && response.data.status === true) {
+                    const data = response.data.data;
+                    setBlockedUser(data.blocked);
+                    setFollowers(data.followers);
+                    setFollowing(data.following);
+                }
+            } catch (error) {
+                if (isMounted) {
+                    console.log("Error", error);
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+        getUserorSellerData();
+
+        return () => {
+            isMounted = false;
+        };
+
+    }, [SellerPostsData, modalContent])
+
+
 
     const handleClick = (type) => {
         let data = [];
@@ -120,7 +119,6 @@ const SellerCommunity = () => {
             default:
                 break;
         }
-        // console.log("under model data", data)
         setModalContent(data.data);
         setUserType(data.type)
         setShowModal(true);
@@ -131,10 +129,9 @@ const SellerCommunity = () => {
         if (postId) {
             setTimeout(() => {
                 if (postRefs.current[postId]) {
-                    // console.log("Scrolling to post:", postId);
                     postRefs.current[postId].scrollIntoView({ behavior: "smooth" });
                 } else {
-                    //console.log("Post not found in postRefs:", postRefs);
+                    console.log("Post not found in postRefs:", postRefs);
                 }
             }, 300);
         }
@@ -252,7 +249,6 @@ const SellerCommunity = () => {
 
                     const data = await response.json();
                     if (data.secure_url) {
-                        // console.log("video upload", data.secure_url);
                         return { url: data.secure_url };
                     } else {
                         throw new Error("Video upload failed");
@@ -340,7 +336,7 @@ const SellerCommunity = () => {
             }, 300);
         });
     }
-  
+
     const handleCategories = (selectedOption) => {
         setDefaultCategoryOption(selectedOption);
         setDefaultProductOption({ label: 'Choose Product', value: '' });
@@ -433,7 +429,7 @@ const SellerCommunity = () => {
                 setCategoryId(null);
                 setProductId(null);
                 setDefaultProductOption({ label: 'Choose Product', value: '' });
-                setDefaultCategoryOption({ label: 'Choose Category', value: '' });
+                setDefaultCategoryOption({ label: 'All Category', value: '' });
             }, 300);
         });
     }
@@ -443,12 +439,11 @@ const SellerCommunity = () => {
         setImages([]);
         setVideos([]);
         setPostStatus('Followers');
-        // setShowPicker(false);
         setIsUpdate(false);
         setCategoryId(null);
         setProductId(null);
         setDefaultProductOption({ label: 'Choose Product', value: '' });
-        setDefaultCategoryOption({ label: 'Choose Category', value: '' });
+        setDefaultCategoryOption({ label: 'All Category', value: '' });
     };
 
     const handleFilterCategory = () => {
@@ -474,7 +469,6 @@ const SellerCommunity = () => {
                 if (response.data.status === true) {
                     getSellerPostsData(dispatch);
                     toast.success("user unblocked..");
-                    // getUserorSellerData();
                 }
             }).catch((error) => {
                 console.log("error", error)
@@ -546,8 +540,7 @@ const SellerCommunity = () => {
                                                                     onClick={() => { handleUnblockUser(item) }}
                                                                 >
                                                                     Unblock
-                                                                </button> : ""}
-                                                            {/* <button onClick={() => this.clickToAddUser(item)}>ADD</button> */}
+                                                                </button> : ""}                                                       
                                                         </a>
                                                     </div>
                                                 </>
@@ -573,8 +566,7 @@ const SellerCommunity = () => {
                                     <div className="cp_body">
                                         <div className="com_user_acc">
                                             <Link to='/Seller-MyProfile'>
-                                                <div className="com_user_img">
-                                                    {/* <img src={userInfo.imgUrl !== null && userInfo.imgUrl !== '' ? config.apiURI + userInfo.imgUrl : userImg} alt="" /> */}
+                                                <div className="com_user_img">                                                  
                                                     <img
                                                         src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
                                                         alt=""
@@ -589,20 +581,11 @@ const SellerCommunity = () => {
                                                     onChange={e => setPostStatus(e.target.value)}
                                                     className="form-select" name="" id="">
                                                     <option value="Followers">Followers</option>
-                                                    <option value="Public">Public</option>
-                                                    {/* <option value="2">Only Me</option> */}
+                                                    <option value="Public">Public</option>                                                
                                                 </select>
                                             </div>
                                         </div>
-                                        <div className="create_post_input">
-                                            {/* <div>
-                                                <input type="text" className='form-control post_title' placeholder='Enter title' />
-                                            </div> */}
-                                            {/* <InputEmoji
-                                                value={text}
-                                                onChange={setText}
-                                                placeholder="What is on your mind ?"
-                                            /> */}
+                                        <div className="create_post_input">                                     
                                             <textarea
                                                 className="input-style"
                                                 value={inputStr}
@@ -621,10 +604,7 @@ const SellerCommunity = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className='cp_box'>
-                                        {/* <div className='d-flex justify-content-center'>
-                                            <button className="btn  add_more_post" onClick={() => setAddMore(!addMore)}>{addMore ? 'Hide' : 'Add more to post'}</button>
-                                        </div> */}
+                                    <div className='cp_box'>                                     
                                         <div className="cp_preview_box">
                                             <div className='mb-2 mt-2 video_preview'>
                                                 <ul className="load_imgs">
@@ -661,27 +641,7 @@ const SellerCommunity = () => {
                                                             <input type="file" id='post_video' accept="video/*" multiple onChange={(event) => handleVideoPreview(event)} />
                                                         </div>
                                                     </>
-                                                )}
-                                                {/* <select className="form-select form-select-lg cp_select mb-3" aria-label=".form-select category"  onChange={(event) => handleCategories(event)}>
-                                                    {
-                                                        postCategories.map((value, index) => {
-                                                            return (
-                                                                <option value={value.id} key={index}>{value.categoryName}</option>
-                                                            )
-                                                        })
-                                                    }
-                                                </select>
-                                                <select  className="form-select form-select-lg cp_select mb-3" aria-label=".form-select Product" onChange={(event) => handleProducts(event)}>
-                                                    {
-                                                     postProducts.length>0?
-                                                     postProducts.map((value,index)=>{
-                                                        return(
-                                                            <option value={value.id} >{value.name}</option>
-                                                        )
-                                                    })
-                                                    :<option value='' >Products</option>  
-                                                    }
-                                                </select> */}
+                                                )}                                          
                                                 <Select
                                                     className="sort_select text-normal "
                                                     options={categoryOption}
@@ -699,23 +659,10 @@ const SellerCommunity = () => {
                                                     }}
                                                 />
                                             </div>
-                                            {isUpdate === true ? <button className="btn custom_btn btn_yellow mx-auto" onClick={updatPost}> Update</button> : <button className="btn custom_btn btn_yellow mx-auto" onClick={() => createPost()} disabled={!inputStr.trim() && images.length === 0 && videos.length === 0 ? true : false} >Post</button>}
-                                            {/* <button className="btn custom_btn btn_yellow mx-auto" onClick={() => createPost()} disabled={!inputStr.trim() && images.length === 0 && videos.length === 0 ? true : false} >Post</button> */}
+                                            {isUpdate === true ? <button className="btn custom_btn btn_yellow mx-auto" onClick={updatPost}> Update</button> : <button className="btn custom_btn btn_yellow mx-auto" onClick={() => createPost()} disabled={!inputStr.trim() && images.length === 0 && videos.length === 0 ? true : false} >Post</button>}                                       
                                         </div>
                                     </div>
-                                </div>
-                                {/* {
-                                    SellerPostsData.length > 0 ?
-                                        <div>
-                                            {SellerPostsData.map((value, index) => {
-                                                return (
-                                                    <SellerPost key={index} posts={value} sendEditData={handleEdit} />
-                                                )
-                                            })}
-                                        </div>
-                                        : <NotFound msg="Data not found." />
-                                } */}
-                                {/* <PostListing/> */}
+                                </div>                             
                                 {
                                     filteredData === null ? (
                                         SellerPostsData.length > 0 ? (
@@ -729,20 +676,12 @@ const SellerCommunity = () => {
                                                         } else if (showMostCommented) {
                                                             return b.commentCount - a.commentCount;
                                                         } else {
-                                                            return 0; // No sorting
+                                                            return 0; 
                                                         }
-                                                    })
-                                                    // .map((value, index) => (
-
-                                                    //     <SellerPost key={value._id} posts={value} sendEditData={handleEdit} ref={(el) => (postRefs.current[value._id] = el)} />
-                                                    // ))}
-
-                                                    .map((value, index) => {
-                                                        // console.log('value------%^&%$%&', value);
+                                                    }).map((value, index) => {                                                      
                                                         return (
                                                             <SellerPost key={value._id} posts={value} sendEditData={handleEdit} ref={(el) => {
-                                                                postRefs.current[value._id] = el;
-                                                                // console.log(`Assigned ref for post ID: ${value._id}`, el);
+                                                                postRefs.current[value._id] = el;                                                        
                                                             }} />
                                                         );
                                                     })
@@ -763,7 +702,7 @@ const SellerCommunity = () => {
                                                         } else if (showMostCommented) {
                                                             return b.commentCount - a.commentCount;
                                                         } else {
-                                                            return 0; // No sorting
+                                                            return 0;
                                                         }
                                                     })
                                                     .map((value, index) => (
