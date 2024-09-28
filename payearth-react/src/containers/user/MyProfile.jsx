@@ -61,7 +61,6 @@ class MyProfile extends Component {
         if (localStorage.getItem('editProfile') === null) {
             localStorage.setItem('editProfile', false);
         }
-
         toast.configure();
     }
 

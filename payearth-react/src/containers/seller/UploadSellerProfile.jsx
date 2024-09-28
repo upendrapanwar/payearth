@@ -173,7 +173,6 @@ const UploadSellerProfile = (props) => {
 
             // Step 2: Delete existing images if their IDs are available
             if (props.original_image_id && props.image_id) {
-                console.log("check delete function")
                 await deleteImageFromCloudinary(props.original_image_id);
                 await deleteImageFromCloudinary(props.image_id);
             }

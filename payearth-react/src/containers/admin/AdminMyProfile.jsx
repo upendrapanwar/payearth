@@ -64,12 +64,6 @@ const AdminMyProfile = () => {
     };
 
     const updateProfileImage = (newOriginalImageUrl, newOriginalImageId, newImageUrl, newImageId) => {
-        console.log("newOriginalImageUrl", newOriginalImageUrl);
-        console.log("newOriginalImageId", newOriginalImageId);
-        console.log("newImageUrl", newImageUrl);
-        console.log("newImageId", newImageId);
-
-
         setAdminDetails(prevDetails => ({
             ...prevDetails,
             original_image_url: newOriginalImageUrl,
@@ -78,7 +72,6 @@ const AdminMyProfile = () => {
             image_id: newImageId
         }));
 
-        console.log("adminDetails", adminDetails);
         setProfileImageUrl(newImageUrl);
     };
 
@@ -88,12 +81,10 @@ const AdminMyProfile = () => {
 
     const handleSubmit = async (values) => {
         setLoading(true);
-        console.log('values', values);
         const updatedValues = {
             ...values,
             role: 'admin'
         };
-        console.log('updatedValues', updatedValues);
         axios.put(`admin/edit-profile/${authInfo.id}`, updatedValues, {
             headers: {
                 'Accept': 'application/json',
@@ -104,7 +95,6 @@ const AdminMyProfile = () => {
             if (response.data.status === true) {
                 toast.success(response.data.message, { autoClose: 3000 });
                 setAdminDetails(response.data.data);
-                console.log("response.data.data checking", response.data.data)
                 handleEdit();
             }
         }).catch(error => {
