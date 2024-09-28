@@ -156,6 +156,7 @@ module.exports = {
   supportReqCall,
   getProfileById,
   saveMyProfile,
+  editProfile,
 };
 
 // function sendMail(mailOptions) {
@@ -4731,7 +4732,7 @@ async function supportReqCall(req) {
 //get Seller Profile
 async function getProfileById(id) {
   const seller = await Seller.findById(id).select(
-    "id name email role seller_type want_to_sell original_image_url original_image_id image_url image_id purchase_type community"
+    "id name email phone address role seller_type want_to_sell original_image_url original_image_id image_url image_id purchase_type community"
   );
   if (!seller) return false;
   return seller;
@@ -4775,5 +4776,48 @@ async function saveMyProfile(req) {
   } catch (error) {
     console.error("Error:", error);
     throw new Error("Error updating profile data.");
+  }
+}
+
+
+async function editProfile(req) {
+
+  try {
+    const _id = req.params.id;
+    const { name, email, phone, seller_type, want_to_sell, role, address } = req.body;
+
+    const seller = await Seller.findById({ _id });
+
+    if (!seller) {
+      return false;
+    }
+
+    const input = {
+      name, email, phone, seller_type, want_to_sell, role,
+      address: {
+        street: address?.street,
+        city: address?.city,
+        state: address?.state,
+        country: address?.country,
+        zip: address?.zip,
+      },
+    };
+
+    Object.assign(seller, input);
+    await seller.save();
+
+    const data = {
+      name: seller.name,
+      email: seller.email,
+      phone: seller.phone,
+      seller_type: seller.seller_type,
+      want_to_sell: seller.want_to_sell,
+      role: seller.role,
+      address: seller.address,
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error:", error)
   }
 }

@@ -8,8 +8,15 @@ const schema = new Schema({
     password: { type: String, required: false, default: '' },
     phone: { type: String, required: false, default: '' },
     role: { type: String, required: false, default: 'seller' },
-    seller_type: { type: String, enum: ['retailer', 'wholeseller'], required: false, default: 'retailer' },
-    want_to_sell: { type: String, enum: ['retailer', 'wholeseller'], required: false, default: 'wholeseller' },
+    address: {
+        street: String,
+        city: String,
+        state: String,
+        country: String,
+        zip: Number
+    },
+    seller_type: { type: String, enum: ['retailer', 'wholesaler'], required: false, default: 'retailer' },
+    want_to_sell: { type: String, enum: ['retailer', 'wholesaler'], required: false, default: 'wholesaler' },
     social_accounts: {
         google: {
             google_id: { type: String, required: false, default: null, index: true },

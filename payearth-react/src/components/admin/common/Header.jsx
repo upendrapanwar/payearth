@@ -51,14 +51,11 @@ function Header() {
           'Authorization': `Bearer ${authInfo.token}`
         }
       });
-      console.log("response Header", response);
 
       if (response.data.status === true) {
         const adminInfo = response.data.data;
-        console.log("adminInfo Header", adminInfo);
 
         if (adminInfo.image_url && adminInfo.image_url !== '') {
-          console.log("Image URL is available:", adminInfo.image_url);
           const userInfo = {
             name: adminInfo.name,
             email: adminInfo.email,

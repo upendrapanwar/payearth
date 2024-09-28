@@ -62,6 +62,7 @@ const UploadAdminProfile = (props) => {
             setLoading(false);
         } else {
             alert('Size must be less than 5 MB');
+            resetState();
         }
     };
 
@@ -266,7 +267,9 @@ const UploadAdminProfile = (props) => {
                                 className="form-control"
                                 type="file"
                                 accept="image/*"
+                                ref={fileInputRef}
                                 onChange={handleFileChange}
+                                value=""
                             />
                         </div>
                     </div>

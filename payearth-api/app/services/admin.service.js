@@ -154,6 +154,7 @@ module.exports = {
     updateSupportCallReqStatus,
     getProfileById,
     saveMyProfile,
+    editProfile,
 };
 
 // Validator function
@@ -3864,5 +3865,45 @@ async function saveMyProfile(req) {
     } catch (error) {
         console.error("Error:", error);
         throw new Error("Error updating profile data.");
+    }
+}
+
+
+async function editProfile(req) {
+    try {
+        const _id = req.params.id;
+        const { name, email, phone, address, role } = req.body;
+
+        const admin = await Admin.findById({ _id });
+
+        if (!admin) {
+            return false;
+        }
+
+        const input = {
+            name, email, phone, role,
+            address: {
+                street: address?.street,
+                city: address?.city,
+                state: address?.state,
+                country: address?.country,
+                zip: address?.zip,
+            },
+        };
+
+        Object.assign(admin, input);
+        await admin.save();
+
+        const data = {
+            name: admin.name,
+            email: admin.email,
+            phone: admin.phone,
+            role: admin.role,
+            address: admin.address,
+        };
+
+        return data;
+    } catch (error) {
+        console.error("Error:", error)
     }
 }

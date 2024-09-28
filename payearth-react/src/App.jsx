@@ -392,7 +392,7 @@ function App() {
             exact
           />
 
-          <PrivateRoute
+          <PublicRoute
             path="/seller/forgot-password"
             restricted={false}
             component={SellerForgotPwd}
