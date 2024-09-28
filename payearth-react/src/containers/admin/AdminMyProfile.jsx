@@ -71,8 +71,10 @@ const AdminMyProfile = () => {
             image_url: newImageUrl,
             image_id: newImageId
         }));
+        // 
 
         setProfileImageUrl(newImageUrl);
+
     };
 
     const handleEdit = () => {
