@@ -233,7 +233,7 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                 'Authorization': `Bearer ${authInfo.token}`
             }
         }).then(response => {
-            if (response.data.status) {              
+            if (response.data.status) {
                 getPosts();
             }
         }).catch(error => {
@@ -296,16 +296,6 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
         }
         getLikes();
     }, [posts]);
-
-    // useEffect(() => {
-    //     if (posts.postImages.length > 0) {
-    //         let sliderImages = [];
-    //         posts.postImages.forEach((value) => {
-    //             sliderImages.push({ url: config.apiURI + value.url })
-    //         });          
-    //         setSliderImages(sliderImages);
-    //     }
-    // }, []);
 
     useEffect(() => {
         let followHandler = (event) => {
@@ -457,47 +447,6 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
         window.open(whatsappShareUrl, '_blank');
     }
 
-    const handleReportPopup = (post) => {
-        setIsReportOpen(true);
-        setReportedPost(post)
-    }
-
-    const reportPopupClose = () => {
-        setIsReportOpen(false);
-        setReportedPost(null);
-    }
-
-    const handleReportPost = async () => {
-        try {
-            const data = reportedPost;
-            const headers = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authInfo.token}`
-            };
-            const response = await axios.post('seller/createPostReport', {
-                reportType: reportOption,
-                notes: reportNote,
-                reportData: {
-                    postId: data.id,
-                    postCreatedBy: data.userId === null ? data.sellerId.id : data.userId.id,
-                },
-                reportBy: authInfo.id
-            }, { headers });      
-            toast.success("Report Succesfully");
-            setIsReportOpen(false);
-        } catch (error) {
-            console.error('Error reporting post:', error);
-        }
-    }
-
-    const handleNoteChange = (e) => {
-        setReportNote(e.target.value);
-    };
-
-    const handleOptionChange = (e) => {
-        setReportOption(e.target.value);
-    };
-
     return (
         <React.Fragment>
             {/* {loading === true ? <SpinnerLoader /> : ''} */}
@@ -592,8 +541,6 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                                             :
                                             <Link to="#" className="btn custom_btn btn_yellow" onClick={() => handleFollow(posts)}>Follow</Link>
                                         }
-
-
                                     </div>
                                 </div>
                                 : ''
@@ -651,39 +598,33 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                         <div className='row post_img_internal_box'>
                             {posts.postImages.slice(0, 2).map((image, index) => {
                                 return (
-                                    <>
-                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-6'}`} key={`image-${index}`} onClick={() => handleSliderShow(image)}>
-                                            <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
-                                        </div>
-                                    </>
+                                    <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-6'}`} key={index} onClick={() => handleSliderShow(image)}>
+                                        <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
+                                    </div>
                                 )
                             })}
                             {posts.postImages.slice(2, 4).map((image, index) => {
                                 return (
-                                    <>
-                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={`image-${index + 2}`} onClick={() => handleSliderShow(image)}>
-                                            <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
-                                        </div>
-                                    </>
+                                    <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={index + 2} onClick={() => handleSliderShow(image)}>
+                                        <div className="post_img mb-3 "><img src={image.url} alt="" /></div>
+                                    </div>
                                 )
                             })}
                             {posts.postImages.slice(4, 5).map((image, index) => {
                                 return (
-                                    <>
-                                        <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={`image-${index + 4}`} onClick={() => handleSliderShow(image)}>
-                                            {
-                                                posts.postImages.length > 5 &&
-                                                <span>{`${posts.postImages.length - 5}+`}</span>
-                                            }
-                                            <div className="post_img mb-3 " ><img src={image.url} alt="" /></div>
-                                        </div>
-                                    </>
+                                    <div className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-4'}`} key={index + 4} onClick={() => handleSliderShow(image)}>
+                                        {
+                                            posts.postImages.length > 5 &&
+                                            <span>{`${posts.postImages.length - 5}+`}</span>
+                                        }
+                                        <div className="post_img mb-3 " ><img src={image.url} alt="" /></div>
+                                    </div>
                                 )
                             })}
 
                             {posts.postVideos.map((video, index) => {
                                 return (
-                                    <div className={`post_main_div ${posts.postVideos.length === 1 ? 'col-12' : 'col-md-4'}`} key={`video-${index}`} onClick={() => handleSliderShow(video)} >
+                                    <div className={`post_main_div ${posts.postVideos.length === 1 ? 'col-12' : 'col-md-4'}`} key={index + 5} onClick={() => handleSliderShow(video)} >
                                         <Link to="#" className='cp_video_play' >
                                             <img src={videoPlay} />
                                         </Link>
@@ -707,7 +648,7 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                                     <img src={filteredLikes.length !== 0 && filteredLikes.includes(authInfo.id) ? redHeartIcon : heartIconBordered} /> {posts.likeCount}
                                 </Link> */}
                                 <Link to="#">
-                                    <img src={redHeartIcon} /> {posts.likeCount}
+                                    {posts.likeCount === 0 ? "Likes not found" : (<><img src={redHeartIcon} alt="Liked" /> {posts.likeCount}</>)}
                                 </Link>
                                 <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}><i className="post_icon ps_comment"></i> {posts.commentCount} Comments</Link>
                                 {/* <Link
@@ -794,7 +735,14 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                                                         ? 'justify-content-end'
                                                         : 'justify-content-start'
                                                 }`} key={id}>
-                                                <div className="avtar_img"><img className="img-fluid" src={userImg} alt="" /></div>
+                                                <div className="avtar_img">
+                                                    <img className="img-fluid" src={val.isSeller
+                                                        ? (val.sellerId && val.sellerId.image_url ? val.sellerId.image_url : userImg)
+                                                        : val.isAdmin
+                                                            ? (val.adminId && val.adminId.image_url ? val.adminId.image_url : userImg)
+                                                            : (val.userId && val.userId.image_url ? val.userId.image_url : userImg)
+                                                    } alt="" />
+                                                </div>
                                                 <div className="commnt_text">
                                                     <div className="commnt_body">
                                                         <div className="commnt_by">
@@ -811,7 +759,7 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                                                             {/* <div className="cb_date">{`${new Date(val.createdAt).getDate() < 10 ? `0${new Date(val.createdAt).getDate()}` : `${new Date(val.createdAt).getDate()}`} - ${new Date(val.createdAt).getMonth() + 1 < 10 ? `0${new Date(val.createdAt).getMonth() + 1}` : `${new Date(val.createdAt).getMonth() + 1}`} - ${new Date(val.createdAt).getFullYear()}`}</div> */}
                                                             <div className="cb_date"> <ReactTimeAgo date={new Date(val.createdAt)} locale="en-US" timeStyle="round-minute" /></div>
                                                         </div>
-                                                        <p>{val.content}</p>
+                                                        <p><b>{val.content}</b></p>
                                                     </div>
                                                     {/* <Link to="#" className="reply_link">Reply</Link> */}
                                                 </div>
@@ -851,86 +799,6 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                     </div>
                 </div>
             </div>
-
-            <Modal
-                show={isReportOpen}
-                // onHide={() => this.setState({ isShareOpen: false })}
-                onHide={() => setIsReportOpen(false)}
-                size="md"
-                aria-labelledby="contained-modal-title-vcenter"
-                centered
-            >
-                <Modal.Body>
-                    <div>
-                        <p class="text-center fw-bold">Are you sure you want to report ?</p>
-                    </div>
-                    <div className="">
-                        <div className="form-check d-inline-block me-3">
-                            <input
-                                className="form-check-input"
-                                type="radio"
-                                id="option1"
-                                name="options"
-                                value="Please delete this post"
-                                checked={reportOption === "Please delete this post"}
-                                onChange={handleOptionChange}
-                            />
-                            <label className="form-check-label" htmlFor="option1">
-                                Please delete this post
-                            </label>
-                        </div> <br />
-                        <div className="form-check d-inline-block me-3">
-                            <input
-                                className="form-check-input"
-                                type="radio"
-                                id="option1"
-                                name="options"
-                                value="This post contains inappropriate language"
-                                checked={reportOption === "This post contains inappropriate language"}
-                                onChange={handleOptionChange}
-                            />
-                            <label className="form-check-label" htmlFor="option1">
-                                This post contains inappropriate language
-                            </label>
-                        </div> <br />
-                        <div className="form-check d-inline-block me-3">
-                            <input
-                                className="form-check-input"
-                                type="radio"
-                                id="option2"
-                                name="options"
-                                value="This post voilates our Terms & Condition"
-                                checked={reportOption === "This post voilates our Terms & Condition"}
-                                onChange={handleOptionChange}
-                            />
-                            <label className="form-check-label" htmlFor="option2">
-                                This post voilates our Terms & Condition
-                            </label>
-                        </div> <br />
-                    </div>
-                    <br />
-                    <div className="input-section">
-                        <label htmlFor="">Note</label>
-                        <div className="field_item text-left mt-2">
-                            <textarea
-                                type="text"
-                                name="note"
-                                value={reportNote}
-                                onChange={handleNoteChange}
-                                cols="30"
-                                rows="10"
-                                className="form-control"
-                            ></textarea>
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-center mt-2">
-                        <div className="d-grid gap-2 d-md-block">
-                            <button className="btn btn-warning btn-sm" type="button" onClick={handleReportPost}>Send Report</button>
-                            <button className="btn btn-secondary btn-sm" type="button" onClick={reportPopupClose}>Cancle</button>
-                        </div>
-                    </div>
-                </Modal.Body>
-            </Modal>
         </React.Fragment>
     );
 });

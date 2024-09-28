@@ -400,7 +400,7 @@ const AdminCommunity = () => {
                 <Header />
                 <PageTitle title="Community" />
                 <Helmet><title>{"Community - Pay Earth"}</title></Helmet>
-                <div className="cumm_page_wrap pt-5 pb-5">
+                <div className="cumm_page_wrap pt-2 pb-5">
                     <div className="container">
                         <div className="row">
                             <div className="col-lg-9">
