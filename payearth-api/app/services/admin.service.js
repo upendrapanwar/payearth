@@ -3821,7 +3821,7 @@ async function updateSupportCallReqStatus(req) {
 //get profile data
 async function getProfileById(id) {
     const admin = await Admin.findById(id).select(
-        "id name email role original_image_url original_image_id image_url image_id"
+        "id name email phone address  role original_image_url original_image_id image_url image_id"
     );
     if (!admin) return false;
     return admin;
@@ -3850,18 +3850,18 @@ async function saveMyProfile(req) {
         if (image_url) updateData.image_url = image_url;
         if (image_id) updateData.image_id = image_id;
 
-        const updatedAdmin = await Admin.findByIdAndUpdate(
+        const data = await Admin.findByIdAndUpdate(
             _id,
             { $set: updateData },
             { new: true }
         );
 
-        if (!updatedAdmin) {
+        if (!data) {
             console.error("Failed to update admin.");
             return false;
         }
 
-        return updatedAdmin;
+        return data;
     } catch (error) {
         console.error("Error:", error);
         throw new Error("Error updating profile data.");

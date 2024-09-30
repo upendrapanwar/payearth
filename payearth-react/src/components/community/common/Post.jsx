@@ -66,6 +66,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
     const handleComments = (e) => {
         setComments(e.target.value);
     }
+
     const addNewComment = (postId) => {
         let reqBody = {};
         if (userInfo.role === 'user') {
