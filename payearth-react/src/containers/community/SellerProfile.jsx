@@ -51,7 +51,7 @@ const SellerProfile = () => {
     const [categoryId, setCategoryId] = useState('');
     const [postStatus, setPostStatus] = useState('Followers');
     const [categoryOption, setCategoryOption] = useState([]);
-    const [defaultCategoryOption, setDefaultCategoryOption] = useState({ label: 'Choose Category', value: '' })
+    const [defaultCategoryOption, setDefaultCategoryOption] = useState({ label: 'All Category', value: '' })
     const [productOption, setProductOption] = useState([]);
     const [defaultProductOption, setDefaultProductOption] = useState({ label: 'Choose Product', value: '' })
     const [posts, setPosts] = useState([]);
@@ -278,7 +278,7 @@ const SellerProfile = () => {
                 setCategoryId(null);
                 setProductId(null);
                 setDefaultProductOption({ label: 'Choose Product', value: '' });
-                setDefaultCategoryOption({ label: 'Choose Category', value: '' });
+                setDefaultCategoryOption({ label: 'All Category', value: '' });
             }, 300);
         }
     };
@@ -289,7 +289,7 @@ const SellerProfile = () => {
             if (response.data.status) {
                 let res = response.data.data;
                 dispatch(setPostCategories({ postCategories: res }));
-                let catOptions = [{ label: 'Choose Category', value: '' }]
+                let catOptions = [{ label: 'All Category', value: '' }]
                 res.forEach((value) => {
                     catOptions.push({ label: value.categoryName, value: value.id });
                 });
@@ -405,7 +405,7 @@ const SellerProfile = () => {
                 setCategoryId(null);
                 setProductId(null);
                 setDefaultProductOption({ label: 'Choose Product', value: '' });
-                setDefaultCategoryOption({ label: 'Choose Category', value: '' });
+                setDefaultCategoryOption({ label: 'All Category', value: '' });
             }, 300);
         });
     }
@@ -420,7 +420,7 @@ const SellerProfile = () => {
         setCategoryId(null);
         setProductId(null);
         setDefaultProductOption({ label: 'Choose Product', value: '' });
-        setDefaultCategoryOption({ label: 'Choose Category', value: '' });
+        setDefaultCategoryOption({ label: 'All Category', value: '' });
     };
 
     const handleFilterCategory = () => {
