@@ -96,9 +96,12 @@ export const SellerMyProfile = () => {
             }
         }).then((response) => {
             if (response.data.status === true) {
+                console.log("response.data.data checking", response.data.data)
                 toast.success(response.data.message, { autoClose: 3000 });
                 setSellerDetails(response.data.data);
-                console.log("response.data.data checking", response.data.data)
+                console.log("sellerDetails", sellerDetails)
+
+
                 handleEdit();
             }
         }).catch(error => {
