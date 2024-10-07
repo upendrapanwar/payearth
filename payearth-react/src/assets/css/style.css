@@ -479,6 +479,40 @@ ul {
   left: 0px;
 }
 
+/*************************notification table css*************************** */
+
+.notification_wapper .sc-gtLWhw {
+  display: none;
+}
+
+/****** Table header *********/
+.notification_wapper .data-table-extensions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+/* Table Center */
+
+.notification_wapper .dLHSn {
+  display: flow !important;
+}
+
+/******* Table Bottom **********/
+.notification_wapper .sc-epnzzT {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+
+
+
+
+
+
 /* ***************************notification bell css********************************** */
 
 .header .main_nav {
@@ -1671,12 +1705,13 @@ button.view_more img {
   justify-content: center;
   align-items: center;
   text-align: center;
-  width: 100%; 
+  width: 100%;
   max-height: 200px;
   min-height: 200px;
   overflow: hidden;
   border-bottom: 1px solid #eeeeee;
 }
+
 .serv_card .img_wrapper img {
   max-width: 100%;
   max-height: 100%;
@@ -4554,24 +4589,30 @@ h4 {
   }
 }
 
-.ql-discription{
+.ql-discription {
   max-width: 100%;
-  max-height:200px;
+  max-height: 200px;
   min-height: 200px;
 }
 
-.img_srv_details{
+.img_srv_details {
   max-width: 100%;
-  max-height:600px;
+  max-height: 600px;
 }
 
-.fc-event.fc-event-start > div{
+.fc-event.fc-event-start>div {
   width: 100%;
   padding: 6px 6px;
 }
-.fc-event.fc-event-start > div > div{line-height: 1.4;}
 
-.form_wrapper input.PhoneInputInput:focus { outline: none; border: 0px;}
+.fc-event.fc-event-start>div>div {
+  line-height: 1.4;
+}
+
+.form_wrapper input.PhoneInputInput:focus {
+  outline: none;
+  border: 0px;
+}
 
 .seller_dash_wrap .check-table {
   width: max-content;
@@ -4579,10 +4620,10 @@ h4 {
 
 .modal-scroll-content {
   max-height: 300px;
-  overflow-y: auto; 
+  overflow-y: auto;
 }
 
-.crop_modal_panel_filter_pb50{
+.crop_modal_panel_filter_pb50 {
   padding-bottom: 50px;
 }
 
@@ -4599,6 +4640,7 @@ h4 {
   display: flex;
   gap: 15px;
 }
+
 .pointer {
   cursor: pointer;
 }

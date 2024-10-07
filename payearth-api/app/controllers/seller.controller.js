@@ -229,7 +229,7 @@ router.put("/updateBanner/:id", updateBanner);
 router.delete("/deleteSubPlan/:id", deleteSubPlan);
 router.post("/addNotification/:id", addNotification);
 router.get("/getNotification/:id", getNotification);
-router.delete("/deleteNotification/:id", deleteNotification);
+router.delete("/removeNotification/:id", removeNotification);
 
 // Chat
 router.get("/getAllUser", getAllUser);
@@ -1297,15 +1297,15 @@ function getNotification(req, res, next) {
 //*****************************************************************************************/
 //*****************************************************************************************/
 //deleteNotification
-function deleteNotification(req, res, next) {
+function removeNotification(req, res, next) {
   sellerService
-    .deleteNotification(req)
+    .removeNotification(req)
     .then((result) =>
       result
         ? res.status(200).json({
           status: true,
           data: result,
-          message: "Delete Notification Successfully",
+          message: "Notification Remove Successfully",
         })
         : res.status(400).json({ status: false, message: "ERROR ", data: [] })
     )

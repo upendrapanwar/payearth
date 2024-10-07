@@ -133,7 +133,7 @@ module.exports = {
   updateGroupName,
   addNotification,
   getNotification,
-  deleteNotification,
+  removeNotification,
   addPost,
   getPosts,
   addPostImages,
@@ -3714,10 +3714,10 @@ async function getNotification(req) {
 // *******************************************************************************
 // *******************************************************************************
 //deleteNotification
-async function deleteNotification(req) {
-  // const id = req.params.id;
+async function removeNotification(req) {
   try {
-    // const result = await Calendar.deleteOne({ _id: id });
+    const id = req.params.id;
+    const result = await Notification.deleteOne({ _id: id });
     return result;
   } catch (error) {
     console.log(error);
