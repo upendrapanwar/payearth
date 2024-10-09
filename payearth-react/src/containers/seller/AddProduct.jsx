@@ -15,16 +15,16 @@ import addProductSchema from '../../validation-schemas/addProductSchema';
 class AddProduct extends Component {
     constructor(props) {
         super(props);
-        const {dispatch} = props;
+        const { dispatch } = props;
         this.dispatch = dispatch;
         this.authInfo = store.getState().auth.authInfo;
         this.state = {
             catOptions: [],
-            defaultCatOption: {label: 'Choose Category', value: ''},
+            defaultCatOption: { label: 'Choose Category', value: '' },
             subCatOptions: [],
-            defaultSubCatOption: {label: 'Choose Sub Category', value: ''},
+            defaultSubCatOption: { label: 'Choose Sub Category', value: '' },
             brands: [],
-            defaultBrand: {label: 'Brand', value: ''},
+            defaultBrand: { label: 'Brand', value: '' },
             colors: [],
             colorSize: {
                 s: [],
@@ -34,13 +34,13 @@ class AddProduct extends Component {
                 xxl: []
             },
             tierPrices: [
-                {qty: '', price: ''}
+                { qty: '', price: '' }
             ],
             colorsWithImgs: {},
             colorImages: [
-                {color: '', images: [], previews: []}
+                { color: '', images: [], previews: [] }
             ],
-            featuredImg: {image: '', preview: ''}
+            featuredImg: { image: '', preview: '' }
         }
         toast.configure();
     }
@@ -68,30 +68,30 @@ class AddProduct extends Component {
                 if (param === null) {
                     let catOptions = [];
                     response.data.data.forEach(value => {
-                        catOptions.push({label: value.categoryName, value: value.id})
+                        catOptions.push({ label: value.categoryName, value: value.id })
                     });
-                    this.setState({catOptions});
+                    this.setState({ catOptions });
                 } else {
                     let subCatOptions = [];
                     response.data.data.forEach(value => {
-                        subCatOptions.push({label: value.categoryName, value: value.id})
+                        subCatOptions.push({ label: value.categoryName, value: value.id })
                     });
-                    this.setState({subCatOptions});
+                    this.setState({ subCatOptions });
                 }
             }
         }).catch(error => {
-            if(error.response && error.response.data.status === false) {
+            if (error.response && error.response.data.status === false) {
                 toast.error(error.response.data.message);
             }
         }).finally(() => {
             setTimeout(() => {
-                this.dispatch(setLoading({loading: false}));
+                this.dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
 
     getBrands = () => {
-        this.dispatch(setLoading({loading: true}));
+        this.dispatch(setLoading({ loading: true }));
         axios.get('seller/brands/', {
             headers: {
                 'Accept': 'application/json',
@@ -102,23 +102,23 @@ class AddProduct extends Component {
             if (response.data.status) {
                 let brands = [];
                 response.data.data.forEach(value => {
-                    brands.push({label: value.brandName, value: value.id})
+                    brands.push({ label: value.brandName, value: value.id })
                 });
-                this.setState({brands});
+                this.setState({ brands });
             }
         }).catch(error => {
-            if(error.response && error.response.data.status === false) {
+            if (error.response && error.response.data.status === false) {
                 toast.error(error.response.data.message);
             }
         }).finally(() => {
             setTimeout(() => {
-                this.dispatch(setLoading({loading: false}));
+                this.dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
 
     getColors = () => {
-        this.dispatch(setLoading({loading: true}));
+        this.dispatch(setLoading({ loading: true }));
         axios.get('seller/colors/', {
             headers: {
                 'Accept': 'application/json',
@@ -127,15 +127,15 @@ class AddProduct extends Component {
             }
         }).then(response => {
             if (response.data.status) {
-                this.setState({colors: response.data.data});
+                this.setState({ colors: response.data.data });
             }
         }).catch(error => {
-            if(error.response && error.response.data.status === false) {
+            if (error.response && error.response.data.status === false) {
                 toast.error(error.response.data.message);
             }
         }).finally(() => {
             setTimeout(() => {
-                this.dispatch(setLoading({loading: false}));
+                this.dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
@@ -146,19 +146,19 @@ class AddProduct extends Component {
 
         if (fieldName === 'colorSize') {
             for (const [key, value] of Object.entries(data)) {
-                html.push(<li key={value}><input type="checkbox" name="colorSizeSmall[]" style={{backgroundColor: value}} className="form-check-input color_box" onChange={() => this.handleColorSize(key, size)} /></li>);
+                html.push(<li key={value}><input type="checkbox" name="colorSizeSmall[]" style={{ backgroundColor: value }} className="form-check-input color_box" onChange={() => this.handleColorSize(key, size)} /></li>);
             }
         } else {
             for (const [key, value] of Object.entries(data)) {
-                html.push(<li key={value}><input type="radio" name={`colorsWithImgs${index}[]`} value={key} style={{backgroundColor: value}} className="form-check-input color_box" onChange={(e) => this.handleColorImg(e, index, 'color')} /></li>);
+                html.push(<li key={value}><input type="radio" name={`colorsWithImgs${index}[]`} value={key} style={{ backgroundColor: value }} className="form-check-input color_box" onChange={(e) => this.handleColorImg(e, index, 'color')} /></li>);
             }
         }
         return html;
     }
 
     handleColorSize = (value, size) => {
-        let colorSize = {...this.state.colorSize};
-        this.setState({colorSize});
+        let colorSize = { ...this.state.colorSize };
+        this.setState({ colorSize });
         if (colorSize[size].includes(value)) {
             let index = colorSize[size].indexOf(value);
             if (index !== -1) colorSize[size].splice(index, 1);
@@ -167,12 +167,12 @@ class AddProduct extends Component {
         }
     }
 
-    addMoreTierPrice = () => this.setState({tierPrices: [...this.state.tierPrices, {qty: '', price: ''}]});
+    addMoreTierPrice = () => this.setState({ tierPrices: [...this.state.tierPrices, { qty: '', price: '' }] });
 
     removeTierPrice = i => {
         let tierPrices = this.state.tierPrices;
         tierPrices.splice(i, 1);
-        this.setState({tierPrices});
+        this.setState({ tierPrices });
     }
 
     handleQtyPrice = (event, index, fieldName) => {
@@ -182,15 +182,15 @@ class AddProduct extends Component {
         } else {
             tierPrices[index].price = event.target.value;
         }
-        this.setState({tierPrices});
+        this.setState({ tierPrices });
     }
 
-    addMoreColorImg = () => this.setState({colorImages: [...this.state.colorImages, {color: '', images:[], previews: []}]});
+    addMoreColorImg = () => this.setState({ colorImages: [...this.state.colorImages, { color: '', images: [], previews: [] }] });
 
     removeColorImg = i => {
         let colorImages = this.state.colorImages;
         colorImages.splice(i, 1);
-        this.setState({colorImages});
+        this.setState({ colorImages });
     }
 
     handleColorImg = (event, index, fieldName) => {
@@ -203,14 +203,14 @@ class AddProduct extends Component {
                 colorImages[index].previews.push(URL.createObjectURL(event.target.files[i]));
             }
         }
-        this.setState({colorImages});
+        this.setState({ colorImages });
     }
 
     removeImg = (mainIndex, imgIndex) => {
         let colorImages = [...this.state.colorImages];
         colorImages[mainIndex].images.splice(imgIndex, 1);
         colorImages[mainIndex].previews.splice(imgIndex, 1);
-        this.setState({colorImages});
+        this.setState({ colorImages });
     }
 
     handleFeaturedImg = event => {
@@ -219,13 +219,13 @@ class AddProduct extends Component {
                 image: event.target.files[0],
                 preview: URL.createObjectURL(event.target.files[0])
             };
-            this.setState({featuredImg});
+            this.setState({ featuredImg });
         } else {
             let featuredImg = {
                 image: '',
                 preview: ''
             };
-            this.setState({featuredImg});
+            this.setState({ featuredImg });
         }
     }
 
@@ -241,19 +241,19 @@ class AddProduct extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`
             }
         }).then(response => {
-            if(response.data.status) {
+            if (response.data.status) {
                 toast.dismiss();
-                toast.success(successMsg, {autoClose: 3000});
-                this.dispatch(setLoading({loading: true}));
+                toast.success(successMsg, { autoClose: 3000 });
+                this.dispatch(setLoading({ loading: true }));
                 this.props.history.push('/seller/product-stock-management');
             }
         }).catch(error => {
-            if(error.response && error.response.data.status === false) {
+            if (error.response && error.response.data.status === false) {
                 toast.error(error.response.data.message);
             }
         }).finally(() => {
             setTimeout(() => {
-                this.dispatch(setLoading({loading: false}));
+                this.dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
@@ -275,7 +275,7 @@ class AddProduct extends Component {
             if (this.state.colorSize[key].length > 0) {
                 for (let index = 0; index < value.length; index++) {
                     if (value[index] !== undefined && value[index] !== '') {
-                        formData.append('color_size['+key+'][]', value[index]);
+                        formData.append('color_size[' + key + '][]', value[index]);
                     }
                 }
             }
@@ -283,8 +283,8 @@ class AddProduct extends Component {
 
         // Bind tier prices
         for (let index = 0; index < tierPrices.length; index++) {
-            formData.append('tier_price['+index+'][qty]', tierPrices[index].qty);
-            formData.append('tier_price['+index+'][price]', tierPrices[index].price);
+            formData.append('tier_price[' + index + '][qty]', tierPrices[index].qty);
+            formData.append('tier_price[' + index + '][price]', tierPrices[index].price);
         }
 
         // Bind images with color
@@ -297,7 +297,7 @@ class AddProduct extends Component {
             }
         }
 
-        this.dispatch(setLoading({loading: true}));
+        this.dispatch(setLoading({ loading: true }));
         axios.post('seller/products', formData, {
             headers: {
                 'Accept': 'application/form-data',
@@ -305,22 +305,22 @@ class AddProduct extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`
             }
         }).then((response) => {
-            if(response.data.status) {
+            if (response.data.status) {
                 this.saveFeaturedImg(response.data.data.id, response.data.message);
             }
         }).catch(error => {
-            if(error.response && error.response.data.status === false) {
+            if (error.response && error.response.data.status === false) {
                 toast.error(error.response.data.message);
             }
         }).finally(() => {
             setTimeout(() => {
-                this.dispatch(setLoading({loading: false}));
+                this.dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
 
     render() {
-        const {loading} = store.getState().global;
+        const { loading } = store.getState().global;
         const {
             catOptions,
             defaultCatOption,
@@ -388,9 +388,9 @@ class AddProduct extends Component {
                                                                 <div className="input-group mb-2">
                                                                     <input type="text" readOnly className="form-control" aria-label="Text input" placeholder="S" value="S" />
                                                                     <button className="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                        <ul className="colors_pick" style={{'display': 'none'}}>
-                                                                            <li><span style={{backgroundColor: '#0EB4B3'}} className="color_box"></span></li>
-                                                                            <li><span style={{backgroundColor: '#7C80BC'}} className="color_box"></span></li>
+                                                                        <ul className="colors_pick" style={{ 'display': 'none' }}>
+                                                                            <li><span style={{ backgroundColor: '#0EB4B3' }} className="color_box"></span></li>
+                                                                            <li><span style={{ backgroundColor: '#7C80BC' }} className="color_box"></span></li>
                                                                         </ul>
                                                                         <span>Color</span>
                                                                     </button>
@@ -401,9 +401,9 @@ class AddProduct extends Component {
                                                                 <div className="input-group mb-2">
                                                                     <input type="text" readOnly className="form-control" placeholder="M" value="M" />
                                                                     <button className="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                        <ul className="colors_pick" style={{'display': 'none'}}>
-                                                                            <li><span style={{backgroundColor: '#0EB4B3'}} className="color_box"></span></li>
-                                                                            <li><span style={{backgroundColor: '#7C80BC'}} className="color_box"></span></li>
+                                                                        <ul className="colors_pick" style={{ 'display': 'none' }}>
+                                                                            <li><span style={{ backgroundColor: '#0EB4B3' }} className="color_box"></span></li>
+                                                                            <li><span style={{ backgroundColor: '#7C80BC' }} className="color_box"></span></li>
                                                                         </ul>
                                                                         <span>Color</span>
                                                                     </button>
@@ -414,9 +414,9 @@ class AddProduct extends Component {
                                                                 <div className="input-group mb-2">
                                                                     <input type="text" readOnly className="form-control" aria-label="Text input" placeholder="L" value="L" />
                                                                     <button className="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                        <ul className="colors_pick" style={{'display': 'none'}}>
-                                                                            <li><span style={{backgroundColor: '#0EB4B3'}} className="color_box"></span></li>
-                                                                            <li><span style={{backgroundColor: '#7C80BC'}} className="color_box"></span></li>
+                                                                        <ul className="colors_pick" style={{ 'display': 'none' }}>
+                                                                            <li><span style={{ backgroundColor: '#0EB4B3' }} className="color_box"></span></li>
+                                                                            <li><span style={{ backgroundColor: '#7C80BC' }} className="color_box"></span></li>
                                                                         </ul>
                                                                         <span>Color</span>
                                                                     </button>
@@ -427,9 +427,9 @@ class AddProduct extends Component {
                                                                 <div className="input-group mb-2">
                                                                     <input type="text" readOnly className="form-control" aria-label="Text input" placeholder="XL" value="XL" />
                                                                     <button className="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                        <ul className="colors_pick" style={{'display': 'none'}}>
-                                                                            <li><span style={{backgroundColor: '#0EB4B3'}} className="color_box"></span></li>
-                                                                            <li><span style={{backgroundColor: '#7C80BC'}} className="color_box"></span></li>
+                                                                        <ul className="colors_pick" style={{ 'display': 'none' }}>
+                                                                            <li><span style={{ backgroundColor: '#0EB4B3' }} className="color_box"></span></li>
+                                                                            <li><span style={{ backgroundColor: '#7C80BC' }} className="color_box"></span></li>
                                                                         </ul>
                                                                         <span>Color</span>
                                                                     </button>
@@ -440,9 +440,9 @@ class AddProduct extends Component {
                                                                 <div className="input-group mb-2">
                                                                     <input type="text" readOnly className="form-control" aria-label="Text input" placeholder="XXL" value="XXL" />
                                                                     <button className="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                        <ul className="colors_pick" style={{'display': 'none'}}>
-                                                                            <li><span style={{backgroundColor: '#0EB4B3'}} className="color_box"></span></li>
-                                                                            <li><span style={{backgroundColor: '#7C80BC'}} className="color_box"></span></li>
+                                                                        <ul className="colors_pick" style={{ 'display': 'none' }}>
+                                                                            <li><span style={{ backgroundColor: '#0EB4B3' }} className="color_box"></span></li>
+                                                                            <li><span style={{ backgroundColor: '#7C80BC' }} className="color_box"></span></li>
                                                                         </ul>
                                                                         <span>Color</span>
                                                                     </button>
@@ -457,25 +457,25 @@ class AddProduct extends Component {
                                                                 <label htmlFor="name" className="form-label">Tier Price</label>
                                                                 {tierPrices.map((value, index) => {
                                                                     return <div className="input-group mb-2" key={index}>
-                                                                                <input
-                                                                                    type="number"
-                                                                                    className="form-control"
-                                                                                    placeholder="Quantity"
-                                                                                    min="1"
-                                                                                    value={value.qty}
-                                                                                    onChange={(e) => this.handleQtyPrice(e, index, 'qty')}
-                                                                                />
-                                                                                <input
-                                                                                    type="text"
-                                                                                    className="form-control"
-                                                                                    placeholder="Price"
-                                                                                    value={value.price}
-                                                                                    onChange={(e) => this.handleQtyPrice(e, index, 'price')}
-                                                                                />
-                                                                                <button type="button" className="btn btn-danger" disabled={tierPrices.length === 1 ? true : false}
-                                                                                    onClick={() => this.removeTierPrice(index)}
-                                                                                >X</button>
-                                                                            </div>
+                                                                        <input
+                                                                            type="number"
+                                                                            className="form-control"
+                                                                            placeholder="Quantity"
+                                                                            min="1"
+                                                                            value={value.qty}
+                                                                            onChange={(e) => this.handleQtyPrice(e, index, 'qty')}
+                                                                        />
+                                                                        <input
+                                                                            type="text"
+                                                                            className="form-control"
+                                                                            placeholder="Price"
+                                                                            value={value.price}
+                                                                            onChange={(e) => this.handleQtyPrice(e, index, 'price')}
+                                                                        />
+                                                                        <button type="button" className="btn btn-danger" disabled={tierPrices.length === 1 ? true : false}
+                                                                            onClick={() => this.removeTierPrice(index)}
+                                                                        >X</button>
+                                                                    </div>
                                                                 })}
                                                                 <button type="button" className="icon_btn" onClick={this.addMoreTierPrice}><i className="fa fa-plus"></i></button>
                                                             </div>
@@ -514,7 +514,7 @@ class AddProduct extends Component {
                                                                             value={defaultCatOption}
                                                                             onChange={selectedOption => {
                                                                                 values.category = selectedOption.value;
-                                                                                this.setState({defaultCatOption: selectedOption});
+                                                                                this.setState({ defaultCatOption: selectedOption });
                                                                                 this.getCategories(selectedOption.value);
                                                                             }}
                                                                             onBlur={handleBlur}
@@ -530,7 +530,7 @@ class AddProduct extends Component {
                                                                             value={defaultSubCatOption}
                                                                             onChange={selectedOption => {
                                                                                 values.subCategory = selectedOption.value;
-                                                                                this.setState({defaultSubCatOption: selectedOption});
+                                                                                this.setState({ defaultSubCatOption: selectedOption });
                                                                             }}
                                                                         />
                                                                     </div>
@@ -553,41 +553,41 @@ class AddProduct extends Component {
                                                             <div className="controls_grp upload_img">
                                                                 <label htmlFor="name" className="form-label">Upload image</label>
                                                                 {colorImages.map((value, index) => {
-                                                                    return  <div className="load_img_box" key={index}>
-                                                                                <div className="input-group mb-2">
-                                                                                    <button className="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                                        <ul className="colors_pick" style={{'display': 'none'}}>
-                                                                                            <li><span style={{backgroundColor: '#0EB4B3'}} className="color_box"></span></li>
-                                                                                            <li><span style={{backgroundColor: '#7C80BC'}} className="color_box"></span></li>
-                                                                                        </ul>
-                                                                                        <span>Color</span>
-                                                                                    </button>
-                                                                                    <ul className="dropdown-menu dropdown-menu-end colors_pick ps-3 pe-2 pb-4">
-                                                                                        {this.colorPalette(null, 'colorImage', index)}
-                                                                                    </ul>
-                                                                                    <input
-                                                                                        className="form-control"
-                                                                                        type="file"
-                                                                                        multiple={true}
-                                                                                        name="file"
-                                                                                        onChange={(e) => this.handleColorImg(e, index, 'image')}
-                                                                                        accept="image/*"
-                                                                                    />
-                                                                                    <button type="button" className="btn btn-danger" disabled={colorImages.length === 1 ? true : false}
-                                                                                        onClick={() => this.removeColorImg(index)}
-                                                                                    >X</button>
-                                                                                </div>
-                                                                                {value.previews.length > 0 &&
-                                                                                    <ul className="load_imgs">
-                                                                                        {value.previews.map((imgUrl, index2) => {
-                                                                                            return  <li key={index2}>
-                                                                                                        <Link to="#" className="delete_icon_btn" onClick={() => this.removeImg(index, index2)}><i className="fa fa-trash"></i></Link>
-                                                                                                        <img src={imgUrl} alt="..." />
-                                                                                                    </li>
-                                                                                        })}
-                                                                                    </ul>
-                                                                                }
-                                                                            </div>
+                                                                    return <div className="load_img_box" key={index}>
+                                                                        <div className="input-group mb-2">
+                                                                            <button className="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                                <ul className="colors_pick" style={{ 'display': 'none' }}>
+                                                                                    <li><span style={{ backgroundColor: '#0EB4B3' }} className="color_box"></span></li>
+                                                                                    <li><span style={{ backgroundColor: '#7C80BC' }} className="color_box"></span></li>
+                                                                                </ul>
+                                                                                <span>Color</span>
+                                                                            </button>
+                                                                            <ul className="dropdown-menu dropdown-menu-end colors_pick ps-3 pe-2 pb-4">
+                                                                                {this.colorPalette(null, 'colorImage', index)}
+                                                                            </ul>
+                                                                            <input
+                                                                                className="form-control"
+                                                                                type="file"
+                                                                                multiple={true}
+                                                                                name="file"
+                                                                                onChange={(e) => this.handleColorImg(e, index, 'image')}
+                                                                                accept="image/*"
+                                                                            />
+                                                                            <button type="button" className="btn btn-danger" disabled={colorImages.length === 1 ? true : false}
+                                                                                onClick={() => this.removeColorImg(index)}
+                                                                            >X</button>
+                                                                        </div>
+                                                                        {value.previews.length > 0 &&
+                                                                            <ul className="load_imgs">
+                                                                                {value.previews.map((imgUrl, index2) => {
+                                                                                    return <li key={index2}>
+                                                                                        <Link to="#" className="delete_icon_btn" onClick={() => this.removeImg(index, index2)}><i className="fa fa-trash"></i></Link>
+                                                                                        <img src={imgUrl} alt="..." />
+                                                                                    </li>
+                                                                                })}
+                                                                            </ul>
+                                                                        }
+                                                                    </div>
                                                                 })}
                                                                 <button type="button" className="icon_btn" onClick={this.addMoreColorImg}><i className="fa fa-plus"></i></button>
                                                             </div>
@@ -603,7 +603,7 @@ class AddProduct extends Component {
                                                                 value={defaultBrand}
                                                                 onChange={selectedOption => {
                                                                     values.brand = selectedOption.value;
-                                                                    this.setState({defaultBrand: selectedOption});
+                                                                    this.setState({ defaultBrand: selectedOption });
                                                                 }}
                                                                 onBlur={handleBlur}
                                                             />

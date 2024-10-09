@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, Suspense, lazy } from 'react';
 import Footer from '../../components/common/Footer';
 import Header from '../../components/seller/common/Header';
 import userImg from '../../assets/images/user.png'
@@ -22,6 +22,9 @@ import { toast } from 'react-toastify';
 import { Helmet } from 'react-helmet';
 import PageTitle from './../../components/user/common/PageTitle';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
+
+
+// const Header = lazy(() => import("../../components/seller/common/Header"));
 
 const SellerCommunity = () => {
     const userInfo = useSelector(state => state.auth.userInfo);
@@ -338,6 +341,7 @@ const SellerCommunity = () => {
     }
 
     const handleCategories = (selectedOption) => {
+        console.log("selectedOption :", selectedOption)
         setDefaultCategoryOption(selectedOption);
         setDefaultProductOption({ label: 'Choose Product', value: '' });
         setCategoryId(selectedOption.value);
@@ -359,6 +363,7 @@ const SellerCommunity = () => {
         axios.get(`community/front/products/${catId}`).then(response => {
             if (response.data.status) {
                 let res = response.data.data;
+                console.log("res get product ", res)
                 dispatch(setPostProducts({ postProducts: res }));
                 let proOption = [{ label: 'Choose Product', value: '' }];
                 res.forEach((value) => {
@@ -483,6 +488,7 @@ const SellerCommunity = () => {
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
             <div className='seller_body'>
+
                 <Header />
                 <PageTitle title="Community" />
                 <Helmet><title>{"Community - Pay Earth"}</title></Helmet>
@@ -540,7 +546,7 @@ const SellerCommunity = () => {
                                                                     onClick={() => { handleUnblockUser(item) }}
                                                                 >
                                                                     Unblock
-                                                                </button> : ""}                                                       
+                                                                </button> : ""}
                                                         </a>
                                                     </div>
                                                 </>
@@ -566,7 +572,7 @@ const SellerCommunity = () => {
                                     <div className="cp_body">
                                         <div className="com_user_acc">
                                             <Link to='/Seller-MyProfile'>
-                                                <div className="com_user_img">                                                  
+                                                <div className="com_user_img">
                                                     <img
                                                         src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
                                                         alt=""
@@ -581,11 +587,11 @@ const SellerCommunity = () => {
                                                     onChange={e => setPostStatus(e.target.value)}
                                                     className="form-select" name="" id="">
                                                     <option value="Followers">Followers</option>
-                                                    <option value="Public">Public</option>                                                
+                                                    <option value="Public">Public</option>
                                                 </select>
                                             </div>
                                         </div>
-                                        <div className="create_post_input">                                     
+                                        <div className="create_post_input">
                                             <textarea
                                                 className="input-style"
                                                 value={inputStr}
@@ -604,7 +610,7 @@ const SellerCommunity = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className='cp_box'>                                     
+                                    <div className='cp_box'>
                                         <div className="cp_preview_box">
                                             <div className='mb-2 mt-2 video_preview'>
                                                 <ul className="load_imgs">
@@ -641,7 +647,7 @@ const SellerCommunity = () => {
                                                             <input type="file" id='post_video' accept="video/*" multiple onChange={(event) => handleVideoPreview(event)} />
                                                         </div>
                                                     </>
-                                                )}                                          
+                                                )}
                                                 <Select
                                                     className="sort_select text-normal "
                                                     options={categoryOption}
@@ -659,10 +665,10 @@ const SellerCommunity = () => {
                                                     }}
                                                 />
                                             </div>
-                                            {isUpdate === true ? <button className="btn custom_btn btn_yellow mx-auto" onClick={updatPost}> Update</button> : <button className="btn custom_btn btn_yellow mx-auto" onClick={() => createPost()} disabled={!inputStr.trim() && images.length === 0 && videos.length === 0 ? true : false} >Post</button>}                                       
+                                            {isUpdate === true ? <button className="btn custom_btn btn_yellow mx-auto" onClick={updatPost}> Update</button> : <button className="btn custom_btn btn_yellow mx-auto" onClick={() => createPost()} disabled={!inputStr.trim() && images.length === 0 && videos.length === 0 ? true : false} >Post</button>}
                                         </div>
                                     </div>
-                                </div>                             
+                                </div>
                                 {
                                     filteredData === null ? (
                                         SellerPostsData.length > 0 ? (
@@ -676,12 +682,12 @@ const SellerCommunity = () => {
                                                         } else if (showMostCommented) {
                                                             return b.commentCount - a.commentCount;
                                                         } else {
-                                                            return 0; 
+                                                            return 0;
                                                         }
-                                                    }).map((value, index) => {                                                      
+                                                    }).map((value, index) => {
                                                         return (
                                                             <SellerPost key={value._id} posts={value} sendEditData={handleEdit} ref={(el) => {
-                                                                postRefs.current[value._id] = el;                                                        
+                                                                postRefs.current[value._id] = el;
                                                             }} />
                                                         );
                                                     })

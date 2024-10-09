@@ -87,7 +87,7 @@ const Header = () => {
 
     return () => {
       socket.off('receive_notification');
-      socket.disconnect(); // Ensure disconnection on unmount
+      socket.disconnect(); 
     };
   }, [authInfo.id]);
 
