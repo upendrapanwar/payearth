@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import Header from '../../components/user/common/Header';
+import React, { Component, Suspense, lazy } from 'react';
+// import Header from '../../components/user/common/Header';
 import PageTitle from '../../components/user/common/PageTitle';
 import Footer from '../../components/common/Footer';
 import { Link } from 'react-router-dom';
@@ -31,6 +31,8 @@ import moment from 'moment';
 import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data';
 import { Helmet } from 'react-helmet';
+
+const Header = lazy(() => import("../../components/user/common/Header"));
 
 class Chat extends Component {
     constructor(props) {
@@ -135,7 +137,7 @@ class Chat extends Component {
         // })
     }
 
-    
+
     componentDidMount() {
         this.fetchAllUserData();
         this.socket.emit("active", this.authInfo.id);
@@ -404,7 +406,7 @@ class Chat extends Component {
                     this.socket.emit('chatNotification', { notification });
 
                     axios.post('front/notifications', notification).then(response => {
-                       // console.log("Notification saved:", response.data.message);
+                        // console.log("Notification saved:", response.data.message);
                     }).catch(error => {
                         console.log("Error saving notification:", error);
                     });
@@ -894,7 +896,7 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             }).then((response) => {
-               // console.log("response remove from group..", response)
+                // console.log("response remove from group..", response)
                 this.fetchAllUserData();
                 this.setState({ sendChatData: "" });
             }).catch((error) => {
@@ -950,7 +952,9 @@ class Chat extends Component {
         return (
             <React.Fragment>
                 {loading === true ? <SpinnerLoader /> : ''}
-                <Header />
+                <Suspense fallback={<SpinnerLoader />}>
+                    <Header />
+                </Suspense>
                 <PageTitle title="Chat" />
                 <section className="inr_wrap">
                     <Helmet><title>{"Chat - Pay Earth"}</title></Helmet>

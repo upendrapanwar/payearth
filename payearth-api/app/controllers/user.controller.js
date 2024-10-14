@@ -280,7 +280,7 @@ router.put("/updateGroupName", updateGroupName);
 router.post("/add-notification", addNotification);
 router.get("/get-notification/:id", getNotification);
 router.patch("/update-notification/:id", updateNotification);
-router.delete("/delete-notification/:id", deleteNotification);
+router.delete("/removeNotification/:id", removeNotification);
 router.post("/user-contact-us", userContactUs);
 router.post("/user-support-email", userSupportEmail);
 router.post("/support/request-call", supportReqCall);
@@ -1546,15 +1546,15 @@ function updateNotification(req, res, next) {
 //*****************************************************************************************/
 //*****************************************************************************************/
 //deleteNotification
-function deleteNotification(req, res, next) {
+function removeNotification(req, res, next) {
   userService
-    .deleteNotification(req)
+    .removeNotification(req)
     .then((result) =>
       result
         ? res.status(200).json({
           status: true,
           data: result,
-          message: "Delete Notification Successfully",
+          message: "Notification Remove Successfully",
         })
         : res.status(400).json({ status: false, message: "ERROR ", data: [] })
     )

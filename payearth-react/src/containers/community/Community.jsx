@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, Suspense, lazy } from 'react';
 import Footer from '../../components/common/Footer';
-import Header from '../../components/user/common/Header';
+// import Header from '../../components/user/common/Header';
 import userImg from '../../assets/images/user.png'
 import { Link } from 'react-router-dom';
 import InputEmoji from 'react-input-emoji'
@@ -21,6 +21,8 @@ import { Modal } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { Helmet } from 'react-helmet';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
+
+const Header = lazy(() => import("../../components/user/common/Header"));
 
 const Community = () => {
     const userInfo = useSelector(state => state.auth.userInfo);
@@ -113,7 +115,6 @@ const Community = () => {
             default:
                 break;
         }
-        console.log("under model data", data)
         setModalContent(data.data);
         setUserType(data.type)
         setShowModal(true);
@@ -462,7 +463,9 @@ const Community = () => {
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
             <div className='seller_body'>
-                <Header />
+                <Suspense fallback={<SpinnerLoader />}>
+                   <Header />
+                </Suspense> 
                 <PageTitle title="Community" />
                 <Helmet><title>{"Community - Pay Earth"}</title></Helmet>
                 <div className="cumm_page_wrap pt-2 pb-5">

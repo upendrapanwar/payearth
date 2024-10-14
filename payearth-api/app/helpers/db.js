@@ -49,5 +49,5 @@ module.exports = {
   Chat: require("../models/chat.model"),
   ChatMessage: require("../models/chatmessage.model"),
   Notification: require("../models/notification.model"),
-  Support: require('../models/support.modael'),
+  Support: require('../models/support.model'),
 };

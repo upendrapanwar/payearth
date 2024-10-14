@@ -603,9 +603,7 @@ class AddProduct extends Component {
             }
         }).then(response => {
             if (response.data.status) {
-                console.log("response", response.data.data);
                 this.setState({ colors: response.data.data });
-                console.log("colors", this.state.colors);
             }
         }).catch(error => {
             if (error.response && error.response.data.status === false) {
@@ -855,10 +853,10 @@ class AddProduct extends Component {
                                                                 <label htmlFor="name" className="form-label">Color & Size</label>
                                                                 <div className="input-group mb-2">
                                                                     <input type="text" readOnly className="form-control" aria-label="Text input" placeholder="S" value="S" />
-                                                                    <button className="btn btn-outline-secondary"  type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                        <ul className="colors_pick" style={{'display': 'none'}}>
-                                                                            <li><span style={{backgroundColor: '#0EB4B3'}} className="color_box"></span></li>
-                                                                            <li><span style={{backgroundColor: '#7C80BC'}} className="color_box"></span></li>
+                                                                    <button className="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                                        <ul className="colors_pick" style={{ 'display': 'none' }}>
+                                                                            <li><span style={{ backgroundColor: '#0EB4B3' }} className="color_box"></span></li>
+                                                                            <li><span style={{ backgroundColor: '#7C80BC' }} className="color_box"></span></li>
                                                                         </ul>
                                                                         <span>Color</span>
                                                                     </button>

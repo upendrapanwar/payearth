@@ -9,6 +9,12 @@ import { setLoading } from '../../store/reducers/global-reducer';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { Helmet } from 'react-helmet';
+import DataTable from "react-data-table-component";
+import DataTableExtensions from "react-data-table-component-extensions";
+import "react-data-table-component-extensions/dist/index.css";
+// import { DateRangePicker } from "react-date-range";
+import "react-date-range/dist/styles.css"; // main style file
+import "react-date-range/dist/theme/default.css";
 
 const Notifications = () => {
   const [notification, setNotification] = useState([]);
@@ -47,7 +53,6 @@ const Notifications = () => {
   };
 
   const updateReadStatus = (notificationId) => {
-    console.log("notificationId", notificationId)
     axios.put('front/setNotificationSeen', { notificationId }).then(response => {
       const updatedReadStatus = response.data.data;
       //console.log('updatedReadStatus--', updatedReadStatus)
@@ -61,6 +66,59 @@ const Notifications = () => {
     });
   }
 
+  const removeNotification = async (id) => {
+    try {
+      const url = `/user/removeNotification/${id}`;
+      await axios.delete(url, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Authorization': `Bearer ${authInfo.token}`
+        }
+      });
+      fetchNotification(authInfo.id)
+    } catch (error) {
+      console.error("Somthing went wrong..", error);
+    }
+  }
+
+  const notification_column = [
+    {
+      selector: (row, i) => <>
+        <Link
+          to={
+            row.notification.type === 'comment' || row.notification.type === 'like'
+              ? '#'
+              : '#'
+          }
+          onClick={() => updateReadStatus(row.notification._id)}
+        >
+          <div className={`card border border-2 border-info-subtle mb-2 mt-2 ${!row.notification.isSeen ? 'bg-info-subtle' : 'bg-light'}`} >
+            <div className="card-header d-flex justify-content-between align-items-center text-primary">
+              <span>{row.notification.type || "not available"}</span>
+            </div>
+            <div className="card-body">
+              {/* <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5> */}
+              <div className="d-flex justify-content-between">
+                <h5 className="card-title mb-0">
+                  {row.senderDetails.name || "Special title not defined"}
+                </h5>
+                <small className="text-muted">{new Date(row.notification.createdAt).toLocaleString() || "Just now"}</small>
+              </div>
+              <p className="card-text">
+                {row.notification.message || " No message."}
+              </p>
+            </div>
+          </div>
+        </Link>
+        {!row.notification.isSeen ? "" : <i className="bi bi-trash fs-3 text-danger"
+          onClick={() => removeNotification(row.notification._id)}
+        ></i>}
+      </>,
+      sortable: true,
+    },
+  ]
+
   return (
     <>
       {loading === true ? <SpinnerLoader /> : ''}
@@ -71,25 +129,27 @@ const Notifications = () => {
         <div className="container">
           <div className="row">
             <div className="col-md-12">
-              {Array.isArray(notification) && notification.length > 0 ? (
+              {/* {Array.isArray(notification) && notification.length > 0 ? (
                 notification.map((notifications, index) => (
                   <Link
                     key={index}
                     to={
                       notifications.notification.type === 'comment' || notifications.notification.type === 'like'
                         ? '#'
-                        : '#' // for follow or  other types of notifications
+                        : '#'
                     }
                     onClick={() => updateReadStatus(notifications.notification._id)}
                   >
                     <div
                       className={`card border border-2 border-info-subtle mb-1 mt-1 ${!notifications.notification.isSeen ? 'bg-info-subtle' : 'bg-light'}`}
                     >
-                      <div className="card-header  text-primary">
-                        {notifications.notification.type || "not available"}
+                      <div className="card-header d-flex justify-content-between align-items-center text-primary">
+                        <span>{notifications.notification.type || "not available"}</span>
+                        {!notifications.notification.isSeen ? "" : <i className="bi bi-trash fs-3 text-danger"
+                          onClick={() => removeNotification(notifications.notification._id)}
+                        ></i>}
                       </div>
                       <div className="card-body">
-                        {/* <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5> */}
                         <div className="d-flex justify-content-between">
                           <h5 className="card-title mb-0">
                             {notifications.senderDetails.name || "Special title not defined"}
@@ -107,7 +167,28 @@ const Notifications = () => {
                 <div className="alert alert-info" role="alert">
                   Notification not available
                 </div>
-              )}
+              )} */}
+
+              <div className="notification_wapper col-md-12">
+                {/* <button>Filter</button> */}
+                <DataTableExtensions
+                  columns={notification_column}
+                  data={notification}
+                >
+                  <DataTable
+                    pagination
+                    highlightOnHover
+                    noHeader
+                    defaultSortField="id"
+                    defaultSortAsc={false}
+                    // selectedRows={selectedRows}
+                    // onSelectedRowsChange={this.handleRowSelected}
+                    // paginationPerPage={this.itemsPerPage}
+                    paginationRowsPerPageOptions={[6, 10, 15, 20]}
+                  />
+                </DataTableExtensions>
+              </div>
+
             </div>
           </div>
         </div>
