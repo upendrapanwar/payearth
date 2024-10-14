@@ -90,6 +90,7 @@ var certOptions = {
   cert: fs.readFileSync(config.ssl_cert, "utf8"),
 };
 
+
 // serve the API with HTTPS
 const httpsServer = https.createServer(certOptions, app);
 
@@ -181,6 +182,11 @@ io.on("connection", function (socket) {
 
   socket.on('chatNotification', (data) => {
     NotificationController.chatNotification(socket, data);
+    //console.log('liked data---',data)
+  });
+
+  socket.on('Event_added', (data) => {
+    NotificationController.Event_added(socket, data);
     //console.log('liked data---',data)
   });
 

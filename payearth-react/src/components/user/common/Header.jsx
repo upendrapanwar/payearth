@@ -777,6 +777,13 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
                     <li>
                       <Link to="/blog">Blog</Link>
                     </li>
+                    <li>
+                      <Link to="/product-listing">All-Products</Link>
+                      {/* <Link to={`/product-detail/${'66db3efeb660f1cef86e1048'}`}>All-Products</Link> */}
+                    </li>
+                    <li>
+                      <Link to="#">All-Services</Link>
+                    </li>
                   </ul>
                   <ul>
                     <li className="login_links_wrapper me-3">

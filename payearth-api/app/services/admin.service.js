@@ -155,6 +155,19 @@ module.exports = {
     getProfileById,
     saveMyProfile,
     editProfile,
+
+    //Products
+    createProductCategory,
+    getAllProductCategory,
+    addProductSubCate,
+    getSubCateProduct,
+    updateStatus,
+    getIndivisualCate,
+    updateProductCategory,
+    updateSubCateStatus,
+    getIndivisualSubCate,
+    updateSubCate,
+    getTrashSubCateProduct,
 };
 
 // Validator function
@@ -3772,7 +3785,6 @@ async function updatePost(req) {
     }
 }
 
-
 async function getSupportCallReq() {
     try {
 
@@ -3788,8 +3800,6 @@ async function getSupportCallReq() {
         return false;
     }
 }
-
-
 
 async function updateSupportCallReqStatus(req) {
     const { id } = req.params;
@@ -3821,7 +3831,7 @@ async function updateSupportCallReqStatus(req) {
 //get profile data
 async function getProfileById(id) {
     const admin = await Admin.findById(id).select(
-        "id name email phone address  role original_image_url original_image_id image_url image_id"
+        "id name email phone address role original_image_url original_image_id image_url image_id"
     );
     if (!admin) return false;
     return admin;
@@ -3868,7 +3878,6 @@ async function saveMyProfile(req) {
     }
 }
 
-
 async function editProfile(req) {
     try {
         const _id = req.params.id;
@@ -3905,5 +3914,290 @@ async function editProfile(req) {
         return data;
     } catch (error) {
         console.error("Error:", error)
+    }
+}
+
+async function getAllProductCategory(req) {
+    try {
+        const data = await Category.find({ parent: null,  isUncategorized: false,  isService: false })
+            .sort({ createdAt: 'desc' })
+
+        if (!data) {
+            return { status: false, message: `Category is not found.` };
+        }
+
+
+        return { status: true, data: data, message: "Category fetch successfully." };
+
+    } catch (error) {
+        console.error(error);
+        return { status: false, message: error.message };
+    }
+}
+
+async function addProductSubCate(req) {
+    const { name, description, parent_id, is_service, add_to_menu, admin_id } = req.body;
+
+    try {
+        var Name = name.trim();
+        var lName = Name.toLowerCase();
+
+        const existingCategory = await Category.findOne({ isService: false, lname: lName });
+        if (existingCategory) {
+            return { status: false, message: `Category "${name}" already exists.` };
+        }
+
+        const input = {
+            categoryName: Name,
+            lname: lName,
+            parent: parent_id,
+            description: description,
+            isService: is_service || false,
+            onMainMenu: add_to_menu,
+            createdBy: admin_id,
+            updatedBy: admin_id,
+        };
+
+        const category = new Category(input);
+        const data = await category.save();
+        console.log("data", data);
+        return { status: true, data: data, message: "Category created successfully." };
+    } catch (error) {
+        console.error(error);
+        return { status: false, message: error.message };
+    }
+}
+
+async function getSubCateProduct(req) {
+    const parent = req.params.id;
+    try {
+        const data = await Category.find({ parent: { $ne: null, $eq: parent }, isActive: true, isService: false })
+            .sort({ createdAt: 'desc' });
+
+        return { status: true, data };
+    } catch (error) {
+        console.error(error);
+        return { status: false, message: error.message };
+    }
+}
+
+async function updateStatus(req) {
+    const _id = req.params.id;
+    const isActive = req.body.isActive;
+
+    if (typeof isActive === 'undefined') {
+        return { status: false, message: 'isActive is required.' };
+    }
+
+    try {
+        const findData = await Category.find({ _id });
+        if (findData.length === 0) {
+            return { status: false, message: 'Data not found.' };
+        }
+
+        const data = await Category.findByIdAndUpdate(
+            _id,
+            { isActive: isActive },
+            { new: true }
+        );
+
+        return { status: true, data: data, message: 'Status updated successfully.' };
+    } catch (error) {
+        console.error(error);
+        return { status: false, message: error.message };
+    }
+}
+
+async function getIndivisualCate(req) {
+    const _id = req.params.id;
+    try {
+        const data = await Category.find({ _id })
+            .populate({
+                path: 'createdBy',
+                model: Admin,
+                select: 'name'
+            })
+            .populate({
+                path: 'updatedBy',
+                model: Admin,
+                select: 'name'
+            });
+
+        return { status: true, data };
+    } catch (error) {
+        console.error(error);
+        return { status: false, message: error.message };
+    }
+}
+
+//Create product Categories
+async function createProductCategory(req) {
+    const { name, description, parent_id, is_service, add_to_menu, admin_id } = req.body;
+
+    try {
+        var Name = name.trim();
+        var lName = Name.toLowerCase();
+
+
+        const existingCategory = await Category.findOne({ isService: false, lname: lName });
+        if (existingCategory) {
+            return { status: false, message: `Category "${name}" already exists.` };
+        }
+
+        const input = {
+            categoryName: Name,
+            lname: lName,
+            parent: parent_id,
+            description: description,
+            isService: is_service || false,
+            onMainMenu: add_to_menu,
+            createdBy: admin_id,
+            updatedBy: admin_id,
+        };
+
+        const category = new Category(input);
+        const data = await category.save();
+
+        return { status: true, data: data, message: "Category created successfully." };
+    } catch (error) {
+        console.error(error);
+        return { status: false, message: error.message };
+    }
+}
+
+async function updateProductCategory(req) {
+    const _id = req.params.id;
+    const { name, description, isActive, admin_id } = req.body;
+
+    try {
+        var Name = name.trim();
+        var lName = Name.toLowerCase();
+
+        const findData = await Category.findOne + ({ _id })
+        if (!findData) {
+            return { status: false, message: `"${name}" is not exists.` };
+        }
+
+        const input = {
+            categoryName: Name,
+            lname: lName,
+            parent: findData.parent,
+            description: description,
+            isService: findData.isService,
+            isActive: findData.isActive,
+            onMainMenu: findData.onMainMenu,
+            createdBy: findData.createdBy,
+            updatedBy: admin_id,
+        };
+
+        const data = await Category.findByIdAndUpdate(_id, input, { new: true })
+        if (!data) {
+            return { status: false, message: 'failed to update category.', }
+        }
+
+        return { status: true, message: "Category updated successfully.", data: data };
+    } catch (error) {
+        console.error(error);
+        return { status: false, message: error.message };
+    }
+}
+
+async function updateSubCateStatus(req) {
+    const _id = req.params.id;
+    const isActive = req.body.isActive;
+
+    if (typeof isActive === 'undefined') {
+        return { status: false, message: 'isActive is required.' };
+    }
+
+    try {
+        const findData = await Category.find({ _id });
+        if (findData.length === 0) {
+            return { status: false, message: 'Data not found.' };
+        }
+
+        const data = await Category.findByIdAndUpdate(
+            _id,
+            { isActive: isActive },
+            { new: true }
+        );
+
+        return { status: true, data: data, message: 'Status updated successfully.' };
+    } catch (error) {
+        console.error(error);
+        return { status: false, message: error.message };
+    }
+}
+
+async function getIndivisualSubCate(req) {
+    const _id = req.params.id;
+    try {
+        const data = await Category.find({ _id })
+            .populate({
+                path: 'createdBy',
+                model: Admin,
+                select: 'name'
+            })
+            .populate({
+                path: 'updatedBy',
+                model: Admin,
+                select: 'name'
+            });
+        return { status: true, data };
+    } catch (error) {
+        console.error(error);
+        return { status: false, message: error.message };
+    }
+}
+
+async function updateSubCate(req) {
+    const _id = req.params.id;
+    const { name, description, admin_id } = req.body;
+    try {
+
+        var Name = name.trim();
+        var lName = Name.toLowerCase();
+
+        const findData = await Category.findById({ _id })
+        if (!findData) {
+            return { status: false, message: `"${name}" is not exists.` };
+        }
+
+        const input = {
+            categoryName: Name,
+            lname: lName,
+            parent: findData.parent,
+            description: description,
+            isService: findData.isService,
+            isActive: findData.isActive,
+            onMainMenu: findData.onMainMenu,
+            createdBy: findData.createdBy,
+            updatedBy: admin_id,
+        };
+
+
+        const data = await Category.findByIdAndUpdate(_id, input, { new: true })
+        if (!data) {
+            return { status: false, message: 'failed to update sub-category.', }
+        }
+
+        return { status: true, message: "Sub-Category updated successfully.", data: data };
+
+    } catch (error) {
+        console.error(error);
+        return { status: false, message: error.message };
+    }
+}
+
+async function getTrashSubCateProduct(req){
+    const parent = req.params.id;
+    try {
+        const data = await Category.find({ parent: { $ne: null, $eq: parent }, isActive: false, isService: false })
+            .sort({ createdAt: 'desc' });
+
+        return { status: true, data };
+    } catch (error) {
+        console.error(error);
+        return { status: false, message: error.message };
     }
 }
