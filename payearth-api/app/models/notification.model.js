@@ -29,7 +29,7 @@ const schema = new Schema(
     type: {
       type: String,
       required: true,
-      enum: ['follow', 'like', 'comment', 'message', 'report', 'chat']
+      enum: ['follow', 'like', 'comment', 'message', 'report', 'chat', 'Meeting_Request']
     },
     receiver: {
       id: {

@@ -4644,3 +4644,8 @@ h4 {
 .pointer {
   cursor: pointer;
 }
+
+.modal-body .ql-editor { min-height: 200px;}
+
+.action_btn_textView { min-width: max-content!important; font-size: 13px; }
+

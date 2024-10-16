@@ -2868,9 +2868,9 @@ async function deleteReviews(req) {
     throw err;
   }
 }
-// *******************************************************************************
-// *******************************************************************************
-// async function addMeetByUser(req) {
+
+//Add (save) Google Event in data base
+// async function addGoogleEvent(req) {
 //   try {
 //     const reqData = req.body;
 //     let data = "";
@@ -2890,20 +2890,32 @@ async function deleteReviews(req) {
 //           end_datetime: event.end_datetime,
 //           meeting_url: event.meeting_url,
 //         };
-
+        
 //         data = await Calendar.create(eventData);
+//         console.log("calendar data", data)
+
+//         const serviceData = await Services.find({
+//           _id: data.service_id
+//         });
+//         console.log("serviceData", serviceData)
+        
+//         resultData = {
+//           createdBy:serviceData[0].createdBy,
+//           data:data
+//         }
+//         console.log("resultData", resultData)
+
 //       } else {
-//         data = [];
+//         resultData = [];
 //       }
 //     }
-//     return data;
+//     return resultData;
 //   } catch (err) {
 //     console.error("Error saving calendar events:", err);
-//     return false; // Indicate failure
+//     return false;
 //   }
 // }
 
-//Add (save) Google Event in data base
 async function addGoogleEvent(req) {
   try {
     const reqData = req.body;
@@ -2924,13 +2936,26 @@ async function addGoogleEvent(req) {
           end_datetime: event.end_datetime,
           meeting_url: event.meeting_url,
         };
-
+        
         data = await Calendar.create(eventData);
+        console.log("calendar data", data)
+
+        const serviceData = await Services.find({
+          _id: data.service_id
+        });
+        console.log("serviceData", serviceData)
+        
+        resultData = {
+          createdBy:serviceData[0].createdBy,
+          data:data
+        }
+        console.log("resultData", resultData)
+
       } else {
-        data = [];
+        resultData = [];
       }
     }
-    return data;
+    return resultData;
   } catch (err) {
     console.error("Error saving calendar events:", err);
     return false;

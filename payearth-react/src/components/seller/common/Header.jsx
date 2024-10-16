@@ -82,6 +82,7 @@ const Header = () => {
         return;
       }
 
+      
       setUnreadCount((prevCount) => prevCount + 1);
     });
 

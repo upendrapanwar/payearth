@@ -9,7 +9,8 @@ const schema = new Schema(
     user_id: { type: String, ref: "User", required: false, default: null },
     // seller_id: { type: Schema.Types.ObjectId, ref: 'Seller', required: false, default: null },
     service_id: {
-      type: String,
+      // type: String,
+      type: Schema.Types.ObjectId,
       ref: "Services",
       required: false,
       default: null,

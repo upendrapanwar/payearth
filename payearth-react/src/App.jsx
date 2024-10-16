@@ -140,7 +140,7 @@ import StripePaymentForms from "./containers/user/paymentCheckoutStripe";
 import StripePaymentForm from "./containers/user/paymentCheckoutStripe";
 import ServiceOrder from "./containers/user/service/ServiceOrder";
 import adminAddService from './containers/admin/AddService';
-import ManageCategories from "./containers/admin/ManageCategories";
+// import ManageCategories from "./containers/admin/ManageCategories";
 import AdminProfile from "./containers/community/AdminProfile";
 import SupportUser from "./containers/user/SupportUser";
 import SupportSeller from "./containers/seller/SupportSeller";
@@ -169,6 +169,8 @@ function App() {
             exact
           />
 
+        
+
           <PublicRoute
             path="/product-listing"
             restricted={false}
@@ -183,6 +185,7 @@ function App() {
             exact
           />
 
+        
           <PublicRoute
             path="/service-display"
             restricted={false}
@@ -770,14 +773,14 @@ function App() {
             exact
           />
 
-          <PrivateRoute
+          {/* <PrivateRoute
             path="/admin/manage-categories"
             restricted={false}
             component={ManageCategories}
             roles={[Role.admin]}
             currentUserRole={userInfo.role}
             exact
-          />
+          /> */}
 
           <PrivateRoute
             path="/admin/manage-categories-product"

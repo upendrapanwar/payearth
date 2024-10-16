@@ -238,6 +238,23 @@ router.get("/my-profile/:id", getProfileById);
 router.put("/save-admin-profile/:id", saveMyProfile);
 router.put("/edit-profile/:id", editProfile);
 
+//Products categories
+router.post('/create-product-categories', createProductCategory);
+router.get("/get-product-categories", getAllProductCategory);
+router.put("/update-category-status/:id", updateStatus);
+router.get("/get-indivisual-categories/:id", getIndivisualCate);
+router.put("/update-product-categories/:id", updateProductCategory);
+
+//Products Sub-categories
+router.post('/add-product-sub-categories', addProductSubCate);
+router.get("/get-product-sub-categories/:id", getSubCateProduct);
+router.put("/update-subcategory-status/:id", updateSubCateStatus);
+router.get("/get-indivisual-sub-categories/:id", getIndivisualSubCate);
+router.put("/update-product-sub-categories/:id", updateSubCate);
+router.get("/get-trash-sub-categories/:id", getTrashSubCateProduct);
+
+
+
 
 module.exports = router;
 
@@ -1099,7 +1116,6 @@ function updateSupportCallReqStatus(req, res, next) {
         .catch((err) => next(res.json({ status: false, message: err.message })));
 }
 
-
 //get Seller Profile
 function getProfileById(req, res, next) {
     adminService
@@ -1124,5 +1140,71 @@ function saveMyProfile(req, res, next) {
 function editProfile(req, res, next) {
     adminService.editProfile(req)
         .then((data) => data ? res.json({ status: true, data: data, message: "Personal information updated successfully." }) : res.json({ status: false, data: {}, message: "Error updating personal information." }))
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function createProductCategory(req, res, next) {
+    adminService.createProductCategory(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getAllProductCategory(req, res, next) {
+    adminService.getAllProductCategory(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function addProductSubCate(req, res, next) {
+    adminService.addProductSubCate(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getSubCateProduct(req, res, next) {
+    adminService.getSubCateProduct(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function updateStatus(req, res, next) {
+    adminService.updateStatus(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getIndivisualCate(req, res, next) {
+    adminService.getIndivisualCate(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function updateProductCategory(req, res, next) {
+    adminService.updateProductCategory(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function updateSubCateStatus(req, res, next) {
+    adminService.updateSubCateStatus(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getIndivisualSubCate(req, res, next) {
+    adminService.getIndivisualSubCate(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function updateSubCate(req, res, next) {
+    adminService.updateSubCate(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getTrashSubCateProduct(req, res, next) {
+    adminService.getTrashSubCateProduct(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
         .catch((err) => next(res.json({ status: false, message: err.message })));
 }

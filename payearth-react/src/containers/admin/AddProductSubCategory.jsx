@@ -10,82 +10,91 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Link } from "react-router-dom";
 import arrow_back from '../../assets/icons/arrow-back.svg';
-import AddProductSubCategory from './AddProductSubCategory';
-import Header from '../../components/admin/common/Header';
-import Footer from '../../components/common/Footer'
 
-const ManageProductsCategory = () => {
+
+const AddProductSubCategory = (props) => {
+
     // Global variables
     const authInfo = JSON.parse(localStorage.getItem("authInfo"));
+    const parent_Id = props.cateData.id;
 
     //states
     const [loading, setLoading] = useState(false);
-    const [description, setDescription] = useState('');
-    const [categories, setCategories] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [showSubCategory, setShowSubCategory] = useState(false);
-    const [selectedCateData, setSelectedCateData] = useState(null);
+    const [defaultCateName, setDefaultCateName] = useState({ categoryName: props.cateData.categoryName, CateId: props.cateData.id });
+    const [description, setDescription] = useState('');
+    const [subCategories, setSubCategories] = useState([]);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [indiCate, setIndiCate] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editCateData, setEditCateData] = useState([]);
-
+    const [activeCategory, setActiveCategory] = useState('publish');
+    const [trashSubCategories, setTrashSubCategories] = useState([]);
 
 
     //functions
     useEffect(() => {
-        getAllCateData();
-    }, []);
 
-    //handle categories for add categories
-    const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-        setLoading(true);
+        if (activeCategory === 'trash') {
+            getTrashSubCate();
+        };
+
+        getSubCatedata();
+    }, [activeCategory])
+
+    //get sub-cate data
+    const getSubCatedata = async () => {
         try {
-            const token = authInfo.token;
-            const admin_id = authInfo.id;
-
-            const productCateData = {
-                ...values,
-                parent_id: null,
-                is_service: false,
-                add_to_menu: true,
-                admin_id: admin_id
-            };
-
-            const response = await axios.post("/admin/create-product-categories", productCateData, {
+            const response = await axios.get(`/admin/get-product-sub-categories/${parent_Id}`, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${authInfo.token}`
                 }
-            });
+            })
 
             if (response.data.status === true) {
-                toast.success(response.data.message);
-                getAllCateData();
-                setIsModalOpen(false);
-                resetForm();
-                setDescription('');
-            } else if (response.data.status === false) {
-                toast.error(response.data.message);
-                getAllCateData();
-                setIsModalOpen(false);
-                resetForm();
-                setDescription('');
+                setSubCategories(response.data.data)
             }
-        } catch (error) {
-            console.error("Categories add failed.", error);
-        } finally {
-            setLoading(false);
-            setSubmitting(false);
-        }
-    };
 
-    //get all categories and display in the list
-    const getAllCateData = async () => {
-        setLoading(true);
+        } catch (error) {
+            console.error("Sub-category data has not fetch", error);
+        }
+    }
+
+    //get trash sub-cate data
+    const getTrashSubCate = async () => {
         try {
-            const response = await axios.get("/admin/get-product-categories", {
+            const response = await axios.get(`/admin/get-trash-sub-categories/${parent_Id}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${authInfo.token}`
+                }
+            })
+
+            if (response.data.status === true) {
+                setTrashSubCategories(response.data.data);
+            }
+
+        } catch (error) {
+            console.error("Sub-category data has not fetch", error);
+        }
+    }
+
+    //add sub-cate
+    const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+        try {
+            const updatedValues = {
+                name: values.subCategoryName,
+                parent_id: values.categoryId,
+                description: values.description,
+                isService: false,
+                add_to_menu: true,
+                admin_id: authInfo.id,
+            }
+
+            const response = await axios.post("/admin/add-product-sub-categories", updatedValues, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
@@ -94,20 +103,27 @@ const ManageProductsCategory = () => {
             });
 
             if (response.data.status === true) {
-                setCategories(response.data.data);
-                setLoading(false);
+                toast.success(response.data.message);
+                getSubCatedata();
+                setIsModalOpen(false);
+                resetForm();
+                setDescription('');
             } else if (response.data.status === false) {
                 toast.error(response.data.message);
+                getSubCatedata();
+                setIsModalOpen(false);
+                resetForm();
+                setDescription('');
             }
-
         } catch (error) {
-            console.error("categories data fetch failed", error);
+            console.error("Sub-category has not saved", error);
         }
-    };
+    }
 
+    //update sub-cate status
     const updateStatus = async (row, newStatus) => {
         try {
-            const response = await axios.put(`/admin/update-category-status/${row._id}`, {
+            const response = await axios.put(`/admin/update-subcategory-status/${row._id}`, {
                 isActive: newStatus
             }, {
                 headers: {
@@ -119,7 +135,8 @@ const ManageProductsCategory = () => {
 
             if (response.data.status === true) {
                 toast.success(response.data.message);
-                getAllCateData();
+                getSubCatedata();
+                getTrashSubCate();
             } else {
                 toast.error(response.data.message);
             }
@@ -127,12 +144,13 @@ const ManageProductsCategory = () => {
             console.error("Status update failed", error);
             toast.error("An error occurred while updating the status");
         }
-    };
 
-    const getIndivisualCate = async (id) => {
+    }
+
+    const getIndivisualSubCate = async (id) => {
         setIsViewModalOpen(true)
         try {
-            const response = await axios.get(`/admin/get-indivisual-categories/${id}`, {
+            const response = await axios.get(`/admin/get-indivisual-sub-categories/${id}`, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
@@ -140,67 +158,60 @@ const ManageProductsCategory = () => {
                 }
             })
             if (response.data.status === true && response.data.data.length > 0) {
-                setIndiCate(response.data.data[0])
+                setIndiCate(response.data.data[0]);
+                getSubCatedata();
             }
         } catch (error) {
             console.error("Data has not fatched.", error);
         }
     }
 
-    //edit functionality
-    const handleEdit = async (id, categoryName, description) => {
+    const handleEdit = (id, categoryName, description) => {
         setEditCateData({
             id: id,
-            categoryName: categoryName,
+            categoryName: props.cateData.categoryName,
+            subCategoryName: categoryName,
             description: description,
-            isActive: true
         });
         setIsEditModalOpen(true);
     };
 
-
     const handleUpdateSubmit = async (values) => {
-        try {
-            const admin_id = authInfo.id;
-            const updatedData = {
-                ...values,
-                isActive: editCateData.isActive,
-                admin_id: admin_id,
-            };
-
-            const response = await axios.put(`/admin/update-product-categories/${values.id}`, updatedData, {
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json;charset=UTF-8',
-                    'Authorization': `Bearer ${authInfo.token}`
-                }
-            })
-
-            if (response.data.status === true) {
-                setIsEditModalOpen(false);
-                getAllCateData();
-            }
-
-        } catch (error) {
-            console.error('failed data update.', error);
+        const updatedData = {
+            name: values.subCategoryName,
+            description: values.description,
+            admin_id: authInfo.id,
         }
+
+        const response = await axios.put(`/admin/update-product-sub-categories/${values.id}`, updatedData, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${authInfo.token}`
+            }
+        })
+
+        if (response.data.status === true) {
+            setIsEditModalOpen(false);
+            getSubCatedata();
+        }
+
     }
 
-    const handleAddSubCate = (row) => {
-        setSelectedCateData({ id: row._id, categoryName: row.categoryName });
-        setShowSubCategory(true);
+    const handleCategoryChange = (category) => {
+        setActiveCategory(category);
     };
 
-    //data table column 
+
     const columns = [
         {
-            name: 'Category Name',
+            name: 'Sub-cate Name',
             selector: row => row.categoryName,
             sortable: true
         },
         {
             name: 'Status',
-            selector: (row, i) => (
+            selector: (row) => (
                 <span className={`badge ${row.isActive ? 'bg-success' : 'bg-danger'}`}>
                     {row.isActive === true ? 'Active' : 'In-Active'}
                 </span>
@@ -218,102 +229,159 @@ const ManageProductsCategory = () => {
         },
         {
             name: 'Actions',
-            cell: (row) => {
-                return (
-                    <>
-                        <button
-                            className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
-                            onClick={() => getIndivisualCate(row.id)}>
-                            <i className="bi bi-eye"></i>
-                        </button>
+            cell: (row) => (
+                <>
+                    <button
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+                        onClick={() => getIndivisualSubCate(row.id)}>
+                        View
+                    </button>
 
 
-                        <button
-                            className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
-                            onClick={() => handleEdit(row.id, row.categoryName, row.description)}>
-                            <i className="bi bi-pen"></i>
-                        </button>
+                    <button
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+                        onClick={() => handleEdit(row.id, row.categoryName, row.description)}
+                    >
+                        Edit
+                    </button>
 
-                        {row.isActive ? (
-                            <button
-                                className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new action_btn_textView"
-                                onClick={() => updateStatus(row, false)}
-                            >
-                                In-Active
-                            </button>
-                        ) : (
-                            <button
-                                className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new action_btn_textView"
-                                onClick={() => updateStatus(row, true)}
-                            >
-                                Active
-                            </button>
-                        )}
 
-                        <button
-                            className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new action_btn_textView"
-                            onClick={() => handleAddSubCate(row)}
-                        >
-                            View Sub-Cat
-                        </button>
-
-                    </>
-                )
-            }
+                    <button
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+                        onClick={() => updateStatus(row, false)}
+                    >
+                        Trash
+                    </button>
+                </>
+            )
         }
     ];
 
     //data of table
-    const tableData = {
-        columns,
-        data: categories
+    const tableData = { columns, data: subCategories};
+
+    const columnsTrash = [
+        { name: 'Category Name', selector:  row => row.categoryName, sortable: true },
+
+        {
+            name: 'Status',
+            selector: (row) => (
+                <span className={`badge ${row.isActive ? 'bg-success' : 'bg-danger'}`}>
+                    {row.isActive === true ? 'Active' : 'In-Active'}
+                </span>
+            ),
+            sortable: true
+        },
+
+        { name: 'Created Date', selector:  row => new Date(row.createdAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        }),
+        sortable: true},     
+       
+{
+            name: 'Actions',
+            cell: (row) => (
+                <>
+                    <button
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+                        onClick={() => getIndivisualSubCate(row.id)}>
+                        View
+                    </button>
+
+                    <button
+                        className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+                        onClick={() => updateStatus(row, true)}
+                    >
+                        Remove Trash
+                    </button>
+                </>
+            )
+        }
+    ];
+
+    const tableDataTrash = { columns: columnsTrash, data: trashSubCategories };
+    const handleClick = (e) => {
+        e.preventDefault(); // Prevent navigation behavior
+        props.toggleShowSubCategory(); // Call the function to toggle state
     };
-
-
-    const toggleShowSubCategory = () => {
-        setShowSubCategory(false);
-    };
-
 
     return (
         <React.Fragment>
             {loading && <SpinnerLoader />}
             <div className="container">
-                <Header />
                 <Helmet>
-                    <title>{"Product category - Pay Earth"}</title>
+                    <title>{"Add Sub-Category - Pay Earth"}</title>
                 </Helmet>
                 <div className="row">
-                    {showSubCategory ? (
-                        <AddProductSubCategory cateData={selectedCateData}  toggleShowSubCategory={toggleShowSubCategory} />
-                    ) : (
-                        <div className="col-lg-12">
-                            <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
-                                <div className="cp_top d-flex justify-content-between align-items-center">
-                                    <div className="cumm_title">Products Category List</div>
-                                    <div className="d-flex justify-content-end ml-auto gap-2">
-                                        <Link className="btn custom_btn btn_yellow ml-auto " to='#' onClick={() => setIsModalOpen(true)}>Add-Cate</Link>
-                                        <Link className="btn custom_btn btn_yellow mx-auto " to="/admin/dashboard"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link>
-                                    </div>
-                                </div>
-
-                                <div className="cp_body">
-                                    <div>
-                                        <DataTableExtensions {...tableData}>
-                                            <DataTable
-                                                columns={columns}
-                                                data={categories}
-                                                noHeader
-                                                defaultSortField="name"
-                                                pagination
-                                                highlightOnHover
-                                            />
-                                        </DataTableExtensions>
-                                    </div>
+                    <div className="col-lg-12">
+                        <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
+                            <div className="cp_top d-flex justify-content-between align-items-center">
+                                <div className="cumm_title">Sub-Category List</div>
+                                <div className="cumm_title">{props.cateData.categoryName}</div>
+                                <div className="d-flex justify-content-end ml-auto gap-2">
+                                    <Link className="btn custom_btn btn_yellow ml-auto action_btn_textView" to='#' onClick={() => setIsModalOpen(true)}>Add-SubCate</Link>
+                                    <Link className="btn custom_btn btn_yellow mx-auto action_btn_textView" onClick={handleClick} to=""><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link>
                                 </div>
                             </div>
+
+                            {/* Filter Navigation (ul and li elements) */}
+                            <div className="report_tabing_nav">
+                                <div className="report_tab_link">
+                                    <ul>
+                                        <li className={activeCategory === 'publish' ? 'activeNav' : ''}>
+                                            <Link to="#" onClick={() => handleCategoryChange('publish')}>
+                                                Publish
+                                            </Link>
+                                        </li>
+                                        <li className={activeCategory === 'trash' ? 'activeNav' : ''}>
+                                            <Link to="#" onClick={() => handleCategoryChange('trash')}>
+                                                Trash
+                                            </Link>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div>
+                                {activeCategory === 'publish' && (
+                                    <div className="cp_body">
+                                        <div>
+                                            <DataTableExtensions {...tableData}>
+                                                <DataTable
+                                                    columns={columns}
+                                                    data={subCategories}
+                                                    noHeader
+                                                    defaultSortField="name"
+                                                    pagination
+                                                    highlightOnHover
+                                                />
+                                            </DataTableExtensions>
+                                        </div>
+                                    </div>
+                                )}
+                                {activeCategory === 'trash' && (
+                                    <div className="cp_body">
+                                        <div>
+
+                                            <DataTableExtensions {...tableDataTrash}>
+                                                <DataTable
+                                                    columns={columnsTrash}
+                                                    data={trashSubCategories}
+                                                    noHeader
+                                                    defaultSortField="name"
+                                                    pagination
+                                                    highlightOnHover
+                                                />
+                                            </DataTableExtensions>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    )}
+                    </div>
+
 
                     {isModalOpen && (
                         <div className="modal fade show " style={{ display: 'block' }} tabIndex="-1" aria-modal="true">
@@ -326,11 +394,14 @@ const ManageProductsCategory = () => {
                                     <div className="modal-body">
                                         <Formik
                                             initialValues={{
-                                                name: '',
+                                                categoryName: defaultCateName.categoryName,
+                                                categoryId: defaultCateName.CateId,
+                                                subCategoryName: '',
                                                 description: '',
                                             }}
                                             validationSchema={Yup.object({
-                                                name: Yup.string().required('Category name is required'),
+                                                categoryName: Yup.string().required('Category name is required'),
+                                                subCategoryName: Yup.string().required('Sub-category name is required'),
                                             })}
                                             onSubmit={handleSubmit}
                                         >
@@ -341,10 +412,24 @@ const ManageProductsCategory = () => {
                                                         <Field
                                                             className="form-control"
                                                             type="text"
-                                                            name="name"
+                                                            name="categoryName"
+                                                            value={defaultCateName.categoryName}
+                                                            readOnly
                                                         />
-                                                        {touched.name && errors.name && (
-                                                            <small className="text-danger">{errors.name}</small>
+                                                        {touched.categoryName && errors.categoryName && (
+                                                            <small className="text-danger">{errors.categoryName}</small>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="mb-3">
+                                                        <label htmlFor="name" className="form-label">Sub-Category Name</label>
+                                                        <Field
+                                                            className="form-control"
+                                                            type="text"
+                                                            name="subCategoryName"
+                                                        />
+                                                        {touched.subCategoryName && errors.subCategoryName && (
+                                                            <small className="text-danger">{errors.subCategoryName}</small>
                                                         )}
                                                     </div>
 
@@ -368,11 +453,10 @@ const ManageProductsCategory = () => {
                                                     </div>
 
                                                     <button
+                                                        className='btn custom_btn btn_yellow_bordered'
                                                         type="submit"
-                                                        className="btn custom_btn btn_yellow"
-                                                        disabled={isSubmitting}
                                                     >
-                                                        {isSubmitting ? 'Adding...' : 'Add Cate'}
+                                                        Add
                                                     </button>
                                                 </Form>
                                             )}
@@ -382,7 +466,6 @@ const ManageProductsCategory = () => {
                             </div>
                         </div>
                     )}
-
 
                     {isEditModalOpen && editCateData && (
                         <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1" aria-modal="true">
@@ -404,11 +487,13 @@ const ManageProductsCategory = () => {
                                         <Formik
                                             initialValues={{
                                                 id: editCateData.id,
-                                                name: editCateData.categoryName,
+                                                categoryName: editCateData.categoryName,
+                                                subCategoryName: editCateData.subCategoryName,
                                                 description: editCateData.description,
                                             }}
                                             validationSchema={Yup.object({
-                                                name: Yup.string().required('Category name is required'),
+                                                categoryName: Yup.string().required('Category name is required'),
+                                                subCategoryName: Yup.string().required('Sub-category name is required'),
                                             })}
                                             onSubmit={(values, { setSubmitting }) => {
                                                 handleUpdateSubmit(values, setSubmitting);
@@ -421,10 +506,23 @@ const ManageProductsCategory = () => {
                                                         <Field
                                                             className="form-control"
                                                             type="text"
-                                                            name="name"
+                                                            name="categoryName"
+                                                            readOnly
                                                         />
                                                         {touched.name && errors.name && (
                                                             <small className="text-danger">{errors.name}</small>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="mb-3">
+                                                        <label htmlFor="name" className="form-label">Sub-Category Name</label>
+                                                        <Field
+                                                            className="form-control"
+                                                            type="text"
+                                                            name="subCategoryName"
+                                                        />
+                                                        {touched.subCategoryName && errors.subCategoryName && (
+                                                            <small className="text-danger">{errors.subCategoryName}</small>
                                                         )}
                                                     </div>
 
@@ -447,7 +545,6 @@ const ManageProductsCategory = () => {
                                                         </Field>
                                                     </div>
 
-
                                                     <button
                                                         type="submit"
                                                         className="btn custom_btn btn_yellow"
@@ -464,8 +561,6 @@ const ManageProductsCategory = () => {
                         </div>
                     )}
 
-
-                    {/* New modal for viewing category details */}
                     {isViewModalOpen && (
                         <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1" aria-modal="true">
                             <div className="modal-dialog modal-dialog-centered">
@@ -480,7 +575,7 @@ const ManageProductsCategory = () => {
                                         ></button>
                                     </div>
                                     <div className="modal-body">
-                                        <p><strong>Category Name:</strong> {indiCate?.categoryName}</p>
+                                        <p><strong>Subcategory Name:</strong> {indiCate?.categoryName}</p>
                                         <p><strong>Description:</strong> {indiCate?.description || ''}</p>
                                         <p>
                                             <strong>Status:</strong>
@@ -504,11 +599,11 @@ const ManageProductsCategory = () => {
                             </div>
                         </div>
                     )}
-                    <Footer />
+
                 </div>
             </div>
-        </React.Fragment>
-    );
-};
+        </React.Fragment >
+    )
+}
 
-export default ManageProductsCategory;
+export default AddProductSubCategory

@@ -11,6 +11,9 @@ import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 import { Helmet } from 'react-helmet';
+import Header from '../../components/admin/common/Header';
+import Footer from '../../components/common/Footer';
+
 
 class AdminCategoryModel extends Component {
     constructor(props) {
@@ -225,8 +228,9 @@ class AdminCategoryModel extends Component {
             <React.Fragment>
                 {loading === true ? <SpinnerLoader /> : ''}
                 <div className="container">
+                    <Header/>
                     <Helmet>
-                        <title>{"Category - Pay Earth"}</title>
+                        <title>{"Blog Category - Pay Earth"}</title>
                     </Helmet>
                     <div className="row">
                         <div className="col-lg-4">
@@ -330,6 +334,7 @@ class AdminCategoryModel extends Component {
                         </div>
                     </div>
                 </div>
+            <Footer/>
             </React.Fragment>
         );
     }

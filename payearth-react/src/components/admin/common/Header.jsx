@@ -71,6 +71,15 @@ function Header() {
     }
   };
 
+  // const removeBack = () => {
+  //   // Remove any active backdrop elements (if using Bootstrap modals or dropdown backdrops)
+  //   const backdrop = document.querySelector('.modal-backdrop');
+  //   if (backdrop) {
+  //     backdrop.remove();
+  //   }
+  // };
+  
+
 
   useEffect(() => {
     getAdminProfile();
@@ -183,13 +192,52 @@ function Header() {
                   Manage Orders
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link to="/admin/manage-categories" onClick={() => removeBackdrop()}>
                   <i className="icon">
                     <img src={shoppingBagIcon} alt="" />
                   </i>{" "}
                   Manage Categories
                 </Link>
+              </li> */}
+              <li className="nav-item dropdown">
+                <Link
+                  to="#"
+                  className="nav-link dropdown-toggle"
+                  id="categoryDropdown"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  // onClick={() => removeBack()}
+                >
+                  <i className="icon">
+                    <img src={shoppingBagIcon} alt="" />
+                  </i>{" "}
+                  Manage Categories
+                </Link>
+
+                <ul className="dropdown-menu" aria-labelledby="categoryDropdown">
+                  {/* Products Category */}
+                  <li>
+                    <Link to="/admin/manage-categories-product" className="dropdown-item">
+                      Products Category
+                    </Link>
+                  </li>
+
+                  {/* Service Category */}
+                  <li>
+                    <Link to="/admin/manage-categories-services" className="dropdown-item">
+                      Service Category
+                    </Link>
+                  </li>
+
+                  <li>
+                    <Link to="/admin/category-module" className="dropdown-item">
+                      Blog Category
+                    </Link>
+                  </li>
+
+                </ul>
               </li>
               <li>
                 <Link to="/admin/service-order" onClick={() => removeBackdrop()}>

@@ -7,6 +7,8 @@ import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import { Helmet } from 'react-helmet';
 import { toast } from 'react-toastify';
+import Header from '../../components/admin/common/Header';
+import Footer from '../../components/common/Footer';
 
 
 class ManageServiceCategory extends Component {
@@ -259,8 +261,9 @@ class ManageServiceCategory extends Component {
             <React.Fragment>
                 <div className="seller_dash_wrap pb-5">
                     <div className="container">
+                        <Header/>
                         <Helmet>
-                            <title>{"Category - Pay Earth"}</title>
+                            <title>{"Service Category - Pay Earth"}</title>
                         </Helmet>
                         <div className="row">
                             <div className="col-md-6">
@@ -307,6 +310,7 @@ class ManageServiceCategory extends Component {
                                 </div>
                             </div>
                         </div>
+                        
                         <div className="row mt-4">
                             <div className="col-12">
                                 <div className="createpost bg-white rounded-3 addPost_left_container">
@@ -385,7 +389,7 @@ class ManageServiceCategory extends Component {
                         </div>
                     </div>
                 </div>
-
+            <Footer/>
             </React.Fragment>
         );
     }

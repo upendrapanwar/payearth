@@ -57,6 +57,19 @@ const NotificationController = {
         NotificationService.chatNotification(socket,Notification);
     },
 
+    Meeting_Request: (socket, data ) => {
+        if (!data) {
+            console.error('Invalid data received in Event_added :', { data });
+            return;
+        }
+        const Notification = data.notification
+        //console.log('liked daata:', Notification);
+
+        NotificationService.Meeting_Request(socket,Notification);
+    },
+
+    
+
 };
 
 module.exports = NotificationController;
