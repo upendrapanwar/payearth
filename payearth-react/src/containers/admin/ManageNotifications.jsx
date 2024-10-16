@@ -186,7 +186,7 @@ const ManageNotifications = () => {
                                     role="tabpanel"
                                     aria-labelledby="nav-draft-post-tab"
                                 >
- 
+
                                     {/* <div className=" date-wrapper col-md-3">
                                         <DateRangePicker
                                             // ranges={[dateRange]}
@@ -205,6 +205,7 @@ const ManageNotifications = () => {
                                                 noHeader
                                                 defaultSortField="id"
                                                 defaultSortAsc={false}
+                                                paginationPerPage={6}
                                                 // selectedRows={selectedRows}
                                                 // onSelectedRowsChange={this.handleRowSelected}
                                                 // paginationPerPage={this.itemsPerPage}

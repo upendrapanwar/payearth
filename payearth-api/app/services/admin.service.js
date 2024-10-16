@@ -43,6 +43,7 @@ module.exports = {
     getCateogyById,
 
     createBrand,
+    updateBrand,
     editBrand,
     getBrands,
     getBrandById,
@@ -778,39 +779,66 @@ async function statusCategory(req) {
 }
 
 
-//Brand
-
+// Brand ***
 async function createBrand(req) {
-    var file = req.file;
-    var param = req.body;
-    var logoUrl = '';
+    const { brandName, brandDescription, logoImage, isPopular, isActive, createdBy } = req.body;
 
-    if (await Brand.findOne({ brandName: param.name })) { throw 'Brand Name "' + param.name + '" already exists.'; }
+    try {
+        const existing = await Brand.findOne({ brandName: { $regex: `^${brandName}$`, $options: 'i' } });
+        if (existing) {
+            console.log("already existing...")
+            return { status: false, message: `Brand Name "${brandName}" already exists.` }
+        }
+        const input = {
+            "brandName": brandName,
+            "brandDescription": brandDescription,
+            "isActive": isActive,
+            "logoImage": logoImage,
+            "isPopular": isPopular,
+            "createdBy": createdBy,
+            "updatedBy": createdBy,
+        };
 
-    if (typeof file != "undefined") {
-        logoUrl = file.destination + "/" + file.filename;
+        const brand = new Brand(input);
+        const data = await brand.save();
+        return { status: true, data: data, message: "Brand created successfully." };
+
+    } catch (error) {
+        console.error(error);
+        return { status: false, message: error.message };
     }
-
-    const input = {
-        "brandName": param.name,
-        "isActive": param.is_active,
-        "logoImage": logoUrl,
-        "isPopular": param.is_popular,
-        "createdBy": param.admin_id,
-        "updatedBy": param.admin_id,
-    };
-
-    const brand = new Brand(input);
-    const data = await brand.save();
-
-    if (data) {
-        return await Brand.findById(data.id).select();
-    } else {
-        return false;
-    }
-
 }
 
+// ***
+async function updateBrand(req) {
+    const brandId = req.params.id;
+    const { logoImage, brandName, brandDescription, updatedBy } = req.body;
+    try {
+
+        // const existing = await Brand.findOne({ brandName: { $regex: `^${brandName}$`, $options: 'i' } });
+        // if (existing) {
+        //     console.log("in Update section...")
+        //     return { status: false, message: `Brand Name "${brandName}" already exists.` }
+        // }
+
+        const brand = await Brand.findByIdAndUpdate(
+            brandId,
+            {
+                logoImage,
+                brandName,
+                brandDescription,
+                updatedBy
+            },
+            { new: true }
+        );
+        // Brand Update Successfully....
+        return { status: true, data: brand, message: "Brand Update Successfully...." };
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+//
 async function editBrand(req) {
     var file = req.file;
     var param = req.body;
@@ -857,11 +885,10 @@ async function editBrand(req) {
 
 async function getBrands() {
     const result = await Brand.find().select().sort({ createdAt: 'desc' });
-
     if (result && result.length > 0) return result;
-
     return false;
 }
+
 async function getCateogyById(categoryid) {
     try {
         const categoryData = await Category.findOne({ _id: categoryid }).exec();
@@ -900,22 +927,18 @@ async function deleteBrand(id) {
     return await Brand.findByIdAndRemove(id);
 }
 
-
+// ***
 async function statusBrand(req) {
     const id = req.params.id;
     const param = req.body;
-
     const brand = await Brand.findById(id);
-
     if (!brand) {
         return false;
     } else {
         const input = {
-            "isActive": param.is_active
+            "isActive": param.isActive
         };
-
         Object.assign(brand, input);
-
         if (await brand.save()) {
             return await Brand.findById(id).select();
         }
@@ -3907,3 +3930,41 @@ async function editProfile(req) {
         console.error("Error:", error)
     }
 }
+
+
+// Create brand
+
+// async function createBrand(req) {
+//     const { brandName, logoImage, isPopular, isActive, createdBy } = req.body;
+
+//     try {
+//         var Name = brandName.trim();
+//         var lName = Name.toLowerCase();
+
+
+//         const existingCategory = await Category.findOne({ isService: false, lname: lName });
+//         if (existingCategory) {
+//             return { status: false, message: `Category "${name}" already exists.` };
+//         }
+
+//         const input = {
+//             categoryName: Name,
+//             lname: lName,
+//             parent: parent_id,
+//             description: description,
+//             isService: is_service || false,
+//             onMainMenu: add_to_menu,
+//             createdBy: admin_id,
+//             updatedBy: admin_id,
+//         };
+
+//         const category = new Category(input);
+//         const data = await category.save();
+
+//         return { status: true, data: data, message: "Category created successfully." };
+//     } catch (error) {
+//         console.error(error);
+//         return { status: false, message: error.message };
+//     }
+// }
+

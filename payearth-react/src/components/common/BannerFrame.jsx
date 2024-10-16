@@ -224,7 +224,7 @@ export const GetAllBanner = () => {
                 if (urls.length > 0) {
                     const timeoutId = setTimeout(() => {
                         setIframeOpen(true);
-                    }, 5000);
+                    }, 1000);
                     return () => clearTimeout(timeoutId);
                 }
             })
@@ -335,7 +335,15 @@ export const GetAllBanner = () => {
                     <div className='iFrame-wrapper'>
                         <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
                         {advertiseData.video ? (
-                            <video key={videoKey} autoPlay loop onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)} className='advertisement-media'>
+                            <video
+                                key={videoKey}
+                                autoPlay
+                                loop
+                                playsInline
+                                muted
+                                onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
+                                className='advertisement-media'
+                            >
                                 <source
                                     src={advertiseData.video}
                                     type="video/mp4"

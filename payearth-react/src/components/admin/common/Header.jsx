@@ -248,6 +248,14 @@ function Header() {
                 </Link>
               </li>
               <li>
+                <Link to="/admin/manage-brands" onClick={() => removeBackdrop()}>
+                  <i className="icon">
+                    <img src={discountIcon} alt="" />
+                  </i>{" "}
+                  Manage Brands
+                </Link>
+              </li>
+              <li>
                 <Link
                   to="/admin/manage-customers"
                   onClick={() => removeBackdrop()}
