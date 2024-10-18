@@ -13,7 +13,7 @@ import store from '../../store';
 import arrow_back from './../../assets/icons/arrow-back.svg'
 import emptyImg from './../../assets/images/emptyimage.png';
 import { Link } from 'react-router-dom/cjs/react-router-dom';
-// import Switch from 'react-input-switch';
+import Switch from 'react-input-switch';
 
 class ManageBrands extends Component {
     constructor(props) {
@@ -24,7 +24,6 @@ class ManageBrands extends Component {
         this.apiSecret = process.env.REACT_APP_CLOUD_API_SECRET;
         this.state = {
             isEditMode: false,
-            isPopular: "",
             brandId: null,
             brandName: "",
             brandDescription: "",
@@ -53,6 +52,19 @@ class ManageBrands extends Component {
                 sortable: true
             },
             {
+                name: 'isPopular',
+                cell: (row, i) => {
+                    return <>
+                        <Switch
+                            on={true}
+                            off={false}
+                            value={row.isPopular}
+                            onChange={() => this.handlePopular(row.id, row.isPopular)}
+                        />
+                    </>
+                },
+            },
+            {
                 name: "Action",
                 cell: (row, i) => {
                     return (
@@ -79,17 +91,6 @@ class ManageBrands extends Component {
                                     Activate
                                 </button>
                             )}
-                            {/*
-                            <button
-                                className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
-                                onClick={() => this.handleDelete(row)}
-                            >
-                                Delete
-                            </button> */}
-                            {/* <Switch on="yes" off="no"
-                                isPopular={this.state.isPopular}
-                                onChange={this.handlePopular()}
-                            /> */}
                         </>
                     );
                 },
@@ -120,7 +121,6 @@ class ManageBrands extends Component {
         }
     };
 
-    //Cloudinary code for upload image
     handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file.size <= 5242880) {
@@ -135,7 +135,6 @@ class ManageBrands extends Component {
             toast.error("Image size must be less than 5 MB", { autoClose: 3000 });
         }
     };
-
 
     uploadImage = () => {
         return new Promise((resolve, reject) => {
@@ -182,7 +181,7 @@ class ManageBrands extends Component {
                 brandName: values.brandName,
                 brandDescription: values.brandDescription,
                 logoImage: emptyImg,
-                isPopular: true,
+                isPopular: false,
                 isActive: true,
                 createdBy: this.authInfo.id
             };
@@ -230,13 +229,12 @@ class ManageBrands extends Component {
                     brandName: values.brandName,
                     brandDescription: values.brandDescription,
                     logoImage: this.state.imagePreview,
-                    isPopular: true,
-                    isActive: true,
+                    // isPopular: true,
+                    // isActive: true,
                     updatedBy: this.authInfo.id,
                 };
             } else {
-                const response = this.deleteImage(this.state.imageId);
-                console.log("response", response)
+                this.deleteImage(this.state.imageId);
                 let imageData = await this.uploadImage();
                 editBrandData = {
                     brandName: values.brandName,
@@ -255,13 +253,10 @@ class ManageBrands extends Component {
             if (response.data.status === false) {
                 toast.error(response.data.message);
                 this.handleClear();
-                // this.setState({ imagePreview: null, imageFile: null });
             } else {
-                console.log("else condition run")
                 toast.success(response.data.message);
                 this.fetchBrandList();
                 this.handleClear();
-                // this.setState({ imagePreview: null, imageFile: null });
             }
 
         } catch (error) {
@@ -290,47 +285,27 @@ class ManageBrands extends Component {
         });
     }
 
-    handlePopular = (data) => {
-        console.log("data isPopular", data)
-    }
-
-    // updateServiceCategory = async (values, { setSubmitting }) => {
-    //     console.log("values", values)
-    //     try {
-    //         const updateCategoryUrl = `/admin/categories/${this.state.currentCategory.id}`;
-    //         const authInfo = JSON.parse(localStorage.getItem('authInfo'));
-    //         const token = authInfo ? authInfo.token : '';
-
-    //         await axios.patch(updateCategoryUrl, { categoryName: values.editCategoryName }, {
-    //             headers: {
-    //                 'Accept': 'application/json',
-    //                 'Content-Type': 'application/json;charset=UTF-8',
-    //                 'Authorization': `Bearer ${token}`
-    //             }
-    //         }).then((response) => {
-    //             console.log("Checking response", response)
-    //             if (response.data.status === true) {
-    //                 toast.success(response.data.message)
-    //                 // Re-fetch the list to include the updated category
-    //                 this.fetchServiceCategoryList();
-    //                 this.setState({ currentCategory: null });
-    //                 this.modalRef.current.click();  // Close the modal
-    //             } else {
-    //                 toast.error(response.data.message);
-    //             }
-    //         })
-    //     } catch (error) {
-    //         console.error('There was an error updating the service category', error);
-    //     } finally {
-    //         setSubmitting(false);
-    //     }
-    // };
-
-
     handleChangeStatus = async (row, isActive) => {
         try {
             const updateStatusUrl = `/admin/brands/status/${row.id}`;
             await axios.put(updateStatusUrl, { isActive }, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            });
+            this.fetchBrandList();
+        } catch (error) {
+            console.error("There was an error changing the status", error);
+        }
+    }
+
+    handlePopular = async (id, isPopular) => {
+        try {
+            const status = !isPopular;
+            const updateStatusUrl = `/admin/brands/popularStatus/${id}`;
+            await axios.put(updateStatusUrl, { isPopular: status }, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
@@ -349,8 +324,6 @@ class ManageBrands extends Component {
 
     render() {
         const { data, isEditMode, brandName, brandDescription } = this.state;
-
-        // Yup validation for Formik form
         const validationSchema = Yup.object({
             brandName: Yup.string().required('Brand name is required'),
             brandDescription: Yup.string().required('Brand description is required'),

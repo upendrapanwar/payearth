@@ -17,8 +17,12 @@ import SpinnerLoader from '../../../components/common/SpinnerLoader';
 import { setLoading } from '../../../store/reducers/global-reducer';
 import { getPostsData } from '../../../helpers/post-listing';
 import SimpleImageSlider from "react-simple-image-slider";
+import CommunityAdvertise from '../../common/BannerFrame'
 import ReactTimeAgo from 'react-time-ago'
 import TimeAgo from 'javascript-time-ago'
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 import io from "socket.io-client";
 
@@ -649,6 +653,39 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
         setReportOption(e.target.value);
     };
 
+    const settings = {
+        dots: true,
+        infinite: false,
+        speed: 300,
+        slidesToShow: posts.postImages.length === 1 ? 1 : 2,
+        slidesToScroll: 1,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: posts.postImages.length === 1 ? 1 : 2,
+                    slidesToScroll: 1,
+                    infinite: true,
+                    dots: true,
+                },
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1,
+                },
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                },
+            },
+        ],
+    };
+
     return (
         <React.Fragment>
             {/* {loading === true ? <SpinnerLoader /> : ''} */}
@@ -774,8 +811,64 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                         </div>
                     }
 
+                    <div class="commVideoSlider destopHidden">
+                        <Slider {...settings}>
+                            {posts.postImages.map((image, ind) => {
+                                return (
+                                    <div
+                                        className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-6'}`}
+                                        key={ind}
+                                        onClick={() => handleSliderShow(image)}
+                                    >
+                                        <div className="post_img mb-3">
+                                            <img src={image.url} alt={`Slide ${ind + 1}`} />
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                            {posts.postVideos.map((video, ind) => {
+                                return (
+                                    <div
+                                        className={`post_main_div ${posts.postVideos.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind + 5}
+                                        onClick={() => handleSliderShow(video)}
+                                    >
+                                        <div className="post_img mb-3 ">
+                                            <video controls>
+                                                <source src={video.url}
+                                                    autoPlay
+                                                    loop
+                                                    type="video/mp4" />
+                                            </video>
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </Slider>
+                    </div>
+
                     {/* slider end */}
-                    <div className='post_img_box container'>
+                    <div className='post_img_box container mobHidden'>
+                        {/* Display video slider for Mobile Version */}
+
+                        {/* <div class="commVideoSlider destopHidden">
+                            <div>your content</div>
+                            <div>your content</div>
+                            <div>your content</div>
+                        </div> */}
+
+
+
+
+                        {/* <Slider {...settings} className="commVideoSlider destopHidden">
+                            <div>one</div>
+                            <div>Two</div>
+                            <div>Three</div>
+                        </Slider> */}
+
+
+
+
+                        {/* Display video on desktop */}
                         <div className='row post_img_internal_box'>
                             {posts.postImages.slice(0, 2).map((image, ind) => {
                                 return (
@@ -828,10 +921,10 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                 <Link to="#" onClick={() => filteredLikes.length !== 0 && filteredLikes.includes(authInfo.id) ? removeFromLiked(posts.id) : addToLiked(posts.id)}>
                                     <img src={filteredLikes.length !== 0 && filteredLikes.includes(authInfo.id) ? redHeartIcon : heartIconBordered} /> {posts.likeCount}
                                 </Link>
-                                <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}><i className="post_icon ps_comment"></i> {posts.commentCount} Comments</Link>
+                                <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}><i className="post_icon ps_comment"></i> {posts.commentCount} <span className='mobHidden'>Comments</span></Link>
                             </li>
 
-                            <li className="ms-auto">
+                            <li className="ms-auto commReplyActionBtn">
                                 {(posts.userId?.id === authInfo.id || posts.sellerId?.id === authInfo.id || posts.adminId?.id === authInfo.id) ? (
                                     <>
                                         <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => { handleEdit(posts); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>Edit</button>
@@ -862,7 +955,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                     to="#"
                                     onClick={() => handleShare(posts)}
                                     className="post_follow">
-                                    <i className="post_icon ps_share"></i> Share
+                                    <i className="post_icon ps_share"></i> <span className='mobHidden'>Share</span>
                                 </Link>
                             </li>
                         </ul>

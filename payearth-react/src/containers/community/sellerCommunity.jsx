@@ -496,7 +496,7 @@ const SellerCommunity = () => {
                     <div className="container">
                         <div className="row">
                             <div className="col-lg-12">
-                                <div className="comm_profile">
+                                <div className="comm_profile myComm_profile_panel">
                                     <div className="post_by">
                                         <Link to="/Seller-MyProfile" className="pointer poster_img"><img src={userInfo.imgUrl} alt="" /></Link>
                                         <div className="poster_info">
@@ -559,6 +559,8 @@ const SellerCommunity = () => {
                                     </Modal>
                                 </div>
                             </div>
+                        </div>
+                        <div className="row create_comm_wrapper">
                             <div className="col-lg-9">
                                 <div className="createpost bg-white rounded-3">
                                     <div className="cp_top  d-flex justify-content-between align-items-center">
@@ -722,7 +724,6 @@ const SellerCommunity = () => {
                                 }
 
                             </div>
-
                             {/* Filter */}
                             <div className="col-lg-3">
                                 <div className="cumm_sidebar_box bg-white p-3 rounded-3">
@@ -788,6 +789,7 @@ const SellerCommunity = () => {
                         </div>
                     </div>
                 </div>
+
                 <Footer />
             </div>
         </React.Fragment>

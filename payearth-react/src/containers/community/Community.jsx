@@ -20,6 +20,7 @@ import Picker from 'emoji-picker-react';
 import { Modal } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { Helmet } from 'react-helmet';
+import { CommunityAdvertise } from '../../components/common/BannerFrame';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
 
 const Header = lazy(() => import("../../components/user/common/Header"));
@@ -29,6 +30,8 @@ const Community = () => {
     const authInfo = useSelector(state => state.auth.authInfo);
     const loading = useSelector(state => state.global.loading);
     const postsData = useSelector(state => state.post.postsData);
+    // const advertiseCat = postsData.filter(data => data.categoryId !== null).slice(0, 3);
+    // console.log("advertiseCat", advertiseCat)
     const postCategories = useSelector(state => state.post.postCategories);
     const postProducts = useSelector(state => state.post.postProducts);
     const dispatch = useDispatch();
@@ -459,20 +462,28 @@ const Community = () => {
         }
     }
 
+    const data = postsData.filter(data => data.categoryId !== null).map(data => data.categoryId).slice(0, 1);
+    const advertiseCat = data.map(data => data.categoryName).join();
+    // console.log("advertiseCat................", advertiseCat)
+
+
+
+
     return (
         <React.Fragment>
             {loading === true ? <SpinnerLoader /> : ''}
             <div className='seller_body'>
                 <Suspense fallback={<SpinnerLoader />}>
-                   <Header />
-                </Suspense> 
+                    <Header />
+                </Suspense>
                 <PageTitle title="Community" />
+                {/* <CommunityAdvertise keywords={advertiseCat} /> */}
                 <Helmet><title>{"Community - Pay Earth"}</title></Helmet>
                 <div className="cumm_page_wrap pt-2 pb-5">
                     <div className="container" >
                         <div className="row">
                             <div className="col-lg-12">
-                                <div className="comm_profile">
+                                <div className="comm_profile myComm_profile_panel">
                                     <div className="post_by">
                                         <Link to="/my-profile" className="pointer poster_img"><img src={userInfo.imgUrl} alt="" /></Link>
                                         <div className="poster_info">
@@ -535,6 +546,8 @@ const Community = () => {
                                     </Modal>
                                 </div>
                             </div>
+                        </div>
+                        <div className="row create_comm_wrapper">
                             <div className="col-lg-9">
                                 <div className="createpost bg-white rounded-3">
                                     <div className="cp_top d-flex justify-content-between align-items-center">
@@ -692,6 +705,7 @@ const Community = () => {
 
                             {/* Filter */}
                             <div className="col-lg-3">
+                                <CommunityAdvertise keywords={advertiseCat} />
                                 <div className="cumm_sidebar_box bg-white p-3 rounded-3">
                                     <div className="cumm_title">advanced filter</div>
                                     <div className="filter_box">

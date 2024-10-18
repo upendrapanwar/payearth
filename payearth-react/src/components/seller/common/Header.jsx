@@ -259,7 +259,7 @@ const Header = () => {
                   <div className="container-fluid p-0">
                     <div className="side_menu_btn">
                       <button
-                        className="btn"
+                        className="btn" 
                         type="button"
                         data-bs-toggle="offcanvas"
                         data-bs-target="#sideMenu"
@@ -304,7 +304,7 @@ const Header = () => {
                                 <img src={blcakbellIcon} alt="" />
                                 {unreadCount > 0 && <span className="notification-count">{unreadCount}</span>}
                               </div>
-                              <span>Notification</span>
+                              <span>Notifications</span>
                             </Link>
                           </li>
                           {/*seller notification bell icon */}

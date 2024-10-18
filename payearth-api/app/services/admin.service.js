@@ -49,6 +49,7 @@ module.exports = {
     getBrandById,
     deleteBrand,
     statusBrand,
+    brandPopularStatus,
 
     createDeal,
     editDeal,
@@ -950,6 +951,23 @@ async function statusBrand(req) {
     } else {
         const input = {
             "isActive": param.isActive
+        };
+        Object.assign(brand, input);
+        if (await brand.save()) {
+            return await Brand.findById(id).select();
+        }
+    }
+}
+
+async function brandPopularStatus(req) {
+    const id = req.params.id;
+    const param = req.body;
+    const brand = await Brand.findById(id);
+    if (!brand) {
+        return false;
+    } else {
+        const input = {
+            "isPopular": param.isPopular
         };
         Object.assign(brand, input);
         if (await brand.save()) {

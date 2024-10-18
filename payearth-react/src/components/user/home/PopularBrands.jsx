@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Brand from "./../../common/Brand";
 import config from "./../../../config.json";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -37,13 +36,14 @@ const PopularBrands = () => {
                     <div className="brands_wrapper">
                       {brands && brands.length
                         ? brands.map((brand, index) => {
-                            return (
-                              <Brand
-                                image={config.apiURI + brand.logoImage}
-                                key={index}
+                          return (
+                            <div className="brand">
+                              <img src={brand.logoImage} alt="Brand logo" className="img-fluid"
+                                style={{ width: "120px", height: "120px" }}
                               />
-                            );
-                          })
+                            </div>
+                          )
+                        })
                         : ""}
                     </div>
                   </div>

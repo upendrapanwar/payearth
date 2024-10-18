@@ -22,7 +22,7 @@ import communityIcon from "./../../../assets/icons/community_icon.svg";
 import bannerIcon from "./../../../assets/icons/banners_icon.svg";
 import supportIcon from "./../../../assets/icons/support_icon.svg";
 import clostBtn from "./../../../assets/icons/close_icon.svg";
-import blackBellIcon from "../../../assets/icons/notification-black-bell-icon.svg";
+import blackBellIcon from "../../../assets/icons/notification-black-bell-icon.svg"; 
 import { useSelector, useDispatch } from "react-redux";
 import { setLoginStatus, setUserInfo } from "./../../../store/reducers/auth-reducer";
 import io from 'socket.io-client';

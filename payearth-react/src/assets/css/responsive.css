@@ -245,6 +245,11 @@
         /* justify-content: space-between; */
         justify-content: space-evenly;
     }
+
+    .table_max {
+        overflow-x: scroll;
+        max-width: 800px;
+    }
 }
 
 @media only screen and (max-width: 668px) {
@@ -274,6 +279,76 @@
         /* justify-content: space-between; */
         justify-content: space-evenly;
     }
+
+    .comm_profile.myComm_profile_panel {
+        display: flex;
+        flex-wrap: nowrap;
+    }
+
+    .comm_profile.myComm_profile_panel .post_by {
+        flex-direction: column;
+    }
+
+    .comm_profile.myComm_profile_panel .poster_img {
+        width: 70px;
+        height: 70px;
+    }
+
+    .comm_profile.myComm_profile_panel .poster_name {
+        font-size: 16px;
+        margin-top: 10px;
+        line-height: 1.1;
+        max-width: 70px;
+        text-align: center;
+    }
+
+    .comm_profile.myComm_profile_panel ul {
+        max-width: 65%;
+        display: flex;
+        gap: 8px;
+    }
+
+    .comm_profile.myComm_profile_panel ul li .fp_fc {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    .comm_profile.myComm_profile_panel ul li small {
+        font-size: 14px;
+    }
+
+    .ps_links {
+        padding: 15px 10px;
+        align-items: center;
+    }
+
+    .commReplyActionBtn {
+        display: flex;
+        gap: 4px;
+    }
+
+    .commReplyActionBtn .custom_btn {
+        width: auto;
+        margin-right: 5px;
+        font-size: 14px;
+    }
+
+    .create_comm_wrapper {
+        flex-direction: column-reverse;
+    }
+
+    .create_comm_wrapper .createpost {
+        margin-top: 15px;
+    }
+
+    .destopHidden {
+        display: block;
+    }
+
+    .mobHidden {
+        display: none;
+    }
+
 }
 
 @media only screen and (max-width: 568px) {
