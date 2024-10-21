@@ -112,7 +112,7 @@ const io = require('socket.io')(httpsServer, {
 });
 
 io.on("connection", function (socket) {
- // console.log("Connected to socket.io");
+  // console.log("Connected to socket.io");
 
   socket.on('setup', function (userID) {
     socket.join(userID);
@@ -156,7 +156,7 @@ io.on("connection", function (socket) {
       return;
     }
     socket.join(userID);
-   // console.log(`User with ID ${userID} joined their room.`);
+    // console.log(`User with ID ${userID} joined their room.`);
   });
 
   // Follow event
@@ -191,7 +191,7 @@ io.on("connection", function (socket) {
   });
 
   socket.on('disconnect', () => {
-   // console.log('Client disconnected:', socket.id);
+    // console.log('Client disconnected:', socket.id);
   });
 
   //**********************************/

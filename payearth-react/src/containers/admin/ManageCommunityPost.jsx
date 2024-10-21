@@ -18,9 +18,10 @@ import { setLoading } from '../../store/reducers/global-reducer';
 import SimpleImageSlider from "react-simple-image-slider";
 import ReactTimeAgo from 'react-time-ago'
 import TimeAgo from 'javascript-time-ago'
-
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import io from "socket.io-client";
-
 import en from 'javascript-time-ago/locale/en.json'
 import ru from 'javascript-time-ago/locale/ru.json'
 
@@ -447,6 +448,39 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
         window.open(whatsappShareUrl, '_blank');
     }
 
+    const settings = {
+        dots: true,
+        infinite: false,
+        speed: 300,
+        slidesToShow: posts.postImages.length === 1 ? 1 : 2,
+        slidesToScroll: 1,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: posts.postImages.length === 1 ? 1 : 2,
+                    slidesToScroll: 1,
+                    infinite: true,
+                    dots: true,
+                },
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1,
+                },
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                },
+            },
+        ],
+    };
+
     return (
         <React.Fragment>
             {/* {loading === true ? <SpinnerLoader /> : ''} */}
@@ -593,8 +627,43 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                         </div>
                     }
 
+                    <div class="commVideoSlider destopHidden">
+                        <Slider {...settings}>
+                            {posts.postImages.map((image, ind) => {
+                                return (
+                                    <div
+                                        className={`post_child_div ${posts.postImages.length === 1 ? 'col-12' : 'col-md-6'}`}
+                                        key={ind}
+                                        onClick={() => handleSliderShow(image)}
+                                    >
+                                        <div className="post_img mb-3">
+                                            <img src={image.url} alt={`Slide ${ind + 1}`} />
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                            {posts.postVideos.map((video, ind) => {
+                                return (
+                                    <div
+                                        className={`post_main_div ${posts.postVideos.length === 1 ? 'col-12' : 'col-md-4'}`} key={ind + 5}
+                                        onClick={() => handleSliderShow(video)}
+                                    >
+                                        <div className="post_img mb-3 ">
+                                            <video controls>
+                                                <source src={video.url}
+                                                    autoPlay
+                                                    loop
+                                                    type="video/mp4" />
+                                            </video>
+                                        </div>
+                                    </div>
+                                )
+                            })}
+                        </Slider>
+                    </div>
+
                     {/* slider end */}
-                    <div className='post_img_box container'>
+                    <div className='post_img_box container mobHidden'>
                         <div className='row post_img_internal_box'>
                             {posts.postImages.slice(0, 2).map((image, index) => {
                                 return (
@@ -650,7 +719,7 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                                 <Link to="#">
                                     {posts.likeCount === 0 ? "Likes not found" : (<><img src={redHeartIcon} alt="Liked" /> {posts.likeCount}</>)}
                                 </Link>
-                                <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}><i className="post_icon ps_comment"></i> {posts.commentCount} Comments</Link>
+                                <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}><i className="post_icon ps_comment"></i> {posts.commentCount} <span className='mobHidden'>Comments</span></Link>
                                 {/* <Link
                                     //data-bs-toggle="collapse"
                                     to={`#collapseComment${posts.id}`}
@@ -668,7 +737,7 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                                 </Link> */}
                             </li>
 
-                            <li className="ms-auto">
+                            <li className="ms-auto commReplyActionBtn">
                                 {posts.userId?.id === authInfo.id || posts.sellerId?.id === authInfo.id || posts.adminId?.id === authInfo.id ? <>
                                     <button className="btn custom_btn btn_yellow_bordered edit_cumm" onClick={() => { handleEdit(posts); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>Edit</button>
                                 </> : ""}
@@ -701,7 +770,7 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                                     // onClick={() => setOpenShare(true)}
                                     onClick={() => handleShare(posts)}
                                     className="post_follow">
-                                    <i className="post_icon ps_share"></i> Share
+                                    <i className="post_icon ps_share"></i> <span className='mobHidden'>Share</span>
                                 </Link>
                             </li>
 

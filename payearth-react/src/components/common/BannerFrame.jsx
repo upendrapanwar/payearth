@@ -6,7 +6,10 @@ import { isLogin } from '../../helpers/login';
 import ReactGA from "react-ga4";
 import { toast } from 'react-toastify';
 
+
+// All details page
 export const BannerTopIframe = ({ width, height, keywords }) => {
+    console.log("keywords", keywords)
     const [advertisements, setAdvertisements] = useState([]);
     const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
     const [length, setLength] = useState();
@@ -189,6 +192,7 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
     </>
 }
 
+// Home 
 export const GetAllBanner = () => {
     const [advertisements, setAdvertisements] = useState([]);
     const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
@@ -224,7 +228,7 @@ export const GetAllBanner = () => {
                 if (urls.length > 0) {
                     const timeoutId = setTimeout(() => {
                         setIframeOpen(true);
-                    }, 5000);
+                    }, 1000);
                     return () => clearTimeout(timeoutId);
                 }
             })
@@ -335,7 +339,15 @@ export const GetAllBanner = () => {
                     <div className='iFrame-wrapper'>
                         <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
                         {advertiseData.video ? (
-                            <video key={videoKey} autoPlay loop onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)} className='advertisement-media'>
+                            <video
+                                key={videoKey}
+                                autoPlay
+                                loop
+                                playsInline
+                                muted
+                                onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
+                                className='advertisement-media'
+                            >
                                 <source
                                     src={advertiseData.video}
                                     type="video/mp4"
@@ -367,9 +379,63 @@ export const GetAllBanner = () => {
 
 }
 
-export const BannerIframe2 = ({ width, height, }) => {
 
-    const [iframeOpen, setIframeOpen] = useState(true);
+// Community
+export const CommunityAdvertise = ({ width, height, keywords }) => {
+
+    // console.log("keywords", keywords)
+
+    const [iframeOpen, setIframeOpen] = useState(false);
+    const [advertise, setAdvertise] = useState([]);
+    const [currentUrlIndex, setCurrentUrlIndex] = useState(0);
+    const [length, setLength] = useState();
+    const [urlData, setUrlData] = useState([]);
+    const [advertisement, setAdvertisement] = useState([]);
+    const isloginUser = isLogin();
+    const [prevKeyword, setPrevKeyword] = useState("");
+    const authInfo = JSON.parse(localStorage.getItem("authInfo"));
+
+
+    useEffect(() => {
+        // fetchData();
+        fetchAdvertise();
+    }, [keywords]);
+
+
+    const fetchAdvertise = async () => {
+        if (keywords !== "" && keywords !== prevKeyword) {
+            try {
+                setPrevKeyword(keywords);
+                const response = await axios.get(`/front/advBanner-list/${keywords}`);
+                // console.log("response", response.data.data)
+                const data = response.data.data;
+                const url = data.map(item => !item.video ? item.image : item.video);
+                setAdvertise(data)
+                setUrlData(url)
+                setLength(url.length)
+                if (url.length > 0) {
+                    const timeoutId = setTimeout(() => {
+                        setIframeOpen(true);
+                    }, 8000);
+                    return () => clearTimeout(timeoutId);
+                }
+                // const withoutBlockData = data.filter(item => !item.blockByUser.includes(isloginUser === true ? authInfo.id : ''))
+                //console.log("withoutBlockData", withoutBlockData)
+            } catch (err) {
+                console.error("err");
+            }
+        }
+    }
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            // console.log("advertise length", advertise.length)
+            setCurrentUrlIndex((prevIndex) => (prevIndex + 1) % advertise.length);
+        }, 7000);
+        return () => clearInterval(intervalId);
+    }, [length]);
+
+
 
     const iframeStyles = {
         // border: '1px solid red',
@@ -379,44 +445,154 @@ export const BannerIframe2 = ({ width, height, }) => {
     };
 
 
+    const fetchData = () => {
+        if (keywords !== "") {
+            axios.get(`/front/advBanner-list/${keywords}`)
+                .then((response) => {
+                    const data = response.data.data;
+                    // console.log("data", data)
+                    const withoutBlockData = data.filter(item => !item.blockByUser.includes(isloginUser === true ? authInfo.id : ''))
+                    console.log("withoutBlockData", withoutBlockData)
+                    // console.log("data $$", data)
+                    setAdvertise(isloginUser === true ? withoutBlockData : data)
+                    const urls = isloginUser === true ? withoutBlockData : data.map(item => !item.video ? item.image : item.video);
+                    setUrlData(urls)
+                    setLength(urls.length)
+                    // console.log("urls length", urls.length)
+                    if (urls.length > 0) {
+                        const timeoutId = setTimeout(() => {
+                            setIframeOpen(true);
+                            // frameloaded();
+                        }, 9000);
+                        return () => clearTimeout(timeoutId);
+                    }
+                })
+                .catch(error => {
+                    console.log("error", error)
+                })
+        }
+    };
+
+
     const closeIframe = () => {
         setIframeOpen(false);
     };
 
+    const communitySideAdvertise = () => {
+        if (iframeOpen === true) {
+            const advertiseData = advertise[currentUrlIndex];
+            // console.log("advertiseData", advertiseData)
+            const videoKey = `${advertiseData.video}-${Date.now()}`;
+            return (
+
+                <div className='iFrame-wrapper'>
+                    <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
+                    {advertiseData.video ? (
+                        <video key={videoKey} autoPlay loop
+                            // onClick={() => onWebsiteMove(advertise[currentUrlIndex].siteUrl)}
+                            className='advertisement-media'>
+                            <source
+                                src={advertiseData.video}
+                                type="video/mp4"
+                            // onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
+                            />
+                            Your browser does not support the video tag.
+                        </video>
+                    ) : (
+                        <img
+                            src={advertiseData.image}
+                            alt="advertisement"
+                            className='advertisement-media'
+                        // onClick={() => onWebsiteMove(advertise[currentUrlIndex].siteUrl)}
+                        />
+                    )}
+                    {/* <button className="block_button"
+                        // onClick={() => block(advertise[currentUrlIndex].id)}
+                        >Click to Block this advertise..!</button> */}
+                </div>
+
+            );
+        }
+    }
+
+
+
     const renderBannerSideBarIframe = () => <>
-        {/* <iframe
-            // src={urlData[currentUrlIndex]}
-            src={"https://res.cloudinary.com/pay-earth/image/upload/v1711954185/obyrtbvcfbiktvcvtylv.png"}
-            width="95%"
-            height="600"
-            scrolling="no"
-            style={iframeStyles}
-            className='Video'
-        ></iframe> */}
+        {iframeOpen === true ? (
+            <div className='iframe-containerSide' key="iframeContainer">
+                <button className="btn btn-light btn-sm" >Block Now...!</button>
+                <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
+                {/* <iframe
+                    // src={advertisements.map(item => !item.video ? item.image : item.video)[currentUrlIndex]}
+                    src={"https://res.cloudinary.com/pay-earth/image/upload/v1705641713/cug9hizrzlpjjx9fbxi1.jpg"}
+                    width="95%"
+                    height="600px"
+                    scrolling="no"
+                    style={iframeStyles}
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
+                    className="centeredIframe"
+                // onInferredClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
+                /> */}
 
-        {iframeOpen === true ? (<div className='iframe-containerSide' key="iframeContainer">
-            <button className="btn btn-light btn-sm" >Block Now...!</button>
-            <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
-            <iframe
-                // src={advertisements.map(item => !item.video ? item.image : item.video)[currentUrlIndex]}
-                src={"https://res.cloudinary.com/pay-earth/image/upload/v1705641713/cug9hizrzlpjjx9fbxi1.jpg"}
-                width="95%"
-                height="600px"
-                scrolling="no"
-                style={iframeStyles}
-                allow="autoplay; encrypted-media"
-                allowFullScreen
-                className="centeredIframe"
-            // onInferredClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
-            />
 
-        </div>) : ""}
+
+                {/* <video autoPlay loop className='advertisement-media'>
+                    <source
+                        src={"https://res.cloudinary.com/pay-earth/video/upload/v1713346739/aloutgio40djuibd7tv0.mp4"}
+                        type="video/mp4"
+                    // onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
+                    />
+                    Your browser does not support the video tag.
+                </video> */}
+
+                {/* <img
+                    src={"https://res.cloudinary.com/pay-earth/image/upload/v1729143324/wfavxhzssskpmk1oepua.jpg"}
+                    alt="advertisement"
+                    className='advertisement-media'
+                // onClick={() => onWebsiteMove(advertise[currentUrlIndex].siteUrl)}
+                /> */}
+
+
+            </div>
+        ) : ""
+        }
     </>
+
+    // const fetchData = () => {
+    //     if (keywords !== "") {
+    //         axios.get(`/front/advBanner-list/${keywords}`)
+    //             .then((response) => {
+    //                 const data = response.data.data;
+    //                 // console.log("data", data)
+    //                 const withoutBlockData = data.filter(item => !item.blockByUser.includes(isloginUser === true ? authInfo.id : ''))
+    //                 // console.log("withoutBlockData", withoutBlockData)
+    //                 // console.log("data $$", data)
+    //                 setAdvertise(isloginUser === true ? withoutBlockData : data)
+    //                 const urls = isloginUser === true ? withoutBlockData : data.map(item => !item.video ? item.image : item.video);
+    //                 setUrlData(urls)
+    //                 setLength(urls.length)
+    //                 // console.log("urls length", urls.length)
+    //                 if (urls.length > 0) {
+    //                     const timeoutId = setTimeout(() => {
+    //                         setIframeOpen(true);
+    //                         // frameloaded();
+    //                     }, 5000);
+    //                     return () => clearTimeout(timeoutId);
+    //                 }
+    //             })
+    //             .catch(error => {
+    //                 console.log("error", error)
+    //             })
+    //     }
+    // };
+    // console.log("prevKeyword", prevKeyword);
 
     return <>
         <div className='BannerSide'>
-            {renderBannerSideBarIframe()}
-            {/* {renderIframe2()} */}
+
+            {communitySideAdvertise()}
+
         </div>
 
     </>

@@ -21,6 +21,7 @@ class Dashboard extends Component {
     render() {
         return (
             <React.Fragment>
+
                 <div className="seller_body">
                     <Header />
                     <div className="seller_dash_wrap pt-5 pb-5">
@@ -106,34 +107,35 @@ class Dashboard extends Component {
                                                 </div>
                                             </div>
                                         </div>
-                                        <table className="table table-responsive table-hover pe_table mpc_table">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col">Product / Service</th>
-                                                    <th scope="col">Price</th>
-                                                    <th scope="col">Sales</th>
-                                                    <th scope="col">Reviews</th>
-                                                    <th scope="col">Profit</th>
-                                                    <th scope="col">Revenue</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {data.map((value, index) => {
-                                                    return (
-                                                        <tr key={index}>
-                                                            <td>
-                                                                <div className="odr_item_img"><img src={value.productImg} className="img-fluid" alt="" /></div>
-                                                                <span>{value.productId}</span>
-                                                            </td>
-                                                            <td>{value.price}</td>
-                                                            <td>{value.sales}</td>
-                                                            <td>{value.reviews}</td>
-                                                            <td>{value.profit}</td>
-                                                            <td>{value.revenue}</td>
-                                                        </tr>
-                                                    )
-                                                })}
-                                                {/* <tr>
+                                        <div className='table_max'>
+                                            <table className="table table-responsive table-hover pe_table mpc_table">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">Product / Service</th>
+                                                        <th scope="col">Price</th>
+                                                        <th scope="col">Sales</th>
+                                                        <th scope="col">Reviews</th>
+                                                        <th scope="col">Profit</th>
+                                                        <th scope="col">Revenue</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {data.map((value, index) => {
+                                                        return (
+                                                            <tr key={index}>
+                                                                <td>
+                                                                    <div className="odr_item_img"><img src={value.productImg} className="img-fluid" alt="" /></div>
+                                                                    <span>{value.productId}</span>
+                                                                </td>
+                                                                <td>{value.price}</td>
+                                                                <td>{value.sales}</td>
+                                                                <td>{value.reviews}</td>
+                                                                <td>{value.profit}</td>
+                                                                <td>{value.revenue}</td>
+                                                            </tr>
+                                                        )
+                                                    })}
+                                                    {/* <tr>
                                                     <td>
                                                         <div className="odr_item_img"><img src={mensJacket} className="img-fluid" alt="" /></div>
                                                         <span>#BeqQ190</span>
@@ -188,34 +190,37 @@ class Dashboard extends Component {
                                                     <td>$2690 / 09 BTC</td>
                                                     <td>$62690 / 8 BTC</td>
                                                 </tr> */}
-                                            </tbody>
-                                        </table>
-                                        <div>
-                                            {/* <GoogleAnalyticsEvents /> */}
-                                        </div>
+                                                </tbody>
+                                            </table>
 
-                                        <div className="mpc_footer">
-                                            <div className="dash_inner_wrap">
-                                                <nav aria-label="Page navigation">
-                                                    <ul className="pagination">
-                                                        <li className="page-item">
-                                                            <Link className="page-link" to="#" aria-label="Previous">
-                                                                <i className="fa fa-chevron-left"></i>
-                                                            </Link>
-                                                        </li>
-                                                        <li className="page-item"><Link className="page-link" to="#">1</Link></li>
-                                                        <li className="page-item"><Link className="page-link" to="#">2</Link></li>
-                                                        <li className="page-item"><Link className="page-link" to="#">3</Link></li>
-                                                        <li className="page-item"><Link className="page-link" to="#">4</Link></li>
-                                                        <li className="page-item"><Link className="page-link" to="#">....</Link></li>
-                                                        <li className="page-item"><Link className="page-link" to="#">8</Link></li>
-                                                        <li className="page-item">
-                                                            <Link className="page-link" to="#" aria-label="Next">
-                                                                <i className="fa fa-chevron-right"></i>
-                                                            </Link>
-                                                        </li>
-                                                    </ul>
-                                                </nav>
+
+                                            <div>
+                                                {/* <GoogleAnalyticsEvents /> */}
+                                            </div>
+
+                                            <div className="mpc_footer">
+                                                <div className="dash_inner_wrap">
+                                                    <nav aria-label="Page navigation">
+                                                        <ul className="pagination">
+                                                            <li className="page-item">
+                                                                <Link className="page-link" to="#" aria-label="Previous">
+                                                                    <i className="fa fa-chevron-left"></i>
+                                                                </Link>
+                                                            </li>
+                                                            <li className="page-item"><Link className="page-link" to="#">1</Link></li>
+                                                            <li className="page-item"><Link className="page-link" to="#">2</Link></li>
+                                                            <li className="page-item"><Link className="page-link" to="#">3</Link></li>
+                                                            <li className="page-item"><Link className="page-link" to="#">4</Link></li>
+                                                            <li className="page-item"><Link className="page-link" to="#">....</Link></li>
+                                                            <li className="page-item"><Link className="page-link" to="#">8</Link></li>
+                                                            <li className="page-item">
+                                                                <Link className="page-link" to="#" aria-label="Next">
+                                                                    <i className="fa fa-chevron-right"></i>
+                                                                </Link>
+                                                            </li>
+                                                        </ul>
+                                                    </nav>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

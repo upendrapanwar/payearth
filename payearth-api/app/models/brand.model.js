@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const schema = new Schema({
     brandName: { type: String, required: false, default: '' },
+    brandDescription: { type: String, required: false, default: '' },
     logoImage: { type: String, required: false, default: '' },
     isActive: { type: Boolean, required: false, default: true },
     isPopular: { type: Boolean, required: false, default: false },

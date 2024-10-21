@@ -14,6 +14,7 @@ import visibleIcon from '../../assets/icons/eye-icon.svg';
 
 const ManageAdmins = () => {
     const authInfo = JSON.parse(localStorage.getItem('authInfo'));
+    console.log("authInfo",authInfo)
 
 
     const [admins, setAdmins] = useState([]);
@@ -27,25 +28,51 @@ const ManageAdmins = () => {
     }, [])
 
 
-    const getAllAdmins = async () => {
+    // const getAllAdmins = async () => {
 
+    //     try {
+    //         const response = await axios.get("/admin/getAllAdmins",{
+    //             headers: {
+    //                 'Accept': 'application/json',
+    //                 'Content-Type': 'application/json;charset=UTF-8',
+    //                 'Authorization': `Bearer ${authInfo.token}`
+    //             }
+    //         })
+    //         console.log("response", response);
+    //         if (response.data.status === true && response.data.data.length > 0) {
+    //             setAdmins(response.data.data);
+    //         }
+    //         setLoading(false);
+
+    //     } catch (error) {
+    //         console.error("Categories add failed.", error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // }
+
+    const getAllAdmins = async () => {
         try {
-            const response = await axios.get("/admin/getAllAdmins", {
+            const response = await axios.get("/getAllAdmins", {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
-                    'Authorization': `Bearer ${authInfo.token}`
+                    'Authorization': `Bearer ${authInfo.token}` 
                 }
-            })
+            });
             console.log("response", response);
+    
             if (response.data.status === true && response.data.data.length > 0) {
-                setAdmins(response.data.data);
-                setLoading(false)
+                setAdmins(response.data.data);  
             }
+            setLoading(false); 
         } catch (error) {
-
+            console.error("Admin fetch failed.", error);
+        } finally {
+            setLoading(false);
         }
-    }
+    };
+    
 
 
     const ManageCapability = (row) => {
@@ -58,15 +85,15 @@ const ManageAdmins = () => {
     }
 
     const handlePasswordVisibility = () => {
-        setSeePassword((prev) => !prev); 
+        setSeePassword((prev) => !prev);
     };
 
-    const handleSubmit = async(values) => {
-        console.log("values",values);
-        const response = await axios.post(`admin/signup`,values);
-        console.log("response",response);
-        if(response.data.status === true && response.data.data.length > 0){
-            
+    const handleSubmit = async (values) => {
+        console.log("values", values);
+        const response = await axios.post(`admin/signup`, values);
+        console.log("response", response);
+        if (response.data.status === true && response.data.data.length > 0) {
+
         }
     }
 
@@ -185,7 +212,7 @@ const ManageAdmins = () => {
                                     ></button>
                                 </div>
                                 <div className="modal-body">
-                                <Formik
+                                    <Formik
                                         initialValues={{
                                             name: '',
                                             phone: '',
@@ -229,11 +256,11 @@ const ManageAdmins = () => {
                                                         <div className="pwd_wrapper sel_pwd mb-3">
                                                             <label htmlFor="password" className="form-label">Password <small className="text-danger">*</small></label>
                                                             <Field type={seePassword ? "text" : "password"} className="form-control" id="password" name="password" />
-                                                            <img 
-                                                                src={seePassword ? visibleIcon : invisibleIcon} 
-                                                                alt="toggle password visibility" 
-                                                                onClick={handlePasswordVisibility} 
-                                                                style={{ cursor: 'pointer' }} 
+                                                            <img
+                                                                src={seePassword ? visibleIcon : invisibleIcon}
+                                                                alt="toggle password visibility"
+                                                                onClick={handlePasswordVisibility}
+                                                                style={{ cursor: 'pointer' }}
                                                             />
                                                             {touched.password && errors.password ? (
                                                                 <small className="text-danger">{errors.password}</small>

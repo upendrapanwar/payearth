@@ -114,9 +114,11 @@ router.delete('/categories/:id', deleteCategory);
 router.post('/brands', uploadBrand, createBrand);
 router.put('/brands/:id', uploadBrand, editBrand);
 router.put('/brands/status/:id', statusBrand);
+router.put('/brands/popularStatus/:id', brandPopularStatus);
 router.get('/brands', listBrand);
 router.get('/brandbyid/:id', getBrand);
 router.delete('/brands/:id', deleteBrand);
+router.put("/updateBrand/:id", updateBrand);
 
 //Deal
 router.post('/deals', uploadDeal, createDeal);
@@ -389,13 +391,27 @@ function statusCategory(req, res, next) {
         .catch(err => next(res.status(400).json({ status: false, message: err })));
 }
 
-//Brand
+//Brand***
 
 function createBrand(req, res, next) {
     adminService.createBrand(req)
-        .then(brand => brand ? res.status(201).json({ status: true, message: msg.admin.brand.add.success, data: brand }) : res.status(400).json({ status: false, message: msg.admin.brand.add.error }))
-        .catch(err => next(res.json({ status: false, message: err })));
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
 }
+
+// ***
+
+function updateBrand(req, res, next) {
+    adminService.updateBrand(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+// function updateBrand(req, res, next) {
+//     adminService.updateBrand(req)
+//         .then((banner) => banner ? res.json({ status: true, message: "Brand Update Successfully...." }) : res.json({ status: false, message: "ERROR" }))
+//         .catch((err) => next(res.json({ status: false, message: err })));
+// }
 
 function editBrand(req, res, next) {
     adminService.editBrand(req)
@@ -421,6 +437,12 @@ function deleteBrand(req, res, next) {
 
 function statusBrand(req, res, next) {
     adminService.statusBrand(req)
+        .then(brand => brand ? res.status(201).json({ status: true, message: msg.admin.brand.status.success, data: brand }) : res.status(400).json({ status: false, message: msg.admin.brand.status.error }))
+        .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function brandPopularStatus(req, res, next) {
+    adminService.brandPopularStatus(req)
         .then(brand => brand ? res.status(201).json({ status: true, message: msg.admin.brand.status.success, data: brand }) : res.status(400).json({ status: false, message: msg.admin.brand.status.error }))
         .catch(err => next(res.status(400).json({ status: false, message: err })));
 }
