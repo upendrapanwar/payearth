@@ -209,8 +209,6 @@ router.delete("/service/delete-calendar-event/:id", delSellerCalendarEvents)
 //contact-Us
 router.post("/seller-contact-us", contactUsValidation, seller_contactUs);
 
-//Support Page
-router.post("/support/send-email", contactUsValidation, sellerSupportEmail);
 
 
 router.post("/service-order", sellerServiceOrders);
@@ -265,7 +263,14 @@ router.put("/communityUserBlock", communityUserBlock);
 router.put("/communityUserUnblock", communityUserUnblock);
 router.get("/getPostById/:id", getPostById);
 router.put("/editProfileImage/:id", editProfileImage);
-router.post("/support/request-call", supportReqCall)
+
+//support
+router.post("/support/request-call", supportReqCall);
+router.post("/support/send-email", contactUsValidation, sellerSupportEmail);
+router.post("/openTicket", supportOpenTicket);
+router.get("/getAllOpenTicket/:id", getAllOpenTicket);
+router.get("/get-indivisual-opened-tickect-message/:id", getOpenedTicketMessage);
+
 
 //myProfile
 router.get("/my-profile/:id", getProfileById);
@@ -1467,14 +1472,11 @@ function getProfileById(req, res, next) {
 }
 
 //save seller profile
-
 function saveMyProfile(req, res, next) {
   sellerService.saveMyProfile(req)
     .then((data) => data ? res.json({ status: true, data: data, message: "Profile saved successfully." }) : res.json({ status: false, data: {}, message: "Error saving Profile request." }))
     .catch((err) => next(res.json({ status: false, message: err.message })));
 }
-
-
 
 function editProfile(req, res, next) {
   sellerService.editProfile(req)
@@ -1482,3 +1484,21 @@ function editProfile(req, res, next) {
     .catch((err) => next(res.json({ status: false, message: err.message })));
 }
 
+function supportOpenTicket(req, res, next) {
+  sellerService.supportOpenTicket(req)
+      .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+      .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+
+function getAllOpenTicket(req, res, next) {
+  sellerService.getAllOpenTicket(req)
+      .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+      .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getOpenedTicketMessage(req, res, next) {
+  sellerService.getOpenedTicketMessage(req)
+      .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+      .catch((err) => next(res.json({ status: false, message: err.message })));
+}

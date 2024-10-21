@@ -303,8 +303,8 @@ const AddProductSubCategory = (props) => {
 
     const tableDataTrash = { columns: columnsTrash, data: trashSubCategories };
     const handleClick = (e) => {
-        e.preventDefault(); // Prevent navigation behavior
-        props.toggleShowSubCategory(); // Call the function to toggle state
+        e.preventDefault();
+        props.toggleShowSubCategory(); 
     };
 
     return (

@@ -89,7 +89,8 @@ const SupportSeller = () => {
                                                 <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry lorem Ipsum has been the industrys standard dummy text ever since.</p>
 
                                                 <div className="support_button">
-                                                    <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/seller-support-email" id="email" >Email on your Question</Link>
+                                                    {/* <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/seller-support-email" id="email" >Email on your Question</Link> */}
+                                                    <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/support_ticket_seller"  >Request for support ticket</Link>
                                                     <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/support-call" id="call" >Request a call</Link>
                                                     <Link className="btn custom_btn btn_yellow mx-auto" to="#" onClick={() => handleSupportChat()}>Chat</Link>
                                                 </div>

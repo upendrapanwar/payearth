@@ -71,6 +71,7 @@ class Login extends Component {
             this.setState({ seePassword: true });
         }
     }
+    
     handleClose = () => {
         this.props.history.push('/');
         console.log('test');

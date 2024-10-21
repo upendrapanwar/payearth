@@ -252,7 +252,8 @@ router.get("/get-indivisual-sub-categories/:id", getIndivisualSubCate);
 router.put("/update-product-sub-categories/:id", updateSubCate);
 router.get("/get-trash-sub-categories/:id", getTrashSubCateProduct);
 
-
+//manage Admins
+router.get("/getAllAdmins",getAllAdmins);
 
 
 module.exports = router;
@@ -1190,6 +1191,13 @@ function updateSubCate(req, res, next) {
 
 function getTrashSubCateProduct(req, res, next) {
     adminService.getTrashSubCateProduct(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+
+function getAllAdmins(req, res, next) {
+    adminService.getAllAdmins(req)
         .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
         .catch((err) => next(res.json({ status: false, message: err.message })));
 }

@@ -53,6 +53,8 @@ const {
   PostComment,
   ReportPost,
   Support,
+  Ticket,
+  TicketMessage,
 } = require("../helpers/db");
 
 module.exports = {
@@ -157,6 +159,9 @@ module.exports = {
   getProfileById,
   saveMyProfile,
   editProfile,
+  supportOpenTicket,
+  getAllOpenTicket,
+  getOpenedTicketMessage,
 };
 
 // function sendMail(mailOptions) {
@@ -4819,5 +4824,79 @@ async function editProfile(req) {
     return data;
   } catch (error) {
     console.error("Error:", error)
+  }
+}
+
+//support Ticket created & initial ticket message
+async function supportOpenTicket(req) {
+  try {
+    const { ticketId, category, subject, priority, message, createdBy, createdByType, status } = req.body;
+
+    const existingTicket = await Ticket.findOne({ ticketId });
+    if (existingTicket) {
+      return { status: false, message: "Ticket already exists." };
+    }
+
+    const ticket = new Ticket({
+      ticketId,
+      category,
+      subject,
+      priority,
+      createdBy,
+      createdByType,
+      status
+    });
+
+    const newTicket = await ticket.save();
+
+    const ticketMessage = new TicketMessage({
+      ticketId: newTicket.ticketId,
+      sender: createdBy,
+      senderType: createdByType,
+      message: message
+    });
+
+    const savedMessage = await ticketMessage.save();
+
+    newTicket.messages.push(savedMessage._id);
+    await newTicket.save();
+
+    return { status: true, message: "Ticket opened successfully.", data: newTicket };
+  } catch (error) {
+    console.error(error);
+    return { status: false, message: error.message };
+  }
+}
+
+
+async function getAllOpenTicket(req) {
+  const createdBy = req.params.id;
+  try {
+    const findData = await Ticket.find({ createdBy })
+    if (!findData) {
+      return { status: false, message: "No tickets found for this seller." };
+    }
+
+    return { status: true, message: "Tickets retrieved successfully.", data: findData };
+  } catch (error) {
+    console.error(error);
+    return { status: false, message: error.message };
+  }
+}
+
+async function getOpenedTicketMessage(req) {
+
+  const ticketId = req.params.id;
+  try {
+
+    const data = await TicketMessage.find({ticketId})
+    if(!data){
+      return { status: false, message: "Ticket message not found." };
+    }
+    
+    return { status: true, message: "Tickets retrieved successfully.", data: data };
+  } catch (error) {
+    console.error(error);
+    return { status: false, message: error.message };
   }
 }

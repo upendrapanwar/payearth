@@ -168,6 +168,7 @@ module.exports = {
     getIndivisualSubCate,
     updateSubCate,
     getTrashSubCateProduct,
+    getAllAdmins,
 };
 
 // Validator function
@@ -223,7 +224,7 @@ async function signup(param) {
 
     //Email send functionality.
     const mailOptions = {
-        from: config.mail_from_email, // sender address
+        from: config.mail_from_email,
         to: admin.email,
         subject: 'Welcome Email - PayEarth',
         text: 'Welcome Email',
@@ -3919,7 +3920,7 @@ async function editProfile(req) {
 
 async function getAllProductCategory(req) {
     try {
-        const data = await Category.find({ parent: null,  isUncategorized: false,  isService: false })
+        const data = await Category.find({ parent: null, isUncategorized: false, isService: false })
             .sort({ createdAt: 'desc' })
 
         if (!data) {
@@ -4189,13 +4190,27 @@ async function updateSubCate(req) {
     }
 }
 
-async function getTrashSubCateProduct(req){
+async function getTrashSubCateProduct(req) {
     const parent = req.params.id;
     try {
         const data = await Category.find({ parent: { $ne: null, $eq: parent }, isActive: false, isService: false })
             .sort({ createdAt: 'desc' });
 
         return { status: true, data };
+    } catch (error) {
+        console.error(error);
+        return { status: false, message: error.message };
+    }
+}
+
+async function getAllAdmins() {
+    try {
+        const data = await Admin.find({ role: "admin" })
+        if (!data) {
+            return { status: false, message: "Data is not find." };
+        }
+
+        return { status: true, message: "Data fetch successfully.", data:data };
     } catch (error) {
         console.error(error);
         return { status: false, message: error.message };

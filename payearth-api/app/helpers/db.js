@@ -50,4 +50,6 @@ module.exports = {
   ChatMessage: require("../models/chatmessage.model"),
   Notification: require("../models/notification.model"),
   Support: require('../models/support.model'),
+  Ticket : require('../models/ticket.model'),
+  TicketMessage: require('../models/ticketmessage.model')
 };
