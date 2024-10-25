@@ -140,7 +140,6 @@ import StripePaymentForms from "./containers/user/paymentCheckoutStripe";
 import StripePaymentForm from "./containers/user/paymentCheckoutStripe";
 import ServiceOrder from "./containers/user/service/ServiceOrder";
 import adminAddService from './containers/admin/AddService';
-// import ManageCategories from "./containers/admin/ManageCategories";
 import AdminProfile from "./containers/community/AdminProfile";
 import SupportUser from "./containers/user/SupportUser";
 import SupportSeller from "./containers/seller/SupportSeller";
@@ -152,6 +151,9 @@ import { SupportAdminCall } from "./containers/admin/SupportAdminCall";
 import SupportAdmin from "./containers/admin/SupportAdmin";
 import { SellerMyProfile } from "./containers/seller/SellerMyProfile";
 import AdminMyProfile from "./containers/admin/AdminMyProfile";
+import SupportTicketSeller from "./containers/seller/SupportTicketSeller";
+import SupportTicketChat from "./containers/seller/SupportTicketChat";
+import ManageAdmins from "./containers/admin/ManageAdmins";
 
 
 function App() {
@@ -169,7 +171,7 @@ function App() {
             exact
           />
 
-        
+
 
           <PublicRoute
             path="/product-listing"
@@ -185,7 +187,7 @@ function App() {
             exact
           />
 
-        
+
           <PublicRoute
             path="/service-display"
             restricted={false}
@@ -623,6 +625,8 @@ function App() {
             path="/admin/forgot-password"
             restricted={false}
             component={AdminForgotPwd}
+            roles={[Role.super_admin, Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
 
@@ -630,6 +634,8 @@ function App() {
             path="/admin/reset-password"
             restricted={false}
             component={AdminResetPwd}
+            roles={[Role.super_admin, Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
 
@@ -637,6 +643,8 @@ function App() {
             path="/admin/payments"
             restricted={false}
             component={AdminPayments}
+            roles={[Role.super_admin, Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
 
@@ -644,6 +652,8 @@ function App() {
             path="/admin/manage-community-post"
             restricted={false}
             component={ManageCommunityPost}
+            roles={[Role.super_admin, Role.admin]}
+            currentUserRole={userInfo.role}
             exact
           />
 
@@ -651,7 +661,7 @@ function App() {
             path="/admin/post-module"
             restricted={false}
             component={AdminPostModule}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -660,7 +670,7 @@ function App() {
             path="/admin/post-module-add-new"
             restricted={false}
             component={AdminPostModuleAddNew}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -669,7 +679,7 @@ function App() {
             path="/admin/post-module-edit/:id"
             restricted={false}
             component={AdminPostEdit}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -678,7 +688,7 @@ function App() {
             path="/admin/page-module"
             restricted={false}
             component={AdminPageModule}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -687,7 +697,7 @@ function App() {
             path="/admin/page-module-add-new"
             restricted={false}
             component={AdminPageModuleAddNew}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -696,7 +706,7 @@ function App() {
             path="/admin/page-module-edit/:id"
             restricted={false}
             component={AdminPageEdit}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -705,7 +715,7 @@ function App() {
             path="/admin/category-module"
             restricted={false}
             component={AdminCategoryModel}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -714,7 +724,7 @@ function App() {
             path="/admin/category-module-edit/:id"
             restricted={false}
             component={AdminCategoryModelEdit}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -723,7 +733,7 @@ function App() {
             path="/admin/manage-payment-details/:id"
             restricted={false}
             component={ManagePaymentDetails}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -732,7 +742,7 @@ function App() {
             path="/admin/chat"
             restricted={false}
             component={AdminChat}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -741,7 +751,7 @@ function App() {
             path="/admin/manage-order-details/:id"
             restricted={false}
             component={ManageOrderDetails}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -750,7 +760,7 @@ function App() {
             path="/admin/manage-products"
             restricted={false}
             component={ManageProducts}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -759,7 +769,7 @@ function App() {
             path="/admin/manage-product-details"
             restricted={false}
             component={ManageProductDetails}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -768,25 +778,16 @@ function App() {
             path="/admin/manage-services"
             restricted={false}
             component={ManageServices}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
-
-          {/* <PrivateRoute
-            path="/admin/manage-categories"
-            restricted={false}
-            component={ManageCategories}
-            roles={[Role.admin]}
-            currentUserRole={userInfo.role}
-            exact
-          /> */}
 
           <PrivateRoute
             path="/admin/manage-categories-product"
             restricted={false}
             component={ManageProductsCategory}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -804,7 +805,7 @@ function App() {
             path="/admin/manage-categories-services"
             restricted={false}
             component={ManageServiceCategory}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -813,7 +814,7 @@ function App() {
             path="/admin/manage-service-details"
             restricted={false}
             component={ManageServiceDetails}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -821,7 +822,15 @@ function App() {
           <PrivateRoute
             path="/admin/manage-community"
             component={ManageCommunity}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/admin/manage-admins"
+            component={ManageAdmins}
+            roles={[Role.super_admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -829,7 +838,7 @@ function App() {
           <PrivateRoute
             path="/admin/manage-reports"
             component={ManageReports}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -837,7 +846,7 @@ function App() {
           <PrivateRoute
             path="/admin/manage-reports-services"
             component={ManageReportsServices}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -846,7 +855,7 @@ function App() {
             path="/admin/manage-notifications"
             restricted={false}
             component={ManageNotifications}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -855,7 +864,7 @@ function App() {
             path="/admin/manage-customers"
             restricted={false}
             component={ManageCustomers}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -863,7 +872,7 @@ function App() {
           <PrivateRoute
             path="/admin/orders"
             component={AdminOrders}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -871,7 +880,7 @@ function App() {
           <PrivateRoute
             path="/admin/Service-order"
             component={AdminServiceOrders}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -879,7 +888,7 @@ function App() {
           <PrivateRoute
             path="/admin/dashboard"
             component={AdminDashboard}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -887,7 +896,7 @@ function App() {
           <PrivateRoute
             path="/admin/add-coupon"
             component={AddCoupon}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -895,7 +904,7 @@ function App() {
           <PrivateRoute
             path="/admin/coupons"
             component={CouponsListing}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -903,7 +912,7 @@ function App() {
           <PrivateRoute
             path="/admin/manage-vendors"
             component={ManageVendors}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -911,7 +920,7 @@ function App() {
           {/* <PrivateRoute
             path="/admin/manage-community-post"
             component={ManageCommunityPost}
-            roles={[Role.admin]}
+             roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           /> */}
@@ -919,7 +928,7 @@ function App() {
           <PrivateRoute
             path="/admin/add-service"
             component={adminAddService}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -927,7 +936,7 @@ function App() {
           <PrivateRoute
             path="/admin/manage-banner-advertisement"
             component={ManageBannerAdvertisement}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -935,7 +944,7 @@ function App() {
           <PrivateRoute
             path="/admin/manage-support"
             component={SupportAdmin}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -943,7 +952,7 @@ function App() {
           <PrivateRoute
             path="/admin/support-call"
             component={SupportAdminCall}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -951,7 +960,7 @@ function App() {
           <PrivateRoute
             path="/admin/manage-banner-list"
             component={ManageBannerList}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -959,7 +968,7 @@ function App() {
           <PrivateRoute
             path="/admin/manage-banner-list-edit/:id"
             component={ManageBannerListEdit}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -967,7 +976,7 @@ function App() {
           <PrivateRoute
             path="/admin/admin-manage-subscriptionplan"
             component={AdminManageSubPlan}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -975,7 +984,7 @@ function App() {
 
           <PrivateRoute path="/admin/edit-service/:id"
             component={AdminEditService}
-            roles={[Role.admin]}
+            roles={[Role.super_admin, Role.admin]}
             currentUserRole={userInfo.role}
             exact
           />
@@ -1027,6 +1036,20 @@ function App() {
             path="/seller_share_community/:id"
             restricted={false}
             component={SellerSharePostData}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/support_ticket_seller"
+            restricted={false}
+            component={SupportTicketSeller}
+            exact
+          />
+
+          <PublicRoute
+            path="/seller/support_ticket_message"
+            restricted={false}
+            component={SupportTicketChat}
             exact
           />
 

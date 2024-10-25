@@ -71,15 +71,6 @@ function Header() {
     }
   };
 
-  // const removeBack = () => {
-  //   // Remove any active backdrop elements (if using Bootstrap modals or dropdown backdrops)
-  //   const backdrop = document.querySelector('.modal-backdrop');
-  //   if (backdrop) {
-  //     backdrop.remove();
-  //   }
-  // };
-  
-
 
   useEffect(() => {
     getAdminProfile();
@@ -181,9 +172,6 @@ function Header() {
                 </Link>
               </li>
 
-              {/* <li><Link to="/admin/page-module" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Pages </Link></li>
-                            <li><Link to="/admin/page-module-add-new" onClick={() => removeBackdrop()}><i className="icon"><img src={bannerIcon} alt="" /></i> Create Page </Link></li> */}
-
               <li>
                 <Link to="/admin/orders" onClick={() => removeBackdrop()}>
                   <i className="icon">
@@ -192,14 +180,7 @@ function Header() {
                   Manage Orders
                 </Link>
               </li>
-              {/* <li>
-                <Link to="/admin/manage-categories" onClick={() => removeBackdrop()}>
-                  <i className="icon">
-                    <img src={shoppingBagIcon} alt="" />
-                  </i>{" "}
-                  Manage Categories
-                </Link>
-              </li> */}
+
               <li className="nav-item dropdown">
                 <Link
                   to="#"
@@ -208,7 +189,6 @@ function Header() {
                   role="button"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
-                  // onClick={() => removeBack()}
                 >
                   <i className="icon">
                     <img src={shoppingBagIcon} alt="" />
@@ -325,6 +305,21 @@ function Header() {
                   Manage Vendors
                 </Link>
               </li>
+
+              {userInfo.role === 'super_admin' && (
+                <li>
+                  <Link
+                    to="/admin/manage-admins"
+                    onClick={() => removeBackdrop()}
+                  >
+                    <i className="icon">
+                      <img src={vendorIcon} alt="" />
+                    </i>{" "}
+                    Manage Admins
+                  </Link>
+                </li>
+              )}
+
               <li>
                 <Link
                   to="/admin/manage-reports"
@@ -447,6 +442,7 @@ function Header() {
                           aria-label="Close"
                         ></button>
                       </div>
+
                       <div className="offcanvas-body d-block">
                         <ul className="seller_menu navbar-nav justify-content-end flex-grow-1 pe-0">
                           <li className="nav-item">
@@ -458,6 +454,7 @@ function Header() {
                               <span>Notifications</span>
                             </Link>
                           </li>
+
                           <li className="nav-item">
                             <Link className="nav-link" to="/admin/chat">
                               <div className="sm_icon">
