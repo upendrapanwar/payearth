@@ -2,8 +2,18 @@ var mongoose = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
 const Schema = mongoose.Schema;
 
+const colorSizeSchema = new Schema({
+    size: { type: String, required: true },
+    color: { type: String, required: true }
+});
+
+const tierPriceSchema = new Schema({
+    qty: { type: Number, required: true },
+    price: { type: Number, required: true }
+});
+
 const schema = new Schema({
-    productCode: { type: String, unique: true, required: false, index: true, default: function() { return getRandomString(8); } },
+    productCode: { type: String, unique: true, required: false, index: true, default: function () { return getRandomString(8); } },
     name: { type: String, required: true },
     lname: { type: String, required: false, default: "", index: true },
     category: { type: mongoose.Schema.ObjectId, ref: "Category" },
@@ -12,10 +22,10 @@ const schema = new Schema({
     description: { type: String, required: true, default: "" },
     specifications: { type: String, required: false, default: "" },
     validity: { type: String, required: false, default: "" },
-    color_size: { type: Array, required: false, default: [] },
+    color_size: { type: [colorSizeSchema], required: false, default: [] },
     featuredImage: { type: String, required: false, default: "" },
     images: { type: Array, required: false, default: [] },
-    tier_price: { type: Array, required: false, default: [] },
+    tier_price: { type: [tierPriceSchema], required: false, default: [] },
     price: { type: Number, required: true, default: 0 },
     cryptoPrices: [{ type: Schema.Types.ObjectId, ref: 'CryptoConversion' }],
     isActive: { type: Boolean, required: false, default: true },

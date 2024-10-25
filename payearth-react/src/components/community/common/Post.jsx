@@ -17,7 +17,7 @@ import SpinnerLoader from '../../../components/common/SpinnerLoader';
 import { setLoading } from '../../../store/reducers/global-reducer';
 import { getPostsData } from '../../../helpers/post-listing';
 import SimpleImageSlider from "react-simple-image-slider";
-import CommunityAdvertise from '../../common/BannerFrame'
+import { CommunityAdvertise } from '../../common/BannerFrame';
 import ReactTimeAgo from 'react-time-ago'
 import TimeAgo from 'javascript-time-ago'
 import Slider from "react-slick";
@@ -34,6 +34,7 @@ import ru from 'javascript-time-ago/locale/ru.json'
 
 
 const Post = ({ posts, sendEditData, sendShareData }) => {
+    // console.log("posts", posts)
     const authInfo = useSelector(state => state.auth.authInfo);
     const userInfo = useSelector(state => state.auth.userInfo);
     const loading = useSelector(state => state.global.loading);
@@ -811,7 +812,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                         </div>
                     }
 
-                    <div class="commVideoSlider destopHidden">
+                    <div className="commVideoSlider destopHidden">
                         <Slider {...settings}>
                             {posts.postImages.map((image, ind) => {
                                 return (
@@ -848,27 +849,6 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
 
                     {/* slider end */}
                     <div className='post_img_box container mobHidden'>
-                        {/* Display video slider for Mobile Version */}
-
-                        {/* <div class="commVideoSlider destopHidden">
-                            <div>your content</div>
-                            <div>your content</div>
-                            <div>your content</div>
-                        </div> */}
-
-
-
-
-                        {/* <Slider {...settings} className="commVideoSlider destopHidden">
-                            <div>one</div>
-                            <div>Two</div>
-                            <div>Three</div>
-                        </Slider> */}
-
-
-
-
-                        {/* Display video on desktop */}
                         <div className='row post_img_internal_box'>
                             {posts.postImages.slice(0, 2).map((image, ind) => {
                                 return (
@@ -1047,6 +1027,23 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                     </div>
                 </div>
             </div>
+
+            {posts.categoryId !== null && posts.categoryId.categoryName !== '' ? <>
+                {/* <div className="row my-3">
+                    <div className="col text-center position-relative">
+                        <aside className="advertisement-banner position-relative">
+                            <span className="small-advertise-tag position-absolute top-0 start-0 bg-dark text-white px-2 py-1 rounded">
+                                Advertisement
+                            </span> */}
+                <CommunityAdvertise keywords={posts.categoryId.categoryName} />
+                {/* </aside>
+                    </div>
+                </div> */}
+            </> : <>
+
+            </>}
+
+
             <Modal
                 show={isReportOpen}
                 onHide={() => setIsReportOpen(false)}

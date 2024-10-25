@@ -806,12 +806,14 @@ async function getProductById(id) {
     };
     return result;
   }
-}
+} 
 
 async function addProduct(req) {
   const files = req.files;
   console.log(' req.files----', req.files)
   const param = req.body;
+
+  console.log("param", param)
   var lName = param.name.toLowerCase();
   var imagesArr = [];
   var colorSizeArr = [];
@@ -838,8 +840,17 @@ async function addProduct(req) {
     }
   }
 
+  // if (param.color_size) {
+  //   for (var size in param.color_size) {
+  //     colorSizeArr.push({ size: size, color: param.color_size[size] });
+  //   }
+  // }
+
   if (param.color_size) {
     for (var size in param.color_size) {
+
+      let clz = param.color_size[size]
+
       colorSizeArr.push({ size: size, color: param.color_size[size] });
     }
   }
@@ -876,6 +887,8 @@ async function addProduct(req) {
     isActive: true,
   };
 
+  console.log("input", input)
+
   if (param.sub_category !== "") {
     input["sub_category"] = param.sub_category;
   }
@@ -888,6 +901,8 @@ async function addProduct(req) {
     let res = await Product.findById(data.id).select(
       "name category sub_category brand description specifications color_size tier_price price images quantity isService isActive"
     );
+
+    console.log("resCheck ", res)
 
     if (res) {
       return res;
@@ -1510,18 +1525,18 @@ async function getColors() {
 
 async function getCategories(req) {
   var param = req.body;
+  console.log("param.is_service", param.is_service)
   var parent = param.parent ? param.parent : null;
 
   const result = await Category.find({
-    // isActive: true,
+    isActive: true,
     isService: param.is_service,
-    // parent: parent,
+    parent: parent,
   })
-    .select("id categoryName isService ")
+    .select("id categoryName isService")
     .sort({ createdAt: "desc" });
 
   if (result && result.length > 0) return result;
-
   return false;
 }
 

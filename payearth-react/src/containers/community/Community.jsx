@@ -119,7 +119,7 @@ const Community = () => {
                 break;
         }
         setModalContent(data.data);
-        setUserType(data.type)
+        setUserType(data.type);
         setShowModal(true);
     };
 
@@ -705,7 +705,7 @@ const Community = () => {
 
                             {/* Filter */}
                             <div className="col-lg-3">
-                                <CommunityAdvertise keywords={advertiseCat} />
+                                {/* <CommunityAdvertise keywords={advertiseCat} /> */}
                                 <div className="cumm_sidebar_box bg-white p-3 rounded-3">
                                     <div className="cumm_title">advanced filter</div>
                                     <div className="filter_box">

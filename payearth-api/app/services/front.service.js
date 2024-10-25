@@ -873,13 +873,21 @@ async function advertismentBySlug(req) {
 
 async function getAllBannersData(req) {
   const keywordsData = req.params.keywords;
+  const keywordsArray = keywordsData.toLowerCase().split(/[\s&]+/);
+
   try {
     // const result = await bannerAdvertisement.find({}).select().sort({ createdAt: 'desc' })
     // const matchedBannerData = result.filter(item => item.keyword.toLowerCase().includes(keywordsData.toLowerCase()))
 
+    // const query = {
+    //   keyword: { $regex: keywordsData, $options: "i" },
+    //   status: "Publish",
+    // };
+
     const query = {
-      keyword: { $regex: keywordsData, $options: "i" },
-      status: "Publish",
+      $or: keywordsArray.map(keyword => ({
+        keyword: { $regex: keyword, $options: "i" }
+      }))
     };
     const fieldsToSelect = "image video category keyword siteUrl bannerName blockByUser";
     const result = await bannerAdvertisement

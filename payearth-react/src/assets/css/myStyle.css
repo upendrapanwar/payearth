@@ -3004,12 +3004,27 @@ input[type="search"] {
   z-index: 999;
 }
 
-.iframe-container iframe img { max-width: 100%!important;}
+.iframe-container iframe img {
+  max-width: 100% !important;
+}
 
 
 
 
-.cp_body .spinner_loader{
+.cp_body .spinner_loader {
   padding: 40px;
   position: relative;
+}
+
+.advertisement-banner {
+  /* border: 1px solid #ddd; */
+  /* padding: 20px; */
+  /* background-color: #f9f9f9; */
+  /* margin-top: 10px; */
+  /* border-radius: 5px; */
+}
+
+.small-advertise-tag {
+  font-size: 0.75rem;
+  /* Small font size */
 }
