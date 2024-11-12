@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const colorSizeSchema = new Schema({
     size: { type: String, required: true },
-    color: { type: String, required: true }
+    color: { type: String, required: true, default: '' }
 });
 
 const tierPriceSchema = new Schema({

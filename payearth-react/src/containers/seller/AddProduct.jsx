@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios';
 import { Formik, Field, FieldArray, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import { setLoading } from '../../store/reducers/global-reducer';
@@ -8,8 +9,11 @@ import store from '../../store';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import Header from '../../components/seller/common/Header';
 import Footer from '../../components/common/Footer';
+import { Helmet } from 'react-helmet';
 import Select from 'react-select';
 import { Link } from 'react-router-dom';
+import arrow_back from './../../assets/icons/arrow-back.svg';
+import CryptoJS from 'crypto-js';
 import addProductSchema from '../../validation-schemas/addProductSchema';
 
 class AddProduct extends Component {
@@ -18,6 +22,9 @@ class AddProduct extends Component {
         const { dispatch } = props;
         this.dispatch = dispatch;
         this.authInfo = store.getState().auth.authInfo;
+        this.cloudName = process.env.REACT_APP_CLOUD_NAME;
+        this.apiKey = process.env.REACT_APP_CLOUD_API_KEY;
+        this.apiSecret = process.env.REACT_APP_CLOUD_API_SECRET;
         this.state = {
             catOptions: [],
             defaultCatOption: { label: 'Choose Category', value: '' },
@@ -193,20 +200,51 @@ class AddProduct extends Component {
         this.setState({ colorImages });
     }
 
-    handleColorImg = (event, index, fieldName) => {
+    handleColorImg = async (event, index, fieldName) => {
         let colorImages = [...this.state.colorImages];
         if (fieldName === 'color') {
             colorImages[index].color = event.target.value;
         } else {
             for (let i = 0; i < event.target.files.length; i++) {
-                colorImages[index].images.push(event.target.files[i]);
-                colorImages[index].previews.push(URL.createObjectURL(event.target.files[i]));
+                // console.log("event image ::::", event.target.files[i])
+                let imageData = await this.uploadImage(event.target.files[i])
+                // console.log("handleColorImage::::", imageData.secure_url)
+                colorImages[index].images.push(imageData.secure_url);
+                colorImages[index].previews.push(imageData.secure_url);
+                //  colorImages[index].previews.push(URL.createObjectURL(event.target.files[i]));
             }
         }
         this.setState({ colorImages });
     }
 
-    removeImg = (mainIndex, imgIndex) => {
+    deleteImage = async (id) => {
+        const timestamp = Math.round(new Date().getTime() / 1000);
+        const signature = CryptoJS.SHA1(`public_id=${id}&timestamp=${timestamp}${this.apiSecret}`).toString(CryptoJS.enc.Hex);
+        try {
+            const formData = new FormData();
+            formData.append('public_id', id);
+            formData.append('api_key', this.apiKey);
+            formData.append('timestamp', timestamp);
+            formData.append('signature', signature);
+
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/image/destroy`, {
+                method: 'POST',
+                body: formData,
+            });
+            if (response.ok) {
+                console.log("Image deleted successfully");
+            }
+        } catch (err) {
+            console.error('Error in image deletion process:', err);
+        }
+    };
+
+    removeImg = (mainIndex, imgIndex, imgUrl) => {
+        // console.log("imgUrl", imgUrl)
+        const match = imgUrl.match(/\/v\d+\/(.*?)(\.|$)/);
+        const id = match ? match[1] : null;
+
+        this.deleteImage(id);
         let colorImages = [...this.state.colorImages];
         colorImages[mainIndex].images.splice(imgIndex, 1);
         colorImages[mainIndex].previews.splice(imgIndex, 1);
@@ -229,12 +267,35 @@ class AddProduct extends Component {
         }
     }
 
-    saveFeaturedImg = (productId, successMsg) => {
+    uploadImage = (imageFile) => {
+        // console.log("imageFile", imageFile)
+        return new Promise((resolve, reject) => {
+            const data = new FormData();
+            data.append("file", imageFile);
+            data.append("upload_preset", "pay-earth-images");
+            data.append("cloud_name", this.cloudName);
+
+            fetch(`https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`, {
+                method: "post",
+                body: data
+            })
+                .then((res) => res.json())
+                .then((data) => resolve(data))
+                .catch((err) => reject(err));
+        });
+    };
+
+    saveFeaturedImg = async (productId, successMsg) => {
+        console.log("featuredImg", this.state.featuredImg)
+        let imageData = await this.uploadImage(this.state.featuredImg.image);
+        console.log("imageData", imageData)
         let formData = new FormData();
         formData.append('id', productId);
-        formData.append('file', this.state.featuredImg.image);
+        formData.append('file', imageData.secure_url);
 
-        axios.post('seller/products/featured-image', formData, {
+        // console.log("image Data", imageData);
+
+        await axios.post('seller/products/featured-image', formData, {
             headers: {
                 'Accept': 'application/form-data',
                 'Content-Type': 'application/json; charset=UTF-8',
@@ -245,7 +306,7 @@ class AddProduct extends Component {
                 toast.dismiss();
                 toast.success(successMsg, { autoClose: 3000 });
                 this.dispatch(setLoading({ loading: true }));
-                // this.props.history.push('/seller/product-stock-management');
+                this.props.history.push('/seller/product-stock-management');
             }
         }).catch(error => {
             if (error.response && error.response.data.status === false) {
@@ -259,7 +320,7 @@ class AddProduct extends Component {
     }
 
     handleSubmit = values => {
-        console.log("values::::", values)
+        // console.log("values::::", values)
         let formData = new FormData();
         let tierPrices = this.state.tierPrices;
         let colorSizes = this.state.colorSizes;
@@ -271,17 +332,8 @@ class AddProduct extends Component {
         formData.append('description', values.description);
         formData.append('specifications', values.specifications);
         formData.append('price', values.price);
-
-        //   Bind colors with size
-        // for (const [key, value] of Object.entries(this.state.colorSizes)) {
-        //     if (this.state.colorSizes[key].length > 0) {
-        //         for (let index = 0; index < value.length; index++) {
-        //             if (value[index] !== undefined && value[index] !== '') {
-        //                 formData.append('color_size[' + key + '][]', value[index]);
-        //             }
-        //         }
-        //     }
-        // }
+        formData.append('images', JSON.stringify(this.state.colorImages));
+        // images
 
         for (let index = 0; index < colorSizes.length; index++) {
             formData.append('color_size[' + index + '][size]', colorSizes[index].size);
@@ -294,20 +346,34 @@ class AddProduct extends Component {
             formData.append('tier_price[' + index + '][price]', tierPrices[index].price);
         }
 
-        // Bind images with color
+        //   Bind colors with size
+        // for (const [key, value] of Object.entries(this.state.colorSizes)) {
+        //     if (this.state.colorSizes[key].length > 0) {
+        //         for (let index = 0; index < value.length; index++) {
+        //             if (value[index] !== undefined && value[index] !== '') {
+        //                 formData.append('color_size[' + key + '][]', value[index]);
+        //             }
+        //         }
+        //     }
+        // }
+
+
+
+
+
+        // //   Bind images with color
         // for (let index = 0; index < this.state.colorImages.length; index++) {
         //     const element = this.state.colorImages[index];
         //     if (element.images.length > 0) {
         //         element.images.forEach(value => {
-        //             formData.append(element.color, value);
+        //             formData.append(element, value);
         //         })
         //     }
         // }
 
 
-        console.log("formData", formData)
+        // console.log("formData", formData)
         this.dispatch(setLoading({ loading: true }));
-
         axios.post('seller/products', formData, {
             headers: {
                 'Accept': 'application/form-data',
@@ -342,32 +408,23 @@ class AddProduct extends Component {
     render() {
         const { loading } = store.getState().global;
         const { selectedColors } = this.state;
-        const {
-            catOptions,
-            defaultCatOption,
-            subCatOptions,
-            defaultSubCatOption,
-            brands,
-            defaultBrand,
-            tierPrices,
-            colorSizes,
-            colorImages,
-            featuredImg,
-            colors,
-        } = this.state;
+        const { catOptions, defaultCatOption, subCatOptions, defaultSubCatOption, brands, defaultBrand, tierPrices, colorSizes, colorImages, featuredImg, colors } = this.state;
 
-        console.log("colorImages", colorImages)
-        console.log("colors", colors)
-        console.log("colorSizes", colorSizes)
 
         return (
             <React.Fragment >
                 {loading === true ? <SpinnerLoader /> : ''}
                 <div className="seller_body">
                     <Header />
-                    <div className="seller_dash_wrap pt-5 pb-5">
+                    <div className="inr_top_page_title">
+                        <h2>Add Product</h2>
+                    </div>
+                    <Helmet>
+                        <title>{"Add Product - Pay Earth"}</title>
+                    </Helmet>
+                    <div className="seller_dash_wrap pt-1 pb-5">
                         <div className="container ">
-                            <div className="bg-white rounded-3 pt-3 pb-5">
+                            <div className="bg-white rounded-3 pt-2 pb-5">
                                 <div className="dash_inner_wrap">
                                     <Formik
                                         initialValues={{ name: '', category: defaultCatOption.value, subCategory: defaultSubCatOption.value, brand: defaultBrand.value, description: '', specifications: '', price: '', featuredImg: '' }}
@@ -376,14 +433,21 @@ class AddProduct extends Component {
                                         {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isValid, }) => (
                                             <form onSubmit={handleSubmit} encType="multipart/form-data">
                                                 <div className="row">
-                                                    <div className="col-md-12 pt-4 pb-4">
+                                                    <div className="col-md-12 pt-4 pb-5  d-flex justify-content-between align-items-center">
                                                         <div className="dash_title">Add Product</div>
+                                                        <div className=""><span>
+                                                            <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/product-stock-management">
+                                                                <img src={arrow_back} alt="linked-in" />&nbsp;
+                                                                Back
+                                                            </Link>
+                                                        </span></div>
                                                     </div>
                                                     <div className="col-md-4">
                                                         <div className="mb-4">
                                                             <label htmlFor="name" className="form-label">Name of product <small className="text-danger">*</small></label>
                                                             <input type="text" className="form-control"
                                                                 name="name"
+                                                                placeholder="Name of product"
                                                                 onChange={handleChange}
                                                                 onBlur={handleBlur}
                                                                 value={values.name}
@@ -395,7 +459,7 @@ class AddProduct extends Component {
 
                                                         <div className="mb-4">
                                                             <div className="controls_grp">
-                                                                <label htmlFor="name" className="form-label">Tier Price</label>
+                                                                <label htmlFor="name" className="form-label">Tier Price <small className="text-danger">*</small></label>
                                                                 {tierPrices.map((value, index) => {
                                                                     return <div className="input-group mb-2" key={index}>
                                                                         <input
@@ -405,11 +469,12 @@ class AddProduct extends Component {
                                                                             min="1"
                                                                             value={value.qty}
                                                                             onChange={(e) => this.handleQtyPrice(e, index, 'qty')}
+                                                                            onBlur={handleBlur}
                                                                         />
                                                                         <input
                                                                             type="text"
                                                                             className="form-control"
-                                                                            placeholder="Price"
+                                                                            placeholder="Regular Price"
                                                                             value={value.price}
                                                                             onChange={(e) => this.handleQtyPrice(e, index, 'price')}
                                                                         />
@@ -417,6 +482,8 @@ class AddProduct extends Component {
                                                                             onClick={() => this.removeTierPrice(index)}
                                                                         >X</button> */}
                                                                     </div>
+
+
                                                                 })}
                                                                 {/* <button type="button" className="icon_btn" onClick={this.addMoreTierPrice}><i className="fa fa-plus"></i></button> */}
                                                             </div>
@@ -440,85 +507,11 @@ class AddProduct extends Component {
                                                             </div>
                                                         </div>
 
-
-                                                        {/* <div className="mb-4">
-                                                            <div className="controls_grp">
-                                                                <label htmlFor="name" className="form-label">Color & Size</label>
-                                                                <div className="input-group mb-2">
-                                                                    <input type="text" className="form-control" aria-label="Text input" placeholder="S" value="S" />
-                                                                    <button className="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                        <ul className="colors_pick" style={{ 'display': 'none' }}>
-                                                                            <li><span style={{ backgroundColor: '#0EB4B3' }} className="color_box"></span></li>
-                                                                            <li><span style={{ backgroundColor: '#7C80BC' }} className="color_box"></span></li>
-                                                                        </ul>
-                                                                        <span>Color</span>
-                                                                    </button>
-                                                                    <ul className="dropdown-menu dropdown-menu-end colors_pick ps-3 pe-2 pb-4">
-                                                                        {() => { this.colorPalette('s', 'colorSize') }}
-                                                                    </ul>
-                                                                </div>
-
-
-                                                                <div className="input-group mb-2">
-                                                                    <input type="text" readOnly className="form-control" placeholder="M" value="M" />
-                                                                    <button className="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                        <ul className="colors_pick" style={{ 'display': 'none' }}>
-                                                                            <li><span style={{ backgroundColor: '#0EB4B3' }} className="color_box"></span></li>
-                                                                            <li><span style={{ backgroundColor: '#7C80BC' }} className="color_box"></span></li>
-                                                                        </ul>
-                                                                        <span>Color</span>
-                                                                    </button>
-                                                                    <ul className="dropdown-menu dropdown-menu-end colors_pick ps-3 pe-2 pb-4">
-                                                                        {() => { this.colorPalette('m', 'colorSize') }}
-                                                                    </ul>
-                                                                </div>
-                                                                <div className="input-group mb-2">
-                                                                    <input type="text" readOnly className="form-control" aria-label="Text input" placeholder="L" value="L" />
-                                                                    <button className="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                        <ul className="colors_pick" style={{ 'display': 'none' }}>
-                                                                            <li><span style={{ backgroundColor: '#0EB4B3' }} className="color_box"></span></li>
-                                                                            <li><span style={{ backgroundColor: '#7C80BC' }} className="color_box"></span></li>
-                                                                        </ul>
-                                                                        <span>Color</span>
-                                                                    </button>
-                                                                    <ul className="dropdown-menu dropdown-menu-end colors_pick ps-3 pe-2 pb-4">
-                                                                        {() => { this.colorPalette('l', 'colorSize') }}
-                                                                    </ul>
-                                                                </div>
-                                                                <div className="input-group mb-2">
-                                                                    <input type="text" readOnly className="form-control" aria-label="Text input" placeholder="XL" value="XL" />
-                                                                    <button className="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                        <ul className="colors_pick" style={{ 'display': 'none' }}>
-                                                                            <li><span style={{ backgroundColor: '#0EB4B3' }} className="color_box"></span></li>
-                                                                            <li><span style={{ backgroundColor: '#7C80BC' }} className="color_box"></span></li>
-                                                                        </ul>
-                                                                        <span>Color</span>
-                                                                    </button>
-                                                                    <ul className="dropdown-menu dropdown-menu-end colors_pick ps-3 pe-2 pb-4">
-                                                                        {() => { this.colorPalette('xl', 'colorSize') }}
-                                                                    </ul>
-                                                                </div>
-                                                                <div className="input-group mb-2">
-                                                                    <input type="text" readOnly className="form-control" aria-label="Text input" placeholder="XXL" value="XXL" />
-                                                                    <button className="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                        <ul className="colors_pick" style={{ 'display': 'none' }}>
-                                                                            <li><span style={{ backgroundColor: '#0EB4B3' }} className="color_box"></span></li>
-                                                                            <li><span style={{ backgroundColor: '#7C80BC' }} className="color_box"></span></li>
-                                                                        </ul>
-                                                                        <span>Color</span>
-                                                                    </button>
-                                                                    <ul className="dropdown-menu dropdown-menu-end colors_pick ps-3 pe-2 pb-4">
-                                                                        {() => { this.colorPalette('xxl', 'colorSize') }}
-                                                                    </ul>
-                                                                </div>
-                                                            </div>
-                                                        </div> */}
-
                                                         {/* Test */}
 
                                                         <div className="mb-4">
                                                             <div className="controls_grp">
-                                                                <label htmlFor="name" className="form-label">Color & Size</label>
+                                                                <label htmlFor="name" className="form-label">Color & Size <small className="text-danger">*</small></label>
                                                                 {colorSizes.map((value, index) => {
                                                                     return <div className="input-group" key={index}>
                                                                         <input
@@ -660,7 +653,7 @@ class AddProduct extends Component {
                                                                             <ul className="load_imgs">
                                                                                 {value.previews.map((imgUrl, index2) => {
                                                                                     return <li key={index2}>
-                                                                                        <Link to="#" className="delete_icon_btn" onClick={() => this.removeImg(index, index2)}><i className="fa fa-trash"></i></Link>
+                                                                                        <Link to="#" className="delete_icon_btn" onClick={() => this.removeImg(index, index2, imgUrl)}><i className="fa fa-trash"></i></Link>
                                                                                         <img src={imgUrl} alt="..." />
                                                                                     </li>
                                                                                 })}

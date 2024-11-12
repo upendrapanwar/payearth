@@ -81,6 +81,14 @@ module.exports = {
   addToCart,
   updateToCart,
   deleteFromCart,
+
+
+  //
+  checkoutSession,
+
+
+
+
   socialLogin,
   getOrders,
   getOrderStatus,
@@ -1164,6 +1172,8 @@ async function addToCart(req) {
     return false;
   }
 }
+
+
 async function updateToCart(req) {
   try {
     var param = req.body;
@@ -1210,6 +1220,38 @@ async function deleteFromCart(req) {
   } catch (err) {
     console.log("Error", err);
     return false;
+  }
+}
+
+
+// Stripe Checkout session
+
+async function checkoutSession(req) {
+  try {
+    // console.log("backend run")
+    const { cart } = req.body;
+    // console.log("cart backend ", cart)
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: cart.map(product => ({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: product.name,
+          },
+          unit_amount: product.price * product.quantity
+        },
+        quantity: product.quantity,
+      })),
+      mode: "payment",
+      success_url: 'https://localhost:3000/checkout',
+      // success_url: `https://localhost:3000/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `http://localhost:3000/cancel`,
+    });
+    return session;
+
+  } catch (err) {
+
   }
 }
 
@@ -2890,7 +2932,7 @@ async function deleteReviews(req) {
 //           end_datetime: event.end_datetime,
 //           meeting_url: event.meeting_url,
 //         };
-        
+
 //         data = await Calendar.create(eventData);
 //         console.log("calendar data", data)
 
@@ -2898,7 +2940,7 @@ async function deleteReviews(req) {
 //           _id: data.service_id
 //         });
 //         console.log("serviceData", serviceData)
-        
+
 //         resultData = {
 //           createdBy:serviceData[0].createdBy,
 //           data:data
@@ -2936,7 +2978,7 @@ async function addGoogleEvent(req) {
           end_datetime: event.end_datetime,
           meeting_url: event.meeting_url,
         };
-        
+
         data = await Calendar.create(eventData);
         console.log("calendar data", data)
 
@@ -2944,10 +2986,10 @@ async function addGoogleEvent(req) {
           _id: data.service_id
         });
         console.log("serviceData", serviceData)
-        
+
         resultData = {
-          createdBy:serviceData[0].createdBy,
-          data:data
+          createdBy: serviceData[0].createdBy,
+          data: data
         }
         console.log("resultData", resultData)
 

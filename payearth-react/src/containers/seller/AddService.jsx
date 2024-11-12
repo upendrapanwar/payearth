@@ -418,11 +418,7 @@ class AddService extends Component {
                                             <form onSubmit={handleSubmit} encType="multipart/form-data" >
                                                 <div className="row">
                                                     <div className="col-md-12 pt-4 pb-4  d-flex justify-content-between align-items-center">
-                                                        <div className="dash_title">Add Service</div>
-
-                                                        {/* <div className="col-md-4 pt-4 pb-4"> */}
-                                                        {/* <button type="submit" className="btn  custom_btn btn_yellow w-auto" onClick={() => window.history.back()}>Back</button> */}
-                                                        {/* </div> */}
+                                                        <div className="dash_title">Add Service</div>                                            
                                                         <div className=""><span>
                                                             <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/service-stock-management">
                                                                 <img src={arrow_back} alt="linked-in" />&nbsp;

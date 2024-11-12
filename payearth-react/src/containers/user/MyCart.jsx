@@ -17,7 +17,6 @@ import emptyCart from './../../assets/images/empty-cart.png';
 class MyCart extends Component {
     constructor(props) {
         super(props);
-
         this.state = {
             data: [],
             reqBody: {
@@ -27,7 +26,6 @@ class MyCart extends Component {
                 }
             },
         };
-
         toast.configure();
     }
 
@@ -51,12 +49,12 @@ class MyCart extends Component {
                     <div className="container">
                         <div className="row">
                             <div className="col-md-12">
-                            <div className="cart my_cart">
+                                <div className="cart my_cart">
                                     {getTotal().totalQuantity === 0 ?
                                         <div align="center">
                                             <img src={emptyCart} alt='...' width="300px" height="300px" />
                                             <h1>Your Cart Is Empty......!</h1>
-                                            <div className="ctn_btn"><Link to="/" className="view_more">Continue shopping</Link></div>
+                                            <div className="ctn_btn"><Link to="/product-listing" className="view_more">Continue shopping</Link></div>
                                             &nbsp;
                                         </div>
                                         :

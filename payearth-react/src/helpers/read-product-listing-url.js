@@ -34,7 +34,7 @@ const readUrl = (dispatch, reqBody, location, setReqBody, param) => {
         return { catId: catId, searchInput: searchInput };
     }
 
-    if (location.pathname === '/service-listing') {
+    if (location.pathname === '/service-listing') { 
         if (location.search !== null && location.search !== '') {
             if (/cat=([^&]+)/.exec(location.search) !== null) {
                 catId = /cat=([^&]+)/.exec(location.search)[1];

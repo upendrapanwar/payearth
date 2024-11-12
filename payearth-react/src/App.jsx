@@ -171,8 +171,6 @@ function App() {
             exact
           />
 
-
-
           <PublicRoute
             path="/product-listing"
             restricted={false}

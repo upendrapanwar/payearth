@@ -35,6 +35,7 @@ module.exports = {
   getRatingCount,
   getSimilarProducts,
   getPopularBrands,
+  getProductBrands,
   getTrendingProducts,
   getPopularProducts,
   getTodayDeals,
@@ -43,6 +44,11 @@ module.exports = {
   getCategoriesSearch,
   getCategoriesMenu,
   getProductListing,
+  // test 
+  getProductsListing,
+  getSubCateProduct,
+
+
   getFilterCategories,
   getBrandsListByProducts,
   getColorsListByProducts,
@@ -169,6 +175,15 @@ async function getSimilarProducts(id) {
 
 async function getPopularBrands() {
   const result = await Brand.find({ isActive: true, isPopular: true })
+    .select("brandName logoImage")
+    .limit(11)
+    .sort({ brandName: "asc" });
+  if (result && result.length > 0) return result;
+  return false;
+}
+
+async function getProductBrands() {
+  const result = await Brand.find({ isActive: true })
     .select("brandName logoImage")
     .limit(11)
     .sort({ brandName: "asc" });
@@ -387,6 +402,8 @@ async function getProductListing(req) {
   try {
     // console.log('param', param);
     var param = req.body;
+
+    console.log("param in getProductListing", param)
     var sortOption = { createdAt: "desc" }; //default
     var limit = "";
     var skip = "";
@@ -484,6 +501,71 @@ async function getProductListing(req) {
     return false;
   }
 }
+
+async function getProductsListing(req) {
+  try {
+    const { selectedCategories, selectedBrands, priceRange, selectedSubCategories } = req.body;
+
+    const query = {};
+    if (Array.isArray(selectedCategories) && selectedCategories.length > 0) {
+      query.category = { $in: selectedCategories }; // No ObjectId conversion, treat as strings
+    }
+    if (Array.isArray(selectedBrands) && selectedBrands.length > 0) {
+      query.brand = { $in: selectedBrands }; // No ObjectId conversion, treat as strings
+    }
+
+    if (Array.isArray(priceRange) && priceRange.length === 2) {
+      query.price = {
+        $gte: priceRange[0],
+        $lte: priceRange[1]
+      };
+    }
+
+    // Filter by multiple subCategories
+    if (Array.isArray(selectedSubCategories) && selectedSubCategories.length > 0) {
+      query.sub_category = { $in: selectedSubCategories };
+    }
+
+    const products = await Product.find(query)
+      .select("id name price featuredImage avgRating isService quantity")
+      .sort({ createdAt: "desc" })
+      .populate([
+        {
+          path: "cryptoPrices",
+          model: CryptoConversion,
+          select: "name code cryptoPriceUSD",
+          match: { isActive: true, asCurrency: true },
+        },
+      ])
+    console.log("products lengths", products.length)
+    // Return the filtered product data
+    return products;
+  } catch (error) {
+    console.log("Error:", error.message);
+    return false;
+  }
+}
+
+async function getSubCateProduct(req) {
+  const parent = req.body;
+  console.log("parent", parent)
+  try {
+    const data = await Category.find({
+      parent: {
+        $ne: null,
+        // $eq: parent.categoryId 
+      }, isActive: true, isService: false
+    })
+      .select('categoryName parent id')
+      .sort({ createdAt: 'desc' });
+
+    return { status: true, data };
+  } catch (error) {
+    console.error(error);
+    return { status: false, message: error.message };
+  }
+}
+
 
 async function getBrandsListByProducts(req) {
   try {

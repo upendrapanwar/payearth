@@ -500,7 +500,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
         window.open(facebookShareUrl, '_blank');
     };
 
-    const handleTwitterShare = (postId) => {
+    const handleXShare = (postId) => {
         // const { shareAdvertise } = this.state;
         const url = `https://pay.earth/share_community/${postId}`
         // const url = `https://localhost:3000/share_community/${postId}`
@@ -950,7 +950,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                                 Share
                                             </li>
                                             <li><Link to="#" onClick={() => handleFacebookShare(posts.id)}>Facebook</Link></li>
-                                            <li><Link to="#" onClick={() => handleTwitterShare(posts.id)}>Twitter</Link></li>
+                                            <li><Link to="#" onClick={() => handleXShare(posts.id)}>X</Link></li>
                                             <li><Link to="#" onClick={() => handleInstagramShare(posts.id)}>Instagram</Link></li>
                                             <li><Link to="#" onClick={() => handleWhatsappShare(posts.id)}>Whatsapp</Link></li>
                                         </ul>
@@ -1117,7 +1117,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                     <div class="d-flex justify-content-center mt-2">
                         <div className="d-grid gap-2 d-md-block">
                             <button className="btn btn-warning btn-sm" type="button" onClick={handleReportPost}>Send Report</button>
-                            <button className="btn btn-secondary btn-sm" type="button" onClick={reportPopupClose}>Cancle</button>
+                            <button className="btn btn-secondary btn-sm" type="button" onClick={reportPopupClose}>Cancel</button>
                         </div>
                     </div>
                 </Modal.Body>

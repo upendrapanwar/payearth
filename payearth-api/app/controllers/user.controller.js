@@ -177,6 +177,10 @@ router.post("/savelater", addToSaveLater);
 router.post("/addtocart", addToCart);
 router.post("/updatetocart", updateToCart);
 router.post("/deletefromcart", deleteFromCart);
+// Strip
+router.post("/checkoutSession", checkoutSession);
+
+
 router.post("/savelaterlist/:id", getSaveLaterList);
 router.post("/remove-from-savelater", removeProductFromSavelater);
 router.post("/my-coupons/:id", getMyCoupons);
@@ -694,6 +698,15 @@ function deleteFromCart(req, res, next) {
       next(res.status(400).json({ status: false, message: err }))
     );
 }
+// stripe
+
+function checkoutSession(req, res, next) {
+  userService.checkoutSession(req)
+    .then((data) => data ? res.status(201).json({ status: true, data: data }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
+    .catch((err) => next(res.status(400).json({ status: false, message: err })));
+}
+
+
 
 function getOrderById(req, res, next) {
   userService

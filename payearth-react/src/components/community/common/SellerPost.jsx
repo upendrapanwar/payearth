@@ -2,7 +2,7 @@ import React, { useRef, useState, forwardRef } from 'react';
 import userImg from '../../../assets/images/user.png'
 import Modal from "react-bootstrap/Modal";
 import closeIcon from '../../../assets/icons/close_icon.svg'
-import post from '../../../assets/images/posts/post_img.jpg' 
+import post from '../../../assets/images/posts/post_img.jpg'
 import { Link } from 'react-router-dom';
 import config from '../../../config.json'
 import videoPlay from '../../../assets/icons/video_play_icon.svg'
@@ -503,7 +503,7 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
         window.open(facebookShareUrl, '_blank');
     };
 
-    const handleTwitterShare = (postId) => {
+    const handleXShare = (postId) => {
         // const { shareAdvertise } = this.state;
         const url = `https://pay.earth/share_community/${postId}`
         // const url = `https://localhost:3000/share_community/${postId}`
@@ -827,7 +827,7 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                         </div>
                     }
 
-<div class="commVideoSlider destopHidden">
+                    <div class="commVideoSlider destopHidden">
                         <Slider {...settings}>
                             {posts.postImages.map((image, ind) => {
                                 return (
@@ -972,7 +972,7 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                                         <ul className="shareto">
                                             <li><i className="post_icon ps_share"></i> Share</li>
                                             <li><Link to="#" onClick={() => handleFacebookShare(posts.id)}>Facebook</Link></li>
-                                            <li><Link to="#" onClick={() => handleTwitterShare(posts.id)}>Twitter</Link></li>
+                                            <li><Link to="#" onClick={() => handleXShare(posts.id)}>X</Link></li>
                                             <li><Link to="#" onClick={() => handleInstagramShare(posts.id)}>Instagram</Link></li>
                                             <li><Link to="#" onClick={() => handleWhatsappShare(posts.id)}>Whatsapp</Link></li>
                                         </ul>
@@ -1110,7 +1110,7 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                     <div class="d-flex justify-content-center mt-2">
                         <div className="d-grid gap-2 d-md-block">
                             <button className="btn btn-warning btn-sm" type="button" onClick={handleReportPost}>Send Report</button>
-                            <button className="btn btn-secondary btn-sm" type="button" onClick={reportPopupClose}>Cancle</button>
+                            <button className="btn btn-secondary btn-sm" type="button" onClick={reportPopupClose}>Cancel</button>
                         </div>
                     </div>
                 </Modal.Body>

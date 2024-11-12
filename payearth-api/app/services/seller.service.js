@@ -71,6 +71,8 @@ module.exports = {
   getListedProducts,
   getProductById,
   addProduct,
+  getProductStock,
+  productStatus,
   editProduct,
   addFeaturedImage,
   getStockItems,
@@ -811,133 +813,139 @@ async function getProductById(id) {
     };
     return result;
   }
-} 
+}
 
 async function addProduct(req) {
-  const files = req.files;
-  console.log(' req.files----', req.files)
-  const param = req.body;
+  try {
+    const { body: param } = req;
 
-  console.log("param", param)
-  var lName = param.name.toLowerCase();
-  var imagesArr = [];
-  var colorSizeArr = [];
-  var tierPriceArr = [];
-  var stockQty = 0;
+    let images = typeof param.images === 'string' ? JSON.parse(param.images) : param.images;
+    const lName = param.name.toLowerCase();
+    let colorSizeArr = [];
+    let tierPriceArr = [];
+    let stockQty = 0;
 
-  if (await Product.findOne({ lname: lName })) {
-    throw 'Name "' + param.name + '" is already taken';
-  }
+    // Check if the name is already taken
+    if (await Product.findOne({ lname: lName })) {
+      throw new Error(`Name "${param.name}" is already taken`);
+    }
 
-  if (files.length > 0) {
-    var fieldnames = {};
-    for (var i = 0; i < files.length; i++) {
-      var field = files[i].fieldname;
-      var url = files[i].destination + "/" + files[i].filename;
-      if (!fieldnames[field]) {
-        fieldnames[field] = [];
+    // Process color_size array
+    if (Array.isArray(param.color_size)) {
+      for (let item of param.color_size) {
+        if (item.size && item.color) {
+          colorSizeArr.push({ size: item.size, color: item.color });
+        } else {
+          throw new Error("Each color_size entry must include both 'size' and 'color' properties.");
+        }
       }
-      fieldnames[field].push(url);
     }
 
-    for (var field in fieldnames) {
-      imagesArr.push({ color: field, paths: fieldnames[field] });
+    // Process tier_price array and calculate stock quantity
+    if (param.tier_price) {
+      for (let tp of param.tier_price) {
+        const qty = Number(tp.qty);
+        stockQty += qty;
+        tierPriceArr.push({ qty, price: Number(tp.price) });
+      }
     }
-  }
 
-  // if (param.color_size) {
-  //   for (var size in param.color_size) {
-  //     colorSizeArr.push({ size: size, color: param.color_size[size] });
-  //   }
-  // }
+    const qtyObj = { selling_qty: 0, stock_qty: stockQty };
 
-  if (param.color_size) {
-    for (var size in param.color_size) {
+    let input = {
+      name: param.name,
+      lname: lName,
+      category: param.category,
+      sub_category: param.sub_category || null,
+      brand: param.brand,
+      description: param.description,
+      specifications: param.specifications,
+      price: Number(param.price),
+      color_size: colorSizeArr,
+      tier_price: tierPriceArr,
+      images,
+      quantity: qtyObj,
+      createdBy: param.seller_id,
+      updatedBy: param.seller_id,
+      isActive: true
+    };
 
-      let clz = param.color_size[size]
+    const product = new Product(input);
+    const data = await product.save();
 
-      colorSizeArr.push({ size: size, color: param.color_size[size] });
+    if (data) {
+      const res = await Product.findById(data.id).select(
+        "name category sub_category brand description specifications color_size tier_price price images quantity isService isActive"
+      );
+      return res || false;
     }
-  }
-
-  if (param.tier_price) {
-    for (var tp in param.tier_price) {
-      let tpArr = param.tier_price[tp];
-      let qty = Number(tpArr.qty);
-      stockQty += qty;
-      tierPriceArr.push({ qty: qty, price: Number(tpArr.price) });
-    }
-  }
-
-  let qtyObj = {
-    selling_qty: 0,
-    stock_qty: stockQty,
-  };
-
-  let input = {
-    name: param.name,
-    lname: lName,
-    category: param.category,
-    brand: param.brand,
-    description: param.description,
-    specifications: param.specifications,
-    price: param.price,
-    color_size: colorSizeArr,
-    tier_price: tierPriceArr,
-    price: param.price,
-    images: imagesArr,
-    quantity: qtyObj,
-    createdBy: param.seller_id,
-    updatedBy: param.seller_id,
-    isActive: true,
-  };
-
-  console.log("input", input)
-
-  if (param.sub_category !== "") {
-    input["sub_category"] = param.sub_category;
-  }
-
-  const product = new Product(input);
-
-  const data = await product.save();
-
-  if (data) {
-    let res = await Product.findById(data.id).select(
-      "name category sub_category brand description specifications color_size tier_price price images quantity isService isActive"
-    );
-
-    console.log("resCheck ", res)
-
-    if (res) {
-      return res;
-    } else {
-      return false;
-    }
-  } else {
     return false;
+  } catch (error) {
+    console.error("Error adding product:", error.message);
+    throw error; // Re-throw the error for upstream handling
   }
 }
 
+async function getProductStock(req) {
+
+  const { authId, status } = req.query;
+
+  try {
+    const query = {
+      isActive: status,
+      createdBy: authId
+    };
+    const fieldsToSelect = "id productCode name category sub_category brand featuredImage quantity isActive";
+    let result = await Product.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect)
+      .populate({
+        path: 'category',
+        match: { isVisible: true },
+        select: 'categoryName isActive'
+      })
+      .populate({
+        path: 'brand',
+        match: { isVisible: true },
+        select: 'brandName'
+      })
+
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function productStatus(req) {
+  const id = req.params.id;
+  const param = req.body;
+  const product = await Product.findById(id);
+  if (!product) {
+    return false;
+  } else {
+    const input = {
+      "isActive": param.isActive
+    };
+    Object.assign(product, input);
+    if (await product.save()) {
+      return await Product.findById(id).select();
+    }
+  }
+}
+
+
+
+
+
 async function editProduct(req) {
   try {
-    // console.log('old_images', req.body.old_images);
-    //return false;
-
     const id = req.params.id;
     const product = await Product.findById(id);
-
     if (!product) return false;
-
-    const files = req.files;
     const param = req.body;
-    var old_images = [];
+    let images = typeof param.images === 'string' ? JSON.parse(param.images) : param.images;
     var lName = param.name.toLowerCase();
-    var imagesArr = [];
     var colorSizeArr = [];
     var tierPriceArr = [];
     var stockQty = 0;
-    var fieldnames = {};
 
     if (
       product.lname !== lName &&
@@ -952,45 +960,14 @@ async function editProduct(req) {
       }
     }
 
-    if (files.length > 0) {
-      //when images is selected to upload in atleast one color
-      for (var i = 0; i < files.length; i++) {
-        var fx = files[i].fieldname;
-        var url = files[i].destination + "/" + files[i].filename;
-        if (!fieldnames[fx]) {
-          fieldnames[fx] = [];
+    // Process color_size array
+    if (Array.isArray(param.color_size)) {
+      for (let item of param.color_size) {
+        if (item.size && item.color) {
+          colorSizeArr.push({ size: item.size, color: item.color });
+        } else {
+          throw new Error("Each color_size entry must include both 'size' and 'color' properties.");
         }
-        fieldnames[fx].push(url);
-      }
-
-      if (fieldnames) {
-        for (var fy in fieldnames) {
-          let paths = fieldnames[fy];
-
-          if (old_images.includes(fy)) {
-            //when existing color is selected to upload images
-            paths = paths.concat(param.old_images[fy]);
-          }
-
-          imagesArr.push({ color: fy, paths: paths });
-        }
-      }
-    }
-
-    if (param.old_images) {
-      //when old images are exists.
-      for (var fz in param.old_images) {
-        if (fieldnames && !checkForColor(fieldnames, fz)) {
-          //when color is not exist in new upload images
-          let el = { color: fz, paths: param.old_images[fz] };
-          imagesArr.push(el);
-        }
-      }
-    }
-
-    if (param.color_size) {
-      for (var size in param.color_size) {
-        colorSizeArr.push({ size: size, color: param.color_size[size] });
       }
     }
 
@@ -1003,22 +980,21 @@ async function editProduct(req) {
       }
     }
 
-    let qtyObj = {
-      selling_qty: 0,
-      stock_qty: stockQty,
-    };
+    let qtyObj = { selling_qty: 0, stock_qty: stockQty };
 
     let input = {
       name: param.name,
       lname: lName,
       category: param.category,
+      sub_category: param.sub_category || null,
       brand: param.brand,
       description: param.description,
       specifications: param.specifications,
+      price: Number(param.price),
       color_size: colorSizeArr,
       tier_price: tierPriceArr,
       price: param.price,
-      images: imagesArr,
+      images,
       quantity: qtyObj,
       updatedBy: param.seller_id,
     };
@@ -1059,22 +1035,23 @@ function checkForColor(obj, key) {
 async function addFeaturedImage(req) {
   var file = req.file;
   var param = req.body;
+  console.log("params fetaure image", param);
   const id = param.id;
-  var imgUrl = "";
+  const imgUrl = param.file;
 
   const data = await Product.findById(id);
 
   if (!data) return false;
 
-  if (typeof file != "undefined") {
-    if (fs.existsSync(data.featuredImage)) {
-      fs.unlinkSync(data.featuredImage);
-    }
+  // if (typeof file != "undefined") {
+  //   if (fs.existsSync(data.featuredImage)) {
+  //     fs.unlinkSync(data.featuredImage);
+  //   }
 
-    imgUrl = file.destination + "/" + file.filename;
-  } else {
-    imgUrl = data.featuredImage;
-  }
+  //   imgUrl = file.destination + "/" + file.filename;
+  // } else {
+  //   imgUrl = data.featuredImage;
+  // }
 
   const input = {
     featuredImage: imgUrl,
@@ -1530,7 +1507,6 @@ async function getColors() {
 
 async function getCategories(req) {
   var param = req.body;
-  console.log("param.is_service", param.is_service)
   var parent = param.parent ? param.parent : null;
 
   const result = await Category.find({
@@ -2112,23 +2088,23 @@ async function getListedServices(req) {
 
     var options = {
       select:
-        "id name price featuredImage avgRating isService isActive quantity",
+        "id name charges featuredImage isActive",
       sort: sortOption,
-      populate: [
-        {
-          path: "cryptoPrices",
-          model: CryptoConversion,
-          select: "name code cryptoPriceUSD",
-          match: { isActive: true, asCurrency: true },
-        },
-      ],
+      // populate: [
+      //   {
+      //     path: "cryptoPrices",
+      //     model: CryptoConversion,
+      //     select: "name code cryptoPriceUSD",
+      //     match: { isActive: true, asCurrency: true },
+      //   },
+      // ],
       lean: true,
       page: page,
       offset: skip,
       limit: limit,
     };
 
-    const result = await Product.paginate(whereCondition, options).then(
+    const result = await Services.paginate(whereCondition, options).then(
       (data) => {
         let res = {
           services: data.docs,
@@ -2159,32 +2135,32 @@ async function getListedServices(req) {
 }
 
 async function getServiceById(id) {
-  const service = await Product.findById(id)
+  const service = await Services.findById(id)
     .select(
-      "name category sub_category description validity price videoCount isActive isService quantity videos createdAt featuredImage"
+      "name category description charges isActive isService createdAt featuredImage"
     )
     .populate([
-      {
-        path: "cryptoPrices",
-        model: CryptoConversion,
-        select: "name code cryptoPriceUSD",
-        match: { isActive: true, asCurrency: true },
-      },
+      // {
+      //   path: "cryptoPrices",
+      //   model: CryptoConversion,
+      //   select: "name code cryptoPriceUSD",
+      //   match: { isActive: true, asCurrency: true },
+      // },
       {
         path: "category",
         model: Category,
         select: "id categoryName",
       },
-      {
-        path: "sub_category",
-        model: Category,
-        select: "id categoryName",
-      },
-      {
-        path: "videos",
-        model: ServiceVideo,
-        select: "video.title video.no video.thumb video.description",
-      },
+      // {
+      //   path: "sub_category",
+      //   model: Category,
+      //   select: "id categoryName",
+      // },
+      // {
+      //   path: "videos",
+      //   model: ServiceVideo,
+      //   select: "video.title video.no video.thumb video.description",
+      // },
     ]);
 
   if (!service) {
@@ -4904,11 +4880,11 @@ async function getOpenedTicketMessage(req) {
   const ticketId = req.params.id;
   try {
 
-    const data = await TicketMessage.find({ticketId})
-    if(!data){
+    const data = await TicketMessage.find({ ticketId })
+    if (!data) {
       return { status: false, message: "Ticket message not found." };
     }
-    
+
     return { status: true, message: "Tickets retrieved successfully.", data: data };
   } catch (error) {
     console.error(error);

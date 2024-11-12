@@ -10,6 +10,7 @@ router.get('/product/reviews/:id', getReviews);
 router.get('/product/rating-count/:id', getRatingCount);
 router.get('/product/similar-products/:id', getSimilarProducts);
 router.get('/popular-brands', getPopularBrands);
+router.get('/allProductBrands', getProductBrands);
 router.get('/product/trending/:limit', getTrendingProducts);
 router.get('/product/popular/:limit', getPopularProducts);
 router.get('/product/recent-search/:limit', getRecentSearchProducts);
@@ -24,6 +25,10 @@ router.get('/product/detail/:id', getProductById);
 
 //For products only
 router.post('/product/listing', getProductListing);
+router.post('/products/listing', getProductsListing);// test
+router.post("/getProductSubCat", getSubCateProduct); // test
+
+
 router.post('/product/listing/brands', getBrandsListByProducts);
 router.post('/product/listing/colors', getColorsListByProducts);
 
@@ -83,6 +88,24 @@ function getPopularBrands(req, res, next) {
         .catch(err => next(res.json({ status: false, message: err })));
 }
 
+function getProductBrands(req, res, next) {
+    frontService.getProductBrands()
+        .then(brands => brands ? res.status(200).json({ status: true, data: brands }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function getSubCateProduct(req, res, next) {
+    frontService.getSubCateProduct(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getCategoriesWithSubcategories(req, res, next) {
+    frontService.getCategoriesWithSubcategories(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
 function getTrendingProducts(req, res, next) {
     frontService.getTrendingProducts(req)
         .then(products => products ? res.status(200).json({ status: true, data: products }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
@@ -128,6 +151,12 @@ function getCategoriesMenu(req, res, next) {
 
 function getProductListing(req, res, next) {
     frontService.getProductListing(req)
+        .then(products => products ? res.status(200).json({ status: true, data: products }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: "No data found.", data: [] })));
+}
+
+function getProductsListing(req, res, next) {
+    frontService.getProductsListing(req)
         .then(products => products ? res.status(200).json({ status: true, data: products }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: "No data found.", data: [] })));
 }

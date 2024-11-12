@@ -33,7 +33,7 @@ class ProductDetail extends Component {
             }
         }).then(response => {
             if (response.data.status) {
-                this.setState({colors: response.data.data});
+                this.setState({ colors: response.data.data });
             }
         }).catch(error => {
             if (error.response && error.response.data.status === false) {
@@ -43,10 +43,10 @@ class ProductDetail extends Component {
     }
 
     getProductDetail = () => {
-        const {dispatch} = this.props;
+        const { dispatch } = this.props;
         const productId = window.location.pathname.split('/')[3];
 
-        dispatch(setLoading({loading: true}));
+        dispatch(setLoading({ loading: true }));
         axios.get(`seller/products/${productId}`, {
             headers: {
                 'Accept': 'application/json',
@@ -55,7 +55,7 @@ class ProductDetail extends Component {
             }
         }).then(response => {
             if (response.data.status) {
-                this.setState({productDetail: response.data.data});
+                this.setState({ productDetail: response.data.data });
             }
         }).catch(error => {
             if (error.response && error.response.data.status === false) {
@@ -63,21 +63,23 @@ class ProductDetail extends Component {
             }
         }).finally(() => {
             setTimeout(() => {
-                dispatch(setLoading({loading: false}));
+                dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
 
     render() {
-        const {loading} = store.getState().global;
-        const {productDetail, colors} = this.state;
+        const { loading } = store.getState().global;
+        const { productDetail, colors } = this.state;
+        console.log("productDetail PAGE", productDetail)
+        const type = 'product';
 
         return (
             <React.Fragment>
                 {loading === true ? <SpinnerLoader /> : ''}
                 <div className="seller_body">
                     <Header />
-                    <DetailComponent data={productDetail} colors={colors} type="product" />
+                    <DetailComponent data={productDetail} colors={colors} type={type} />
                     <Footer />
                 </div>
             </React.Fragment>

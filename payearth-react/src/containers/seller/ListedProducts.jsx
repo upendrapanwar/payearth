@@ -9,13 +9,14 @@ import { toast } from 'react-toastify';
 import { connect } from 'react-redux';
 import config from '../../config.json';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
-import {NotFound} from '../../components/common/NotFound';
+import { NotFound } from '../../components/common/NotFound';
 import Select from 'react-select';
+import { Helmet } from 'react-helmet';
 
 class ListedProducts extends Component {
     constructor(props) {
         super(props)
-        const {dispatch} = props;
+        const { dispatch } = props;
         this.dispatch = dispatch;
         this.authInfo = store.getState().auth.authInfo;
         this.state = {
@@ -85,13 +86,13 @@ class ListedProducts extends Component {
 
         if (type === 'product') {
             url = 'seller/products/list/';
-            this.setState({reqBody});
+            this.setState({ reqBody });
         } else if (type === 'service') {
             url = 'seller/services/list/';
-            this.setState({reqBody2: reqBody});
+            this.setState({ reqBody2: reqBody });
         }
 
-        this.dispatch(setLoading({loading: true}));
+        this.dispatch(setLoading({ loading: true }));
         axios.post(url + this.authInfo.id, reqBody, {
             headers: {
                 'Accept': 'application/json',
@@ -116,7 +117,7 @@ class ListedProducts extends Component {
             }
         }).finally(() => {
             setTimeout(() => {
-                this.dispatch(setLoading({loading: false}));
+                this.dispatch(setLoading({ loading: false }));
             }, 300);
         });
     }
@@ -160,11 +161,11 @@ class ListedProducts extends Component {
 
     handleItemType = param => {
         let flag = param === 'service' ? true : false;
-        this.setState({itemIsService: flag});
+        this.setState({ itemIsService: flag });
     }
 
     render() {
-        const {loading} = store.getState().global;
+        const { loading } = store.getState().global;
         const {
             ListedProducts,
             ListedServices,
@@ -176,12 +177,20 @@ class ListedProducts extends Component {
             itemIsService
         } = this.state;
 
+        console.log('ListedServices', ListedServices)
+
         return (
             <React.Fragment>
                 {loading === true ? <SpinnerLoader /> : ''}
                 <div className="seller_body">
                     <Header />
-                    <div className="seller_dash_wrap pt-5 pb-5">
+                    <div className="inr_top_page_title">
+                        <h2>Listed Items</h2>
+                    </div>
+                    <Helmet>
+                        <title>{"Listed Items - Pay Earth"}</title>
+                    </Helmet>
+                    <div className="seller_dash_wrap pt-2 pb-5">
                         <div className="container ">
                             <div className="bg-white rounded-3 pt-3 pb-5">
                                 <div className="dash_inner_wrap">
@@ -191,13 +200,15 @@ class ListedProducts extends Component {
                                                 onClick={() => {
                                                     this.handleItemType('product')
                                                     this.getListedItems(false, null, 'product')
-                                                }} >listed-product
+                                                }} >
+                                                listed-product
                                             </button>
                                             <button className="nav-link" id="nav-listed-service-tab" data-bs-toggle="tab" data-bs-target="#nav-listed-service" type="button" role="tab" aria-controls="nav-listed-service" aria-selected="false"
                                                 onClick={() => {
                                                     this.handleItemType('service')
                                                     this.getListedItems(false, null, 'service')
-                                                }}>listed-service
+                                                }}>
+                                                listed-service
                                             </button>
                                             {itemIsService ?
                                                 <Select
@@ -224,14 +235,14 @@ class ListedProducts extends Component {
                                                             <div className="card seller_pro_card">
                                                                 <div className="lst_pro_img">
                                                                     <Link to={`/seller/product-detail/${value.id}`}>
-                                                                        <img src={config.apiURI + value.featuredImage} className="card-img-top" alt={value.name} />
+                                                                        <img src={value.featuredImage} className="card-img-top" alt={value.name} />
                                                                     </Link>
                                                                 </div>
                                                                 <div className="card-body">
                                                                     <Link to={`/seller/product-detail/${value.id}`} className="pro_name">{value.name}</Link>
                                                                     <div className="pro_price"><span>{value.price} USD</span>
                                                                         {value.cryptoPrices && value.cryptoPrices.map((val, index) => {
-                                                                            let crypPrice =  value.price / val.cryptoPriceUSD;
+                                                                            let crypPrice = value.price / val.cryptoPriceUSD;
                                                                             crypPrice = crypPrice.toFixed(5);
                                                                             return <React.Fragment key={index}> | <span>{crypPrice} {val.code}</span></React.Fragment>
                                                                         })}
@@ -262,17 +273,12 @@ class ListedProducts extends Component {
                                                             <div className="card seller_pro_card">
                                                                 <div className="lst_pro_img">
                                                                     <Link to={`/seller/service-detail/${value.id}`} className="pro_name">
-                                                                        <img src={config.apiURI + value.featuredImage} className="card-img-top" alt={value.name} />
+                                                                        <img src={value.featuredImage} className="card-img-top" alt={value.name} />
                                                                     </Link>
                                                                 </div>
                                                                 <div className="card-body">
-                                                                <Link to={`/seller/service-detail/${value.id}`} className="pro_name">{value.name}</Link>
-                                                                    <div className="pro_price"><span>{value.price} USD </span>
-                                                                        {value.cryptoPrices.map((val, index) => {
-                                                                            let crypPrice =  value.price / val.cryptoPriceUSD;
-                                                                            crypPrice = crypPrice.toFixed(5);
-                                                                            return <React.Fragment key={index}>| <span>{crypPrice} {val.code}</span></React.Fragment>
-                                                                        })}
+                                                                    <Link to={`/seller/service-detail/${value.id}`} className="pro_name">{value.name}</Link>
+                                                                    <div className="pro_price"><span>{value.charges} USD </span>                                                  
                                                                     </div>
                                                                 </div>
                                                             </div>

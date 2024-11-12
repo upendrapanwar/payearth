@@ -1719,7 +1719,7 @@ button.view_more img {
 }
 
 .prod_card {
-  max-width: 330px;
+  max-width: 310px;
   width: 100%;
   border-radius: 8px;
   overflow: hidden;
@@ -4645,8 +4645,15 @@ h4 {
   cursor: pointer;
 }
 
-.modal-body .ql-editor { min-height: 200px;}
+.modal-body .ql-editor {
+  min-height: 200px;
+}
 
-.action_btn_textView { min-width: max-content!important; font-size: 13px; }
+.action_btn_textView {
+  min-width: max-content !important;
+  font-size: 13px;
+}
 
-.destopHidden { display: none;}
+.destopHidden {
+  display: none;
+}

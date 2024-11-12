@@ -79,23 +79,17 @@ const ProductCard = ({ data, inWishList }) => {
     let selectedWishItemsCopy = JSON.parse(
       localStorage.getItem("selectedWishItems")
     );
-    axios
-      .post("user/remove-from-wishlist/", reqBody, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json;charset=UTF-8",
-          Authorization: `Bearer ${authInfo.token}`,
-        },
-      })
+    axios.post("user/remove-from-wishlist/", reqBody, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json;charset=UTF-8",
+        Authorization: `Bearer ${authInfo.token}`,
+      },
+    })
       .then((response) => {
         if (response.data.status) {
-          let filteredArray = selectedWishItemsCopy.filter(
-            (item) => item !== productId
-          );
-          localStorage.setItem(
-            "selectedWishItems",
-            JSON.stringify(filteredArray)
-          );
+          let filteredArray = selectedWishItemsCopy.filter((item) => item !== productId);
+          localStorage.setItem("selectedWishItems", JSON.stringify(filteredArray));
           dispatch(setSelectedWishItems({ selectedWishItems: filteredArray }));
           toast.success(response.data.message);
         }
@@ -111,6 +105,8 @@ const ProductCard = ({ data, inWishList }) => {
         }, 300);
       });
   };
+
+  // console.log("data", data)
 
   return (
     <div className="prod_card">
@@ -142,11 +138,7 @@ const ProductCard = ({ data, inWishList }) => {
                     </div> */}
         </div>
         <Link
-          to={
-            data.isService === false
-              ? `/product-detail/${data.id}`
-              : `/service-detail/${data.id}`
-          }
+          to={data.isService === false ? `/product-detail/${data.id}` : `/service-detail/${data.id}`}
         >
           <img src={data.image} className="img-fluid" alt="..." />
         </Link>
@@ -157,11 +149,7 @@ const ProductCard = ({ data, inWishList }) => {
             <Rating avgRating={data.avgRating} />
             <p className="product_name">
               <Link
-                to={
-                  data.isService === false
-                    ? `/product-detail/${data.id}`
-                    : `/service-detail/${data.id}`
-                }
+                to={data.isService === false ? `/product-detail/${data.id}` : `/service-detail/${data.id}`}
               >
                 {data.name}
               </Link>
@@ -170,17 +158,16 @@ const ProductCard = ({ data, inWishList }) => {
           <div className="priceData">
             {data.cryptoPrices && data.cryptoPrices.length > 0
               ? data.cryptoPrices.map((val, index) => {
-                  let crypPrice = data.price / val.cryptoPriceUSD;
-                  crypPrice = crypPrice.toFixed(5);
-                  return (
-                    <p className="price crypto" key={index}>
-                      {" "}
-                      {crypPrice} {val.code}
-                    </p>
-                  );
-                })
+                let crypPrice = data.price / val.cryptoPriceUSD;
+                crypPrice = crypPrice.toFixed(5);
+                return (
+                  <p className="price crypto" key={index}>
+                    {" "}
+                    {crypPrice} {val.code}
+                  </p>
+                );
+              })
               : ""}
-
             <p className="price">{data.price} USD</p>
           </div>
         </div>
@@ -190,11 +177,28 @@ const ProductCard = ({ data, inWishList }) => {
             {isLoggedIn ? (
               <>
                 <Link
+                  className="btn custom_btn btn_yellow_bordered"
+                  to={'/my-cart'}
+                  onClick={() =>
+                    dispatch(
+                      addToCart({
+                        id: data.id,
+                        name: data.name,
+                        image: data.image,
+                        price: data.price,
+                      })
+                    )
+                  }
+                >
+                  Buy Now
+                </Link>
+
+                <Link
                   className="btn custom_btn btn_yellow"
                   //to={data.isService === false ? `/product-detail/${data.id}` : `/service-detail/${data.id}
                   //`}
                   //   to={`/my-cart`}
-                  to={`/checkout`}
+                  to={`#`}
                   onClick={() =>
                     dispatch(
                       addToCart({
@@ -207,25 +211,8 @@ const ProductCard = ({ data, inWishList }) => {
                     )
                   }
                 >
-                  View
-                </Link>
-
-                {/* <Link
-                  className="btn custom_btn btn_yellow_bordered"
-                  to="#"
-                  onClick={() =>
-                    dispatch(
-                      addToCart({
-                        id: data.id,
-                        name: data.name,
-                        image: data.image,
-                        price: data.price,
-                      })
-                    )
-                  }
-                >
                   Add to cart
-                </Link> */}
+                </Link>
               </>
             ) : (
               <>
@@ -233,23 +220,24 @@ const ProductCard = ({ data, inWishList }) => {
                   className="btn custom_btn btn_yellow"
                   to="#"
                   onClick={openmodalHandler}
-                  // onClick={() =>
-                  //     dispatch(addToCart({
-                  //         id: data.id, name: data.name, image: data.image, price: data.price
-                  //     }))
-                  // }
                 >
                   Buy Now
                 </Link>
                 <Link
                   className="btn custom_btn btn_yellow_bordered"
                   to="#"
-                  onClick={openmodalHandler}
-                  // onClick={() =>
-                  //     dispatch(addToCart({
-                  //         id: data.id, name: data.name, image: data.image, price: data.price
-                  //     }))
-                  // }
+                  // add data in session storage...and use
+                  // onClick={openmodalHandler}
+                  onClick={() =>
+                    dispatch(
+                      addToCart({
+                        id: data.id,
+                        name: data.name,
+                        image: data.image,
+                        price: data.price
+                      })
+                    )
+                  }
                 >
                   Add to cart
                 </Link>

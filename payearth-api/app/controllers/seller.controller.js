@@ -162,6 +162,8 @@ router.post("/products/featured-image", uploadFeaturedImage, addFeaturedImage);
 router.get("/colors", getColors);
 router.post("/categories", getCategories);
 router.get("/brands", getBrands);
+router.get("/getProductStock", getProductStock);
+router.put('/productStatus/:id', productStatus);
 
 //Stock Management
 router.post("/stock/items/:id", getStockItems); //product or service  - added / pending / reject
@@ -484,6 +486,19 @@ function addProduct(req, res, next) {
     .catch((err) =>
       next(res.status(400).json({ status: false, message: err }))
     );
+}
+
+function getProductStock(req, res, next) {
+  sellerService.getProductStock(req).then((data) => data ? res.status(200).json({ status: true, data: data })
+    : res.status(400).json({ status: false, message: "ERROR ", data: [] })
+  )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function productStatus(req, res, next) {
+  sellerService.productStatus(req)
+    .then(data => data ? res.status(201).json({ status: true, message: msg.admin.brand.status.success, data: data }) : res.status(400).json({ status: false, message: msg.admin.brand.status.error }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
 }
 
 function editProduct(req, res, next) {
@@ -1486,19 +1501,19 @@ function editProfile(req, res, next) {
 
 function supportOpenTicket(req, res, next) {
   sellerService.supportOpenTicket(req)
-      .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
-      .catch((err) => next(res.json({ status: false, message: err.message })));
+    .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+    .catch((err) => next(res.json({ status: false, message: err.message })));
 }
 
 
 function getAllOpenTicket(req, res, next) {
   sellerService.getAllOpenTicket(req)
-      .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
-      .catch((err) => next(res.json({ status: false, message: err.message })));
+    .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+    .catch((err) => next(res.json({ status: false, message: err.message })));
 }
 
 function getOpenedTicketMessage(req, res, next) {
   sellerService.getOpenedTicketMessage(req)
-      .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
-      .catch((err) => next(res.json({ status: false, message: err.message })));
+    .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+    .catch((err) => next(res.json({ status: false, message: err.message })));
 }

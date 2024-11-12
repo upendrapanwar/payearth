@@ -6,6 +6,10 @@ import store from '../../store/index';
 import { connect } from 'react-redux';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import DataTable from 'react-data-table-component';
+import DataTableExtensions from "react-data-table-component-extensions";
+import Switch from 'react-input-switch';
+import { Helmet } from 'react-helmet';
 import { setLoading } from '../../store/reducers/global-reducer';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { NotFound } from '../../components/common/NotFound';
@@ -31,15 +35,138 @@ class ProductStockManagement extends Component {
             data: [],
             pendingProducts: [],
             rejectedProducts: [],
+            currentTab: '',
             pagination: {},
             pendingProductsPagination: {},
             rejectedProductsPagination: {},
         }
         toast.configure();
+
+        this.addedProduct_column = [
+            {
+                name: 'PRODUCT IMAGE',
+                selector: (row, i) => (
+                    <img
+                        src={row.featuredImage}
+                        alt="Not selected"
+                        style={{ width: "80px", height: "80px" }}
+                    />
+                ),
+                sortable: true
+            },
+            {
+                name: 'PRODUCT ID',
+                selector: (row, i) => row.productCode,
+                sortable: true
+            },
+            {
+                name: 'PRODUCT NAME',
+                selector: (row, i) => row.name,
+                sortable: true
+            },
+            {
+                name: 'BRAND',
+                selector: (row, i) => row.brand.brandName,
+                sortable: true
+            },
+            {
+                name: 'SELLING QUANTITY',
+                selector: (row, i) => row.quantity.selling_qty,
+                sortable: true
+            },
+            {
+                name: 'CATEGORY',
+                selector: (row, i) => row.category.categoryName,
+                sortable: true
+            },
+            {
+                name: 'TOTAL STOCK QUANTITY',
+                selector: (row, i) => row.quantity.stock_qty,
+                sortable: true
+            },
+            {
+                name: 'STATUS',
+                cell: (row, i) => {
+                    return <>
+                        <Switch
+                            on={true}
+                            off={false}
+                            value={row.isActive}
+                            onChange={() => this.handleStatus(row.id, row.isActive)}
+                        />
+                    </>
+                },
+                sortable: true
+            },
+            {
+                // name: 'STATUS',
+                cell: (row, i) => {
+                    return (
+                        <>
+                            <Link to={`/seller/product-detail/${row.id}`}>
+                                <button className="custom_btn btn_yellow_bordered w-auto btn">DETAIL</button>
+                            </Link>
+                        </>
+                    );
+                },
+                sortable: true
+            }
+        ]
     }
 
     componentDidMount() {
-        this.getAddedProducts(false, null, 'none');
+        this.getProductStock(true);
+    }
+
+    getProductStock = async (currentStatus, currentTab) => {
+        try {
+            this.setState({ currentTab: currentTab })
+            this.dispatch(setLoading({ loading: true }));
+            const url = 'seller/getProductStock/';
+            const response = await axios.get(url, {
+                params: {
+                    authId: this.authInfo.id,
+                    status: currentStatus
+                },
+                headers: {
+                    'Authorization': `Bearer ${this.authInfo.token}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+            if (response.data.status === true) {
+                if (currentStatus === false) {
+                    this.setState({ rejectedProducts: response.data.data });
+                } else {
+                    this.setState({ data: response.data.data });
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        } finally {
+            this.dispatch(setLoading({ loading: false }));
+        }
+    }
+
+    handleStatus = async (id, isActive) => {
+        try {
+            const status = !isActive;
+            const updateStatusUrl = `/seller/productStatus/${id}`;
+            await axios.put(updateStatusUrl, { isActive: status }, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            });
+            if (this.state.currentTab === 'trashTab') {
+                this.getProductStock(false);
+            } else {
+                this.getProductStock(true);
+            }
+
+        } catch (error) {
+            console.error("There was an error changing the status", error);
+        }
     }
 
     getAddedProducts = (pagination, param, type) => {
@@ -170,15 +297,23 @@ class ProductStockManagement extends Component {
             rejectedProductsPagination
         } = this.state;
 
+
+        console.log("data", data)
         return (
             <React.Fragment>
                 {loading === true ? <SpinnerLoader /> : ''}
                 <div className="seller_body">
                     <Header />
-                    <div className="seller_dash_wrap pt-5 pb-5">
+                    <div className="inr_top_page_title">
+                        <h2>Product Management</h2>
+                    </div>
+                    <Helmet>
+                        <title>{"Product Management - Pay Earth"}</title>
+                    </Helmet>
+                    <div className="seller_dash_wrap pt-2 pb-5">
                         <div className="container ">
                             <div className="bg-white rounded-3 pt-3 pb-5">
-                                <div className="dash_inner_wrap">
+                                <div className="dash_inner_wrap pb-2">
                                     <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
                                         <div className="dash_title">Product Stock Management</div>
                                         <Link to="/seller/add-product" className="custom_btn btn_yellow w-auto btn">Add Product</Link>
@@ -186,59 +321,33 @@ class ProductStockManagement extends Component {
                                 </div>
                                 <nav className="orders_tabs">
                                     <div className="nav nav-tabs" id="nav-tab" role="tablist">
-                                        <button className="nav-link active" id="nav-pending-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-pending-orders" type="button" role="tab" aria-controls="nav-pending-orders" aria-selected="true" onClick={() => this.getAddedProducts(false, null, 'none')}>Added Products</button>
-                                        <button className="nav-link" id="nav-ongoing-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-ongoing-orders" type="button" role="tab" aria-controls="nav-ongoing-orders" aria-selected="false" onClick={() => this.getAddedProducts(false, null, 'pending')}>Draft </button>
-                                        <button className="nav-link" id="nav-cancelled-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-cancelled-orders" type="button" role="tab" aria-controls="nav-cancelled-orders" aria-selected="true" onClick={() => this.getAddedProducts(false, null, 'reject')}>Trash</button>
+                                        <button className="nav-link active" id="nav-pending-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-pending-orders" type="button" role="tab" aria-controls="nav-pending-orders" aria-selected="true" onClick={() => this.getProductStock(true, 'addedTab')}>Added Products</button>
+                                        {/* <button className="nav-link" id="nav-ongoing-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-ongoing-orders" type="button" role="tab" aria-controls="nav-ongoing-orders" aria-selected="false" onClick={() => this.getAddedProducts(false, null, 'pending')}>Draft </button> */}
+                                        <button className="nav-link" id="nav-cancelled-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-cancelled-orders" type="button" role="tab" aria-controls="nav-cancelled-orders" aria-selected="true" onClick={() => this.getProductStock(false, 'trashTab')}>Trash</button>
                                     </div>
                                 </nav>
                                 <div className="orders_table tab-content pt-0 pb-0" id="nav-tabContent">
+
+                                    {/* Added product First */}
                                     <div className="tab-pane fade show active" id="nav-pending-orders" role="tabpanel" aria-labelledby="nav-pending-orders-tab">
-                                        {data.length > 0 ?
-                                            <table className="table table-responsive table-bordered">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Product ID</th>
-                                                        <th>Product Name</th>
-                                                        <th>Brand</th>
-                                                        <th>Selling quantity</th>
-                                                        <th>Category</th>
-                                                        <th>Total Stock quantity</th>
-                                                        <th colSpan="2">Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {data.length && data.map((value, index) => {
-                                                        return (
-                                                            <tr key={index}>
-                                                                <td>{value.productCode}</td>
-                                                                <td>{value.name}</td>
-                                                                <td>{value.brand.brandName}</td>
-                                                                <td>{value.quantity.selling_qty}</td>
-                                                                <td>{value.category ? value.category.categoryName : ''}</td>
-                                                                <td>{value.quantity.stock_qty}</td>
-                                                                <td>
-                                                                    <div className="form-check form-switch">
-                                                                        <input className="form-check-input" type="checkbox" value={value.id} onChange={(event) => this.halndleStatus(event, value.id)} checked={value.isActive} />
-                                                                    </div>
-                                                                </td>
-                                                                <td><Link to={`/seller/product-detail/${value.id}`} className="custom_btn btn_yellow_bordered w-auto btn">Details</Link></td>
-                                                            </tr>
-                                                        )
-                                                    })}
-                                                </tbody>
-                                            </table>
-                                            : <NotFound msg="Data not found." />
-                                        }
-                                        {data.length > 0 &&
-                                            <div className="pagination">
-                                                <ul>
-                                                    <li><Link to="#" className={`link ${pagination.hasPrevPage ? '' : 'disabled'}`} onClick={() => this.getAddedProducts(true, pagination.prevPage, 'none')}><span className="fa fa-angle-left me-2"></span> Prev</Link></li>
-                                                    {this.pagination('none')}
-                                                    <li><Link to="#" className={`link ${pagination.hasNextPage ? '' : 'disabled'}`} onClick={() => this.getAddedProducts(true, pagination.nextPage, 'none')}>Next <span className="fa fa-angle-right ms-2"></span></Link></li>
-                                                </ul>
-                                            </div>
-                                        }
+                                        <DataTableExtensions
+                                            columns={this.addedProduct_column}
+                                            data={data}
+                                        >
+                                            <DataTable
+                                                pagination
+                                                noHeader
+                                                highlightOnHover
+                                                defaultSortField="id"
+                                                defaultSortAsc={false}
+                                                paginationPerPage={7}
+                                                paginationRowsPerPageOptions={[7, 14, 21, 60]}
+                                            // selectableRows           
+                                            />
+                                        </DataTableExtensions>
                                     </div>
+
+                                    {/* Second */}
 
                                     <div className="tab-pane fade" id="nav-ongoing-orders" role="tabpanel" aria-labelledby="nav-ongoing-orders-tab">
                                         {pendingProducts.length > 0 ?
@@ -280,42 +389,24 @@ class ProductStockManagement extends Component {
                                         }
                                     </div>
 
+                                    {/* third */}
+
                                     <div className="tab-pane fade" id="nav-cancelled-orders" role="tabpanel" aria-labelledby="nav-cancelled-orders-tab">
-                                        {rejectedProducts.length > 0 ?
-                                            <table className="table table-responsive table-bordered">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Product ID</th>
-                                                        <th>Product Name</th>
-                                                        <th>Brand</th>
-                                                        <th>Category</th>
-                                                        <th colSpan="2">Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {rejectedProducts.map((value, index) => {
-                                                        return <tr key={index}>
-                                                            <td>{value.productCode}</td>
-                                                            <td>{value.name}</td>
-                                                            <td>{value.brand.brandName}</td>
-                                                            <td>{value.category.categoryName}</td>
-                                                            <td className="text-capitalize">{value.approveStatus}</td>
-                                                            <td><Link to={`/seller/product-detail/${value.id}`} className="custom_btn btn_yellow_bordered w-auto btn">Details</Link></td>
-                                                        </tr>
-                                                    })}
-                                                </tbody>
-                                            </table>
-                                            : <NotFound msg="Data not found." />
-                                        }
-                                        {rejectedProducts.length > 0 &&
-                                            <div className="pagination">
-                                                <ul>
-                                                    <li><Link to="#" className={`link ${rejectedProductsPagination.hasPrevPage ? '' : 'disabled'}`} onClick={() => this.getAddedProducts(true, rejectedProductsPagination.prevPage, 'reject')}><span className="fa fa-angle-left me-2"></span> Prev</Link></li>
-                                                    {this.pagination('reject')}
-                                                    <li><Link to="#" className={`link ${rejectedProductsPagination.hasNextPage ? '' : 'disabled'}`} onClick={() => this.getAddedProducts(true, rejectedProductsPagination.nextPage, 'reject')}>Next <span className="fa fa-angle-right ms-2"></span></Link></li>
-                                                </ul>
-                                            </div>
-                                        }
+                                        <DataTableExtensions
+                                            columns={this.addedProduct_column}
+                                            data={rejectedProducts}
+                                        >
+                                            <DataTable
+                                                pagination
+                                                noHeader
+                                                highlightOnHover
+                                                defaultSortField="id"
+                                                defaultSortAsc={false}
+                                                paginationPerPage={7}
+                                                paginationRowsPerPageOptions={[7, 14, 21, 60]}
+                                            // selectableRows           
+                                            />
+                                        </DataTableExtensions>
                                     </div>
                                 </div>
                             </div>

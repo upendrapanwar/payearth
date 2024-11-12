@@ -485,7 +485,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
     const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
     if (authInfo) {
       socket.emit('allNotifications', { userID: authInfo.id });
-     // console.log(`User with ID ${authInfo.id} joined their room.`);
+      // console.log(`User with ID ${authInfo.id} joined their room.`);
       fetchNotification(authInfo.id);
     }
 
@@ -506,13 +506,16 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
   }, []);
 
   const cart = useSelector((state) => state.cart);
+  // console.log("cart", cart.cart.length);
   localStorage.setItem("cart", cart);
   const getTotalQuantity = () => {
     let total = 0;
     if (!loginStatus) {
-      return total;
+      // console.log("loginStatus", !loginStatus)
+      // console.log("total", total)
+      return total = cart.cart.length;
     }
-    //console.log('loginStatus='+loginStatus);
+    // console.log('loginStatus=', loginStatus);
     Object.keys(cart).forEach((item) => {
       let cartItems = cart[item];
       for (const key in cartItems) {
@@ -521,6 +524,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
       //total += item.quantity
     });
     localStorage.setItem("totalQuantity", total);
+    // console.log("total cart quantity check", total)
     return total;
   };
 
@@ -844,11 +848,13 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
                           if (loginStatus) {
                             history.push("/my-cart");
                           } else {
-                            return false;
+                            // return false;
+                            history.push("/my-cart");
                           }
                         }}
                       >
-                        {getTotalQuantity() || 0} Cart
+                        {/* {getTotalQuantity() || 0} Cart */}
+                        {getTotalQuantity()} Cart
                       </Link>
                     </li>
                   </ul>

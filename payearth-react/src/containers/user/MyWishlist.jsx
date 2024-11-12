@@ -135,12 +135,12 @@ class MyWishlist extends Component {
                                             <span>{totalWishlistCount} Items in your Wishlist</span>
                                         </div>
                                     </div>
-                                    <div className="cl_head">
+                                    {/* <div className="cl_head">
                                         <div className="cart_wrap">
                                             <div>Product</div>
                                             <div className="invisible">Actions</div>
                                         </div>
-                                    </div>
+                                    </div> */}
                                     <div className="cart_list cart_wrap">
                                         {data.length > 0 ?
                                             data.map((value, index) => {
@@ -153,7 +153,7 @@ class MyWishlist extends Component {
                                                 return <div className={`cl_items ${cls}`} key={index}>
                                                     <div className="cl_pro_info">
                                                         <div className="clp_item">
-                                                            <div className="clp_item_img"><img src={config.apiURI + value.productId.featuredImage} alt="mens-jacket" /></div>
+                                                            <div className="clp_item_img"><img src={value.productId.featuredImage} alt="mens-jacket" /></div>
                                                             <div className="clp_item_info">
                                                                 <Rating avgRating={value.productId.avgRating} />
                                                                 <div className="cl_pro_name">{value.productId.name}</div>
