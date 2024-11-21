@@ -58,111 +58,115 @@ class MyOrders extends Component {
           "ORDER status",
           response.data.data.data[0].order.orderStatus
         );
+        this.setState({
+          data: response.data.data.data,
+          loading: false
+        })
+
 
         // Check if the response contains data
-        if (response.data.data.data) {
-          const formattedData = response.data.data.data.map((item) => {
-            const date = new Date(item.order.createdAt).toLocaleDateString();
+        // if (response.data.data.data) {
+        //   const formattedData = response.data.data.data.map((item) => {
+        //     const date = new Date(item.order.createdAt).toLocaleDateString();
 
-            // Create an object to hold the formatted data
-            const formattedItem = {
-              _id: item.order._id,
-              orderDate: date,
-              id: item.order.id,
-              orderDetails: item.orderDetails,
-            };
-            // Check if orderId exists and has valid data
-            if (item.order.id) {
-              formattedItem.orderCode = item.order.orderCode;
-              formattedItem.billingFirstName = item.order.billingFirstName;
-              formattedItem.billingLastName = item.order.billingLastName;
-              formattedItem.billingCompanyName = item.order.billingCompanyName;
-              formattedItem.billingStreetAddress =
-                item.order.billingStreetAddress;
-              formattedItem.billingStreetAddress1 =
-                item.order.billingStreetAddress1;
-              formattedItem.billingCity = item.order.billingCity;
-              formattedItem.billingCountry = item.order.billingCountry;
-              formattedItem.billingPostCode = item.order.billingPostCode;
-              formattedItem.billingPhone = item.order.billingPhone;
-              formattedItem.billingEmail = item.order.billingEmail;
-              formattedItem.deliveryCharge =
-                item.order.deliveryCharge.toFixed(2);
-              formattedItem.price = item.order.price.toFixed(2);
-              formattedItem.taxAmount = item.order.taxAmount.toFixed(2);
-              formattedItem.discount = item.order.discount.toFixed(2);
-              formattedItem.total = item.order.total.toFixed(2);
+        //     // Create an object to hold the formatted data
+        //     const formattedItem = {
+        //       _id: item.order._id,
+        //       orderDate: date,
+        //       id: item.order.id,
+        //       orderDetails: item.orderDetails,
+        //     };
+        //     // Check if orderId exists and has valid data
+        //     if (item.order.id) {
+        //       formattedItem.orderCode = item.order.orderCode;
+        //       formattedItem.billingFirstName = item.order.billingFirstName;
+        //       formattedItem.billingLastName = item.order.billingLastName;
+        //       formattedItem.billingCompanyName = item.order.billingCompanyName;
+        //       formattedItem.billingStreetAddress =
+        //         item.order.billingStreetAddress;
+        //       formattedItem.billingStreetAddress1 =
+        //         item.order.billingStreetAddress1;
+        //       formattedItem.billingCity = item.order.billingCity;
+        //       formattedItem.billingCountry = item.order.billingCountry;
+        //       formattedItem.billingPostCode = item.order.billingPostCode;
+        //       formattedItem.billingPhone = item.order.billingPhone;
+        //       formattedItem.billingEmail = item.order.billingEmail;
+        //       formattedItem.deliveryCharge = item.order.deliveryCharge.toFixed(2);
+        //       formattedItem.price = item.order.price.toFixed(2);
+        //       formattedItem.taxAmount = item.order.taxAmount.toFixed(2);
+        //       formattedItem.discount = item.order.discount.toFixed(2);
+        //       formattedItem.total = item.order.total.toFixed(2);
 
-              if (item.orderDetails && item.orderDetails.length > 0) {
-                const firstOrderDetail = item.orderDetails[0];
-                formattedItem.sellerAddress =
-                  firstOrderDetail.sellerId.full_address.address;
-                formattedItem.sellerState =
-                  firstOrderDetail.sellerId.full_address.state;
-                formattedItem.sellerCountry =
-                  firstOrderDetail.sellerId.full_address.country;
-                formattedItem.sellerName = firstOrderDetail.sellerId.name;
-                formattedItem.sellerPhone = firstOrderDetail.sellerId.phone;
-                formattedItem.sellerEmail = firstOrderDetail.sellerId.email;
-              } else {
-                // Handle the case where there is no orderDetails or it's an empty array
-                formattedItem.sellerAddress = "N/A";
-                formattedItem.sellerState = "N/A";
-                formattedItem.sellerCountry = "N/A";
-                formattedItem.sellerName = "N/A";
-                formattedItem.sellerPhone = "N/A";
-                formattedItem.sellerEmail = "N/A";
-              }
+        //       if (item.orderDetails && item.orderDetails.length > 0) {
+        //         const firstOrderDetail = item.orderDetails[0];
+        //         formattedItem.sellerAddress =
+        //           firstOrderDetail.sellerId.full_address.address;
+        //         formattedItem.sellerState =
+        //           firstOrderDetail.sellerId.full_address.state;
+        //         formattedItem.sellerCountry =
+        //           firstOrderDetail.sellerId.full_address.country;
+        //         formattedItem.sellerName = firstOrderDetail.sellerId.name;
+        //         formattedItem.sellerPhone = firstOrderDetail.sellerId.phone;
+        //         formattedItem.sellerEmail = firstOrderDetail.sellerId.email;
+        //       } else {
+        //         // Handle the case where there is no orderDetails or it's an empty array
+        //         formattedItem.sellerAddress = "N/A";
+        //         formattedItem.sellerState = "N/A";
+        //         formattedItem.sellerCountry = "N/A";
+        //         formattedItem.sellerName = "N/A";
+        //         formattedItem.sellerPhone = "N/A";
+        //         formattedItem.sellerEmail = "N/A";
+        //       }
 
-              formattedItem.invoiceNo = item.order.paymentId.invoiceNo;
-              formattedItem.paymentAccount =
-                item.order.paymentId.paymentAccount;
-              formattedItem.paymentMode = item.order.paymentId.paymentMode;
+        //       formattedItem.invoiceNo = item.order.paymentId.invoiceNo;
+        //       formattedItem.paymentAccount =
+        //         item.order.paymentId.paymentAccount;
+        //       formattedItem.paymentMode = item.order.paymentId.paymentMode;
 
-              if (item.order.orderStatus) {
-                formattedItem.orderStatus = item.order.orderStatus.title;
-              } else {
-                formattedItem.orderStatus = "N/A";
-              }
-            } else {
-              // Handle missing orderId data
-              formattedItem.orderCode = "N/A";
-              formattedItem.billingFirstName = "N/A";
-              formattedItem.billingLastName = "N/A";
-              formattedItem.billingCompanyName = "N/A";
-              formattedItem.billingStreetAddress = "N/A";
-              formattedItem.billingStreetAddress1 = "N/A";
-              formattedItem.billingCity = "N/A";
-              formattedItem.billingCountry = "N/A";
-              formattedItem.billingPostCode = "N/A";
-              formattedItem.billingPhone = "N/A";
-              formattedItem.billingEmail = "N/A";
-              formattedItem.price = "N/A";
-              formattedItem.deliveryCharge = "N/A";
-              formattedItem.taxAmount = "N/A";
-              formattedItem.discount = "N/A";
-              formattedItem.total = "N/A";
-              formattedItem.invoiceNo = "N/A";
-              formattedItem.paymentAccount = "N/A";
-              formattedItem.paymentMode = "N/A";
-              formattedItem.orderStatus = "N/A";
-            }
-            return formattedItem;
-          });
+        //       if (item.order.orderStatus) {
+        //         formattedItem.orderStatus = item.order.orderStatus.title;
+        //       } else {
+        //         formattedItem.orderStatus = "N/A";
+        //       }
+        //     } else {
+        //       // Handle missing orderId data
+        //       formattedItem.orderCode = "N/A";
+        //       formattedItem.billingFirstName = "N/A";
+        //       formattedItem.billingLastName = "N/A";
+        //       formattedItem.billingCompanyName = "N/A";
+        //       formattedItem.billingStreetAddress = "N/A";
+        //       formattedItem.billingStreetAddress1 = "N/A";
+        //       formattedItem.billingCity = "N/A";
+        //       formattedItem.billingCountry = "N/A";
+        //       formattedItem.billingPostCode = "N/A";
+        //       formattedItem.billingPhone = "N/A";
+        //       formattedItem.billingEmail = "N/A";
+        //       formattedItem.price = "N/A";
+        //       formattedItem.deliveryCharge = "N/A";
+        //       formattedItem.taxAmount = "N/A";
+        //       formattedItem.discount = "N/A";
+        //       formattedItem.total = "N/A";
+        //       formattedItem.invoiceNo = "N/A";
+        //       formattedItem.paymentAccount = "N/A";
+        //       formattedItem.paymentMode = "N/A";
+        //       formattedItem.orderStatus = "N/A";
+        //     }
+        //     return formattedItem;
+        //   });
 
-          this.setState({
-            data: formattedData,
-            loading: false,
-            error: null,
-          });
-        } else {
-          // Handle the case where there is no data
-          this.setState({
-            data: [],
-            loading: false,
-            error: null,
-          });
-        }
+        //   this.setState({
+        //     data: formattedData,
+        //     loading: false,
+        //     error: null,
+        //   });
+        // } else {
+        //   // Handle the case where there is no data
+        //   this.setState({
+        //     data: [],
+        //     loading: false,
+        //     error: null,
+        //   });
+        // }
         // }
       })
       .catch((error) => {
@@ -221,21 +225,21 @@ class MyOrders extends Component {
     const itemRows =
       row.orderDetails.length > 0
         ? row.orderDetails
-            .map(
-              (item, index) => `
+          .map(
+            (item, index) => `
       <tr>
         <td style="width: 50px;">${index + 1}</td>
         <td style="width: 70px;">${item.productId[0].name}</td>
         <td style="width: 100px;">${item.quantity[0]}</td>
         <td class="text-end" style="width: 70px;">$ ${item.price.toFixed(
-          2
-        )}</td>
+              2
+            )}</td>
         <td class="text-end" style="width: 70px;">$ ${(
-          item.price * item.quantity[0]
-        ).toFixed(2)}</td>
+                item.price * item.quantity[0]
+              ).toFixed(2)}</td>
       </tr>`
-            )
-            .join("")
+          )
+          .join("")
         : `<tr>
         <td>Data is not available</td>
       </tr>`;
@@ -359,7 +363,7 @@ class MyOrders extends Component {
   data_column = [
     {
       name: "Order ID",
-      selector: (row, i) => row.orderCode,
+      selector: (row, i) => row.order.orderCode,
       sortable: true,
       width: "200px",
     },
@@ -377,24 +381,26 @@ class MyOrders extends Component {
     },
     {
       name: "Total Amount",
-      selector: (row, i) => row.total,
+      selector: (row, i) => row.order.price,
       sortable: true,
-      width: "200px",
+      width: "150px",
     },
-    {
-      name: "Order Status",
-      selector: (row, i) => row.orderStatus,
-      sortable: true,
-      width: "200px",
-    },
+    // {
+    //   name: "Order Status",
+    //   selector: (row, i) => row.orderStatus,
+    //   sortable: true,
+    //   width: "200px",
+    // },
     {
       name: "Order Date",
-      selector: (row, i) => row.orderDate,
+      // selector: (row, i) => row.order.createdAt,
       sortable: true,
 
       cell: (row) => {
-        const date = row.orderDate;
-        return <div>{date}</div>;
+        const dateString = row.order.createdAt;
+        const date = new Date(dateString);
+        const formattedDate = `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}`;
+        return <div>{formattedDate}</div>;
       },
     },
     {
@@ -451,12 +457,15 @@ class MyOrders extends Component {
                   <div className="cart_wrap">
                     <div className="items_incart">
                       <span className="text-uppercase">
-                        {data.length} ITEMS IN YOUR ORDER
+                        {data.length} ORDER FOUND
                       </span>
                     </div>
                   </div>
                   <div className="cart_list cart_wrap pb-5">
-                    <DataTableExtensions columns={this.data_column} data={data}>
+                    <DataTableExtensions
+                      columns={this.data_column}
+                      data={data}
+                    >
                       <DataTable
                         pagination
                         noHeader

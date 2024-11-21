@@ -13,6 +13,8 @@ import Total from '../../components/user/common/Total';
 import CartItem from '../../components/user/common/CartItem';
 import { connect } from 'react-redux';
 //import { CardTravel } from '@mui/icons-material';
+import { useDispatch } from 'react-redux';
+import { clearCart } from '../../store/reducers/cart-slice-reducer';
 import emptyCart from './../../assets/images/empty-cart.png';
 class MyCart extends Component {
     constructor(props) {
@@ -31,7 +33,7 @@ class MyCart extends Component {
 
     render() {
         const cart = this.props.cart;
-        console.log(cart);
+        // console.log(cart);
         const getTotal = () => {
             let totalQuantity = 0
             let totalPrice = 0
@@ -41,6 +43,7 @@ class MyCart extends Component {
             })
             return { totalPrice, totalQuantity }
         }
+
         return (
             <React.Fragment>
                 <Header />

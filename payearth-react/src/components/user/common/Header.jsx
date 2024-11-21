@@ -50,6 +50,7 @@ import { authVerification } from "../../../helpers/auth-verification";
 import io from 'socket.io-client';
 
 
+
 const subCategories = (catId, data) => {
   if (data && data.length) {
     return (
@@ -70,7 +71,7 @@ const subCategories = (catId, data) => {
 };
 
 
-const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
+const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProductsData }) => {
   toast.configure();
   const loginStatus = useSelector((state) => state.auth.isLoggedIn);
   const userInfo = useSelector((state) => state.auth.userInfo);
@@ -106,6 +107,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
   const [searchOption, setSearchOption] = useState(
     searchInput !== "" ? searchInput : readUrlResult.searchInput
   );
+
   const [flag, setFlag] = useState(false);
   const url = location.search;
   var param = false;
@@ -181,11 +183,12 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
     document.body.style.overflow = "unset";
     document.body.style.padding = 0;
   };
-  const handleCatChange = (selectedOption) =>
-    setCatSelectedOption(selectedOption);
+  const handleCatChange = (selectedOption) => setCatSelectedOption(selectedOption);
+
   const handleSearchInput = (event) => setSearchOption(event.target.value);
 
   const handleIsService = (event) => {
+    console.log("handleIsService", event.target.value)
     const isServiceValue = parseInt(event.target.value);
     dispatch(setIsService({ isService: isServiceValue }));
     //dispatch(setIsService({ isService: parseInt(event.target.value) }));
@@ -336,6 +339,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
         })
       );
       if (props.pageName === "service-listing") {
+        console.log("Service listing page");
         reqBody.search_value = searchOption;
         if (catSelectedOption.value !== "") {
           reqBody.category_filter = catSelectedOption.value;
@@ -558,15 +562,11 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
     }
   };
 
-  const handleSearchFilter = async () => {
-    console.log("searchOption", searchOption);
-    console.log("catSelectedOption", catSelectedOption);
-
+  const handleSearchServiceFilter = async () => {
     try {
       const query = new URLSearchParams();
       if (catSelectedOption.label !== 'All') query.append('category', catSelectedOption.label);
       if (searchOption) query.append('name', searchOption);
-
       const response = await axios.get(`/front/searchFilterServices?${query.toString()}`, {
         headers: {
           'Accept': 'application/json',
@@ -575,14 +575,24 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
       });
       console.log("response form searching..:", response.data.data);
       sendServiceData(response.data.data);
-      // const response = await axios.get(`/front/searchFilterServices?category=${catSelectedOption.label}&name=${searchOption}`, {
-      //   headers: {
-      //     'Accept': 'application/json',
-      //     'Content-Type': 'application/json;charset=UTF-8',
-      //   },
-      // });
-      // console.log("response form searching..:", response.data.data)
-      // sendServiceData(response.data.data)
+    } catch (error) {
+      toast.error("Data Not Found", { autoClose: 3000 })
+      console.error('Error fetching users:', error);
+    }
+  }
+
+  const handleSearchProductFilter = async () => {
+    try {
+      const query = new URLSearchParams();
+      if (catSelectedOption.label !== 'All') query.append('category', catSelectedOption.label);
+      if (searchOption) query.append('name', searchOption);
+      const response = await axios.get(`/front/searchFilterProducts?${query.toString()}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+      });
+      history.push(`/product-listing?cat=${catSelectedOption.value}&searchText=${searchOption || ''}`)
     } catch (error) {
       toast.error("Data Not Found", { autoClose: 3000 })
       console.error('Error fetching users:', error);
@@ -916,13 +926,23 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData }) => {
                               value={searchOption}
                               onChange={handleSearchInput}
                             />
-                            <button
-                              className="btn btn_dark"
-                              type="button"
-                              onClick={handleSearchFilter}
-                            >
-                              Search
-                            </button>
+                            {isService === 0 ?
+                              <button
+                                className="btn btn_dark"
+                                type="button"
+                                onClick={handleSearchProductFilter}
+                              >
+                                Search
+                              </button>
+                              :
+                              <button
+                                className="btn btn_dark"
+                                type="button"
+                                onClick={handleSearchServiceFilter}
+                              >
+                                Search
+                              </button>
+                            }
                           </form>
                           <div
                             className="btn-group"

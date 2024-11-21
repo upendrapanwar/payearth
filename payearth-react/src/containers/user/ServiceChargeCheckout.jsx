@@ -12,7 +12,7 @@ import store from '../../store/index';
 import successImg from "../../assets/images/success_png.png"
 import { Elements, CardElement, ElementsConsumer } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import Modal from "react-bootstrap/Modal";
+import Modal from "react-bootstrap/Modal"; 
 
 const Button = styled.button({
     "&:hover": { cursor: "pointer" },
@@ -22,6 +22,8 @@ const Button = styled.button({
     fontWeight: 600,
     borderRadius: "2px"
 });
+
+
 
 class ServiceCheckOut extends Component {
     constructor(props) {
@@ -98,6 +100,8 @@ class ServiceCheckOut extends Component {
             return;
         }
         const cardElement = elements.getElement(CardElement);
+
+        console.log("cardElement", cardElement)
         // TEST *********************
         // const { error, paymentMethod } = await stripe.createPaymentMethod({
         //     type: 'card',
@@ -111,7 +115,6 @@ class ServiceCheckOut extends Component {
             console.error("card validation error : ", error);
             toast.error(error.message);
             this.setState({ isLoading: false });
-
         } else {
             // console.log("this.authInfo.token", this.authInfo.token)
             const response = await fetch('/user/serviceCharge', {

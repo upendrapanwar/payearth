@@ -429,7 +429,8 @@ class AddProduct extends Component {
                                     <Formik
                                         initialValues={{ name: '', category: defaultCatOption.value, subCategory: defaultSubCatOption.value, brand: defaultBrand.value, description: '', specifications: '', price: '', featuredImg: '' }}
                                         onSubmit={values => this.handleSubmit(values)}
-                                        validationSchema={addProductSchema}>
+                                        validationSchema={addProductSchema}
+                                    >
                                         {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isValid, }) => (
                                             <form onSubmit={handleSubmit} encType="multipart/form-data">
                                                 <div className="row">

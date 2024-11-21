@@ -27,26 +27,18 @@ function CartItem({ id, image, title, price, quantity }) {
           'Authorization': `Bearer ${authInfo.token}`
         }
       }).then(response => {
-
-
         if (response.data.status) {
-
           selectedSaveLaterItemsCopy.push(response.data.data.productId);
-
           localStorage.setItem('selectedSaveLaterItems', JSON.stringify(selectedSaveLaterItemsCopy));
-
           dispatch(setSelectedSavedItems({ selectedSaveLaterItems: selectedSaveLaterItemsCopy }));
           toast.dismiss();
-
           toast.success(response.data.message);
         }
       }).catch(error => {
-
         if (error.response && error.response.data.status === false) {
           toast.error(error.response.data.message);
         }
       }).finally(() => {
-
         setTimeout(() => {
           dispatch(setLoading({ loading: false }));
         }, 300);

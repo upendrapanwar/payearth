@@ -11,6 +11,7 @@ router.get('/product/rating-count/:id', getRatingCount);
 router.get('/product/similar-products/:id', getSimilarProducts);
 router.get('/popular-brands', getPopularBrands);
 router.get('/allProductBrands', getProductBrands);
+router.get('/allProductCategory', getProductCategory);
 router.get('/product/trending/:limit', getTrendingProducts);
 router.get('/product/popular/:limit', getPopularProducts);
 router.get('/product/recent-search/:limit', getRecentSearchProducts);
@@ -24,9 +25,8 @@ router.post('/product/listing/categories/:id', getFilterCategories);
 router.get('/product/detail/:id', getProductById);
 
 //For products only
-router.post('/product/listing', getProductListing);
-router.post('/products/listing', getProductsListing);// test
-router.post("/getProductSubCat", getSubCateProduct); // test
+router.post('/products/listing', getProductsListing);
+router.post("/getProductSubCat", getSubCateProduct);
 
 
 router.post('/product/listing/brands', getBrandsListByProducts);
@@ -51,11 +51,11 @@ router.get('/advertisement/:slug', advertismentBySlug);
 router.get('/advBanner-list/:keywords', getAllBannersData);
 router.get('/getAllAdvBanner-list', getAllAdvBannerData);
 
+router.get("/searchFilterProducts", searchFilterProducts);
 router.get("/searchFilterServices", searchFilterServices);
 router.get("/getServiceCategory", getServiceCategory);
 router.get("/getServicesByCategory/:categoryId", getServicesByCategory);
 
-// /seller/searchFilterServices?search=${this.state.search}
 router.post('/notifications', saveNotifications);
 router.get('/notifications/:id', getNotifications);
 router.put('/updateNotifications/:id', updateNotifications);
@@ -90,6 +90,12 @@ function getPopularBrands(req, res, next) {
 
 function getProductBrands(req, res, next) {
     frontService.getProductBrands()
+        .then(brands => brands ? res.status(200).json({ status: true, data: brands }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function getProductCategory(req, res, next) {
+    frontService.getProductCategory()
         .then(brands => brands ? res.status(200).json({ status: true, data: brands }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
@@ -148,12 +154,6 @@ function getCategoriesMenu(req, res, next) {
         .catch(err => next(res.json({ status: false, message: err })));
 }
 
-
-function getProductListing(req, res, next) {
-    frontService.getProductListing(req)
-        .then(products => products ? res.status(200).json({ status: true, data: products }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
-        .catch(err => next(res.json({ status: false, message: "No data found.", data: [] })));
-}
 
 function getProductsListing(req, res, next) {
     frontService.getProductsListing(req)
@@ -240,6 +240,13 @@ function getAllBannersData(req, res, next) {
 function getAllAdvBannerData(req, res, next) {
     frontService.getAllAdvBannerData(req)
         .then(banner => banner ? res.status(200).json({ status: true, data: banner }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+// filter & search searchFilterproducts
+function searchFilterProducts(req, res, next) {
+    frontService.searchFilterProducts(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
 

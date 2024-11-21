@@ -122,6 +122,7 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
 
     const renderBannerTopIframe = () => {
         if (iframeOpen === true) {
+            // console.log("advertiseData in home page", advertiseData)
             const advertiseData = advertisements[currentUrlIndex];
             const videoKey = `${advertiseData.video}-${Date.now()}`;
             return (
@@ -186,7 +187,8 @@ export const GetAllBanner = () => {
                 const urls = isloginUser === true ? withoutBlockData : data.map(item => !item.video ? item.image : item.video);
                 setUrlData(urls)
                 setLength(urls.length)
-                if (urls.length > 0) {
+                if (urls.length > 0 && advertisements !== null) {
+                    console.log("url", urls)
                     const timeoutId = setTimeout(() => {
                         setIframeOpen(true);
                     }, 1000);
@@ -230,35 +232,76 @@ export const GetAllBanner = () => {
         setIframeOpen(false);
     };
 
+    // const renderAllBannerTopIframe = () => {
+    //     const advertiseData = advertisements[currentUrlIndex];
+    //     if (iframeOpen === true && advertiseData !== null) {
+    //         const videoKey = `${advertiseData.video}-${Date.now()}`;
+    //         console.log("advertiseData : ", advertiseData)
+    //         // const videoKey = advertiseData !== null ? `${advertiseData.video}-${Date.now()}` : '';
+    //         return (
+    //             <div className="iframe-container">
+    //                 <div className='iFrame-wrapper'>
+    //                     <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
+    //                     {advertiseData.video ? (
+    //                         <video key={videoKey} autoPlay loop playsInline muted onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)} className='advertisement-media'>
+    //                             <source
+    //                                 src={advertiseData.video}
+    //                                 type="video/mp4"
+    //                             />
+    //                             Your browser does not support the video tag.
+    //                         </video>
+    //                     ) : (
+    //                         <img
+    //                             className='advertisement-media'
+    //                             src={advertiseData.image}
+    //                             alt="advertisement"
+    //                             onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
+    //                         />
+    //                     )}
+    //                 </div>
+    //             </div>
+    //         );
+    //     }
+    // }
+
     const renderAllBannerTopIframe = () => {
-        if (iframeOpen === true) {
-            const advertiseData = advertisements[currentUrlIndex];
+        const advertiseData = advertisements[currentUrlIndex];
+
+        if (iframeOpen === true && advertiseData) {
             const videoKey = `${advertiseData.video}-${Date.now()}`;
+            console.log("advertiseData : ", advertiseData);
+
             return (
                 <div className="iframe-container">
-                    <div className='iFrame-wrapper'>
+                    <div className="iFrame-wrapper">
                         <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
                         {advertiseData.video ? (
-                            <video key={videoKey} autoPlay loop playsInline muted onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)} className='advertisement-media'>
-                                <source
-                                    src={advertiseData.video}
-                                    type="video/mp4"
-                                />
+                            <video
+                                key={videoKey}
+                                autoPlay
+                                loop
+                                playsInline
+                                muted
+                                onClick={() => onWebsiteMove(advertiseData.siteUrl)}
+                                className="advertisement-media"
+                            >
+                                <source src={advertiseData.video} type="video/mp4" />
                                 Your browser does not support the video tag.
                             </video>
-                        ) : (
+                        ) : advertiseData.image ? (
                             <img
-                                className='advertisement-media'
+                                className="advertisement-media"
                                 src={advertiseData.image}
                                 alt="advertisement"
-                                onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl)}
+                                onClick={() => onWebsiteMove(advertiseData.siteUrl)}
                             />
-                        )}
+                        ) : null}
                     </div>
                 </div>
             );
         }
-    }
+        return null; // Return null if iframe is closed or advertiseData is undefined
+    };
 
     return <>
         {renderAllBannerTopIframe()}
@@ -268,8 +311,6 @@ export const GetAllBanner = () => {
 
 // Community
 export const CommunityAdvertise = ({ width, height, keywords }) => {
-
-    console.log("keywords", keywords);
     const [iframeOpen, setIframeOpen] = useState(false);
     const [advertise, setAdvertise] = useState([]);
     const [currentUrlIndex, setCurrentUrlIndex] = useState(0);

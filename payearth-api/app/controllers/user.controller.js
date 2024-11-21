@@ -177,8 +177,7 @@ router.post("/savelater", addToSaveLater);
 router.post("/addtocart", addToCart);
 router.post("/updatetocart", updateToCart);
 router.post("/deletefromcart", deleteFromCart);
-// Strip
-router.post("/checkoutSession", checkoutSession);
+
 
 
 router.post("/savelaterlist/:id", getSaveLaterList);
@@ -235,6 +234,11 @@ router.post("/createAuthorizeCustomer/payment", customerAuthorizePayment);
 router.post("/schedule/payment", bannerPayment);
 router.post("/create-subscription", createSubscription);
 router.post("/serviceCharge", serviceCharges);
+router.post("/createPaymentIntent", createPaymentIntent);
+router.post("/createInvoice", createInvoice);
+
+// Strip
+router.post("/checkoutSession", checkoutSession);
 
 router.get("/get-common-service", getAllCommonService);
 router.get("/get-common-service/:id", getCommonServiceById);
@@ -289,6 +293,7 @@ router.post("/user-contact-us", userContactUs);
 router.post("/user-support-email", userSupportEmail);
 router.post("/support/request-call", supportReqCall);
 router.put("/save-user-myprofile/:id", saveMyProfile);
+router.get("/getProductOrder/:id", getProductOrder);
 
 
 module.exports = router;
@@ -1118,6 +1123,18 @@ function serviceCharges(req, res, next) {
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 
+function createPaymentIntent(req, res, next) {
+  userService.createPaymentIntent(req)
+    .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function createInvoice(req, res, next) {
+  userService.createInvoice(req)
+    .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
 /*****************************************************************************************/
 /*****************************************************************************************/
 
@@ -1622,3 +1639,10 @@ function saveMyProfile(req, res, next) {
     .then((data) => data ? res.json({ status: true, data: data, message: "Profile saved successfully." }) : res.json({ status: false, data: {}, message: "Error saving Profile request." }))
     .catch((err) => next(res.json({ status: false, message: err.message })));
 }
+
+function getProductOrder(req, res, next) {
+  userService.getProductOrder(req)
+    .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error saving Profile request." }))
+    .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+

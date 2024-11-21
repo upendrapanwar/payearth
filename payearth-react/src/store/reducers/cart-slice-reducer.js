@@ -54,12 +54,15 @@ const cartSlice = createSlice({
             }
         },
 
+
         incrementQuantity: (state, action) => {
             const item = state.cart.find((item) => item.id === action.payload);
             const authInfo = JSON.parse(localStorage.getItem('authInfo'));
             if (authInfo === null) {
+                console.log("user not login")
                 item.quantity++;
             } else {
+                console.log("user is login")
                 item.quantity++;
                 let reqBody = {
                     user_id: authInfo.id,
@@ -174,7 +177,14 @@ const cartSlice = createSlice({
                     }, 300);*/
                 });
             }
-        }
+        },
+        clearCart: (state) => {
+            console.log("clearCart run")
+            state.cart = [];
+        },
+
+
+
     }
 });
 
@@ -183,5 +193,6 @@ export const {
     addToCart,
     incrementQuantity,
     decrementQuantity,
-    removeItem
+    removeItem,
+    clearCart
 } = cartSlice.actions;

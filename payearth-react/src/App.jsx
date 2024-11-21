@@ -19,7 +19,8 @@ import ServiceListing from "./containers/user/service/ServiceListing";
 import ServiceDetail from "./containers/user/service/ServiceDetails";
 import MyOrders from "./containers/user/MyOrders";
 import MyCart from "./containers/user/MyCart";
-import CheckOut from "./containers/user/CheckOut";
+import CheckOut from '../src/containers/user/productCheckout/checkOut';
+import CheckOutCompletePage from "./containers/user/productCheckout/checkoutComplete";
 import MyWishlist from "./containers/user/MyWishlist";
 import SaveLaterlist from "./containers/user/SaveLaterlist";
 import MyProfile from "./containers/user/MyProfile";
@@ -214,10 +215,18 @@ function App() {
             exact
           />
 
+          {/* Product orderCheckout */}
           <PrivateRoute
-            path="/checkout"
+            path="/orderCheckout"
             restricted={false}
             component={CheckOut}
+            exact
+          />
+
+          <PrivateRoute
+            path="/checkOutCompletePage"
+            restricted={false}
+            component={CheckOutCompletePage}
             exact
           />
 

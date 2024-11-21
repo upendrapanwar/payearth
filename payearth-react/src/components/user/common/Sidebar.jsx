@@ -10,7 +10,14 @@ import { getColors } from '../../../helpers/product-listing';
 import { useLocation } from 'react-router-dom';
 
 const Sidebar = (props) => {
-    const { categories, pageName, onPriceRangeChange, onCategoryChange, onSubCategoryChange, onBrandChange } = props;
+    const {
+        categories,
+        pageName,
+        onPriceRangeChange,
+        onCategoryChange,
+        onSubCategoryChange,
+        onBrandChange,
+    } = props;
 
     const [brands, setBrands] = useState('')
     const [priceRange, setPriceRange] = useState();
@@ -18,7 +25,6 @@ const Sidebar = (props) => {
     const [selectedSubCategories, setSelectedSubCategories] = useState([]);
     const [selectedBrands, setSelectedBrands] = useState([]);
     const [productSubCategory, setProductSubCategory] = useState([]);
-
 
     useEffect(() => {
         axios
@@ -37,7 +43,6 @@ const Sidebar = (props) => {
     }, []);
 
     const getSubCat = (id) => {
-        // console.log("selected  ID", id)
         try {
             const data = {
                 'categoryId': id
@@ -96,14 +101,6 @@ const Sidebar = (props) => {
         onPriceRangeChange(priceRange);
     }
 
-    // console.log("priceRange in side bar", priceRange)
-    // console.log("selectedCategories", selectedCategories)
-    // console.log("selectedBrands", selectedBrands)
-
-
-
-    // console.log("productSubCategory", productSubCategory)
-
     const renderSubCategoryList = (categoryId) => {
         if (!selectedCategories.includes(categoryId)) return null;
         return (
@@ -141,22 +138,22 @@ const Sidebar = (props) => {
                             <h3>Categories</h3>
                         </li>
                         {categories.map((category, index) => {
-                            if (category.value !== '') {
+                            if (category.id !== '') {
                                 return (
-                                    <li key={category.value}>
+                                    <li key={category.id}>
                                         <div className="form-check d-flex">
                                             <input
                                                 className="form-check-input"
                                                 type="checkbox"
-                                                id={category.value}
-                                                value={category.value}
+                                                id={category.id}
+                                                value={category.id}
                                                 onChange={(event) => handleCateCheckbox(event, index)}
-                                                checked={selectedCategories.includes(category.value)}
+                                                checked={selectedCategories.includes(category.id)}
                                                 disabled={selectedSubCategories && selectedSubCategories.length > 0}
                                             />
-                                            <label className="form-check-label" htmlFor={category.value}>{category.label}</label>
+                                            <label className="form-check-label" htmlFor={category.id}>{category.categoryName}</label>
                                         </div>
-                                        {renderSubCategoryList(category.value)}
+                                        {renderSubCategoryList(category.id)}
                                     </li>
                                 );
                             } else {

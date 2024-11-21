@@ -33,50 +33,60 @@
 
 
 /* checkout-css */
-.checkout_wrap .checkout_cart_wrap{
+.checkout_wrap .checkout_cart_wrap {
+    width: 70%;
     padding: 25px 25px;
     margin: 0 auto;
     border: 1px solid #E3E3E3;
     border-radius: 5px;
 }
-.checkout_wrap .checkout_cart_wrap .input-group{
+
+.checkout_wrap .checkout_cart_wrap .input-group {
     display: flex;
 }
-.checkout_wrap .input-group .form-control:last-child{
+
+.checkout_wrap .input-group .form-control:last-child {
     border-top-left-radius: 5px !important;
     border-bottom-left-radius: 5px !important;
 }
-.checkout_wrap .input-group .form-control:not(:first-child):not(:last-child){
+
+.checkout_wrap .input-group .form-control:not(:first-child):not(:last-child) {
     border-radius: 5px !important;
 }
-.checkout_wrap .checkout_cart_wrap .input-group .form_field input
-{ 
-    margin-right: 15px;
-    border-radius: 5px !important;
-    border-top-left-radius: 5px !important;
-    border-bottom-left-radius: 5px !important;
-}
-.checkout_wrap .checkout_cart_wrap .input-group .form_field textarea,button{
+
+.checkout_wrap .checkout_cart_wrap .input-group .form_field input {
     margin-right: 15px;
     border-radius: 5px !important;
     border-top-left-radius: 5px !important;
     border-bottom-left-radius: 5px !important;
 }
 
-.checkout_wrap .checkout-form .checkout_form_wrapper{
-   display: flex;
-   padding: 15px 0;
+.checkout_wrap .checkout_cart_wrap .input-group .form_field textarea,
+button {
+    margin-right: 15px;
+    border-radius: 5px !important;
+    border-top-left-radius: 5px !important;
+    border-bottom-left-radius: 5px !important;
 }
-.checkout_wrap .checkout-form .checkout_form_wrapper .input-group{
+
+.checkout_wrap .checkout-form .checkout_form_wrapper {
+    display: flex;
+    padding: 15px 0;
+}
+
+.checkout_wrap .checkout-form .checkout_form_wrapper .input-group {
     width: 100%;
     padding-right: 10px;
 }
-.checkout_wrap .checkout_form_wrapper .form_field .dropdown .button{
+
+.checkout_wrap .checkout_form_wrapper .form_field .dropdown .button {
     width: 100%;
 }
-.checkout_wrap .checkout_form_wrapper .form_field .dropdown .dropdown-menu{
+
+.checkout_wrap .checkout_form_wrapper .form_field .dropdown .dropdown-menu {
     margin-top: 30px !important;
 }
+
 .payment_method_section {
     background: #c0b8c8;
     border: 1px solid #E3E3E3;
@@ -86,10 +96,12 @@
     border-radius: 15px;
     max-width: 600px;
 }
-.payment_method_section ul{
+
+.payment_method_section ul {
     padding-left: 0;
 }
-.payment_method_section ul li{
+
+.payment_method_section ul li {
     list-style: none;
     font-size: 15px;
     line-height: 36px;
@@ -97,24 +109,32 @@
 }
 
 .ElementsApp input {
-    border: 1px solid #000!important;
-    height: 36px!important;
-    line-height: 36px!important;
-    padding: 0px 5px!important;
-    width: 100%!important;
+    border: 1px solid #000 !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    padding: 0px 5px !important;
+    width: 100% !important;
 }
 
-.payment_method_section .payment_method_wrapper .payment_list{
+.payment_method_section .payment_method_wrapper .payment_list {
     display: flex;
 }
 
-.StripeElement  iframe {height: 36px!important;}
+/* .StripeElement iframe {
+    height: 36px !important;
+} */
 
-.CardField-input-wrapper { margin: 15px 0px;}
-.CardField-input-wrapper  .CardField-number input,
-.CardField-input-wrapper  .CardField-restWrapper input,
-.customCardElement input { 
-    padding: 5px!important;
-    border: 1px solid rgba(0, 0, 0, 0.2)!important;
- }
-.payment_method_section .subtotal_wrapper { margin-bottom: 15px;}
+.CardField-input-wrapper {
+    margin: 15px 0px;
+}
+
+.CardField-input-wrapper .CardField-number input,
+.CardField-input-wrapper .CardField-restWrapper input,
+.customCardElement input {
+    padding: 5px !important;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+}
+
+.payment_method_section .subtotal_wrapper {
+    margin-bottom: 15px;
+}

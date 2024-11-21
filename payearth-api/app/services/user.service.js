@@ -84,7 +84,7 @@ module.exports = {
 
 
   //
-  checkoutSession,
+  // checkoutSession,
 
 
 
@@ -118,6 +118,8 @@ module.exports = {
   customerAuthorizePayment,
   createSubscription,
   serviceCharges,
+  createPaymentIntent,
+  createInvoice,
   getCommonService,
   CommonServiceById,
   addServiceReview,
@@ -157,6 +159,11 @@ module.exports = {
   userSupportEmail,
   supportReqCall,
   saveMyProfile,
+
+
+  getProductOrder
+
+
 };
 
 // function sendMail(mailOptions) {
@@ -1226,34 +1233,34 @@ async function deleteFromCart(req) {
 
 // Stripe Checkout session
 
-async function checkoutSession(req) {
-  try {
-    // console.log("backend run")
-    const { cart } = req.body;
-    // console.log("cart backend ", cart)
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: cart.map(product => ({
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: product.name,
-          },
-          unit_amount: product.price * product.quantity
-        },
-        quantity: product.quantity,
-      })),
-      mode: "payment",
-      success_url: 'https://localhost:3000/checkout',
-      // success_url: `https://localhost:3000/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `http://localhost:3000/cancel`,
-    });
-    return session;
+// async function checkoutSession(req) {
+//   try {
+//     // console.log("backend run")
+//     const { cart } = req.body;
+//     // console.log("cart backend ", cart)
+//     const session = await stripe.checkout.sessions.create({
+//       payment_method_types: ["card"],
+//       line_items: cart.map(product => ({
+//         price_data: {
+//           currency: 'usd',
+//           product_data: {
+//             name: product.name,
+//           },
+//           unit_amount: product.price * product.quantity
+//         },
+//         quantity: product.quantity,
+//       })),
+//       mode: "payment",
+//       success_url: 'https://localhost:3000/checkout',
+//       // success_url: `https://localhost:3000/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+//       cancel_url: `http://localhost:3000/cancel`,
+//     });
+//     return session;
 
-  } catch (err) {
+//   } catch (err) {
 
-  }
-}
+//   }
+// }
 
 async function getOrders(req) {
   try {
@@ -2679,7 +2686,7 @@ async function serviceCharges(req, res) {
       auto_advance: true,
       collection_method: 'charge_automatically',
     });
-    console.log("invoice", invoice)
+    // console.log("invoice", invoice)
 
     const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id);
 
@@ -2708,6 +2715,67 @@ async function serviceCharges(req, res) {
 
   }
 }
+
+
+// product *******************************STRIPE***************************************
+async function createPaymentIntent(req, res) {
+  const { amount, name, email, cart } = req.body;
+
+  const trimmedCart = cart.map(item => ({
+    id: item.id,
+    name: item.name,
+    price: item.price,
+    quantity: item.quantity
+  }));
+  try {
+    const stringifiedCart = JSON.stringify(trimmedCart);
+
+    // console.log("stringifiedCart", stringifiedCart)
+
+    const customer = await stripe.customers.create({
+      email: email,
+      name: name,
+    });
+
+
+    // console.log("customer", customer)
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount * 100,
+      currency: 'usd',
+      customer: customer.id,
+      payment_method_types: ['card'],
+      metadata: {
+        cart: stringifiedCart,
+      },
+    });
+
+    return paymentIntent
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+}
+
+async function createInvoice(req, res) {
+  const { paymentIntentId } = req.body;
+
+  // console.log("paymentIntentId", paymentIntentId)
+  const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+  const invoice = await stripe.invoices.create({
+    customer: paymentIntent.customer,
+    collection_method: "send_invoice",
+    days_until_due: 30,
+    auto_advance: true,
+    description: "Invoice for payment",
+  });
+  await stripe.invoices.finalizeInvoice(invoice.id);
+
+  // console.log("invoice", invoice)
+  return invoice;
+
+}
+
+
+
 
 // TEST**************
 // async function serviceCharges(req, res) {
@@ -4122,4 +4190,14 @@ async function saveMyProfile(req) {
     console.error("Error:", error);
     throw new Error("Error updating profile data.");
   }
+}
+
+
+// getOrder
+
+async function getProductOrder() {
+  const result = await Order.find({ isActive: true, userId: authorId })
+    .sort();
+  if (result && result.length > 0) return result;
+  return false;
 }

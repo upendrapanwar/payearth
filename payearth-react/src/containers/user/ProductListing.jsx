@@ -10,6 +10,7 @@ import { NotFound } from './../../components/common/NotFound';
 import SpinnerLoader from './../../components/common/SpinnerLoader';
 import config from './../../config.json';
 import axios from 'axios';
+import { Link, useLocation, useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { setProducts, setReqBody, setTotalProducts, setMaxPrice } from './../../store/reducers/product-reducer';
 import { setLoading } from './../../store/reducers/global-reducer';
@@ -19,22 +20,56 @@ import GoToTop from './../../helpers/GoToTop';
 
 const ProductListing = () => {
     const dispatch = useDispatch();
-
-    // Use useSelector to access the Redux state instead of store.getState()
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const category = queryParams.get("cat");
+    const searchQuery = queryParams.get("searchText");
     const reqBodyFromStore = useSelector(state => state.product.reqBody);
     const { loading } = useSelector(state => state.global);
-    const { totalProducts, categories } = useSelector(state => state.product);
+    const { totalProducts } = useSelector(state => state.product);
     const { selectedWishItems } = useSelector(state => state.wishlist);
-
     const [reqBody, setReqBodyState] = useState(JSON.parse(JSON.stringify(reqBodyFromStore)));
     const [products, setProductsState] = useState([]);
-    // const [maxPrice, setMaxPriceState] = useState(0);
-
-
     const [priceRange, setPriceRange] = useState();
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedSubCategories, setSelectedSubCategories] = useState([]);
     const [selectedBrands, setSelectedBrands] = useState([]);
+    const [categories, setCategories] = useState('')
+
+    useEffect(() => {
+        if (!category) {
+            setSelectedCategories([]);
+        } else {
+            handleCategoryChange([`${category}`]);
+        }
+    }, [category]);
+
+    useEffect(() => {
+        axios
+            .get("front/allProductCategory")
+            .then((response) => {
+                if (response.data.status) {
+                    console.log("response.data.data", response.data.data)
+                    setCategories(response.data.data);
+                } else {
+                    console.log("Error")
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }, []);
+
+    useEffect(() => {
+        let reqBodyUpdated = { ...reqBody };
+        reqBodyUpdated = readUrl(dispatch, reqBodyUpdated, window.location, setReqBody, 'product-listing');
+        setReqBodyState(reqBodyUpdated);
+        getProducts('didMount');
+    }, []);
+
+    useEffect(() => {
+        getProducts()
+    }, [priceRange, selectedCategories, selectedBrands, selectedSubCategories, searchQuery])
 
     const handlePriceRangeChange = (range) => {
         setPriceRange(range);
@@ -52,29 +87,14 @@ const ProductListing = () => {
         setSelectedBrands(brands);
     };
 
-
-    useEffect(() => {
-        let reqBodyUpdated = { ...reqBody };
-        reqBodyUpdated = readUrl(dispatch, reqBodyUpdated, window.location, setReqBody, 'product-listing');
-        setReqBodyState(reqBodyUpdated);
-        getProducts('didMount');
-    }, []);
-
-    useEffect(() => {
-        getProducts()
-    }, [priceRange, selectedCategories, selectedBrands, selectedSubCategories])
-
     const getProducts = () => {
-        // console.log("getProduct function run");
-
-        // let reqBodyUpdated = JSON.parse(JSON.stringify(reqBodyFromStore));
         let productsData = [];
-
         let reqBodyUpdated = {
             "priceRange": priceRange,
             "selectedCategories": selectedCategories,
             "selectedSubCategories": selectedSubCategories,
             "selectedBrands": selectedBrands,
+            "searchQuery": searchQuery,
         };
 
         axios.post('front/products/listing', reqBodyUpdated).then((response) => {
@@ -116,14 +136,22 @@ const ProductListing = () => {
         });
     }
 
+    const handleProductData = (data) => {
+        console.log("data in product listing page", data)
+    }
+
     // console.log("priceRange in product listing", priceRange)
     // console.log("selectedCategories product listing", selectedCategories)
     // console.log("selectedBrands product listing", selectedBrands)
 
     return (
         <React.Fragment>
-            {loading ? <SpinnerLoader /> : ''}
-            <Header pageName="product-listing" reqBody={reqBody} />
+            {loading === true ? <SpinnerLoader /> : ''}
+            <Header
+                pageName="product-listing"
+                reqBody={reqBody}
+                sendProductsData={handleProductData}
+            />
             <PageTitle title={"Products"} />
             <section className="inr_wrap">
                 <div className="container">
@@ -135,6 +163,7 @@ const ProductListing = () => {
                                 onCategoryChange={handleCategoryChange}
                                 onSubCategoryChange={handleSubCategoryChange}
                                 onBrandChange={handleBrandChange}
+
                             />
                         </div>
                         <div className="col-md-9">
@@ -164,6 +193,31 @@ const ProductListing = () => {
                                     </div>
                                 )}
                             </div>
+
+                            {/* <div className="row">
+                                <div className="col-sm-12">
+                                    {(searchingProducts.length === 0 ? products : searchingProducts).length === 0
+                                        ? <NotFound msg="Product not found." />
+                                        : ''}
+                                    <div className="cards_wrapper">
+                                        {
+                                            (searchingProducts.length === 0 ? products : searchingProducts).map((product, index) => (
+                                                <ProductCard
+                                                    data={product}
+                                                    key={index}
+                                                    inWishList={selectedWishItems.length !== 0 && selectedWishItems.includes(product.id)}
+                                                />
+                                            ))
+                                        }
+                                    </div>
+                                </div>
+                                {((searchingProducts.length === 0 ? products : searchingProducts).length !== 0) &&
+                                    (searchingProducts.length === 0 ? products : searchingProducts).length < totalProducts && (
+                                        <div className="col-md-12 more_pord_load_btn">
+                                            <button type="button" onClick={() => getProducts('viewMore')} className="view_more">View More</button>
+                                        </div>
+                                    )}
+                            </div> */}
                         </div>
                     </div>
                 </div>

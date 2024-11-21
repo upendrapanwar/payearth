@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from 'react-router-dom';
@@ -12,6 +12,7 @@ function Total() {
   const dispatch = useDispatch();
   const history = useHistory();
   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   const cart = useSelector((state) => state.cart.cart)
   // console.log("cart", cart)
@@ -25,72 +26,54 @@ function Total() {
     return { totalPrice, totalQuantity }
   }
 
+  const handleCheckout = () => {
+    let reqBody = {
+      "amount": getTotal().totalPrice,
+      "quantity": getTotal().totalQuantity,
+      "name": userInfo.name,
+      "email": userInfo.email,
+      "cart": cart
+    };
+    axios.post("user/createPaymentIntent/", reqBody, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json;charset=UTF-8",
+        Authorization: `Bearer ${authInfo.token}`,
+      },
+    })
+      .then((response) => {
+        if (response.data.status === true) {
+          const data = response.data.data
+          console.log("data", data)
+          history.push({
+            pathname: '/orderCheckout',
+            state: data,
+          });
+        }
+      })
+      .catch((error) => {
+        if (error.response && error.response.data.status === false) {
+          toast.error(error.response.data.message);
+        }
+      })
+      .finally(() => {
+        setTimeout(() => {
+          // dispatch(setLoading({ loading: false }));
+        }, 300);
+      });
+  };
+
   const openmodalHandler = async () => {
     if (authInfo === null) {
-      // console.log("test....................")
       toast.error("Buyer login failed....");
       setTimeout(() => {
         dispatch(setIsLoginModalOpen({ isLoginModalOpen: true }));
         document.body.style.overflow = "hidden";
       }, 2000);
     } else {
-      // history.push('/checkout');
-      // console.log("checkout session code run")
-      try {
-        const url = '/user/checkoutSession/';
-        // const amount = '15'
-        // const response = await axios.post("user/checkoutSession",
-        //   { amount: parseFloat(amount) }
-        // );
-
-        // console.log("Product payment response:::;", response)
-
-        // window.location.href = response.data.url;
-
-        const response = await axios.post("/user/checkoutSession/", {
-          headers: {
-            // 'Accept': 'application/json',
-            // 'Content-Type': 'application/json;charset=UTF-8',
-            'Authorization': `Bearer ${authInfo.token}`
-          }
-        });
-        console.log("response", response)
-
-      } catch (error) {
-        console.log("error", error)
-      }
-    }
-  };
-
-  // const handleCheckout = () => {
-  //   let reqBody = {
-  //     // "amount": getTotal().totalPrice
-  //     "cart": cart
-  //   };
-  //   axios.post("user/checkoutSession/", reqBody, {
-  //     headers: {
-  //       Accept: "application/json",
-  //       "Content-Type": "application/json;charset=UTF-8",
-  //       Authorization: `Bearer ${authInfo.token}`,
-  //     },
-  //   })
-  //     .then((response) => {
-  //       console.log("response check", response.data)
-  //       if (response.data.status === true) {
-  //         window.location.href = response.data.data.url;
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       if (error.response && error.response.data.status === false) {
-  //         toast.error(error.response.data.message);
-  //       }
-  //     })
-  //     .finally(() => {
-  //       setTimeout(() => {
-  //         // dispatch(setLoading({ loading: false }));
-  //       }, 300);
-  //     });
-  // };
+      handleCheckout()
+    };
+  }
 
 
   return (
@@ -116,8 +99,6 @@ function Total() {
             </Link>
             {/* <button className="btn custom_btn btn_yellow" onClick={openmodalHandler}>Place Order</button> */}
           </div>
-
-          {/* <button onClick={handleCheckout}>BUY PLACED ORDER</button> */}
         </div>
       </div>
     </div>

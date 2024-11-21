@@ -11,8 +11,11 @@ const stripePromise = loadStripe(`${process.env.REACT_APP_PUBLISHABLE_KEY}`);
 
 class StripePaymentForm extends Component {
     render() {
+        const appearance = {
+            theme: 'stripe'
+        };
         return (
-            <Elements stripe={stripePromise}>
+            <Elements stripe={stripePromise} options={appearance}>
                 <ElementsConsumer>
                     {({ elements, stripe }) => (
                         // <BannerCheckOut elements={elements} stripe={stripe} />,

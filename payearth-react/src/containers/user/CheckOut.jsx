@@ -4,77 +4,23 @@ import PageTitle from "../../components/user/common/PageTitle";
 import Footer from "../../components/common/Footer";
 import { connect } from "react-redux";
 import axios from "axios";
+import { Formik, Field, FieldArray, ErrorMessage } from 'formik';
 import { Box, Text } from "rebass";
 import styled from "styled-components";
 import { toast } from "react-toastify";
 import store from "../../store/index";
+import { Link } from "react-router-dom/cjs/react-router-dom.min";
 import { useHistory } from "react-router-dom";
-//coinbase inport
-//import CoinbaseCommerceButton from "react-coinbase-commerce";
-//import 'react-coinbase-commerce/dist/coinbase-commerce-button.css';
-import { FormComponent, FormContainer } from "react-authorize-net";
-
-//let clientKey = process.env.REACT_APP_AUTHORIZENET_CLIENTKEY as string;
-//let clientKey;
-//let apiLoginId = process.env.REACT_APP_AUTHORIZENET_LOGINID as string;
-//let apiLoginId;
-/*
-type State = {
-    status: "paid" | "unpaid" | ["failure", string[]];
-};*/
-const Button = styled.button({
-  "&:hover": { cursor: "pointer" },
-  padding: "10px",
-  backgroundColor: "white",
-  border: "2px solid black",
-  fontWeight: 600,
-  borderRadius: "2px",
-});
-
-// const ErrorComponent = (props) => (
-//   <div>
-//     <Text fontSize={3} fontWeight={"500"} mb={3}>
-//       Failed to process payment
-//     </Text>
-//     {props.errors.map((error, index) => (
-//       <Text key={index} py={2}>
-//         {error}
-//       </Text>
-//     ))}
-//     <Button onClick={props.onBackButtonClick}>Go Back</Button>
-//   </div>
-// );
-
-const ErrorComponent = (props: {
-  errors: [],
-  onBackButtonClick: () => void,
-}) => (
-  <div>
-    <Text fontSize={3} fontWeight={"500"} mb={3}>
-      Failed to process payment
-    </Text>
-    {props.errors.map((error) => (
-      <Text py={2}>{error}</Text>
-    ))}
-    <Button onClick={props.onBackButtonClick}>Go Back</Button>
-  </div>
-);
-
-/*
-  const Header = props => (
-    <Flex py={4}>
-      <Heading>react-authorize-net-example</Heading>
-    </Flex>
-  );*/
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+// import InjectedCheckoutForm from "./InjectedCheckoutForm";
+import InjectedCheckoutForm from "./productCheckout";
+const stripePromise = loadStripe(`${process.env.REACT_APP_PUBLISHABLE_KEY}`);
 
 class CheckOut extends Component {
   constructor(props) {
     super(props);
-
     this.buttonRef = React.createRef;
-    this.clientKey =
-      "3q47VR4QY739gdggD4dP2JJsUNyd54bJJdDDpAdmktL59dA96SZMARZHtG2tDz6V";
-    this.apiLoginId = "7e44GKHmR3b";
     this.authInfo = store.getState().auth.authInfo;
     this.state = {
       formStatus: false,
@@ -104,70 +50,13 @@ class CheckOut extends Component {
       user_id: "",
       paymentType: "",
       moneyComparision: false,
+
+
+      // Stripe
+      clientSecret: this.props.location.state || {},
+      appearance: { theme: 'stripe' }
     };
   }
-  onErrorHandler = (response) => {
-    console.log(response);
-    this.setState({
-      status: ["failure", response.messages.message.map((err) => err.text)],
-    });
-    const paymentData = [
-      {
-        userId: this.authInfo.id,
-        sellerId: this.state.productSku,
-        amountPaid: this.getTotal().totalAmmount,
-        paymentMode: "usd",
-        paymentAccount: "Authorize .Net",
-        invoiceUrl: "",
-        paymentStatus: "failed",
-      },
-    ];
-    var paymentIds = this.managePaymentData(paymentData);
-    let paymentId;
-    paymentIds.then((result) => {
-      paymentId = result;
-    });
-    this.setState({ paymentId: paymentId });
-  };
-  /**
-   * Called On successful payment
-   *
-   * @param {*} response
-   */
-  onSuccessHandler = (response) => {
-    console.log(response);
-    console.log(response.messages.resultCode);
-    if (response.messages.resultCode === "Ok") {
-      this.setState({ status: ["paid", []] });
-      toast.dismiss();
-      toast.success("Payment Successfull", { autoClose: 3000 });
-
-      const paymentData = [
-        {
-          userId: this.authInfo.id,
-          sellerId: this.state.productSku,
-          amountPaid: this.getTotal().totalAmmount,
-          paymentMode: "usd",
-          paymentAccount: "Authorize .Net",
-          invoiceUrl: "",
-          paymentStatus: "Paid",
-        },
-      ];
-      console.log(paymentData);
-      var paymentIds = this.managePaymentData(paymentData);
-      let paymentId;
-      paymentIds.then((result) => {
-        console.log(result);
-        paymentId = result;
-        this.setState({ paymentId: result });
-      });
-      console.log(paymentId);
-      console.log("Payment PAID or UNPAID check here: ", this.state.status);
-
-      //window.location.href('/OrderDetail')
-    }
-    // Process API response on your backend...
-  };
 
   /**************************************************************************/
   /**************************************************************************/
@@ -192,14 +81,6 @@ class CheckOut extends Component {
       return productid;
     } else {
       return false;
-    }
-    {
-      /*}.then((response) => {
-            //this.setState({ orderStatus: response.data.data.orderstatus })
-            console.log(response.data.data)
-        }).catch(error => {
-            console.log(error)
-        });*/
     }
   };
   /**************************************************************************/
@@ -623,6 +504,8 @@ class CheckOut extends Component {
   /******************************************************************************/
 
   render() {
+    const { clientSecret, appearance } = this.state;
+    console.log("clientSecret", clientSecret)
     const cart = this.props.cart;
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     const fullname = userInfo.name;
@@ -688,13 +571,19 @@ class CheckOut extends Component {
 
     return (
       <React.Fragment>
+        {/* {loading === true ? <SpinnerLoader /> : ''} */}
         <Header />
         <PageTitle title="CheckOut" />
+        {/* <Helmet>
+          <title>{"Checkout - Pay Earth"}</title>
+        </Helmet> */}
         <section className="inr_wrap checkout_wrap">
           <div className="container">
             <div className="row">
               <div className="col-md-12">
                 <div className="cart my_cart">
+
+                  {/* Start coupon code */}
                   <div className="cart_wrap">
                     <div className="items_incart">
                       <span>
@@ -724,6 +613,8 @@ class CheckOut extends Component {
                       </div>
                     </div>
                   </div>
+                  {/* End coupon code */}
+
                   <div className="row">
                     <div className="col-md-8">
                       <div
@@ -980,62 +871,6 @@ class CheckOut extends Component {
                             <li>Subtotal : {this.getTotal().totalAmmount}$</li>
                           </ul>
                         </div>
-
-                        <div className="payment_method_wrapper">
-                          {/*<b>Select any option for Payment </b>*/}
-                          <ul>
-                            <li className="payment_list">
-                              <div className="">
-                                {/*<input
-                                                                    type="radio"
-                                                                    id=""
-                                                                    name="payment"
-                                                                    value="authorize_net"
-                                                                    checked={this.state.paymentType === "authorize_net"}
-                                                                    onChange={this.onValueChange}
-                                                                />*/}
-                                <span>Pay Now</span>
-                              </div>
-
-                              {/* <div className="dropdown">
-                                                                <button className=" dropdown-toggle" type="button" data-toggle="dropdown">Select Payment Method
-                                                                    <span className="caret"></span></button>
-                                                                <ul className="dropdown-menu">
-                                                                    <li><a href="#">Visa</a></li>
-                                                                    <li><a href="#">Bank to bank</a></li>
-                                                                    <li><a href="#">Paypal</a></li>
-                                                                </ul>
-                                                            </div> */}
-                            </li>
-                          </ul>
-                        </div>
-                        <div className="">
-                          <Box className="App" p={3}>
-                            {this.state.status[0] === "paid" ? (
-                              <Text fontWeight={"500"} fontSize={3} mb={4}>
-                                Thank you for your payment!
-                              </Text>
-                            ) : this.state.status === "unpaid" ? (
-                              <FormContainer
-                                environment="sandbox"
-                                onError={this.onErrorHandler}
-                                onSuccess={this.onSuccessHandler}
-                                amount={this.getTotal().totalAmmount}
-                                component={FormComponent}
-                                clientKey={this.clientKey}
-                                apiLoginId={this.apiLoginId}
-                              />
-                            ) : this.state.status[0] === "failure" ? (
-                              <ErrorComponent
-                                onBackButtonClick={() =>
-                                  this.setState({ status: "unpaid" })
-                                }
-                                errors={this.state.status[1]}
-                              />
-                            ) : null}
-                          </Box>
-                          {/* <a className="btn custom_btn btn_yellow" >Place Order</a> */}
-                        </div>
                       </div>
                     </div>
                   </div>
@@ -1044,6 +879,208 @@ class CheckOut extends Component {
             </div>
           </div>
         </section>
+
+        <div className="inr_wrap checkout_wrap">
+          <div className="container">
+            <div className="row">
+              <div className="col-md-12">
+                <div className="cart my_cart">
+                  <div className="dash_inner_wrap">
+                    <Formik
+                      initialValues={{ name: '', category: "", subCategory: "", brand: "", description: '', specifications: '', price: '', featuredImg: '' }}
+                    // onSubmit={values => this.handleSubmit(values)}
+                    // validationSchema={addProductSchema}
+                    >
+                      {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isValid, }) => (
+                        <form onSubmit={handleSubmit} encType="multipart/form-data">
+                          <div className="row">
+                            <div className="col-md-12 pt-4 d-flex justify-content-between align-items-center">
+                              <div className="dash_title">BILLING DETAILS</div>
+                              <div className="">
+                                <span>
+                                  <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/product-stock-management">
+                                    {/* <img src={arrow_back} alt="linked-in" />&nbsp; */}
+                                    Back
+                                  </Link>
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="cart_wrap mb-5">
+                              <div className="items_incart d-flex justify-content-center align-items-center">
+                                <span>have a coupons <a href="/">Click here to have</a> </span>
+                              </div>
+                              <div className="cart_wrap">
+                                <div className="checkout_cart_wrap">
+                                  <p>IF YOU HAVE A COUPON CODE,PLEASE APPLY IT BELOW </p>
+                                  <div className="input-group d-flex">
+                                    <input type="text" className="form-control" placeholder="Enter your coupons code" aria-label="Example text with button addon" id="myCoupon" />
+                                    <button className="btn custom_btn btn_yellow" type="button"
+                                    // onClick={this.onSubmit}
+                                    >
+                                      {" "}
+                                      Apply coupns code
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-md-6">
+                              <div className="row">
+                                <div className="col-md-6 mb-4">
+                                  <label htmlFor="firstName" className="form-label">
+                                    First Name <small className="text-danger">*</small>
+                                  </label>
+                                  <input
+                                    type="text"
+                                    className="form-control"
+                                    name="firstName"
+                                    placeholder="First Name"
+                                  // onChange={handleChange}
+                                  // onBlur={handleBlur}
+                                  // value={values.firstName}
+                                  />
+                                  {/* {touched.firstName && errors.firstName ? (
+                                      <small className="text-danger">{errors.firstName}</small>
+                                        ) : null} */}
+                                </div>
+                                <div className="col-md-6 mb-4">
+                                  <label htmlFor="lastName" className="form-label">
+                                    Last Name <small className="text-danger">*</small>
+                                  </label>
+                                  <input
+                                    type="text"
+                                    className="form-control"
+                                    name="lastName"
+                                    placeholder="Last Name"
+                                  // onChange={handleChange}
+                                  // onBlur={handleBlur}
+                                  // value={values.lastName}
+                                  />
+                                  {/* {touched.lastName && errors.lastName ? (
+                                      <small className="text-danger">{errors.lastName}</small>
+                                    ) : null} */}
+                                </div>
+                              </div>
+
+                              <div className="mb-4">
+                                <label htmlFor="name" className="form-label">Company Name {'(Optional)'} </label>
+                                <input type="text" className="form-control"
+                                  name="name"
+                                  placeholder="Company Name"
+                                // onChange={handleChange}
+                                // onBlur={handleBlur}
+                                // value={values.name}
+                                />
+                                {/* {touched.name && errors.name ? (
+                                  <small className="text-danger">{errors.name}</small>
+                                ) : null} */}
+                              </div>
+
+                              <div className="mb-4">
+                                <label htmlFor="name" className="form-label">County/Region <small className="text-danger">*</small></label>
+                                <input type="text" className="form-control"
+                                  name="name"
+                                  placeholder="County/Region"
+                                // onChange={handleChange}
+                                // onBlur={handleBlur}
+                                // value={values.name}
+                                />
+                                {/* {touched.name && errors.name ? (
+                                  <small className="text-danger">{errors.name}</small>
+                                ) : null} */}
+                              </div>
+
+                              <div className="mb-4">
+                                <label htmlFor="name" className="form-label">Street Address <small className="text-danger">*</small></label>
+                                <input type="text" className="form-control"
+                                  name="name"
+                                  placeholder="Street Address"
+                                // onChange={handleChange}
+                                // onBlur={handleBlur}
+                                // value={values.name}
+                                />
+                                {/* {touched.name && errors.name ? (
+                                  <small className="text-danger">{errors.name}</small>
+                                ) : null} */}
+                              </div>
+
+                              <div className="mb-4">
+                                <label htmlFor="name" className="form-label">Town/City <small className="text-danger">*</small></label>
+                                <input type="text" className="form-control"
+                                  name="name"
+                                  placeholder="Town/City"
+                                // onChange={handleChange}
+                                // onBlur={handleBlur}
+                                // value={values.name}
+                                />
+                                {/* {touched.name && errors.name ? (
+                                  <small className="text-danger">{errors.name}</small>
+                                ) : null} */}
+                              </div>
+
+                              <div className="mb-4">
+                                <label htmlFor="name" className="form-label">Postcode <small className="text-danger">*</small></label>
+                                <input type="text" className="form-control"
+                                  name="name"
+                                  placeholder="Postcode"
+                                // onChange={handleChange}
+                                // onBlur={handleBlur}
+                                // value={values.name}
+                                />
+                                {/* {touched.name && errors.name ? (
+                                  <small className="text-danger">{errors.name}</small>
+                                ) : null} */}
+                              </div>
+
+                              <div className="mb-4">
+                                <label htmlFor="name" className="form-label">Phone <small className="text-danger">*</small></label>
+                                <input type="text" className="form-control"
+                                  name="name"
+                                  placeholder="Phone"
+                                // onChange={handleChange}
+                                // onBlur={handleBlur}
+                                // value={values.name}
+                                />
+                                {/* {touched.name && errors.name ? (
+                                  <small className="text-danger">{errors.name}</small>
+                                ) : null} */}
+                              </div>
+
+                              <div className="mb-4">
+                                <label htmlFor="name" className="form-label">Email <small className="text-danger">*</small></label>
+                                <input type="text" className="form-control"
+                                  name="name"
+                                  placeholder="Email"
+                                // onChange={handleChange}
+                                // onBlur={handleBlur}
+                                // value={values.name}
+                                />
+                                {/* {touched.name && errors.name ? (
+                                  <small className="text-danger">{errors.name}</small>
+                                ) : null} */}
+                              </div>
+                            </div>
+
+                            {/* ******************************************PAYMENT FORM ********************************** */}
+                            <div className="col-md-6">
+                              <div className="mb-4">
+                                <Elements stripe={stripePromise} options={{ clientSecret }}>
+                                  <InjectedCheckoutForm />
+                                </Elements>
+                              </div>
+                            </div>
+                          </div>
+                        </form> 
+                      )}
+                    </Formik>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <Footer />
       </React.Fragment>
     );
