@@ -24,12 +24,15 @@ const ProductListing = () => {
     const queryParams = new URLSearchParams(location.search);
     const category = queryParams.get("cat");
     const searchQuery = queryParams.get("searchText");
+    const subCat = queryParams.get("subcat");
     const reqBodyFromStore = useSelector(state => state.product.reqBody);
-    const { loading } = useSelector(state => state.global);
+    // const { loading } = useSelector(state => state.global);
+
     const { totalProducts } = useSelector(state => state.product);
     const { selectedWishItems } = useSelector(state => state.wishlist);
     const [reqBody, setReqBodyState] = useState(JSON.parse(JSON.stringify(reqBodyFromStore)));
     const [products, setProductsState] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [priceRange, setPriceRange] = useState();
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedSubCategories, setSelectedSubCategories] = useState([]);
@@ -45,8 +48,15 @@ const ProductListing = () => {
     }, [category]);
 
     useEffect(() => {
-        axios
-            .get("front/allProductCategory")
+        if (!subCat) {
+            setSelectedSubCategories([]);
+        } else {
+            handleSubCategoryChange([`${subCat}`]);
+        }
+    }, [subCat]);
+
+    useEffect(() => {
+        axios.get("front/allProductCategory")
             .then((response) => {
                 if (response.data.status) {
                     console.log("response.data.data", response.data.data)
@@ -69,7 +79,7 @@ const ProductListing = () => {
 
     useEffect(() => {
         getProducts()
-    }, [priceRange, selectedCategories, selectedBrands, selectedSubCategories, searchQuery])
+    }, [priceRange, selectedCategories, selectedBrands, selectedSubCategories, searchQuery, category, subCat])
 
     const handlePriceRangeChange = (range) => {
         setPriceRange(range);
@@ -131,14 +141,14 @@ const ProductListing = () => {
             }
         }).finally(() => {
             setTimeout(() => {
-                // dispatch(setLoading({ loading: false }));
+                setLoading(false);
             }, 300);
         });
     }
 
-    const handleProductData = (data) => {
-        console.log("data in product listing page", data)
-    }
+    // const handleProductData = (data) => {
+    //     console.log("data in product listing page", data)
+    // }
 
     // console.log("priceRange in product listing", priceRange)
     // console.log("selectedCategories product listing", selectedCategories)
@@ -150,28 +160,27 @@ const ProductListing = () => {
             <Header
                 pageName="product-listing"
                 reqBody={reqBody}
-                sendProductsData={handleProductData}
+            // sendProductsData={handleProductData}
             />
             <PageTitle title={"Products"} />
             <section className="inr_wrap">
                 <div className="container">
                     <div className="row">
-                        <div className="col-md-3">
+                        <div className="col-md-3 mt-3" style={{ overflowY: 'auto', maxHeight: '120vh', border: '1px solid #ddd', scrollbarWidth: 'thin', }}>
                             <Sidebar pageName="product-listing"
                                 categories={categories}
                                 onPriceRangeChange={handlePriceRangeChange}
                                 onCategoryChange={handleCategoryChange}
                                 onSubCategoryChange={handleSubCategoryChange}
                                 onBrandChange={handleBrandChange}
-
                             />
                         </div>
                         <div className="col-md-9">
-                            <div className="row">
+                            {/* <div className="row">
                                 <div className="col">
                                     <ListingHead title="Products" count={products.length} />
                                 </div>
-                            </div>
+                            </div> */}
                             <div className="row">
                                 <div className="col-sm-12">
                                     {products.length === 0 ? <NotFound msg="Product not found." /> : ''}

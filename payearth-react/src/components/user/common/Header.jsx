@@ -6,28 +6,10 @@ import { toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
 import { Helmet } from 'react-helmet';
 import { setLoginStatus, setUserInfo } from "../../../store/reducers/auth-reducer";
-import {
-  setProducts,
-  setReqBody,
-  setTotalProducts,
-  setCategories,
-  setMaxPrice,
-} from "../../../store/reducers/product-reducer";
-import {
-  setServices,
-  setServiceReqBody,
-  setTotalServices,
-  setServiceCategories,
-  setServiceMaxPrice,
-} from "../../../store/reducers/service-reducer";
-import {
-  setCatSearchValue,
-  setIsService,
-} from "../../../store/reducers/cat-search-reducer";
-import {
-  setLoading,
-  setIsLoginModalOpen,
-} from "../../../store/reducers/global-reducer";
+import { setProducts, setReqBody, setTotalProducts, setCategories, setMaxPrice, } from "../../../store/reducers/product-reducer";
+import { setServices, setServiceReqBody, setTotalServices, setServiceCategories, setServiceMaxPrice, } from "../../../store/reducers/service-reducer";
+import { setCatSearchValue, setIsService, } from "../../../store/reducers/cat-search-reducer";
+import { setLoading, setIsLoginModalOpen, } from "../../../store/reducers/global-reducer";
 import Select from "react-select";
 import readUrl from "../../../helpers/read-product-listing-url";
 import { getBrands, getColors } from "../../../helpers/product-listing";
@@ -50,27 +32,6 @@ import { authVerification } from "../../../helpers/auth-verification";
 import io from 'socket.io-client';
 
 
-
-const subCategories = (catId, data) => {
-  if (data && data.length) {
-    return (
-      <ul className="dropdown-menu" aria-labelledby="offcanvasNavbarDropdown">
-        {data.map((value) => {
-          let url = `/product-listing?cat=${catId}&subcat=${value._id}`;
-          return (
-            <li key={value["_id"]}>
-              <Link to={url} className="dropdown-item">
-                {value.categoryName}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    );
-  }
-};
-
-
 const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProductsData }) => {
   toast.configure();
   const loginStatus = useSelector((state) => state.auth.isLoggedIn);
@@ -82,13 +43,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
   const serviceReqBody = useSelector((state) => state.service.reqBody);
   const productCategories = useSelector((state) => state.product.categories);
   const loginModal = useSelector((state) => state.global.isLoginModalOpen);
-  const readUrlResult = readUrl(
-    dispatch,
-    { ...productReqBody },
-    location,
-    setReqBody,
-    "header"
-  );
+  const readUrlResult = readUrl(dispatch, { ...productReqBody }, location, setReqBody, "header");
   const [data, setData] = useState([]);
   const [registerModal, setRegister] = useState(false);
   const [forgotModal, setForgot] = useState(false);
@@ -96,18 +51,12 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
   const [isToggle, setIsToggle] = useState(false);
   const [notifiLength, setNotifiLength] = useState(null);
   const [showNotifi, setShowNotifi] = useState([]);
-  const selectedCategory = useSelector(
-    (state) => state.catSearch.selectedCategory
-  );
+  const selectedCategory = useSelector((state) => state.catSearch.selectedCategory);
   const searchInput = useSelector((state) => state.catSearch.searchInput);
   const isService = useSelector((state) => state.catSearch.isService);
-  const [catSelectedOption, setCatSelectedOption] = useState(
-    selectedCategory === "" ? [] : selectedCategory
-  );
-  const [searchOption, setSearchOption] = useState(
-    searchInput !== "" ? searchInput : readUrlResult.searchInput
-  );
-
+  const [catSelectedOption, setCatSelectedOption] = useState(selectedCategory === "" ? [] : selectedCategory);
+  const [searchOption, setSearchOption] = useState(searchInput !== "" ? searchInput : readUrlResult.searchInput);
+  const [hoveredItem, setHoveredItem] = useState(null);
   const [flag, setFlag] = useState(false);
   const url = location.search;
   var param = false;
@@ -118,9 +67,16 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
   }
   const [navbarExpanded, setNavbarExpanded] = useState(false);
   const [resetModal, setReset] = useState(param);
-
   const [unreadCount, setUnreadCount] = useState(0);
   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
+
+  const handleMouseEnter = (index) => {
+    setHoveredItem(index);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredItem(null);
+  };
 
   const openmodalHandler = () => {
     setRegister(false);
@@ -129,10 +85,12 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
     dispatch(setIsLoginModalOpen({ isLoginModalOpen: true }));
     document.body.style.overflow = "hidden";
   };
+
   const closemodalHandler = () => {
     dispatch(setIsLoginModalOpen({ isLoginModalOpen: false }));
     document.body.style.overflow = "unset";
   };
+
   const showregisterHandler = () => {
     dispatch(setIsLoginModalOpen({ isLoginModalOpen: false }));
     setForgot(false);
@@ -140,10 +98,12 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
     setRegister(true);
     document.body.style.overflow = "hidden";
   };
+
   const hideregisterHandler = () => {
     setRegister(false);
     document.body.style.overflow = "unset";
   };
+
   const showForgotHandler = () => {
     dispatch(setIsLoginModalOpen({ isLoginModalOpen: false }));
     setRegister(false);
@@ -151,10 +111,12 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
     setForgot(true);
     document.body.style.overflow = "hidden";
   };
+
   const hideForgotHandler = () => {
     setForgot(false);
     document.body.style.overflow = "unset";
   };
+
   const showRestPwdHandler = () => {
     dispatch(setIsLoginModalOpen({ isLoginModalOpen: false }));
     setRegister(false);
@@ -162,10 +124,12 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
     setReset(true);
     document.body.style.overflow = "hidden";
   };
+
   const hideRestPwdHandler = () => {
     setReset(false);
     document.body.style.overflow = "unset";
   };
+
   const logout = () => {
     localStorage.clear();
     dispatch(setLoginStatus({ isLoggedIn: false }));
@@ -175,6 +139,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
     //window.location.href = "/";
     history.push('/');
   };
+
   const removeBackdrop = () => {
     const elements = document.getElementsByClassName("offcanvas-backdrop");
     while (elements.length > 0) {
@@ -183,12 +148,12 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
     document.body.style.overflow = "unset";
     document.body.style.padding = 0;
   };
+
   const handleCatChange = (selectedOption) => setCatSelectedOption(selectedOption);
 
   const handleSearchInput = (event) => setSearchOption(event.target.value);
 
   const handleIsService = (event) => {
-    console.log("handleIsService", event.target.value)
     const isServiceValue = parseInt(event.target.value);
     dispatch(setIsService({ isService: isServiceValue }));
     //dispatch(setIsService({ isService: parseInt(event.target.value) }));
@@ -207,18 +172,12 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
     let url = "";
     if (catId !== "") {
       url = "front/product/listing/categories/" + catId;
-      dispatch(
-        setCatSearchValue({
-          selectedCategory: { label: "", value: catId },
-        })
-      );
+      dispatch(setCatSearchValue({ selectedCategory: { label: "", value: catId }, }));
     } else {
       url = "front/product/categories/search";
     }
-    let requestBody =
-      isService === 0 ? { is_service: false } : { is_service: true };
-    axios
-      .post(url, requestBody)
+    let requestBody = isService === 0 ? { is_service: false } : { is_service: true };
+    axios.post(url, requestBody)
       .then((response) => {
         if (response.data.status) {
           let res = response.data.data;
@@ -601,10 +560,32 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
 
   const renderItems = (items) => {
     return items.map((item, index) => (
-      <li className="nav-item" key={index}>
+      <li
+        className="nav-item"
+        key={index}
+        onMouseEnter={() => handleMouseEnter(index)}
+        onMouseLeave={handleMouseLeave}
+      >
         <Link className="nav-link" to={isService === 0 ? `product-listing?cat=${item._id}` : `/service-listing?cat=${item._id}`}>
           {item.name}
         </Link>
+        {item.subCategories.length > 0 && hoveredItem === index && (
+          <div
+            className="position-absolute bg-white border p-2 shadow-sm"
+            style={{ zIndex: 10 }}
+          >
+            {item.subCategories.map((value) => {
+              let url = `/product-listing?cat=${item._id}&subcat=${value._id}`;
+              return (
+                <li key={value["_id"]}>
+                  <Link to={url} className="dropdown-item m-2">
+                    {value.categoryName}
+                  </Link>
+                </li>
+              );
+            })}
+          </div>
+        )}
       </li>
     ));
   };
@@ -620,6 +601,9 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
       setUnreadCount(0);
     }
   }
+
+
+  console.log("data::>>>", data)
 
   return (
     <React.Fragment>
@@ -792,11 +776,11 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                       <Link to="/blog">Blog</Link>
                     </li>
                     <li>
-                      <Link to="/product-listing">All-Products</Link>
+                      <Link to="/product-listing">Products</Link>
                       {/* <Link to={`/product-detail/${'66db3efeb660f1cef86e1048'}`}>All-Products</Link> */}
                     </li>
                     <li>
-                      <Link to="#">All-Services</Link>
+                      <Link to="#">Services</Link>
                     </li>
                   </ul>
                   <ul>
@@ -1008,11 +992,36 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                                     <div className="container">
                                       <div className="row my-3">
                                         {data.slice(4).map((item, index) => (
-                                          <div className="col-md-6 col-lg-4 mb-3 mb-lg-0 " key={index}>
+                                          <div
+                                            className="col-md-6 col-lg-4 mb-3 mb-lg-0"
+                                            key={index}
+                                            onMouseEnter={() => handleMouseEnter(index)}
+                                            onMouseLeave={handleMouseLeave}
+                                          >
                                             <div className="list-group list-group-flush">
-                                              <Link className="list-group-item list-group-item-action" to={isService === 0 ? `product-listing?cat=${item._id}` : `/service-listing?cat=${item._id}`}>
+                                              <Link
+                                                className="list-group-item list-group-item-action"
+                                                to={isService === 0 ? `product-listing?cat=${item._id}` : `/service-listing?cat=${item._id}`}
+                                              >
                                                 {item.name}
                                               </Link>
+                                              {item.subCategories.length > 0 && hoveredItem === index && (
+                                                <div
+                                                  className="position-absolute bg-white border p-2 shadow-sm mt-2"
+                                                  style={{ zIndex: 10, }}
+                                                >
+                                                  {item.subCategories.map((value) => {
+                                                    let url = `/product-listing?cat=${item._id}&subcat=${value._id}`;
+                                                    return (
+                                                      <li key={value["_id"]}>
+                                                        <Link to={url} className="dropdown-item">
+                                                          {value.categoryName}
+                                                        </Link>
+                                                      </li>
+                                                    );
+                                                  })}
+                                                </div>
+                                              )}
                                             </div>
                                           </div>
                                         ))}

@@ -131,7 +131,7 @@ const Sidebar = (props) => {
 
     return (
         <div className="side_bar">
-            <div className="filters">
+            <div className="filters" >
                 {pageName === 'product-listing' && categories.length ?
                     <ul className="filter_list">
                         <li>
