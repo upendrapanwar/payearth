@@ -171,6 +171,8 @@ class ProductDetail extends Component {
 
   render() {
     const { sizeControlls, productDetail, featuredImage, mainImage, selectColor, selectColorImage } = this.state;
+
+    console.log("productDetail", productDetail)
     var proQuantity = 0;
     const productID = this.state.id;
     //const dispatch = useDispatch();
@@ -370,89 +372,7 @@ class ProductDetail extends Component {
                               ""
                             )}
                           </div>
-                          <div className="pdi_fea">
-                            <div className="pdi_fea_box">
-                              <div className="heading">Quantity</div>
-                              <div className="qnty_select">
-                                <div className="input-group">
-                                  <button
-                                    onClick={() =>
-                                      dispatch(incrementQuantity(this.state.id))
-                                    }
-                                    className="btn btn-outline-secondary"
-                                    type="button"
-                                    id="button-addon1"
-                                  >
-                                    <svg
-                                      width="13"
-                                      height="14"
-                                      viewBox="0 0 13 14"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <g clipPath="url(#clip0)">
-                                        <path
-                                          d="M7.31107 5.81393V0.125H5.68893V5.81393H0V7.43607H5.68893V13.125H7.31107V7.43607H13V5.81393H7.31107Z"
-                                          fill="black"
-                                        />
-                                      </g>
-                                      <defs>
-                                        <clipPath id="clip0">
-                                          <rect
-                                            width="13"
-                                            height="13"
-                                            fill="white"
-                                            transform="translate(0 0.125)"
-                                          />
-                                        </clipPath>
-                                      </defs>
-                                    </svg>
-                                  </button>
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="3"
-                                    aria-label="Example text with button addon"
-                                    aria-describedby="button-addon1"
-                                    value={proQuantity}
-                                  />
-                                  <button
-                                    onClick={() =>
-                                      dispatch(decrementQuantity(this.state.id))
-                                    }
-                                    className="btn btn-outline-secondary"
-                                    type="button"
-                                    id="button-addon2"
-                                  >
-                                    <svg
-                                      width="14"
-                                      height="14"
-                                      viewBox="0 0 14 14"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <g clipPath="url(#clip0)">
-                                        <path
-                                          d="M7.81107 5.814L6.18893 5.81396L0.5 5.814V7.43615H6.18893H7.81107H13.5V5.814H7.81107Z"
-                                          fill="black"
-                                        />
-                                      </g>
-                                      <defs>
-                                        <clipPath id="clip0">
-                                          <rect
-                                            width="13"
-                                            height="13"
-                                            fill="white"
-                                            transform="translate(0.5 0.125)"
-                                          />
-                                        </clipPath>
-                                      </defs>
-                                    </svg>
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-
+                          <div className="pdi_fea">                        
                             <div className="pdi_fea_box ">
                               <div className="heading">Delivery</div>
                               <div className="pin_select">
@@ -487,7 +407,7 @@ class ProductDetail extends Component {
                                   addToCart({
                                     id: productDetail.id,
                                     name: productDetail.name,
-                                    image: this.state.thumbnails[0],
+                                    image: productDetail.featuredImage,
                                     price: productDetail.price,
                                   })
                                 )}

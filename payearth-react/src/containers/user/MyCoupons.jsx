@@ -74,6 +74,8 @@ class MyCoupons extends Component {
         const { loading } = store.getState().global;
         const { availableCoupons, coupons, totalCoupons } = this.state.data;
 
+        console.log("coupons :::", coupons)
+
         return (
             <React.Fragment>
                 {loading === true ? <SpinnerLoader /> : ''}

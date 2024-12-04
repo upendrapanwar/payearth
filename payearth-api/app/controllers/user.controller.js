@@ -182,6 +182,9 @@ router.post("/deletefromcart", deleteFromCart);
 
 router.post("/savelaterlist/:id", getSaveLaterList);
 router.post("/remove-from-savelater", removeProductFromSavelater);
+
+router.get("/coupon/:couponCode", applyMyCouponCode);
+
 router.post("/my-coupons/:id", getMyCoupons);
 router.post("/coupons/new", getNewCoupons);
 router.post("/coupons/checkpayment", checkPayment);
@@ -514,16 +517,18 @@ function removeProductFromSavelater(req, res, next) {
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
+
+function applyMyCouponCode(req, res, next) {
+  userService.applyMyCouponCode(req)
+    .then((couponData) => couponData ? res.status(200).json({ status: true, data: couponData }) : res.status(400).json({ status: false, data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+
 function getMyCoupons(req, res, next) {
   userService
     .getMyCoupons(req)
-    .then((coupons) =>
-      coupons
-        ? res.status(200).json({ status: true, data: coupons })
-        : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
-    )
+    .then((coupons) => coupons ? res.status(200).json({ status: true, data: coupons }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 
@@ -996,15 +1001,8 @@ function saveorderdetails(req, res, next) {
  * @returns JSON|null
  */
 function updateOrderStatus(req, res, next) {
-  userService
-    .updateOrderStatus(req)
-    .then((data) =>
-      data
-        ? res.status(200).json({ status: true, data: data })
-        : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
-    )
+  userService.updateOrderStatus(req)
+    .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 

@@ -136,7 +136,6 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
     dispatch(setUserInfo({ userInfo: [] }));
     dispatch(setIsService({ isService: 0 }));
     setIsToggle(false);
-    //window.location.href = "/";
     history.push('/');
   };
 
@@ -155,10 +154,12 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
 
   const handleIsService = (event) => {
     const isServiceValue = parseInt(event.target.value);
+    console.log("isServiceValue", isServiceValue)
     dispatch(setIsService({ isService: isServiceValue }));
     //dispatch(setIsService({ isService: parseInt(event.target.value) }));
     // Set isToggle value based on isService
     const isToggleValue = isServiceValue === 0 ? true : false;
+    console.log("isToggleValue", isToggleValue)
     setIsToggle(isToggleValue);
     // handleIsToggle(isToggleValue);
     if (window.location.pathname === "/") {
@@ -378,16 +379,15 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
       setFlag(true);
     }
     if (isToggle === false) {
+      console.log("isToggle ????", isToggle)
       if (location.pathname === "/service-listing") {
         dispatch(setIsService({ isService: 1 }));
       } else if (location.pathname === "/product-listing") {
         dispatch(setIsService({ isService: 0 }));
       }
     }
-    let requestBody =
-      isService === 0 ? { is_service: false } : { is_service: true };
-    axios
-      .post("front/product/categories/menu", requestBody)
+    let requestBody = isService === 0 ? { is_service: false } : { is_service: true };
+    axios.post("front/product/categories/menu", requestBody)
       .then((response) => {
         if (response.data.status) {
           setData(response.data.data);
@@ -399,8 +399,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
         console.log(error);
       });
     // Get categories
-    axios
-      .post("front/product/categories/search", requestBody)
+    axios.post("front/product/categories/search", requestBody)
       .then((response) => {
         if (response.data.status) {
           let options = [];
@@ -419,7 +418,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
           });
           if (!productCategories.length) {
             if (isService === 0) {
-              // dispatch(setCategories({categories: options}));
+              dispatch(setCategories({ categories: options }));
             } else {
               dispatch(setServiceCategories({ categories: options }));
             }
@@ -603,7 +602,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
   }
 
 
-  console.log("data::>>>", data)
+
 
   return (
     <React.Fragment>

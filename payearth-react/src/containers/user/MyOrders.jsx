@@ -62,112 +62,6 @@ class MyOrders extends Component {
           data: response.data.data.data,
           loading: false
         })
-
-
-        // Check if the response contains data
-        // if (response.data.data.data) {
-        //   const formattedData = response.data.data.data.map((item) => {
-        //     const date = new Date(item.order.createdAt).toLocaleDateString();
-
-        //     // Create an object to hold the formatted data
-        //     const formattedItem = {
-        //       _id: item.order._id,
-        //       orderDate: date,
-        //       id: item.order.id,
-        //       orderDetails: item.orderDetails,
-        //     };
-        //     // Check if orderId exists and has valid data
-        //     if (item.order.id) {
-        //       formattedItem.orderCode = item.order.orderCode;
-        //       formattedItem.billingFirstName = item.order.billingFirstName;
-        //       formattedItem.billingLastName = item.order.billingLastName;
-        //       formattedItem.billingCompanyName = item.order.billingCompanyName;
-        //       formattedItem.billingStreetAddress =
-        //         item.order.billingStreetAddress;
-        //       formattedItem.billingStreetAddress1 =
-        //         item.order.billingStreetAddress1;
-        //       formattedItem.billingCity = item.order.billingCity;
-        //       formattedItem.billingCountry = item.order.billingCountry;
-        //       formattedItem.billingPostCode = item.order.billingPostCode;
-        //       formattedItem.billingPhone = item.order.billingPhone;
-        //       formattedItem.billingEmail = item.order.billingEmail;
-        //       formattedItem.deliveryCharge = item.order.deliveryCharge.toFixed(2);
-        //       formattedItem.price = item.order.price.toFixed(2);
-        //       formattedItem.taxAmount = item.order.taxAmount.toFixed(2);
-        //       formattedItem.discount = item.order.discount.toFixed(2);
-        //       formattedItem.total = item.order.total.toFixed(2);
-
-        //       if (item.orderDetails && item.orderDetails.length > 0) {
-        //         const firstOrderDetail = item.orderDetails[0];
-        //         formattedItem.sellerAddress =
-        //           firstOrderDetail.sellerId.full_address.address;
-        //         formattedItem.sellerState =
-        //           firstOrderDetail.sellerId.full_address.state;
-        //         formattedItem.sellerCountry =
-        //           firstOrderDetail.sellerId.full_address.country;
-        //         formattedItem.sellerName = firstOrderDetail.sellerId.name;
-        //         formattedItem.sellerPhone = firstOrderDetail.sellerId.phone;
-        //         formattedItem.sellerEmail = firstOrderDetail.sellerId.email;
-        //       } else {
-        //         // Handle the case where there is no orderDetails or it's an empty array
-        //         formattedItem.sellerAddress = "N/A";
-        //         formattedItem.sellerState = "N/A";
-        //         formattedItem.sellerCountry = "N/A";
-        //         formattedItem.sellerName = "N/A";
-        //         formattedItem.sellerPhone = "N/A";
-        //         formattedItem.sellerEmail = "N/A";
-        //       }
-
-        //       formattedItem.invoiceNo = item.order.paymentId.invoiceNo;
-        //       formattedItem.paymentAccount =
-        //         item.order.paymentId.paymentAccount;
-        //       formattedItem.paymentMode = item.order.paymentId.paymentMode;
-
-        //       if (item.order.orderStatus) {
-        //         formattedItem.orderStatus = item.order.orderStatus.title;
-        //       } else {
-        //         formattedItem.orderStatus = "N/A";
-        //       }
-        //     } else {
-        //       // Handle missing orderId data
-        //       formattedItem.orderCode = "N/A";
-        //       formattedItem.billingFirstName = "N/A";
-        //       formattedItem.billingLastName = "N/A";
-        //       formattedItem.billingCompanyName = "N/A";
-        //       formattedItem.billingStreetAddress = "N/A";
-        //       formattedItem.billingStreetAddress1 = "N/A";
-        //       formattedItem.billingCity = "N/A";
-        //       formattedItem.billingCountry = "N/A";
-        //       formattedItem.billingPostCode = "N/A";
-        //       formattedItem.billingPhone = "N/A";
-        //       formattedItem.billingEmail = "N/A";
-        //       formattedItem.price = "N/A";
-        //       formattedItem.deliveryCharge = "N/A";
-        //       formattedItem.taxAmount = "N/A";
-        //       formattedItem.discount = "N/A";
-        //       formattedItem.total = "N/A";
-        //       formattedItem.invoiceNo = "N/A";
-        //       formattedItem.paymentAccount = "N/A";
-        //       formattedItem.paymentMode = "N/A";
-        //       formattedItem.orderStatus = "N/A";
-        //     }
-        //     return formattedItem;
-        //   });
-
-        //   this.setState({
-        //     data: formattedData,
-        //     loading: false,
-        //     error: null,
-        //   });
-        // } else {
-        //   // Handle the case where there is no data
-        //   this.setState({
-        //     data: [],
-        //     loading: false,
-        //     error: null,
-        //   });
-        // }
-        // }
       })
       .catch((error) => {
         if (error.response && error.response.data.status === false) {
@@ -187,7 +81,6 @@ class MyOrders extends Component {
           this.dispatch(setLoading({ loading: false }));
         }, 300);
       });
-    console.log("RESPONSE", this.state.data);
   };
 
   handleDetailsClick = (row) => {

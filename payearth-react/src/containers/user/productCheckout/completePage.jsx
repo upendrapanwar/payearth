@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import {
-    useStripe,
-} from "@stripe/react-stripe-js";
+import { useStripe } from "@stripe/react-stripe-js";
 import { Link } from "react-router-dom/cjs/react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import SpinnerLoader from "../../../components/common/SpinnerLoader";
 
 const SuccessIcon =
     <svg width="16" height="14" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -51,91 +50,270 @@ export default function CompletePage() {
     const authInfo = JSON.parse(localStorage.getItem("authInfo"));
     const [status, setStatus] = useState("default");
     const [intentId, setIntentId] = useState(null);
+    const [paymentId, setPaymentId] = useState(null);
+    const [invoiceData, setInvoiceData] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (!stripe) {
-            return;
-        }
+        if (!stripe) return;
 
         const clientSecret = new URLSearchParams(window.location.search).get(
             "payment_intent_client_secret"
         );
 
-        console.log("clientSecret in coplenete page", clientSecret)
-
-        if (!clientSecret) {
-            return;
-        }
+        if (!clientSecret) return;
 
         stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
-            if (!paymentIntent) {
-                return;
-            }
+            if (!paymentIntent) return;
+
             setStatus(paymentIntent.status);
             setIntentId(paymentIntent.id);
-            createInvoice(paymentIntent.id);
+            handleInvoiceCreation(paymentIntent.id);
         });
     }, [stripe]);
 
-    // useEffect(() => {
-
-    // }, [])
-
-    const createInvoice = (intentId) => {
-
-        // console.log("run create invoice function")
-
-        let reqBody = {
-            "paymentIntentId": intentId,
-        };
-        console.log("reqBody", reqBody)
-        axios.post("user/createInvoice/", reqBody, {
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json;charset=UTF-8",
-                Authorization: `Bearer ${authInfo.token}`,
-            },
-        })
-            .then((response) => {
-                if (response.data.status === true) {
-                    const data = response.data.data
-                    console.log("Invoice generated:", data)
+    const handleInvoiceCreation = async (intentId) => {
+        setLoading(true);
+        try {
+            const invoiceData = await createInvoice(intentId);
+            console.log("invoiceData", invoiceData);
+            if (invoiceData) {
+                const paymentData = formatPaymentData(invoiceData);
+                const paymentId = await managePaymentData(paymentData);
+                if (paymentId) {
+                    setPaymentId(paymentId);
+                    await manageOrderStatus(invoiceData, paymentId);
                 }
-            })
-            .catch((error) => {
-                if (error.response && error.response.data.status === false) {
-                    toast.error(error.response.data.message);
-                }
+            }
+        } catch (error) {
+            console.error("Error during invoice creation:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const createInvoice = async (intentId) => {
+        try {
+            const reqBody = { paymentIntentId: intentId };
+            const response = await axios.post("user/createInvoice/", reqBody, {
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json;charset=UTF-8",
+                    Authorization: `Bearer ${authInfo.token}`,
+                },
             });
+
+            if (response.data.status) {
+                const data = response.data.data;
+                setInvoiceData(data);
+                return data;
+            } else {
+                throw new Error(response.data.message || "Failed to create invoice.");
+            }
+        } catch (error) {
+            console.error("Error in createInvoice:", error);
+            toast.error("Failed to create invoice.");
+            return null;
+        }
+    };
+
+    const formatPaymentData = (invoiceData) => {
+        return [
+            {
+                userId: authInfo.id,
+                sellerId: null,
+                amountPaid: invoiceData.invoiceItem.amount / 100,
+                paymentAccount: "Stripe",
+                invoiceUrl: invoiceData.finalizedInvoice.invoice_pdf,
+                paymentStatus: invoiceData.finalizedInvoice.status,
+            },
+        ];
+    };
+
+    const managePaymentData = async (paymentData) => {
+        try {
+            const response = await axios.post("user/savepayment", paymentData, {
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json;charset=UTF-8",
+                    Authorization: `Bearer ${authInfo.token}`,
+                },
+            });
+
+            if (response.data.status) {
+                return response.data.data;
+            } else {
+                throw new Error(response.data.message || "Failed to save payment data.");
+            }
+        } catch (error) {
+            console.error("Error saving payment data:", error);
+            toast.error("Failed to save payment data.");
+            return null;
+        }
+    };
+
+    const manageOrderStatus = async (data, paymentId) => {
+        try {
+            const productData = JSON.parse(data.invoiceItem.metadata.cart);
+            console.log("productData", productData)
+            const orderResId = [];
+
+            for (let product of productData) {
+                if (!product.id || !product.name) {
+                    alert("Product ID and Title are required for all products.");
+                    return;
+                }
+
+                const payload = {
+                    ...product,
+                    status: "Order placed", // Processing // Shipped // Delivered
+                    userId: authInfo.id,
+                    paymentId: paymentId,
+                    product: {
+                        productId: product.id,
+                        quantity: product.quantity || 0,
+                        price: product.price || 0,
+                        color: product.color || "",
+                        size: product.size || ""
+                    },
+                    service: null,
+                    serviceCreateCharge: null,
+                    subscriptionPlan: null
+                };
+
+                const response = await axios.post("user/updateorderstatus", payload, {
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json;charset=UTF-8",
+                        Authorization: `Bearer ${authInfo.token}`,
+                    },
+                });
+
+                console.log("Update Order Response:", response.data);
+                orderResId.push(response.data.data.id);
+            }
+
+            // Pass orderResId to onSubmitHandler and ensure invoiceData is included
+            onSubmitHandler(orderResId, data, paymentId);
+        } catch (error) {
+            alert("Failed to create some order statuses.");
+            console.error("Error updating order status:", error);
+        }
+    };
+
+    const onSubmitHandler = (orderResId, data, paymentId) => {
+        // console.log("Final orderResId:", orderResId);
+        // console.log("Invoice Data:", data);
+        const url = 'user/saveorder';
+        // const productData = data.invoiceItem.metadata.cart;
+        if (data.finalizedInvoice.status === "paid") {
+            let reqBody = {}
+            reqBody = {
+                data: {
+                    userId: authInfo.id,
+                    paymentId: paymentId,
+                    sellerId: null,
+                    billingFirstName: "TEST FIRST NAME",
+                    billingLastName: "billingLastName",
+                    billingCity: "billingCity",
+                    billingCompanyName: "billingCompanyName",
+                    billingCounty: "billingCounty",
+                    billingPhone: "billingPhone",
+                    billingPostCode: "billingPostCode",
+                    billingStreetAddress: "billingStreetAddress",
+                    billingStreetAddress1: "billingStreetAddress1",
+                    billingEmail: "billingEmail",
+                    deliveryCharge: data.invoiceItem.metadata.deliveryCharge,
+                    taxPercent: 0,
+                    taxAmount: data.invoiceItem.metadata.taxAmount,
+                    discount: data.invoiceItem.metadata.discount,
+                    price: data.invoiceItem.amount / 100,
+                    total: data.invoiceItem.amount / 100,
+                    orderStatus: orderResId,
+                    isActive: true,
+                    isService: false,
+                    isSubscription: false,
+                },
+                user_id: authInfo.id
+            }
+
+            axios.post(url, reqBody.data, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${authInfo.token}`,
+                }
+            }).then((response) => {
+                toast.success('Order Placed Successfull', { autoClose: 3000 });
+                console.log(" Order Placed response++++ : ", response);
+                // console.log("response++++ : ", response.data.status);
+                if (response.data.status === true) {
+                    // this.addOrderTimeLine(response.data.data, orderStatus);
+                    // console.log("response userSave order : ", response);
+                    // this.saveOrderDetails(response.data.data, product_sku, orderStatus);
+                }
+            }).catch(error => {
+                console.log(error)
+                toast.error(error);
+            });
+        } else {
+            toast.dismiss();
+            toast.error('Order is not placed.Please try again.');
+        }
+
     };
 
     return (
         <div id="payment-status">
-            <div id="status-icon" style={{ backgroundColor: STATUS_CONTENT_MAP[status].iconColor }}>
-                {STATUS_CONTENT_MAP[status].icon}
-            </div>
-            <h2 id="status-text">{STATUS_CONTENT_MAP[status].text}</h2>
-            {intentId && <div id="details-table">
-                <table>
-                    <tbody>
-                        <tr>
-                            <td className="TableLabel">id</td>
-                            <td id="intent-id" className="TableContent">{intentId}</td>
-                        </tr>
-                        <tr>
-                            <td className="TableLabel">status</td>
-                            <td id="intent-status" className="TableContent">{status}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>}
-            {intentId && <a href={`https://dashboard.stripe.com/payments/${intentId}`} id="view-details" rel="noopener noreferrer" target="_blank">View details
-                <svg width="15" height="14" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ paddingLeft: '5px' }}>
-                    <path fillRule="evenodd" clipRule="evenodd" d="M3.125 3.49998C2.64175 3.49998 2.25 3.89173 2.25 4.37498V11.375C2.25 11.8582 2.64175 12.25 3.125 12.25H10.125C10.6082 12.25 11 11.8582 11 11.375V9.62498C11 9.14173 11.3918 8.74998 11.875 8.74998C12.3582 8.74998 12.75 9.14173 12.75 9.62498V11.375C12.75 12.8247 11.5747 14 10.125 14H3.125C1.67525 14 0.5 12.8247 0.5 11.375V4.37498C0.5 2.92524 1.67525 1.74998 3.125 1.74998H4.875C5.35825 1.74998 5.75 2.14173 5.75 2.62498C5.75 3.10823 5.35825 3.49998 4.875 3.49998H3.125Z" fill="#0055DE" />
-                    <path d="M8.66672 0C8.18347 0 7.79172 0.391751 7.79172 0.875C7.79172 1.35825 8.18347 1.75 8.66672 1.75H11.5126L4.83967 8.42295C4.49796 8.76466 4.49796 9.31868 4.83967 9.66039C5.18138 10.0021 5.7354 10.0021 6.07711 9.66039L12.7501 2.98744V5.83333C12.7501 6.31658 13.1418 6.70833 13.6251 6.70833C14.1083 6.70833 14.5001 6.31658 14.5001 5.83333V0.875C14.5001 0.391751 14.1083 0 13.6251 0H8.66672Z" fill="#0055DE" />
-                </svg>
-            </a>}
-            <div className="ctn_btn"><Link to="/product-listing" className="view_more">Continue shopping</Link></div>
+            {loading ? (
+                <SpinnerLoader />
+            ) : (
+                <>
+                    <div
+                        id="status-icon"
+                        style={{ backgroundColor: STATUS_CONTENT_MAP[status].iconColor }}
+                    >
+                        {STATUS_CONTENT_MAP[status].icon}
+                    </div>
+                    <h2 id="status-text">{STATUS_CONTENT_MAP[status].text}</h2>
+                    {intentId && (
+                        <div id="details-table">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td className="TableLabel">id</td>
+                                        <td id="intent-id" className="TableContent">
+                                            {intentId}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td className="TableLabel">status</td>
+                                        <td id="intent-status" className="TableContent">
+                                            {status}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                    {intentId && (
+                        <a
+                            href={`https://dashboard.stripe.com/payments/${intentId}`}
+                            id="view-details"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                        >
+                            View details
+                        </a>
+                    )}
+                    <div className="ctn_btn">
+                        <Link to="/product-listing" className="view_more">
+                            Continue shopping
+                        </Link>
+                    </div>
+                </>
+            )}
         </div>
     );
 }
+

@@ -5,15 +5,17 @@ import { useHistory } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { setIsLoginModalOpen } from "../../../store/reducers/global-reducer";
 import { toast } from "react-toastify";
+import check_symbol from '../../../assets/icons/check-symbol.svg';
+// check-symbol
 import axios from "axios";
 
-function Total() {
-  // const [price, setTotalPrice] = useState('')
+function Total(data) {
   const dispatch = useDispatch();
   const history = useHistory();
   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-
+  const couponData = data.couponData;
+  console.log("couponData", couponData)
   const cart = useSelector((state) => state.cart.cart)
   // console.log("cart", cart)
   const getTotal = () => {
@@ -26,14 +28,27 @@ function Total() {
     return { totalPrice, totalQuantity }
   }
 
+  const amount = couponData !== null ? `${getTotal().totalPrice - getTotal().totalPrice * couponData.discount_per / 100}` : `${getTotal().totalPrice}`;
+  const finalAmount = parseFloat(amount);
+
+  const additionalData = {
+    "finalAmount": finalAmount,
+    "discount": couponData !== null ? `${getTotal().totalPrice * couponData.discount_per / 100}` : "0",
+    "deliveryCharge": "0",
+    "taxAmount": "0",
+  }
+
   const handleCheckout = () => {
     let reqBody = {
-      "amount": getTotal().totalPrice,
+      "amount": finalAmount,
       "quantity": getTotal().totalQuantity,
       "name": userInfo.name,
       "email": userInfo.email,
-      "cart": cart
+      "cart": cart,
+      "additionalData": additionalData
     };
+
+    console.log("reqBody", reqBody)
     axios.post("user/createPaymentIntent/", reqBody, {
       headers: {
         Accept: "application/json",
@@ -79,24 +94,30 @@ function Total() {
   return (
     <div>
       <div className="cart_footer cart_wrap border-bottom">
-        <div className="ctn_btn"><Link to="/" className="view_more">Continue shopping</Link></div>
+        {/* <div className="ctn_btn"><Link to="/" className="view_more">Continue shopping</Link></div> */}
         <div className="cart_foot_price">
           <div className="cfp"><span>Price ({getTotal().totalQuantity} items)</span> <b>${getTotal().totalPrice}</b></div>
-          <div className="cfp"><span>Discount</span> <b>0000 BTC</b></div>
+          <div className="cfp"><span>Discount</span> <b>{couponData !== null ? `${couponData.discount_per}%` : 'No Discount'}</b> </div>
+          <div className="cfp"><span>Final Price</span> <b>{`$${amount}`}</b></div>
           <div className="cfp"><span>Delivery Charges</span> <b>Free</b></div>
         </div>
       </div>
       <div className="cart_footer cart_wrap border-bottom justify-content-end">
         <div className="cart_foot_price">
-          <div className="cfp"><span>Sub Total</span> <b>${getTotal().totalPrice}</b></div>
+          <div className="cfp"><span>Sub Total</span> <b>{`$${amount}`}</b></div>
 
-          <div className="cfp mt-4">
-            <Link className="btn custom_btn btn_yellow"
-              to="#"
-              onClick={openmodalHandler}
-            >
-              Place Order
-            </Link>
+          <div className="cfp mt-4 text-center">
+            <div className="d-grid col-6 mx-auto">
+              <button className="btn custom_btn btn_yellow m-2"
+                onClick={openmodalHandler}
+              >
+                Place Order
+              </button>
+            </div>
+            <br /> OR
+            <div className="ctn_btn m-4">
+              <Link to="/" className="view_more">Continue shopping</Link>
+            </div>
             {/* <button className="btn custom_btn btn_yellow" onClick={openmodalHandler}>Place Order</button> */}
           </div>
         </div>

@@ -89,13 +89,10 @@ class ServiceCheckout extends Component {
 
 
     // Stripe function
-
     componentWillMount() {
         var storedDataset = sessionStorage.getItem('selectPlan');
         if (storedDataset) {
             var retrievedDataset = JSON.parse(storedDataset);
-            console.log("data for session storage", retrievedDataset.nickname)
-            console.log("selectCard", retrievedDataset)
             this.setState({ plan_Id: retrievedDataset.id })
             this.setState({ selectCard: retrievedDataset })
         } else {
@@ -105,96 +102,53 @@ class ServiceCheckout extends Component {
         var serviceData = localStorage.getItem('serviceData');
         if (serviceData) {
             var retriveServiceData = JSON.parse(serviceData);
-            console.log("Check ServiceData name", retriveServiceData.name);
-            console.log("Check ServiceData name", retriveServiceData);
             this.setState({ serviceName: retriveServiceData.name })
             this.setState({ serviceCategory: retriveServiceData.category })
             this.setState({ serviceCategoryName: retriveServiceData.categoryName })
         }
     }
 
-    fetchStripePlans = async () => {
-        console.log("fetchStrip plan function is run")
-        try {
-            const stripeSecretKey = process.env.REACT_APP_SECRET_KEY;
-            const response = await axios.get(`https://api.stripe.com/v1/plans`, {
-                headers: {
-                    Authorization: `Bearer ${stripeSecretKey}`,
-                },
-            });
-            console.log("response.data", response.data.data)
-            console.log("response.data", response.data)
-
-            var storedDataset = sessionStorage.getItem('selectPlan');
-
-            if (!storedDataset) {
-                // this.setState({ plan_Id: 'plan_PtQDZnQWN42U7q' })
-                this.setState({ plan_Id: 'price_1OhntbD2za5c5GtOpiypaDOt' })
-                // service plan id is change when realtime time data will fetch..
-            }
-
-            // setPlans(fetchedPlans);
-        } catch (error) {
-            console.error('Error fetching Stripe plans:', error);
-        }
-
-    };
-
-    // handleCheckOut = () => {
-    //     console.log("RUNNNNN>>>>>>handleCheckOut")
-    //     this.setState({ showModal: true });
+    // fetchStripePlans = async () => {
+    //     try {
+    //         const stripeSecretKey = process.env.REACT_APP_SECRET_KEY;
+    //         const response = await axios.get(`https://api.stripe.com/v1/plans`, {
+    //             headers: {
+    //                 Authorization: `Bearer ${stripeSecretKey}`,
+    //             },
+    //         });
+    //         var storedDataset = sessionStorage.getItem('selectPlan');
+    //         if (!storedDataset) {
+    //             this.setState({ plan_Id: 'price_1OhntbD2za5c5GtOpiypaDOt' })
+    //         }
+    //     } catch (error) {
+    //         console.error('Error fetching Stripe plans:', error);
+    //     }
     // };
 
+    handleCheckOut = () => {
+        this.setState({ showModal: true });
+    };
+
     handleSubmit = async (event, elements, stripe) => {
-        // var currrent_Sub_Id = sessionStorage.getItem('currrent_Sub_Id');
-        // if (currrent_Sub_Id) {
-        //     try {
-        //         const response = await axios.delete(`https://api.stripe.com/v1/subscriptions/${currrent_Sub_Id}`, {
-        //             headers: {
-        //                 Authorization: `Bearer ${process.env.REACT_APP_SECRET_KEY}`, // Replace with your actual Stripe secret key
-        //                 'Content-Type': 'application/x-www-form-urlencoded',
-        //             },
-        //         });
-        //         alert("Subscription successfully canceled")
-        //         console.log("Subscription successfully canceled: ", response.data);
-        //     } catch (error) {
-        //         alert("Error canceling subscription")
-        //         console.log("Error", error)
-        //     }
-        // }
         this.setState({ isLoading: true });
         event.preventDefault();
-        console.log("Just to check handleSubmit")
-        console.log("Elements", elements)
-        console.log("event", event)
-        console.log("stripe", stripe)
         if (!stripe || !elements) {
             return;
         }
         const cardElement = elements.getElement(CardElement);
         const { token, error } = await stripe.createToken(cardElement);
-
         if (error) {
-            console.error("Create Token Error:", error);
             this.setState({ isLoading: false });
             toast.error(error.message);
         } else {
-            // You can handle the token or payment method ID here
-            console.log('Token or Payment Method ID:', token.id);
             this.setState({ paymentMethodId: token.id })
-            // Now, you can send the token or payment method ID to your server for further processing
         }
-
         this.handleSubscribeStripe();
-        // this.savePlan();
     };
 
     handleSubscribeStripe = () => {
         const { email, paymentMethodId, plan_Id, authName, selectCard } = this.state;
-        console.log("Plan ID :", plan_Id)
-
         const url = 'seller/create-subscription';
-
         const subData = {
             email,
             paymentMethodId,
@@ -208,47 +162,33 @@ class ServiceCheckout extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`
             }
         }).then((response) => {
-            console.log("subscription plan id", response.data.data.id)
-
             this.setState({ stripeResponse: response.data })
-            // this.setState({ sub_id: response.data.data.id })
             if (selectCard !== null) {
                 this.savePlan(response.data.data.id);
             }
-            // this is subscription_id plan id..
             const paymentData = [{
-                'userId': this.authInfo.id,
-                'sellerId': "",
+                'userId': null,
+                'sellerId': this.authInfo.id,
                 'amountPaid': response.data.data.plan.amount / 100,
                 'paymentMode': response.data.data.plan.currency,
                 'paymentAccount': 'Stripe',
                 'invoiceUrl': response.data.data.latest_invoice.invoice_pdf,
                 'paymentStatus': response.data.data.latest_invoice.status,
             }];
-            console.log("paymentData", paymentData)
-            // this.onSubmitHandler();
             var paymentIds = this.managePaymentData(paymentData);
             let paymentId;
             paymentIds.then((result) => {
                 paymentId = result;
                 this.setState({ "paymentId": paymentId })
-                this.onSubmitHandler();
-
+                this.manageOrderStatus()
             })
-            // this.savePlan(response.data.data.id);
-
         }).catch((error) => {
             console.log("error", error);
         })
     }
 
-    // handle Plan save
-
     savePlan = (sub_id) => {
         const { selectCard } = this.state;
-        // var currrent_Sub_Id = sessionStorage.getItem('currrent_Sub_Id');
-        console.log("selecet Card", selectCard);
-
         const url = '/seller/createSellerSubscriptionPlan';
         const planData = {
             id: selectCard.id,
@@ -265,7 +205,6 @@ class ServiceCheckout extends Component {
                 isActive: true
             }]
         }
-        console.log("plan......>>>.", planData)
         axios.post(url, planData, {
             headers: {
                 'Accept': 'application/json',
@@ -274,34 +213,27 @@ class ServiceCheckout extends Component {
             }
         }).then((response) => {
             console.log(response)
-            // if (currrent_Sub_Id) {
-            //     this.stripeCanclePayment(currrent_Sub_Id);
-            // }
-
         }).catch((err) => {
             console.log("error", err)
         })
     }
 
-    // If client want to cancele previous reccuring payment then use this function.
-
-    stripeCanclePayment = async (currrent_Sub_Id) => {
-        try {
-            // const sub_id = parseFloat(currrent_Sub_Id);
-            const sub_id = currrent_Sub_Id
-            const response = await axios.delete(`https://api.stripe.com/v1/subscriptions/${sub_id}`, {
-                headers: {
-                    Authorization: `Bearer ${process.env.REACT_APP_STRIPE_SECRET_KEY}`, // Replace with your actual Stripe secret key
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-            });
-            alert("Subscription successfully canceled")
-            console.log("Subscription successfully canceled: ", response.data);
-        } catch (error) {
-            alert("Error canceling subscription")
-            console.log("Error", error)
-        }
-    }
+    // stripeCanclePayment = async (currrent_Sub_Id) => {
+    //     try {
+    //         const sub_id = currrent_Sub_Id
+    //         const response = await axios.delete(`https://api.stripe.com/v1/subscriptions/${sub_id}`, {
+    //             headers: {
+    //                 Authorization: `Bearer ${process.env.REACT_APP_STRIPE_SECRET_KEY}`, // Replace with your actual Stripe secret key
+    //                 'Content-Type': 'application/x-www-form-urlencoded',
+    //             },
+    //         });
+    //         alert("Subscription successfully canceled")
+    //         console.log("Subscription successfully canceled: ", response.data);
+    //     } catch (error) {
+    //         alert("Error canceling subscription")
+    //         console.log("Error", error)
+    //     }
+    // }
 
 
     /**
@@ -317,19 +249,12 @@ class ServiceCheckout extends Component {
                 'Authorization': `Bearer ${this.authInfo.token}`,
             }
         })
-        console.log("managepayment Data", res.data.data);
         let productid = res.data.data;
         if (typeof productid != 'undefined') {
             return productid;
         } else {
             return false;
         }
-        {/*}.then((response) => {
-            //this.setState({ orderStatus: response.data.data.orderstatus })
-            console.log(response.data.data)
-        }).catch(error => {
-            console.log(error)
-        });*/}
     }
     /**************************************************************************/
     /**************************************************************************/
@@ -404,7 +329,6 @@ class ServiceCheckout extends Component {
      * Get order tracking time data
      */
     getOrderTrackingTime = () => {
-
         axios.get('user/ordertrackingtime', {
             headers: {
                 'Accept': 'application/json',
@@ -492,54 +416,78 @@ class ServiceCheckout extends Component {
         })
         return { totalPrice, totalQuantity, totalAmmount, discount, tax }
     }
-    /******************************************************************************/
-    /******************************************************************************/
+
+
+    manageOrderStatus = async () => {
+        const { paymentId, selectCard } = this.state;
+        try {
+            const orderResId = [];
+            if (selectCard !== null) {
+                // for subscription plan
+                const payload = {
+                    status: "Subscription payment complete",
+                    userId: this.authInfo.id,
+                    paymentId: paymentId,
+                    product: null,
+                    service: null,
+                    serviceCreateCharge: null,
+                    subscriptionPlan: {
+                        _id: selectCard._id,
+                        planId: selectCard.id,
+                    }
+                }
+                const response = await axios.post("seller/updateorderstatus", payload, {
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json;charset=UTF-8",
+                        Authorization: `Bearer ${this.authInfo.token}`,
+                    },
+                });
+                orderResId.push(response.data.data.id);
+            } else {
+                const payload = {
+                    status: "Payment complete",
+                    userId: this.authInfo.id,
+                    paymentId: paymentId,
+                    product: null,
+                    service: null,
+                    serviceCreateCharge: true,
+                    subscriptionPlan: null
+                }
+                const response = await axios.post("seller/updateorderstatus", payload, {
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json;charset=UTF-8",
+                        Authorization: `Bearer ${this.authInfo.token}`,
+                    },
+                });
+                orderResId.push(response.data.data.id);
+            }
+            this.onSubmitHandler(orderResId)
+        } catch (error) {
+            alert("Failed to create some order statuses.");
+            console.error("Error updating order status:", error);
+        }
+    };
 
     /**
      * Submit form data when order is placed
      * 
      * @param {*} event 
      */
-    onSubmitHandler = event => {
+    onSubmitHandler = (orderResId) => {
         const { selectCard, planPrice, stripeResponse } = this.state;
-
-        console.log("price amount selected=> ", selectCard !== null ? selectCard.amount / 100 : planPrice,)
+        // console.log("orderResId in onSubmit Handler", orderResId)
+        // console.log("price amount selected=> ", selectCard !== null ? selectCard.amount / 100 : planPrice,)
 
         const url = '/seller/saveorder';
 
         if (stripeResponse.status === true) {
-            let orderStatusData = this.state.orderStatus;
-            let orderStatus = '6137423b2651fc157c545d50';//pending
-            console.log(orderStatusData);
-            if (typeof orderStatusData != 'undefined') {
-                orderStatusData && orderStatusData.map((d) => {
-                    if (d.title === "Completed") {
-                        orderStatus = d._id;
-                    }
-                })
-            }
-
-            let product_sku = this.state.productSku;
             let reqBody = {}
-            // let user = this.authInfo.id
-
             reqBody = {
-                count: {
-                    page: 1,
-                    skip: 0,
-                    limit: 2,
-                    data: '',
-                },
-                sorting: {
-                    sort_type: "date",
-                    sort_val: "desc"
-                },
                 data: {
                     userId: this.authInfo.id,
-                    productId: product_sku,
                     paymentId: this.state.paymentId,
-                    sellerId: product_sku,
-                    product_sku: product_sku,
                     billingFirstName: this.state.billingFirstName,
                     billingLastName: this.state.billingLastName,
                     billingCity: this.state.billingCity,
@@ -557,14 +505,13 @@ class ServiceCheckout extends Component {
                     discount: 0,
                     price: selectCard !== null ? selectCard.amount / 100 : planPrice,
                     total: selectCard !== null ? selectCard.amount / 100 : planPrice,
-                    orderStatus: orderStatus,
+                    orderStatus: orderResId,
                     isActive: true,
-                    isService: false
+                    isService: false,
+                    isSubscription: true,
                 },
                 user_id: this.authInfo.id
             }
-            console.log("submit handler: ", reqBody);
-
             axios.post(url, reqBody.data, {
                 headers: {
                     'Accept': 'application/json',
@@ -572,14 +519,15 @@ class ServiceCheckout extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`,
                 }
             }).then((response) => {
-                console.log("response++++ : ", response);
-                console.log("response++++ : ", response.data.status);
-                if (response.data.status === true) {
-                    this.addOrderTimeLine(response.data.data, orderStatus);
-                    console.log("response userSave order : ", response);
-                    this.saveOrderDetails(response.data.data, product_sku, orderStatus);
+                // console.log("response++++ : ", response);
+                // console.log("response++++ : ", response.data.status);
+                // if (response.data.status === true) {
+                //     this.addOrderTimeLine(response.data.data, orderStatus);
+                //     console.log("response userSave order : ", response);
+                //     this.saveOrderDetails(response.data.data, product_sku, orderStatus);
+                // }
+                this.handleCheckOut();
 
-                }
             }).catch(error => {
                 console.log(error)
                 toast.error(error);
@@ -631,9 +579,6 @@ class ServiceCheckout extends Component {
     saveOrderDetails = (orderId, orderStatus) => {
 
         const { planPrice, selectCard } = this.state;
-
-        console.log("selectCard", selectCard)
-        console.log("planPrice", planPrice)
 
         let reqBody = {}
         let prodArray = [];
@@ -720,41 +665,11 @@ class ServiceCheckout extends Component {
                     //   this.dispatch(setLoading({ loading: false }));
                 }, 300);
             });
-
-
-
-
-
-            // toast.success('Payment Successfull', { autoClose: 3000 });
-            // this.props.history.push('/my-banners')
-            // toast.dismiss();
-            // toast.success('Payment successful!', 2000, function () {
-            //     this.props.history.push('/my-banners')
-            // });
         }).catch(error => {
             console.log(error)
             toast.error(error);
         });
     }
-    /**
-     * Sets the form data
-     * 
-     * @param {*} field 
-     * @param {*} value 
-     */
-    //onChange(field, value) {
-    // parent class change handler is always called with field name and value
-    //    this.setState({field: value});
-    //this.setState({ "productSku": product_sku })
-    //}
-    // onChange(evt) {
-    //     // parent class change handler is always called with field name and value
-    //     const value = evt.target.value;
-    //     this.setState({ ...this.state, [evt.target.name]: value });
-
-    // }
-    /******************************************************************************/
-    /******************************************************************************/
 
     clearSessionStorage = () => {
         sessionStorage.clear();
@@ -762,46 +677,15 @@ class ServiceCheckout extends Component {
 
     render() {
         const { selectCard, planPrice, serviceName, serviceCategory, serviceCategoryName, isLoading, stripeResponse } = this.state;
-        console.log('serviceCategory---', serviceCategory)
-        this.onSubmit = () => {
-            let disCode = document.getElementById('myCoupon').value
-            console.log(disCode)
-            let reqBody = {}
-            let user = this.authInfo.id
-            reqBody = {
-                count: {
-                    page: 1,
-                    skip: 0,
-                    limit: 2,
-                    data: '',
-                },
-                sorting: {
-                    sort_type: "date",
-                    sort_val: "desc"
-                },
-                data: disCode,
-                user_id: user
-            }
+        // this.onSubmit = () => {
+        //     let disCode = document.getElementById('myCoupon').value
+        //     console.log(disCode)
+        //     let reqBody = {}
+        //     let user = this.authInfo.id
 
-            if (disCode === '') {
-                toast.error('Coupon code is blank')
-            } else {
-                //check isActive is true
-                axios.post('user/coupons/check', reqBody, {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json;charset=UTF-8',
-                        'Authorization': `Bearer ${this.authInfo.token}`,
-                    }
-                }).then((response) => {
-                    this.setState({ apiData: response.data.data.coupons })
 
-                }).catch(error => {
-                    console.log(error)
-                    toast.error('This code is already used or code is not match')
-                });//check isActive is true
-            }
-        }    //onSubmit() 
+
+        // }    //onSubmit() 
 
         return (
             <React.Fragment>
@@ -853,7 +737,8 @@ class ServiceCheckout extends Component {
                                             </form>
                                         </div>
                                     </div>
-                                </div> :
+                                </div>
+                                    :
 
                                     <div className="payment_method_section">
                                         <div className="payment_list">

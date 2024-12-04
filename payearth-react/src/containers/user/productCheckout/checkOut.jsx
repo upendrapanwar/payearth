@@ -3,7 +3,9 @@ import Header from "../../../components/user/common/Header";
 import PageTitle from "../../../components/user/common/PageTitle";
 import Footer from "../../../components/common/Footer";
 import { connect } from "react-redux";
+import { setLoading } from '../../../store/reducers/global-reducer';
 import axios from "axios";
+import * as Yup from 'yup';
 import { Formik, Field, FieldArray, ErrorMessage } from 'formik';
 import { Box, Text } from "rebass";
 import styled from "styled-components";
@@ -13,6 +15,7 @@ import { Link } from "react-router-dom/cjs/react-router-dom.min";
 import { useHistory } from "react-router-dom";
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
+import arrow_back from '../../../assets/icons/arrow-back.svg';
 // import InjectedCheckoutForm from "./InjectedCheckoutForm";
 import CheckoutForm from "./checkoutForm";
 
@@ -25,6 +28,7 @@ class CheckOut extends Component {
         this.buttonRef = React.createRef;
         this.authInfo = store.getState().auth.authInfo;
         this.state = {
+            userDetails: [],
             formStatus: false,
             chargeData: "",
             checkoutData: "",
@@ -76,7 +80,7 @@ class CheckOut extends Component {
                 Authorization: `Bearer ${this.authInfo.token}`,
             },
         });
-        console.log(res.data.data);
+        // console.log(res.data.data);
         let productid = res.data.data;
         if (typeof productid != "undefined") {
             return productid;
@@ -94,10 +98,66 @@ class CheckOut extends Component {
         this.getOrderStaus();
         //this.getOrderTrackingTime();
         this.getProductSku();
+        this.getUserData();
 
     }
     /**************************************************************************/
     /**************************************************************************/
+
+    getUserData = () => {
+        const userId = this.authInfo.id
+        axios.get('user/my-profile/' + userId, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${this.authInfo.token}`
+            }
+        }).then((response) => {
+            if (response.data.status) {
+                let resData = response.data.data;
+                // console.log("resData", resData)
+                this.setState({
+                    userDetails: resData,
+                });
+            }
+        }).catch(error => {
+            console.log(error)
+        }).finally(() => {
+            setTimeout(() => {
+                // dispatch(setLoading({ loading: false }));
+            }, 300);
+        });
+    }
+
+
+    // componentDidMount() {
+    //     const { dispatch } = this.props;
+    //     dispatch(setLoading({ loading: true }));
+    //     axios.get('user/my-profile/' + this.authInfo.id, {
+    //         headers: {
+    //             'Accept': 'application/json',
+    //             'Content-Type': 'application/json;charset=UTF-8',
+    //             'Authorization': `Bearer ${this.authInfo.token}`
+    //         }
+    //     }).then((response) => {
+    //         if (response.data.status) {
+    //             let resData = response.data.data;
+    //             // console.log("resData", resData)
+    //             // this.setState({
+    //             //     userDetails: resData,                
+    //             // });
+    //             // console.log("Response data from backend", resData)
+    //         }
+    //     }).catch(error => {
+    //         console.log(error)
+    //     }).finally(() => {
+    //         setTimeout(() => {
+    //             dispatch(setLoading({ loading: false }));
+    //         }, 300);
+    //     });
+    // }
+
+
 
     /**
      * Get the sellet id by product id
@@ -503,22 +563,57 @@ class CheckOut extends Component {
     /******************************************************************************/
     /******************************************************************************/
 
+    handleSubmit = (values) => {
+        const updatedValues = {
+            ...values,
+            role: 'user'
+        };
+        const { dispatch } = this.props;
+        dispatch(setLoading({ loading: true }));
+        axios.put(`user/edit-profile/${this.authInfo.id}`, updatedValues, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                "Authorization": `Bearer ${this.authInfo.token}`
+            }
+        }).then((response) => {
+            if (response.data.status) {
+                toast.success(response.data.message, { autoClose: 3000 });
+                this.handleEdit();
+            }
+        }).catch(error => {
+            toast.dismiss();
+            if (error.response && error.response.data.status === false) {
+                toast.error(error.response.data.message, { autoClose: 3000 });
+            }
+        }).finally(() => {
+            setTimeout(() => {
+                dispatch(setLoading({ loading: false }));
+            }, 300);
+        });
+    }
+
+    handleEdit = () => {
+        this.setState({ userDetails: this.state.userDetails })
+        let editProfile = localStorage.getItem('editProfile');
+        if (editProfile !== null && editProfile === 'false') {
+            localStorage.setItem('editProfile', true);
+            this.setState({ editProfile: true });
+        } else {
+            localStorage.setItem('editProfile', false);
+            this.setState({ editProfile: false });
+        }
+    }
+
     render() {
-        const { stripeData } = this.state;
-        console.log('stripeData', stripeData.client_secret);
-        // const clientSecret = stripeData.client_secret
-        // // // const dpmCheckerLink = data.dpmCheckerLink
-        // // console.log("data", data)
-
-        // const appearance = {
-        //     theme: 'flat'
-        // };
-
-        // const loader = 'auto';
+        const { stripeData, userDetails, editProfile } = this.state;
+        console.log("stripeData", stripeData)
+        const reviewOrder = JSON.parse(stripeData.metadata.cart);
+        // console.log("reviewOrder", reviewOrder)
 
         const options = {
             clientSecret: stripeData.client_secret,
-            appearance: { theme: 'stripe' }, // Customize the appearance if needed
+            appearance: { theme: 'flat' },
         };
 
         const cart = this.props.cart;
@@ -531,7 +626,7 @@ class CheckOut extends Component {
         // submit Function
         this.onSubmit = () => {
             let disCode = document.getElementById("myCoupon").value;
-            console.log(disCode);
+            // console.log(disCode);
             //this.setState({ couponCode: disCode })
             let reqBody = {};
             let user = this.authInfo.id;
@@ -597,47 +692,65 @@ class CheckOut extends Component {
                                 <div className="cart my_cart">
                                     <div className="dash_inner_wrap">
                                         <Formik
-                                            initialValues={{ name: '', category: "", subCategory: "", brand: "", description: '', specifications: '', price: '', featuredImg: '' }}
-                                        // onSubmit={values => this.handleSubmit(values)}
-                                        // validationSchema={addProductSchema}
+                                            initialValues={{
+                                                name: this.state.userDetails.name,
+                                                email: this.state.userDetails.email,
+                                                phone: this.state.userDetails.phone || '',
+                                                address: {
+                                                    street: this.state.userDetails?.address?.street || '',
+                                                    city: this.state.userDetails?.address?.city || '',
+                                                    state: this.state.userDetails?.address?.state || '',
+                                                    country: this.state.userDetails?.address?.country || '',
+                                                    zip: this.state.userDetails?.address?.zip || '',
+                                                }
+                                            }}
+                                            validationSchema={Yup.object().shape({
+                                                name: Yup.string().required("Name is required.").min(3, 'Name is too short - should be 3 chars minimum.').max(50, 'Name is too long - should be 50 chars maximum.'),
+                                                email: Yup.string().email().required("Email is required."),
+                                                phone: Yup.string().matches(/^[0-9]+$/, "Phone number is not valid").min(10, 'Phone number is too short').max(15, 'Phone number is too long').required("Phone is required."),
+                                                address: Yup.object().shape({
+                                                    street: Yup.string().required("Street is required."),
+                                                    city: Yup.string().required("City is required."),
+                                                    state: Yup.string().required("State is required."),
+                                                    country: Yup.string().required("Country is required."),
+                                                    zip: Yup.number().required("Zip code is required.").positive().integer(),
+                                                })
+                                            })}
+                                            onSubmit={(values, { setSubmitting }) => {
+                                                this.handleSubmit(values);
+                                                setTimeout(() => {
+                                                    setSubmitting(false);
+                                                }, 400);
+                                            }}
+                                            enableReinitialize={true}
                                         >
-                                            {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isValid, }) => (
+                                            {({
+                                                values,
+                                                errors,
+                                                touched,
+                                                handleChange,
+                                                handleBlur,
+                                                handleSubmit,
+                                                isValid,
+                                            }) => (
                                                 <form onSubmit={handleSubmit} encType="multipart/form-data">
                                                     <div className="row">
                                                         <div className="col-md-12 pt-4 d-flex justify-content-between align-items-center">
-                                                            <div className="dash_title">BILLING DETAILS</div>
+                                                            <div className="dash_title">Getting Your Order</div>
+
                                                             <div className="">
                                                                 <span>
                                                                     <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/product-stock-management">
-                                                                        {/* <img src={arrow_back} alt="linked-in" />&nbsp; */}
+                                                                        <img src={arrow_back} alt="linked-in" />&nbsp;
                                                                         Back
                                                                     </Link>
                                                                 </span>
                                                             </div>
                                                         </div>
-
-                                                        <div className="cart_wrap mb-5">
-                                                            <div className="items_incart d-flex justify-content-center align-items-center">
-                                                                <span>have a coupons <a href="/">Click here to have</a> </span>
-                                                            </div>
-                                                            <div className="cart_wrap">
-                                                                <div className="checkout_cart_wrap">
-                                                                    <p>IF YOU HAVE A COUPON CODE,PLEASE APPLY IT BELOW </p>
-                                                                    <div className="input-group d-flex">
-                                                                        <input type="text" className="form-control" placeholder="Enter your coupons code" aria-label="Example text with button addon" id="myCoupon" />
-                                                                        <button className="btn custom_btn btn_yellow" type="button"
-                                                                        // onClick={this.onSubmit}
-                                                                        >
-                                                                            {" "}
-                                                                            Apply coupns code
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
+                                                        <hr className="my-3" />
                                                         <div className="col-md-6">
-                                                            <div className="row">
+                                                            <h5 className="font-semibold">Shipping Information</h5>
+                                                            <div className="row mt-5">
                                                                 <div className="col-md-6 mb-4">
                                                                     <label htmlFor="firstName" className="form-label">
                                                                         First Name <small className="text-danger">*</small>
@@ -647,13 +760,9 @@ class CheckOut extends Component {
                                                                         className="form-control"
                                                                         name="firstName"
                                                                         placeholder="First Name"
-                                                                    // onChange={handleChange}
-                                                                    // onBlur={handleBlur}
-                                                                    // value={values.firstName}
+                                                                        value={first}
+                                                                        disabled={true}
                                                                     />
-                                                                    {/* {touched.firstName && errors.firstName ? (
-                                                                        <small className="text-danger">{errors.firstName}</small>
-                                                                          ) : null} */}
                                                                 </div>
                                                                 <div className="col-md-6 mb-4">
                                                                     <label htmlFor="lastName" className="form-label">
@@ -664,121 +773,162 @@ class CheckOut extends Component {
                                                                         className="form-control"
                                                                         name="lastName"
                                                                         placeholder="Last Name"
-                                                                    // onChange={handleChange}
-                                                                    // onBlur={handleBlur}
-                                                                    // value={values.lastName}
+                                                                        value={last}
+                                                                        disabled={true}
                                                                     />
-                                                                    {/* {touched.lastName && errors.lastName ? (
-                                                                           <small className="text-danger">{errors.lastName}</small>
-                                                                          ) : null} */}
                                                                 </div>
                                                             </div>
 
                                                             <div className="mb-4">
-                                                                <label htmlFor="name" className="form-label">Company Name {'(Optional)'} </label>
-                                                                <input type="text" className="form-control"
-                                                                    name="name"
-                                                                    placeholder="Company Name"
-                                                                // onChange={handleChange}
-                                                                // onBlur={handleBlur}
-                                                                // value={values.name}
+                                                                <label htmlFor="name" className="form-label">Email <small className="text-danger">*</small></label>
+                                                                <input
+                                                                    type="email"
+                                                                    className="form-control"
+                                                                    name="email"
+                                                                    placeholder="Email"
+                                                                    onChange={handleChange}
+                                                                    // onBlur={handleBlur}
+                                                                    value={values.email}
+                                                                    disabled={true}
+                                                                    maxLength="50"
                                                                 />
-                                                                {/* {touched.name && errors.name ? (
-                                                                       <small className="text-danger">{errors.name}</small>
-                                                                        ) : null} */}
-                                                            </div>
-
-                                                            <div className="mb-4">
-                                                                <label htmlFor="name" className="form-label">County/Region <small className="text-danger">*</small></label>
-                                                                <input type="text" className="form-control"
-                                                                    name="name"
-                                                                    placeholder="County/Region"
-                                                                // onChange={handleChange}
-                                                                // onBlur={handleBlur}
-                                                                // value={values.name}
-                                                                />
-                                                                {/* {touched.name && errors.name ? (
-                                  <small className="text-danger">{errors.name}</small>
-                                ) : null} */}
-                                                            </div>
-
-                                                            <div className="mb-4">
-                                                                <label htmlFor="name" className="form-label">Street Address <small className="text-danger">*</small></label>
-                                                                <input type="text" className="form-control"
-                                                                    name="name"
-                                                                    placeholder="Street Address"
-                                                                // onChange={handleChange}
-                                                                // onBlur={handleBlur}
-                                                                // value={values.name}
-                                                                />
-                                                                {/* {touched.name && errors.name ? (
-                                  <small className="text-danger">{errors.name}</small>
-                                ) : null} */}
-                                                            </div>
-
-                                                            <div className="mb-4">
-                                                                <label htmlFor="name" className="form-label">Town/City <small className="text-danger">*</small></label>
-                                                                <input type="text" className="form-control"
-                                                                    name="name"
-                                                                    placeholder="Town/City"
-                                                                // onChange={handleChange}
-                                                                // onBlur={handleBlur}
-                                                                // value={values.name}
-                                                                />
-                                                                {/* {touched.name && errors.name ? (
-                                  <small className="text-danger">{errors.name}</small>
-                                ) : null} */}
-                                                            </div>
-
-                                                            <div className="mb-4">
-                                                                <label htmlFor="name" className="form-label">Postcode <small className="text-danger">*</small></label>
-                                                                <input type="text" className="form-control"
-                                                                    name="name"
-                                                                    placeholder="Postcode"
-                                                                // onChange={handleChange}
-                                                                // onBlur={handleBlur}
-                                                                // value={values.name}
-                                                                />
-                                                                {/* {touched.name && errors.name ? (
-                                  <small className="text-danger">{errors.name}</small>
-                                ) : null} */}
+                                                                {touched.email && errors.email && (
+                                                                    <small className="text-danger">{errors.email}</small>
+                                                                )}
                                                             </div>
 
                                                             <div className="mb-4">
                                                                 <label htmlFor="name" className="form-label">Phone <small className="text-danger">*</small></label>
-                                                                <input type="text" className="form-control"
-                                                                    name="name"
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control"
+                                                                    name="phone"
                                                                     placeholder="Phone"
-                                                                // onChange={handleChange}
-                                                                // onBlur={handleBlur}
-                                                                // value={values.name}
+                                                                    onChange={handleChange}
+                                                                    // onBlur={handleBlur}
+                                                                    value={values.phone}
+                                                                    disabled={!editProfile}
                                                                 />
-                                                                {/* {touched.name && errors.name ? (
-                                  <small className="text-danger">{errors.name}</small>
-                                ) : null} */}
+                                                                {touched.phone && errors.phone && (
+                                                                    <small className="text-danger">{errors.phone}</small>
+                                                                )}
+                                                            </div>
+
+
+                                                            <div className="mb-4">
+                                                                <label htmlFor="name" className="form-label">County/Region <small className="text-danger">*</small></label>
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control"
+                                                                    name="address.country"
+                                                                    placeholder="County/Region"
+                                                                    onChange={handleChange}
+                                                                    // onBlur={handleBlur}
+                                                                    value={values.address.country}
+                                                                    disabled={!editProfile}
+                                                                />
+                                                                {touched.address?.country && errors.address?.country && (
+                                                                    <small className="text-danger">{errors.address.country}</small>
+                                                                )}
                                                             </div>
 
                                                             <div className="mb-4">
-                                                                <label htmlFor="name" className="form-label">Email <small className="text-danger">*</small></label>
-                                                                <input type="text" className="form-control"
-                                                                    name="name"
-                                                                    placeholder="Email"
-                                                                // onChange={handleChange}
-                                                                // onBlur={handleBlur}
-                                                                // value={values.name}
+                                                                <label htmlFor="name" className="form-label">Street Address <small className="text-danger">*</small></label>
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control"
+                                                                    name="address.street"
+                                                                    placeholder="Street Address"
+                                                                    onChange={handleChange}
+                                                                    // onBlur={handleBlur}
+                                                                    value={values.address.street}
+                                                                    disabled={!editProfile}
                                                                 />
-                                                                {/* {touched.name && errors.name ? (
-                                                                      <small className="text-danger">{errors.name}</small>
-                                                                     ) : null} */}
+                                                                {touched.address?.street && errors.address?.street && (
+                                                                    <small className="text-danger">{errors.address.street}</small>
+                                                                )}
+                                                            </div>
+
+                                                            <div className="mb-4">
+                                                                <label htmlFor="name" className="form-label">Town/City <small className="text-danger">*</small></label>
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control"
+                                                                    name="address.city"
+                                                                    placeholder="Town/City"
+                                                                    onChange={handleChange}
+                                                                    // onBlur={handleBlur}
+                                                                    value={values.address.city}
+                                                                    disabled={!editProfile}
+                                                                />
+                                                                {touched.address?.city && errors.address?.city && (
+                                                                    <small className="text-danger">{errors.address.city}</small>
+                                                                )}
+                                                            </div>
+
+                                                            <div className="mb-4">
+                                                                <label htmlFor="name" className="form-label">Zip Code <small className="text-danger">*</small></label>
+                                                                <input
+                                                                    type="number"
+                                                                    className="form-control"
+                                                                    name="address.zip"
+                                                                    placeholder="Zip Code"
+                                                                    onChange={handleChange}
+                                                                    // onBlur={handleBlur}
+                                                                    value={values.address.zip}
+                                                                    disabled={!editProfile}
+                                                                />
+                                                                {touched.address?.zip && errors.address?.zip && (
+                                                                    <small className="text-danger">{errors.address.zip}</small>
+                                                                )}
+                                                            </div>
+
+
+                                                            <div className="form-group text-center mb-4">
+                                                                {editProfile ? (
+                                                                    <div>
+                                                                        <button type="submit" className="btn custom_btn btn_yellow_bordered">Save</button>
+                                                                        <button type="button" className="btn custom_btn btn_yellow_bordered ms-2" onClick={this.handleEdit}>Cancel</button>
+                                                                    </div>
+                                                                ) : (
+                                                                    <button type="button" className="btn custom_btn btn_yellow_bordered" onClick={this.handleEdit}>Click to Update</button>
+                                                                )}
                                                             </div>
                                                         </div>
 
                                                         {/* ******************************************PAYMENT FORM ********************************** */}
                                                         <div className="col-md-6">
-                                                            <div className="mb-4">
-                                                                <Elements options={options} stripe={stripePromise} >
-                                                                    <CheckoutForm />
-                                                                </Elements>
+                                                            <h5 className="text-md font-semibold mb-4 text-center">Review Your Order</h5>
+                                                            <div className="checkout_cart_element mt-2">
+                                                                <div className="mb-5">
+                                                                    {reviewOrder.map((item, index) => (
+                                                                        <div className="d-flex justify-content-between align-items-center border-bottom py-2">
+                                                                            <div className="product-data text-start">
+                                                                                {/* <h6 className="mb-1">{`${index + 1}) ${item.name}`}</h6> */}
+                                                                                <h6 className="mb-1">{`${index + 1}) ${item.name.split(' ').slice(0, 4).join(' ')}${item.name.split(' ').length > 4 ? '...' : ''}`}</h6>
+                                                                            </div>
+                                                                            {/* <div className="product-quantity text-start">
+                                                                                <h6 className="mb-1">{`x`}</h6>
+                                                                            </div> */}
+                                                                            <div className="product-quantity text-end">
+                                                                                <h6 className="mb-1"><b>{`${item.quantity}`}</b> qty.</h6>
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+                                                                    <div className="cart_footer cart_wrap border-bottom">
+                                                                        <div className="cart_foot_price">
+                                                                            <div className="cfp"><span>Total Item</span> <b>{reviewOrder.length}</b></div>
+                                                                            <div className="cfp"><span>Subtotal </span> <b>{`$${stripeData.amount / 100}`}</b></div>
+                                                                            <div className="cfp"><span>Tax </span> <b></b></div>
+                                                                            <div className="cfp"><span>Grand Total</span> <b>{`$${stripeData.amount / 100}`}</b></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="mb-4">
+                                                                    <Elements options={options} stripe={stripePromise} >
+                                                                        <CheckoutForm />
+                                                                    </Elements>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>

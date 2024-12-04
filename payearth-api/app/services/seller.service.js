@@ -2541,19 +2541,23 @@ async function saveorderdetails(req) {
 
 async function updateOrderStatus(req) {
   try {
-    var param = req.body;
-    console.log("_id=" + param.orderId);
-    console.log("order_status=" + param.orderStatus);
-    //update in order
-    await Order.findOneAndUpdate(
-      { _id: param.orderId },
-      { orderStatus: param.orderStatus },
-      { new: true }
-    );
-    return true;
-  } catch (err) {
-    console.log("Error", err);
-    return false;
+    const data = req.body;
+    let input;
+    input = {
+      title: data.status,
+      product: data.product,
+      isActive: true,
+      userId: data.userId,
+      paymentId: data.paymentId,
+      service: data.service,
+      subscriptionPlan: data.subscriptionPlan,
+      serviceCreateCharge: data.serviceCreateCharge
+    }
+    const newOrderStatus = new OrderStatus(input);
+    const savedOrderStatus = await newOrderStatus.save();
+    return savedOrderStatus;
+  } catch (error) {
+    console.error(error);
   }
 }
 

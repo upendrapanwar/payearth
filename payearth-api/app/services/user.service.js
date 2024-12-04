@@ -69,6 +69,9 @@ module.exports = {
   getSaveLaterList,
   removeProductFromWishlist,
   removeProductFromSavelater,
+
+  applyMyCouponCode,
+
   getMyCoupons,
   getNewCoupons,
   checkPayment,
@@ -852,14 +855,35 @@ async function removeProductFromSavelater(req) {
   return await Savelater.findByIdAndRemove(savelater._id);
 }
 
+
+
+// **************Coupons*************
+async function applyMyCouponCode(req) {
+  try {
+    const { couponCode } = req.params;
+    const coupon = await Coupon.find({ code: couponCode, isActive: true });
+    if (!coupon) {
+      return { status: false, message: 'Coupon not found or inactive' };
+    }
+    return coupon;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
 async function getMyCoupons(req) {
   try {
     var param = req.body;
+
+    console.log("param in getMy coupon", param)
     var id = req.params.id;
     var sortOption = { createdAt: "desc", isActive: "desc" }; //default
     var limit = "";
     var skip = "";
     var whereCondition = { userId: id, isActive: true };
+
+
 
     if (param.count) {
       limit = parseInt(param.count.limit);
@@ -894,6 +918,8 @@ async function getMyCoupons(req) {
         availableCoupons: availableCoupons,
         coupons: coupons,
       };
+
+      console.log("result get my coupons", result)
       return result;
     }
     return false;
@@ -902,6 +928,9 @@ async function getMyCoupons(req) {
     return false;
   }
 }
+
+
+
 async function getNewCoupons(req) {
   try {
     let now = new Date();
@@ -2153,19 +2182,23 @@ async function saveorderdetails(req) {
 
 async function updateOrderStatus(req) {
   try {
-    var param = req.body;
-    console.log("_id=" + param.orderId);
-    console.log("order_status=" + param.orderStatus);
-    //update in order
-    await Order.findOneAndUpdate(
-      { _id: param.orderId },
-      { orderStatus: param.orderStatus },
-      { new: true }
-    );
-    return true;
-  } catch (err) {
-    console.log("Error", err);
-    return false;
+    const data = req.body;
+    let input;
+    input = {
+      title: data.status,
+      product: data.product,
+      isActive: true,
+      userId: data.userId,
+      paymentId: data.paymentId,
+      service: data.service,
+      subscriptionPlan: data.subscriptionPlan,
+      serviceCreateCharge: data.serviceCreateCharge
+    }
+    const newOrderStatus = new OrderStatus(input);
+    const savedOrderStatus = await newOrderStatus.save();
+    return savedOrderStatus;
+  } catch (error) {
+    console.error(error);
   }
 }
 /************************************************************************************/
@@ -2635,11 +2668,7 @@ async function createSubscription(req, res) {
 // STRIPE Service.............
 async function serviceCharges(req, res) {
   const { paymentMethodId, email, amount, authName } = req.body;
-  console.log("amount", amount);
-
   // const email = "test@gmail.com";
-
-  console.log("paymentMethodId", paymentMethodId);
   // console.log("email", email);
   // console.log("authName", authName);
 
@@ -2660,8 +2689,6 @@ async function serviceCharges(req, res) {
       },
       name: authName,
     });
-
-    console.log("customer", customer);
 
     await stripe.paymentMethods.attach(paymentMethod.id, {
       customer: customer.id,
@@ -2702,13 +2729,12 @@ async function serviceCharges(req, res) {
         // allow_redirects: 'always',  // Always allow redirects for payment methods that require it
       },
       confirm: true,
-      return_url: 'https://pay.earth/',  // Set your return URL here
+      return_url: 'https://pay.earth/',
     });
     const response = {
       paymentIntent: paymentIntent,
       invoice: finalizedInvoice,
     };
-    // console.log("Confirmed Payment Intent", response);
     return response
   } catch (error) {
     console.log("Error", error)
@@ -2719,7 +2745,7 @@ async function serviceCharges(req, res) {
 
 // product *******************************STRIPE***************************************
 async function createPaymentIntent(req, res) {
-  const { amount, name, email, cart } = req.body;
+  const { amount, name, email, cart, additionalData } = req.body;
 
   const trimmedCart = cart.map(item => ({
     id: item.id,
@@ -2729,14 +2755,10 @@ async function createPaymentIntent(req, res) {
   }));
   try {
     const stringifiedCart = JSON.stringify(trimmedCart);
-
-    // console.log("stringifiedCart", stringifiedCart)
-
     const customer = await stripe.customers.create({
       email: email,
       name: name,
     });
-
 
     // console.log("customer", customer)
     const paymentIntent = await stripe.paymentIntents.create({
@@ -2746,6 +2768,10 @@ async function createPaymentIntent(req, res) {
       payment_method_types: ['card'],
       metadata: {
         cart: stringifiedCart,
+        finalAmount: additionalData.finalAmount,
+        discount: additionalData.discount,
+        deliveryCharge: additionalData.deliveryCharge,
+        taxAmount: additionalData.taxAmount,
       },
     });
 
@@ -2758,8 +2784,20 @@ async function createPaymentIntent(req, res) {
 async function createInvoice(req, res) {
   const { paymentIntentId } = req.body;
 
-  // console.log("paymentIntentId", paymentIntentId)
   const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+  // Create an Invoice Item with the payment amount
+  const invoiceItem = await stripe.invoiceItems.create({
+    customer: paymentIntent.customer,
+    amount: paymentIntent.amount,
+    currency: paymentIntent.currency,
+    description: "Payment for products",
+    metadata: {
+      ...paymentIntent.metadata, // Include the PaymentIntent's metadata
+    },
+  });
+  // console.log("invoiceItem", invoiceItem);
+
   const invoice = await stripe.invoices.create({
     customer: paymentIntent.customer,
     collection_method: "send_invoice",
@@ -2767,10 +2805,14 @@ async function createInvoice(req, res) {
     auto_advance: true,
     description: "Invoice for payment",
   });
-  await stripe.invoices.finalizeInvoice(invoice.id);
 
   // console.log("invoice", invoice)
-  return invoice;
+  // await stripe.invoices.finalizeInvoice(invoice.id);
+
+  const finalizedInvoice = await stripe.invoices.finalizeInvoice(invoice.id);
+
+  // console.log("finalizedInvoice", finalizedInvoice)
+  return { finalizedInvoice, invoiceItem };
 
 }
 

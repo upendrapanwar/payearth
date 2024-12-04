@@ -12,7 +12,7 @@ import store from '../../store/index';
 import successImg from "../../assets/images/success_png.png"
 import { Elements, CardElement, ElementsConsumer } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import Modal from "react-bootstrap/Modal"; 
+import Modal from "react-bootstrap/Modal";
 
 const Button = styled.button({
     "&:hover": { cursor: "pointer" },
@@ -41,7 +41,6 @@ class ServiceCheckOut extends Component {
             orderStatus: [],
             paymentId: '',
             productSku: [],
-            //status: "paid" | "unpaid" | ["failure", []],
             status: "unpaid",
             data: [],
             reqBody: {
@@ -100,23 +99,11 @@ class ServiceCheckOut extends Component {
             return;
         }
         const cardElement = elements.getElement(CardElement);
-
-        console.log("cardElement", cardElement)
-        // TEST *********************
-        // const { error, paymentMethod } = await stripe.createPaymentMethod({
-        //     type: 'card',
-        //     card: cardElement,
-        // });
-
-        // TEST**********************/
         const { token, error } = await stripe.createToken(cardElement);
-
         if (error) {
-            console.error("card validation error : ", error);
             toast.error(error.message);
             this.setState({ isLoading: false });
         } else {
-            // console.log("this.authInfo.token", this.authInfo.token)
             const response = await fetch('/user/serviceCharge', {
                 method: 'POST',
                 headers: {
@@ -132,13 +119,11 @@ class ServiceCheckOut extends Component {
                 }),
             });
             const paymentIntent = await response.json();
-            console.log("paymentIntent : ", paymentIntent);
-
             if (paymentIntent.status === true) {
                 // this.setState({ stripeResponse: paymentIntent });
                 const paymentData = [{
                     'userId': this.authInfo.id,
-                    'sellerId': "",
+                    'sellerId': null,
                     'amountPaid': paymentIntent.data.paymentIntent.amount_received / 100,
                     // 'paymentMode': "",
                     'paymentAccount': 'Stripe',
@@ -151,67 +136,13 @@ class ServiceCheckOut extends Component {
                 paymentIds.then((result) => {
                     paymentId = result;
                     this.setState({ "paymentId": paymentId })
-                    this.onSubmitHandler();
+                    // this.onSubmitHandler();
+                    this.manageOrderStatus()
                 })
                 this.setState({ stripeResponse: paymentIntent });
             }
         }
     };
-
-    // handleSubscribeStripe = () => {
-    //     const { email, paymentMethodId,
-    //         // plan_Id,
-    //         authName } = this.state;
-    //     const url = '/user/serviceCharge';
-
-    //     const subData = {
-    //         email,
-    //         paymentMethodId,
-    //         // plan_Id,
-    //         authName
-    //     };
-
-    //     axios.post(url, subData, {
-    //         headers: {
-    //             'Accept': 'application/json',
-    //             'Content-Type': 'application/json;charset=UTF-8',
-    //             'Authorization': `Bearer ${this.authInfo.token}`
-    //         }
-    //     }).then((response) => {
-    //         console.log("Subscription created succesfully....", response.data);
-    //         console.log("response", response.data.data)
-    //         // console.log("invoice url : ",response.data.data.latest_invoice.invoice_pdf)
-    //         // console.log("currency", response.data.data.plan.currency)
-    //         console.log("paymentStatus", response.data.data.latest_invoice.status)
-    //         this.setState({ stripeResponse: response.data })
-
-    //         const paymentData = [{
-    //             'userId': this.authInfo.id,
-    //             'sellerId': this.state.productSku,
-    //             'amountPaid': response.data.data.plan.amount / 100,
-    //             'paymentMode': response.data.data.plan.currency,
-    //             'paymentAccount': 'Stripe',
-    //             'invoiceUrl': response.data.data.latest_invoice.invoice_pdf,
-    //             'paymentStatus': response.data.data.latest_invoice.status,
-    //         }];
-    //         console.log("paymentData", paymentData)
-    //         // this.onSubmitHandler();
-    //         var paymentIds = this.managePaymentData(paymentData);
-    //         let paymentId;
-    //         paymentIds.then((result) => {
-    //             paymentId = result;
-    //             this.setState({ "paymentId": paymentId })
-    //             this.onSubmitHandler();
-
-    //         })
-    //     }).catch((error) => {
-    //         console.log("error", error);
-    //     })
-    // }
-
-
-
-
 
     /**
      * Manages payment Data
@@ -419,60 +350,69 @@ class ServiceCheckOut extends Component {
         })
         return { totalPrice, totalQuantity, totalAmmount, discount, tax }
     }
-    /******************************************************************************/
-    /******************************************************************************/
+
+    manageOrderStatus = async () => {
+        const { paymentId } = this.state;
+        try {
+            // console.log("paymentId", this.state.paymentId);
+            // console.log("data", data);
+            // console.log("serviceDetails", this.state.serviceDetails);
+            const orderResId = [];
+
+            if (this.state.serviceDetails !== null) {
+                const payload = {
+                    status: "Order complete",
+                    userId: this.authInfo.id,
+                    paymentId: paymentId,
+                    product: null,
+                    service: {
+                        serviceId: this.state.serviceDetails.id,
+                        serviceCode: this.state.serviceDetails.serviceCode,
+                    },
+                    serviceCreateCharge: null,
+                    subscriptionPlan: null
+                }
+                const response = await axios.post("user/updateorderstatus", payload, {
+                    headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json;charset=UTF-8",
+                        Authorization: `Bearer ${this.authInfo.token}`,
+                    },
+                });
+                orderResId.push(response.data.data.id);
+            }
+            this.onSubmitHandler(orderResId)
+        } catch (error) {
+            alert("Failed to create some order statuses.");
+            console.error("Error updating order status:", error);
+        }
+    };
+
 
     /**
      * Submit form data when order is placed 
      * 
      * @param {*} event 
      */
-    onSubmitHandler = () => {
-        const { selectCard, stripeResponse } = this.state;
-
+    onSubmitHandler = (orderResId) => {
+        const { stripeResponse, paymentId } = this.state;
+        console.log("orderResId", orderResId)
         console.log("stripeResponse: ", stripeResponse)
         console.log("amount", stripeResponse.data.paymentIntent.amount_received / 100);
         const url = 'user/saveorder';
 
         if (stripeResponse.status === true) {
-            let orderStatusData = this.state.orderStatus;
-            let orderStatus = '';//pending
-            console.log(orderStatusData);
-            if (typeof orderStatusData != 'undefined') {
-                orderStatusData && orderStatusData.map((d) => {
-                    if (d.title == "Completed") {
-                        orderStatus = d._id;
-                    }
-                })
-            }
-
-            let product_sku = this.state.productSku;
-            let reqBody = {}
-            // let user = this.authInfo.id
-
+            let reqBody = {};
             reqBody = {
-                count: {
-                    page: 1,
-                    skip: 0,
-                    limit: 2,
-                    data: '',
-                },
-                sorting: {
-                    sort_type: "date",
-                    sort_val: "desc"
-                },
                 data: {
                     userId: this.authInfo.id,
-                    productId: product_sku,
-                    paymentId: this.state.paymentId,
-                    sellerId: product_sku,
-                    product_sku: product_sku,
+                    paymentId: paymentId,
+                    sellerId: null,
                     billingFirstName: this.state.billingFirstName,
                     billingLastName: this.state.billingLastName,
                     billingCity: this.state.billingCity,
                     billingCompanyName: this.state.billingCompanyName,
                     billingCounty: this.state.billingCounty,
-                    billingNote: this.state.billingNote,
                     billingPhone: this.state.billingPhone,
                     billingPostCode: this.state.billingPostCode,
                     billingStreetAddress: this.state.billingStreetAddress,
@@ -484,9 +424,10 @@ class ServiceCheckOut extends Component {
                     discount: 0,
                     price: stripeResponse.data.paymentIntent.amount_received / 100,
                     total: stripeResponse.data.paymentIntent.amount_received / 100,
-                    orderStatus: orderStatus,
+                    orderStatus: orderResId,
                     isActive: true,
-                    isService: true
+                    isService: true,
+                    isSubscription: false,
                 },
                 user_id: this.authInfo.id
             }
@@ -499,13 +440,12 @@ class ServiceCheckOut extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`,
                 }
             }).then((response) => {
-                // toast.success('Order Placed Successfull', { autoClose: 3000 });
-                // console.log("response++++ : ", response);
-                // console.log("response++++ : ", response.data.status);
                 if (response.data.status === true) {
-                    this.addOrderTimeLine(response.data.data, orderStatus);
-                    // console.log("response userSave order : ", response);
-                    this.saveOrderDetails(response.data.data, product_sku, orderStatus);
+                    toast.success('Payment Done.', { autoClose: 3000 });
+                    this.handleCheckOut();
+                    // this.addOrderTimeLine(response.data.data, orderStatus);
+                    // // console.log("response userSave order : ", response);
+                    // this.saveOrderDetails(response.data.data, product_sku, orderStatus);
 
                 }
             }).catch(error => {
@@ -560,14 +500,14 @@ class ServiceCheckOut extends Component {
      * @param {*} orderStatus 
      */
     saveOrderDetails = (orderId, orderStatus) => {
-        const serviceId=sessionStorage.getItem('serviceId');
+        const serviceId = sessionStorage.getItem('serviceId');
         let reqBody = {}
         var prodArray = [];
         // for (var i = 0; i < subscriptionPlanData.length; i++) {
         prodArray.push({
             orderId: orderId,
             //   productId: productData[i].productId,
-            serviceId:serviceId,
+            serviceId: serviceId,
             //  quantity: productData[i].quantity,
             price: this.state.stripeResponse.data.paymentIntent.amount_received / 100,
             //  color: productData[i].color,
