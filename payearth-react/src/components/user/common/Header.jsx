@@ -660,7 +660,15 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                     <i className="icon">
                       <img src={shoppingBagIcon} alt="" />
                     </i>{" "}
-                    Orders
+                    Product Orders
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/service-order" onClick={() => removeBackdrop()}>
+                    <i className="icon">
+                      <img src={serviceIcon} alt="heart" />
+                    </i>{" "}
+                    Service Orders
                   </Link>
                 </li>
                 <li>
@@ -709,14 +717,6 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                       <img src={heartIcon} alt="heart" />
                     </i>{" "}
                     Savelater List
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/service-order" onClick={() => removeBackdrop()}>
-                    <i className="icon">
-                      <img src={serviceIcon} alt="heart" />
-                    </i>{" "}
-                    Service Orders
                   </Link>
                 </li>
                 <li>

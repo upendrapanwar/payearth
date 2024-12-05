@@ -61,7 +61,7 @@ class MyCart extends Component {
 
     render() {
         const cart = this.props.cart;
-        // console.log(cart);
+        console.log("cart", cart);
         const getTotal = () => {
             let totalQuantity = 0
             let totalPrice = 0
@@ -80,7 +80,7 @@ class MyCart extends Component {
                     <div className="container">
                         <div className="bg-white rounded-3">
                             <div className='row'>
-                                <div className="col-md-8">
+                                <div className={cart.length > 0 ? "col-md-12" : "col-md-8"}>
                                     <div className="cart my_cart m-2">
                                         {getTotal().totalQuantity === 0 ?
                                             <div align="center">
@@ -116,7 +116,41 @@ class MyCart extends Component {
                                         }
                                     </div>
                                 </div>
-                                <div className="col-md-4">
+                                {cart && cart.length === 1 && (
+                                    <div className="col-md-4">
+                                        <div className="cart_wrap mb-5">
+                                            <div className="items_incart d-flex justify-content-center align-items-center">
+                                                <span>have a coupons <a href="/my-coupons">Click here to have</a> </span>
+                                            </div>
+                                            <div className="cart_wrap">
+                                                <div className="checkout_cart_wrap">
+                                                    <p>IF YOU HAVE A COUPON CODE,PLEASE APPLY IT BELOW </p>
+                                                    <div className="input-group d-flex">
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            placeholder="Enter your coupons code"
+                                                            aria-label="Example text with button addon"
+                                                            value={this.state.couponCode}
+                                                            onChange={(e) => this.setState({ couponCode: e.target.value })}
+                                                            id="myCoupon"
+                                                        />
+                                                        <button
+                                                            className="btn custom_btn btn_yellow"
+                                                            type="button"
+                                                            onClick={this.handleApplyCoupon}
+                                                        >
+                                                            {" "}
+                                                            Apply coupns code
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <Total couponData={this.state.couponData} />
+                                    </div>
+                                )}
+                                {/* <div className="col-md-4">
                                     <div className="cart_wrap mb-5">
                                         <div className="items_incart d-flex justify-content-center align-items-center">
                                             <span>have a coupons <a href="/my-coupons">Click here to have</a> </span>
@@ -147,7 +181,7 @@ class MyCart extends Component {
                                         </div>
                                     </div>
                                     <Total couponData={this.state.couponData} />
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     </div>

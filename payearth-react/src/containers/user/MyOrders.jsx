@@ -28,7 +28,7 @@ class MyOrders extends Component {
     this.userInfo = store.getState().auth.userInfo;
     this.state = {
       data: [],
-      loading: false,
+      loading: true,
       error: null,
       show: false,
       showModal: false,
@@ -41,44 +41,29 @@ class MyOrders extends Component {
   }
 
   getOrderDetails = () => {
-    this.dispatch(setLoading({ loading: true }));
-    console.log(this.authInfo.id);
-    console.log(this.userInfo.name);
-    axios
-      .get("user/orderdetails/" + this.authInfo.id, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json;charset=UTF-8",
-          Authorization: `Bearer ${this.authInfo.token}`,
-        },
-      })
+    axios.get("user/orderdetails", {
+      params: {
+        authorId: this.authInfo.id,
+        status: false,
+      },
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json;charset=UTF-8",
+        Authorization: `Bearer ${this.authInfo.token}`,
+      },
+    })
       .then((response) => {
-        console.log("RES", response.data.data.data);
-        console.log(
-          "ORDER status",
-          response.data.data.data[0].order.orderStatus
-        );
-        this.setState({
-          data: response.data.data.data,
-          loading: false
-        })
+        const data = response.data.data.data;
+        this.setState({ data: data, loading: false });
       })
       .catch((error) => {
         if (error.response && error.response.data.status === false) {
           toast.error(error.response.data.message);
-          this.setState({
-            data: [],
-            loading: false,
-            error: error,
-            lgShow: false,
-            selectedRowData: null,
-            selectedRowDataPDF: null,
-          });
         }
       })
       .finally(() => {
         setTimeout(() => {
-          this.dispatch(setLoading({ loading: false }));
+          this.setState({ loading: false });
         }, 300);
       });
   };
@@ -115,32 +100,24 @@ class MyOrders extends Component {
       orderDate,
     } = row;
 
-    const itemRows =
-      row.orderDetails.length > 0
-        ? row.orderDetails
-          .map(
-            (item, index) => `
-      <tr>
+    const itemRows = row.orderStatus.length > 0 ? row.orderStatus.map((item, index) =>
+      `<tr>
         <td style="width: 50px;">${index + 1}</td>
-        <td style="width: 70px;">${item.productId[0].name}</td>
-        <td style="width: 100px;">${item.quantity[0]}</td>
-        <td class="text-end" style="width: 70px;">$ ${item.price.toFixed(
-              2
-            )}</td>
-        <td class="text-end" style="width: 70px;">$ ${(
-                item.price * item.quantity[0]
-              ).toFixed(2)}</td>
+        <td style="width: 70px;">${item.product.productId[0]?.name || 'No product name'}</td>
+        <td style="width: 100px;">${item.product.quantity}</td>
+        <td class="text-end" style="width: 70px;">$ ${item.product.price}</td>
+        <td class="text-end" style="width: 70px;">$ ${item.product.price * item.product.quantity}</td>
       </tr>`
-          )
-          .join("")
-        : `<tr>
+    )
+      .join("")
+      : `<tr>
         <td>Data is not available</td>
       </tr>`;
 
     const htmlData = `<div id="pdfContent"  style="padding:25px 50px;">
       <div class="d-flex flex-row justify-content-between align-items-start bg-light w-100 p-4">
         <div class="w-100">
-          <h4 class="fw-bold my-2">${userName}</h4>
+          <h4 class="fw-bold my-2 text-dark">${userName}</h4>
           <h6 class="fw-bold text-secondary mb-1">
             Order Id: ${orderCode}
           </h6>
@@ -256,41 +233,41 @@ class MyOrders extends Component {
   data_column = [
     {
       name: "Order ID",
-      selector: (row, i) => row.order.orderCode,
+      selector: (row, i) => row.orderCode,
       sortable: true,
       width: "200px",
     },
     {
       name: "Invoice Number",
-      selector: (row, i) => row.invoiceNo,
+      selector: (row, i) => row.paymentId.invoiceNo,
       sortable: true,
       width: "200px",
-    },
-    {
-      name: "Payment Account",
-      selector: (row, i) => row.paymentAccount,
-      sortable: true,
-      width: "200px",
-    },
-    {
-      name: "Total Amount",
-      selector: (row, i) => row.order.price,
-      sortable: true,
-      width: "150px",
     },
     // {
-    //   name: "Order Status",
-    //   selector: (row, i) => row.orderStatus,
+    //   name: "Payment Account",
+    //   // selector: (row, i) => row.paymentAccount,
     //   sortable: true,
     //   width: "200px",
     // },
     {
+      name: "Total Amount",
+      selector: (row, i) => `$${row.price}`,
+      sortable: true,
+      width: "150px",
+    },
+    {
+      name: "Order Status",
+      selector: (row, i) => row.paymentId.paymentStatus === "paid" ? "processing" : "",
+      sortable: true,
+      width: "200px",
+    },
+    {
       name: "Order Date",
-      // selector: (row, i) => row.order.createdAt,
+      // selector: (row, i) => row.createdAt,
       sortable: true,
 
       cell: (row) => {
-        const dateString = row.order.createdAt;
+        const dateString = row.createdAt;
         const date = new Date(dateString);
         const formattedDate = `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}`;
         return <div>{formattedDate}</div>;
@@ -327,14 +304,7 @@ class MyOrders extends Component {
   render() {
     const { data, loading, error, selectedRowData, downloading } = this.state;
     const userName = this.userInfo.name;
-    console.log("Render RESPONSE", data);
-    console.log(data.orderCode);
-    if (loading) {
-      return <SpinnerLoader />;
-    }
-    if (error) {
-      return <div>Error: {error}</div>;
-    }
+    console.log("data", data);
 
     return (
       <React.Fragment>
@@ -396,7 +366,7 @@ class MyOrders extends Component {
               <div>
                 <div className="d-flex flex-row justify-content-between align-items-start bg-light w-100 p-4">
                   <div className="w-100">
-                    <h4 className="fw-bold my-2">{userName}</h4>
+                    <h4 className="fw-bold my-2 text-dark">{userName}</h4>
                     <h6 className="fw-bold text-secondary mb-1">
                       Order Id : {selectedRowData.orderCode || ""}
                     </h6>
@@ -426,20 +396,13 @@ class MyOrders extends Component {
                     </Col>
                     <Col md={4}>
                       <div className="fw-bold">Billed From:</div>
-                      <div>{selectedRowData.sellerName || ""}</div>
-                      <div>{selectedRowData.sellerAddress || ""}</div>
-                      <div>
-                        {selectedRowData.sellerState || ""}
-                        {", "}
-                        {selectedRowData.sellerCountry || ""}
-                      </div>
-                      <div>{selectedRowData.sellerEmail || ""}</div>
+                      <div>{'Pay Earth'}</div>
                     </Col>
                     <Col md={4}>
                       <div className="fw-bold mt-2">Date Of Issue:</div>
-                      <div>{selectedRowData.orderDate || ""}</div>
+                      <div>{selectedRowData.paymentId.createdAt || ""}</div>
                       <div className="fw-bold mt-2">Invoice:</div>
-                      <div>{selectedRowData.invoiceNo || ""}</div>
+                      <div>{selectedRowData.paymentId.invoiceNo || ""}</div>
                     </Col>
                   </Row>
                   <Table className="mb-0 table-responsive">
@@ -457,28 +420,25 @@ class MyOrders extends Component {
                       </tr>
                     </thead>
                     <tbody>
-                      {selectedRowData.orderDetails.length > 0 ? (
-                        selectedRowData.orderDetails.map((item, i) => {
+                      {selectedRowData.orderStatus.length > 0 ? (
+                        selectedRowData.orderStatus.map((item, i) => {
                           return (
                             <tr id={i} key={i}>
                               <td style={{ width: "50px" }}>{i + 1}</td>
                               <td style={{ width: "70px" }}>
-                                {item.productId[0].name}
+                                {item.product.productId[0]?.name || 'No product name'}
                               </td>
                               <td style={{ width: "100px" }}>
-                                {item.quantity[0]}
+                                {item.product.quantity}
+                              </td>
+                              <td className="text-end" style={{ width: "70px" }}>
+                                $ {item.product.price}
                               </td>
                               <td
                                 className="text-end"
                                 style={{ width: "70px" }}
                               >
-                                $ {item.price}
-                              </td>
-                              <td
-                                className="text-end"
-                                style={{ width: "70px" }}
-                              >
-                                $ {item.price * item.quantity[0]}
+                                $ {item.product.price * item.product.quantity}
                               </td>
                             </tr>
                           );
@@ -538,13 +498,12 @@ class MyOrders extends Component {
                       </tr>
                     </tbody>
                   </Table>
-                  <div className="bg-light py-3 px-4 rounded">
+                  <div className="bg-light py-3 px-4 rounded text-center">
                     Amount is charged as per the terms and conditions.
                   </div>
                 </div>
               </div>
             )}
-            ;
           </Modal.Body>
         </Modal>
       </React.Fragment>

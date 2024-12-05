@@ -197,7 +197,7 @@ router.post("/payments/:id", getPayments);
 router.get("/paymentsbyid/:id", getPaymentsById);
 router.get("/orders/:id", getOrderById);
 router.get("/orderbyid/:id", getOrderDataById);
-router.get("/orderdetails/:id", getOrderDetails);
+router.get("/orderdetails", getOrderDetails);
 router.get("/orderstatus", getOrderStatus);
 router.get("/ordertrackingtime", getOrderTrackingTime);
 router.post("/saveordertracking", saveOrdertrackingTime);
@@ -743,17 +743,11 @@ function getOrderDataById(req, res, next) {
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 function getOrderDetails(req, res, next) {
-  userService
-    .getOrderDetails(req.params.id)
-    .then((order) =>
-      order
-        ? res.status(200).json({ status: true, data: order })
-        : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: {} })
-    )
+  userService.getOrderDetails(req)
+    .then((order) => order ? res.status(200).json({ status: true, data: order }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
     .catch((err) => next(res.json({ status: false, message: err })));
 }
+
 function addComplaint(req, res, next) {
   if (req.files && req.files.fileValidationError) {
     return res

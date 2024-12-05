@@ -75,12 +75,12 @@ function ServiceOrder() {
   };
 
   const columns = [
-    {
-      name: "Name",
-      // selector: (row) => row.userId.name,
-      selector: (row) => ` ${row.userId.name}`,
-      sortable: true,
-    },
+    // {
+    //   name: "Name",
+    //   // selector: (row) => row.userId.name,
+    //   // selector: (row) => ` ${row.userId.name}`,
+    //   sortable: true,
+    // },
     {
       name: "Invoice No",
       // selector: "invoiceNo",

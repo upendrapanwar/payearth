@@ -1488,82 +1488,11 @@ async function getOrderById(id) {
     return result;
   }
 }
-/*
-async function getUserOrderById(id) {
-    const order = await Order.findById(id).select('id orderCode productId userId amount quantity isActive orderStatus createdAt')
-        .populate([{
-            path: "productId",
-            model: Product,
-            select: "id name price featuredImage avgRating isService",
-            populate: {
-                path: "cryptoPrices",
-                model: CryptoConversion,
-                select: "name code cryptoPriceUSD",
-                match: { isActive: true, asCurrency: true }
-            }
-        },
-        {
-            path: "orderStatus",
-            model: OrderTrackingTimeline,
-            select: "updatedAt",
-            populate: {
-                path: "orderStatusId",
-                model: OrderStatus,
-                select: "lname title"
-            }
-        },
-        
-        {
-            path: "userId",
-            model: User,
-            select: "id name"
-        }
-        ]);
 
-    if (!order) {
-        return false;
-    } else {
-
-        //get order tracking timeline data
-        let orderTimeline = await OrderTrackingTimeline.find({ orderId: order.id })
-            .select("orderId orderStatusId updatedAt")
-            .sort({ createdAt: 'asc' })
-            .populate("orderStatusId", "id lname title", { isActive: true });
-
-        //get payment data
-        let payment = await Payment.findOne({ orderId: order.id, userId: order.userId._id })
-            .select("invoiceNo invoiceUrl").exec();
-
-        //get review data
-        let reviewData = await Review.findOne({ productId: order.productId._id, userId: order.userId._id })
-            .select("rating review reviewImages isActive").exec();
-
-        //get complaint data
-        let complaintData = await ProductComplaint.findOne({ orderId: order.id, productId: order.productId._id, userId: order.userId._id }).select("rating complaint complaintImages isActive").exec();
-
-        let result = {
-            order: order,
-            orderTimeline: orderTimeline,
-            invoice: payment,
-            reviewData: reviewData,
-            complaintData: complaintData
-        };
-        return result;
-    }
-
-}*/
-/**
- * Get order details by order id
- *
- * @param {*} req
- * @returns ObjectArray|boolean
- */
 async function getOrderDataById(req) {
   try {
     let result = await Order.findById(req)
-      .select(
-        "orderCode product_sku price paymentId sellerId billingFirstName billingLastName billingCompanyName billingCounty billingStreetAddress billingStreetAddress1 billingCity billingCountry billingPostCode billingPhone billingEmail billingNote deliveryCharge taxPercent taxAmount discount orderStatus productId userId createdId"
-      )
+      .select("orderCode product_sku price paymentId sellerId billingFirstName billingLastName billingCompanyName billingCounty billingStreetAddress billingStreetAddress1 billingCity billingCountry billingPostCode billingPhone billingEmail billingNote deliveryCharge taxPercent taxAmount discount orderStatus productId userId createdId")
       .populate({
         path: "productId.productId",
         model: Product,
@@ -1589,53 +1518,29 @@ async function getOrderDataById(req) {
   }
 }
 
-async function getOrderDetails(id) {
-  try {
-    let result = await OrderDetails.find({ userId: id })
-      .select("orderId productId quantity price userId sellerId createdAt")
-      .populate({
-        path: "orderId",
-        model: Order,
-        select:
-          "orderCode billingFirstName billingLastName billingCompanyName billingCounty billingStreetAddress billingStreetAddress1 billingCity billingCountry billingPostCode billingPhone billingEmail billingNote deliveryCharge taxPercent taxAmount discount",
-        populate: {
-          path: "orderStatus",
-          model: OrderTrackingTimeline,
-          populate: {
-            path: "orderStatusId",
-            model: OrderStatus,
-            select: "title",
-          },
-        },
-      })
-      .populate({
-        path: "productId",
-        model: Product,
-        select: "name",
-      });
 
-    if (result) {
-      return result;
-    } else {
-      return false;
-    }
-  } catch (err) {
-    console.log("Error", err);
-    return false;
-  }
-}
-
-async function getOrderDetails(id) {
+async function getOrderDetails(req) {
   try {
-    const orders = await Order.find({ userId: id })
-      .select(
-        "orderCode price paymentId billingFirstName billingLastName billingCompanyName billingCounty billingStreetAddress billingStreetAddress1 billingCity billingCountry billingPostCode billingPhone billingEmail billingNote deliveryCharge taxPercent taxAmount discount orderStatus total createdAt"
-      )
+    const { authorId, status } = req.query;
+    const orders = await Order.find({ userId: authorId, isService: status })
+      .select("orderCode price paymentId billingFirstName billingLastName billingCompanyName billingCounty billingStreetAddress billingStreetAddress1 billingCity billingCountry billingPostCode billingPhone billingEmail billingNote deliveryCharge taxPercent taxAmount discount orderStatus total createdAt")
       .populate([
         {
           path: "orderStatus",
           model: OrderStatus,
-          select: "title",
+          select: "title product service",
+          populate: [
+            {
+              path: "product.productId",
+              model: Product,
+              select: "name",
+            },
+            {
+              path: "service.serviceId",
+              model: Services,
+              select: "name charges isActive",
+            },
+          ],
         },
         {
           path: "paymentId",
@@ -1644,58 +1549,29 @@ async function getOrderDetails(id) {
             "invoiceNo amountPaid paymentMode paymentAccount createdAt paymentStatus",
         },
       ]);
-
-    // Collect all orderIds
-    const orderIds = orders.map((order) => order._id);
-
-    const orderDetails = await OrderDetails.find({ orderId: { $in: orderIds } })
-      .populate({
-        path: "productId",
-        model: Product,
-        select: "name",
-      })
-      .populate({
-        path: "sellerId",
-        model: Seller,
-        select: "name email phone full_address",
-      });
-
-    // Create a map to associate orderIds with their corresponding product data
-    const orderDetailsMap = {};
-    orderDetails.forEach((detail) => {
-      if (!orderDetailsMap[detail.orderId]) {
-        orderDetailsMap[detail.orderId] = [];
-      }
-      orderDetailsMap[detail.orderId].push(detail);
-    });
-
-    // Create an array of results, each containing order and product data
-    const result = orders.map((order) => {
-      const orderId = order._id;
-      if (orderDetailsMap[orderId]) {
-        return {
-          order: order,
-          orderDetails: orderDetailsMap[orderId],
-        };
-      } else {
-        return {
-          order: order,
-          orderDetails: [],
-        };
-      }
-    });
+    if (!orders || orders.length === 0) {
+      return {
+        status: false,
+        message: "No orders found for this user.",
+        data: [],
+      };
+    }
 
     return {
-      data: result,
+      status: true,
+      message: "Orders retrieved successfully.",
+      data: orders,
     };
   } catch (err) {
-    console.log("Error:", err);
+    console.error("Error fetching orders:", err);
     return {
       status: false,
-      data: "An error occurred while fetching data.",
+      message: "An error occurred while fetching orders.",
+      error: err.message,
     };
   }
 }
+
 
 /**************************************************************************/
 /**************************************************************************/
