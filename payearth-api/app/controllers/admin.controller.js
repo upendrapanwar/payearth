@@ -255,7 +255,22 @@ router.put("/update-product-sub-categories/:id", updateSubCate);
 router.get("/get-trash-sub-categories/:id", getTrashSubCateProduct);
 
 //manage Admins
-router.get("/getAllAdmins",getAllAdmins);
+router.get("/getAllAdmins", getAllAdmins);
+
+// Product 
+router.get("/getProductStock", getProductStock);
+router.get("/getProductDetailsById/:id", getProductDetailsById);
+router.get("/colors", getColors);
+router.put('/productStatus/:id', productStatus);
+
+//dashboard
+router.get("/getProductData", getProductData);
+router.get("/getDashboardData", getDashboardData);
+router.get("/getTopSellingCategories", getTopSellingCategories);
+router.get("/productSalesGraph", productSalesGraph);
+router.get("/serviceSalesGraph", serviceSalesGraph);
+
+
 
 
 module.exports = router;
@@ -267,7 +282,6 @@ function register(req, res, next) {
 }
 
 function authenticate(req, res, next) {
-
     adminService.authenticate(req.body)
         .then(admin => admin ? (admin && admin.isActive == true ? res.json({ status: true, message: msg.admin.login.success, data: admin }) : res.json({ status: false, message: msg.admin.login.active })) : res.json({ status: false, message: msg.admin.login.error }))
         .catch(err => next(err));
@@ -1217,9 +1231,62 @@ function getTrashSubCateProduct(req, res, next) {
         .catch((err) => next(res.json({ status: false, message: err.message })));
 }
 
-
 function getAllAdmins(req, res, next) {
     adminService.getAllAdmins(req)
         .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getProductStock(req, res, next) {
+    adminService.getProductStock(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function getProductDetailsById(req, res, next) {
+    adminService.getProductDetailsById(req.params.id)
+        .then((product) => product ? res.status(200).json({ status: true, data: product }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function getColors(req, res, next) {
+    adminService.getColors()
+        .then((colors) => colors ? res.status(200).json({ status: true, data: colors }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function productStatus(req, res, next) {
+    adminService.productStatus(req)
+        .then(data => data ? res.status(201).json({ status: true, message: msg.admin.brand.status.success, data: data }) : res.status(400).json({ status: false, message: msg.admin.brand.status.error }))
+        .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function getTopSellingCategories(req, res, next) {
+    adminService.getTopSellingCategories(req)
+        .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error updating personal information." }))
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function productSalesGraph(req, res, next) {
+    adminService.productSalesGraph(req)
+        .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error updating personal information." }))
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function serviceSalesGraph(req, res, next) {
+    adminService.serviceSalesGraph(req)
+        .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error updating personal information." }))
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getProductData(req, res, next) {
+    adminService.getProductData(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function getDashboardData(req, res, next) {
+    adminService.getDashboardData(req)
+        .then((data) => data ? res.json({ status: true, data: data, message: "Personal information updated successfully." }) : res.json({ status: false, data: {}, message: "Error updating personal information." }))
         .catch((err) => next(res.json({ status: false, message: err.message })));
 }

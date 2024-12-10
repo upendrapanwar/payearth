@@ -48,8 +48,8 @@ const ProductDetail = ({ data, colors, type }) => {
                             <div className="cp_top d-flex justify-content-between align-items-center">
                                 <div className="dash_title">{itemDetail?.name}</div>
                                 <div className="d-flex justify-content-end ml-auto gap-2">
-                                    <Link to={itemDetail ? `${url}${itemDetail.id}` : '#'} className="custom_btn btn_yellow_bordered w-auto btn">Edit Details</Link>
-                                    <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/product-stock-management"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link>
+                                    {/* <Link to={itemDetail ? `${url}${itemDetail.id}` : '#'} className="custom_btn btn_yellow_bordered w-auto btn">Edit Details</Link> */}
+                                    <Link className="btn custom_btn btn_yellow mx-auto " to="/admin/manage-products"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link>
                                 </div>
                             </div>
                             <div className="col-md-12">

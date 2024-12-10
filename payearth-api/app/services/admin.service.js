@@ -75,7 +75,7 @@ module.exports = {
 
     createColor,
     editColor,
-    getColors,
+    // getColors,
     deleteColor,
     statusColor,
 
@@ -171,6 +171,20 @@ module.exports = {
     updateSubCate,
     getTrashSubCateProduct,
     getAllAdmins,
+
+    // product stock
+    getProductStock,
+    getProductDetailsById,
+    getColors,
+    productStatus,
+
+
+    // Dashboard
+    getTopSellingCategories,
+    getProductData,
+    getDashboardData,
+    productSalesGraph,
+    serviceSalesGraph
 };
 
 // Validator function
@@ -1451,13 +1465,11 @@ async function editColor(req) {
 }
 
 
-async function getColors() {
-    const result = await Color.find().select().sort({ createdAt: 'desc' });
-
-    if (result && result.length > 0) return result;
-
-    return false;
-}
+// async function getColors() {
+//     const result = await Color.find().select().sort({ createdAt: 'desc' });
+//     if (result && result.length > 0) return result;
+//     return false;
+// }
 
 
 async function deleteColor(id) {
@@ -4251,9 +4263,418 @@ async function getAllAdmins() {
             return { status: false, message: "Data is not find." };
         }
 
-        return { status: true, message: "Data fetch successfully.", data:data };
+        return { status: true, message: "Data fetch successfully.", data: data };
     } catch (error) {
         console.error(error);
         return { status: false, message: error.message };
+    }
+}
+
+async function getProductStock(req) {
+    const { status } = req.query;
+    try {
+        const query = {
+            isActive: status,
+        };
+        const fieldsToSelect = "id productCode name category sub_category brand featuredImage quantity isActive";
+        let result = await Product.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect)
+            .populate({
+                path: 'category',
+                match: { isVisible: true },
+                select: 'categoryName isActive'
+            })
+            .populate({
+                path: 'brand',
+                match: { isVisible: true },
+                select: 'brandName'
+            })
+        return result;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+async function getProductDetailsById(id) {
+    const product = await Product.findById(id)
+        .select(
+            "name category sub_category brand description specifications color_size tier_price price images quantity isService isActive createdAt featuredImage"
+        )
+        .populate([
+            {
+                path: "cryptoPrices",
+                model: CryptoConversion,
+                select: "name code cryptoPriceUSD",
+                match: { isActive: true, asCurrency: true },
+            },
+            {
+                path: "brand",
+                model: Brand,
+                select: "id brandName",
+            },
+            {
+                path: "category",
+                model: Category,
+                select: "id categoryName",
+            },
+            {
+                path: "sub_category",
+                model: Category,
+                select: "id categoryName",
+            },
+        ]);
+
+    if (!product) {
+        return false;
+    } else {
+        const sales = await ProductSales.findOne({ productId: product.id })
+            .select("totalSalesCount")
+            .exec();
+
+        let result = {
+            product: product,
+            sales: sales,
+        };
+        return result;
+    }
+}
+
+async function getColors() {
+    try {
+      const result = await Color.find({ isActive: true })
+        .select("colorName lname code")
+        .sort({ createdAt: "desc" });
+      var colors = {};
+      if (result && result.length > 0) {
+        for (var i = 0; i < result.length; i++) {
+          colors[result[i].lname] = result[i].code;
+        }
+        return colors;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      console.log("Error", err);
+      return false;
+    }
+  }
+
+async function productStatus(req) {
+    const id = req.params.id;
+    const param = req.body;
+    const product = await Product.findById(id);
+    if (!product) {
+        return false;
+    } else {
+        const input = {
+            "isActive": param.isActive
+        };
+        Object.assign(product, input);
+        if (await product.save()) {
+            return await Product.findById(id).select();
+        }
+    }
+}
+
+async function getTopSellingCategories(req) {
+    try {
+        const topSellingCategories = await OrderStatus.find({ title: "Delivered" }).select('product')
+            .populate([
+                {
+                    path: "product.productId",
+                    model: Product,
+                    select: "category",
+                    populate: {
+                        path: "category",
+                        model: Category,
+                        select: "categoryName"
+                    }
+
+                }
+            ]);
+
+        if (!topSellingCategories || topSellingCategories.length === 0) {
+            return {
+                status: false,
+                data: [],
+            };
+        }
+        const categoryCounts = {};
+        topSellingCategories.forEach(order => {
+            const product = order.product?.productId;
+            const category = product[0]?.category;
+            if (category) {
+                const categoryId = category._id.toString();
+                const categoryName = category.categoryName;
+
+                if (!categoryCounts[categoryId]) {
+                    categoryCounts[categoryId] = {
+                        id: categoryId,
+                        name: categoryName,
+                        count: 0,
+                    };
+                }
+                categoryCounts[categoryId].count++;
+            }
+        });
+        const sortedCategories = Object.values(categoryCounts)
+            .sort((a, b) => b.count - a.count);
+
+        const top4Categories = sortedCategories.slice(0, 4);
+        return {
+            status: true,
+            data: top4Categories,
+        };
+
+    } catch (error) {
+        console.log("error", error)
+    }
+}
+
+async function productSalesGraph(req) {
+    try {
+        const { year } = req.query;
+        if (!year) {
+            return { success: false, message: "Year is required" }
+        }
+        const yearInt = parseInt(year, 10);
+
+        const monthsArray = [
+            { month: 1, monthName: "Jan" },
+            { month: 2, monthName: "Feb" },
+            { month: 3, monthName: "Mar" },
+            { month: 4, monthName: "Apr" },
+            { month: 5, monthName: "May" },
+            { month: 6, monthName: "Jun" },
+            { month: 7, monthName: "Jul" },
+            { month: 8, monthName: "Aug" },
+            { month: 9, monthName: "Sep" },
+            { month: 10, monthName: "Oct" },
+            { month: 11, monthName: "Nov" },
+            { month: 12, monthName: "Dec" },
+        ];
+
+        const results = await OrderStatus.aggregate([
+            {
+                $match: {
+                    title: "Delivered",
+                    product: { $ne: null },
+                    createdAt: {
+                        $gte: new Date(`${yearInt}-01-01T00:00:00Z`),
+                        $lte: new Date(`${yearInt}-12-31T23:59:59Z`),
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: { month: { $month: "$createdAt" } },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $addFields: {
+                    monthName: {
+                        $arrayElemAt: [
+                            [
+                                "",
+                                "Jan",
+                                "Feb",
+                                "Mar",
+                                "Apr",
+                                "May",
+                                "Jun",
+                                "Jul",
+                                "Aug",
+                                "Sep",
+                                "Oct",
+                                "Nov",
+                                "Dec",
+                            ],
+                            "$_id.month",
+                        ],
+                    },
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    month: "$_id.month",
+                    monthName: 1,
+                    count: 1,
+                },
+            },
+            { $sort: { month: 1 } },
+        ]);
+
+        const salesResults = monthsArray.map((month) => {
+            const found = results.find((r) => r.month === month.month);
+            return {
+                month: month.month,
+                monthName: month.monthName,
+                count: found ? found.count : 0,
+            };
+        });
+        return salesResults;
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+}
+
+async function serviceSalesGraph(req) {
+    try {
+        const { year } = req.query;
+        if (!year) {
+            return { success: false, message: "Year is required" }
+        }
+        const yearInt = parseInt(year, 10);
+
+        const monthsArray = [
+            { month: 1, monthName: "Jan" },
+            { month: 2, monthName: "Feb" },
+            { month: 3, monthName: "Mar" },
+            { month: 4, monthName: "Apr" },
+            { month: 5, monthName: "May" },
+            { month: 6, monthName: "Jun" },
+            { month: 7, monthName: "Jul" },
+            { month: 8, monthName: "Aug" },
+            { month: 9, monthName: "Sep" },
+            { month: 10, monthName: "Oct" },
+            { month: 11, monthName: "Nov" },
+            { month: 12, monthName: "Dec" },
+        ];
+
+        const results = await OrderStatus.aggregate([
+            {
+                $match: {
+                    title: "service_completed",
+                    service: { $ne: null },
+                    createdAt: {
+                        $gte: new Date(`${yearInt}-01-01T00:00:00Z`),
+                        $lte: new Date(`${yearInt}-12-31T23:59:59Z`),
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: { month: { $month: "$createdAt" } },
+                    count: { $sum: 1 },
+                },
+            },
+            {
+                $addFields: {
+                    monthName: {
+                        $arrayElemAt: [
+                            [
+                                "",
+                                "Jan",
+                                "Feb",
+                                "Mar",
+                                "Apr",
+                                "May",
+                                "Jun",
+                                "Jul",
+                                "Aug",
+                                "Sep",
+                                "Oct",
+                                "Nov",
+                                "Dec",
+                            ],
+                            "$_id.month",
+                        ],
+                    },
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    month: "$_id.month",
+                    monthName: 1,
+                    count: 1,
+                },
+            },
+            { $sort: { month: 1 } },
+        ]);
+
+        const salesResults = monthsArray.map((month) => {
+            const found = results.find((r) => r.month === month.month);
+            return {
+                month: month.month,
+                monthName: month.monthName,
+                count: found ? found.count : 0,
+            };
+        });
+        return salesResults;
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+}
+
+
+
+async function getDashboardData(req) {
+    try {
+        const [productCount, serviceCount, userCount, sellerCount, orderCount, totalPaymentAmount] = await Promise.all([
+            Product.countDocuments({ isActive: true }),
+            Services.countDocuments({ isActive: true }),
+            User.countDocuments({ isActive: true }),
+            Seller.countDocuments({ isActive: true }),
+            Order.countDocuments({ isActive: true }),
+            Payment.aggregate([
+                {
+                    $match: {
+                        isActive: true,
+                        paymentStatus: "paid",
+                    },
+                },
+                {
+                    $group: {
+                        _id: null,
+                        amountPaid: { $sum: '$amountPaid' },
+                    },
+                },
+            ])
+                .then(result => (result[0] ? result[0].amountPaid : 0))
+
+        ]);
+
+        const data = {
+            productCount,
+            serviceCount,
+            userCount,
+            sellerCount,
+            orderCount,
+            totalPaymentAmount
+        }
+        return data
+    } catch (error) {
+        console.error('Error fetching stats:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+}
+
+async function getProductData(req) {
+    const { status } = req.query;
+    try {
+        const query = {
+            isActive: status,
+        };
+        const fieldsToSelect = "id productCode name category sub_category brand price featuredImage quantity isActive";
+        let result = await Product.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect)
+            .populate({
+                path: 'category',
+                match: { isVisible: true },
+                select: 'categoryName isActive'
+            })
+            .populate({
+                path: 'brand',
+                match: { isVisible: true },
+                select: 'brandName'
+            })
+
+        return result;
+    } catch (error) {
+        console.log(error);
     }
 }

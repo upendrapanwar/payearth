@@ -773,7 +773,7 @@ function App() {
           />
 
           <PrivateRoute
-            path="/admin/manage-product-details"
+            path="/admin/manage-product-details/:id"
             restricted={false}
             component={ManageProductDetails}
             roles={[Role.super_admin, Role.admin]}
