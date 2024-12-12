@@ -3028,3 +3028,19 @@ input[type="search"] {
   font-size: 0.75rem;
   /* Small font size */
 }
+
+.admin_dashboard .data-table-extensions {
+  display: none;
+}
+
+.admin_dashboard .sc-epnzzT {
+  display: none;
+}
+
+.admin_dashboard .sc-eUlrpB .sc-gtLWhw {
+  display: flex;
+  width: 100%;
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 14px;
+  font-weight: 600;
+}

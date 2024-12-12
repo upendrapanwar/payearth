@@ -263,14 +263,17 @@ router.get("/getProductDetailsById/:id", getProductDetailsById);
 router.get("/colors", getColors);
 router.put('/productStatus/:id', productStatus);
 
+
 //dashboard
 router.get("/getProductData", getProductData);
+router.get("/getListedServicesData", getListedServicesData);
 router.get("/getDashboardData", getDashboardData);
 router.get("/getTopSellingCategories", getTopSellingCategories);
 router.get("/productSalesGraph", productSalesGraph);
 router.get("/serviceSalesGraph", serviceSalesGraph);
-
-
+router.get("/getVendorsData", getVendorsData);
+router.get("/getBuyersData", getBuyersData);
+router.get("/getOrderDetails", getOrderDetails);
 
 
 module.exports = router;
@@ -1285,8 +1288,32 @@ function getProductData(req, res, next) {
         .catch((err) => next(res.json({ status: false, message: err })));
 }
 
+function getListedServicesData(req, res, next) {
+    adminService.getListedServicesData(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
 function getDashboardData(req, res, next) {
     adminService.getDashboardData(req)
         .then((data) => data ? res.json({ status: true, data: data, message: "Personal information updated successfully." }) : res.json({ status: false, data: {}, message: "Error updating personal information." }))
         .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getVendorsData(req, res, next) {
+    adminService.getVendorsData(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function getBuyersData(req, res, next) {
+    adminService.getBuyersData(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function getOrderDetails(req, res, next) {
+    adminService.getOrderDetails(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
 }

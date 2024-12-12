@@ -134,6 +134,15 @@ const ProductDetail = ({ data, colors, type }) => {
                                     <div className="col-lg-6">
                                         <div className="pro_summary">
                                             <div className="pro_summ_row">
+                                                <div className="psr_label">Seller Details</div>
+                                                <p>{itemDetail?.createdBy[0].name}</p>
+                                                <p>{itemDetail?.createdBy[0].email}</p>
+                                            </div>
+                                            <div className="pro_summ_row">
+                                                <div className="psr_label">Seller Type</div>
+                                                <div className="psr_item">{itemDetail?.createdBy[0].seller_type}</div>
+                                            </div>
+                                            <div className="pro_summ_row">
                                                 <div className="psr_label">{itemDetail?.isService ? 'Service' : 'Product'} Name</div>
                                                 <div className="psr_item">{itemDetail?.name}</div>
                                             </div>

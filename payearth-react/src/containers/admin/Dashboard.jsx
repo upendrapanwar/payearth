@@ -22,6 +22,7 @@ class Dashboard extends Component {
         this.authInfo = JSON.parse(localStorage.getItem('authInfo'));
         this.state = {
             loading: true,
+            activeTab: "productOrders",
             productCount: "0",
             serviceCount: "0",
             userCount: "0",
@@ -29,18 +30,23 @@ class Dashboard extends Component {
             orderCount: "0",
             totalPaymentAmount: "0",
             hasRun: false,
-            listedServices: "",
-            listedProducts: "",
+            listedServices: [],
+            listedProducts: [],
             serviceYear: new Date().getFullYear(),
             productYear: new Date().getFullYear(),
             topCategories: [],
             productSalesData: [],
-            serviceSalesData: []
+            serviceSalesData: [],
+            listedVendors: [],
+            listedBuyers: [],
+            productOrders: [],
+            serviceOrders: [],
+            subscriptionOrders: []
         };
 
         this.listed_Service = [
             {
-                name: 'Services',
+                name: 'SERVICES',
                 selector: (row, i) => (
                     <img
                         src={row.featuredImage}
@@ -51,45 +57,45 @@ class Dashboard extends Component {
                 sortable: true
             },
             {
-                name: 'Service Code',
+                name: 'SERVICE CODE',
                 selector: (row, i) => row.serviceCode,
                 sortable: true
             },
             {
-                name: 'Service Name',
+                name: 'SERVICE NAME',
                 selector: (row, i) => row.name,
                 sortable: true
             },
             {
-                name: 'Charges',
+                name: 'CHARGES',
                 selector: (row, i) => `$${row.charges}`,
                 sortable: true
             },
-            {
-                name: 'Sales',
-                selector: (row, i) => "null",
-                sortable: true
-            },
-            {
-                name: 'Review',
-                selector: (row, i) => row.reviews.length,
-                sortable: true
-            },
-            {
-                name: 'Profite',
-                selector: (row, i) => "null",
-                sortable: true
-            },
-            {
-                name: 'Revenue',
-                selector: (row, i) => "Null",
-                sortable: true
-            },
+            // {
+            //     name: 'Sales',
+            //     selector: (row, i) => "null",
+            //     sortable: true
+            // },
+            // {
+            //     name: 'Review',
+            //     selector: (row, i) => row.reviews.length,
+            //     sortable: true
+            // },
+            // {
+            //     name: 'Profite',
+            //     selector: (row, i) => "null",
+            //     sortable: true
+            // },
+            // {
+            //     name: 'Revenue',
+            //     selector: (row, i) => "Null",
+            //     sortable: true
+            // },
         ];
 
         this.listed_Product = [
             {
-                name: 'Products',
+                name: 'PRODUCTS',
                 selector: (row, i) => (
                     <img
                         src={row.featuredImage}
@@ -100,43 +106,184 @@ class Dashboard extends Component {
                 sortable: true
             },
             {
-                name: 'Product Code',
+                name: 'PRODUCT CODE',
                 selector: (row, i) => row.productCode,
                 sortable: true
             },
             {
-                name: 'Product Name',
+                name: 'PRODUCT Name',
                 selector: (row, i) => row.name,
                 sortable: true
             },
             {
-                name: 'Price',
+                name: 'PRICE',
                 selector: (row, i) => `$${row.price}`,
                 sortable: true
             },
+            // {
+            //     name: 'Sales',
+            //     selector: (row, i) => row.quantity.selling_qty,
+            //     sortable: true
+            // },
+            // {
+            //     name: 'Stock',
+            //     selector: (row, i) => row.quantity.stock_qty,
+            //     sortable: true
+            // },
+            // {
+            //     name: 'Review',
+            //     selector: (row, i) => "null",
+            //     sortable: true
+            // },
+            // {
+            //     name: 'Profite',
+            //     selector: (row, i) => "null",
+            //     sortable: true
+            // },
+            // {
+            //     name: 'Revenue',
+            //     selector: (row, i) => "Null",
+            //     sortable: true
+            // },
+        ];
+
+        this.listed_Vendors = [
             {
-                name: 'Sales',
-                selector: (row, i) => row.quantity.selling_qty,
+                name: 'NAME',
+                selector: (row, i) => row.name,
                 sortable: true
             },
             {
-                name: 'Stock',
-                selector: (row, i) => row.quantity.stock_qty,
+                name: 'EMAIL',
+                selector: (row, i) => row.email,
+                sortable: true
+            },
+            // {
+            //     name: 'Address',
+            //     selector: (row, i) => "Null",
+            //     sortable: true
+            // },
+            {
+                name: 'PHONE',
+                selector: (row, i) => row.phone,
                 sortable: true
             },
             {
-                name: 'Review',
-                selector: (row, i) => "null",
+                name: 'SELLER TYPE',
+                selector: (row, i) => row.seller_type,
+                sortable: true
+            },
+            // {
+            //     name: 'Want to sell',
+            //     selector: (row, i) => row.want_to_sell,
+            //     sortable: true
+            // },
+        ];
+
+        this.listed_Buyers = [
+            {
+                name: 'NAME',
+                selector: (row, i) => row.name,
                 sortable: true
             },
             {
-                name: 'Profite',
-                selector: (row, i) => "null",
+                name: 'EMAIL',
+                selector: (row, i) => row.email,
+                sortable: true
+            },
+            // {
+            //     name: 'ADDRESS',
+            //     selector: (row, i) => "Null",
+            //     sortable: true
+            // },
+            {
+                name: 'PHONE',
+                selector: (row, i) => row.phone,
+                sortable: true
+            },
+            // {
+            //     name: 'Seller Type',
+            //     selector: (row, i) => row.seller_type,
+            //     sortable: true
+            // },
+            // {
+            //     name: 'Want to sell',
+            //     selector: (row, i) => row.want_to_sell,
+            //     sortable: true
+            // },
+        ];
+
+        this.listed_productOrders = [
+            {
+                name: 'ORDER CODE',
+                selector: (row, i) => row.orderCode,
                 sortable: true
             },
             {
-                name: 'Revenue',
-                selector: (row, i) => "Null",
+                name: 'ORDER AMOUNT',
+                selector: (row, i) => `$ ${row.total}`,
+                sortable: true
+            },
+            {
+                name: 'DISCOUNT',
+                selector: (row, i) => `$ ${row.discount}`,
+                sortable: true
+            },
+            {
+                name: 'ORDER STATUS',
+                selector: (row, i) => row.orderStatus[0].title,
+                sortable: true
+            },
+            {
+                name: 'PAYMENT MODE',
+                selector: (row, i) => row.paymentId.paymentMode,
+                sortable: true
+            },
+        ];
+
+
+        this.listed_serviceOrders = [
+            {
+                name: 'ORDER CODE',
+                selector: (row, i) => row.orderCode,
+                sortable: true
+            },
+            {
+                name: 'ORDER AMOUNT',
+                selector: (row, i) => `$ ${row.total}`,
+                sortable: true
+            },
+            {
+                name: 'ORDER STATUS',
+                selector: (row, i) => row.orderStatus[0].title,
+                sortable: true
+            },
+            {
+                name: 'PAYMENT MODE',
+                selector: (row, i) => row.paymentId.paymentMode,
+                sortable: true
+            },
+        ];
+
+        this.listed_subscriptionOrders = [
+            {
+                name: 'ORDER CODE',
+                selector: (row, i) => row.orderCode,
+                sortable: true
+            },
+            {
+                name: 'ORDER AMOUNT',
+                selector: (row, i) => `$ ${row.total}`,
+                sortable: true
+            },
+            {
+                name: 'ORDER STATUS',
+                selector: (row, i) => row.orderStatus[0].title,
+                sortable: true
+            },
+            {
+                name: 'PAYMENT MODE',
+                selector: (row, i) => row.paymentId.paymentMode,
                 sortable: true
             },
         ];
@@ -145,6 +292,7 @@ class Dashboard extends Component {
     componentDidMount() {
         this.getTopSellingCategories();
         this.getDashboardData();
+        this.getOrdersDetails();
         this.getProductSalesGraph();
         this.getServiceSalesGraph();
 
@@ -169,9 +317,15 @@ class Dashboard extends Component {
         if (!hasRun) {
             this.getListedServices();
             this.getListedproducts();
+            this.getListedVendors();
+            this.getListedBuyers();
             this.setState({ hasRun: true });
             window.removeEventListener('scroll', this.handleScroll);
         }
+    };
+
+    handleTabChange = (tab) => {
+        this.setState({ activeTab: tab });
     };
 
     getTopSellingCategories = () => {
@@ -240,7 +394,7 @@ class Dashboard extends Component {
             console.error("There was an error fetching service list category data", error);
             this.setState({ loading: false });
         }
-    }
+    };
 
     getDashboardData = async () => {
         try {
@@ -267,35 +421,7 @@ class Dashboard extends Component {
             console.error("There was an error fetching service list category data", error);
             this.setState({ loading: false });
         }
-    }
-
-    getListedServices = () => {
-        let url = "/admin/services";
-        axios.get(url, {
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json;charset=UTF-8",
-                Authorization: `Bearer ${this.authInfo.token}`,
-            },
-        })
-            .then((response) => {
-                if (response.data.status === true) {
-                    this.setState({ listedServices: response.data.data, loading: false })
-                }
-            })
-            .catch((error) => {
-                if (error.response && error.response.data.status === false) {
-                    console.log("error", error.response.data.message)
-                }
-            })
-            .finally(() => {
-                setTimeout(() => {
-                    this.setState({ loading: false });
-                }, 300);
-            });
     };
-
-
 
     getListedproducts = async () => {
         try {
@@ -319,6 +445,91 @@ class Dashboard extends Component {
             setTimeout(() => {
                 this.setState({ loading: false });
             }, 300);
+        }
+    };
+
+
+    getListedServices = async () => {
+        try {
+            // this.dispatch(setLoading({ loading: true }));
+            const url = 'admin/getListedServicesData';
+            const response = await axios.get(url, {
+                params: {
+                    status: true
+                },
+                headers: {
+                    'Authorization': `Bearer ${this.authInfo.token}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+            if (response.data.status === true) {
+                this.setState({ listedServices: response.data.data, loading: false })
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        } finally {
+            setTimeout(() => {
+                this.setState({ loading: false });
+            }, 300);
+        }
+    };
+
+    getListedVendors = async () => {
+        try {
+            this.setState({ loading: true });
+            const url = "admin/getVendorsData";
+            const response = await axios.get(url, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            });
+            const data = response.data.data;
+            this.setState({ listedVendors: data, loading: false });
+        } catch (error) {
+            console.error("There was an error fetching service list category data", error);
+            this.setState({ loading: false });
+        }
+    };
+
+    getListedBuyers = async () => {
+        try {
+            this.setState({ loading: true });
+            const url = "admin/getBuyersData";
+            const response = await axios.get(url, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            });
+            const data = response.data.data;
+            this.setState({ listedBuyers: data, loading: false });
+        } catch (error) {
+            console.error("There was an error fetching service list category data", error);
+            this.setState({ loading: false });
+        }
+    };
+
+    getOrdersDetails = async () => {
+        try {
+            this.setState({ loading: true });
+            const url = "admin/getOrderDetails";
+            const response = await axios.get(url, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            });
+            const data = response.data.data.data;
+            this.setState({ "productOrders": data.productOrders, loading: false });
+            this.setState({ "serviceOrders": data.serviceOrders, loading: false });
+            this.setState({ "subscriptionOrders": data.subscriptionCharges, loading: false });
+        } catch (error) {
+            console.error("There was an error fetching service list category data", error);
+            this.setState({ loading: false });
         }
     };
 
@@ -346,10 +557,8 @@ class Dashboard extends Component {
         }));
     };
 
-
-
     render() {
-        const { loading, productCount, serviceCount, userCount, sellerCount, orderCount, totalPaymentAmount, listedServices, listedProducts, topCategories, productSalesData, serviceSalesData } = this.state;
+        const { loading, activeTab, productCount, serviceCount, userCount, sellerCount, orderCount, totalPaymentAmount, listedServices, listedProducts, listedVendors, listedBuyers, topCategories, productSalesData, serviceSalesData, productOrders, serviceOrders, subscriptionOrders } = this.state;
         const colors = ['rgb(2, 178, 175)', 'rgb(46, 150, 255)', 'rgb(184, 0, 216)', 'rgb(96, 0, 155)'];
         const xLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         // const valueFormatter = (item) => `${item.value}%`;
@@ -357,6 +566,11 @@ class Dashboard extends Component {
         const productData = productSalesData.map(item => item.count);
         const serviceData = serviceSalesData.map(item => item.count);
         const currentYear = new Date().getFullYear();
+
+        // console.log("productOrders", productOrders);
+        // console.log("serviceOrders", serviceOrders);
+        // console.log("subscriptionOrders", subscriptionOrders);
+
         return (
             <React.Fragment>
                 {loading === true ? <SpinnerLoader /> : ""}
@@ -385,7 +599,7 @@ class Dashboard extends Component {
                                 </div>
                                 <div className="col-md-3 col-sm-6 col-12">
                                     <div className="count_box">
-                                        <div className="cb_count">69</div>
+                                        <div className="cb_count">50</div>
                                         <div className="cb_name">Stock low by Units</div>
                                     </div>
                                 </div>
@@ -428,17 +642,18 @@ class Dashboard extends Component {
                                                         data: productData,
                                                         label: 'Products',
                                                         color: '#4169E1',
-                                                        // color: "#27408B",
                                                         style: { strokeWidth: 3, strokeDasharray: '5 5' }
                                                     },
-                                                    // { data: serviceData, label: 'Services' },
+                                                    {
+                                                        data: serviceData,
+                                                        label: 'Services',
+                                                        color: "#C71585"
+                                                    },
                                                 ]}
                                                 xAxis={[{ scaleType: 'point', data: xLabels }]}
                                             />
                                         </div>
                                     </div>
-
-
                                 </div>
                                 <div className="col-md-4">
                                     <div className="tsc_box bg-white p-3">
@@ -473,46 +688,104 @@ class Dashboard extends Component {
                                     </div>
                                 </div>
                             </div>
-                            <div className="row mt-4">
-                                <div className="col-md-12">
-                                    <div className="dash_graph bg-white">
-                                        <div className="dash_graph_head">
-                                            <div className="dash_title">Service Analysis Year {`${this.state.serviceYear}`}</div>
-                                            <div>
-                                                <Button className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={this.handlePreviousServiceYear} startIcon={<ArrowBackIosIcon />} ></Button>
-                                                <Button className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={this.handleNextServiceYear} disabled={this.state.serviceYear === currentYear} endIcon={<ArrowForwardIosIcon />} ></Button>
-                                            </div>
-                                        </div>
-                                        <div className="dash_graph_body p-3 text-center">
-                                            <LineChart
-                                                height={350}
-                                                series={[
-                                                    {
-                                                        data: serviceData,
-                                                        label: 'Services',
-                                                        color: "#C71585"
 
-                                                    },
-                                                ]}
-                                                xAxis={[{ scaleType: 'point', data: xLabels }]}
-                                            />
+
+                            <div className="bg-white rounded-3 pt-3 pb-5 mt-4">
+                                <div className="col-md-12">
+                                    <div className="dash_title m-4">Newly Listed Orders</div>
+                                    <div className="report_tabing_nav m-2">
+                                        <div className="report_tab_link">
+                                            <ul>
+                                                <li className={activeTab === "productOrders" ? "activeNav" : ""}
+                                                    onClick={() => this.handleTabChange("productOrders")}
+                                                >
+                                                    <Link to="#">Product Orders</Link>
+                                                </li>
+                                                <li className={activeTab === "serviceOrders" ? "activeNav" : ""}
+                                                    onClick={() => this.handleTabChange("serviceOrders")}
+                                                >
+                                                    <Link to="#">Service Orders</Link>
+                                                </li>
+                                                <li className={activeTab === "subscriptionOrders" ? "activeNav" : ""}
+                                                    onClick={() => this.handleTabChange("subscriptionOrders")}
+                                                >
+                                                    <Link to="#">Subscription Orders</Link>
+                                                </li>
+                                            </ul>
                                         </div>
+
+                                        {activeTab === "productOrders" && (
+                                            <div className='admin_dashboard p-4'>
+                                                <DataTableExtensions
+                                                    columns={this.listed_productOrders}
+                                                    data={productOrders}
+                                                >
+                                                    <DataTable
+                                                        pagination
+                                                        noHeader
+                                                        highlightOnHover
+                                                        defaultSortField="id"
+                                                        defaultSortAsc={false}
+                                                        paginationPerPage={5}
+                                                        paginationRowsPerPageOptions={[5, 10, 15, 30]}
+                                                    // selectableRows           
+                                                    />
+                                                </DataTableExtensions>
+                                            </div>
+                                        )}
+
+                                        {activeTab === "serviceOrders" && (
+                                            // listed_serviceOrders
+                                            <div className='admin_dashboard p-4'>
+                                                <DataTableExtensions
+                                                    columns={this.listed_serviceOrders}
+                                                    data={serviceOrders}
+                                                >
+                                                    <DataTable
+                                                        pagination
+                                                        noHeader
+                                                        highlightOnHover
+                                                        defaultSortField="id"
+                                                        defaultSortAsc={false}
+                                                        paginationPerPage={5}
+                                                        paginationRowsPerPageOptions={[5, 10, 15, 30]}
+                                                    />
+                                                </DataTableExtensions>
+                                            </div>
+                                        )}
+
+                                        {activeTab === "subscriptionOrders" && (
+                                            <div className='admin_dashboard p-4'>
+                                                <DataTableExtensions
+                                                    columns={this.listed_subscriptionOrders}
+                                                    data={subscriptionOrders}
+                                                >
+                                                    <DataTable
+                                                        pagination
+                                                        noHeader
+                                                        highlightOnHover
+                                                        defaultSortField="id"
+                                                        defaultSortAsc={false}
+                                                        paginationPerPage={5}
+                                                        paginationRowsPerPageOptions={[5, 10, 15, 30]}
+                                                    // selectableRows           
+                                                    />
+                                                </DataTableExtensions>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
+                            </div>
 
 
-                                <div className="col-md-12">
+                            <div className="row mt-4">
+                                <div className="col-md-6">
                                     <div className="my_pro_cart bg-white">
-                                        <div className="mpc_header">
-                                            <div className="dash_title">Newly Listed Products</div>
-                                            <div className="mpc_btns search_box">
-                                                <div className="input-group">
-                                                    {/* <input type="text" className="form-control" placeholder="Search products" aria-label="Search products" aria-describedby="button-addon2" /> */}
-                                                    {/* <button className="btn btn-outline-secondary" type="button" id="button-addon2">Search</button> */}
-                                                </div>
+                                        <div className='admin_dashboard p-2'>
+                                            <div className="d-flex align-items-center justify-content-between mb-3 m-3">
+                                                <div className="dash_title">Newly Listed Products</div>
+                                                <Link to="/admin/manage-products" className="btn_yellow_bordered w-auto btn btn-width action_btn_new">View More</Link>
                                             </div>
-                                        </div>
-                                        <div className='table_max p-4 bg-light'>
                                             <DataTableExtensions
                                                 columns={this.listed_Product}
                                                 data={listedProducts}
@@ -532,18 +805,13 @@ class Dashboard extends Component {
                                     </div>
                                 </div>
 
-                                <div className="col-md-12 mt-5">
+                                <div className="col-md-6">
                                     <div className="my_pro_cart bg-white">
-                                        <div className="mpc_header">
-                                            <div className="dash_title">Newly Listed Services</div>
-                                            <div className="mpc_btns search_box">
-                                                <div className="input-group">
-                                                    {/* <input type="text" className="form-control" placeholder="Search products" aria-label="Search products" aria-describedby="button-addon2" /> */}
-                                                    {/* <button className="btn btn-outline-secondary" type="button" id="button-addon2">Search</button> */}
-                                                </div>
+                                        <div className='admin_dashboard p-2'>
+                                            <div className="d-flex align-items-center justify-content-between mb-3 m-3">
+                                                <div className="dash_title">Newly Listed Services</div>
+                                                <Link to="/admin/manage-services" className="btn_yellow_bordered w-auto btn btn-width action_btn_new">View More</Link>
                                             </div>
-                                        </div>
-                                        <div className='table_max p-4 bg-light'>
                                             <DataTableExtensions
                                                 columns={this.listed_Service}
                                                 data={listedServices}
@@ -563,6 +831,63 @@ class Dashboard extends Component {
                                     </div>
                                 </div>
                             </div>
+
+
+                            <div className="row mt-4">
+                                <div className="col-md-6">
+                                    <div className="my_pro_cart bg-white">
+                                        <div className='admin_dashboard p-2'>
+                                            <div className="d-flex align-items-center justify-content-between mb-3 m-3">
+                                                <div className="dash_title">Newly Listed Vendors</div>
+                                                <Link to="/admin/manage-vendors" className="btn_yellow_bordered w-auto btn btn-width action_btn_new">View More</Link>
+                                            </div>
+                                            <DataTableExtensions
+                                                columns={this.listed_Vendors}
+                                                data={listedVendors}
+                                            >
+                                                <DataTable
+                                                    pagination
+                                                    noHeader
+                                                    highlightOnHover
+                                                    defaultSortField="id"
+                                                    defaultSortAsc={false}
+                                                    paginationPerPage={5}
+                                                    paginationRowsPerPageOptions={[5, 10, 15, 30]}
+                                                // selectableRows           
+                                                />
+                                            </DataTableExtensions>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="col-md-6">
+                                    <div className="my_pro_cart bg-white">
+                                        <div className='admin_dashboard p-2'>
+                                            <div className="d-flex align-items-center justify-content-between mb-3 m-3">
+                                                <div className="dash_title">Newly Listed Buyers</div>
+                                                <Link to="#" className="btn_yellow_bordered w-auto btn btn-width action_btn_new">View More</Link>
+                                            </div>
+                                            <DataTableExtensions
+                                                columns={this.listed_Buyers}
+                                                data={listedBuyers}
+                                            >
+                                                <DataTable
+                                                    pagination
+                                                    noHeader
+                                                    highlightOnHover
+                                                    defaultSortField="id"
+                                                    defaultSortAsc={false}
+                                                    paginationPerPage={5}
+                                                    paginationRowsPerPageOptions={[5, 10, 15, 30]}
+                                                // selectableRows           
+                                                />
+                                            </DataTableExtensions>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
                         </div>
                     </div>
                     <Footer />

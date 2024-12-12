@@ -73,18 +73,28 @@ class ManageProducts extends Component {
                 sortable: true
             },
             {
-                name: 'SELLING QUANTITY',
-                selector: (row, i) => row.quantity.selling_qty,
-                sortable: true
-            },
-            {
                 name: 'CATEGORY',
                 selector: (row, i) => row.category.categoryName,
                 sortable: true
             },
             {
+                name: 'SELLER DETAILS',
+                selector: row => (
+                    <>
+                        <p>{row.createdBy[0].name || 'N/A'}</p>
+                        <p>{row.createdBy[0].email || 'N/A'}</p>
+                    </>
+                ),
+                sortable: true,
+            },
+            {
                 name: 'TOTAL STOCK QUANTITY',
                 selector: (row, i) => row.quantity.stock_qty,
+                sortable: true
+            },
+            {
+                name: 'SELLING QUANTITY',
+                selector: (row, i) => row.quantity.selling_qty,
                 sortable: true
             },
             {
@@ -298,6 +308,8 @@ class ManageProducts extends Component {
             pendingProductsPagination,
             rejectedProductsPagination
         } = this.state;
+
+        console.log("data", data)
 
         return (
             <React.Fragment>

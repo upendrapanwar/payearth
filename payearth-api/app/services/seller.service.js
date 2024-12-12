@@ -2467,6 +2467,7 @@ async function saveOrder(req) {
       orderStatus: param.orderStatus,
       isActive: param.isActive,
       isService: param.isService,
+      isSubscription: param.isSubscription
     };
 
     const orderItem = new Order(input);

@@ -182,9 +182,13 @@ module.exports = {
     // Dashboard
     getTopSellingCategories,
     getProductData,
+    getListedServicesData,
     getDashboardData,
     productSalesGraph,
-    serviceSalesGraph
+    serviceSalesGraph,
+    getVendorsData,
+    getBuyersData,
+    getOrderDetails
 };
 
 // Validator function
@@ -4288,6 +4292,11 @@ async function getProductStock(req) {
                 match: { isVisible: true },
                 select: 'brandName'
             })
+            .populate({
+                path: 'createdBy',
+                model: Seller,
+                select: 'id name email',
+            });
         return result;
     } catch (error) {
         console.log(error);
@@ -4298,7 +4307,7 @@ async function getProductStock(req) {
 async function getProductDetailsById(id) {
     const product = await Product.findById(id)
         .select(
-            "name category sub_category brand description specifications color_size tier_price price images quantity isService isActive createdAt featuredImage"
+            "name category sub_category brand description specifications color_size tier_price price images quantity isService isActive createdAt featuredImage createdBy"
         )
         .populate([
             {
@@ -4322,6 +4331,11 @@ async function getProductDetailsById(id) {
                 model: Category,
                 select: "id categoryName",
             },
+            {
+                path: "createdBy",
+                model: Seller,
+                select: "id name email phone seller_type want_to_sell",
+            },
         ]);
 
     if (!product) {
@@ -4330,7 +4344,6 @@ async function getProductDetailsById(id) {
         const sales = await ProductSales.findOne({ productId: product.id })
             .select("totalSalesCount")
             .exec();
-
         let result = {
             product: product,
             sales: sales,
@@ -4341,23 +4354,23 @@ async function getProductDetailsById(id) {
 
 async function getColors() {
     try {
-      const result = await Color.find({ isActive: true })
-        .select("colorName lname code")
-        .sort({ createdAt: "desc" });
-      var colors = {};
-      if (result && result.length > 0) {
-        for (var i = 0; i < result.length; i++) {
-          colors[result[i].lname] = result[i].code;
+        const result = await Color.find({ isActive: true })
+            .select("colorName lname code")
+            .sort({ createdAt: "desc" });
+        var colors = {};
+        if (result && result.length > 0) {
+            for (var i = 0; i < result.length; i++) {
+                colors[result[i].lname] = result[i].code;
+            }
+            return colors;
+        } else {
+            return false;
         }
-        return colors;
-      } else {
-        return false;
-      }
     } catch (err) {
-      console.log("Error", err);
-      return false;
+        console.log("Error", err);
+        return false;
     }
-  }
+}
 
 async function productStatus(req) {
     const id = req.params.id;
@@ -4389,7 +4402,6 @@ async function getTopSellingCategories(req) {
                         model: Category,
                         select: "categoryName"
                     }
-
                 }
             ]);
 
@@ -4611,8 +4623,6 @@ async function serviceSalesGraph(req) {
     }
 }
 
-
-
 async function getDashboardData(req) {
     try {
         const [productCount, serviceCount, userCount, sellerCount, orderCount, totalPaymentAmount] = await Promise.all([
@@ -4661,7 +4671,7 @@ async function getProductData(req) {
             isActive: status,
         };
         const fieldsToSelect = "id productCode name category sub_category brand price featuredImage quantity isActive";
-        let result = await Product.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect)
+        let result = await Product.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect).limit(5)
             .populate({
                 path: 'category',
                 match: { isVisible: true },
@@ -4676,5 +4686,135 @@ async function getProductData(req) {
         return result;
     } catch (error) {
         console.log(error);
+    }
+}
+
+async function getListedServicesData(req) {
+    const { status } = req.query;
+    try {
+        const query = {
+            isActive: status,
+        };
+        const fieldsToSelect = "id serviceCode name category charges featuredImage reviews isActive";
+        let result = await Services.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect).limit(5)
+            .populate({
+                path: 'category',
+                match: { isVisible: true },
+                select: 'categoryName isActive'
+            })
+        return result;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function getVendorsData(req) {
+    const result = await Seller.find().select().sort({ createdAt: 'desc' }).limit(5);
+    if (result && result.length > 0) return result;
+    return false;
+}
+
+async function getBuyersData(req) {
+    const result = await User.find().select().sort({ createdAt: 'desc' }).limit(5);
+    if (result && result.length > 0) return result;
+    return false;
+}
+
+async function getOrderDetails() {
+    try {
+        const productOrders = await Order.find({ isService: false, isSubscription: false, isActive: true })
+            .select("orderCode orderStatus total discount").sort({ createdAt: 'desc' }).limit(5)
+            .populate([
+                {
+                    path: "orderStatus",
+                    model: OrderStatus,
+                    select: "title",
+                },
+                {
+                    path: "paymentId",
+                    model: Payment,
+                    select: "invoiceNo amountPaid paymentMode",
+                },
+                {
+                    path: "userId",
+                    model: User,
+                    select: "name email",
+                },
+            ]);
+
+        const serviceOrders = await Order.find({ isService: true })
+            .select("orderStatus orderCode total discount userId paymentId").sort({ createdAt: 'desc' }).limit(5)
+            .populate([
+                {
+                    path: "orderStatus",
+                    model: OrderStatus,
+                    select: "title",
+                },
+                {
+                    path: "paymentId",
+                    model: Payment,
+                    select: "invoiceNo amountPaid paymentMode paymentAccount createdAt paymentStatus",
+                },
+                {
+                    path: "userId",
+                    model: User,
+                    select: "name email",
+                },
+            ]);
+
+
+        const subscriptionCharges = await Order.find({ isSubscription: true })
+            .select("orderStatus orderCode total discount userId paymentId").sort({ createdAt: 'desc' }).limit(5)
+            .populate([
+                {
+                    path: "orderStatus",
+                    model: OrderStatus,
+                    select: "title",
+                },
+                {
+                    path: "paymentId",
+                    model: Payment,
+                    select: "invoiceNo amountPaid paymentMode paymentAccount createdAt paymentStatus",
+                },
+                {
+                    path: "userId",
+                    model: Seller,
+                    select: "name email",
+                },
+            ]);
+
+        if (!productOrders.length && !serviceOrders.length && !subscriptionCharges.length) {
+            return {
+                status: false,
+                message: "No orders found for this user.",
+                data: {
+                    productOrders: [],
+                    serviceOrders: [],
+                    subscriptionCharges: [],
+                },
+            };
+        }
+
+        // console.log("productOrders:>", productOrders);
+        // console.log("serviceOrders:>", serviceOrders);
+        // console.log("serviceCharges>>>>.", subscriptionCharges);
+
+        return {
+            status: true,
+            message: "Orders retrieved successfully.",
+            data: {
+                productOrders,
+                serviceOrders,
+                subscriptionCharges
+            },
+        };
+
+    } catch (err) {
+        console.error("Error fetching orders:", err);
+        return {
+            status: false,
+            message: "An error occurred while fetching orders.",
+            error: err.message,
+        };
     }
 }
