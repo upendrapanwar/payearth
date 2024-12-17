@@ -372,7 +372,7 @@ class ProductDetail extends Component {
                               ""
                             )}
                           </div>
-                          <div className="pdi_fea">                        
+                          <div className="pdi_fea">
                             <div className="pdi_fea_box ">
                               <div className="heading">Delivery</div>
                               <div className="pin_select">
@@ -414,7 +414,18 @@ class ProductDetail extends Component {
                               >
                                 Add to cart
                               </Link>
-                              <Link className="btn custom_btn btn_yellow" to="#">
+                              <Link
+                                className="btn custom_btn btn_yellow"
+                                to={'/my-cart'}
+                                onClick={() => dispatch(
+                                  addToCart({
+                                    id: productDetail.id,
+                                    name: productDetail.name,
+                                    image: productDetail.featuredImage,
+                                    price: productDetail.price,
+                                  })
+                                )}
+                              >
                                 Buy Now
                               </Link>
                             </div>

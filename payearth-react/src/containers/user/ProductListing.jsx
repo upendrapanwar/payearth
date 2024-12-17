@@ -124,17 +124,6 @@ const ProductListing = () => {
                 });
             }
             setProductsState(productsData);
-
-
-            // dispatch(setReqBody({ reqBody: reqBodyUpdated }));
-            // dispatch(setProducts({ products: productsData }));
-            // dispatch(setTotalProducts({ totalProducts: response.data.data.totalProducts }));
-            // setMaxPriceState(response.data.data.maxPrice);
-            // dispatch(setMaxPrice({ maxPrice: response.data.data.maxPrice }));
-            // if (param === 'didMount' || param === 'viewMore') {
-            // getBrands(dispatch);
-            // getColors(dispatch);
-            // }
         }).catch(error => {
             if (error.response && error.response.data.status === false) {
                 // dispatch(setProducts({ products: [] }));
@@ -145,14 +134,6 @@ const ProductListing = () => {
             }, 300);
         });
     }
-
-    // const handleProductData = (data) => {
-    //     console.log("data in product listing page", data)
-    // }
-
-    // console.log("priceRange in product listing", priceRange)
-    // console.log("selectedCategories product listing", selectedCategories)
-    // console.log("selectedBrands product listing", selectedBrands)
 
     return (
         <React.Fragment>

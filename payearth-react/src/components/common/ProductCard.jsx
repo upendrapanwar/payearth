@@ -195,9 +195,6 @@ const ProductCard = ({ data, inWishList }) => {
 
                 <Link
                   className="btn custom_btn btn_yellow"
-                  //to={data.isService === false ? `/product-detail/${data.id}` : `/service-detail/${data.id}
-                  //`}
-                  //   to={`/my-cart`}
                   to={`#`}
                   onClick={() =>
                     dispatch(

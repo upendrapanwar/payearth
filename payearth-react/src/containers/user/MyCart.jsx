@@ -80,7 +80,7 @@ class MyCart extends Component {
                     <div className="container">
                         <div className="bg-white rounded-3">
                             <div className='row'>
-                                <div className={cart.length > 0 ? "col-md-12" : "col-md-8"}>
+                                <div className={cart.length === 0 ? "col-md-12" : "col-md-8"}>
                                     <div className="cart my_cart m-2">
                                         {getTotal().totalQuantity === 0 ?
                                             <div align="center">

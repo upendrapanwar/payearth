@@ -261,7 +261,7 @@ class ManageServiceCategory extends Component {
             <React.Fragment>
                 <div className="seller_dash_wrap pb-5">
                     <div className="container">
-                        <Header/>
+                        <Header />
                         <Helmet>
                             <title>{"Service Category - Pay Earth"}</title>
                         </Helmet>
@@ -310,7 +310,7 @@ class ManageServiceCategory extends Component {
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div className="row mt-4">
                             <div className="col-12">
                                 <div className="createpost bg-white rounded-3 addPost_left_container">
@@ -389,7 +389,7 @@ class ManageServiceCategory extends Component {
                         </div>
                     </div>
                 </div>
-            <Footer/>
+                <Footer />
             </React.Fragment>
         );
     }
