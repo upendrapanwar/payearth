@@ -17,7 +17,6 @@ class AdminPostModule extends Component {
     constructor(props) {
         super(props);
         this.authInfo = store.getState().auth.authInfo;
-        // console.log("Auth", this.userInfo.name)
         this.state = {
             selectedRows: [],
             publish: [],
@@ -25,11 +24,16 @@ class AdminPostModule extends Component {
             trash: [],
             loading: true,
             error: null,
-
+            permissions: {
+                add: false,
+                edit: false,
+                delete: false
+            }
         };
     }
 
     componentDidMount() {
+        this.getPostPermission();
         this.getPublished();
         this.getDraft();
         this.getTrash();
@@ -39,6 +43,28 @@ class AdminPostModule extends Component {
         this.getPublished();
         this.getDraft();
         this.getTrash();
+    }
+
+
+    getPostPermission = async () => {
+        const admin_Id = this.authInfo.id;
+        try {
+            const res = await axios.get(`admin/getPostPermission/${admin_Id}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            })
+
+            if (res.data.status === true && res.data.data) {
+                this.setState({ permissions: res.data.data });
+            }
+
+        } catch (error) {
+            toast.error(error.response.data.message);
+            console.error("Error fetching data: ", error);
+        }
     }
 
 
@@ -129,7 +155,7 @@ class AdminPostModule extends Component {
     blogDetails = (slug) => {
         this.props.history.push(`/blog-detail/${slug}`);
     }
- 
+
     handleRowSelected = (state) => {
         this.setState({ selectedRows: state.selectedRows });
     };
@@ -326,6 +352,7 @@ class AdminPostModule extends Component {
                     <button
                         onClick={() => this.handleEdit(row.id)}
                         className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+                        disabled={!this.state.permissions.edit}
                     >
                         Edit
                     </button>
@@ -388,6 +415,7 @@ class AdminPostModule extends Component {
                     <button
                         className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
                         onClick={() => this.handleDeleteSeletedData(row._id)}
+                        disabled={!this.state.permissions.delete}
                     >
                         Delete
                     </button>
@@ -445,6 +473,7 @@ class AdminPostModule extends Component {
                     <button
                         className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
                         onClick={() => this.handleDeleteSeletedData(row._id)}
+                        disabled={!this.state.permissions.delete}
                     >
                         Delete
                     </button>
@@ -492,8 +521,15 @@ class AdminPostModule extends Component {
                                                 <div className="search_customer_field">
                                                     <div className="noti_wrap">
                                                         <div className="">
+
                                                             <span>
-                                                                <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/post-module-add-new"> Create New Post</Link>
+                                                                <Link className={`btn custom_btn mx-auto ${this.state.permissions.add ? 'btn_yellow' : 'btn_disabled'}`}
+                                                                    to={this.state.permissions.add ? "/admin/post-module-add-new" : "#"}
+                                                                    onClick={(e) => {
+                                                                        if (!this.state.permissions.add) {
+                                                                            e.preventDefault(); // Prevent navigation
+                                                                        }
+                                                                    }}> Create New Post</Link>
                                                             </span>
                                                         </div>
                                                     </div>

@@ -92,7 +92,6 @@ class ManageBannerAdvertisement extends Component {
         } else {
             toast.error("Banner size must be less than 5 MB", { autoClose: 3000 })
         }
-
     };
 
     handleVideoChange = (e) => {
@@ -223,8 +222,8 @@ class ManageBannerAdvertisement extends Component {
     handleSelectImageOrVideo = (e) => {
         console.log("select IMAGE OR VIDEO", e.target.value)
         this.setState({ selectImageOrVideo: e.target.value });
-
     }
+    
     selectImageOrVideo = () => {
         const { image, video } = this.state;
 

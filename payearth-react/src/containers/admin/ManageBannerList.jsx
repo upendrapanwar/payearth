@@ -13,8 +13,8 @@ import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
 import "react-data-table-component-extensions/dist/index.css";
 import { DateRangePicker } from "react-date-range";
-import "react-date-range/dist/styles.css"; 
-import "react-date-range/dist/theme/default.css"; 
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
 
 import CryptoJS from "crypto-js";
 import Modal from "react-bootstrap/Modal";
@@ -46,11 +46,40 @@ class ManageBannerList extends Component {
         key: "selection",
       },
       filteredBanner: [],
+      permissions: {
+        add: false,
+        edit: false,
+        delete: false
+      }
     };
   }
 
   componentDidMount() {
+    this.getAdvertiesmentPermission();
     this.getBanner();
+  }
+
+  getAdvertiesmentPermission = async () => {
+    const admin_Id = this.authInfo.id;
+    try {
+      const res = await axios.get(`admin/getAdvertiesmentPermission/${admin_Id}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Authorization': `Bearer ${this.authInfo.token}`
+        }
+      })
+
+      if (res.data.status === true && res.data.data) {
+        this.setState({ permissions: res.data.data }, () => {
+          console.log("Checking Response permission", this.state.permissions);
+        });
+      }
+
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.error("Error fetching data: ", error);
+    }
   }
 
   handleClose = () => {
@@ -158,45 +187,45 @@ class ManageBannerList extends Component {
     {
       id.status === "Unpublish"
         ? axios
-            .put(
-              "/admin/updateBanner/" + id.id,
-              { status: "Publish" },
-              {
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "application/json;charset=UTF-8",
-                  Authorization: `Bearer ${this.authInfo.token}`,
-                },
-              }
-            )
-            .then((response) => {
-              if (response) {
-                this.getBanner();
-              }
-            })
-            .catch((error) => {
-              console.log("error", error);
-            })
+          .put(
+            "/admin/updateBanner/" + id.id,
+            { status: "Publish" },
+            {
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json;charset=UTF-8",
+                Authorization: `Bearer ${this.authInfo.token}`,
+              },
+            }
+          )
+          .then((response) => {
+            if (response) {
+              this.getBanner();
+            }
+          })
+          .catch((error) => {
+            console.log("error", error);
+          })
         : axios
-            .put(
-              "/admin/updateBanner/" + id.id,
-              { status: "Unpublish" },
-              {
-                headers: {
-                  Accept: "application/json",
-                  "Content-Type": "application/json;charset=UTF-8",
-                  Authorization: `Bearer ${this.authInfo.token}`,
-                },
-              }
-            )
-            .then((response) => {
-              if (response) {
-                this.getBanner();
-              }
-            })
-            .catch((error) => {
-              console.log("error", error);
-            });
+          .put(
+            "/admin/updateBanner/" + id.id,
+            { status: "Unpublish" },
+            {
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json;charset=UTF-8",
+                Authorization: `Bearer ${this.authInfo.token}`,
+              },
+            }
+          )
+          .then((response) => {
+            if (response) {
+              this.getBanner();
+            }
+          })
+          .catch((error) => {
+            console.log("error", error);
+          });
     }
   };
 
@@ -292,12 +321,14 @@ class ManageBannerList extends Component {
           <button
             onClick={() => this.handleEdit(row.id)}
             className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+            disabled={!this.state.permissions.edit}
           >
             Edit
           </button>
           <button
             className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
             onClick={() => this.handleDeleteSeletedData(row._id)}
+            disabled={!this.state.permissions.delete}
           >
             Delete
           </button>
@@ -353,11 +384,21 @@ class ManageBannerList extends Component {
                           <div className="">
                             <span>
                               <Link
+                                className={`btn custom_btn mx-auto ${this.state.permissions.add ? 'btn_yellow' : 'btn_disabled'}`}
+                                to={this.state.permissions.add ? "/admin/add-service" : "#"}
+                                onClick={(e) => {
+                                  if (!this.state.permissions.add) {
+                                    e.preventDefault(); }
+                                }}
+                              >
+                                Create New Advertisement
+                              </Link>
+                              {/* <Link
                                 className="btn custom_btn btn_yellow mx-auto"
                                 to="/admin/manage-banner-advertisement"
                               >
                                 Create New Advertisement
-                              </Link>
+                              </Link> */}
                             </span>
                           </div>
                         </div>

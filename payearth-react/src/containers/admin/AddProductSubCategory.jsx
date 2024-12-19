@@ -30,17 +30,44 @@ const AddProductSubCategory = (props) => {
     const [editCateData, setEditCateData] = useState([]);
     const [activeCategory, setActiveCategory] = useState('publish');
     const [trashSubCategories, setTrashSubCategories] = useState([]);
+    const [permission, setPermission] = useState({});
 
 
     //functions
     useEffect(() => {
-
+        getProductCatePermission();
         if (activeCategory === 'trash') {
             getTrashSubCate();
         };
 
         getSubCatedata();
     }, [activeCategory])
+
+
+    const getProductCatePermission = async () => {
+        const admin_Id = authInfo.id;
+        try {
+            const res = await axios.get(`admin/getProductSubCatePermission/${admin_Id}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${authInfo.token}`
+                }
+            })
+
+            if (res.data.status === true && res.data.data) {
+                console.log("res.data.data", res.data.data)
+
+                const permissionss = res.data.data;
+                setPermission(permissionss)
+                console.log("permissionspermissions", permissionss)
+            }
+
+        } catch (error) {
+            toast.error(error.response.data.message);
+            console.error("Error fetching data: ", error);
+        }
+    }
 
     //get sub-cate data
     const getSubCatedata = async () => {
@@ -241,6 +268,7 @@ const AddProductSubCategory = (props) => {
                     <button
                         className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
                         onClick={() => handleEdit(row.id, row.categoryName, row.description)}
+                        disabled={!permission?.edit}
                     >
                         Edit
                     </button>
@@ -258,10 +286,10 @@ const AddProductSubCategory = (props) => {
     ];
 
     //data of table
-    const tableData = { columns, data: subCategories};
+    const tableData = { columns, data: subCategories };
 
     const columnsTrash = [
-        { name: 'Category Name', selector:  row => row.categoryName, sortable: true },
+        { name: 'Category Name', selector: row => row.categoryName, sortable: true },
 
         {
             name: 'Status',
@@ -273,14 +301,16 @@ const AddProductSubCategory = (props) => {
             sortable: true
         },
 
-        { name: 'Created Date', selector:  row => new Date(row.createdAt).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-        }),
-        sortable: true},     
-       
-{
+        {
+            name: 'Created Date', selector: row => new Date(row.createdAt).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            }),
+            sortable: true
+        },
+
+        {
             name: 'Actions',
             cell: (row) => (
                 <>
@@ -304,7 +334,7 @@ const AddProductSubCategory = (props) => {
     const tableDataTrash = { columns: columnsTrash, data: trashSubCategories };
     const handleClick = (e) => {
         e.preventDefault();
-        props.toggleShowSubCategory(); 
+        props.toggleShowSubCategory();
     };
 
     return (
@@ -321,7 +351,21 @@ const AddProductSubCategory = (props) => {
                                 <div className="cumm_title">Sub-Category List</div>
                                 <div className="cumm_title">{props.cateData.categoryName}</div>
                                 <div className="d-flex justify-content-end ml-auto gap-2">
-                                    <Link className="btn custom_btn btn_yellow ml-auto action_btn_textView" to='#' onClick={() => setIsModalOpen(true)}>Add-SubCate</Link>
+                                    {/* <Link className="btn custom_btn btn_yellow ml-auto action_btn_textView" to='#' onClick={() => setIsModalOpen(true)}>Add-SubCate</Link> */}
+                                    <Link
+                                        className={`btn custom_btn mx-auto ${permission?.add ? 'btn_yellow ml-auto action_btn_textView' : 'btn_disabled ml-auto action_btn_textView'}`}
+                                        to="#"
+                                        onClick={(e) => {
+                                            if (!permission?.add) {
+                                                e.preventDefault();
+                                            } else {
+                                                setIsModalOpen(true);
+                                            }
+                                        }}
+                                    >
+                                        Add-SubCate
+                                    </Link>
+
                                     <Link className="btn custom_btn btn_yellow mx-auto action_btn_textView" onClick={handleClick} to=""><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link>
                                 </div>
                             </div>

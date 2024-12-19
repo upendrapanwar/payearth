@@ -22,7 +22,7 @@ import communityIcon from "./../../../assets/icons/community_icon.svg";
 import bannerIcon from "./../../../assets/icons/banners_icon.svg";
 import supportIcon from "./../../../assets/icons/support_icon.svg";
 import clostBtn from "./../../../assets/icons/close_icon.svg";
-import blackBellIcon from "../../../assets/icons/notification-black-bell-icon.svg"; 
+import blackBellIcon from "../../../assets/icons/notification-black-bell-icon.svg";
 import { useSelector, useDispatch } from "react-redux";
 import { setLoginStatus, setUserInfo } from "./../../../store/reducers/auth-reducer";
 import io from 'socket.io-client';
@@ -157,18 +157,7 @@ function Header() {
                   <i className="icon">
                     <img src={shoppingBagIcon} alt="" />
                   </i>{" "}
-                  Posts
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/admin/post-module-add-new"
-                  onClick={() => removeBackdrop()}
-                >
-                  <i className="icon">
-                    <img src={bannerIcon} alt="" />
-                  </i>{" "}
-                  Create Post
+                  Manage Posts
                 </Link>
               </li>
 
@@ -233,7 +222,7 @@ function Header() {
                   <i className="icon">
                     <img src={creditCardIcon} alt="" />
                   </i>{" "}
-                  Payments
+                  Manage Payments
                 </Link>
               </li>
               <li>
@@ -372,7 +361,7 @@ function Header() {
                   <i className="icon">
                     <img src={supportIcon} alt="" />
                   </i>
-                  Support
+                  Manage Support
                 </Link>
               </li>
               <li>
@@ -454,7 +443,6 @@ function Header() {
                               <span>Notifications</span>
                             </Link>
                           </li>
-
                           <li className="nav-item">
                             <Link className="nav-link" to="/admin/chat">
                               <div className="sm_icon">

@@ -14,11 +14,11 @@ import { Helmet } from 'react-helmet';
 import Header from '../../components/admin/common/Header';
 import Footer from '../../components/common/Footer';
 
-
 class AdminCategoryModel extends Component {
     constructor(props) {
         super(props);
         this.authInfo = store.getState().auth.authInfo;
+        this.authInfoLocal = JSON.parse(localStorage.getItem("authInfo"))
         this.state = {
             names: '',
             slug: '',
@@ -27,11 +27,39 @@ class AdminCategoryModel extends Component {
             selectedRows: [],
             loading: true,
             error: null,
+            permissions: {
+                add: false,
+                edit: false,
+                delete: false
+            },
         }
     }
 
     componentDidMount() {
+        this.getBlogCatePermission();
         this.getCategory();
+    }
+
+    getBlogCatePermission = async () => {
+        const admin_Id = this.authInfoLocal.id;
+        try {
+            const res = await axios.get(`admin/getBlogCatePermission/${admin_Id}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfoLocal.token}`
+                }
+            })
+
+            if (res.data.status === true && res.data.data) {
+                this.setState({ permissions: res.data.data });
+                console.log("permissions",this.state.permissions);
+
+            }
+        } catch (error) {
+            toast.error(error.response.data.message);
+            console.error("Error fetching data: ", error);
+        }
     }
 
     generateUniqueSlug = (names) => {
@@ -69,24 +97,6 @@ class AdminCategoryModel extends Component {
         this.setState({ selectedRows: state.selectedRows });
     };
 
-    // handleDeleteSeletedData = () => {
-    //     const { selectedRows } = this.state;
-    //     // console.log("selected data", selectedRows)
-    //     for (let i = 0; i < selectedRows.length; i++) {
-    //         const ids = selectedRows[i].id
-    //         axios.delete(`/admin/categoryDelete/${ids}`, {
-    //             headers: {
-    //                 'Authorization': `Bearer ${this.authInfo.token}`
-    //             }
-    //         }).then((res) => { console.log('Row Data', res.data) })
-    //             .catch((error) => {
-    //                 console.log("error", error)
-    //             })
-    //         this.setState({ loading: true })
-    //     }
-    //     this.getCategory();
-    // }
-
     handleDeleteSeletedData = (id) => {
         const { selectedRows } = this.state;
         if (selectedRows == false) {
@@ -101,7 +111,6 @@ class AdminCategoryModel extends Component {
                 .catch((error) => {
                     console.log("error", error)
                 })
-            // this.setState({ loading: true })
 
         } else {
             for (let i = 0; i < selectedRows.length; i++) {
@@ -118,8 +127,6 @@ class AdminCategoryModel extends Component {
                         console.log("error", error)
                     })
             }
-            // window.location.reload(); 
-            // this.setState({ loading: true })
             this.setState({ selectedRows: "" })
         }
     }
@@ -127,10 +134,6 @@ class AdminCategoryModel extends Component {
     handleTitleChange = (e) => {
         this.setState({ names: e.target.value });
     };
-
-    // handleSlugChange = (e) => {
-    //     this.setState({ slug: e.target.value });
-    // };
 
     handleDescriptionChange = (description) => {
         this.setState({ description });
@@ -162,8 +165,6 @@ class AdminCategoryModel extends Component {
             });
 
         this.setState({ names: "", description: "" })
-
-
     }
 
     category_column = [
@@ -172,11 +173,6 @@ class AdminCategoryModel extends Component {
             selector: (row, i) => row.names,
             sortable: true,
         },
-        // {
-        //     name: "Slug",
-        //     selector: (row, i) => row.slug,
-        //     sortable: true
-        // },
         {
             name: ' Date & Time',
             selector: (row, i) => row.updatedAt,
@@ -194,6 +190,7 @@ class AdminCategoryModel extends Component {
                     <button
                         onClick={() => this.handleEdit(row.id)}
                         className="custom_btn btn_yellow_bordered w-auto btn btn-width"
+                        disabled={!this.state.permissions.edit}
                     >
                         Edit
                     </button>
@@ -202,6 +199,7 @@ class AdminCategoryModel extends Component {
 
                         className="custom_btn btn_yellow_bordered w-auto btn btn-width"
                         onClick={() => this.handleDeleteSeletedData(row._id)}
+                        disabled={!this.state.permissions.delete}
                     >
                         Delete
                     </button>
@@ -216,7 +214,6 @@ class AdminCategoryModel extends Component {
 
     render() {
         const { cateData, loading, error, selectedRows } = this.state;
-        // console.log("cateData :", cateData)
         if (loading) {
             return <SpinnerLoader />
         }
@@ -257,28 +254,11 @@ class AdminCategoryModel extends Component {
                                         </div>
                                     </div>
 
-                                    {/* <div className="crt_bnr_fieldRow">
-                                        <div className="crt_bnr_field">
-                                            <label htmlFor="">Slug</label>
-                                            <div className="field_item">
-                                                <input
-                                                    className="form-control"
-                                                    type="text"
-                                                    name="slug"
-                                                    id=""
-                                                    value={this.state.slug}
-                                                    onChange={this.handleSlugChange}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div> */}
-
                                     <div className="crt_bnr_fieldRow">
                                         <div className="crt_bnr_field">
                                             <label>Description</label>
                                             <div className="field_item">
                                                 <ReactQuill
-                                                    //style={{ height: '250px' }}
                                                     type="text"
                                                     name="description"
                                                     value={this.state.description}
@@ -287,9 +267,7 @@ class AdminCategoryModel extends Component {
                                                         toolbar: [
                                                             [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
                                                             [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                                                            ['bold', 'italic', 'underline', 'strike'],
-                                                            // ['link', 'image'],
-                                                            // ['clean']
+                                                            ['bold', 'italic', 'underline', 'strike'],                                                          
                                                         ]
                                                     }}
                                                 />
@@ -301,6 +279,7 @@ class AdminCategoryModel extends Component {
                                         <button
                                             className='btn custom_btn btn_yellow_bordered'
                                             onClick={this.handleSubmit}
+                                            disabled={!this.state.permissions.add}
                                         >
                                             Add
                                         </button>

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import store from '../../store/index';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
@@ -9,17 +10,26 @@ import { Helmet } from 'react-helmet';
 import { toast } from 'react-toastify';
 import Header from '../../components/admin/common/Header';
 import Footer from '../../components/common/Footer';
+import { Link } from "react-router-dom";
+import arrow_back from '../../assets/icons/arrow-back.svg';
+import { Modal } from 'react-bootstrap';
 
 
 class ManageServiceCategory extends Component {
     constructor(props) {
         super(props);
+        this.authInfo = store.getState().auth.authInfo;
         this.state = {
             loading: false,
             ServiceCategoryList: [],
             selectedRows: [],
             currentCategory: null,
-
+            permissions: {
+                add: false,
+                edit: false,
+                delete: false
+            },
+            modalShow: false,
         };
 
         //for close bootstrap modal
@@ -60,6 +70,7 @@ class ManageServiceCategory extends Component {
                                 className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
                                 data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo"
                                 onClick={() => this.handleEdit(row)}
+                                disabled={!this.state.permissions.edit}
                             >
                                 Edit
                             </button>
@@ -93,7 +104,30 @@ class ManageServiceCategory extends Component {
     }
 
     componentDidMount() {
+        this.getServiceCatePermission();
         this.fetchServiceCategoryList();
+    }
+
+
+    getServiceCatePermission = async () => {
+        const admin_Id = this.authInfo.id;
+        try {
+            const res = await axios.get(`admin/getServiceCatePermission/${admin_Id}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            })
+
+            if (res.data.status === true && res.data.data) {
+                console.log("res.data.data", res.data.data);
+                this.setState({ permissions: res.data.data });
+            }
+        } catch (error) {
+            toast.error(error.response.data.message);
+            console.error("Error fetching data: ", error);
+        }
     }
 
     fetchServiceCategoryList = async () => {
@@ -164,8 +198,6 @@ class ManageServiceCategory extends Component {
 
     handleEdit = (row) => {
         this.setState({ currentCategory: { ...row, editCategoryName: row.categoryName } });
-        console.log("handleEdit current category:", this.state.currentCategory);
-        console.log("handleEdit categoryName:", row.categoryName);
     }
 
     updateServiceCategory = async (values, { setSubmitting }) => {
@@ -244,6 +276,16 @@ class ManageServiceCategory extends Component {
         }
     }
 
+    handleAddCategory = () => {
+        // Open modal
+        this.setState({ modalShow: true });
+    };
+
+    handleCloseModal = () => {
+        // Close modal
+        this.setState({ modalShow: false });
+    };
+
     render() {
         const { loading, ServiceCategoryList, selectedRows, currentCategory } = this.state;
 
@@ -261,61 +303,86 @@ class ManageServiceCategory extends Component {
             <React.Fragment>
                 <div className="seller_dash_wrap pb-5">
                     <div className="container">
-                        <Header/>
+                        <Header />
                         <Helmet>
                             <title>{"Service Category - Pay Earth"}</title>
                         </Helmet>
                         <div className="row">
                             <div className="col-md-6">
-                                <div className="createpost bg-white rounded-3 addPost_left_container">
-                                    <div className="cp_top">
-                                        <div className="cumm_title">
-                                            ADD NEW SERVICE CATEGORY
-                                        </div>
-                                    </div>
-                                    <div className="cp_body">
-                                        <Formik
-                                            initialValues={initialValues}
-                                            validationSchema={validationSchema}
-                                            onSubmit={this.saveServiceCategories}
-                                        >
-                                            {({ isSubmitting }) => (
-                                                <Form>
-                                                    <div className="crt_bnr_fieldRow">
-                                                        <div className="crt_bnr_field">
-                                                            <label htmlFor="categoryName">Category Name</label>
-                                                            <div className="field_item">
-                                                                <Field
-                                                                    className="form-control"
-                                                                    type="text"
-                                                                    name="name"
-                                                                />
-                                                                <ErrorMessage name="name" component="div" className="text-danger" />
+                                {/* Modal */}
+                                <Modal show={this.state.modalShow} onHide={this.handleCloseModal}>
+                                    <div className="createpost bg-white rounded-3 addPost_left_container">
+                                        <Modal.Header closeButton>
+                                            <div className="cp_top">
+                                                <Modal.Title>
+                                                    <div className="cumm_title">
+                                                        ADD NEW SERVICE CATEGORY
+                                                    </div>
+                                                </Modal.Title>
+                                            </div>
+                                        </Modal.Header>
+                                        <Modal.Body>
+                                            <div className="cp_body">
+                                                <Formik
+                                                    initialValues={initialValues}
+                                                    validationSchema={validationSchema}
+                                                    onSubmit={this.saveServiceCategories}
+                                                >
+                                                    {({ isSubmitting }) => (
+                                                        <Form>
+                                                            <div className="crt_bnr_fieldRow">
+                                                                <div className="crt_bnr_field">
+                                                                    <label htmlFor="categoryName">Category Name</label>
+                                                                    <div className="field_item">
+                                                                        <Field
+                                                                            className="form-control"
+                                                                            type="text"
+                                                                            name="name"
+                                                                        />
+                                                                        <ErrorMessage name="name" component="div" className="text-danger" />
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="filter_btn_box text-center">
-                                                        <button
-                                                            className='btn custom_btn btn_yellow_bordered'
-                                                            type="submit"
-                                                            disabled={isSubmitting}
-                                                        >
-                                                            {isSubmitting ? "Adding..." : "Add"}
-                                                        </button>
-                                                    </div>
-                                                </Form>
-                                            )}
-                                        </Formik>
+                                                            <div className="filter_btn_box text-center">
+                                                                <button
+                                                                    className='btn custom_btn btn_yellow_bordered'
+                                                                    type="submit"
+                                                                    disabled={isSubmitting}
+                                                                >
+                                                                    {isSubmitting ? "Adding..." : "Add"}
+                                                                </button>
+                                                            </div>
+                                                        </Form>
+                                                    )}
+                                                </Formik>
+                                            </div>
+                                        </Modal.Body>
                                     </div>
-                                </div>
+                                </Modal>
                             </div>
                         </div>
-                        
+
                         <div className="row mt-4">
                             <div className="col-12">
                                 <div className="createpost bg-white rounded-3 addPost_left_container">
-                                    <div className="cp_top">
-                                        <div className="cumm_title">Service Category List</div>
+                                    <div className="cp_top ">
+                                        <div className="d-flex ml-auto justify-content-between gap-2">
+                                            <div className="cumm_title">Service Category List</div>
+                                            <div className="d-flex justify-content-end ml-auto gap-2">
+                                                <span>
+                                                    {/* <Link className={"btn custom_btn btn_yellow mx-auto"} to="#" onClick={this.handleAddCategory}>Add-Cate</Link> */}
+                                                    <Link
+                                                        className={`btn custom_btn mx-auto ${this.state.permissions.add ? "btn_yellow" : "btn_disabled"
+                                                            }`}
+                                                        to="#"
+                                                        onClick={this.state.permissions.add ? this.handleAddCategory : null}
+                                                    >
+                                                        Add-Cate
+                                                    </Link>
+                                                </span>
+                                                <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/dashboard"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div className="cp_body">
                                         {loading && <SpinnerLoader />}
@@ -389,8 +456,8 @@ class ManageServiceCategory extends Component {
                         </div>
                     </div>
                 </div>
-            <Footer/>
-            </React.Fragment>
+                <Footer />
+            </React.Fragment >
         );
     }
 }

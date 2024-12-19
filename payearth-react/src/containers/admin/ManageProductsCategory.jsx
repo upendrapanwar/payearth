@@ -29,13 +29,41 @@ const ManageProductsCategory = () => {
     const [indiCate, setIndiCate] = useState([]);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editCateData, setEditCateData] = useState([]);
+    const [permission, setPermission] = useState({});
 
 
 
     //functions
     useEffect(() => {
+        getProductCatePermission();
         getAllCateData();
     }, []);
+
+
+    const getProductCatePermission = async () => {
+        const admin_Id = authInfo.id;
+        try {
+            const res = await axios.get(`admin/getProductcatePermission/${admin_Id}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${authInfo.token}`
+                }
+            })
+
+            if (res.data.status === true && res.data.data) {
+                console.log("res.data.data", res.data.data)
+
+                const permissionss = res.data.data;
+                setPermission(permissionss)
+                console.log("permissionspermissions", permissionss)
+            }
+
+        } catch (error) {
+            toast.error(error.response.data.message);
+            console.error("Error fetching data: ", error);
+        }
+    }
 
     //handle categories for add categories
     const handleSubmit = async (values, { setSubmitting, resetForm }) => {
@@ -230,7 +258,9 @@ const ManageProductsCategory = () => {
 
                         <button
                             className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
-                            onClick={() => handleEdit(row.id, row.categoryName, row.description)}>
+                            onClick={() => handleEdit(row.id, row.categoryName, row.description)}
+                            disabled={!permission.edit}
+                        >
                             <i className="bi bi-pen"></i>
                         </button>
 
@@ -285,14 +315,28 @@ const ManageProductsCategory = () => {
                 </Helmet>
                 <div className="row">
                     {showSubCategory ? (
-                        <AddProductSubCategory cateData={selectedCateData}  toggleShowSubCategory={toggleShowSubCategory} />
+                        <AddProductSubCategory cateData={selectedCateData} toggleShowSubCategory={toggleShowSubCategory} />
                     ) : (
                         <div className="col-lg-12">
                             <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
                                 <div className="cp_top d-flex justify-content-between align-items-center">
                                     <div className="cumm_title">Products Category List</div>
                                     <div className="d-flex justify-content-end ml-auto gap-2">
-                                        <Link className="btn custom_btn btn_yellow ml-auto " to='#' onClick={() => setIsModalOpen(true)}>Add-Cate</Link>
+                                        {/* <Link className="btn custom_btn btn_yellow ml-auto " to='#' disabled={!permission.add} onClick={() => setIsModalOpen(true)}>Add-Cate</Link> */}
+                                        <Link
+                                            className={`btn custom_btn mx-auto ${permission.add ? 'btn_yellow' : 'btn_disabled'}`}
+                                            to={permission.add ? "#" : "#"}
+                                            onClick={(e) => {
+                                                if (!permission.add) {
+                                                    e.preventDefault(); // Prevent navigation
+                                                } else {
+                                                    setIsModalOpen(true);
+                                                }
+                                            }}
+                                        >
+                                            Add-Cate
+                                        </Link>
+                                       
                                         <Link className="btn custom_btn btn_yellow mx-auto " to="/admin/dashboard"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link>
                                     </div>
                                 </div>

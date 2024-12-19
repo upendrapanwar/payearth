@@ -1,5 +1,6 @@
 module.exports = {
   Admin: require("../models/admin.model"),
+  AccessPermission: require("../models/acess.permission.model"),
   User: require("../models/user.model"),
   Seller: require("../models/seller.model"),
   Product: require("../models/product.model"),
@@ -51,5 +52,5 @@ module.exports = {
   Notification: require("../models/notification.model"),
   Support: require('../models/support.model'),
   Ticket : require('../models/ticket.model'),
-  TicketMessage: require('../models/ticketmessage.model')
+  TicketMessage: require('../models/ticketmessage.model'),
 };

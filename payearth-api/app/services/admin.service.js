@@ -16,7 +16,7 @@ const { Admin, User, Seller, Coupon, Product, Category, Brand,
     OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline,
     ProductSales, cmsPost, cmsPage, cmsCategory, bannerAdvertisement,
     Chat, ChatMessage, Services, OrderDetails, Post, PostLike, PostVideos,
-    PostImages, PostComment, Support,
+    PostImages, PostComment, Support, AccessPermission,
 } = require("../helpers/db");
 
 module.exports = {
@@ -171,6 +171,8 @@ module.exports = {
     updateSubCate,
     getTrashSubCateProduct,
     getAllAdmins,
+    addNewAdmin,
+    accessPermission,
 
     // product stock
     getProductStock,
@@ -188,7 +190,19 @@ module.exports = {
     serviceSalesGraph,
     getVendorsData,
     getBuyersData,
-    getOrderDetails
+    getOrderDetails,
+
+    // permission
+    getPostPermission,
+    getProductCatePermission,
+    products_sub_categories,
+    getServicesCatePermission,
+    getBlogCatePermission,
+    getServicesPermission,
+    getDiscountPermission,
+    getBrandPermission,
+    getAdvertiesmentPermission,
+    getSubscriptionPermission,
 };
 
 // Validator function
@@ -4262,7 +4276,11 @@ async function getTrashSubCateProduct(req) {
 
 async function getAllAdmins() {
     try {
-        const data = await Admin.find({ role: "admin" })
+        // const data = await Admin.find({ role: "admin" })
+
+        const data = await Admin.find({ role: { $in: ["admin", "manager"] } })
+            .sort({ createdAt: 'desc' });
+
         if (!data) {
             return { status: false, message: "Data is not find." };
         }
@@ -4273,6 +4291,88 @@ async function getAllAdmins() {
         return { status: false, message: error.message };
     }
 }
+
+
+async function addNewAdmin(req) {
+    try {
+        const { name, email, phone, role, password } = req.body;
+
+        if (!name || !email || !phone || !role || !password) {
+            return { status: false, message: "All fields are required." };
+        };
+
+        const existingAdmin = await Admin.findOne({ email });
+        if (existingAdmin) {
+            return { status: false, message: "Email address already exists." };
+        };
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newAdmin = new Admin({
+            name,
+            email,
+            phone,
+            role,
+            password: hashedPassword,
+            isActive: true
+        });
+
+        const result = await newAdmin.save();
+
+        const roleMessage = role === "admin" ? "Admin added successfully." : "Manager added successfully.";
+
+        return { status: true, data: result, message: roleMessage };
+    } catch (error) {
+        console.error(error);
+        return { status: false, message: error.message };
+    }
+}
+
+
+async function accessPermission(req) {
+    const { id } = req.params;
+    const { dashboard, post, create_post, manage_orders, manage_services_orders } = req.body.permissions;
+
+    try {
+
+        const admin = await Admin.findById({ _id: id });
+        if (!admin) {
+            return { status: false, message: 'Admin not found' };
+        }
+
+        let accessPermission = await AccessPermission.findOne({ admin_Id: id });
+
+        if (accessPermission) {
+
+            accessPermission.dashboard = dashboard;
+            accessPermission.post = post;
+            accessPermission.create_post = create_post;
+            accessPermission.manage_orders = manage_orders;
+            accessPermission.manage_services_orders = manage_services_orders;
+
+            const result = await accessPermission.save();
+            return { status: true, data: result, message: 'Permissions updated successfully' };
+        } else {
+
+            const newAccessPermission = new AccessPermission({
+                admin_Id: id,
+                dashboard,
+                post,
+                create_post,
+                manage_orders,
+                manage_services_orders
+            });
+
+            const result = await newAccessPermission.save();
+            return { status: true, data: result, message: 'Permissions created successfully' };
+        }
+    } catch (error) {
+        console.error(error);
+        return { status: false, message: error.message };
+    }
+}
+
+
 
 async function getProductStock(req) {
     const { status } = req.query;
@@ -4816,5 +4916,206 @@ async function getOrderDetails() {
             message: "An error occurred while fetching orders.",
             error: err.message,
         };
+    }
+}
+
+async function getPostPermission(req) {
+    const { admin_Id } = req.params;
+    try {
+        const permissions = await AccessPermission.findOne({ admin_Id: admin_Id });
+
+        if (!permissions) {
+            return { status: false, message: 'Permissions not found' };
+        }
+
+        const postPermissions = permissions.post;
+
+        return { status: true, message: 'Permissions fetched successfully', data: postPermissions };
+    } catch (error) {
+        console.error("Error fetching permission:", err);
+        return { status: false, message: "An error occurred while fetching permission.", error: err.message, };
+    }
+}
+
+async function getProductCatePermission(req) {
+    const { admin_Id } = req.params;
+    try {
+        const permissions = await AccessPermission.findOne({ admin_Id: admin_Id });
+
+        if (!permissions) {
+            return { status: false, message: 'Permissions not found' };
+        }
+
+        const productCatePermissions = permissions.products_categories;
+
+        return { status: true, message: 'Permissions fetched successfully', data: productCatePermissions };
+    } catch (error) {
+        console.error("Error fetching permission:", err);
+        return { status: false, message: "An error occurred while fetching permission.", error: err.message, };
+    }
+}
+
+async function products_sub_categories(req) {
+    const { admin_Id } = req.params;
+    try {
+        const permissions = await AccessPermission.findOne({ admin_Id: admin_Id });
+
+        if (!permissions) {
+            return { status: false, message: 'Permissions not found' };
+        }
+
+        const productsSubCategories = permissions.products_sub_categories;
+
+        return { status: true, message: 'Permissions fetched successfully', data: productsSubCategories };
+    } catch (error) {
+        console.error("Error fetching permission:", err);
+        return { status: false, message: "An error occurred while fetching permission.", error: err.message, };
+    }
+}
+
+
+async function getServicesCatePermission(req) {
+    const { admin_Id } = req.params;
+    try {
+        const permissions = await AccessPermission.findOne({ admin_Id: admin_Id });
+
+        if (!permissions) {
+            return { status: false, message: 'Permissions not found' };
+        }
+
+        const services_categories = permissions.services_categories;
+
+        return { status: true, message: 'Permissions fetched successfully', data: services_categories };
+    } catch (error) {
+        console.error("Error fetching permission:", err);
+        return { status: false, message: "An error occurred while fetching permission.", error: err.message, };
+    }
+}
+
+
+async function getBlogCatePermission(req) {
+    const { admin_Id } = req.params;
+    try {
+        const permissions = await AccessPermission.findOne({ admin_Id: admin_Id });
+
+        if (!permissions) {
+            return { status: false, message: 'Permissions not found' };
+        }
+
+        const blog_categories = permissions.blogs_categories;
+
+        return { status: true, message: 'Permissions fetched successfully', data: blog_categories };
+    } catch (error) {
+        console.error("Error fetching permission:", err);
+        return { status: false, message: "An error occurred while fetching permission.", error: err.message, };
+    }
+}
+
+
+async function getServicesPermission(req) {
+    const { admin_Id } = req.params;
+    try {
+        const permissions = await AccessPermission.findOne({ admin_Id: admin_Id });
+
+        if (!permissions) {
+            return { status: false, message: 'Permissions not found' };
+        }
+
+        const manage_service = permissions.manage_service;
+
+        return { status: true, message: 'Permissions fetched successfully', data: manage_service };
+    } catch (error) {
+        console.error("Error fetching permission:", err);
+        return { status: false, message: "An error occurred while fetching permission.", error: err.message, };
+    }
+}
+
+
+async function getDiscountPermission(req) {
+    const { admin_Id } = req.params;
+    try {
+        const permissions = await AccessPermission.findOne({ admin_Id: admin_Id });
+
+        if (!permissions) {
+            return { status: false, message: 'Permissions not found' };
+        }
+
+        const manage_discount = permissions.manage_discount;
+
+        return { status: true, message: 'Permissions fetched successfully', data: manage_discount };
+    } catch (error) {
+        console.error("Error fetching permission:", err);
+        return { status: false, message: "An error occurred while fetching permission.", error: err.message, };
+    }
+}
+
+
+async function getBrandPermission(req) {
+    const { admin_Id } = req.params;
+    try {
+        const permissions = await AccessPermission.findOne({ admin_Id: admin_Id });
+
+        if (!permissions) {
+            return { status: false, message: 'Permissions not found' };
+        }
+
+        const manage_brand = permissions.manage_brand;
+
+        return { status: true, message: 'Permissions fetched successfully', data: manage_brand };
+    } catch (error) {
+        console.error("Error fetching permission:", err);
+        return { status: false, message: "An error occurred while fetching permission.", error: err.message, };
+    }
+}
+
+/*****************************************************************/
+/**
+ * Fetches the advertisement management permissions for the given admin ID.
+ * @param {object} req - Express request object.
+ * @param {string} req.params.admin_Id - The ID of the admin to fetch permissions for.
+ * @returns {Promise<object>} - A promise resolving to an object with a status, message, and data property. The data property contains the advertisement management permissions.
+ */
+/*****************************************************************/
+async function getAdvertiesmentPermission(req) {
+    const { admin_Id } = req.params;
+    try {
+        const permissions = await AccessPermission.findOne({ admin_Id: admin_Id });
+
+        if (!permissions) {
+            return { status: false, message: 'Permissions not found' };
+        }
+
+        const manage_advertisement = permissions.manage_advertisement;
+
+        return { status: true, message: 'Permissions fetched successfully', data: manage_advertisement };
+    } catch (error) {
+        console.error("Error fetching permission:", err);
+        return { status: false, message: "An error occurred while fetching permission.", error: err.message, };
+    }
+}
+
+/*****************************************************************/
+/**
+ * Get subscription permission for a given admin
+ * @param {Object} req - request object
+ * @param {string} req.params.admin_Id - admin id
+ * @returns {Object} permission object with status and message
+ */
+/*****************************************************************/
+async function getSubscriptionPermission(req) {
+    const { admin_Id } = req.params;
+    try {
+        const permissions = await AccessPermission.findOne({ admin_Id: admin_Id });
+
+        if (!permissions) {
+            return { status: false, message: 'Permissions not found' };
+        }
+
+        const manage_subcription = permissions.manage_subcription;
+
+        return { status: true, message: 'Permissions fetched successfully', data: manage_subcription };
+    } catch (error) {
+        console.error("Error fetching permission:", err);
+        return { status: false, message: "An error occurred while fetching permission.", error: err.message, };
     }
 }

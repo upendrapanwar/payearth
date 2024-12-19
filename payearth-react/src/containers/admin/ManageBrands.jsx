@@ -31,7 +31,12 @@ class ManageBrands extends Component {
             imageId: "",
             imagePreview: null,
             emptyImg: emptyImg,
-            data: ""
+            data: "",
+            permissions: {
+                add: false,
+                edit: false,
+                delete: false
+            }
         };
 
         this.brand_column = [
@@ -73,6 +78,7 @@ class ManageBrands extends Component {
                                 className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
                                 data-bs-whatever="@mdo"
                                 onClick={() => this.handleEdit(row)}
+                                disabled={!this.state.permissions.edit}
                             >
                                 Edit
                             </button>
@@ -100,8 +106,32 @@ class ManageBrands extends Component {
     }
 
     componentDidMount() {
+        this.getBrandPermission();
         this.fetchBrandList();
     }
+
+    getBrandPermission = async () => {
+        const admin_Id = this.authInfo.id;
+        try {
+          const res = await axios.get(`admin/getBrandPermission/${admin_Id}`, {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json;charset=UTF-8',
+              'Authorization': `Bearer ${this.authInfo.token}`
+            }
+          })
+    
+          if (res.data.status === true && res.data.data) {
+            this.setState({ permissions: res.data.data }, () => {
+              console.log("Checking Response permission", this.state.permissions);
+            });
+          }
+    
+        } catch (error) {
+          toast.error(error.response.data.message);
+          console.error("Error fetching data: ", error);
+        }
+      }
 
     fetchBrandList = async () => {
         this.setState({ loading: true });
@@ -554,7 +584,8 @@ class ManageBrands extends Component {
                                                         </div>
 
                                                         <div className="cre_ser_pay col-md-12 pt-4 pb-4 text-center">
-                                                            <button type="submit" className="btn custom_btn btn_yellow w-auto">
+                                                            <button type="submit" className="btn custom_btn btn_yellow w-auto" 
+                                                                disabled={!this.state.permissions.add}>
                                                                 Create Brand
                                                             </button>
                                                         </div>

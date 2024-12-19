@@ -11,15 +11,15 @@ import { Link } from "react-router-dom";
 import adminRegistrationSchema from '../../validation-schemas/adminRegistrationSchema';
 import invisibleIcon from '../../assets/icons/invisible-icon.svg';
 import visibleIcon from '../../assets/icons/eye-icon.svg';
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 
 const ManageAdmins = () => {
     const authInfo = JSON.parse(localStorage.getItem('authInfo'));
-    console.log("authInfo",authInfo)
-
+    const history = useHistory();
 
     const [admins, setAdmins] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [adminModalOpen, setAdminModalOpen] = useState(false);
+    // const [adminModalOpen, setAdminModalOpen] = useState(false);
     const [seePassword, setSeePassword] = useState(false);
 
 
@@ -28,60 +28,38 @@ const ManageAdmins = () => {
     }, [])
 
 
-    // const getAllAdmins = async () => {
-
-    //     try {
-    //         const response = await axios.get("/admin/getAllAdmins",{
-    //             headers: {
-    //                 'Accept': 'application/json',
-    //                 'Content-Type': 'application/json;charset=UTF-8',
-    //                 'Authorization': `Bearer ${authInfo.token}`
-    //             }
-    //         })
-    //         console.log("response", response);
-    //         if (response.data.status === true && response.data.data.length > 0) {
-    //             setAdmins(response.data.data);
-    //         }
-    //         setLoading(false);
-
-    //     } catch (error) {
-    //         console.error("Categories add failed.", error);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // }
-
     const getAllAdmins = async () => {
         try {
-            const response = await axios.get("/getAllAdmins", {
+            const response = await axios.get("admin/getAllAdmins", {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
-                    'Authorization': `Bearer ${authInfo.token}` 
+                    'Authorization': `Bearer ${authInfo.token}`
                 }
             });
             console.log("response", response);
-    
+
             if (response.data.status === true && response.data.data.length > 0) {
-                setAdmins(response.data.data);  
+                setAdmins(response.data.data);
             }
-            setLoading(false); 
+            setLoading(false);
         } catch (error) {
             console.error("Admin fetch failed.", error);
         } finally {
             setLoading(false);
         }
     };
-    
+
 
 
     const ManageCapability = (row) => {
-        console.log('row', row);
+        const id = row;
+        history.push(`/admin/admin-manage-Capabilities`,{id});     
     }
 
 
     const addNewAdmin = async () => {
-        setAdminModalOpen(true);
+        history.push("/admin/add-admin");
     }
 
     const handlePasswordVisibility = () => {
@@ -102,6 +80,11 @@ const ManageAdmins = () => {
         {
             name: 'Name',
             selector: row => row.name,
+            sortable: true,
+        },
+        {
+            name: 'Role',
+            selector: row => row.role,
             sortable: true,
         },
         {
@@ -194,89 +177,6 @@ const ManageAdmins = () => {
                         </div>
                     </div>
                 </div>
-
-                {adminModalOpen && (
-                    <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1" aria-modal="true">
-                        <div className="modal-dialog modal-dialog-centered">
-                            <div className="modal-content">
-                                <div className="modal-header">
-                                    <h5 className="modal-title">Edit Category</h5>
-                                    <button
-                                        type="button"
-                                        className="btn-close"
-                                        onClick={() => {
-                                            setAdminModalOpen(false);
-                                            // setEditCateData([]);
-                                        }}
-                                        aria-label="Close"
-                                    ></button>
-                                </div>
-                                <div className="modal-body">
-                                    <Formik
-                                        initialValues={{
-                                            name: '',
-                                            phone: '',
-                                            email: '',
-                                            password: '',
-                                        }}
-                                        onSubmit={handleSubmit}
-                                        validationSchema={adminRegistrationSchema}
-                                    >
-                                        {({ values,
-                                            errors,
-                                            touched,
-                                            handleChange,
-                                            handleBlur,
-                                            isValid
-                                        }) => (
-                                            <Form className="seller_register">
-                                                <div className="row ">
-                                                    <div className="col-md-12 ">
-                                                        <div className="mb-3">
-                                                            <label htmlFor="name" className="form-label">Business Name <small className="text-danger">*</small></label>
-                                                            <Field type="text" className="form-control" id="name" name="name" />
-                                                            {touched.name && errors.name ? (
-                                                                <small className="text-danger">{errors.name}</small>
-                                                            ) : null}
-                                                        </div>
-                                                        <div className="mb-3">
-                                                            <label htmlFor="phone" className="form-label">Phone Number <small className="text-danger">*</small></label>
-                                                            <Field type="text" className="form-control" id="phone" name="phone" />
-                                                            {touched.phone && errors.phone ? (
-                                                                <small className="text-danger">{errors.phone}</small>
-                                                            ) : null}
-                                                        </div>
-                                                        <div className="mb-3">
-                                                            <label htmlFor="email" className="form-label">Business Email ID <small className="text-danger">*</small></label>
-                                                            <Field type="email" className="form-control" id="email" name="email" />
-                                                            {touched.email && errors.email ? (
-                                                                <small className="text-danger">{errors.email}</small>
-                                                            ) : null}
-                                                        </div>
-                                                        <div className="pwd_wrapper sel_pwd mb-3">
-                                                            <label htmlFor="password" className="form-label">Password <small className="text-danger">*</small></label>
-                                                            <Field type={seePassword ? "text" : "password"} className="form-control" id="password" name="password" />
-                                                            <img
-                                                                src={seePassword ? visibleIcon : invisibleIcon}
-                                                                alt="toggle password visibility"
-                                                                onClick={handlePasswordVisibility}
-                                                                style={{ cursor: 'pointer' }}
-                                                            />
-                                                            {touched.password && errors.password ? (
-                                                                <small className="text-danger">{errors.password}</small>
-                                                            ) : null}
-                                                        </div>
-                                                        <button type="submit" className="btn custom_btn btn_yellow text-uppercase w-100 p-3" disabled={!isValid}>Save</button>
-                                                    </div>
-                                                </div>
-                                            </Form>
-                                        )}
-                                    </Formik>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
                 <Footer />
             </div>
         </React.Fragment>

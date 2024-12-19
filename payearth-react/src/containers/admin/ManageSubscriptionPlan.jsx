@@ -22,6 +22,8 @@ class AdminManageSubPlan extends Component {
     constructor(props) {
         super(props);
         this.authInfo = store.getState().auth.authInfo;
+        this.authInfoString = JSON.parse(localStorage.getItem("authInfo"));
+
         this.state = {
             planName: '',
             interval: '',
@@ -36,23 +38,70 @@ class AdminManageSubPlan extends Component {
             selectedRows: [],
             loading: true,
             error: null,
+            permissions: {
+                add: '',
+                edit: '',
+                delete: ''
+            }
         }
     }
 
     componentDidMount() {
+        this.getSubscriptionPermission();
         this.getSubData();
     }
 
-    // generateUniqueSlug = (names) => {
-    //     return names
-    //         .toLowerCase()
-    //         .replace(/[^a-z0-9 -]/g, '')
-    //         .replace(/\s+/g, '-')
-    //         .replace(/-+/g, '-')
-    //         .trim();
+
+    getSubscriptionPermission = () => {
+        const admin_Id = this.authInfoString.id;
+        this.setState({ loading: true })
+        // Axios API call without async/await
+        axios
+          .get(`admin/getSubscriptionPermission/${admin_Id}`, {
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json;charset=UTF-8',
+              Authorization: `Bearer ${this.authInfoString.token}`,
+            },
+          })
+          .then((res) => {
+            if (res.data.status === true && res.data.data) {
+              this.setState({ permissions: res.data.data }, () => {
+                console.log("Checking Response permission", this.state.permissions);
+                this.setState({ loading: false })
+              });
+            }
+          })
+          .catch((error) => {
+            this.setState({ loading: false })
+            toast.error(error.response.data.message);
+            console.error("Error fetching data: ", error);
+          });
+      };
+      
+    // getSubscriptionPermission = async () => {
+    //     const admin_Id = this.authInfo.id;
+    //     try {
+    //         const res = await axios.get(`admin/getSubscriptionPermission/${admin_Id}`, {
+    //             headers: {
+    //                 'Accept': 'application/json',
+    //                 'Content-Type': 'application/json;charset=UTF-8',
+    //                 'Authorization': `Bearer ${this.authInfo.token}`
+    //             }
+    //         })
+
+    //         if (res.data.status === true && res.data.data) {
+    //             this.setState({ permissions: res.data.data }, () => {
+    //                 console.log("Checking Response permission", this.state.permissions);
+    //             });
+    //         }
+
+    //     } catch (error) {
+    //         toast.error(error.response.data.message);
+    //         console.error("Error fetching data: ", error);
+    //     }
     // }
 
-   
     getSubData = async () => {
         try {
             // const productList = await stripe.products.list();
@@ -66,70 +115,6 @@ class AdminManageSubPlan extends Component {
             console.error('Error fetching products: ', error);
         }
     }
-
-    // handleSaveInDatabase = (data) => {
-    //     console.log("data>>>>>>>>>>>>>>>>>", data)
-    // }
-
-
-    // handleRowSelected = (state) => {
-    //     this.setState({ selectedRows: state.selectedRows });
-    // };
-
-    // handleDeleteSeletedData = () => {
-    //     const { selectedRows } = this.state;
-    //     // console.log("selected data", selectedRows)
-    //     for (let i = 0; i < selectedRows.length; i++) {
-    //         const ids = selectedRows[i].id
-    //         axios.delete(`/admin/categoryDelete/${ids}`, {
-    //             headers: {
-    //                 'Authorization': `Bearer ${this.authInfo.token}`
-    //             }
-    //         }).then((res) => { console.log('Row Data', res.data) })
-    //             .catch((error) => {
-    //                 console.log("error", error)
-    //             })
-    //         this.setState({ loading: true })
-    //     }
-    //     this.getCategory();
-    // }
-
-    // handleDeleteSeletedData = (id) => {
-    //     const { selectedRows } = this.state;
-    //     if (selectedRows == false) {
-    //         axios.delete(`/admin/categoryDelete/${id}`, {
-    //             headers: {
-    //                 'Authorization': `Bearer ${this.authInfo.token}`
-    //             }
-    //         }).then((res) => {
-    //             this.getCategory();
-    //             console.log(res.data)
-    //         })
-    //             .catch((error) => {
-    //                 console.log("error", error)
-    //             })
-    //         // this.setState({ loading: true })
-
-    //     } else {
-    //         for (let i = 0; i < selectedRows.length; i++) {
-    //             const ids = selectedRows[i].id
-    //             axios.delete(`/admin/categoryDelete/${ids}`, {
-    //                 headers: {
-    //                     'Authorization': `Bearer ${this.authInfo.token}`
-    //                 }
-    //             }).then((res) => {
-    //                 this.getCategory();
-    //                 console.log('Row Data', res.data)
-    //             })
-    //                 .catch((error) => {
-    //                     console.log("error", error)
-    //                 })
-    //         }
-    //         // window.location.reload(); 
-    //         // this.setState({ loading: true })
-    //         this.setState({ selectedRows: "" })
-    //     }
-    // }
 
     handlePlanType = (e) => {
         console.log("plan Type : ", e.target.value)
@@ -160,17 +145,12 @@ class AdminManageSubPlan extends Component {
         this.setState({ advertiseAllowed: e.target.value });
     };
 
-    // handleDescription = (e) => {
-    //     console.log("Description", e.target.value)
-    //     this.setState({ description: e.target.value });
-    // };
-
     handleDescription = (description) => {
         console.log("Description", description)
         this.setState({ description });
     };
 
-  
+
     handleCreatePlan = async () => {
         const { planType, interval, interval_count, planName, planPrice, advertiseAllowed, description } = this.state;
         // console.log("price : ", price)
@@ -223,11 +203,6 @@ class AdminManageSubPlan extends Component {
             selector: (row, i) => `${row.amount / 100} $`,
             sortable: true
         },
-        // {
-        //     name: "ADVERTISE ALLOWED",
-        //     selector: (row, i) => row.metadata.advertiseAllowed,
-        //     sortable: true
-        // },
         {
             name: "PLAN TYPE FOR",
             selector: (row, i) => row.metadata.planType,
@@ -238,16 +213,6 @@ class AdminManageSubPlan extends Component {
             selector: (row, i) => row.active === true ? 'True' : 'False',
             sortable: true
         },
-        // {
-        //     name: ' Date & Time',
-        //     selector: (row, i) => row.updatedAt,
-        //     sortable: true,
-        //     cell: row => {
-        //         const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        //         const date = new Date(row.updatedAt).toLocaleDateString('en-US', options);
-        //         return <div>{date}</div>;
-        //     },
-        // },
         {
             name: 'Actions',
             cell: (row) => (
@@ -256,6 +221,8 @@ class AdminManageSubPlan extends Component {
 
                         className="custom_btn btn_yellow_bordered w-auto btn btn-width"
                         onClick={() => this.handleDeletePlan(row.id)}
+                        disabled={!this.state.permissions.delete}
+                        // disabled={true}
                     >
                         Delete
                     </button>
@@ -263,10 +230,6 @@ class AdminManageSubPlan extends Component {
             ),
         },
     ]
-
-    // handleEdit = (id) => {
-    //     this.props.history.push(`/admin/category-module-edit/${id}`)
-    // }
 
     render() {
         const { allPlanData, loading, error, selectedRows } = this.state;
@@ -395,30 +358,11 @@ class AdminManageSubPlan extends Component {
                                         </div>
                                     </div>
 
-
-                                    {/* <div className="crt_bnr_fieldRow">
-                                        <div className="crt_bnr_field">
-                                            <label htmlFor="">Description</label>
-                                            <div className="field_item">
-                                                <textarea
-                                                    type="text"
-                                                    name="bannerText"
-                                                    // value={this.state.bannerText}
-                                                    onChange={this.handleDescription}
-                                                    cols="30"
-                                                    rows="10"
-                                                    className="form-control"
-                                                ></textarea>
-                                            </div>
-                                        </div>
-                                    </div> */}
-
                                     <div className="crt_bnr_fieldRow">
                                         <div className="crt_bnr_field">
                                             <label>Description</label>
                                             <div className="field_item">
                                                 <ReactQuill
-                                                    //style={{ height: '250px' }}
                                                     type="text"
                                                     name="description"
                                                     value={this.state.description}
@@ -442,6 +386,7 @@ class AdminManageSubPlan extends Component {
                                         <button
                                             className='btn custom_btn btn_yellow_bordered'
                                             onClick={this.handleCreatePlan}
+                                            disabled={!this.state.permissions.add}
                                         >
                                             Create
                                         </button>
@@ -454,22 +399,17 @@ class AdminManageSubPlan extends Component {
                                 <div className="cp_top">
                                     <div className="cumm_title">Plan List</div>
                                 </div>
-                                <div
-                                // className="cp_body"
-                                >
+                                <div>
                                     <DataTableExtensions
                                         columns={this.category_column}
-                                        data={allPlanData}
-                                    >
+                                        data={allPlanData}>
                                         <DataTable
                                             pagination
                                             noHeader
                                             highlightOnHover
                                             defaultSortField="id"
                                             defaultSortAsc={false}
-                                            // selectableRows
                                             selectedRows={selectedRows}
-                                        // onSelectedRowsChange={this.handleRowSelected}
                                         />
                                     </DataTableExtensions>
                                 </div>

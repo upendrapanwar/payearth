@@ -33,6 +33,11 @@ class ManageServices extends Component {
       showModal: false,
       loading: true,
       activeTab: localStorage.getItem("activeTab") || "nav-pending-orders",
+      permissions: {
+        add: false,
+        edit: false,
+        delete: false
+      }
     };
   }
 
@@ -121,44 +126,6 @@ class ManageServices extends Component {
     };
 
     const deletePromises = selectedRows.map((row) => {
-      // let deleteImageRequest;
-
-      // if (row.imageId) {
-      //     // If the service has an image, delete it from Cloudinary
-      //     const timestamp = Math.floor(Date.now() / 1000); // Current timestamp in seconds
-      //     const stringToSign = `public_id=${row.imageId}&timestamp=${timestamp}${this.apiSecret}`;
-      //     const signature = CryptoJS.SHA1(stringToSign).toString(CryptoJS.enc.Hex);
-
-      //     const cloudinaryDeleteUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/destroy`;
-      //     deleteImageRequest = fetch(cloudinaryDeleteUrl, {
-      //         method: 'POST',
-      //         headers: {
-      //             'Content-Type': 'application/json'
-      //         },
-      //         body: JSON.stringify({
-      //             public_id: row.imageId,
-      //             api_key: this.apiKey,
-      //             timestamp,
-      //             signature
-      //         })
-      //     }).then(response => response.json())
-      //         .then(data => {
-      //             //    console.log("Cloudinary response data:", data);
-      //             if (data.result === 'ok') {
-      //                 //    toast.success("Image deleted successfully");
-      //             } else {
-      //                 throw new Error("Failed to delete image from Cloudinary");
-      //             }
-      //         }).catch(error => {
-      //             toast.error("Error deleting image from Cloudinary");
-      //             console.error("Cloudinary deletion error:", error);
-      //             throw error; // Rethrow error to propagate it further
-      //         });
-      // } else {
-      //     // If no image to delete, resolve immediately
-      //     deleteImageRequest = Promise.resolve();
-      // }
-
       // Delete the service from your backend
       const deleteServiceRequest = axios
         .delete(`/admin/services/delete/${row._id}`, { headers })
@@ -179,19 +146,7 @@ class ManageServices extends Component {
           }
           throw error; // Rethrow error to propagate it further
         });
-
-      // Return a promise that resolves when both deletion actions are complete
-      // return deleteImageRequest.then(() => deleteServiceRequest);
     });
-
-    // Promise.all(deletePromises)
-    //     .then(() => {
-    //         this.getServices(); // Refresh the list after deletion
-    //     })
-    //     .catch(error => {
-    //         console.error("Error during deletion process:", error);
-    //         toast.error("An unexpected error occurred. Please try again.");
-    //     });
   };
 
   getServices = () => {
@@ -243,7 +198,31 @@ class ManageServices extends Component {
   };
 
   componentDidMount() {
+    this.getServicesPermission();
     this.getServices();
+  }
+
+  getServicesPermission = async () => {
+    const admin_Id = this.authInfo.id;
+    try {
+      const res = await axios.get(`admin/getServicesPermission/${admin_Id}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Authorization': `Bearer ${this.authInfo.token}`
+        }
+      })
+
+      if (res.data.status === true && res.data.data) {
+        this.setState({ permissions: res.data.data }, () => {
+          console.log("Checking Response permission", this.state.permissions);
+        });
+      }
+
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.error("Error fetching data: ", error);
+    }
   }
 
   activeService_column = [
@@ -274,48 +253,19 @@ class ManageServices extends Component {
       selector: (row, i) => row.category.categoryName,
       sortable: true,
     },
-    // {
-    //     name: "DESCRIPTION",
-    //     selector: (row, i) => (
-    //         <div
-    //             dangerouslySetInnerHTML={{
-    //                 __html: (row.description),
-    //             }}
-    //         />
-    //     ),
-    //     sortable: true
-    // },
     {
       name: "STATUS",
       selector: (
         row,
-        i // row.isActive === true ? (
+        i
       ) => (
         <p className="p-1 text-white bg-success  bg-opacity-6 border-info rounded">
           Active
         </p>
       ),
-      //  ) : (
-      //  <p className="p-1 text-white bg-danger  bg-opacity-6 border-info rounded">
-      //   In-Active
-      //   </p>
-      //    ),
       sortable: true,
     },
     {
-      // name:
-      // (
-      //     <div style={{ display: 'flex', alignItems: 'center' }}>
-      //         <span>ACTIONS</span>
-      //         <button
-      //         className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
-      //         // onClick={() => this.handleDeleteSeletedData(row._id)}
-      //         onClick={() => this.handleDeleteSelectedData()}
-      //     >
-      //         Delete
-      //     </button>
-      //     </div>
-      // ),
       name: "ACTIONS",
       width: "460px",
       cell: (row) => (
@@ -329,6 +279,7 @@ class ManageServices extends Component {
           <button
             onClick={() => this.handleEdit(row)}
             className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+            disabled={!this.state.permissions.edit}
           >
             Edit
           </button>
@@ -342,6 +293,8 @@ class ManageServices extends Component {
             className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
             //onClick={() => this.handleDeleteSeletedData(row._id)}
             onClick={() => this.handleDeleteSelectedData(row)}
+            disabled={!this.state.permissions.delete}
+
           >
             Delete
           </button>
@@ -420,6 +373,7 @@ class ManageServices extends Component {
           <button
             onClick={() => this.handleEdit(row)}
             className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
+            disabled={!this.state.permissions.edit}
           >
             Edit
           </button>
@@ -434,6 +388,7 @@ class ManageServices extends Component {
             className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
             // onClick={() => this.handleDeleteSeletedData(row._id)}
             onClick={() => this.handleDeleteSelectedData(row)}
+            disabled={!this.state.permissions.delete}
           >
             Delete
           </button>
@@ -466,9 +421,14 @@ class ManageServices extends Component {
                   <div className="text-center">
                     <span>
                       <Link
-                        className="btn custom_btn btn_yellow mx-auto "
-                        to="/admin/add-service"
-                        onClick={this.clearSessionStorage}
+                        className={`btn custom_btn mx-auto ${this.state.permissions.add ? 'btn_yellow' : 'btn_disabled'}`}
+                        to={this.state.permissions.add ? "/admin/add-service" : "#"}
+                        onClick={(e) => {
+                          if (!this.state.permissions.add) {
+                            e.preventDefault(); // Prevent navigation
+                            // this.clearSessionStorage();
+                          }
+                        }}
                       >
                         Add New Service
                       </Link>
@@ -484,9 +444,8 @@ class ManageServices extends Component {
                 >
                   <button
                     // className="nav-link active"
-                    className={`nav-link ${
-                      activeTab === "nav-pending-orders" ? "active" : ""
-                    }`}
+                    className={`nav-link ${activeTab === "nav-pending-orders" ? "active" : ""
+                      }`}
                     id="nav-pending-orders-tab"
                     data-bs-toggle="tab"
                     data-bs-target="#nav-pending-orders"
@@ -500,9 +459,8 @@ class ManageServices extends Component {
                   </button>
                   <button
                     //  className="nav-link"
-                    className={`nav-link ${
-                      activeTab === "nav-ongoing-orders" ? "active" : ""
-                    }`}
+                    className={`nav-link ${activeTab === "nav-ongoing-orders" ? "active" : ""
+                      }`}
                     id="nav-ongoing-orders-tab"
                     data-bs-toggle="tab"
                     data-bs-target="#nav-ongoing-orders"
@@ -516,9 +474,8 @@ class ManageServices extends Component {
                   </button>
                   <button
                     // className="nav-link"
-                    className={`nav-link ${
-                      activeTab === "nav-cancelled-orders" ? "active" : ""
-                    }`}
+                    className={`nav-link ${activeTab === "nav-cancelled-orders" ? "active" : ""
+                      }`}
                     id="nav-cancelled-orders-tab"
                     data-bs-toggle="tab"
                     data-bs-target="#nav-cancelled-orders"
@@ -538,9 +495,8 @@ class ManageServices extends Component {
               >
                 <div
                   // className="tab-pane fade show active"
-                  className={`tab-pane fade ${
-                    activeTab === "nav-pending-orders" ? "show active" : ""
-                  }`}
+                  className={`tab-pane fade ${activeTab === "nav-pending-orders" ? "show active" : ""
+                    }`}
                   id="nav-pending-orders"
                   role="tabpanel"
                   aria-labelledby="nav-pending-orders-tab"
@@ -566,9 +522,8 @@ class ManageServices extends Component {
                 </div>
                 <div
                   //  className="tab-pane fade"
-                  className={`tab-pane fade ${
-                    activeTab === "nav-ongoing-orders" ? "show active" : ""
-                  }`}
+                  className={`tab-pane fade ${activeTab === "nav-ongoing-orders" ? "show active" : ""
+                    }`}
                   id="nav-ongoing-orders"
                   role="tabpanel"
                   aria-labelledby="nav-ongoing-orders-tab"
@@ -747,9 +702,8 @@ class ManageServices extends Component {
                 </div>
                 <div
                   // className="tab-pane fade"
-                  className={`tab-pane fade ${
-                    activeTab === "nav-cancelled-orders" ? "show active" : ""
-                  }`}
+                  className={`tab-pane fade ${activeTab === "nav-cancelled-orders" ? "show active" : ""
+                    }`}
                   id="nav-cancelled-orders"
                   role="tabpanel"
                   aria-labelledby="nav-cancelled-orders-tab"

@@ -256,6 +256,27 @@ router.get("/get-trash-sub-categories/:id", getTrashSubCateProduct);
 
 //manage Admins
 router.get("/getAllAdmins", getAllAdmins);
+router.post("/addAdmin", addNewAdmin);
+router.post("/permission/:id", accessPermission);
+
+//Permission
+router.get("/getPostPermission/:admin_Id", getPostPermission);
+router.get("/getProductcatePermission/:admin_Id", getProductCatePermission);
+router.get("/getProductSubCatePermission/:admin_Id", products_sub_categories);
+router.get("/getServiceCatePermission/:admin_Id", getServicesCatePermission);
+router.get("/getBlogCatePermission/:admin_Id", getBlogCatePermission);
+router.get("/getServicesPermission/:admin_Id", getServicesPermission);
+router.get("/getDiscountPermission/:admin_Id", getDiscountPermission);
+router.get("/getBrandPermission/:admin_Id", getBrandPermission);
+router.get("/getAdvertiesmentPermission/:admin_Id", getAdvertiesmentPermission);
+router.get("/getSubscriptionPermission/:admin_Id", getSubscriptionPermission);
+
+
+
+
+
+
+
 
 // Product 
 router.get("/getProductStock", getProductStock);
@@ -1240,6 +1261,76 @@ function getAllAdmins(req, res, next) {
         .catch((err) => next(res.json({ status: false, message: err.message })));
 }
 
+function addNewAdmin(req, res, next) {
+    adminService.addNewAdmin(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function accessPermission(req, res, next) {
+    adminService.accessPermission(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getPostPermission(req, res, next) {
+    adminService.getPostPermission(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getProductCatePermission(req, res, next) {
+    adminService.getProductCatePermission(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function products_sub_categories(req, res, next) {
+    adminService.products_sub_categories(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getServicesCatePermission(req, res, next) {
+    adminService.getServicesCatePermission(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getBlogCatePermission(req, res, next) {
+    adminService.getBlogCatePermission(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getServicesPermission(req, res, next) {
+    adminService.getServicesPermission(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getDiscountPermission(req, res, next) {
+    adminService.getDiscountPermission(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getBrandPermission(req, res, next) {
+    adminService.getBrandPermission(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+function getAdvertiesmentPermission(req, res, next) {
+    adminService.getAdvertiesmentPermission(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getSubscriptionPermission(req, res, next) {
+    adminService.getSubscriptionPermission(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
 function getProductStock(req, res, next) {
     adminService.getProductStock(req)
         .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))

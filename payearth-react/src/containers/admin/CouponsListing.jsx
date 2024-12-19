@@ -51,15 +51,45 @@ class CouponsListing extends Component {
             ],
             defaultSelectedOptionNew: { label: 'New to Old', value: 'desc' },
             defaultSelectedOptionExpired: { label: 'New to Old', value: 'desc' },
-            cuponType: ''
+            cuponType: '',
+
+            permissions: {
+                add: false,
+                edit: false,
+                delete: false
+              }
         }
     }
 
 
     componentDidMount() {
+        this.getDiscountPermission();
         this.getCuponsListing(false, null, 'new');
         this.handleItemType('new');
     }
+
+    getDiscountPermission = async () => {
+        const admin_Id = this.authInfo.id;
+        try {
+          const res = await axios.get(`admin/getDiscountPermission/${admin_Id}`, {
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json;charset=UTF-8',
+              'Authorization': `Bearer ${this.authInfo.token}`
+            }
+          })
+    
+          if (res.data.status === true && res.data.data) {
+            this.setState({ permissions: res.data.data }, () => {
+              console.log("Checking Response permission", this.state.permissions);
+            });
+          }
+    
+        } catch (error) {
+          toast.error(error.response.data.message);
+          console.error("Error fetching data: ", error);
+        }
+      }
 
     getCuponsListing = (pagination, param, type) => {
         let reqBody = {};
@@ -199,7 +229,20 @@ class CouponsListing extends Component {
                                 <div className="dash_inner_wrap">
                                     <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
                                         <div className="dash_title">Coupons</div>
-                                        <Link to="/admin/add-coupon" className="custom_btn btn_yellow w-auto btn">Add Coupon</Link>
+                                        {/* <Link to="/admin/add-coupon" className="custom_btn btn_yellow w-auto btn">Add Coupon</Link> */}
+                                        <span>
+                                            <Link
+                                                className={`btn custom_btn mx-auto ${this.state.permissions.add ? 'btn_yellow' : 'btn_disabled'}`}
+                                                to={this.state.permissions.add ? "/admin/add-service" : "#"}
+                                                onClick={(e) => {
+                                                    if (!this.state.permissions.add) {
+                                                        e.preventDefault(); // Prevent navigation
+                                                    }
+                                                }}
+                                            >
+                                                Add Coupon
+                                            </Link>
+                                        </span>
                                     </div>
                                 </div>
                                 <nav className="orders_tabs">
@@ -255,7 +298,7 @@ class CouponsListing extends Component {
                                                                 <td>{value.start}</td>
                                                                 <td>{value.end}</td>
                                                                 <td>{value.discount_per}</td>
-                                                                <td><Link to="#" className="custom_btn btn_yellow_bordered w-auto btn">Edit</Link></td>
+                                                                <td><Link to="#" className="custom_btn btn_yellow_bordered w-auto btn" >Edit</Link></td>
                                                             </tr>
                                                         )
                                                     })}
