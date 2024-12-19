@@ -626,7 +626,7 @@ class Dashboard extends Component {
                                 <div className="col-md-8">
                                     <div className="dash_graph bg-white">
                                         <div className="dash_graph_head">
-                                            <div className="dash_title">Product Sales Analysis Year {`${this.state.productYear}`}</div>
+                                            <div className="dash_title">Total Sales Graph Year {`${this.state.productYear}`}</div>
                                             <div>
                                                 <Button className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={this.handlePreviousProductYear} startIcon={<ArrowBackIosIcon />}></Button>
                                                 <Button className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={this.handleNextProductYear} endIcon={<ArrowForwardIosIcon />} disabled={this.state.productYear === currentYear}></Button>

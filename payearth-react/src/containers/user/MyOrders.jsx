@@ -32,6 +32,7 @@ class MyOrders extends Component {
       error: null,
       show: false,
       showModal: false,
+      showTrackingModal: false,
       downloading: false,
     };
   }
@@ -73,8 +74,14 @@ class MyOrders extends Component {
     this.setState({ showModal: true });
   };
 
+  viewTrackingDetails = (row) => {
+    this.setState({ selectedRowData: row });
+    this.setState({ showTrackingModal: true })
+  }
+
   GenerateInvoice = (row) => {
     const userName = this.userInfo.name;
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
     const {
       orderCode,
       billingFirstName,
@@ -136,16 +143,13 @@ class MyOrders extends Component {
               </div>
               <div class="col-4">
                 <div class="fw-bold">Billed From:</div>
-                <div>${sellerName}</div>
-                <div>${sellerAddress}</div>
-                <div>${sellerState}${", "} ${sellerCountry}</div>
-                <div>${sellerEmail}</div>
+                <div>${"Pay Earth"}</div>
               </div>
               <div class="col-4">
                 <div class="fw-bold mt-2">Date Of Issue:</div>
-                <div>${orderDate}</div>
+              <div>${new Date(row.paymentId.createdAt).toLocaleDateString('en-US', options)}</div>
                 <div class="fw-bold mt-2">Invoice:</div>
-                <div>${invoiceNo}</div>
+                 <div>${row.paymentId.invoiceNo}</div>
               </div>
         </div>
       <table class="mb-0 table-responsive table">
@@ -159,7 +163,7 @@ class MyOrders extends Component {
           </tr>
         </thead>
         <tbody>
-        ${itemRows}
+         ${itemRows}
         </tbody>
       </table>
       <table class="table">
@@ -255,22 +259,20 @@ class MyOrders extends Component {
       sortable: true,
       width: "150px",
     },
-    {
-      name: "Order Status",
-      selector: (row, i) => row.paymentId.paymentStatus === "paid" ? "processing" : "",
-      sortable: true,
-      width: "200px",
-    },
+    // {
+    //   name: "Order Status",
+    //   selector: (row, i) => row.paymentId.paymentStatus === "paid" ? "processing" : "",
+    //   sortable: true,
+    //   width: "200px",
+    // },
     {
       name: "Order Date",
       // selector: (row, i) => row.createdAt,
       sortable: true,
 
       cell: (row) => {
-        const dateString = row.createdAt;
-        const date = new Date(dateString);
-        const formattedDate = `${date.getUTCMonth() + 1}/${date.getUTCDate()}/${date.getUTCFullYear()} ${date.getUTCHours()}:${date.getUTCMinutes()}:${date.getUTCSeconds()}`;
-        return <div>{formattedDate}</div>;
+        const date = new Date(row.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        return <div>{date}</div>;
       },
     },
     {
@@ -299,12 +301,24 @@ class MyOrders extends Component {
         </>
       ),
     },
+    {
+      cell: (row) => (
+        <>
+          <button
+            onClick={() => this.viewTrackingDetails(row)}
+            className="btn custom_btn btn_yellow_bordered"
+          >
+            View Tracking
+          </button>
+        </>
+      ),
+    },
   ];
 
   render() {
     const { data, loading, error, selectedRowData, downloading } = this.state;
+
     const userName = this.userInfo.name;
-    console.log("data", data);
 
     return (
       <React.Fragment>
@@ -400,7 +414,7 @@ class MyOrders extends Component {
                     </Col>
                     <Col md={4}>
                       <div className="fw-bold mt-2">Date Of Issue:</div>
-                      <div>{selectedRowData.paymentId.createdAt || ""}</div>
+                      <div>{new Date(selectedRowData.paymentId.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) || ""}</div>
                       <div className="fw-bold mt-2">Invoice:</div>
                       <div>{selectedRowData.paymentId.invoiceNo || ""}</div>
                     </Col>
@@ -500,6 +514,91 @@ class MyOrders extends Component {
                   </Table>
                   <div className="bg-light py-3 px-4 rounded text-center">
                     Amount is charged as per the terms and conditions.
+                  </div>
+                </div>
+              </div>
+            )}
+          </Modal.Body>
+        </Modal>
+
+        {/* Tracking */}
+        <Modal
+          show={this.state.showTrackingModal}
+          onHide={() => this.setState({ showTrackingModal: false })}
+          dialogClassName="modal-90w"
+          aria-labelledby="example-custom-modal-styling-title"
+        >
+          <Modal.Body
+            style={{ maxHeight: "calc(100vh - 100px)", overflowY: "auto" }}
+          >
+            {selectedRowData && (
+              <div className="d-flex flex-row justify-content-between align-items-start bg-light w-100 p-4">
+                <div className="w-100">
+                  <h3 className="fw-bold my-2 text-bold text-center">{`Thank you for your order #${selectedRowData.orderCode}`}</h3>
+                  <div className="p-4 cart-mob-p0">
+                    <Row className="mb-4">
+                      <Col md={6}>
+                        <div className="fw-bold">Billed to:</div>
+                        <div>
+                          {selectedRowData.billingFirstName || ""}{" "}
+                          {selectedRowData.billingLastName || ""}
+                        </div>
+                        <div>{selectedRowData.billingCompanyName || ""}</div>
+                        <div>
+                          {selectedRowData.billingStreetAddress || ""}
+                          {", "}
+                          {selectedRowData.billingStreetAddress1 || ""}
+                        </div>
+                        <div>
+                          {selectedRowData.billingCity || ""}
+                          {", "}
+                          {selectedRowData.billingPostCode || ""}
+                        </div>
+                        <div>{selectedRowData.billingCountry || ""}</div>
+                        <div>{selectedRowData.billingEmail || ""}</div>
+                      </Col>
+                      <Col md={6}>
+                        <div className="fw-bold">Billed From:</div>
+                        <div>{'Pay Earth'}</div>
+                      </Col>
+                    </Row>
+                    <Table className="mb-0 table-responsive">
+                      <thead>
+                        <tr>
+                          <th style={{ width: "70px" }}>Items</th>
+                          <th className="text-center" style={{ width: "100px" }}>Qty</th>
+                          <th className="text-center" style={{ width: "70px" }}>
+                            Status
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedRowData.orderStatus.length > 0 ? (
+                          selectedRowData.orderStatus.map((item, i) => {
+                            return (
+                              <tr id={i} key={i} className="m-5">
+                                <td style={{ width: "70px" }}>
+                                  ➢ {item.product.productId[0]?.name || 'No product name'}
+                                </td>
+                                <td className="text-center" style={{ width: "100px" }}>
+                                  {item.product.quantity}
+                                </td>
+                                <td className="text-center" style={{ width: "70px" }} >
+                                  <span className="badge rounded-pill text-bg-success">{item.title}</span>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        ) : (
+                          <tr>
+                            <td>Data is not available</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </Table>
+                    <div className="bg-light py-3 px-4 mt-5 rounded text-center">
+                      Amount is charged as per the terms and conditions.
+                    </div>
                   </div>
                 </div>
               </div>

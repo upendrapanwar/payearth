@@ -1524,6 +1524,7 @@ async function getOrderDetails(req) {
     const { authorId, status } = req.query;
     const orders = await Order.find({ userId: authorId, isService: status })
       .select("orderCode price paymentId billingFirstName billingLastName billingCompanyName billingCounty billingStreetAddress billingStreetAddress1 billingCity billingCountry billingPostCode billingPhone billingEmail billingNote deliveryCharge taxPercent taxAmount discount orderStatus total createdAt")
+      .sort({ createdAt: "desc" })
       .populate([
         {
           path: "orderStatus",

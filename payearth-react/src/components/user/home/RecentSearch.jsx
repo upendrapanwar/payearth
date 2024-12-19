@@ -52,12 +52,12 @@ const RecentSearch = () => {
           </div>
           {products && products.length
             ? products.map((product, index) => {
-                return (
-                  <div className="col-xs-12 col-md-6 col-lg-4" key={index}>
-                    <ProductCardHr data={product} />
-                  </div>
-                );
-              })
+              return (
+                <div className="col-xs-12 col-md-6 col-lg-4" key={index}>
+                  <ProductCardHr data={product} />
+                </div>
+              );
+            })
             : ""}
         </div>
       </div>

@@ -457,7 +457,7 @@ class ManageServiceCategory extends Component {
                     </div>
                 </div>
                 <Footer />
-            </React.Fragment >
+            </React.Fragment>
         );
     }
 }
