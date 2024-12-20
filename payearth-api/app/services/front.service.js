@@ -48,13 +48,13 @@ module.exports = {
   // test 
   getProductsListing,
   getSubCateProduct,
-
+  getServiceListing,
 
   getFilterCategories,
   getBrandsListByProducts,
   getColorsListByProducts,
   getProductById,
-  getServiceListing,
+
   getServiceById,
   cmsPublishBlog,
   cmsBlogDetailBySlug,
@@ -408,110 +408,6 @@ async function getFilterCategories(req) {
   }
 }
 
-// async function getProductListing(req) {
-//   try {
-//     // console.log('param', param);
-//     var param = req.body;
-
-//     console.log("param in getProductListing", param)
-//     var sortOption = { createdAt: "desc" }; //default
-//     var limit = "";
-//     var skip = "";
-//     var whereCondition = { isActive: true, isService: false };
-
-//     if (param.sorting) {
-//       sortOption = {};
-//       let sort_type = param.sorting.sort_type;
-//       let sort_val = param.sorting.sort_val;
-
-//       if (sort_type == "price") {
-//         sortOption[sort_type] = sort_val;
-//       } else if (sort_type == "new") {
-//         sortOption["createdAt"] = "desc";
-//       } else if (sort_type == "popular") {
-//         sortOption["reviewCount"] = "desc";
-//       }
-//     }
-
-//     if (param.search_value && param.search_value != "") {
-//       let val = param.search_value.toLowerCase();
-//       whereCondition["lname"] = { $regex: val, $options: "i" };
-//     }
-
-//     if (param.category_filter && param.category_filter.length > 0) {
-//       whereCondition["category"] = { $in: param.category_filter };
-//     }
-
-//     if (param.sub_category_filter && param.sub_category_filter.length > 0) {
-//       whereCondition["sub_category"] = { $in: param.sub_category_filter };
-//     }
-
-//     if (param.brand_filter && param.brand_filter.length > 0) {
-//       whereCondition["brand"] = { $in: param.brand_filter };
-//     }
-
-//     if (param.price_filter) {
-//       let min = param.price_filter.min_val;
-//       let max = param.price_filter.max_val;
-//       if (min !== "" && max !== "") {
-//         whereCondition["price"] = { $gte: min, $lte: max };
-//       }
-//     }
-
-//     if (param.color_filter && param.color_filter.length > 0) {
-//       var colors = param.color_filter;
-//       var orArr = [];
-//       if (colors && colors.length > 0) {
-//         for (let i = 0; i < colors.length; i++) {
-//           let color = colors[i];
-//           orArr.push({ color_size: { $elemMatch: { color: color } } });
-//         }
-//         whereCondition["$or"] = orArr;
-//       }
-//     }
-
-//     if (param.count) {
-//       limit = parseInt(param.count.limit);
-//       skip = parseInt(param.count.start);
-//     }
-
-//     const products = await Product.find(whereCondition)
-//       .select("id name price featuredImage avgRating isService quantity")
-//       .populate([
-//         {
-//           path: "cryptoPrices",
-//           model: CryptoConversion,
-//           select: "name code cryptoPriceUSD",
-//           match: { isActive: true, asCurrency: true },
-//         },
-//       ])
-//       .limit(limit)
-//       .skip(skip)
-//       .sort(sortOption);
-
-//     //to get count of total products
-//     const totalProducts = await Product.find(whereCondition).countDocuments();
-
-//     //to get max price of products
-//     const maxPrice = await Product.findOne(whereCondition).sort({
-//       price: "desc",
-//     });
-
-//     if (products && products.length > 0) {
-//       var result = { totalProducts: totalProducts, products: products };
-//       if (maxPrice) {
-//         result["maxPrice"] = maxPrice.price;
-//       }
-//       return result;
-//     } else {
-//       return false;
-//     }
-//   } catch (err) {
-//     console.log("Error", err);
-//     return false;
-//   }
-// }
-
 async function getProductsListing(req) {
   try {
     const { selectedCategories, selectedBrands, priceRange, selectedSubCategories, searchQuery } = req.body;
@@ -561,6 +457,41 @@ async function getProductsListing(req) {
     return false;
   }
 }
+
+async function getServiceListing(req) {
+  try {
+    const { selectedCategories, priceRange, searchQuery } = req.body;
+
+    console.log("priceRange", priceRange)
+
+    const query = {};
+    if (Array.isArray(selectedCategories) && selectedCategories.length > 0) {
+      query.category = { $in: selectedCategories }; // No ObjectId conversion, treat as strings
+    }
+
+    if (Array.isArray(priceRange) && priceRange.length === 2) {
+      query.charges = {
+        $gte: priceRange[0],
+        $lte: priceRange[1]
+      };
+    }
+
+    if (searchQuery && searchQuery.trim() !== "") {
+      query.$or = [
+        { lname: { $regex: searchQuery, $options: "i" } },
+      ];
+    }
+
+    const service = await Services.find(query)
+      .select("id name charges featuredImage category isActive isAvailable")
+      .sort({ createdAt: "desc" })
+    return service;
+  } catch (error) {
+    console.log("Error:", error.message);
+    return false;
+  }
+}
+
 
 async function getSubCateProduct(req) {
   const parent = req.body;
@@ -703,116 +634,116 @@ async function getProductById(id) {
   return product;
 }
 
-async function getServiceListing(req) {
-  try {
-    var param = req.body;
-    var sortOption = { createdAt: "desc" }; //default
-    var limit = "";
-    var skip = "";
-    var whereCondition = { isActive: true, isService: true };
+// async function getServiceListing(req) {
+//   try {
+//     var param = req.body;
+//     var sortOption = { createdAt: "desc" }; //default
+//     var limit = "";
+//     var skip = "";
+//     var whereCondition = { isActive: true, isService: true };
 
-    if (param.sorting) {
-      sortOption = {};
-      let sort_type = param.sorting.sort_type;
-      let sort_val = param.sorting.sort_val;
+//     if (param.sorting) {
+//       sortOption = {};
+//       let sort_type = param.sorting.sort_type;
+//       let sort_val = param.sorting.sort_val;
 
-      if (sort_type == "price") {
-        sortOption[sort_type] = sort_val;
-      } else if (sort_type == "new") {
-        sortOption["createdAt"] = "desc";
-      } else if (sort_type == "popular") {
-        sortOption["reviewCount"] = "desc";
-      }
-    }
+//       if (sort_type == "price") {
+//         sortOption[sort_type] = sort_val;
+//       } else if (sort_type == "new") {
+//         sortOption["createdAt"] = "desc";
+//       } else if (sort_type == "popular") {
+//         sortOption["reviewCount"] = "desc";
+//       }
+//     }
 
-    if (param.search_value && param.search_value != "") {
-      let val = param.search_value.toLowerCase();
-      whereCondition["lname"] = { $regex: val, $options: "i" };
-    }
+//     if (param.search_value && param.search_value != "") {
+//       let val = param.search_value.toLowerCase();
+//       whereCondition["lname"] = { $regex: val, $options: "i" };
+//     }
 
-    if (param.category_filter && param.category_filter.length > 0) {
-      whereCondition["category"] = { $in: param.category_filter };
-    }
+//     if (param.category_filter && param.category_filter.length > 0) {
+//       whereCondition["category"] = { $in: param.category_filter };
+//     }
 
-    if (param.sub_category_filter && param.sub_category_filter.length > 0) {
-      whereCondition["sub_category"] = { $in: param.sub_category_filter };
-    }
+//     if (param.sub_category_filter && param.sub_category_filter.length > 0) {
+//       whereCondition["sub_category"] = { $in: param.sub_category_filter };
+//     }
 
-    if (param.episode_filter && param.episode_filter.length > 0) {
-      let x = Math.min(...param.episode_filter);
-      whereCondition["videoCount"] = { $gt: x };
-    }
+//     if (param.episode_filter && param.episode_filter.length > 0) {
+//       let x = Math.min(...param.episode_filter);
+//       whereCondition["videoCount"] = { $gt: x };
+//     }
 
-    if (param.price_filter) {
-      let min = param.price_filter.min_val;
-      let max = param.price_filter.max_val;
-      if (min !== "" && max !== "") {
-        whereCondition["price"] = { $gte: min, $lte: max };
-      }
-    }
+//     if (param.price_filter) {
+//       let min = param.price_filter.min_val;
+//       let max = param.price_filter.max_val;
+//       if (min !== "" && max !== "") {
+//         whereCondition["price"] = { $gte: min, $lte: max };
+//       }
+//     }
 
-    if (param.rating_filter && param.rating_filter.length > 0) {
-      let min = Math.min(...param.rating_filter);
-      whereCondition["avgRating"] = { $gte: min };
-    }
+//     if (param.rating_filter && param.rating_filter.length > 0) {
+//       let min = Math.min(...param.rating_filter);
+//       whereCondition["avgRating"] = { $gte: min };
+//     }
 
-    if (param.count) {
-      limit = parseInt(param.count.limit);
-      skip = parseInt(param.count.start);
-    }
+//     if (param.count) {
+//       limit = parseInt(param.count.limit);
+//       skip = parseInt(param.count.start);
+//     }
 
-    const services = await Product.find(whereCondition)
-      .select(
-        "id name price featuredImage avgRating videoCount isService quantity"
-      )
-      .populate([
-        {
-          path: "cryptoPrices",
-          model: CryptoConversion,
-          select: "name code cryptoPriceUSD",
-          match: { isActive: true, asCurrency: true },
-        },
-      ])
-      .limit(limit)
-      .skip(skip)
-      .sort(sortOption);
+//     const services = await Product.find(whereCondition)
+//       .select(
+//         "id name price featuredImage avgRating videoCount isService quantity"
+//       )
+//       .populate([
+//         {
+//           path: "cryptoPrices",
+//           model: CryptoConversion,
+//           select: "name code cryptoPriceUSD",
+//           match: { isActive: true, asCurrency: true },
+//         },
+//       ])
+//       .limit(limit)
+//       .skip(skip)
+//       .sort(sortOption);
 
-    //to get count of total services
-    const totalServices = await Product.find(whereCondition).countDocuments();
+//     //to get count of total services
+//     const totalServices = await Product.find(whereCondition).countDocuments();
 
-    //to get max price of services
-    const maxPrice = await Product.findOne(whereCondition).sort({
-      price: "desc",
-    });
+//     //to get max price of services
+//     const maxPrice = await Product.findOne(whereCondition).sort({
+//       price: "desc",
+//     });
 
-    //to get max video count of services
-    const maxVideoCount = await Product.findOne(whereCondition).sort({
-      videoCount: "desc",
-    });
+//     //to get max video count of services
+//     const maxVideoCount = await Product.findOne(whereCondition).sort({
+//       videoCount: "desc",
+//     });
 
-    if (services && services.length > 0) {
-      var result = { totalServices: totalServices, services: services };
+//     if (services && services.length > 0) {
+//       var result = { totalServices: totalServices, services: services };
 
-      if (maxPrice) {
-        result["maxPrice"] = maxPrice.price;
-      }
+//       if (maxPrice) {
+//         result["maxPrice"] = maxPrice.price;
+//       }
 
-      if (maxVideoCount) {
-        let vid_count = maxVideoCount.videoCount;
-        let x = 5;
-        let filter_chunks = range(x, vid_count, x);
-        result["maxVideoCount"] = vid_count;
-        result["episodeChunks"] = filter_chunks;
-      }
-      return result;
-    } else {
-      return false;
-    }
-  } catch (err) {
-    console.log("Error", err);
-    return false;
-  }
-}
+//       if (maxVideoCount) {
+//         let vid_count = maxVideoCount.videoCount;
+//         let x = 5;
+//         let filter_chunks = range(x, vid_count, x);
+//         result["maxVideoCount"] = vid_count;
+//         result["episodeChunks"] = filter_chunks;
+//       }
+//       return result;
+//     } else {
+//       return false;
+//     }
+//   } catch (err) {
+//     console.log("Error", err);
+//     return false;
+//   }
+// }
 
 var range = function (start, end, step) {
   var range = [];
@@ -1159,7 +1090,6 @@ async function getServicesByCategory(req) {
     const categories = req.query.categories;
     let services
     if (categories) {
-      console.log("categories", categories)
       const selectedCategories = categories.split(',');
       // const selectedCategories = categories.split(',').map(cat => mongoose.Types.ObjectId(cat));
       services = await Services.find({ category: { $in: selectedCategories } });

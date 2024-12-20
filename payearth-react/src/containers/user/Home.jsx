@@ -186,6 +186,7 @@ class Home extends Component {
   }
 
   handleIsToggle = (isToggle) => {
+    console.log("Home page", isToggle)
     this.setState({ isToggle });
   };
 

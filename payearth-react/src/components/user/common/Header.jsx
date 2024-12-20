@@ -168,6 +168,10 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
     localStorage.setItem("isToggle", JSON.stringify(isToggleValue));
   };
 
+  const handleChange = (status) => {
+
+  }
+
   const getCategories = (catId) => {
     let categories = [];
     let url = "";
@@ -378,14 +382,14 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
       getCategories(catId);
       setFlag(true);
     }
-    if (isToggle === false) {
-      console.log("isToggle ????", isToggle)
-      if (location.pathname === "/service-listing") {
-        dispatch(setIsService({ isService: 1 }));
-      } else if (location.pathname === "/product-listing") {
-        dispatch(setIsService({ isService: 0 }));
-      }
-    }
+    // if (isToggle === false) {
+    //   console.log("isToggle ????", isToggle)
+    //   if (location.pathname === "/service-listing") {
+    //     dispatch(setIsService({ isService: 1 }));
+    //   } else if (location.pathname === "/product-listing") {
+    //     dispatch(setIsService({ isService: 0 }));
+    //   }
+    // }
     let requestBody = isService === 0 ? { is_service: false } : { is_service: true };
     axios.post("front/product/categories/menu", requestBody)
       .then((response) => {
@@ -521,22 +525,44 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
   };
 
   const handleSearchServiceFilter = async () => {
+    // try {
+    //   const query = new URLSearchParams();
+    //   if (catSelectedOption.label !== 'All') query.append('category', catSelectedOption.label);
+    //   if (searchOption) query.append('name', searchOption);
+    //   const response = await axios.get(`/front/searchFilterServices?${query.toString()}`, {
+    //     headers: {
+    //       'Accept': 'application/json',
+    //       'Content-Type': 'application/json;charset=UTF-8',
+    //     },
+    //   });
+    //   console.log("response form searching..:", response.data.data);
+    //   history.push("/service-listing")
+    //   if (window.location.pathname === "/service-listing") {
+    //     sendServiceData(response.data.data);
+    //   }
+
+    // } catch (error) {
+    //   toast.error("Data Not Found", { autoClose: 3000 })
+    //   console.error('Error fetching users:', error);
+    // }
+
+
     try {
       const query = new URLSearchParams();
       if (catSelectedOption.label !== 'All') query.append('category', catSelectedOption.label);
       if (searchOption) query.append('name', searchOption);
-      const response = await axios.get(`/front/searchFilterServices?${query.toString()}`, {
+      const response = await axios.get(`/front/searchFilterServices?${query.toString()}}`, {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json;charset=UTF-8',
         },
       });
-      console.log("response form searching..:", response.data.data);
-      sendServiceData(response.data.data);
+      history.push(`/service-listing?cat=${catSelectedOption.value}&searchText=${searchOption || ''}`)
     } catch (error) {
       toast.error("Data Not Found", { autoClose: 3000 })
       console.error('Error fetching users:', error);
     }
+
   }
 
   const handleSearchProductFilter = async () => {
@@ -779,7 +805,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                       {/* <Link to={`/product-detail/${'66db3efeb660f1cef86e1048'}`}>All-Products</Link> */}
                     </li>
                     <li>
-                      <Link to="#">Services</Link>
+                      <Link to="/service-listing">Services</Link>
                     </li>
                   </ul>
                   <ul>
@@ -941,6 +967,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                                   : "btn custom_btn"
                               }
                               onClick={handleIsService}
+                            // onClick={handleChange('product')}
                             >
                               Products
                             </button>
@@ -953,6 +980,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                                   : "btn custom_btn"
                               }
                               onClick={handleIsService}
+                            // onClick={handleChange('service')}
                             >
                               Services
                             </button>

@@ -15,7 +15,8 @@ import Home from "./containers/user/Home";
 import ProductListing from "./containers/user/ProductListing";
 import ProductDetail from "./containers/user/ProductDetail";
 import ServicesDisplay from "./containers/user/service/ServicesDisplay";
-import ServiceListing from "./containers/user/service/ServiceListing";
+// import ServiceListing from "./containers/user/service/ServiceListing";
+import ServicesListing from "./containers/user/ServicesListing";
 import ServiceDetail from "./containers/user/service/ServiceDetails";
 import MyOrders from "./containers/user/MyOrders";
 import MyCart from "./containers/user/MyCart";
@@ -197,10 +198,17 @@ function App() {
             exact
           />
 
-          <PublicRoute
+          {/* <PublicRoute
             path="/service-listing"
             restricted={false}
             component={ServiceListing}
+            exact
+          /> */}
+
+          <PublicRoute
+            path="/service-listing"
+            restricted={false}
+            component={ServicesListing}
             exact
           />
 
