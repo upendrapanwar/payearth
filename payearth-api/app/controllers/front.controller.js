@@ -25,7 +25,7 @@ router.post('/product/listing/categories/:id', getFilterCategories);
 router.get('/product/detail/:id', getProductById);
 
 //For products only
-router.post('/products/listing', getProductsListing);
+router.post('/products/listing', getProductsListing); 
 router.post("/getProductSubCat", getSubCateProduct);
 
 
