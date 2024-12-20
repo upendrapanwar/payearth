@@ -35,8 +35,8 @@ const ServicesListing = () => {
     const [loading, setLoading] = useState(true);
     const [priceRange, setPriceRange] = useState();
     const [selectedCategories, setSelectedCategories] = useState([]);
-
     const [categories, setCategories] = useState('')
+    const [sideBarToggle, setSideBarToggle] = useState(false);
 
     useEffect(() => {
         if (!category) {
@@ -134,6 +134,8 @@ const ServicesListing = () => {
         });
     }
 
+
+
     console.log("services", services)
 
     return (
@@ -149,7 +151,11 @@ const ServicesListing = () => {
                 <div className="container">
                     <div className="row">
                         <div className="col-md-3 mt-3" style={{ overflowY: 'auto', maxHeight: '120vh', border: '1px solid #ddd', scrollbarWidth: 'thin', }}>
+                            <div className='mob-show'>
+                                <button class="filter-mob-catShow px-2" type="button" aria-controls="navbarExampleOnHover" aria-expanded="false" aria-label="Toggle navigation" onClick={() => setSideBarToggle(prevState => !prevState)}><span class="fa fa-bars"></span> Filter</button>
+                            </div>
                             <ServiceSidebar pageName="service-listing"
+                                sideBarToggle={sideBarToggle}
                                 categories={categories}
                                 onPriceRangeChange={handlePriceRangeChange}
                                 onCategoryChange={handleCategoryChange}

@@ -206,6 +206,7 @@ import { useLocation } from 'react-router-dom';
 
 const ServiceSidebar = (props) => {
     const {
+        sideBarToggle,
         categories,
         pageName,
         onPriceRangeChange,
@@ -213,6 +214,8 @@ const ServiceSidebar = (props) => {
         // onSubCategoryChange,
         // onBrandChange,
     } = props;
+
+    console.log("sideBarToggle", sideBarToggle)
 
     const [brands, setBrands] = useState('')
     const [priceRange, setPriceRange] = useState();
@@ -242,49 +245,56 @@ const ServiceSidebar = (props) => {
     }
 
 
+
+
+
     return (
-        <div className="side_bar">
-            <div className="filters" >
-                {pageName === 'service-listing' && categories.length ?
+        <>
+            {/* className="side_bar mob-hide `filter-mob-catShow */}
+            <div className={`side_bar mob-hide ${sideBarToggle ? '' : 'filter-mob-catShow'}`}>
+
+                <div className="filters" >
+                    {pageName === 'service-listing' && categories.length ?
+                        <ul className="filter_list">
+                            <li>
+                                <h3>Categories</h3>
+                            </li>
+                            {categories.map((category, index) => {
+                                if (category.id !== '') {
+                                    return (
+                                        <li key={category.id}>
+                                            <div className="form-check d-flex">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    id={category.id}
+                                                    value={category.id}
+                                                    onChange={(event) => handleCateCheckbox(event, index)}
+                                                    checked={selectedCategories.includes(category.id)}
+                                                    disabled={selectedSubCategories && selectedSubCategories.length > 0}
+                                                />
+                                                <label className="form-check-label" htmlFor={category.id}>{category.categoryName}</label>
+                                            </div>
+                                        </li>
+                                    );
+                                } else {
+                                    return null;
+                                }
+                            })}
+                        </ul> : ''
+                    }
+
                     <ul className="filter_list">
                         <li>
-                            <h3>Categories</h3>
+                            <h3>Price</h3>
                         </li>
-                        {categories.map((category, index) => {
-                            if (category.id !== '') {
-                                return (
-                                    <li key={category.id}>
-                                        <div className="form-check d-flex">
-                                            <input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                id={category.id}
-                                                value={category.id}
-                                                onChange={(event) => handleCateCheckbox(event, index)}
-                                                checked={selectedCategories.includes(category.id)}
-                                                disabled={selectedSubCategories && selectedSubCategories.length > 0}
-                                            />
-                                            <label className="form-check-label" htmlFor={category.id}>{category.categoryName}</label>
-                                        </div>
-                                    </li>
-                                );
-                            } else {
-                                return null;
-                            }
-                        })}
-                    </ul> : ''
-                }
-
-                <ul className="filter_list">
-                    <li>
-                        <h3>Price</h3>
-                    </li>
-                    <li className="mb-5">
-                        <RangeTwoThumbs currency="USD" currencySymbol="$" sendRanges={handleRangeData} />
-                    </li>
-                </ul>
+                        <li className="mb-5">
+                            <RangeTwoThumbs currency="USD" currencySymbol="$" sendRanges={handleRangeData} />
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
+        </>
     )
 }
 

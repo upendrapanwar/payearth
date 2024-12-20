@@ -11,6 +11,7 @@ import { useLocation } from 'react-router-dom';
 
 const Sidebar = (props) => {
     const {
+        sideBarToggle,
         categories,
         pageName,
         onPriceRangeChange,
@@ -130,7 +131,7 @@ const Sidebar = (props) => {
     };
 
     return (
-        <div className="side_bar">
+        <div className={`side_bar mob-hide ${sideBarToggle ? '' : 'filter-mob-catShow'}`}>
             <div className="filters" >
                 {pageName === 'product-listing' && categories.length ?
                     <ul className="filter_list">

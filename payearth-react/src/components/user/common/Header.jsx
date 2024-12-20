@@ -682,6 +682,31 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
             <div className="side_menu_body">
               <ul className="side_menu_links">
                 <li>
+                  <Link to="/" onClick={() => removeBackdrop()}>
+                    <i className="icon">
+                      <img src={serviceIcon} alt="heart" />
+                    </i>{" "}
+                    Home
+                  </Link>
+                </li>
+
+                <li>
+                  <Link to="/product-listing" onClick={() => removeBackdrop()}>
+                    <i className="icon">
+                      <img src={serviceIcon} alt="heart" />
+                    </i>{" "}
+                    Products
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/service-listing" onClick={() => removeBackdrop()}>
+                    <i className="icon">
+                      <img src={serviceIcon} alt="heart" />
+                    </i>{" "}
+                    Services
+                  </Link>
+                </li>
+                <li>
                   <Link to="/my-orders" onClick={() => removeBackdrop()}>
                     <i className="icon">
                       <img src={shoppingBagIcon} alt="" />
@@ -695,6 +720,14 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                       <img src={serviceIcon} alt="heart" />
                     </i>{" "}
                     Service Orders
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/blog" onClick={() => removeBackdrop()}>
+                    <i className="icon">
+                      <img src={serviceIcon} alt="heart" />
+                    </i>{" "}
+                    Blog
                   </Link>
                 </li>
                 <li>
@@ -746,6 +779,22 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                   </Link>
                 </li>
                 <li>
+                  <Link to="/community" onClick={() => removeBackdrop()}>
+                    <i className="icon">
+                      <img src={serviceIcon} alt="heart" />
+                    </i>{" "}
+                    Community
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/user-contact" onClick={() => removeBackdrop()}>
+                    <i className="icon">
+                      <img src={serviceIcon} alt="heart" />
+                    </i>{" "}
+                    Contact
+                  </Link>
+                </li>
+                <li>
                   <Link to="/user-support" onClick={() => removeBackdrop()}>
                     <i className="icon">
                       <img src={serviceIcon} alt="heart" />
@@ -785,7 +834,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                   ""
                 )}
                 <div className="nav_wrapper">
-                  <ul>
+                  <ul className="mob-hide">
                     <li>
                       <Link to="/">Home</Link>
                     </li>
@@ -808,7 +857,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                       <Link to="/service-listing">Services</Link>
                     </li>
                   </ul>
-                  <ul>
+                  <ul className="d-flex align-items-center">
                     <li className="login_links_wrapper me-3">
                       {loginStatus && userInfo.role === "user" ? (
                         <Link className="nav-link" to="/notifications" onClick={handleNotificationClick}>
@@ -859,10 +908,10 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                         )}
                       </div>
                     </li>
-                    <li>
+                    <li className="head_cart_mini">
                       <Link
                         to="#"
-                        className="cart_link position-relative"
+                        className="cart_link position-relative d-flex"
                         onClick={() => {
                           if (loginStatus) {
                             history.push("/my-cart");
@@ -916,7 +965,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                       </div>
                       <div className="offcanvas-body d-block">
                         <div className="nav_wrapper w-100 mt-2">
-                          <form className="d-lg-flex">
+                          <form className="drop d-lg-flex">
                             <Select
                               className="custom_select w-50"
                               options={categoryOptions}
@@ -986,17 +1035,17 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                             </button>
                           </div>
                         </div>
-                        <div className="container-fluid">
+                        <div className="container-fluid mt-3">
                           {data && data.length > 4 && (
                             <button
-                              className="navbar-toggler px-0"
+                              className="navbar-toggler px-2"
                               type="button"
                               aria-controls="navbarExampleOnHover"
                               aria-expanded={navbarExpanded}
                               aria-label="Toggle navigation"
                               onClick={() => setNavbarExpanded(!navbarExpanded)}
                             >
-                              <i className="fas fa-bars"></i>
+                              <span class="fa fa-bars"></span>
                             </button>
                           )}
 

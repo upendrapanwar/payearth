@@ -627,12 +627,12 @@ class Dashboard extends Component {
                                     <div className="dash_graph bg-white">
                                         <div className="dash_graph_head">
                                             <div className="dash_title">Total Sales Graph Year {`${this.state.productYear}`}</div>
-                                            <div>
+                                            <div className='d-flex'>
                                                 <Button className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={this.handlePreviousProductYear} startIcon={<ArrowBackIosIcon />}></Button>
                                                 <Button className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={this.handleNextProductYear} endIcon={<ArrowForwardIosIcon />} disabled={this.state.productYear === currentYear}></Button>
                                             </div>
                                         </div>
-                                        <div className="dash_graph_body p-3">
+                                        <div className="mob-dashboard dash_graph_body p-3">
                                             {/* <img src={graph} className="img-fluid" alt="" /> */}
                                             <LineChart
                                                 width={800}
