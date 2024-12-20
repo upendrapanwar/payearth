@@ -203,6 +203,8 @@ module.exports = {
     getBrandPermission,
     getAdvertiesmentPermission,
     getSubscriptionPermission,
+    getAllpermission,
+    updatePermission,
 };
 
 // Validator function
@@ -5117,5 +5119,92 @@ async function getSubscriptionPermission(req) {
     } catch (error) {
         console.error("Error fetching permission:", err);
         return { status: false, message: "An error occurred while fetching permission.", error: err.message, };
+    }
+}
+
+async function getAllpermission(req) {
+    const { admin_Id } = req.params;
+    try {
+        const permissions = await AccessPermission.findOne({ admin_Id: admin_Id });
+
+        if (!permissions) {
+            return { status: false, message: 'Permissions not found' };
+        }
+
+        const Permissions = permissions;
+
+        return { status: true, message: 'Permissions fetched successfully', data: Permissions };
+    } catch (error) {
+        console.error("Error fetching permission:", err);
+        return { status: false, message: "An error occurred while fetching permission.", error: err.message, };
+    }
+}
+
+// async function updatePermission(req) {
+//     const { admin_Id } = req.params;
+//     const { permissions } = req.body;
+//     console.log("Testing req.body", permissions);
+
+//     if (!admin_Id || !permissions) {
+//         return { status: false, message: "Missing admin_Id or permissions" };
+//     }
+
+//     try {
+//         // Find the existing permissions for the admin
+//         const existingPermissions = await AccessPermission.findOne({ admin_Id: admin_Id });
+
+//         if (!existingPermissions) {
+//             return { status: false, message: 'Permissions not found' };
+//         }
+
+//         console.log("Testing permissions is available or not", existingPermissions);
+
+//         // Prepare the updated permissions object
+//         const updatedPermissions = {
+//             dashboard: { add: permissions.dashboard.add, edit: permissions.dashboard.edit, delete: permissions.dashboard.delete },
+//             post: { add: permissions.post.add, edit: permissions.post.edit, delete: permissions.post.delete },
+//             create_post: { add: permissions.create_post.add, edit: permissions.create_post.edit, delete: permissions.create_post.delete },
+//             products_categories: { add: permissions.products_categories.add, edit: permissions.products_categories.edit, delete: permissions.products_categories.delete },
+//             products_sub_categories: { add: permissions.products_sub_categories.add, edit: permissions.products_sub_categories.edit, delete: permissions.products_sub_categories.delete },
+//             services_categories: { add: permissions.services_categories.add, edit: permissions.services_categories.edit, delete: permissions.services_categories.delete },
+//             blogs_categories: { add: permissions.blogs_categories.add, edit: permissions.blogs_categories.edit, delete: permissions.blogs_categories.delete },
+//             manage_orders: { add: permissions.manage_orders.add, edit: permissions.manage_orders.edit, delete: permissions.manage_orders.delete },
+//             manage_services_orders: { add: permissions.manage_services_orders.add, edit: permissions.manage_services_orders.edit, delete: permissions.manage_services_orders.delete },
+//             manage_service: { add: permissions.manage_service.add, edit: permissions.manage_service.edit, delete: permissions.manage_service.delete },
+//             manage_discount: { add: permissions.manage_discount.add, edit: permissions.manage_discount.edit, delete: permissions.manage_discount.delete },
+//             manage_brand: { add: permissions.manage_brand.add, edit: permissions.manage_brand.edit, delete: permissions.manage_brand.delete },
+//             manage_customers: { add: permissions.manage_customers.add, edit: permissions.manage_customers.edit, delete: permissions.manage_customers.delete },
+//             manage_vendors: { add: permissions.manage_vendors.add, edit: permissions.manage_vendors.edit, delete: permissions.manage_vendors.delete },
+//             manage_advertisement: { add: permissions.manage_advertisement.add, edit: permissions.manage_advertisement.edit, delete: permissions.manage_advertisement.delete },
+//             manage_subscription: { add: permissions.manage_subscription.add, edit: permissions.manage_subscription.edit, delete: permissions.manage_subscription.delete },
+//         };
+
+//         // Update the permissions document in the database
+//         existingPermissions.permissions = updatedPermissions;
+
+//         // Save the updated permissions
+//         const result = await existingPermissions.save();
+
+//         return { status: true, data: result, message: 'Permissions updated successfully' };
+//     } catch (error) {
+//         console.error("Error Updating permission:", error);
+//         return { status: false, message: "An error occurred while updating permission.", error: error.message };
+//     }
+// }
+
+
+async function updatePermission(req) {
+    const admin_Id = req.params.admin_Id;
+    const permissions = req.body; 
+    console.log("permissions",permissions);
+    console.log("admin_Id",admin_Id);
+
+
+    try {
+       
+        return { message: 'Permissions updated successfully', status: true };
+    } catch (error) {
+        console.error('Error updating permissions:', error);
+        return { message: 'Failed to update permissions', status: false };
     }
 }

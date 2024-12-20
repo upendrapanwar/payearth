@@ -270,12 +270,8 @@ router.get("/getDiscountPermission/:admin_Id", getDiscountPermission);
 router.get("/getBrandPermission/:admin_Id", getBrandPermission);
 router.get("/getAdvertiesmentPermission/:admin_Id", getAdvertiesmentPermission);
 router.get("/getSubscriptionPermission/:admin_Id", getSubscriptionPermission);
-
-
-
-
-
-
+router.get("/getAllpermission/:admin_Id", getAllpermission);
+router.put("/updatePermission/:admin_Id", updatePermission);
 
 
 // Product 
@@ -1331,6 +1327,19 @@ function getSubscriptionPermission(req, res, next) {
         .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
         .catch((err) => next(res.json({ status: false, message: err.message })));
 }
+
+function getAllpermission(req, res, next) {
+    adminService.getAllpermission(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function updatePermission(req, res, next) {
+    adminService.updatePermission(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
 function getProductStock(req, res, next) {
     adminService.getProductStock(req)
         .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))

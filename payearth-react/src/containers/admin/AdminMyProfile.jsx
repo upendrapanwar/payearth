@@ -15,6 +15,7 @@ import adminValidation from '../../validation-schemas/adminmyProfileSchema'
 const AdminMyProfile = () => {
     // Global variable
     const authInfo = JSON.parse(localStorage.getItem('authInfo'));
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));   
 
     // State
     const [loading, setLoading] = useState(false);
@@ -82,7 +83,7 @@ const AdminMyProfile = () => {
         setLoading(true);
         const updatedValues = {
             ...values,
-            role: 'admin'
+            role: userInfo.role,
         };
         axios.put(`admin/edit-profile/${authInfo.id}`, updatedValues, {
             headers: {
