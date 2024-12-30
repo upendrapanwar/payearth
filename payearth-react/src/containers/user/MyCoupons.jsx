@@ -14,6 +14,7 @@ import { NotFound } from './../../components/common/NotFound';
 
 class MyCoupons extends Component {
     constructor(props) {
+        console.log("Checking props data",props);
         super(props);
         this.authInfo = JSON.parse(localStorage.getItem('authInfo'));
         this.state = {
@@ -25,12 +26,11 @@ class MyCoupons extends Component {
                 }
             }
         };
-
-        toast.configure();
     }
 
-    componentDidMount() {
+    componentDidMount(props) {
         this.getCoupons('didMount');
+        console.log("Checking props data12233",props);
     }
 
     getCoupons(param) {
@@ -44,8 +44,11 @@ class MyCoupons extends Component {
                     limit: this.state.reqBody.count.limit + 6
                 }
             };
+            console.log('Checking params reqbody data',reqBody);
+
         } else {
             reqBody = this.state.reqBody;
+            console.log('Checking reqbody data',reqBody);
         }
 
         dispatch(setLoading({ loading: true }));

@@ -5,7 +5,6 @@ import { useHistory } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { setIsLoginModalOpen } from "../../../store/reducers/global-reducer";
 import { toast } from "react-toastify";
-import check_symbol from '../../../assets/icons/check-symbol.svg';
 // check-symbol
 import axios from "axios";
 
@@ -15,9 +14,8 @@ function Total(data) {
   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const couponData = data.couponData;
-  console.log("couponData", couponData)
   const cart = useSelector((state) => state.cart.cart)
-  // console.log("cart", cart)
+  console.log("data", data)
   const getTotal = () => {
     let totalQuantity = 0
     let totalPrice = 0
@@ -98,14 +96,15 @@ function Total(data) {
         <div className="cart_foot_price">
           <div className="cfp"><span>Price ({getTotal().totalQuantity} items)</span> <b>${getTotal().totalPrice}</b></div>
           <div className="cfp"><span>Discount</span> <b>{couponData !== null ? `${couponData.discount_per}%` : 'No Discount'}</b> </div>
+          {/* <div className="cfp"><span>Discount</span> <b>{couponData && couponData.discount_per !== undefined && couponData.discount_per !== null ? `${couponData.discount_per}%` : '0%'}</b></div> */}
           <div className="cfp"><span>Final Price</span> <b>{`$${amount}`}</b></div>
+          {/* <div className="cfp"><span>Final Price</span><b>{amount && !isNaN(amount) ? `$${amount}` : '$0'}</b></div> */}
           <div className="cfp"><span>Delivery Charges</span> <b>Free</b></div>
         </div>
       </div>
       <div className="cart_footer cart_wrap border-bottom justify-content-end">
         <div className="cart_foot_price">
           <div className="cfp"><span>Sub Total</span> <b>{`$${amount}`}</b></div>
-
           <div className="cfp mt-4 text-center">
             <div className="d-grid col-6 mx-auto">
               <button className="btn custom_btn btn_yellow m-2"

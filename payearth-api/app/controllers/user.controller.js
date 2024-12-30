@@ -520,10 +520,18 @@ function removeProductFromSavelater(req, res, next) {
 
 function applyMyCouponCode(req, res, next) {
   userService.applyMyCouponCode(req)
-    .then((couponData) => couponData ? res.status(200).json({ status: true, data: couponData }) : res.status(400).json({ status: false, data: [] }))
-    .catch((err) => next(res.json({ status: false, message: err })));
+    .then((couponData) => {
+      if (couponData) {
+        return res.status(200).json({ status: true, message: "Coupon applied successfully.", data: couponData });
+      } else {
+        return res.status(200).json({ status: false, message: "Coupon is already used or invalid.", data: [] });
+      }
+    })
+    .catch((err) => {
+      console.error("Error in applyMyCouponCode:", err);
+      return res.status(500).json({ status: false, message: "An unexpected error occurred." });
+    });
 }
-
 
 function getMyCoupons(req, res, next) {
   userService

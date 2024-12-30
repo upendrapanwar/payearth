@@ -90,9 +90,6 @@ router.post('/signup', registerValidation, register);
 router.post('/users', getUsers);
 router.post('/userDetails', getUserDetails);
 router.post('/sellers', getSellers);
-router.post('/coupons', createCoupon);
-router.post('/coupons/new', getNewCoupons);
-router.post('/coupons/expired', getExpiredCoupons);
 router.post('/forgot-password', forgotPass);
 router.put('/reset-password', resetPass);
 router.put('/change-password/:id', changePass);
@@ -273,6 +270,18 @@ router.get("/getSubscriptionPermission/:admin_Id", getSubscriptionPermission);
 router.get("/getAllpermission/:admin_Id", getAllpermission);
 router.put("/updatePermission/:admin_Id", updatePermission);
 
+//Coupon
+router.post('/coupons', createCoupon);
+router.post('/coupons/new', getNewCoupons);
+router.post('/coupons/expired', getExpiredCoupons);
+router.get('/get-coupons/:id', getCoupon);
+router.patch('/edit-coupons/:id', editCoupon);
+router.patch('/couponStatus/:id', couponStatus);
+router.delete('/delete-coupon/:id', deleteCoupon);
+
+
+
+
 
 // Product 
 router.get("/getProductStock", getProductStock);
@@ -360,6 +369,30 @@ function getExpiredCoupons(req, res, next) {
     adminService.getExpiredCoupons(req)
         .then(coupons => coupons ? res.status(200).json({ status: true, data: coupons }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function getCoupon(req, res, next) {
+    adminService.getCoupon(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(err));
+}
+
+function editCoupon(req, res, next) {
+    adminService.editCoupon(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(err));
+}
+
+function couponStatus(req, res, next) {
+    adminService.couponStatus(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(err));
+}
+
+function deleteCoupon(req, res, next) {
+    adminService.deleteCoupon(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(err));
 }
 
 // function getById(req, res, next) {

@@ -159,6 +159,7 @@ import ManageAdmins from "./containers/admin/ManageAdmins";
 import AddAdmin from "./containers/admin/AddAdmin"
 import AccessPermission from "./containers/admin/AccessPermission";
 import ManageCapability from "./containers/admin/ManageCapability";
+import EditCoupon from "./containers/admin/EditCoupon";
 
 
 function App() {
@@ -932,6 +933,14 @@ function App() {
           <PrivateRoute
             path="/admin/add-coupon"
             component={AddCoupon}
+            roles={[Role.super_admin, Role.admin, Role.manager]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/admin/edit-coupon"
+            component={EditCoupon}
             roles={[Role.super_admin, Role.admin, Role.manager]}
             currentUserRole={userInfo.role}
             exact

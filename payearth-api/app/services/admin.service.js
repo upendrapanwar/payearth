@@ -16,7 +16,7 @@ const { Admin, User, Seller, Coupon, Product, Category, Brand,
     OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline,
     ProductSales, cmsPost, cmsPage, cmsCategory, bannerAdvertisement,
     Chat, ChatMessage, Services, OrderDetails, Post, PostLike, PostVideos,
-    PostImages, PostComment, Support, AccessPermission,
+    PostImages, PostComment, Support, AccessPermission,UsedCoupons,
 } = require("../helpers/db");
 
 module.exports = {
@@ -27,6 +27,10 @@ module.exports = {
     createCoupon,
     getNewCoupons,
     getExpiredCoupons,
+    getCoupon,
+    editCoupon,
+    couponStatus,
+    deleteCoupon,
     getById,
     signup,
     changePass,
@@ -710,6 +714,105 @@ async function getExpiredCoupons(req) {
     } catch (err) {
         console.log('Error', err);
         return false;
+    }
+}
+
+async function getCoupon(req) {
+    const {id} = req.params;
+
+    try{
+        if(!id){
+            return { message: 'Coupon id is not found.', status: false };
+        };
+
+        const coupon = await Coupon.findById({_id:id});
+
+        if(!coupon){
+            return { message: 'Coupon not found.', status: false };
+        }
+
+        return { status: true, data: coupon, message: 'Coupon retrieved successfully'};
+    } catch(error){
+        console.error('Error getting coupon:', error);
+        return { message: 'Failed to get coupon', status: false }; 
+    }
+}
+
+async function editCoupon(req) {
+    const { id } = req.params;
+    const { coupon_code, start_date, end_date, discount_percentage } = req.body;
+
+    try {
+        if (!id) {
+            return { message: 'Coupon id is not found.', status: false };
+        };
+
+        const updatedData = {};
+
+        if (coupon_code) updatedData.code = coupon_code;
+        if (start_date) updatedData.start = start_date;
+        if (end_date) updatedData.end = end_date;
+        if (discount_percentage) updatedData.discount_per = discount_percentage;
+
+        const coupon = await Coupon.findByIdAndUpdate({ _id: id }, updatedData, { new: true });
+
+        if (!coupon) {
+            return { message: 'Coupon not found.', status: false };
+        }
+
+        return { status: true, data: coupon, message: 'Coupon Updated successfully' };
+    } catch (error) {
+        console.error('Error updating coupon:', error);
+        return { message: 'Failed to update coupon', status: false };
+    }
+}
+
+
+async function couponStatus(req) {
+    const { id } = req.params;
+    const { isActive} = req.body;
+
+    const updatedData = {
+        isActive : isActive
+    };
+
+    try {
+        if (!id) {
+            return { message: 'Coupon id is not found.', status: false };
+        };
+       
+        const coupon = await Coupon.findByIdAndUpdate({ _id: id }, updatedData, { new: true });
+
+        if (!coupon) {
+            return { message: 'Coupon not found.', status: false };
+        }
+
+        return { status: true, data: coupon, message: 'Coupon status updated successfully' };
+    } catch (error) {
+        console.error('Error updating coupon status:', error);
+        return { message: 'Failed to update coupon status', status: false };
+    }
+}
+
+
+async function deleteCoupon(req) {
+    const { id } = req.params;
+  
+    try {
+        if (!id) {
+            return { message: 'Coupon id is not found.', status: false };
+        };
+       
+        const coupon = await Coupon.findByIdAndDelete({ _id: id });
+
+        if (!coupon) {
+            return { message: 'Coupon not found.', status: false };
+        }
+
+        return { status: true, data: coupon, message: 'Coupon deleted successfully' };
+    } catch (error) {
+        console.error('Error deleting coupon.:', error);
+        return { message: 'Failed to delete coupon.', status: false };
     }
 }
 
@@ -5140,71 +5243,48 @@ async function getAllpermission(req) {
     }
 }
 
-// async function updatePermission(req) {
-//     const { admin_Id } = req.params;
-//     const { permissions } = req.body;
-//     console.log("Testing req.body", permissions);
-
-//     if (!admin_Id || !permissions) {
-//         return { status: false, message: "Missing admin_Id or permissions" };
-//     }
-
-//     try {
-//         // Find the existing permissions for the admin
-//         const existingPermissions = await AccessPermission.findOne({ admin_Id: admin_Id });
-
-//         if (!existingPermissions) {
-//             return { status: false, message: 'Permissions not found' };
-//         }
-
-//         console.log("Testing permissions is available or not", existingPermissions);
-
-//         // Prepare the updated permissions object
-//         const updatedPermissions = {
-//             dashboard: { add: permissions.dashboard.add, edit: permissions.dashboard.edit, delete: permissions.dashboard.delete },
-//             post: { add: permissions.post.add, edit: permissions.post.edit, delete: permissions.post.delete },
-//             create_post: { add: permissions.create_post.add, edit: permissions.create_post.edit, delete: permissions.create_post.delete },
-//             products_categories: { add: permissions.products_categories.add, edit: permissions.products_categories.edit, delete: permissions.products_categories.delete },
-//             products_sub_categories: { add: permissions.products_sub_categories.add, edit: permissions.products_sub_categories.edit, delete: permissions.products_sub_categories.delete },
-//             services_categories: { add: permissions.services_categories.add, edit: permissions.services_categories.edit, delete: permissions.services_categories.delete },
-//             blogs_categories: { add: permissions.blogs_categories.add, edit: permissions.blogs_categories.edit, delete: permissions.blogs_categories.delete },
-//             manage_orders: { add: permissions.manage_orders.add, edit: permissions.manage_orders.edit, delete: permissions.manage_orders.delete },
-//             manage_services_orders: { add: permissions.manage_services_orders.add, edit: permissions.manage_services_orders.edit, delete: permissions.manage_services_orders.delete },
-//             manage_service: { add: permissions.manage_service.add, edit: permissions.manage_service.edit, delete: permissions.manage_service.delete },
-//             manage_discount: { add: permissions.manage_discount.add, edit: permissions.manage_discount.edit, delete: permissions.manage_discount.delete },
-//             manage_brand: { add: permissions.manage_brand.add, edit: permissions.manage_brand.edit, delete: permissions.manage_brand.delete },
-//             manage_customers: { add: permissions.manage_customers.add, edit: permissions.manage_customers.edit, delete: permissions.manage_customers.delete },
-//             manage_vendors: { add: permissions.manage_vendors.add, edit: permissions.manage_vendors.edit, delete: permissions.manage_vendors.delete },
-//             manage_advertisement: { add: permissions.manage_advertisement.add, edit: permissions.manage_advertisement.edit, delete: permissions.manage_advertisement.delete },
-//             manage_subscription: { add: permissions.manage_subscription.add, edit: permissions.manage_subscription.edit, delete: permissions.manage_subscription.delete },
-//         };
-
-//         // Update the permissions document in the database
-//         existingPermissions.permissions = updatedPermissions;
-
-//         // Save the updated permissions
-//         const result = await existingPermissions.save();
-
-//         return { status: true, data: result, message: 'Permissions updated successfully' };
-//     } catch (error) {
-//         console.error("Error Updating permission:", error);
-//         return { status: false, message: "An error occurred while updating permission.", error: error.message };
-//     }
-// }
-
-
 async function updatePermission(req) {
     const admin_Id = req.params.admin_Id;
-    const permissions = req.body; 
-    console.log("permissions",permissions);
-    console.log("admin_Id",admin_Id);
-
+    const { dashboard, post, create_post, manage_orders, manage_services_orders,
+        manage_service, manage_discount, manage_brand, manage_customers, manage_vendors,
+        manage_advertisement, manage_subcription, blogs_categories, products_categories, 
+        products_sub_categories, services_categories } = req.body.data;
 
     try {
        
-        return { message: 'Permissions updated successfully', status: true };
+        const Update = {
+            $set: {"dashboard.add": dashboard.add,"dashboard.edit": dashboard.edit,"dashboard.delete": dashboard.delete,
+                "post.add": post.add,"post.edit": post.edit,"post.delete": post.delete,
+                "create_post.add": create_post.add,"create_post.edit": create_post.edit,"create_post.delete": create_post.delete,
+                "manage_orders.add": manage_orders.add,"manage_orders.edit": manage_orders.edit,"manage_orders.delete": manage_orders.delete,
+                "manage_services_orders.add": manage_services_orders.add,"manage_services_orders.edit": manage_services_orders.edit,"manage_services_orders.delete": manage_services_orders.delete,
+                "manage_service.add": manage_service.add,"manage_service.edit": manage_service.edit,"manage_service.delete": manage_service.delete,
+                "manage_discount.add": manage_discount.add,"manage_discount.edit": manage_discount.edit,"manage_discount.delete": manage_discount.delete,    
+                "manage_brand.add": manage_brand.add,"manage_brand.edit": manage_brand.edit,"manage_brand.delete": manage_brand.delete,
+                "manage_customers.add": manage_customers.add,"manage_customers.edit": manage_customers.edit,"manage_customers.delete": manage_customers.delete,
+                "manage_vendors.add": manage_vendors.add,"manage_vendors.edit": manage_vendors.edit,"manage_vendors.delete": manage_vendors.delete,
+                "manage_advertisement.add": manage_advertisement.add,"manage_advertisement.edit": manage_advertisement.edit,"manage_advertisement.delete": manage_advertisement.delete,
+                "manage_subcription.add": manage_subcription.add,"manage_subcription.edit": manage_subcription.edit,"manage_subcription.delete": manage_subcription.delete,
+                "blogs_categories.add": blogs_categories.add,"blogs_categories.edit": blogs_categories.edit,"blogs_categories.delete": blogs_categories.delete,
+                "products_categories.add": products_categories.add,"products_categories.edit": products_categories.edit,"products_categories.delete": products_categories.delete,   
+                "products_sub_categories.add": products_sub_categories.add,"products_sub_categories.edit": products_sub_categories.edit,"products_sub_categories.delete": products_sub_categories.delete,
+                "services_categories.add": services_categories.add,"services_categories.edit": services_categories.edit,"services_categories.delete": services_categories.delete,
+            }
+        }
+        console.log("Update",Update);
+        
+        const result = await AccessPermission.findOneAndUpdate(
+            {admin_Id: admin_Id}, Update, { new: true }
+        );
+
+        if(!result){
+            return { message: 'Admin not found or permissions not updated', status: false };
+        }
+
+        return { message: 'Permissions updated successfully', data: result, status: true };
     } catch (error) {
         console.error('Error updating permissions:', error);
         return { message: 'Failed to update permissions', status: false };
     }
 }
+

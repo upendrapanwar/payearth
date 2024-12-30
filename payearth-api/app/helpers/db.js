@@ -53,4 +53,5 @@ module.exports = {
   Support: require('../models/support.model'),
   Ticket : require('../models/ticket.model'),
   TicketMessage: require('../models/ticketmessage.model'),
+  UsedCoupons: require('../models/used.coupon.model'),
 };

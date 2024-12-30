@@ -51,6 +51,7 @@ const {
   ChatMessage,
   Notification,
   Support,
+  UsedCoupons,
 } = require("../helpers/db");
 
 module.exports = {
@@ -855,35 +856,53 @@ async function removeProductFromSavelater(req) {
   return await Savelater.findByIdAndRemove(savelater._id);
 }
 
-
-
-// **************Coupons*************
 async function applyMyCouponCode(req) {
-  try {
-    const { couponCode } = req.params;
-    const coupon = await Coupon.find({ code: couponCode, isActive: true });
-    if (!coupon) {
-      return { status: false, message: 'Coupon not found or inactive' };
+    try {
+      const { couponCode } = req.params;
+      const { userId } = req.query;
+     
+      if (!userId) {
+        return false;
+      }
+  
+      const coupon = await Coupon.findOne({ code: couponCode, isActive: true });
+      if (!coupon) {
+        return false;
+      }
+  
+      const isCouponUsed = await UsedCoupons.findOne({ userId, couponId: coupon._id });
+      if (isCouponUsed) {
+        return false;
+      }
+  
+      const usedCoupon = new UsedCoupons({
+        userId,
+        couponId: coupon._id,
+        code: coupon.code,
+        discount_per: coupon.discount_per,
+        start: coupon.start,
+        end: coupon.end,
+        isActive: coupon.isActive,
+        usedAt: new Date(), 
+      });
+  
+      await usedCoupon.save();
+      return coupon;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
-    return coupon;
-  } catch (error) {
-    console.error(error);
   }
-}
-
-
+  
 async function getMyCoupons(req) {
   try {
     var param = req.body;
-
     console.log("param in getMy coupon", param)
     var id = req.params.id;
-    var sortOption = { createdAt: "desc", isActive: "desc" }; //default
+    var sortOption = { createdAt: "desc", isActive: "desc" }; 
     var limit = "";
     var skip = "";
     var whereCondition = { userId: id, isActive: true };
-
-
 
     if (param.count) {
       limit = parseInt(param.count.limit);

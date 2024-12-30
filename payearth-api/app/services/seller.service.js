@@ -55,6 +55,7 @@ const {
   Support,
   Ticket,
   TicketMessage,
+  UsedCoupons,
 } = require("../helpers/db");
 
 module.exports = {

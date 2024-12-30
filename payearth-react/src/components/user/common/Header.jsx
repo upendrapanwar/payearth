@@ -1045,7 +1045,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                               aria-label="Toggle navigation"
                               onClick={() => setNavbarExpanded(!navbarExpanded)}
                             >
-                              <span class="fa fa-bars"></span>
+                              <span className="fa fa-bars"></span>
                             </button>
                           )}
 

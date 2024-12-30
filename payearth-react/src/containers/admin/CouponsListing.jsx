@@ -1,366 +1,308 @@
-import React, { Component } from 'react'
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useHistory, Link} from 'react-router-dom';
 import Footer from '../../components/common/Footer';
 import Header from '../../components/admin/common/Header';
 import { toast } from 'react-toastify';
-import { setLoading } from '../../store/reducers/global-reducer';
-import { connect } from 'react-redux';
+import { useDispatch, connect } from 'react-redux';
 import store from '../../store/index';
 import axios from 'axios';
+import DataTable from 'react-data-table-component';
 import Select from 'react-select';
 import { NotFound } from '../../components/common/NotFound';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
+import { setLoading } from '../../store/reducers/global-reducer';
+import arrow_back from '../../assets/icons/arrow-back.svg';
+import Switch from 'react-input-switch';
 
-class CouponsListing extends Component {
-    constructor(props) {
-        super(props)
-        const { dispatch } = props;
-        this.dispatch = dispatch;
-        this.authInfo = store.getState().auth.authInfo;
-        this.state = {
-            data: [],
-            userData: [],
-            expiredData: [],
-            reqBody: {
-                count: {
-                    page: 1,
-                    skip: 0,
-                    limit: 2
-                },
-                sorting: {
-                    sort_type: "date",
-                    sort_val: "desc"
-                }
-            },
-            reqBody2: {
-                count: {
-                    page: 1,
-                    skip: 0,
-                    limit: 2
-                },
-                sorting: {
-                    sort_type: "date",
-                    sort_val: "desc"
-                }
-            },
-            pagination: {},
-            paginationExpired: {},
-            sortingOptions: [
-                { label: 'New to Old', value: 'desc' },
-                { label: "Old to New ", value: 'asc' },
-            ],
-            defaultSelectedOptionNew: { label: 'New to Old', value: 'desc' },
-            defaultSelectedOptionExpired: { label: 'New to Old', value: 'desc' },
-            cuponType: '',
+const CouponsListing = (props) => {
+    const history = useHistory();
+    const dispatch = useDispatch();
+    const authInfo = store.getState().auth.authInfo;
 
-            permissions: {
-                add: false,
-                edit: false,
-                delete: false
-              }
-        }
-    }
+    const [data, setData] = useState([]);
+    const [expiredData, setExpiredData] = useState([]);
+    const [cuponType, setCuponType] = useState('new');
+    const [permissions, setPermissions] = useState({
+        add: false,
+        edit: false,
+        delete: false,
+    });
+    const [loading, setLoading] = useState(false);
+    const [sortingOptions] = useState([
+        { label: 'New to Old', value: 'desc' },
+        { label: 'Old to New', value: 'asc' },
+    ]);
+    const [selectedSortingOption, setSelectedSortingOption] = useState({ label: 'New to Old', value: 'desc' });
 
+    useEffect(() => {
+        getDiscountPermission();
+        getCoupons('new', 'desc');
+    }, []);
 
-    componentDidMount() {
-        this.getDiscountPermission();
-        this.getCuponsListing(false, null, 'new');
-        this.handleItemType('new');
-    }
-
-    getDiscountPermission = async () => {
-        const admin_Id = this.authInfo.id;
+    const getDiscountPermission = async () => {
+        const admin_Id = authInfo.id;
         try {
-          const res = await axios.get(`admin/getDiscountPermission/${admin_Id}`, {
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json;charset=UTF-8',
-              'Authorization': `Bearer ${this.authInfo.token}`
-            }
-          })
-    
-          if (res.data.status === true && res.data.data) {
-            this.setState({ permissions: res.data.data }, () => {
-              console.log("Checking Response permission", this.state.permissions);
-            });
-          }
-    
-        } catch (error) {
-          toast.error(error.response.data.message);
-          console.error("Error fetching data: ", error);
-        }
-      }
-
-    getCuponsListing = (pagination, param, type) => {
-        let reqBody = {};
-        let url = '';
-        console.log(param)
-        if (pagination === true) {
-            reqBody = {
-                count: {
-                    page: param,
-                    skip: (param - 1) * 2,
-                    limit: 2
+            const res = await axios.get(`admin/getDiscountPermission/${admin_Id}`, {
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: `Bearer ${authInfo.token}`,
                 },
-                sorting: {
-                    sort_type: "date",
-                    sort_val: type === 'new' ? this.state.defaultSelectedOptionNew.value : this.state.defaultSelectedOptionExpired.value
+            });
+
+            if (res.data.status && res.data.data) {
+                setPermissions(res.data.data);
+            }
+        } catch (error) {
+            toast.error(error.response.data.message);
+            console.error('Error fetching permissions:', error);
+        }
+    };
+
+    const getCoupons = async (type, sort_val) => {
+        const url = `admin/coupons/${type}`;
+        setLoading(true);
+        try {
+            const res = await axios.post(
+                url,
+                { sorting: { sort_type: 'date', sort_val } },
+                {
+                    headers: {
+                        Accept: 'application/json',
+                        Authorization: `Bearer ${authInfo.token}`,
+                    },
                 }
-            };
-            console.log(param)
-        } else {
+            );
             if (type === 'new') {
-                reqBody = this.state.reqBody;
+                setData(res.data.data.coupons);
             } else {
-                reqBody = this.state.reqBody2;
+                setExpiredData(res.data.data.coupons);
             }
+        } catch (error) {
+            toast.error('Failed to fetch coupons');
+            console.error("Failed to fetch coupons", error);
+        } finally {
+            setLoading(false);
         }
+    };
 
-        if (type === 'new') {
-            url = 'admin/coupons/new';
-            this.setState({ reqBody });
-        } else if (type === 'expired') {
-            url = 'admin/coupons/expired';
-            this.setState({ reqBody2: reqBody });
+    const handleStatus = async (id, isActive) => {
+        try {
+            setLoading(true);
+            const status = !isActive;
+            console.log("status", status);
+            const updateStatusUrl = `/admin/couponStatus/${id}`;
+            const res = await axios.patch(updateStatusUrl, { isActive: status }, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${authInfo.token}`
+                }
+            });
+            if (res.status === 200) {
+                setLoading(false);
+                toast.success("Status updated successfully!");
+
+                if (cuponType === 'new') {
+                    setData((prevData) =>
+                        prevData.map((coupon) =>
+                            coupon.id === id ? { ...coupon, isActive: status } : coupon
+                        )
+                    );
+                } else {
+                    setExpiredData((prevData) =>
+                        prevData.map((coupon) =>
+                            coupon.id === id ? { ...coupon, isActive: status } : coupon
+                        )
+                    );
+                }
+            }
+        } catch (error) {
+            toast.error("Failed to update status");
+            console.error("There was an error changing the status", error);
+        }finally{
+            setLoading(false);
         }
+    }
 
-        this.dispatch(setLoading({ loading: true }));
+    const handleDelete = async (id) => {
+        console.log("id",id);
+        try{
+            const res = await axios.delete(`/admin/delete-coupon/${id}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${authInfo.token}`
+                }
+            })
 
+            if(res.data.status===true){
+                console.log("res",res); 
+                getCoupons(cuponType, selectedSortingOption.value);
+                toast.success("Coupon deleted successfully");       
+            }
+        }catch(error){
+            toast.error("Failed to delete coupon");
+            console.error("There was an error deleting the coupon", error);
+        }finally{
+            setLoading(false);
+        }
+    }
 
-        axios.post(url, reqBody, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Authorization': `Bearer ${this.authInfo.token}`
-            }
-        }).then((response) => {
-            if (response.data.status && type === 'new') {
-                this.setState({
-                    data: response.data.data.coupons,
-                    pagination: response.data.data.paginationData
-                });
-            }
-            else if (response.data.status && type === 'expired') {
-                this.setState({
-                    expiredData: response.data.data.coupons,
-                    paginationExpired: response.data.data.paginationData
-                })
-            }
-        }).catch(error => {
-            if (error.response && error.response.data.status === false) {
-                toast.error(error.response.data.message);
-            }
-        }).finally(() => {
-            setTimeout(() => {
-                this.dispatch(setLoading({ loading: false }));
-            }, 300);
+    const handleTabChange = (type) => {
+        setCuponType(type);
+        getCoupons(type, selectedSortingOption.value);
+    };
+
+    const handleSortingChange = (selectedOption) => {
+        setSelectedSortingOption(selectedOption);
+        getCoupons(cuponType, selectedOption.value);
+    };
+
+    const handleEdit = (id) => {
+        history.push({
+            pathname: '/admin/edit-coupon',
+            state: { id },
         });
+    };
 
-    }
+    const columns = [
+        {
+            name: 'Coupon Code',
+            selector: (row) => row.code,
+            sortable: true,
+        },
+        {
+            name: 'Start Date',
+            selector: (row) => {
+                const start = new Date(row.start);
+                return start.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                });
+            },
+            sortable: true,
+        },
+        {
+            name: 'Expiry Date',
+            selector: (row) => {
+                const endDate = new Date(row.end);
+                return endDate.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                });
+            },
+            sortable: true,
+        },
+        {
+            name: 'Discount Percentage',
+            selector: (row) => row.discount_per,
+            sortable: true,
+        },
+        {
+            name: 'STATUS',
+            cell: (row, i) => {
+                return <>
+                    <Switch
+                        on={true}
+                        off={false}
+                        value={row.isActive}
+                        onChange={() => handleStatus(row.id, row.isActive)}
+                    />
+                </>
+            },
+            sortable: true
+        },
+        {
+            name: 'Manage',
+            cell: (row) => (
+                <div className="d-flex gap-2">
+                    <button
+                        className="btn custom_btn btn_yellow mx-auto"
+                        onClick={() => handleEdit(row.id)}
+                    >
+                        Edit
+                    </button>
+                    <button
+                        className="btn custom_btn btn_yellow mx-auto"
+                        onClick={() => handleDelete(row.id)}
+                    >
+                        Delete
+                    </button>
+                </div>
+            ),
+        },
+    ];
 
-    pagination = (type) => {
-        let html = [];
-        let itemLength = 0;
-        let currentPage = 0;
-        if (type === 'new') {
-            itemLength = this.state.pagination.totalPages;
-            currentPage = this.state.pagination.currentPage;
-        } else if (type === 'expired') {
-            itemLength = this.state.paginationExpired.totalPages;
-            currentPage = this.state.paginationExpired.currentPage;
-        }
+    const currentData = cuponType === 'new' ? data : expiredData;
 
-        for (let index = 0; index < itemLength; index++) {
-            let pageNumber = index + 1;
-            html.push(<li key={index}><Link to="#" className={`link ${currentPage === pageNumber ? 'active' : ''}`} onClick={() => this.getCuponsListing(true, pageNumber, type)}>{pageNumber}</Link></li>);
-        }
-        return html;
-    }
-
-    handleChangeNew = selectedOption => {
-        let reqBody = this.state.reqBody;
-        reqBody.sorting.sort_val = selectedOption.value;
-        reqBody.count.page = this.state.pagination.currentPage;
-        reqBody.count.skip = (this.state.pagination.currentPage - 1) * 3;
-        this.setState({ defaultSelectedOptionNew: selectedOption, reqBody });
-        this.getCuponsListing(false, this.state.pagination.currentPage, 'new');
-    }
-
-    handleChangeExpired = selectedOption => {
-        let reqBody2 = this.state.reqBody2;
-        reqBody2.sorting.sort_val = selectedOption.value;
-        reqBody2.count.page = this.state.paginationExpired.currentPage;
-        reqBody2.count.skip = (this.state.paginationExpired.currentPage - 1) * 3;
-        this.setState({ defaultSelectedOptionExpired: selectedOption, reqBody2 });
-        this.getCuponsListing(false, this.state.paginationExpired.currentPage, 'expired');
-    }
-
-    handleItemType = param => {
-        console.log(param)
-        if (param === 'new') {
-            this.setState({ cuponType: 'new' });
-        } else {
-            this.setState({ cuponType: 'expired' });
-        }
-    }
-
-
-    render() {
-        const { loading } = store.getState().global;
-        const {
-            data,
-            expiredData,
-            pagination,
-            paginationExpired,
-            sortingOptions,
-            defaultSelectedOptionNew,
-            defaultSelectedOptionExpired,
-            cuponType
-        } = this.state;
-
-        return (
-            <React.Fragment>
-                {loading === true ? <SpinnerLoader /> : ''}
-                <div className="seller_body">
-                    <Header />
-                    <div className="seller_dash_wrap pt-5 pb-5">
-                        <div className="container ">
-                            <div className="bg-white rounded-3 pt-3 pb-5">
-                                <div className="dash_inner_wrap">
-                                    <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
-                                        <div className="dash_title">Coupons</div>
-                                        {/* <Link to="/admin/add-coupon" className="custom_btn btn_yellow w-auto btn">Add Coupon</Link> */}
-                                        <span>
-                                            <Link
-                                                className={`btn custom_btn mx-auto ${this.state.permissions.add ? 'btn_yellow' : 'btn_disabled'}`}
-                                                to={this.state.permissions.add ? "/admin/add-service" : "#"}
-                                                onClick={(e) => {
-                                                    if (!this.state.permissions.add) {
-                                                        e.preventDefault(); // Prevent navigation
-                                                    }
-                                                }}
-                                            >
-                                                Add Coupon
-                                            </Link>
-                                        </span>
-                                    </div>
-                                </div>
-                                <nav className="orders_tabs">
-                                    <div className="nav nav-tabs" id="nav-tab" role="tablist">
-                                        <button className="nav-link active" id="nav-new-tab" data-bs-toggle="tab" data-bs-target="#nav-new" type="button" role="tab" aria-controls="nav-new" aria-selected="true"
-                                            onClick={() => {
-                                                this.handleItemType('new')
-                                                this.getCuponsListing(false, null, 'new')
-                                            }}
-                                        >New coupons</button>
-                                        <button className="nav-link" id="nav-nav-expired-tab" data-bs-toggle="tab" data-bs-target="#nav-nav-expired" type="button" role="tab" aria-controls="nav-nav-expired" aria-selected="false"
-                                            onClick={() => {
-                                                this.handleItemType('expired')
-                                                this.getCuponsListing(false, null, 'expired')
-                                            }}
-                                        >expired coupons</button>
-                                        {cuponType === 'new' &&
-                                            <Select
-                                                className="sort_select text-normal ms-auto"
-                                                options={sortingOptions}
-                                                value={defaultSelectedOptionNew}
-                                                onChange={this.handleChangeNew}
-                                            />
-                                        }
-                                        {cuponType === 'expired' &&
-                                            <Select
-                                                className="sort_select text-normal ms-auto"
-                                                options={sortingOptions}
-                                                value={defaultSelectedOptionExpired}
-                                                onChange={this.handleChangeExpired}
-                                            />
-                                        }
-                                    </div>
-                                </nav>
-                                <div className="orders_table tab-content pt-0 pb-0" id="nav-tabContent">
-                                    <div className="tab-pane fade show active" id="nav-new" role="tabpanel" aria-labelledby="nav-new-tab">
-                                        {data.length > 0 ?
-                                            <table className="table table-responsive table-bordered">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Coupon Code</th>
-                                                        <th>Start Date</th>
-                                                        <th>Expiry Date</th>
-                                                        <th>Discount Percentage</th>
-                                                        <th>Manage</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {data.length && data.map((value, index) => {
-                                                        return (
-                                                            <tr key={index}>
-                                                                <td>{value.code}</td>
-                                                                <td>{value.start}</td>
-                                                                <td>{value.end}</td>
-                                                                <td>{value.discount_per}</td>
-                                                                <td><Link to="#" className="custom_btn btn_yellow_bordered w-auto btn" >Edit</Link></td>
-                                                            </tr>
-                                                        )
-                                                    })}
-                                                </tbody>
-                                            </table>
-                                            : <NotFound msg="Data not found." />}
-                                        {data.length > 0 &&
-                                            <div className="pagination">
-                                                <ul>
-                                                    <li><Link to="#" className={`link ${pagination.hasPrevPage ? '' : 'disabled'}`} onClick={() => this.getCuponsListing(true, pagination.prevPage, 'new')}><span className="fa fa-angle-left me-2"></span> Prev</Link></li>
-                                                    {this.pagination('new')}
-                                                    <li><Link to="#" className={`link ${pagination.hasNextPage ? '' : 'disabled'}`} onClick={() => this.getCuponsListing(true, pagination.nextPage, 'new')}>Next <span className="fa fa-angle-right ms-2"></span></Link></li>
-                                                </ul>
-                                            </div>
-                                        }
-                                    </div>
-                                    <div className="tab-pane fade" id="nav-nav-expired" role="tabpanel" aria-labelledby="nav-nav-expired-tab">
-                                        {expiredData.length > 0 ?
-                                            <table className="table table-responsive table-bordered">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Coupon Code</th>
-                                                        <th>Start Date</th>
-                                                        <th>Expiry Date</th>
-                                                        <th>Discount Percentage</th>
-                                                        <th>Manage</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {expiredData.length && this.state.expiredData.map((value, index) => {
-                                                        return (
-                                                            <tr key={index}>
-                                                                <td>{value.code}</td>
-                                                                <td>{value.start}</td>
-                                                                <td>{value.end}</td>
-                                                                <td>{value.discount_per}</td>
-                                                                <td><Link to="#" className="custom_btn btn_yellow_bordered w-auto btn">Edit</Link></td>
-                                                            </tr>
-                                                        )
-                                                    })}
-                                                </tbody>
-                                            </table>
-                                            : <NotFound msg="Data not found." />}
-                                        {expiredData.length > 0 &&
-                                            <div className="pagination">
-                                                <ul>
-                                                    <li><Link to="#" className={`link ${paginationExpired.hasPrevPage ? '' : 'disabled'}`} onClick={() => this.getCuponsListing(true, paginationExpired.prevPage, 'expired')}><span className="fa fa-angle-left me-2"></span> Prev</Link></li>
-                                                    {this.pagination('expired')}
-                                                    <li><Link to="#" className={`link ${paginationExpired.hasNextPage ? '' : 'disabled'}`} onClick={() => this.getCuponsListing(true, paginationExpired.nextPage, 'expired')}>Next <span className="fa fa-angle-right ms-2"></span></Link></li>
-                                                </ul>
-                                            </div>
-                                        }
-                                    </div>
+    return (
+        <React.Fragment>
+            {loading && <SpinnerLoader />}
+            <div className="seller_body">
+                <Header />
+                <div className="seller_dash_wrap pt-5 pb-5">
+                    <div className="container">
+                        <div className="bg-white rounded-3 p-3 p-5">
+                            <div className="dash_inner_wrap">
+                                <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
+                                    <div className="dash_title">Coupons</div>
+                                    <span className="d-flex justify-content-between align-items-center">
+                                        <Link
+                                            className={`btn custom_btn ${permissions.add ? 'btn_yellow' : 'btn_disabled'}`}
+                                            to={permissions.add ? '/admin/add-coupon' : '#'}
+                                        >
+                                            Add Coupon
+                                        </Link>
+                                        &nbsp;
+                                        <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/dashboard"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link>
+                                    </span>
                                 </div>
                             </div>
+
+                            <div className="orders_tabs p-3 d-flex justify-content-between align-items-center">
+                                <div>
+                                    <button
+                                        className={`btn custom_btn ${cuponType === 'new' ? 'btn_yellow' : 'btn-light'}`}
+                                        onClick={() => handleTabChange('new')}
+                                    >
+                                        New Coupons
+                                    </button>
+                                    <button
+                                        className={`btn ms-2 ${cuponType === 'expired' ? 'btn_yellow' : 'btn-light'}`}
+                                        onClick={() => handleTabChange('expired')}
+                                    >
+                                        Expired Coupons
+                                    </button>
+                                </div>
+                                <div className="col-3">
+                                    <Select
+                                        options={sortingOptions}
+                                        value={selectedSortingOption}
+                                        onChange={handleSortingChange}
+                                        className="w-100"
+                                    />
+                                </div>
+                            </div>
+
+                            {currentData.length > 0 ? (
+                                <DataTable
+                                    columns={columns}
+                                    data={currentData}
+                                    pagination
+                                    highlightOnHover
+                                />
+                            ) : (
+                                <NotFound msg="Data not found." />
+                            )}
                         </div>
                     </div>
-                    <Footer />
                 </div>
-            </React.Fragment>
-        )
-    }
-}
+                <Footer />
+            </div>
+        </React.Fragment>
+    );
+};
 
 export default connect(setLoading)(CouponsListing);
