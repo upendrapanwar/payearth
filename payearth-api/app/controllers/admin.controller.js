@@ -267,8 +267,12 @@ router.get("/getDiscountPermission/:admin_Id", getDiscountPermission);
 router.get("/getBrandPermission/:admin_Id", getBrandPermission);
 router.get("/getAdvertiesmentPermission/:admin_Id", getAdvertiesmentPermission);
 router.get("/getSubscriptionPermission/:admin_Id", getSubscriptionPermission);
+router.get("/getcustomerPermission/:admin_Id", getcustomerPermission);
 router.get("/getAllpermission/:admin_Id", getAllpermission);
+router.get("/getVendorsPermission/:admin_Id", getVendorsPermission);
 router.put("/updatePermission/:admin_Id", updatePermission);
+
+
 
 //Coupon
 router.post('/coupons', createCoupon);
@@ -279,16 +283,11 @@ router.patch('/edit-coupons/:id', editCoupon);
 router.patch('/couponStatus/:id', couponStatus);
 router.delete('/delete-coupon/:id', deleteCoupon);
 
-
-
-
-
 // Product 
 router.get("/getProductStock", getProductStock);
 router.get("/getProductDetailsById/:id", getProductDetailsById);
 router.get("/colors", getColors);
 router.put('/productStatus/:id', productStatus);
-
 
 //dashboard
 router.get("/getProductData", getProductData);
@@ -300,6 +299,18 @@ router.get("/serviceSalesGraph", serviceSalesGraph);
 router.get("/getVendorsData", getVendorsData);
 router.get("/getBuyersData", getBuyersData);
 router.get("/getOrderDetails", getOrderDetails);
+
+// manage vendors(sellers)
+router.get("/get-all-vendors", getAllVendors);
+router.patch("/update-vendors-status/:id", updateVendorsStatus);
+
+
+//manage Customers(buyers)
+router.get("/get-all-customers", getAllCustomers);
+router.patch("/update-customer-status/:id", updateCustomerStatus);
+
+
+
 
 
 module.exports = router;
@@ -1361,6 +1372,18 @@ function getSubscriptionPermission(req, res, next) {
         .catch((err) => next(res.json({ status: false, message: err.message })));
 }
 
+function getcustomerPermission(req, res, next) {
+    adminService.getcustomerPermission(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getVendorsPermission(req, res, next) {
+    adminService.getVendorsPermission(req)
+        .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
 function getAllpermission(req, res, next) {
     adminService.getAllpermission(req)
         .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
@@ -1450,3 +1473,27 @@ function getOrderDetails(req, res, next) {
         .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch((err) => next(res.json({ status: false, message: err })));
 }
+
+function getAllVendors(req, res, next) {
+    adminService.getAllVendors(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function updateVendorsStatus(req, res, next) {
+    adminService.updateVendorsStatus(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+function updateCustomerStatus(req, res, next) {
+    adminService.updateCustomerStatus(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function getAllCustomers(req, res, next) {
+    adminService.getAllCustomers(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+

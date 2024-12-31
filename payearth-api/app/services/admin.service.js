@@ -16,7 +16,7 @@ const { Admin, User, Seller, Coupon, Product, Category, Brand,
     OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline,
     ProductSales, cmsPost, cmsPage, cmsCategory, bannerAdvertisement,
     Chat, ChatMessage, Services, OrderDetails, Post, PostLike, PostVideos,
-    PostImages, PostComment, Support, AccessPermission,UsedCoupons,
+    PostImages, PostComment, Support, AccessPermission, UsedCoupons,
 } = require("../helpers/db");
 
 module.exports = {
@@ -209,6 +209,13 @@ module.exports = {
     getSubscriptionPermission,
     getAllpermission,
     updatePermission,
+    getAllVendors,
+    getVendorsPermission,
+    updateVendorsStatus,
+    getAllCustomers,
+    getcustomerPermission,
+    updateCustomerStatus,
+
 };
 
 // Validator function
@@ -718,23 +725,23 @@ async function getExpiredCoupons(req) {
 }
 
 async function getCoupon(req) {
-    const {id} = req.params;
+    const { id } = req.params;
 
-    try{
-        if(!id){
+    try {
+        if (!id) {
             return { message: 'Coupon id is not found.', status: false };
         };
 
-        const coupon = await Coupon.findById({_id:id});
+        const coupon = await Coupon.findById({ _id: id });
 
-        if(!coupon){
+        if (!coupon) {
             return { message: 'Coupon not found.', status: false };
         }
 
-        return { status: true, data: coupon, message: 'Coupon retrieved successfully'};
-    } catch(error){
+        return { status: true, data: coupon, message: 'Coupon retrieved successfully' };
+    } catch (error) {
         console.error('Error getting coupon:', error);
-        return { message: 'Failed to get coupon', status: false }; 
+        return { message: 'Failed to get coupon', status: false };
     }
 }
 
@@ -770,17 +777,17 @@ async function editCoupon(req) {
 
 async function couponStatus(req) {
     const { id } = req.params;
-    const { isActive} = req.body;
+    const { isActive } = req.body;
 
     const updatedData = {
-        isActive : isActive
+        isActive: isActive
     };
 
     try {
         if (!id) {
             return { message: 'Coupon id is not found.', status: false };
         };
-       
+
         const coupon = await Coupon.findByIdAndUpdate({ _id: id }, updatedData, { new: true });
 
         if (!coupon) {
@@ -797,12 +804,12 @@ async function couponStatus(req) {
 
 async function deleteCoupon(req) {
     const { id } = req.params;
-  
+
     try {
         if (!id) {
             return { message: 'Coupon id is not found.', status: false };
         };
-       
+
         const coupon = await Coupon.findByIdAndDelete({ _id: id });
 
         if (!coupon) {
@@ -5198,15 +5205,6 @@ async function getAdvertiesmentPermission(req) {
         return { status: false, message: "An error occurred while fetching permission.", error: err.message, };
     }
 }
-
-/*****************************************************************/
-/**
- * Get subscription permission for a given admin
- * @param {Object} req - request object
- * @param {string} req.params.admin_Id - admin id
- * @returns {Object} permission object with status and message
- */
-/*****************************************************************/
 async function getSubscriptionPermission(req) {
     const { admin_Id } = req.params;
     try {
@@ -5219,6 +5217,42 @@ async function getSubscriptionPermission(req) {
         const manage_subcription = permissions.manage_subcription;
 
         return { status: true, message: 'Permissions fetched successfully', data: manage_subcription };
+    } catch (error) {
+        console.error("Error fetching permission:", err);
+        return { status: false, message: "An error occurred while fetching permission.", error: err.message, };
+    }
+}
+
+async function getVendorsPermission(req) {
+    const { admin_Id } = req.params;
+    try {
+        const permissions = await AccessPermission.findOne({ admin_Id: admin_Id });
+
+        if (!permissions) {
+            return { status: false, message: 'Permissions not found' };
+        }
+
+        const manage_vendors = permissions.manage_vendors;
+
+        return { status: true, message: 'Permissions fetched successfully', data: manage_vendors };
+    } catch (error) {
+        console.error("Error fetching permission:", err);
+        return { status: false, message: "An error occurred while fetching permission.", error: err.message, };
+    }
+}
+
+async function getcustomerPermission(req) {
+    const { admin_Id } = req.params;
+    try {
+        const permissions = await AccessPermission.findOne({ admin_Id: admin_Id });
+
+        if (!permissions) {
+            return { status: false, message: 'Permissions not found' };
+        }
+
+        const manage_customers = permissions.manage_customers;
+
+        return { status: true, message: 'Permissions fetched successfully', data: manage_customers };
     } catch (error) {
         console.error("Error fetching permission:", err);
         return { status: false, message: "An error occurred while fetching permission.", error: err.message, };
@@ -5247,37 +5281,38 @@ async function updatePermission(req) {
     const admin_Id = req.params.admin_Id;
     const { dashboard, post, create_post, manage_orders, manage_services_orders,
         manage_service, manage_discount, manage_brand, manage_customers, manage_vendors,
-        manage_advertisement, manage_subcription, blogs_categories, products_categories, 
+        manage_advertisement, manage_subcription, blogs_categories, products_categories,
         products_sub_categories, services_categories } = req.body.data;
 
     try {
-       
+
         const Update = {
-            $set: {"dashboard.add": dashboard.add,"dashboard.edit": dashboard.edit,"dashboard.delete": dashboard.delete,
-                "post.add": post.add,"post.edit": post.edit,"post.delete": post.delete,
-                "create_post.add": create_post.add,"create_post.edit": create_post.edit,"create_post.delete": create_post.delete,
-                "manage_orders.add": manage_orders.add,"manage_orders.edit": manage_orders.edit,"manage_orders.delete": manage_orders.delete,
-                "manage_services_orders.add": manage_services_orders.add,"manage_services_orders.edit": manage_services_orders.edit,"manage_services_orders.delete": manage_services_orders.delete,
-                "manage_service.add": manage_service.add,"manage_service.edit": manage_service.edit,"manage_service.delete": manage_service.delete,
-                "manage_discount.add": manage_discount.add,"manage_discount.edit": manage_discount.edit,"manage_discount.delete": manage_discount.delete,    
-                "manage_brand.add": manage_brand.add,"manage_brand.edit": manage_brand.edit,"manage_brand.delete": manage_brand.delete,
-                "manage_customers.add": manage_customers.add,"manage_customers.edit": manage_customers.edit,"manage_customers.delete": manage_customers.delete,
-                "manage_vendors.add": manage_vendors.add,"manage_vendors.edit": manage_vendors.edit,"manage_vendors.delete": manage_vendors.delete,
-                "manage_advertisement.add": manage_advertisement.add,"manage_advertisement.edit": manage_advertisement.edit,"manage_advertisement.delete": manage_advertisement.delete,
-                "manage_subcription.add": manage_subcription.add,"manage_subcription.edit": manage_subcription.edit,"manage_subcription.delete": manage_subcription.delete,
-                "blogs_categories.add": blogs_categories.add,"blogs_categories.edit": blogs_categories.edit,"blogs_categories.delete": blogs_categories.delete,
-                "products_categories.add": products_categories.add,"products_categories.edit": products_categories.edit,"products_categories.delete": products_categories.delete,   
-                "products_sub_categories.add": products_sub_categories.add,"products_sub_categories.edit": products_sub_categories.edit,"products_sub_categories.delete": products_sub_categories.delete,
-                "services_categories.add": services_categories.add,"services_categories.edit": services_categories.edit,"services_categories.delete": services_categories.delete,
+            $set: {
+                "dashboard.add": dashboard.add, "dashboard.edit": dashboard.edit, "dashboard.delete": dashboard.delete,
+                "post.add": post.add, "post.edit": post.edit, "post.delete": post.delete,
+                "create_post.add": create_post.add, "create_post.edit": create_post.edit, "create_post.delete": create_post.delete,
+                "manage_orders.add": manage_orders.add, "manage_orders.edit": manage_orders.edit, "manage_orders.delete": manage_orders.delete,
+                "manage_services_orders.add": manage_services_orders.add, "manage_services_orders.edit": manage_services_orders.edit, "manage_services_orders.delete": manage_services_orders.delete,
+                "manage_service.add": manage_service.add, "manage_service.edit": manage_service.edit, "manage_service.delete": manage_service.delete,
+                "manage_discount.add": manage_discount.add, "manage_discount.edit": manage_discount.edit, "manage_discount.delete": manage_discount.delete,
+                "manage_brand.add": manage_brand.add, "manage_brand.edit": manage_brand.edit, "manage_brand.delete": manage_brand.delete,
+                "manage_customers.add": manage_customers.add, "manage_customers.edit": manage_customers.edit, "manage_customers.delete": manage_customers.delete,
+                "manage_vendors.add": manage_vendors.add, "manage_vendors.edit": manage_vendors.edit, "manage_vendors.delete": manage_vendors.delete,
+                "manage_advertisement.add": manage_advertisement.add, "manage_advertisement.edit": manage_advertisement.edit, "manage_advertisement.delete": manage_advertisement.delete,
+                "manage_subcription.add": manage_subcription.add, "manage_subcription.edit": manage_subcription.edit, "manage_subcription.delete": manage_subcription.delete,
+                "blogs_categories.add": blogs_categories.add, "blogs_categories.edit": blogs_categories.edit, "blogs_categories.delete": blogs_categories.delete,
+                "products_categories.add": products_categories.add, "products_categories.edit": products_categories.edit, "products_categories.delete": products_categories.delete,
+                "products_sub_categories.add": products_sub_categories.add, "products_sub_categories.edit": products_sub_categories.edit, "products_sub_categories.delete": products_sub_categories.delete,
+                "services_categories.add": services_categories.add, "services_categories.edit": services_categories.edit, "services_categories.delete": services_categories.delete,
             }
         }
-        console.log("Update",Update);
-        
+        console.log("Update", Update);
+
         const result = await AccessPermission.findOneAndUpdate(
-            {admin_Id: admin_Id}, Update, { new: true }
+            { admin_Id: admin_Id }, Update, { new: true }
         );
 
-        if(!result){
+        if (!result) {
             return { message: 'Admin not found or permissions not updated', status: false };
         }
 
@@ -5285,6 +5320,62 @@ async function updatePermission(req) {
     } catch (error) {
         console.error('Error updating permissions:', error);
         return { message: 'Failed to update permissions', status: false };
+    }
+}
+
+async function getAllVendors(req) {
+    try {
+        const vendors = await Seller.find({}).sort({ createdAt: 'desc' });
+        return vendors;
+    } catch (error) {
+        console.error("Error fetching vendors", error);
+        return false;
+    }
+}
+
+
+async function updateVendorsStatus(req) {
+    const {id} = req.params;
+    const { isActive } = req.body;
+
+    try {
+        const result = await Seller.findByIdAndUpdate({ _id: id }, { isActive: isActive }, { new: true });
+        if (!result) {
+            return false;
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error fetching vendors", error);
+        return false;
+    }
+}
+
+
+async function updateCustomerStatus(req) {
+    const {id} = req.params;
+    const { isActive } = req.body;
+
+    try {
+        const result = await User.findByIdAndUpdate({ _id: id }, { isActive: isActive }, { new: true });
+        if (!result) {
+            return false;
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error fetching vendors", error);
+        return false;
+    }
+}
+
+async function getAllCustomers(req) {
+    try {
+        const customers = await User.find({}).sort({ createdAt: 'desc' });
+        return customers;
+    } catch (error) {
+        console.error("Error fetching customers", error);
+        return false;
     }
 }
 

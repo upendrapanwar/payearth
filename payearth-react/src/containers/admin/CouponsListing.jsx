@@ -89,7 +89,6 @@ const CouponsListing = (props) => {
         try {
             setLoading(true);
             const status = !isActive;
-            console.log("status", status);
             const updateStatusUrl = `/admin/couponStatus/${id}`;
             const res = await axios.patch(updateStatusUrl, { isActive: status }, {
                 headers: {
@@ -197,7 +196,7 @@ const CouponsListing = (props) => {
         },
         {
             name: 'Discount Percentage',
-            selector: (row) => row.discount_per,
+            selector: (row) => `${row.discount_per}%`,
             sortable: true,
         },
         {
