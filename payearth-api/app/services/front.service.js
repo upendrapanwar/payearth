@@ -47,8 +47,10 @@ module.exports = {
   // getProductListing,
   // test 
   getProductsListing,
+  getProductMaxPrice,
   getSubCateProduct,
   getServiceListing,
+  getServiceMaxPrice,
 
   getFilterCategories,
   getBrandsListByProducts,
@@ -458,11 +460,23 @@ async function getProductsListing(req) {
   }
 }
 
+async function getProductMaxPrice() {
+  try {
+    const highestPriceProduct = await Product.findOne().sort({ price: -1 }).select("price");
+
+    if (!highestPriceProduct) {
+      return false;
+    }
+    return highestPriceProduct;
+  } catch (error) {
+    console.error('Error fetching highest price product:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+}
+
 async function getServiceListing(req) {
   try {
     const { selectedCategories, priceRange, searchQuery } = req.body;
-
-    console.log("priceRange", priceRange)
 
     const query = {};
     if (Array.isArray(selectedCategories) && selectedCategories.length > 0) {
@@ -489,6 +503,18 @@ async function getServiceListing(req) {
   } catch (error) {
     console.log("Error:", error.message);
     return false;
+  }
+}
+
+async function getServiceMaxPrice() {
+  try {
+    const highestPriceService = await Services.findOne().sort({ charges: -1 }).select("charges");
+    if (!highestPriceService) {
+      return false;
+    }
+    return highestPriceService;
+  } catch (error) {
+    res.status(500).json({ message: error });
   }
 }
 
@@ -966,9 +992,7 @@ async function searchFilterProducts(req, res) {
   try {
     let items;
     if (category) {
-      // Find the category by categoryName
       const categoryData = await Category.findOne({ categoryName: new RegExp(category, 'i') });
-
       if (!categoryData) {
         return
       }

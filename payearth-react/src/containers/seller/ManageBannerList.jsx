@@ -98,48 +98,11 @@ class SellerBannerList extends Component {
   }
 
   handleRowSelected = (state) => {
-    console.log("selected Row : ", state.selectedRows)
+    // console.log("selected Row : ", state.selectedRows)
     this.setState({ selectedRows: state.selectedRows });
   };
 
-  // createSignature = () => {
-  //   const { selectedRows } = this.state
-  //   const cloudPublicId = selectedRows.map(item => item.imageId === "" ? item.videoId : item.imageId);
-  //   console.log("cloudPublicId", cloudPublicId)
-
-  //   const timestamp = Math.round(new Date().getTime() / 1000);
-  //   const signature = CryptoJS.SHA1(`public_id=${cloudPublicId}&timestamp=${timestamp}${this.apiSecret}`).toString(CryptoJS.enc.Hex);
-
-  //   return { timestamp, signature };
-  // };
-
-  // handleDeleteCloud = async () => {
-  //   this.setState({ image: "" })
-  //   const { cloudImageId } = this.state
-  //   const { timestamp, signature } = this.createSignature();
-
-  //   try {
-  //       const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${this.cloudName}/image/destroy`;
-  //       const response = await axios.delete(cloudinaryUrl, {
-  //           params: {
-  //               public_id: cloudImageId,
-  //               api_key: this.apiKey,
-  //               signature: signature,
-  //               timestamp: timestamp,
-  //           },
-  //       });
-  //       if (response.status === 200) {
-  //           console.log('Image deleted successfully');
-  //       } else {
-  //           console.error('Failed to delete image');
-  //       }
-  //   } catch (error) {
-  //       console.error('Error deleting image', error);
-  //   }
-  // }
-
-
-  // ********************************************************
+  //********************************************************
 
   handleDeleteSeletedData = async () => {
     // const { timestamp, signature } = this.createSignature();

@@ -8,12 +8,18 @@ import axios from 'axios';
 import { getBrands, getColors } from './../../../helpers/product-listing';
 
 const MIN = 0;
-var MAX = 1000;
-
-const RangeTwoThumbs = ({ sendRanges, currencySymbol }) => {
+const RangeTwoThumbs = ({ sendRanges, currencySymbol, MAX }) => {
     const dispatch = useDispatch();
-    const [values, setValues] = useState([MIN, MAX]);
+    const [maxValue, setMaxValue] = useState(MAX || 1000);
+    const [values, setValues] = useState([MIN, maxValue]);
     const [step, setStep] = useState(10);
+
+    useEffect(() => {
+        if (MAX) {
+            setMaxValue(MAX);
+            setValues([MIN, MAX]);
+        }
+    }, [MAX]);
 
     const handleChange = (values) => {
         setValues(values);
@@ -36,7 +42,7 @@ const RangeTwoThumbs = ({ sendRanges, currencySymbol }) => {
                 values={values}
                 step={step}
                 min={MIN}
-                max={MAX}
+                max={maxValue}
                 onChange={handleChange}
                 renderTrack={({ props, children }) => (
                     <div
@@ -60,7 +66,7 @@ const RangeTwoThumbs = ({ sendRanges, currencySymbol }) => {
                                     values,
                                     colors: ['#E8E8E8', '#FBB500', '#E8E8E8'],
                                     min: MIN,
-                                    max: MAX,
+                                    max: maxValue,
                                 }),
                                 alignSelf: 'center',
                             }}

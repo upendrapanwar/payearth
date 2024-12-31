@@ -202,7 +202,7 @@ class SellerManageSubscription extends Component {
     }
 
     fetchProducts = async (data) => {
-        console.log("Sub plan already selected: ", data)
+        // console.log("Sub plan already selected: ", data)
 
         try {
             if (data) {
@@ -234,7 +234,6 @@ class SellerManageSubscription extends Component {
             console.error('Error fetching products: ', error);
         }
     };
-
 
     handleSave = () => {
         // console.log("subscription plan ", subscriptionPlan)
@@ -309,8 +308,8 @@ class SellerManageSubscription extends Component {
     render() {
         const { subscriptionPlan, displaySubPlan, loading, getAllSubscriptionPlan } = this.state;
 
-        console.log("getAllSubscriptionPlan", getAllSubscriptionPlan)
-        console.log("displaySubPlan", displaySubPlan)
+        // console.log("getAllSubscriptionPlan", getAllSubscriptionPlan)
+        // console.log("displaySubPlan", displaySubPlan)
         if (loading) {
             return <SpinnerLoader />
         }
@@ -319,7 +318,7 @@ class SellerManageSubscription extends Component {
                 {loading === true ? <SpinnerLoader /> : ""}
                 <Header />
                 <div className="inr_top_page_title">
-                    <h2>Subscription Plan</h2>
+                    <h2>Subscription Advertising</h2>
                 </div>
                 <Helmet>
                     <title>{"Manage Subscription - Pay Earth"}</title>
@@ -327,9 +326,6 @@ class SellerManageSubscription extends Component {
                 <section className="inr_wrap">
                     <div className="container">
                         <div className="row">
-                            {/* <div>
-                                <h1>My Subscription</h1>
-                            </div> */}
                             <div className="col-md-12 bg-body-tertiary plan-cart">
                                 <div className="row mt-3">
                                     {getAllSubscriptionPlan !== "" ? <>
@@ -361,7 +357,6 @@ class SellerManageSubscription extends Component {
                                                                 <p className="price">
                                                                     <sup>$</sup>
                                                                     <span>{card.amount / 100}</span>
-
                                                                 </p>
                                                                 <p className="hint">Payment Interval Per {card.interval_count} {card.interval}</p>
                                                                 <p className="hint">Advertisements Allowed {card.metadata.advertiseAllowed}</p>
@@ -393,7 +388,6 @@ class SellerManageSubscription extends Component {
                         </div>
                     </div>
                 </section>
-
                 <Footer />
             </React.Fragment>
         );

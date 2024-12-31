@@ -25,9 +25,9 @@ router.post('/product/listing/categories/:id', getFilterCategories);
 router.get('/product/detail/:id', getProductById);
 
 //For products only
-router.post('/products/listing', getProductsListing); 
+router.post('/products/listing', getProductsListing);
 router.post("/getProductSubCat", getSubCateProduct);
-
+router.get("/getProductMaxPrice", getProductMaxPrice);
 
 router.post('/product/listing/brands', getBrandsListByProducts);
 router.post('/product/listing/colors', getColorsListByProducts);
@@ -35,6 +35,7 @@ router.post('/product/listing/colors', getColorsListByProducts);
 //For services only
 router.post('/service/listing', getServiceListing);
 router.get('/service/detail/:id', getServiceById);
+router.get("/getServiceMaxPrice", getServiceMaxPrice);
 
 //For Publish Blog
 router.get('/publishBlog/:status', cmsPublishBlog);
@@ -161,6 +162,12 @@ function getProductsListing(req, res, next) {
         .catch(err => next(res.json({ status: false, message: "No data found.", data: [] })));
 }
 
+function getProductMaxPrice(req, res, next) {
+    frontService.getProductMaxPrice(req)
+        .then(max => max ? res.status(200).json({ status: true, data: max }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: "No data found.", data: [] })));
+}
+
 function getFilterCategories(req, res, next) {
     frontService.getFilterCategories(req)
         .then(categories => categories && categories.length > 0 ? res.status(200).json({ status: true, data: categories }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
@@ -188,6 +195,12 @@ function getProductById(req, res, next) {
 function getServiceListing(req, res, next) {
     frontService.getServiceListing(req)
         .then(services => services ? res.status(200).json({ status: true, data: services }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: "No data found.", data: [] })));
+}
+
+function getServiceMaxPrice(req, res, next) {
+    frontService.getServiceMaxPrice(req)
+        .then(max => max ? res.status(200).json({ status: true, data: max }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: "No data found.", data: [] })));
 }
 

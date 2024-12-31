@@ -215,14 +215,30 @@ const ServiceSidebar = (props) => {
         // onBrandChange,
     } = props;
 
-    console.log("sideBarToggle", sideBarToggle)
-
     const [brands, setBrands] = useState('')
     const [priceRange, setPriceRange] = useState();
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedSubCategories, setSelectedSubCategories] = useState([]);
     const [selectedBrands, setSelectedBrands] = useState([]);
     const [productSubCategory, setProductSubCategory] = useState([]);
+    const [max, setMax] = useState();
+
+
+    useEffect(() => {
+        axios
+            .get("front/getServiceMaxPrice")
+            .then((response) => {
+                if (response.data.status) {
+                    setMax(response.data.data.charges);
+                } else {
+                    toast.error(response.data.message);
+                }
+            })
+            .catch((error) => {
+                toast.error(error);
+                console.log(error);
+            });
+    }, []);
 
 
     const handleCateCheckbox = (event) => {
@@ -243,10 +259,6 @@ const ServiceSidebar = (props) => {
         setPriceRange(priceRange);
         onPriceRangeChange(priceRange);
     }
-
-
-
-
 
     return (
         <>
@@ -289,7 +301,7 @@ const ServiceSidebar = (props) => {
                             <h3>Price</h3>
                         </li>
                         <li className="mb-5">
-                            <RangeTwoThumbs currency="USD" currencySymbol="$" sendRanges={handleRangeData} />
+                            <RangeTwoThumbs currency="USD" currencySymbol="$" sendRanges={handleRangeData} MAX={max} />
                         </li>
                     </ul>
                 </div>

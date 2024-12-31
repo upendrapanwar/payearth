@@ -219,7 +219,7 @@ const Header = () => {
                   <i className="icon">
                     <img src={shoppingBagIcon} alt="" />
                   </i>{" "}
-                  Subscription Plans
+                  Subscription Advertising
                 </Link>
               </li>
               <li>

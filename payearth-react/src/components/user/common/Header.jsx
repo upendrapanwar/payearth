@@ -551,12 +551,12 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
       const query = new URLSearchParams();
       if (catSelectedOption.label !== 'All') query.append('category', catSelectedOption.label);
       if (searchOption) query.append('name', searchOption);
-      const response = await axios.get(`/front/searchFilterServices?${query.toString()}}`, {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-      });
+      // const response = await axios.get(`/front/searchFilterServices?${query.toString()}}`, {
+      //   headers: {
+      //     'Accept': 'application/json',
+      //     'Content-Type': 'application/json;charset=UTF-8',
+      //   },
+      // });
       history.push(`/service-listing?cat=${catSelectedOption.value}&searchText=${searchOption || ''}`)
     } catch (error) {
       toast.error("Data Not Found", { autoClose: 3000 })

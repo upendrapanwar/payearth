@@ -26,6 +26,24 @@ const Sidebar = (props) => {
     const [selectedSubCategories, setSelectedSubCategories] = useState([]);
     const [selectedBrands, setSelectedBrands] = useState([]);
     const [productSubCategory, setProductSubCategory] = useState([]);
+    const [max, setMax] = useState();
+
+
+    useEffect(() => {
+        axios
+            .get("front/getProductMaxPrice")
+            .then((response) => {
+                if (response.data.status) {
+                    setMax(response.data.data.price);
+                } else {
+                    toast.error(response.data.message);
+                }
+            })
+            .catch((error) => {
+                toast.error(error);
+                console.log(error);
+            });
+    }, []);
 
     useEffect(() => {
         axios
@@ -163,16 +181,14 @@ const Sidebar = (props) => {
                         })}
                     </ul> : ''
                 }
-
                 <ul className="filter_list">
                     <li>
                         <h3>Price</h3>
                     </li>
                     <li className="mb-5">
-                        <RangeTwoThumbs currency="USD" currencySymbol="$" sendRanges={handleRangeData} />
+                        <RangeTwoThumbs currency="USD" currencySymbol="$" sendRanges={handleRangeData} MAX={max} />
                     </li>
                 </ul>
-
                 {pageName === 'product-listing' && brands.length ?
                     <ul className="filter_list">
                         <li>
