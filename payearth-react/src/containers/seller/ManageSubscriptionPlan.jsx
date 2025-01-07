@@ -318,7 +318,7 @@ class SellerManageSubscription extends Component {
                 {loading === true ? <SpinnerLoader /> : ""}
                 <Header />
                 <div className="inr_top_page_title">
-                    <h2>Subscription Advertising</h2>
+                    <h2>Buy Advertising Subscriptions</h2>
                 </div>
                 <Helmet>
                     <title>{"Manage Subscription - Pay Earth"}</title>

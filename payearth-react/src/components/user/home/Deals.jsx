@@ -42,18 +42,18 @@ const Deals = () => {
             <div className="cards_wrapper">
               {data && data.length
                 ? data.map((value, index) => {
-                    return (
-                      <div key={index}>
-                        <Link to="#" className="d-inline-block">
-                          <img
-                            src={config.apiURI + value.bannerImage}
-                            alt="..."
-                            className="img-fluid"
-                          />
-                        </Link>
-                      </div>
-                    );
-                  })
+                  return (
+                    <div key={index}>
+                      <Link to="#" className="d-inline-block">
+                        <img
+                          src={config.apiURI + value.bannerImage}
+                          alt="..."
+                          className="img-fluid"
+                        />
+                      </Link>
+                    </div>
+                  );
+                })
                 : ""}
             </div>
           </div>

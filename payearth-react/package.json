@@ -76,6 +76,7 @@
         "react-bootstrap": "^2.10.4",
         "react-bootstrap-modal": "^4.2.0",
         "react-calendar": "^4.3.0",
+        "react-card-slider-component": "^1.0.9",
         "react-chartjs-2": "^4.3.1",
         "react-coinbase-commerce": "^1.6.0",
         "react-confirm-alert": "^2.7.0",

@@ -31,6 +31,7 @@ import UserContact from "./containers/user/Contact";
 import MyBanner from "./containers/user/MyBanners";
 import CreateNewBanner from "./containers/user/CreateBanner";
 import MyBannerEdit from "./containers/user/MyBannerEdit";
+import ManageDeals from "./containers/seller/CreateDeals";
 
 import Notifications from "./containers/user/Notifications";
 import Chat from "./containers/user/Chat";
@@ -160,6 +161,7 @@ import AddAdmin from "./containers/admin/AddAdmin"
 import AccessPermission from "./containers/admin/AccessPermission";
 import ManageCapability from "./containers/admin/ManageCapability";
 import EditCoupon from "./containers/admin/EditCoupon";
+
 
 
 function App() {
@@ -390,6 +392,16 @@ function App() {
             path="/order-summary/:id"
             component={OrderSummary}
             roles={[Role.user]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          {/* ManageDeals */}
+
+          <PrivateRoute
+            path="/seller/manage_deals"
+            component={ManageDeals}
+            roles={[Role.seller]}
             currentUserRole={userInfo.role}
             exact
           />

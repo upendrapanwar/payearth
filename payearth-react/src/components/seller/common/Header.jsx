@@ -82,7 +82,6 @@ const Header = () => {
         return;
       }
 
-      
       setUnreadCount((prevCount) => prevCount + 1);
     });
 
@@ -143,6 +142,20 @@ const Header = () => {
                     <img src={bellIcon} alt="" />
                   </i>
                   Notifications
+                </Link>
+              </li>
+
+              {/* /manage_deals */}
+
+              <li>
+                <Link
+                  to="/seller/manage_deals"
+                  onClick={() => removeBackdrop()}
+                >
+                  <i className="icon">
+                    <img src={bannerIcon} alt="" />
+                  </i>{" "}
+                  Manage Deals
                 </Link>
               </li>
               <li>
@@ -219,7 +232,9 @@ const Header = () => {
                   <i className="icon">
                     <img src={shoppingBagIcon} alt="" />
                   </i>{" "}
-                  Subscription Advertising
+                  {/* Buy  */}
+                  Advertising
+                  Subscriptions
                 </Link>
               </li>
               <li>
@@ -259,7 +274,7 @@ const Header = () => {
                   <div className="container-fluid p-0">
                     <div className="side_menu_btn">
                       <button
-                        className="btn" 
+                        className="btn"
                         type="button"
                         data-bs-toggle="offcanvas"
                         data-bs-target="#sideMenu"

@@ -143,6 +143,15 @@ var uploadFeaturedImage = multer({
   limits: { fileSize: 1024 * 1024 * 5 },
 }).single("file");
 
+// Cron (node-cron)
+
+
+
+
+
+
+
+
 // User Routes
 router.post("/login", loginValidation, authenticate);
 router.post("/signup", registerValidation, register);
@@ -273,6 +282,12 @@ router.post("/openTicket", supportOpenTicket);
 router.get("/getAllOpenTicket/:id", getAllOpenTicket);
 router.get("/get-indivisual-opened-tickect-message/:id", getOpenedTicketMessage);
 
+//Deals
+router.post("/createDeals", createDeals);
+router.put("/updateDeals/:id", updateDeals);
+router.get("/getCategoryForDeals", getCategoryForDeals);
+router.get("/getDealSelectedProduct", getDealSelectedProduct);
+router.get("/getCreatedDeals", getCreatedDeals);
 
 //myProfile
 router.get("/my-profile/:id", getProfileById);
@@ -1516,4 +1531,34 @@ function getOpenedTicketMessage(req, res, next) {
   sellerService.getOpenedTicketMessage(req)
     .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
     .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function createDeals(req, res, next) {
+  sellerService.createDeals(req)
+    .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+    .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function updateDeals(req, res, next) {
+  sellerService.updateDeals(req)
+    .then((result) => { if (!result.status) { return res.json({ status: false, message: result.message }); } return res.json({ status: true, data: result.data, message: result.message }); })
+    .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getCategoryForDeals(req, res, next) {
+  sellerService.getCategoryForDeals()
+    .then((cat) => cat ? res.status(200).json({ status: true, data: cat }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function getDealSelectedProduct(req, res, next) {
+  sellerService.getDealSelectedProduct(req)
+    .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function getCreatedDeals(req, res, next) {
+  sellerService.getCreatedDeals(req)
+    .then((deals) => deals ? res.status(200).json({ status: true, data: deals }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
 }

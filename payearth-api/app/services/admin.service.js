@@ -973,13 +973,6 @@ async function updateBrand(req) {
     const brandId = req.params.id;
     const { logoImage, brandName, brandDescription, updatedBy } = req.body;
     try {
-
-        // const existing = await Brand.findOne({ brandName: { $regex: `^${brandName}$`, $options: 'i' } });
-        // if (existing) {
-        //     console.log("in Update section...")
-        //     return { status: false, message: `Brand Name "${brandName}" already exists.` }
-        // }
-
         const brand = await Brand.findByIdAndUpdate(
             brandId,
             {

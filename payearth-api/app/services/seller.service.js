@@ -56,6 +56,7 @@ const {
   Ticket,
   TicketMessage,
   UsedCoupons,
+  TodayDeal,
 } = require("../helpers/db");
 
 module.exports = {
@@ -165,6 +166,12 @@ module.exports = {
   supportOpenTicket,
   getAllOpenTicket,
   getOpenedTicketMessage,
+
+  createDeals,
+  updateDeals,
+  getCategoryForDeals,
+  getDealSelectedProduct,
+  getCreatedDeals,
 };
 
 // function sendMail(mailOptions) {
@@ -4897,3 +4904,114 @@ async function getOpenedTicketMessage(req) {
     return { status: false, message: error.message };
   }
 }
+
+
+// Deals
+async function createDeals(req) {
+  const { dealName, discount, productId, dealImage, sellerId } = req.body;
+
+  try {
+    const existing = await TodayDeal.findOne({
+      dealName: { $regex: `^${dealName}$`, $options: 'i' },
+      sellerId: sellerId,
+      isActive: true
+    });
+    if (existing) {
+      return { status: false, message: `"${dealName}" already created....` }
+    }
+
+    const dealEndDate = new Date();
+    dealEndDate.setHours(dealEndDate.getHours() + 24);
+
+    console.log("dealEndDate", dealEndDate);
+
+    const input = {
+      "dealName": dealName,
+      "discount": discount,
+      "productId": productId,
+      "dealImage": dealImage,
+      "sellerId": sellerId,
+      "dealEndDate": dealEndDate,
+      "isActive": true,
+    };
+
+    const deals = new TodayDeal(input);
+    const data = await deals.save();
+    return { status: true, data: data, message: "Successfully created....." };
+  } catch (error) {
+    console.error(error);
+    return { status: false, message: error.message };
+  }
+}
+
+
+async function updateDeals(req) {
+  const dealId = req.params.id;
+  const { dealImage, dealName, discount, productId, sellerId } = req.body;
+  try {
+    const deals = await TodayDeal.findByIdAndUpdate(
+      dealId,
+      {
+        dealImage,
+        dealName,
+        discount,
+        productId,
+        sellerId
+      },
+      { new: true }
+    );
+    return { status: true, data: deals };
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function getCategoryForDeals() {
+  const result = await Category.find({ parent: null, isService: false, isActive: true })
+    .select("id categoryName")
+    .sort({ createdAt: "desc" });
+  if (result && result.length > 0) return result;
+  return false;
+}
+
+async function getDealSelectedProduct(req) {
+  try {
+    const { categoryId, authorId } = req.query;
+
+    let products;
+    if (categoryId) {
+      products = await Product.find({ category: categoryId, isActive: true, createdBy: authorId }).populate('category').sort({ createdAt: "desc" });
+    } else {
+      products = await Product.find({ isActive: true, createdBy: authorId }).populate('category').sort({ createdAt: "desc" });
+    }
+
+    if (!products || products.length === 0) {
+      return { status: true, data: products, message: "No products found...." };
+    }
+    return products;
+  } catch (error) {
+    console.error('Error fetching products:', error);
+  }
+}
+
+async function getCreatedDeals(req) {
+  const { authorId } = req.query;
+  const result = await TodayDeal.find({ isActive: true, sellerId: authorId })
+    .select("dealName dealImage discount productId")
+    .sort({ createdAt: "desc" })
+    .populate([
+      {
+        path: "productId",
+        model: Product,
+        select: "featuredImage name productCode price description brand specifications",
+        populate: {
+          path: "brand",
+          model: Brand,
+          select: "brandName"
+        }
+      },
+    ])
+  if (result && result.length > 0) return result;
+  return false;
+}
+

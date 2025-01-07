@@ -10,6 +10,7 @@ const package = require("package.json");
 const app = express();
 const https = require("https");
 const fs = require("fs");
+const cron = require('node-cron');
 const { ChatMessage } = require("../payearth-api/app/helpers/db");
 // const setupSocket1 = require("./app/helpers/socket-io");
 const socketIo = require("socket.io");
@@ -97,6 +98,20 @@ const httpsServer = https.createServer(certOptions, app);
 httpsServer.listen(PORT, () => {
   console.log("HTTPS Server running on port " + PORT);
   //log.Info(`Server Running at ${PORT} on ${process.env.NODE_ENV}...`)
+});
+
+
+cron.schedule('* * * * * *', async () => {
+  const now = new Date();
+  // console.log("run every minute", now)
+  // try {
+  //   const result = await Deal.deleteMany({
+  //     dealEndDate: { $lte: now },
+  //   });
+  //   console.log(`${result.deletedCount} deals deleted.`);
+  // } catch (err) {
+  //   console.error('Error deleting expired deals:', err);
+  // }
 });
 
 const io = require('socket.io')(httpsServer, {

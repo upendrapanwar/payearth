@@ -346,32 +346,6 @@ class AddProduct extends Component {
             formData.append('tier_price[' + index + '][price]', tierPrices[index].price);
         }
 
-        //   Bind colors with size
-        // for (const [key, value] of Object.entries(this.state.colorSizes)) {
-        //     if (this.state.colorSizes[key].length > 0) {
-        //         for (let index = 0; index < value.length; index++) {
-        //             if (value[index] !== undefined && value[index] !== '') {
-        //                 formData.append('color_size[' + key + '][]', value[index]);
-        //             }
-        //         }
-        //     }
-        // }
-
-
-
-
-
-        // //   Bind images with color
-        // for (let index = 0; index < this.state.colorImages.length; index++) {
-        //     const element = this.state.colorImages[index];
-        //     if (element.images.length > 0) {
-        //         element.images.forEach(value => {
-        //             formData.append(element, value);
-        //         })
-        //     }
-        // }
-
-
         // console.log("formData", formData)
         this.dispatch(setLoading({ loading: true }));
         axios.post('seller/products', formData, {

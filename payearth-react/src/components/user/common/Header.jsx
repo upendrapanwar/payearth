@@ -168,10 +168,6 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
     localStorage.setItem("isToggle", JSON.stringify(isToggleValue));
   };
 
-  const handleChange = (status) => {
-
-  }
-
   const getCategories = (catId) => {
     let categories = [];
     let url = "";
