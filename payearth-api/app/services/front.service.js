@@ -252,7 +252,7 @@ async function getPopularProducts(req) {
 
 async function getTodayDeals() {
   const result = await TodayDeal.find({ isActive: true })
-    .select("id title categoryId bannerImage")
+    .select("id dealName discount dealImage dealEndDate")
     .sort({ createdAt: "desc" });
   if (result && result.length > 0) return result;
   return false;

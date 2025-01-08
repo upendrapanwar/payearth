@@ -278,7 +278,7 @@ class ListedProducts extends Component {
                                                                 </div>
                                                                 <div className="card-body">
                                                                     <Link to={`/seller/service-detail/${value.id}`} className="pro_name">{value.name}</Link>
-                                                                    <div className="pro_price"><span>{value.charges} USD </span>                                                  
+                                                                    <div className="pro_price"><span>{value.charges} USD </span>
                                                                     </div>
                                                                 </div>
                                                             </div>

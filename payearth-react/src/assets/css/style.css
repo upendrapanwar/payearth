@@ -658,6 +658,19 @@ ul {
   width: 330px;
 }
 
+.slider-card .slider-card-title,
+.slider-card .slider-card-description {
+  display: none !important;
+}
+
+.slider-card-image {
+  width: 100%;
+  height: 300px !important;
+  background-color: rgb(240 240 240 / 80%);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
 .popular_products_sec {
   padding-bottom: 12px;
 }

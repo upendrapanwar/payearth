@@ -80,9 +80,11 @@ export default function CompletePage() {
             if (invoiceData) {
                 const paymentData = formatPaymentData(invoiceData);
                 const paymentId = await managePaymentData(paymentData);
+                const userData = await getProfileById(authInfo.id)
                 if (paymentId) {
                     setPaymentId(paymentId);
-                    await manageOrderStatus(invoiceData, paymentId);
+                    await manageOrderStatus(invoiceData, paymentId, userData);
+
                 }
             }
         } catch (error) {
@@ -152,7 +154,35 @@ export default function CompletePage() {
         }
     };
 
-    const manageOrderStatus = async (data, paymentId) => {
+    const getProfileById = async (userId) => {
+        try {
+            // console.log("Profile Data:");
+            const response = await axios.get(`user/my-profile/${userId}`, {
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json;charset=UTF-8",
+                    Authorization: `Bearer ${authInfo.token}`,
+                },
+            });
+
+            //console.log("Profile Data response:", response);
+            if (response && response.data) {
+                // console.log("Profile Data:", response.data);
+                // setUser(response.data.data);
+                // const name = response.data.data.name;
+
+                // const [first, last] = name.split(" ");
+                // setFirstName(first);
+                // setLastName(last);
+                return response.data.data;
+            }
+        } catch (error) {
+            console.error("Error fetching profile data:", error);
+            throw error; // Handle error if API call fails
+        }
+    };
+
+    const manageOrderStatus = async (data, paymentId, userData) => {
         try {
             const productData = JSON.parse(data.invoiceItem.metadata.cart);
             console.log("productData", productData)
@@ -193,17 +223,19 @@ export default function CompletePage() {
                 orderResId.push(response.data.data.id);
             }
 
-            // Pass orderResId to onSubmitHandler and ensure invoiceData is included
-            onSubmitHandler(orderResId, data, paymentId);
+
+            onSubmitHandler(orderResId, data, paymentId, userData);
         } catch (error) {
             alert("Failed to create some order statuses.");
             console.error("Error updating order status:", error);
         }
     };
 
-    const onSubmitHandler = (orderResId, data, paymentId) => {
+    const onSubmitHandler = (orderResId, data, paymentId, userData) => {
         // console.log("Final orderResId:", orderResId);
-        // console.log("Invoice Data:", data);
+        console.log("userData in onSubmitHANDLER .....", userData);
+        const fullname = userData.name;
+        const [first, last] = fullname.split(" ");
         const url = 'user/saveorder';
         // const productData = data.invoiceItem.metadata.cart;
         if (data.finalizedInvoice.status === "paid") {
@@ -213,8 +245,8 @@ export default function CompletePage() {
                     userId: authInfo.id,
                     paymentId: paymentId,
                     sellerId: null,
-                    billingFirstName: "TEST FIRST NAME",
-                    billingLastName: "billingLastName",
+                    billingFirstName: first,
+                    billingLastName: last,
                     billingCity: "billingCity",
                     billingCompanyName: "billingCompanyName",
                     billingCounty: "billingCounty",
