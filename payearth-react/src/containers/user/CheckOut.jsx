@@ -692,17 +692,6 @@ class CheckOut extends Component {
                                     name="billingCounty"
                                     onChange={this.onChange.bind(this)}
                                   />
-                                  {/*<div className="dropdown">
-                                                                        <button className="dropdown-toggle form-control text-left" type="button" data-toggle="dropdown">United kingdom
-                                                                            <span className="caret"></span>
-                                                                        </button>
-                                                                        <ul className="dropdown-menu">
-                                                                            <li><a href="/">US</a></li>
-                                                                            <li><a href="/">India</a></li>
-                                                                            <li><a href="/">India</a></li>
-                                                                        </ul>
-                                                                        
-                                                                    </div>*/}
                                 </div>
                               </div>
                             </div>
@@ -1072,7 +1061,7 @@ class CheckOut extends Component {
                               </div>
                             </div>
                           </div>
-                        </form> 
+                        </form>
                       )}
                     </Formik>
                   </div>

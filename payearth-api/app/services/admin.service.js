@@ -5346,7 +5346,7 @@ async function updateVendorsStatus(req) {
 
 
 async function updateCustomerStatus(req) {
-    const {id} = req.params;
+    const { id } = req.params;
     const { isActive } = req.body;
 
     try {

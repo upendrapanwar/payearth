@@ -106,8 +106,6 @@ const ProductCard = ({ data, inWishList }) => {
       });
   };
 
-  // console.log("data", data)
-
   return (
     <div className="prod_card">
       <div className="img_wrapper">
@@ -240,21 +238,9 @@ const ProductCard = ({ data, inWishList }) => {
                 </Link>
               </>
             )}
-            {/* <Link className="btn custom_btn btn_yellow"
-                            //to={data.isService === false ? `/product-detail/${data.id}` : `/service-detail/${data.id}
-                            //`}
-                            to={`/my-cart`}
-                            onClick={() => dispatch(addToCart({ id: data.id, name: data.name, image: data.image, price: data.price, quantity: 1 }))}>
-                            Buy Now
-                        </Link>
-
-                        <Link className="btn custom_btn btn_yellow_bordered" to="#" onClick={() =>
-                            dispatch(addToCart({
-                                id: data.id, name: data.name, image: data.image, price: data.price
-                            }))
-                        }>
-                            Add to cart
-                        </Link> */}
+            {data.quantity.stock_qty > 0 && data.quantity.stock_qty <= 3 && (
+              <p className="mt-3 text-danger text-center">Only {data.quantity.stock_qty} stock left</p>
+            )}
           </div>
         ) : (
           <h5 className="text-danger text-center">Out of stock</h5>

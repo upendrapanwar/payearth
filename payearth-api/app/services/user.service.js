@@ -85,6 +85,8 @@ module.exports = {
   addToCart,
   updateToCart,
   deleteFromCart,
+  productReduceStock,
+
 
 
   //
@@ -857,49 +859,49 @@ async function removeProductFromSavelater(req) {
 }
 
 async function applyMyCouponCode(req) {
-    try {
-      const { couponCode } = req.params;
-      const { userId } = req.query;
-     
-      if (!userId) {
-        return false;
-      }
-  
-      const coupon = await Coupon.findOne({ code: couponCode, isActive: true });
-      if (!coupon) {
-        return false;
-      }
-  
-      const isCouponUsed = await UsedCoupons.findOne({ userId, couponId: coupon._id });
-      if (isCouponUsed) {
-        return false;
-      }
-  
-      const usedCoupon = new UsedCoupons({
-        userId,
-        couponId: coupon._id,
-        code: coupon.code,
-        discount_per: coupon.discount_per,
-        start: coupon.start,
-        end: coupon.end,
-        isActive: coupon.isActive,
-        usedAt: new Date(), 
-      });
-  
-      await usedCoupon.save();
-      return coupon;
-    } catch (error) {
-      console.error(error);
+  try {
+    const { couponCode } = req.params;
+    const { userId } = req.query;
+
+    if (!userId) {
       return false;
     }
+
+    const coupon = await Coupon.findOne({ code: couponCode, isActive: true });
+    if (!coupon) {
+      return false;
+    }
+
+    const isCouponUsed = await UsedCoupons.findOne({ userId, couponId: coupon._id });
+    if (isCouponUsed) {
+      return false;
+    }
+
+    const usedCoupon = new UsedCoupons({
+      userId,
+      couponId: coupon._id,
+      code: coupon.code,
+      discount_per: coupon.discount_per,
+      start: coupon.start,
+      end: coupon.end,
+      isActive: coupon.isActive,
+      usedAt: new Date(),
+    });
+
+    await usedCoupon.save();
+    return coupon;
+  } catch (error) {
+    console.error(error);
+    return false;
   }
-  
+}
+
 async function getMyCoupons(req) {
   try {
     var param = req.body;
     console.log("param in getMy coupon", param)
     var id = req.params.id;
-    var sortOption = { createdAt: "desc", isActive: "desc" }; 
+    var sortOption = { createdAt: "desc", isActive: "desc" };
     var limit = "";
     var skip = "";
     var whereCondition = { userId: id, isActive: true };
@@ -1275,6 +1277,56 @@ async function deleteFromCart(req) {
   } catch (err) {
     console.log("Error", err);
     return false;
+  }
+}
+
+async function productReduceStock(req) {
+  try {
+    const { productId, reduceQty } = req.body;
+    if (!reduceQty || reduceQty <= 0) {
+      return {
+        status: false,
+        message: "Invalid quantity to reduce.",
+      };
+    }
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return {
+        status: false,
+        message: "Product not found.",
+      };
+    }
+
+    if (product.quantity.stock_qty < reduceQty) {
+      return {
+        status: false,
+        message: "Insufficient stock.",
+      };
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(productId,
+      {
+        $inc: {
+          'quantity.stock_qty': -reduceQty,
+          'quantity.selling_qty': reduceQty
+        }
+      },
+      { new: true }
+    );
+
+    return {
+      status: true,
+      message: "Stock reduced successfully.",
+      data: updatedProduct.quantity.stock_qty,
+    };
+
+  } catch (error) {
+    console.error(error);
+    return {
+      status: false,
+      message: "Internal server error.",
+    };
   }
 }
 

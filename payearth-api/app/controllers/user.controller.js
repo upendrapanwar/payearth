@@ -177,6 +177,7 @@ router.post("/savelater", addToSaveLater);
 router.post("/addtocart", addToCart);
 router.post("/updatetocart", updateToCart);
 router.post("/deletefromcart", deleteFromCart);
+router.put("/productReduceStock", productReduceStock);
 
 
 
@@ -716,8 +717,14 @@ function deleteFromCart(req, res, next) {
       next(res.status(400).json({ status: false, message: err }))
     );
 }
-// stripe
 
+function productReduceStock(req, res, next) {
+  userService.productReduceStock(req)
+    .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, message: "ERROR" }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+// stripe
 function checkoutSession(req, res, next) {
   userService.checkoutSession(req)
     .then((data) => data ? res.status(201).json({ status: true, data: data }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
