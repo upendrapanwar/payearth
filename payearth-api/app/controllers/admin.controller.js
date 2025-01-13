@@ -309,6 +309,10 @@ router.patch("/update-vendors-status/:id", updateVendorsStatus);
 router.get("/get-all-customers", getAllCustomers);
 router.patch("/update-customer-status/:id", updateCustomerStatus);
 
+// report
+router.get("/getWeeklyOrderStatusCount", getWeeklyOrderStatusCount);
+router.get("/productMonthWeekReport", productMonthWeekReport);
+
 
 
 
@@ -1497,3 +1501,17 @@ function getAllCustomers(req, res, next) {
         .catch((err) => next(res.json({ status: false, message: err })));
 }
 
+
+// report section
+
+function getWeeklyOrderStatusCount(req, res, next) {
+    adminService.getWeeklyOrderStatusCount(req)
+        .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error updating personal information." }))
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function productMonthWeekReport(req, res, next) {
+    adminService.productMonthWeekReport(req)
+        .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error updating personal information." }))
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}

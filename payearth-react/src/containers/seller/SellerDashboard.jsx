@@ -13,19 +13,38 @@ import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { Chart } from "react-google-charts";
 import { Helmet } from 'react-helmet';
 
+import { LineChart } from '@mui/x-charts/LineChart';
+import Box from '@mui/material/Box';
+import { PieChart } from '@mui/x-charts/PieChart';
+import DataTable from 'react-data-table-component';
+import DataTableExtensions from "react-data-table-component-extensions";
+import 'react-data-table-component-extensions/dist/index.css';
+import { Button } from '@mui/material';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+
 class SellerDashboard extends Component {
     constructor(props) {
         super(props);
         const { dispatch } = props;
         this.dispatch = dispatch;
-        this.authInfo = store.getState().auth.authInfo;
+        // this.authInfo = store.getState().auth.authInfo;
+        this.authInfo = JSON.parse(localStorage.getItem('authInfo'));
         this.currentDate = new Date();
         this.currentDate = `${this.currentDate.getFullYear()}-${this.currentDate.getMonth() + 1}-${this.currentDate.getDay()}`;
         this.state = {
+            productYear: new Date().getFullYear(),
+            topCategories: [],
+            productSalesData: [],
+            week: "",
+            month: "",
+            year: "",
+
+
             monthChartData: [],
             yearChartData: [],
             weekChartData: [],
-            hAxisTitle: 'MONTHS',
+            hAxisTitle: '',
             chartTitle: 'MONTHLY',
             charData: [],
             data: [],
@@ -53,16 +72,19 @@ class SellerDashboard extends Component {
             ],
             defaultSelectedOption: { label: 'New to Old', value: 'desc' },
             chartOptions: [
-                { label: 'Monthly Graph', value: 'monthly' },
-                { label: 'Weekly Graph', value: 'weekly' },
-                { label: 'Yearly Graph', value: 'yearly' }
+                { label: 'Yearly Graph', value: 'year' },
+                { label: 'Monthly Graph', value: 'month' },
+                { label: 'Weekly Graph', value: 'week' },
             ],
-            defaultSelectedOptionChart: { label: 'Monthly', value: 'monthly' },
+            defaultSelectedOptionChart: { label: 'Yearly', value: 'year' },
             topSellingCategoriesData: [['category', 'Sale']]
         }
     }
 
     componentDidMount() {
+        this.getTopSellingCategories();
+        // this.getProductSalesGraph();
+
         this.getCounters();
         this.getProductSales();
         this.getChartsData('month');
@@ -255,18 +277,79 @@ class SellerDashboard extends Component {
         });
     }
 
-    handleChart = (selectedOption) => {
-        this.setState({ defaultSelectedOptionChart: selectedOption });
-        if (selectedOption.value === 'monthly') {
-            this.setState({ charData: this.state.monthChartData, hAxisTitle: 'MONTHS', chartTitle: 'MONTHLY' });
-            this.getChartsData('month');
-        } else if (selectedOption.value === 'weekly') {
-            this.setState({ charData: this.state.weekChartData, hAxisTitle: 'WEEKS', chartTitle: 'WEEKLY' });
-            this.getChartsData('week');
-        } else if (selectedOption.value === 'yearly') {
-            this.setState({ charData: this.state.yearChartData, hAxisTitle: 'YEARS', chartTitle: 'YEARLY' });
-            this.getChartsData('year');
+    getTopSellingCategories = () => {
+        const reqParams = {
+            authorId: this.authInfo.id,
+        };
+        axios.get("seller/getTopSellingCategories", {
+            params: reqParams,
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json;charset=UTF-8",
+                Authorization: `Bearer ${this.authInfo.token}`,
+            },
+        })
+            .then((response) => {
+                const data = response.data.data.data;
+                const topCategories = data.map((item) => ({
+                    value: item.count,
+                    label: item.name,
+                }));
+                this.setState({ topCategories: topCategories, loading: false });
+            })
+            .catch((error) => {
+                if (error.response && error.response.data.status === false) {
+                    console.log("error", error.response.data.message)
+                }
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    this.setState({ loading: false });
+                }, 300);
+            });
+    }
+
+    getProductSalesGraph = async (selectedTimeFrame) => {
+        try {
+            this.setState({ loading: true });
+            const reqParams = {
+                authorId: this.authInfo.id,
+                timeFrame: selectedTimeFrame,
+            };
+
+            console.log("reqParams", reqParams)
+            const url = `/seller/productSalesGraph?year=${this.state.productYear}`; // timeFrame = week , month, year
+            const response = await axios.get(url, {
+                params: reqParams,
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            });
+            const data = response.data.data;
+            console.log(" getProductSalesGraph data", data)
+            // this.setState({ productSalesData: data, loading: false });
+        } catch (error) {
+            console.error("There was an error fetching service list category data", error);
+            this.setState({ loading: false });
         }
+    };
+
+    handleChart = (selectedOption) => {
+        console.log("selectedOption", selectedOption)
+        this.setState({ defaultSelectedOptionChart: selectedOption, hAxisTitle: selectedOption.label });
+        this.getProductSalesGraph(selectedOption.value);
+        // if (selectedOption.value === 'monthly') {
+        //     this.setState({ charData: this.state.monthChartData, hAxisTitle: 'MONTHS', chartTitle: 'MONTHLY' });
+        //     this.getChartsData('month');
+        // } else if (selectedOption.value === 'weekly') {
+        //     this.setState({ charData: this.state.weekChartData, hAxisTitle: 'WEEKS', chartTitle: 'WEEKLY' });
+        //     this.getChartsData('week');
+        // } else if (selectedOption.value === 'yearly') {
+        //     this.setState({ charData: this.state.yearChartData, hAxisTitle: 'YEARS', chartTitle: 'YEARLY' });
+        //     this.getChartsData('year');
+        // }
     }
 
     render() {
@@ -283,9 +366,18 @@ class SellerDashboard extends Component {
             monthChartData,
             hAxisTitle,
             chartTitle,
-            topSellingCategoriesData
+            topSellingCategoriesData,
+
+
+            topCategories,
         } = this.state;
 
+        const colors = ['rgb(2, 178, 175)', 'rgb(46, 150, 255)', 'rgb(184, 0, 216)', 'rgb(96, 0, 155)'];
+        const xLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+
+
+        console.log("topCategories", topCategories)
         return (
             <React.Fragment >
                 {loading === true ? <SpinnerLoader /> : ''}
@@ -323,10 +415,20 @@ class SellerDashboard extends Component {
                                 </div>
                             </div>
                             <div className="row mt-4">
-                                <div className="col-md-9">
+                                <div className="col-md-8">
                                     <div className="dash_graph bg-white">
                                         <div className="dash_graph_head">
-                                            <div className="dash_title">{chartTitle} Sales Graph</div>
+                                            <div className="dash_title">{this.state.productYear} Sales Graph</div>
+                                            <div className='d-flex'>
+                                                <Button className="btn btn-outline-secondary" type="button" id="button-addon2"
+                                                    // onClick={this.handlePreviousProductYear} 
+                                                    startIcon={<ArrowBackIosIcon />}></Button>
+                                                <Button className="btn btn-outline-secondary" type="button" id="button-addon2"
+                                                    //  onClick={this.handleNextProductYear}
+                                                    endIcon={<ArrowForwardIosIcon />}
+                                                // disabled={this.state.productYear === currentYear}
+                                                ></Button>
+                                            </div>
                                             <div className="graph_select">
                                                 <Select
                                                     className="sort_select text-normal"
@@ -360,29 +462,36 @@ class SellerDashboard extends Component {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="col-md-3">
+                                <div className="col-md-4">
                                     <div className="tsc_box bg-white p-3">
                                         <div className="dash_title">my top selling categories</div>
                                         <div className="tsc_img mt-4 mb-4">
-                                            <Chart
-                                                width={'100%'}
-                                                height={'400px'}
-                                                chartType="PieChart"
-                                                loader={<div>Loading Chart</div>}
-                                                data={topSellingCategoriesData}
-                                                options={{
-                                                    // title: 'My Daily Activities',
-                                                    legend: { position: "bottom", alignment: "center" },
-                                                    pieHole: 0.4,
-                                                    slices: [
-                                                        { color: "#43D2FF" },
-                                                        { color: "#222327" },
-                                                        { color: "#4358FF" }
-                                                    ]
-                                                }}
-                                                rootProps={{ 'data-testid': '3' }}
-                                            />
+                                            <Box sx={{ width: '100%' }}>
+                                                <PieChart
+                                                    height={220}
+                                                    slotProps={{
+                                                        legend: { hidden: true },
+                                                    }}
+                                                    series={[
+                                                        {
+                                                            data: topCategories,
+                                                            innerRadius: 60,
+                                                            cx: 180,
+                                                            cy: 110,
+                                                            arcLabel: (params) => params.label ?? '',
+                                                            // valueFormatter,
+                                                        }
+                                                    ]}
+                                                />
+                                            </Box>
                                         </div>
+                                        <ul className="tcs_indicators_list">
+                                            {topCategories.map((item, index) => (
+                                                <li key={index}>
+                                                    <i style={{ color: colors[index % colors.length] }} className="fa fa-circle"></i> {item.label}
+                                                </li>
+                                            ))}
+                                        </ul>
                                     </div>
                                 </div>
                             </div>

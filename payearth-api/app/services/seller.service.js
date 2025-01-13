@@ -172,6 +172,9 @@ module.exports = {
   getCategoryForDeals,
   getDealSelectedProduct,
   getCreatedDeals,
+
+  getTopSellingCategories,
+  productSalesGraph,
 };
 
 // function sendMail(mailOptions) {
@@ -5014,4 +5017,318 @@ async function getCreatedDeals(req) {
   if (result && result.length > 0) return result;
   return false;
 }
+
+
+
+// DASHBOARD
+
+async function getTopSellingCategories(req) {
+  try {
+    const { authorId } = req.body;
+    const topSellingCategories = await OrderStatus.find({ authorId: authorId, title: "Delivered" }).select('product')
+      .populate([
+        {
+          path: "product.productId",
+          model: Product,
+          select: "category",
+          populate: {
+            path: "category",
+            model: Category,
+            select: "categoryName"
+          }
+        }
+      ]);
+
+    if (!topSellingCategories || topSellingCategories.length === 0) {
+      return {
+        status: false,
+        data: [],
+      };
+    }
+    const categoryCounts = {};
+    topSellingCategories.forEach(order => {
+      const product = order.product?.productId;
+      const category = product[0]?.category;
+      if (category) {
+        const categoryId = category._id.toString();
+        const categoryName = category.categoryName;
+
+        if (!categoryCounts[categoryId]) {
+          categoryCounts[categoryId] = {
+            id: categoryId,
+            name: categoryName,
+            count: 0,
+          };
+        }
+        categoryCounts[categoryId].count++;
+      }
+    });
+    const sortedCategories = Object.values(categoryCounts)
+      .sort((a, b) => b.count - a.count);
+
+    const top4Categories = sortedCategories.slice(0, 4);
+    return {
+      status: true,
+      data: top4Categories,
+    };
+
+  } catch (error) {
+    console.log("error", error)
+  }
+}
+
+// async function productSalesGraph(req, res) {
+//   try {
+//     const { year, timeFrame, authorId } = req.query;
+
+//     // console.log("year", year);
+//     // console.log("timeFrame", timeFrame);
+//     // console.log("authorId", authorId);
+
+//     if (!year) {
+//       return { success: false, message: "Year is required" };
+//     }
+
+//     if (!timeFrame || !["week", "month", "year"].includes(timeFrame)) {
+//       return { success: false, message: "Invalid time frame. Use 'week', 'month', or 'year'." };
+//     }
+
+//     if (!authorId) {
+//       return { success: false, message: "Author ID is required" };
+//     }
+
+//     const yearInt = parseInt(year, 10);
+
+//     const matchStage = {
+//       title: "Delivered",
+//       product: { $ne: null },
+//       userId: authorId,
+//       createdAt: {
+//         $gte: new Date(`${yearInt}-01-01T00:00:00Z`),
+//         $lte: new Date(`${yearInt}-12-31T23:59:59Z`),
+//       },
+//     };
+
+
+//     let groupStage;
+
+//     if (timeFrame === "week") {
+//       groupStage = {
+//         _id: { week: { $week: "$createdAt" }, year: { $year: "$createdAt" } },
+//         count: { $sum: 1 },
+//       };
+//     } else if (timeFrame === "month") {
+//       groupStage = {
+//         _id: { month: { $month: "$createdAt" }, year: { $year: "$createdAt" } },
+//         count: { $sum: 1 },
+//       };
+//     } else if (timeFrame === "year") {
+//       groupStage = {
+//         _id: { year: { $year: "$createdAt" } },
+//         count: { $sum: 1 },
+//       };
+//     }
+
+//     // console.log("groupStage", groupStage);
+//     // console.log("matchStage", matchStage);
+
+//     const results = await OrderStatus.aggregate([
+//       { $match: matchStage },
+//       { $group: groupStage },
+//       { $sort: { "_id.year": 1, "_id.month": 1, "_id.week": 1 } },
+//     ]);
+
+//     console.log("results", results)
+
+//     let formattedResults;
+
+//     if (timeFrame === "week") {
+//       formattedResults = results.map((item) => ({
+//         week: item._id.week,
+//         year: item._id.year,
+//         count: item.count,
+//       }));
+//       console.log("week")
+//     } else if (timeFrame === "month") {
+//       const monthsArray = [
+//         { month: 1, monthName: "Jan" },
+//         { month: 2, monthName: "Feb" },
+//         { month: 3, monthName: "Mar" },
+//         { month: 4, monthName: "Apr" },
+//         { month: 5, monthName: "May" },
+//         { month: 6, monthName: "Jun" },
+//         { month: 7, monthName: "Jul" },
+//         { month: 8, monthName: "Aug" },
+//         { month: 9, monthName: "Sep" },
+//         { month: 10, monthName: "Oct" },
+//         { month: 11, monthName: "Nov" },
+//         { month: 12, monthName: "Dec" },
+//       ];
+
+//       formattedResults = monthsArray.map((month) => {
+//         const found = results.find((r) => r._id.month === month.month);
+
+//         return {
+//           month: month.month,
+//           monthName: month.monthName,
+//           count: found ? found.count : 0,
+//         };
+//       });
+//       console.log("month")
+//     } else if (timeFrame === "year") {
+//       formattedResults = results.map((item) => ({
+//         year: item._id.year,
+//         count: item.count,
+//       }));
+//       console.log("year")
+//     }
+
+//     console.log("formattedResults", formattedResults)
+//     return { success: true, data: formattedResults };
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     res.status(500).json({ success: false, message: "Internal Server Error" });
+//   }
+
+
+
+
+
+// }
+
+
+
+async function productSalesGraph(req, res) {
+  try {
+    const { year, timeFrame, authorId } = req.query;
+
+    const orders = await OrderStatus.find({ title: "Delivered" })
+      // .populate([
+      //   {
+      //     path: "product.productId",
+      //     match: { createdBy: authorId },
+      //   }
+      // ]);
+
+      .populate([
+        {
+          path: "product.productId",
+          model: Product,
+          select: "createdBy",
+          populate: {
+            path: "createdBy",
+            model: Seller,
+            match: { createdBy: authorId },
+          }
+        }
+      ]);
+
+    console.log("orders", orders)
+
+    // if (!year) {
+    //   return { success: false, message: "Year is required" }
+    // }
+    // const yearInt = parseInt(year, 10);
+
+    // const monthsArray = [
+    //   { month: 1, monthName: "Jan" },
+    //   { month: 2, monthName: "Feb" },
+    //   { month: 3, monthName: "Mar" },
+    //   { month: 4, monthName: "Apr" },
+    //   { month: 5, monthName: "May" },
+    //   { month: 6, monthName: "Jun" },
+    //   { month: 7, monthName: "Jul" },
+    //   { month: 8, monthName: "Aug" },
+    //   { month: 9, monthName: "Sep" },
+    //   { month: 10, monthName: "Oct" },
+    //   { month: 11, monthName: "Nov" },
+    //   { month: 12, monthName: "Dec" },
+    // ];
+
+    // const results = await OrderStatus.aggregate([
+    //   {
+    //     $match: {
+    //       title: "Delivered",
+    //       product: { $ne: null },
+    //       createdAt: {
+    //         $gte: new Date(`${yearInt}-01-01T00:00:00Z`),
+    //         $lte: new Date(`${yearInt}-12-31T23:59:59Z`),
+    //       },
+    //     },
+    //   },
+    //   {
+    //     $lookup: {
+    //       from: "products", // Name of the Product collection
+    //       localField: "product.productId",
+    //       foreignField: "_id",
+    //       as: "productDetails",
+    //     },
+    //   },
+    //   {
+    //     $unwind: "$productDetails", // Flatten the productDetails array
+    //   },
+    //   {
+    //     $match: {
+    //       "productDetails.createdBy": authorId,
+    //     },
+    //   },
+    //   {
+    //     $group: {
+    //       _id: { month: { $month: "$createdAt" } },
+    //       count: { $sum: 1 },
+    //     },
+    //   },
+    //   {
+    //     $addFields: {
+    //       monthName: {
+    //         $arrayElemAt: [
+    //           [
+    //             "",
+    //             "Jan",
+    //             "Feb",
+    //             "Mar",
+    //             "Apr",
+    //             "May",
+    //             "Jun",
+    //             "Jul",
+    //             "Aug",
+    //             "Sep",
+    //             "Oct",
+    //             "Nov",
+    //             "Dec",
+    //           ],
+    //           "$_id.month",
+    //         ],
+    //       },
+    //     },
+    //   },
+    //   {
+    //     $project: {
+    //       _id: 0,
+    //       month: "$_id.month",
+    //       monthName: 1,
+    //       count: 1,
+    //     },
+    //   },
+    //   { $sort: { month: 1 } },
+    // ]);
+
+    // console.log("results", results)
+
+    // const salesResults = monthsArray.map((month) => {
+    //   const found = results.find((r) => r.month === month.month);
+    //   return {
+    //     month: month.month,
+    //     monthName: month.monthName,
+    //     count: found ? found.count : 0,
+    //   };
+    // });
+    // return salesResults;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return { success: false, message: "Internal Server Error" };
+  }
+}
+
+
 

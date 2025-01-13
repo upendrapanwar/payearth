@@ -294,7 +294,9 @@ router.get("/my-profile/:id", getProfileById);
 router.put("/save-seller-profile/:id", saveMyProfile);
 router.put("/edit-profile/:id", editProfile);
 
-
+//dashboard
+router.get("/getTopSellingCategories", getTopSellingCategories);
+router.get("/productSalesGraph", productSalesGraph);
 
 module.exports = router;
 
@@ -1561,4 +1563,17 @@ function getCreatedDeals(req, res, next) {
   sellerService.getCreatedDeals(req)
     .then((deals) => deals ? res.status(200).json({ status: true, data: deals }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
     .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+
+function getTopSellingCategories(req, res, next) {
+  sellerService.getTopSellingCategories(req)
+    .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error updating personal information." }))
+    .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function productSalesGraph(req, res, next) {
+  sellerService.productSalesGraph(req)
+    .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error updating personal information." }))
+    .catch((err) => next(res.json({ status: false, message: err.message })));
 }

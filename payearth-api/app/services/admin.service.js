@@ -216,6 +216,10 @@ module.exports = {
     getcustomerPermission,
     updateCustomerStatus,
 
+    //Report
+    getWeeklyOrderStatusCount,
+    productMonthWeekReport,
+
 };
 
 // Validator function
@@ -5328,7 +5332,7 @@ async function getAllVendors(req) {
 
 
 async function updateVendorsStatus(req) {
-    const {id} = req.params;
+    const { id } = req.params;
     const { isActive } = req.body;
 
     try {
@@ -5372,3 +5376,181 @@ async function getAllCustomers(req) {
     }
 }
 
+
+
+// Reports
+
+
+async function getWeeklyOrderStatusCount() {
+    try {
+        const now = new Date();
+        // Calculate the start and end of the current month
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        const weeklyStatusCounts = await OrderStatus.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: startOfMonth, $lt: endOfMonth },
+                    title: { $in: ["Delivered"] },
+                },
+            },
+            {
+                $addFields: {
+                    weekOfMonth: {
+                        $ceil: {
+                            $divide: [
+                                { $dayOfMonth: "$createdAt" }, // Day of the month
+                                7, // Divide by 7 to calculate the week number
+                            ],
+                        },
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: { week: "$weekOfMonth", status: "$title" }, // Group by week and status
+                    count: { $sum: 1 }, // Count occurrences
+                },
+            },
+            {
+                $group: {
+                    _id: "$_id.week", // Group by week
+                    statuses: {
+                        $push: {
+                            status: "$_id.status",
+                            count: "$count",
+                        },
+                    },
+                },
+            },
+            {
+                $sort: { _id: 1 }, // Sort by week number
+            },
+        ]);
+
+        // console.log("Monthly Weekly Status Counts:", weeklyStatusCounts);
+        return weeklyStatusCounts;
+    } catch (error) {
+        console.error("Error fetching monthly weekly order status count:", error);
+        throw error;
+    }
+}
+
+async function productMonthWeekReport() {
+    try {
+        // const { year,
+        //     // granularity
+        // } = req.query;
+        const year = 2024;
+        const granularity = "month"
+
+        if (!year) {
+            return { success: false, message: "Year is required" };
+        }
+
+        const yearInt = parseInt(year, 10);
+
+        // Define month array for consistent mapping
+        const monthsArray = [
+            { month: 1, monthName: "Jan" },
+            { month: 2, monthName: "Feb" },
+            { month: 3, monthName: "Mar" },
+            { month: 4, monthName: "Apr" },
+            { month: 5, monthName: "May" },
+            { month: 6, monthName: "Jun" },
+            { month: 7, monthName: "Jul" },
+            { month: 8, monthName: "Aug" },
+            { month: 9, monthName: "Sep" },
+            { month: 10, monthName: "Oct" },
+            { month: 11, monthName: "Nov" },
+            { month: 12, monthName: "Dec" },
+        ];
+
+        let groupField;
+        let addFields = {};
+
+        switch (granularity) {
+            case "month":
+                groupField = { month: { $month: "$createdAt" } };
+                addFields = {
+                    monthName: {
+                        $arrayElemAt: [
+                            [
+                                "",
+                                "Jan",
+                                "Feb",
+                                "Mar",
+                                "Apr",
+                                "May",
+                                "Jun",
+                                "Jul",
+                                "Aug",
+                                "Sep",
+                                "Oct",
+                                "Nov",
+                                "Dec",
+                            ],
+                            "$_id.month",
+                        ],
+                    },
+                };
+                break;
+            case "week":
+                groupField = { week: { $week: "$createdAt" } };
+                break;
+            case "year":
+                groupField = { year: { $year: "$createdAt" } };
+                break;
+            default:
+                return {
+                    success: false,
+                    message: "Invalid granularity. Choose 'year', 'month', or 'week'.",
+                };
+        }
+
+        const results = await OrderStatus.aggregate([
+            {
+                $match: {
+                    title: "Delivered",
+                    product: { $ne: null },
+                    createdAt: {
+                        $gte: new Date(`${yearInt}-01-01T00:00:00Z`),
+                        $lte: new Date(`${yearInt}-12-31T23:59:59Z`),
+                    },
+                },
+            },
+            {
+                $group: {
+                    _id: groupField,
+                    count: { $sum: 1 },
+                },
+            },
+            ...(granularity === "month" ? [{ $addFields: addFields }] : []),
+            {
+                $project: {
+                    _id: 0,
+                    group: "$_id",
+                    count: 1,
+                    ...(granularity === "month" ? { monthName: 1 } : {}),
+                },
+            },
+            { $sort: { "group": 1 } },
+        ]);
+
+        if (granularity === "month") {
+            const salesResults = monthsArray.map((month) => {
+                const found = results.find((r) => r.group.month === month.month);
+                return {
+                    month: month.month,
+                    monthName: month.monthName,
+                    count: found ? found.count : 0,
+                };
+            });
+            return { success: true, data: salesResults };
+        }
+
+        return { success: true, data: results };
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
+}
