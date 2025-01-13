@@ -10,7 +10,8 @@ const schema = new Schema({
         price: { type: Number, required: false, default: 0 },
         amount: { type: Number, required: false, default: 0 },
         color: { type: String, required: false, default: "" },
-        size: { type: String, required: false, default: "" }
+        size: { type: String, required: false, default: "" },
+        discountId: { type: mongoose.Schema.Types.ObjectId, ref: "TodayDeal", required: false,  default: null  },
     }],
     subTotal: { type: Number, required: false, default: 0 },
     isActive: { type: Boolean, required: false, default: true }

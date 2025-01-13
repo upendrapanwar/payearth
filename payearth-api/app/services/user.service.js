@@ -87,6 +87,7 @@ module.exports = {
   deleteFromCart,
   productReduceStock,
 
+  // updateToCartDiscountId,
 
 
   //
@@ -167,8 +168,8 @@ module.exports = {
   saveMyProfile,
 
 
-  getProductOrder
-
+  getProductOrder,
+  getCartData
 
 };
 
@@ -1200,74 +1201,186 @@ async function saveOrder(req) {
     return false;
   }
 }
+// async function addToCart(req) {
+
+//   console.log('addtocart ---api--run--', req)
+//   try {
+//     const param = req.body;
+
+//     let input = {
+//       userId: param.user_id,
+//       products: [
+//         {
+//           productId: param.productId,
+//           qty: param.qty,
+//           price: param.price,
+//           discountId: param.discountId
+//         },
+//       ],
+//     };
+
+//     const cartItem = new Cart(input);
+
+//     const data = await cartItem.save();
+
+//     if (data) {
+//       return true;
+//     } else {
+//       return false;
+//     }
+//   } catch (err) {
+//     console.log("Error", err);
+//     return false;
+//   }
+// }
+
 async function addToCart(req) {
+ // console.log('addtocart ---api--run--', req.body);
+
   try {
     const param = req.body;
 
-    let input = {
-      userId: param.user_id,
-      products: [
-        {
-          productId: param.productId,
-          qty: param.qty,
-          price: param.price,
-        },
-      ],
-    };
 
-    const cartItem = new Cart(input);
-
-    const data = await cartItem.save();
-
-    if (data) {
-      return true;
-    } else {
+    if (!param.user_id || !param.productId || !param.qty || !param.price) {
+      console.error('Missing required fields in request body');
       return false;
     }
+
+
+    const existingCart = await Cart.findOne({
+      userId: param.user_id,
+      'products.productId': param.productId,
+    });
+
+    if (existingCart) {
+
+      const update = {
+        $set: {
+          'products.$.qty': param.qty,
+          'products.$.price': param.price,
+          'products.$.discountId': param.discountId,
+        },
+      };
+
+      const updatedCart = await Cart.findOneAndUpdate(
+        { userId: param.user_id, 'products.productId': param.productId },
+        update,
+        { new: true } 
+      );
+
+      if (updatedCart) {
+       // console.log('Cart updated successfully:', updatedCart);
+        return true;
+      } else {
+        console.log('Error updating the cart.');
+        return false;
+      }
+    } else {
+
+      const newCart = new Cart({
+        userId: param.user_id,
+        products: [
+          {
+            productId: param.productId,
+            qty: param.qty,
+            price: param.price,
+            discountId: param.discountId,
+          },
+        ],
+      });
+
+      const savedCart = await newCart.save();
+
+      if (savedCart) {
+       // console.log('New cart created successfully:', savedCart);
+        return true;
+      } else {
+        console.log('Failed to create a new cart.');
+        return false;
+      }
+    }
   } catch (err) {
-    console.log("Error", err);
+    console.error('Error adding/updating cart:', err);
     return false;
   }
 }
 
 
+
+
+// async function updateToCart(req) {
+//   try {
+//     var param = req.body;
+//     let input = {
+//       userId: param.user_id,
+//       products: [
+//         {
+//           productId: param.productId,
+//           qty: param.qty,
+//           price: param.price,
+//          // discountId: param.discountId
+//         },
+//       ],
+//     };
+
+//     await Cart.findOneAndDelete({
+//       userId: param.user_id,
+//       productId: param.productId,
+//       //discountId: param.productId
+//     });
+//     const cartItem = new Cart(input);
+
+//     const data = await cartItem.save();
+//     if (data) {
+//       return true;
+//     } else {
+//       return false;
+//     }
+//   } catch (err) {
+//     console.log("Error", err);
+//     return false;
+//   }
+// }
 async function updateToCart(req) {
   try {
-    var param = req.body;
-    let input = {
-      userId: param.user_id,
-      products: [
-        {
-          productId: param.productId,
-          qty: param.qty,
-          price: param.price,
-        },
-      ],
+    const param = req.body;
+
+    const update = {
+      $set: {
+        'products.$.qty': param.qty,
+        'products.$.price': param.price,
+        // 'products.$[elem].discountId': param.discountId, 
+      },
     };
 
-    await Cart.findOneAndDelete({
-      userId: param.user_id,
-      productId: param.productId,
-    });
-    const cartItem = new Cart(input);
 
-    const data = await cartItem.save();
+    const data = await Cart.findOneAndUpdate(
+      { userId: param.user_id, 'products.productId': param.productId },
+      update,
+    );
+
     if (data) {
+     // console.log('Cart updated successfully:', data);
       return true;
     } else {
+      console.log('No matching cart or product found for update.');
       return false;
     }
   } catch (err) {
-    console.log("Error", err);
+    console.error('Error updating cart:', err);
     return false;
   }
 }
+
+
 async function deleteFromCart(req) {
   try {
+   // console.log('deleteFromCart---', req.body)
     var param = req.body;
+   // console.log('deleteFromCart---', param)
     const data = await Cart.findOneAndDelete({
       userId: param.user_id,
-      productId: param.productId,
+      'products.productId': param.productId,
     });
     if (data) {
       return true;
@@ -1330,6 +1443,41 @@ async function productReduceStock(req) {
   }
 }
 
+// async function updateToCartDiscountId(req) {
+//   try {
+//     const param = req.body;
+
+//     const update = {
+//       $set: {
+//         'products.$[elem].qty': param.qty,
+//         'products.$[elem].price': param.price,
+//         'products.$[elem].discountId': param.discountId, 
+//       },
+//     };
+
+//     const options = {
+//       arrayFilters: [{ 'elem.productId': param.productId }], 
+//       new: true, 
+//     };
+
+//     const data = await Cart.findOneAndUpdate(
+//       { userId: param.user_id, 'products.productId': param.productId },
+//       update,
+//       options
+//     );
+
+//     if (data) {
+//       console.log('Cart updated successfully:', data);
+//       return true;
+//     } else {
+//       console.log('No matching cart or product found for update.');
+//       return false;
+//     }
+//   } catch (err) {
+//     console.error('Error updating cart:', err);
+//     return false;
+//   }
+// }
 
 // Stripe Checkout session
 
@@ -4190,4 +4338,19 @@ async function getProductOrder() {
     .sort();
   if (result && result.length > 0) return result;
   return false;
+}
+
+
+async function getCartData(req) {
+  const userId = req.params.id
+  console.log('getCartData-----', userId)
+  try {
+  const result = await Cart.find({ isActive: true, userId: userId })
+    .sort()
+    .populate('products.productId');
+  if (result && result.length > 0) return result;
+} catch (error) {
+  console.error("Error:", error);
+  throw new Error("Error getCart data.");
+}
 }

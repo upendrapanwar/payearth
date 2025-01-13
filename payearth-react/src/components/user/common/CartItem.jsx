@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState  } from "react";
 import { Link } from "react-router-dom";
 import { incrementQuantity, decrementQuantity, removeItem } from "../../../store/reducers/cart-slice-reducer";
 import { setLoading, setIsLoginModalOpen } from '../../../store/reducers/global-reducer';
@@ -7,12 +7,38 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import { useDispatch, useSelector } from "react-redux";
 
-function CartItem({ id, image, title, price, quantity }) {
+function CartItem({ id, image, title, price, quantity, discountId, discountPercent }) {
   const dispatch = useDispatch()
   const authInfo = useSelector(state => state.auth.authInfo);
   const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
-  const addToSaveLaterlist = productId => {
 
+  const [discountIdStatus, setDiscountIdStatus] = useState(false);
+
+
+  useEffect(() => {
+    if(discountId){
+    getDiscountIdStatus();
+    }else{
+      setDiscountIdStatus(false)
+    }
+  }, []);
+
+  const getDiscountIdStatus = async () => {
+    try {
+      const response = await axios.get(`front/discount-status/${discountId}`); 
+      const data = await response.data.data;
+      console.log('Discount Status-----:', response.data.data);
+      if(data.isActive === true){
+      setDiscountIdStatus(true)
+    }else{
+      setDiscountIdStatus(false)
+    }
+    } catch (error) {
+      console.error('Error fetching discount status:', error);
+    }
+  };
+
+  const addToSaveLaterlist = productId => {
     if (isLoggedIn) {
       let reqBody = {
         user_id: authInfo.id,
@@ -47,6 +73,8 @@ function CartItem({ id, image, title, price, quantity }) {
       dispatch(setIsLoginModalOpen({ isLoginModalOpen: true }));
     }
   }
+
+console.log('discountIdStatus----',discountIdStatus)
   return (
     <div className="cl_items">
       <div className="cl_pro_info">
@@ -61,10 +89,27 @@ function CartItem({ id, image, title, price, quantity }) {
               <li className="star "></li>
             </ul>
             <div className="cl_pro_name">{title}</div>
-            <div className="cl_pro_price"><span className="cl_op">
+            {/* <div className="cl_pro_price"><span className="cl_op">
               <small>$</small>
               <strong>{price}</strong></span>
-            </div>
+            </div> */}
+            {discountIdStatus === true? (
+              <span>
+                <span className="cl_op" style={{ textDecoration: 'line-through', color: '#888' }}>
+                  <small>$</small>
+                  <strong>{price.toFixed(2)}</strong>
+                </span>
+                <span className="cl_op" style={{ marginLeft: '8px', color: 'green' }}>
+                  <small>$</small>
+                  <strong>{(price - (price * discountPercent) / 100).toFixed(2)}</strong>
+                </span>
+              </span>
+            ) : (
+              <span className="cl_op">
+                <small>$</small>
+                <strong>{price?.toFixed(2)}</strong>
+              </span>
+            )}
             <div>
               <Link className="btn custom_btn btn_yellow_bordered" to="#" onClick={() => addToSaveLaterlist(id)}
               >Save for later</Link>
@@ -103,9 +148,25 @@ function CartItem({ id, image, title, price, quantity }) {
           </div>
         </div>
       </div>
-      <div className="cl_pro_total">
+      {/* <div className="cl_pro_total">
         <span>${price * quantity}</span>
+      </div> */}
+      <div className="cl_pro_total">
+        {discountIdStatus ===true ? (
+          <div>
+            <span style={{ textDecoration: 'line-through', color: '#888' }}>
+              ${(price * quantity).toFixed(2)}
+            </span>
+            <div style={{ marginTop: '4px', color: 'green' }}>
+              ${((price - (price * discountPercent) / 100) * quantity).toFixed(2)}
+            </div>
+          </div>
+        ) : (
+          <span>${(price * quantity).toFixed(2)}</span>
+        )}
       </div>
+
+
       <div className="cl_pro_btn">
         <Link to="#" onClick={() => dispatch(removeItem(id))}>
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
