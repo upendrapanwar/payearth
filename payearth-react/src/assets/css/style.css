@@ -1835,7 +1835,7 @@ button.view_more img {
 }
 
 .prod_foot {
-  display: flex;
+  /* display: flex; */
   justify-content: center;
 }
 

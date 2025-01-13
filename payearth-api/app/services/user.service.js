@@ -85,6 +85,8 @@ module.exports = {
   addToCart,
   updateToCart,
   deleteFromCart,
+  productReduceStock,
+
   // updateToCartDiscountId,
 
 
@@ -1388,6 +1390,56 @@ async function deleteFromCart(req) {
   } catch (err) {
     console.log("Error", err);
     return false;
+  }
+}
+
+async function productReduceStock(req) {
+  try {
+    const { productId, reduceQty } = req.body;
+    if (!reduceQty || reduceQty <= 0) {
+      return {
+        status: false,
+        message: "Invalid quantity to reduce.",
+      };
+    }
+
+    const product = await Product.findById(productId);
+    if (!product) {
+      return {
+        status: false,
+        message: "Product not found.",
+      };
+    }
+
+    if (product.quantity.stock_qty < reduceQty) {
+      return {
+        status: false,
+        message: "Insufficient stock.",
+      };
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(productId,
+      {
+        $inc: {
+          'quantity.stock_qty': -reduceQty,
+          'quantity.selling_qty': reduceQty
+        }
+      },
+      { new: true }
+    );
+
+    return {
+      status: true,
+      message: "Stock reduced successfully.",
+      data: updatedProduct.quantity.stock_qty,
+    };
+
+  } catch (error) {
+    console.error(error);
+    return {
+      status: false,
+      message: "Internal server error.",
+    };
   }
 }
 

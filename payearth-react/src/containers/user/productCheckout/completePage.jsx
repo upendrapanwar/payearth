@@ -218,18 +218,42 @@ export default function CompletePage() {
                         Authorization: `Bearer ${authInfo.token}`,
                     },
                 });
-
-                console.log("Update Order Response:", response.data);
+                onUpdateProductStock(response.data.data)
                 orderResId.push(response.data.data.id);
+                // update quty....
+
+
             }
-
-
             onSubmitHandler(orderResId, data, paymentId, userData);
         } catch (error) {
             alert("Failed to create some order statuses.");
             console.error("Error updating order status:", error);
         }
     };
+
+    const onUpdateProductStock = (data) => {
+
+        const reqBody = {
+            productId: data.product.productId[0],
+            reduceQty: data.product.quantity[0]
+        }
+
+        axios.put(`user/productReduceStock`, reqBody, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${authInfo.token}`
+            }
+        }).then(response => {
+            if (response.data.status) {
+                console.log("productReduceStock response", response.data)
+            }
+        }).catch(error => {
+            console.log(error);
+        });
+
+
+    }
 
     const onSubmitHandler = (orderResId, data, paymentId, userData) => {
         // console.log("Final orderResId:", orderResId);

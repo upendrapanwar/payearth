@@ -44,6 +44,8 @@ class Dashboard extends Component {
             subscriptionOrders: []
         };
 
+        // console.log("productYear", this.state.productYear)
+
         this.listed_Service = [
             {
                 name: 'SERVICES',
@@ -564,6 +566,9 @@ class Dashboard extends Component {
         // const valueFormatter = (item) => `${item.value}%`;
         // const valueFormatter = (item) => `${(item.value * 100) / 10}%`;
         const productData = productSalesData.map(item => item.count);
+
+        console.log("productData", productData);
+        console.log("topCategories", topCategories);
         const serviceData = serviceSalesData.map(item => item.count);
         const currentYear = new Date().getFullYear();
 
