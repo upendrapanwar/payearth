@@ -73,6 +73,8 @@ module.exports = {
   getNotifications,
   updateNotifications,
   setNotificationSeen,
+  getTodayDealsProductById,
+  getdiscountStatusById
 };
 
 async function getReviews(id) {
@@ -1283,5 +1285,50 @@ async function setNotificationSeen(req, res) {
   } catch (error) {
     console.error('Error updating notification:', error);
     throw new Error('Failed to update notification');
+  }
+}
+
+/****************************************************************************** */
+async function getTodayDealsProductById(param) {
+ // console.log('getTodayDealsProductById---',param)
+  const  Id  = param.id;
+
+  if (!Id) {
+    return { message: 'Product ID is required' };
+  }
+
+  try {
+    const result = await TodayDeal.findOne({ _id: Id }).populate('productId').select('');
+
+    if (result) {
+      return result;
+    } else {
+      return { message: 'No product found with the given ID' };
+    }
+  } catch (error) {
+    console.error('Error geting product:', error);
+    throw new Error('Failed to get product');
+  }
+}
+
+ async function getdiscountStatusById(param) {
+ // console.log('getdiscountStatusById---',param)
+  const  Id  = param.id;
+
+  if (!Id) {
+    return { message: 'discount ID is required' };
+  }
+
+  try {
+    const result = await TodayDeal.findOne({ _id: Id, isActive: true }).select('');
+
+    if (result) {
+      return result;
+    } else {
+      return {status:false, message: 'No discountId found with the given ID' };
+    }
+  } catch (error) {
+    console.error('Error geting discountId:', error);
+    throw new Error('Failed to get discountId');
   }
 }

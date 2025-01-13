@@ -11,20 +11,34 @@ toast.configure();
 const cartSlice = createSlice({
     name: 'cart',
     initialState: {
-        cart: []
+        cart: [],
     },
 
     reducers: {
         addToCart: (state, action) => {
+
+            if (!Array.isArray(state.cart)) {
+                state.cart = [];
+            }
+
+            const productinPayload = action.payload
             const itemInCart = state.cart.find((item) => item.id === action.payload.id);
-            const authInfo = JSON.parse(localStorage.getItem('authInfo'));
-            if (itemInCart) {
-                if (authInfo !== null) {
+            const authInfo = JSON.parse(localStorage.getItem('authInfo')); 
+            console.log('itemInCart----in authInfo--------', authInfo)
+            if (authInfo !== null) {
+                console.log('itemInCart----in cart--------', itemInCart)
+                console.log('itemInCart----in authInfo--------', authInfo)
+                if (itemInCart) {
+                    // itemInCart.quantity++;
+                    itemInCart.quantity ++;
+                    if (productinPayload.discountId) itemInCart.discountId = productinPayload.discountId;
+                    if (productinPayload.discountPercent) itemInCart.discountPercent = productinPayload.discountPercent;
                     let reqBody = {
                         user_id: authInfo.id,
                         productId: itemInCart.id,
                         qty: itemInCart.quantity,
-                        price: itemInCart.price
+                        price: itemInCart.price,
+                        discountId: itemInCart.discountId,
                     };
                     axios.post('user/addtocart', reqBody, {
                         headers: {
@@ -47,15 +61,53 @@ const cartSlice = createSlice({
                             dispatch(setLoading({loading: false}));
                         }, 300);*/
                     });
-                    itemInCart.quantity++;
+                }else{
+                    let reqBody = {
+                        user_id: authInfo.id,
+                        productId: productinPayload.id,
+                        qty: productinPayload.quantity,
+                        price: productinPayload.price,
+                        discountId: productinPayload.discountId || null
+                    };
+                    axios.post('user/addtocart', reqBody, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json;charset=UTF-8',
+                            'Authorization': `Bearer ${authInfo.token}`
+                        }
+                    }).then(response => {
+                        if (response.data.status) {
+                            toast.success('Product added', { autoClose: 3000 });
+                            //resetForm();
+                        }
+                    }).catch(error => {
+                        if (error.response) {
+                            //toast.error(error.response.data.message, {autoClose: 3000});
+                        }
+                    }).finally(() => {
+                        console.log('addtocart');
+                        /*setTimeout(() => {
+                            dispatch(setLoading({loading: false}));
+                        }, 300);*/
+                    });
+                    state.cart.push({ ...action.payload, quantity: 1 });
                 }
             } else {
-                state.cart.push({ ...action.payload, quantity: 1 });
+                if (itemInCart) {
+                    itemInCart.quantity++;
+                } else {
+                    state.cart.push({ ...action.payload, quantity: 1 });
+                    console.log('itemInCart----in cart----- else---')
+                }
             }
+
+
         },
 
 
         incrementQuantity: (state, action) => {
+            console.log('incrementQuantity----run')
+           // const productinPayload = action.payload
             const item = state.cart.find((item) => item.id === action.payload);
             const authInfo = JSON.parse(localStorage.getItem('authInfo'));
             if (authInfo === null) {
@@ -68,7 +120,8 @@ const cartSlice = createSlice({
                     user_id: authInfo.id,
                     productId: item.id,
                     qty: item.quantity,
-                    price: item.price
+                    price: item.price,
+                   // discountId: productinPayload.discountId || null
                 };
                 axios.post('user/updateToCart', reqBody, {
                     headers: {
@@ -96,6 +149,7 @@ const cartSlice = createSlice({
         },
 
         decrementQuantity: (state, action) => {
+           // const productinPayload = action.payload
             const item = state.cart.find((item) => item.id === action.payload);
             const authInfo = JSON.parse(localStorage.getItem('authInfo'));
             if (authInfo === null) {
@@ -114,7 +168,8 @@ const cartSlice = createSlice({
                     user_id: authInfo.id,
                     productId: item.id,
                     qty: item.quantity,
-                    price: item.price
+                    price: item.price,
+                    //discountId: productinPayload.discountId || null
 
                 };
                 axios.post('user/updateToCart', reqBody, {
@@ -142,20 +197,31 @@ const cartSlice = createSlice({
         },
 
         removeItem: (state, action) => {
+            //const productinPayload = action.payload
             const removeItem = state.cart.filter((item) => item.id !== action.payload);
+            const Itemtodelete = state.cart.find((item) => item.id == action.payload);
             const authInfo = JSON.parse(localStorage.getItem('authInfo'));
+
+            // console.log('state---',state.cart)
+            // console.log('action---',action.payload)
+            // const removeItem = state.cart.filter((item) => item.id !== action.payload);
+             console.log('removeItem---',removeItem)
+            // const removeItem = state.cart.find((item) => item.id == action.payload);
+            
             if (authInfo === null) {
                 state.cart = removeItem;
             } else {
                 state.cart = removeItem;
                 let reqBody = {
                     user_id: authInfo.id,
-                    productId: removeItem.id,
-                    qty: removeItem.quantity,
-                    price: removeItem.price
+                    productId: Itemtodelete.id,
+                    qty: Itemtodelete.quantity,
+                    price: Itemtodelete.price,
+                   // discountId: productinPayload.discountId || null
 
                 };
-                axios.post('user/updateToCart', reqBody, {
+                console.log('reqBody--',reqBody)
+                axios.post('user/deletefromcart', reqBody, {
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json;charset=UTF-8',

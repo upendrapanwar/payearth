@@ -62,6 +62,10 @@ router.get('/notifications/:id', getNotifications);
 router.put('/updateNotifications/:id', updateNotifications);
 router.put('/setNotificationSeen', setNotificationSeen);
 
+router.get('/product/today-dealsById/:id',getTodayDealsProductById)
+router.get('/discount-status/:id', getdiscountStatusById)
+
+
 
 module.exports = router;
 
@@ -304,5 +308,18 @@ function updateNotifications(req, res, next) {
 function setNotificationSeen(req, res, next) {
     frontService.setNotificationSeen(req)
         .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+
+function getTodayDealsProductById(req, res, next) {
+    frontService.getTodayDealsProductById(req.params)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function getdiscountStatusById(req, res, next) {
+    frontService.getdiscountStatusById(req.params)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }

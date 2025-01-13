@@ -164,6 +164,9 @@ import EditCoupon from "./containers/admin/EditCoupon";
 
 
 
+import DealListedItems from "./components/user/home/DealListedItems";
+
+
 function App() {
   const userInfo = useSelector((state) => state.auth.userInfo);
 
@@ -1191,6 +1194,13 @@ function App() {
             component={Zoom}
             roles={[Role.user]}
             currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PublicRoute
+            path="/deal-ofthe-day"
+            restricted={false}
+            component={DealListedItems}
             exact
           />
 

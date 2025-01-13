@@ -177,6 +177,8 @@ router.post("/savelater", addToSaveLater);
 router.post("/addtocart", addToCart);
 router.post("/updatetocart", updateToCart);
 router.post("/deletefromcart", deleteFromCart);
+// router.post("/updateToCartDiscountId", updateToCartDiscountId);
+
 
 
 
@@ -297,6 +299,9 @@ router.post("/user-support-email", userSupportEmail);
 router.post("/support/request-call", supportReqCall);
 router.put("/save-user-myprofile/:id", saveMyProfile);
 router.get("/getProductOrder/:id", getProductOrder);
+
+
+router.get("/getCartData/:id", getCartData);
 
 
 module.exports = router;
@@ -716,6 +721,23 @@ function deleteFromCart(req, res, next) {
       next(res.status(400).json({ status: false, message: err }))
     );
 }
+
+//  function updateToCartDiscountId(req, res, next) {
+//   userService
+//     .updateToCartDiscountId(req)
+//     .then((cart) =>
+//       cart
+//         ? res.status(201).json({ status: true, data: cart })
+//         : res
+//           .status(400)
+//           .json({ status: false, message: msg.common.no_data_err, data: {} })
+//     )
+//     .catch((err) =>
+//       next(res.status(400).json({ status: false, message: err }))
+//     );
+// }
+
+
 // stripe
 
 function checkoutSession(req, res, next) {
@@ -1646,3 +1668,9 @@ function getProductOrder(req, res, next) {
     .catch((err) => next(res.json({ status: false, message: err.message })));
 }
 
+
+function getCartData(req, res, next) {
+  userService.getCartData(req)
+    .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error getCartData request." }))
+    .catch((err) => next(res.json({ status: false, message: err.message })));
+}
