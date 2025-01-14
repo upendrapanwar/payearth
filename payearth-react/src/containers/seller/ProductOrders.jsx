@@ -123,20 +123,183 @@ class ProductOrders extends Component {
                 sortable: true
             }
         ]
+
+        this.cancleRefundsOrders_column = [
+            {
+                name: 'PRODUCT IMAGE',
+                selector: (row, i) => (
+                    <img
+                        src={row.featuredImage}
+                        alt="Not selected"
+                        style={{ width: "80px", height: "80px" }}
+                    />
+                ),
+                sortable: true
+            },
+            {
+                name: 'PRODUCT ID',
+                selector: (row, i) => row.productCode,
+                sortable: true
+            },
+            {
+                name: 'PRODUCT NAME',
+                selector: (row, i) => row.name,
+                sortable: true
+            },
+            {
+                name: 'BRAND',
+                selector: (row, i) => row.brand.brandName,
+                sortable: true
+            },
+            {
+                name: 'CATEGORY',
+                selector: (row, i) => row.category.categoryName,
+                sortable: true
+            },
+            {
+                name: 'SELLER DETAILS',
+                selector: row => (
+                    <>
+                        <p>{row.createdBy[0].name || 'N/A'}</p>
+                        <p>{row.createdBy[0].email || 'N/A'}</p>
+                    </>
+                ),
+                sortable: true,
+            },
+            {
+                name: 'TOTAL STOCK QUANTITY',
+                selector: (row, i) => row.quantity.stock_qty,
+                sortable: true
+            },
+            {
+                name: 'SELLING QUANTITY',
+                selector: (row, i) => row.quantity.selling_qty,
+                sortable: true
+            },
+            {
+                name: 'STATUS',
+                cell: (row, i) => {
+                    return <>
+                        <Switch
+                            on={true}
+                            off={false}
+                            value={row.isActive}
+                            onChange={() => this.handleStatus(row.id, row.isActive)}
+                        />
+                    </>
+                },
+                sortable: true
+            },
+            {
+                // name: 'STATUS',
+                cell: (row, i) => {
+                    return (
+                        <>
+                            <Link to={`/admin/manage-product-details/${row.id}`}>
+                                <button className="custom_btn btn_yellow_bordered w-auto btn">DETAIL</button>
+                            </Link>
+                        </>
+                    );
+                },
+                sortable: true
+            }
+        ]
+
+        this.completedOrders_column = [
+            {
+                name: 'PRODUCT IMAGE',
+                selector: (row, i) => (
+                    <img
+                        src={row.featuredImage}
+                        alt="Not selected"
+                        style={{ width: "80px", height: "80px" }}
+                    />
+                ),
+                sortable: true
+            },
+            {
+                name: 'PRODUCT ID',
+                selector: (row, i) => row.productCode,
+                sortable: true
+            },
+            {
+                name: 'PRODUCT NAME',
+                selector: (row, i) => row.name,
+                sortable: true
+            },
+            {
+                name: 'BRAND',
+                selector: (row, i) => row.brand.brandName,
+                sortable: true
+            },
+            {
+                name: 'CATEGORY',
+                selector: (row, i) => row.category.categoryName,
+                sortable: true
+            },
+            {
+                name: 'SELLER DETAILS',
+                selector: row => (
+                    <>
+                        <p>{row.createdBy[0].name || 'N/A'}</p>
+                        <p>{row.createdBy[0].email || 'N/A'}</p>
+                    </>
+                ),
+                sortable: true,
+            },
+            {
+                name: 'TOTAL STOCK QUANTITY',
+                selector: (row, i) => row.quantity.stock_qty,
+                sortable: true
+            },
+            {
+                name: 'SELLING QUANTITY',
+                selector: (row, i) => row.quantity.selling_qty,
+                sortable: true
+            },
+            {
+                name: 'STATUS',
+                cell: (row, i) => {
+                    return <>
+                        <Switch
+                            on={true}
+                            off={false}
+                            value={row.isActive}
+                            onChange={() => this.handleStatus(row.id, row.isActive)}
+                        />
+                    </>
+                },
+                sortable: true
+            },
+            {
+                // name: 'STATUS',
+                cell: (row, i) => {
+                    return (
+                        <>
+                            <Link to={`/admin/manage-product-details/${row.id}`}>
+                                <button className="custom_btn btn_yellow_bordered w-auto btn">DETAIL</button>
+                            </Link>
+                        </>
+                    );
+                },
+                sortable: true
+            }
+        ]
     }
 
     componentDidMount() {
-        this.getProductStock(true);
+        this.getProductOrderData(true, "Order placed");
     }
 
-    getProductStock = async (currentStatus, currentTab) => {
-        try {
-            this.setState({ currentTab: currentTab })
+    getProductOrderData = async (currentStatus, title) => {
+        try {          
+            // this.setState({ currentTab: currentTab })
             this.dispatch(setLoading({ loading: true }));
-            const url = 'admin/getProductStock/';
+            const url = 'seller/getProductOrders';
             const response = await axios.get(url, {
                 params: {
-                    status: currentStatus
+                    status: currentStatus,
+                    title: title
                 },
                 headers: {
                     'Authorization': `Bearer ${this.authInfo.token}`,
@@ -145,9 +308,9 @@ class ProductOrders extends Component {
             });
             if (response.data.status === true) {
                 if (currentStatus === false) {
-                    this.setState({ rejectedProducts: response.data.data });
+                    // this.setState({ rejectedProducts: response.data.data });
                 } else {
-                    this.setState({ data: response.data.data });
+                    // this.setState({ data: response.data.data });
                 }
             }
         } catch (error) {
@@ -331,18 +494,19 @@ class ProductOrders extends Component {
                                 </div>
                                 <nav className="orders_tabs">
                                     <div className="nav nav-tabs" id="nav-tab" role="tablist">
-                                        <button className="nav-link active" id="nav-pending-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-pending-orders" type="button" role="tab" aria-controls="nav-pending-orders" aria-selected="true" onClick={() => this.getProductStock(true, 'addedTab')}>Pending Orders</button>
-                                        <button className="nav-link" id="nav-ongoing-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-ongoing-orders" type="button" role="tab" aria-controls="nav-ongoing-orders" aria-selected="false" onClick={() => this.getAddedProducts(false, null, 'pending')}>Canclelled & Refund</button>
-                                        <button className="nav-link" id="nav-cancelled-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-cancelled-orders" type="button" role="tab" aria-controls="nav-cancelled-orders" aria-selected="true" onClick={() => this.getProductStock(false, 'trashTab')}>Trash</button>
+                                        <button className="nav-link active" id="nav-pending-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-pending-orders" type="button" role="tab" aria-controls="nav-pending-orders" aria-selected="true" onClick={() => this.getProductOrderData(true, 'Order placed')}>Pending Orders</button>
+                                        <button className="nav-link" id="nav-cancelled&Refunds-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-cancelled&Refunds-orders" type="button" role="tab" aria-controls="nav-cancelled&Refunds-orders" aria-selected="true" onClick={() => this.getProductOrderData(false, 'Cancelled')}>Cancelled and Refunded Orders</button>
+                                        <button className="nav-link" id="nav-completed-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-completed-orders" type="button" role="tab" aria-controls="nav-completed-orders" aria-selected="true" onClick={() => this.getProductOrderData(true, 'Delivered')}>Completed Orders</button>
                                     </div>
                                 </nav>
                                 <div className="orders_table tab-content pt-0 pb-0" id="nav-tabContent">
 
                                     {/* Added product First */}
                                     <div className="tab-pane fade show active" id="nav-pending-orders" role="tabpanel" aria-labelledby="nav-pending-orders-tab">
+                                        <p>Pending</p>
                                         <DataTableExtensions
-                                            columns={this.addedProduct_column}
-                                            data={data}
+                                            columns={this.pendingOrders_column}
+                                        // data={data}
                                         >
                                             <DataTable
                                                 pagination
@@ -359,52 +523,32 @@ class ProductOrders extends Component {
 
                                     {/* Second */}
 
-                                    <div className="tab-pane fade" id="nav-ongoing-orders" role="tabpanel" aria-labelledby="nav-ongoing-orders-tab">
-                                        {pendingProducts.length > 0 ?
-                                            <table className="table table-responsive table-bordered">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Product ID</th>
-                                                        <th>Product Name</th>
-                                                        <th>Brand</th>
-                                                        <th>Category</th>
-                                                        <th>Total Stock quantity</th>
-                                                        <th colSpan="2">Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {pendingProducts.length && pendingProducts.map((value, index) => {
-                                                        return <tr key={index}>
-                                                            <td>{value.productCode}</td>
-                                                            <td>{value.name}</td>
-                                                            <td>{value.brand.brandName}</td>
-                                                            <td>{value.category.categoryName ? value.category.categoryName : ''}</td>
-                                                            <td>{value.quantity.stock_qty}</td>
-                                                            <td className="text-capitalize">{value.approveStatus}</td>
-                                                            <td><Link to={`/seller/product-detail/${value.id}`} className="custom_btn btn_yellow_bordered w-auto btn">Details</Link></td>
-                                                        </tr>
-                                                    })}
-                                                </tbody>
-                                            </table>
-                                            : <NotFound msg="Data not found." />
-                                        }
-                                        {pendingProducts.length > 0 &&
-                                            <div className="pagination">
-                                                <ul>
-                                                    <li><Link to="#" className={`link ${pendingProductsPagination.hasPrevPage ? '' : 'disabled'}`} onClick={() => this.getAddedProducts(true, pendingProductsPagination.prevPage, 'pending')}><span className="fa fa-angle-left me-2"></span> Prev</Link></li>
-                                                    {this.pagination('pending')}
-                                                    <li><Link to="#" className={`link ${pendingProductsPagination.hasNextPage ? '' : 'disabled'}`} onClick={() => this.getAddedProducts(true, pendingProductsPagination.nextPage, 'pending')}>Next <span className="fa fa-angle-right ms-2"></span></Link></li>
-                                                </ul>
-                                            </div>
-                                        }
+                                    <div className="tab-pane fade" id="nav-cancelled&Refunds-orders" role="tabpanel" aria-labelledby="nav-cancelled&Refunds-orders-tab">
+                                        <p>Canclled and refund</p>
+                                        <DataTableExtensions
+                                            columns={this.cancleRefundsOrders_column}
+                                        // data={data}
+                                        >
+                                            <DataTable
+                                                pagination
+                                                noHeader
+                                                highlightOnHover
+                                                defaultSortField="id"
+                                                defaultSortAsc={false}
+                                                paginationPerPage={5}
+                                                paginationRowsPerPageOptions={[5, 10, 15, 20]}
+                                            // selectableRows           
+                                            />
+                                        </DataTableExtensions>
                                     </div>
 
                                     {/* third */}
 
-                                    <div className="tab-pane fade" id="nav-cancelled-orders" role="tabpanel" aria-labelledby="nav-cancelled-orders-tab">
+                                    <div className="tab-pane fade" id="nav-completed-orders" role="tabpanel" aria-labelledby="nav-completed-orders-tab">
+                                        <p>Completed</p>
                                         <DataTableExtensions
-                                            columns={this.addedProduct_column}
-                                            data={rejectedProducts}
+                                            columns={this.completedOrders_column}
+                                        // data={rejectedProducts}
                                         >
                                             <DataTable
                                                 pagination

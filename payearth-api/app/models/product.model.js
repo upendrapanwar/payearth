@@ -41,7 +41,7 @@ const schema = new Schema({
         selling_qty: { type: Number, required: false, default: 0 },
         stock_qty: { type: Number, required: false, default: 0 },
     },
-    createdBy: [{ type: Schema.Types.ObjectId, ref: 'Seller', required: false }],
+    createdBy: { type: Schema.Types.ObjectId, ref: 'Seller', required: false },
     updatedBy: { type: Schema.Types.ObjectId, ref: 'Seller', required: false },
 }, {
     timestamps: true,

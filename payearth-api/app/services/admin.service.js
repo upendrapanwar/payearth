@@ -99,6 +99,8 @@ module.exports = {
     getProductNameById,
     filterOrderData,
 
+    getProductOrders,
+
     //CMS
     createCmsPost,
     getCmsPostData,
@@ -2102,6 +2104,38 @@ async function getOrderById(id) {
     } catch (err) {
         console.log('Error', err);
         return false;
+    }
+}
+
+// getProductOrders
+async function getProductOrders(req) {
+    const { status } = req.query;
+    try {
+        const query = {
+            isActive: status,
+        };
+
+        console.log("query:", query)
+        // const fieldsToSelect = "id productCode name category sub_category brand featuredImage quantity isActive";
+        // let result = await Product.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect)
+        //     .populate({
+        //         path: 'category',
+        //         match: { isVisible: true },
+        //         select: 'categoryName isActive'
+        //     })
+        //     .populate({
+        //         path: 'brand',
+        //         match: { isVisible: true },
+        //         select: 'brandName'
+        //     })
+        //     .populate({
+        //         path: 'createdBy',
+        //         model: Seller,
+        //         select: 'id name email',
+        //     });
+        // return result;
+    } catch (error) {
+        console.log(error);
     }
 }
 
@@ -4614,6 +4648,7 @@ async function getTopSellingCategories(req) {
                 }
             ]);
 
+        console.log("topSellingCategories", topSellingCategories)
         if (!topSellingCategories || topSellingCategories.length === 0) {
             return {
                 status: false,
