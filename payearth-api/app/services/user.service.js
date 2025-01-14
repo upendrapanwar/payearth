@@ -4347,7 +4347,9 @@ async function getCartData(req) {
   try {
   const result = await Cart.find({ isActive: true, userId: userId })
     .sort()
-    .populate('products.productId');
+    .populate('products.productId')
+    .populate('products.discountId');
+
   if (result && result.length > 0) return result;
 } catch (error) {
   console.error("Error:", error);

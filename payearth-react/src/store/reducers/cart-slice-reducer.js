@@ -249,7 +249,10 @@ const cartSlice = createSlice({
             state.cart = [];
         },
 
-
+        updateCart: (state, action) => {
+            state.cart = action.payload;
+            console.log('Cart updated:', state.cart);
+        },
 
     }
 });
@@ -260,5 +263,6 @@ export const {
     incrementQuantity,
     decrementQuantity,
     removeItem,
-    clearCart
+    clearCart,
+    updateCart
 } = cartSlice.actions;
