@@ -57,22 +57,43 @@ function ServiceCalendar() {
       end: { dateTime: end_datetime, timeZone: "Asia/Kolkata" },
       summary: values.event_title,
       description: values.description,
-      location: "https://ZoomMeeting.com",
+      // location: "https://ZoomMeeting.com",
+      //########## Applying google meet on here..........#####
+      location: "Online Meeting",
+      conferenceData: {
+        createRequest: {
+          requestId: `meeting-${Date.now()}`, // Unique ID for the request
+          conferenceSolutionKey: {
+            type: "hangoutsMeet" // Specifies Google Meet
+          }
+        }
+      }
     };
 
     try {
       const accessToken = localStorage.getItem("accessToken");
-
-      const addEvent = await axios.post(`https://www.googleapis.com/calendar/v3/calendars/primary/events`, eventData, {
-        headers: {
-          "Authorization": `Bearer ${accessToken}`,
-        },
-      })
+      const addEvent = await axios.post(
+        `https://www.googleapis.com/calendar/v3/calendars/primary/events?conferenceDataVersion=1`,
+        eventData,
+        {
+          headers: {
+            "Authorization": `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        })
 
       if (addEvent.data.status === "confirmed") {
+
+        console.log("addEvent show..", addEvent)
+
+        const meetLink = addEvent.data.conferenceData.entryPoints?.find(
+          (entryPoint) => entryPoint.entryPointType === "video"
+        )?.uri;
+
+        console.log("meetLink", meetLink)
         toast.success("Event added successfully");
         setFormOpen(false);
-        await saveCalendarEvents()
+        // await saveCalendarEvents(meetLink)
         await fetchGoogleEvents();
       }
 
@@ -123,13 +144,13 @@ function ServiceCalendar() {
   const fetchGoogleEvents = async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
-
-
       const response = await axios.get("https://www.googleapis.com/calendar/v3/calendars/primary/events", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       })
+
+      console.log("response", response)
 
       if (response.status === 200) {
         const eventsData = response.data.items.map((item) => ({
@@ -138,12 +159,14 @@ function ServiceCalendar() {
           start: item.start.dateTime,
           end: item.end.dateTime,
           description: item.description,
-          meeting_url: item.location,
+          meeting_url: item.hangoutLink,
         }));
+
+        console.log("eventsData", eventsData)
 
         if (eventsData.length > 0) {
           const lastEvent = eventsData[eventsData.length - 1];
-          await saveCalendarEvents([lastEvent], service_id, user_id);
+          await saveCalendarEvents([lastEvent], service_id, user_id,);
         } else {
           console.log("No events fetched.");
         }
@@ -155,6 +178,8 @@ function ServiceCalendar() {
 
   //save data in the data base 
   const saveCalendarEvents = async (eventsData, service_id, user_id) => {
+
+    // console.log("eventsData in saveCalendarEvents ", eventsData);
     try {
       const requestData = eventsData.map((event) => ({
         user_id,
@@ -166,6 +191,8 @@ function ServiceCalendar() {
         event_description: event.description,
         meeting_url: event.meeting_url,
       }));
+
+      console.log("requestData in saveCalendarEvents", requestData)
       const response = await axios.post(`/user/add-calendar-event/${authInfo.id}`, requestData, {
         headers: {
           "Accept": "application/json",
@@ -175,22 +202,24 @@ function ServiceCalendar() {
       })
       if (response.data.status === true) {
 
+        // console.log("saveCalendarEvents function ", saveCalendarEvents)
+
         //send notification to seller
         const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
-                const notification = {
-                    message: `${userInfo.name} Added google event for meeting`,
-                    sender: { id: user_id, type: 'user', name: userInfo.name },
-                    receiver: { id: response.data.data.createdBy, type: 'seller'},
-                    type: 'Meeting_Request'
-                };
-                socket.emit('Meeting_Request', {
-                    notification
-                });
-                axios.post('front/notifications', notification).then(response => {
-              }).catch(error => {
-                  console.log("Error saving notification:", error);
-              });
-        
+        const notification = {
+          message: `${userInfo.name} Added google event for meeting`,
+          sender: { id: user_id, type: 'user', name: userInfo.name },
+          receiver: { id: response.data.data.createdBy, type: 'seller' },
+          type: 'Meeting_Request'
+        };
+        socket.emit('Meeting_Request', {
+          notification
+        });
+        axios.post('front/notifications', notification).then(response => {
+        }).catch(error => {
+          console.log("Error saving notification:", error);
+        });
+
         //fetch data
         await fetchEvents();
       }

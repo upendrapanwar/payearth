@@ -19,6 +19,11 @@ import Table from "react-bootstrap/Table";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
+import Box from '@mui/material/Box';
+import Stepper from '@mui/material/Stepper';
+import Step from '@mui/material/Step';
+import StepLabel from '@mui/material/StepLabel';
+
 class MyOrders extends Component {
   constructor(props) {
     super(props);
@@ -319,7 +324,11 @@ class MyOrders extends Component {
     const { data, loading, error, selectedRowData, downloading } = this.state;
 
     const userName = this.userInfo.name;
-
+    const steps = [
+      'Order Placed',
+      'Processing',
+      'Delivered',
+    ];
     return (
       <React.Fragment>
         {loading === true ? <SpinnerLoader /> : ""}
@@ -567,8 +576,8 @@ class MyOrders extends Component {
                         <tr>
                           <th style={{ width: "70px" }}>Items</th>
                           <th className="text-center" style={{ width: "100px" }}>Qty</th>
-                          <th className="text-center" style={{ width: "70px" }}>
-                            Status
+                          <th className="text-center" style={{ width: "50px" }}>
+                            {/* Status */}
                           </th>
                         </tr>
                       </thead>
@@ -583,9 +592,22 @@ class MyOrders extends Component {
                                 <td className="text-center" style={{ width: "100px" }}>
                                   {item.product.quantity}
                                 </td>
-                                <td className="text-center" style={{ width: "70px" }} >
+                                {/* <td className="text-center" style={{ width: "70px" }} >
                                   <span className="badge rounded-pill text-bg-success">{item.title}</span>
-                                </td>
+                                </td> */}
+                                <Box sx={{ width: '100%' }}>
+                                  <Stepper activeStep={item.title === "Order placed" ? 0 :
+                                    item.title === "Processing" ? 1 :
+                                      item.title === "Delivered" ? 4 :
+                                        2} alternativeLabel>
+                                    {steps.map((label) => (
+                                      <Step key={label}>
+                                        <StepLabel>{label}</StepLabel>
+                                      </Step>
+                                    ))}
+                                  </Stepper>
+                                </Box>
+
                               </tr>
                             );
                           })

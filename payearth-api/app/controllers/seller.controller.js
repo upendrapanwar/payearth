@@ -188,6 +188,8 @@ router.post("/updateorderstatus", updateOrderStatus);
 router.get("/orderstatus", getOrderStatus);
 router.post("/coupons/new", getNewCoupons);
 
+router.get("/getProductOrders", getProductOrders);
+
 //Payments
 router.post("/payments/:id", getPayments);
 router.post("/savepayment", savepaymentdata);
@@ -566,6 +568,15 @@ function productStatusUpdate(req, res, next) {
     )
     .catch((err) => next(res.json({ status: false, message: err })));
 }
+
+
+function getProductOrders(req, res, next) {
+  sellerService.getProductOrders(req)
+    .then((orders) => orders ? res.status(200).json({ status: true, data: orders }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+
 
 function getOrders(req, res, next) {
   sellerService

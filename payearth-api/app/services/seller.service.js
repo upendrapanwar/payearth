@@ -167,6 +167,8 @@ module.exports = {
   getAllOpenTicket,
   getOpenedTicketMessage,
 
+  getProductOrders,
+
   createDeals,
   updateDeals,
   getCategoryForDeals,
@@ -175,6 +177,8 @@ module.exports = {
 
   getTopSellingCategories,
   productSalesGraph,
+
+
 };
 
 // function sendMail(mailOptions) {
@@ -4905,6 +4909,39 @@ async function getOpenedTicketMessage(req) {
   } catch (error) {
     console.error(error);
     return { status: false, message: error.message };
+  }
+}
+
+// Orders
+
+async function getProductOrders(req) {
+  const { status, title } = req.query;
+  try {
+    const query = {
+      isActive: status,
+      title: title
+    };
+
+    console.log("query:", query)
+    const fieldsToSelect = "product";
+    const data = await OrderStatus.find(query)
+      // .populate([
+      //   {
+      //     path: "product.productId",
+      //     model: Product,
+      //     select: "createdBy",
+      //     populate: [{
+      //       path: "createdBy",
+      //       model: Seller,
+      //       select: "name"
+      //     }]
+      //   }
+      // ])
+      .populate('product.productId') // Populate productId inside product object
+      .populate('product.productId.createdBy', 'name email');
+    console.log("data", data)
+  } catch (error) {
+    console.log(error);
   }
 }
 
