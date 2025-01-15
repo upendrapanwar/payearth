@@ -13,21 +13,23 @@ function CartItem({ id, image, title, price, quantity, discountId, discountPerce
   const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
 
   const [discountIdStatus, setDiscountIdStatus] = useState(false);
-
+console.log('discountId----get in cart---',discountId)
 
   useEffect(() => {
     if(discountId){
+      console.log('if condition run ',discountId)
     getDiscountIdStatus();
     }else{
       setDiscountIdStatus(false)
     }
-  }, []);
+  }, [discountId]);
 
   const getDiscountIdStatus = async () => {
+  //  console.log('getDiscountIdStatus:');
     try {
       const response = await axios.get(`front/discount-status/${discountId}`); 
       const data = await response.data.data;
-      console.log('Discount Status-----:', response.data.data);
+    //  console.log('getDiscountIdStatus Status-----:',response );
       if(data.isActive === true){
       setDiscountIdStatus(true)
     }else{
@@ -74,7 +76,7 @@ function CartItem({ id, image, title, price, quantity, discountId, discountPerce
     }
   }
 
-console.log('discountIdStatus----',discountIdStatus)
+// console.log('discountIdStatus----',discountIdStatus)
   return (
     <div className="cl_items">
       <div className="cl_pro_info">

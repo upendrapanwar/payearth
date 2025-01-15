@@ -303,6 +303,7 @@ router.get("/getProductOrder/:id", getProductOrder);
 
 
 router.get("/getCartData/:id", getCartData);
+router.post("/updateCartData", updateCartData);
 
 
 module.exports = router;
@@ -1678,6 +1679,12 @@ function getProductOrder(req, res, next) {
 
 function getCartData(req, res, next) {
   userService.getCartData(req)
+    .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error getCartData request." }))
+    .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function updateCartData(req, res, next) {
+  userService.updateCartData(req)
     .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error getCartData request." }))
     .catch((err) => next(res.json({ status: false, message: err.message })));
 }

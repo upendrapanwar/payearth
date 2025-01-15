@@ -169,7 +169,8 @@ module.exports = {
 
 
   getProductOrder,
-  getCartData
+  getCartData,
+  updateCartData
 
 };
 
@@ -1235,7 +1236,7 @@ async function saveOrder(req) {
 // }
 
 async function addToCart(req) {
- // console.log('addtocart ---api--run--', req.body);
+  // console.log('addtocart ---api--run--', req.body);
 
   try {
     const param = req.body;
@@ -1265,11 +1266,11 @@ async function addToCart(req) {
       const updatedCart = await Cart.findOneAndUpdate(
         { userId: param.user_id, 'products.productId': param.productId },
         update,
-        { new: true } 
+        { new: true }
       );
 
       if (updatedCart) {
-       // console.log('Cart updated successfully:', updatedCart);
+        // console.log('Cart updated successfully:', updatedCart);
         return true;
       } else {
         console.log('Error updating the cart.');
@@ -1292,7 +1293,7 @@ async function addToCart(req) {
       const savedCart = await newCart.save();
 
       if (savedCart) {
-       // console.log('New cart created successfully:', savedCart);
+        // console.log('New cart created successfully:', savedCart);
         return true;
       } else {
         console.log('Failed to create a new cart.');
@@ -1360,7 +1361,7 @@ async function updateToCart(req) {
     );
 
     if (data) {
-     // console.log('Cart updated successfully:', data);
+      // console.log('Cart updated successfully:', data);
       return true;
     } else {
       console.log('No matching cart or product found for update.');
@@ -1375,9 +1376,9 @@ async function updateToCart(req) {
 
 async function deleteFromCart(req) {
   try {
-   // console.log('deleteFromCart---', req.body)
+    // console.log('deleteFromCart---', req.body)
     var param = req.body;
-   // console.log('deleteFromCart---', param)
+    // console.log('deleteFromCart---', param)
     const data = await Cart.findOneAndDelete({
       userId: param.user_id,
       'products.productId': param.productId,
@@ -4343,16 +4344,75 @@ async function getProductOrder() {
 
 async function getCartData(req) {
   const userId = req.params.id
-  console.log('getCartData-----', userId)
+  // console.log('getCartData-----', userId)
   try {
-  const result = await Cart.find({ isActive: true, userId: userId })
-    .sort()
-    .populate('products.productId')
-    .populate('products.discountId');
+    const result = await Cart.find({ isActive: true, userId: userId })
+      .sort()
+      .populate('products.productId')
+      .populate('products.discountId');
 
-  if (result && result.length > 0) return result;
-} catch (error) {
-  console.error("Error:", error);
-  throw new Error("Error getCart data.");
+    if (result && result.length > 0) return result;
+  } catch (error) {
+    console.error("Error:", error);
+    throw new Error("Error getCart data.");
+  }
 }
+
+async function updateCartData(req) {
+  const { userId, cartFromRedux } = req.body
+ // console.log('cartFromRedux-----', cartFromRedux)
+  try {
+
+    for (const product of cartFromRedux) {
+      // Loop through all products in cartFromRedux
+      const { id, quantity, price, discountId } = product;
+
+      // Ensure `id` is mapped to `productId`
+      const productId = id;
+
+      // Check if the product already exists in the user's cart
+      // Check if the product already exists in the cart
+      let cart = await Cart.findOne({
+        isActive: true,
+        userId: userId,
+        "products.productId": productId,
+      });
+     // console.log('cart data  --', cart)
+
+      if (cart) {
+        // Update the matching product in the cart
+       // console.log('cart data  if--', cart)
+        // await Cart.updateOne(
+        //   { isActive: true, userId: userId, "products.productId": productId },
+        //   {
+        //     $set: {
+        //       "products.$.quantity": product.quantity,
+        //       "products.$.price": product.price,
+        //       "products.$.discountId": product.discountId || null,
+        //     },
+        //   }
+        // );
+      } else {
+        // Add the product to the cart if not found
+       // console.log('cart data  else--', cart)
+        cart = new Cart({
+          userId: userId,
+          isActive: true,
+          products: [{
+            productId: product.id,
+            quantity: product.quantity,
+            price: product.price,
+            discountId: product.discountId || null,
+          }],
+        });
+
+        await cart.save();
+      }
+    }
+
+    return { message: "Cart updated successfully" };
+  } catch (error) {
+    console.error("Error:", error);
+    throw new Error("Error updating cart data.");
+  }
 }
