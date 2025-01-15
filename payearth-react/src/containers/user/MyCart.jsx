@@ -110,8 +110,8 @@ class MyCart extends Component {
                     mergedCart[existingProductIndex] = {
                         ...mergedCart[existingProductIndex],
                         quantity: product?.qty,
-                        discountId: product?.discountId.id,
-                        discountPercent: product?.discountId.discount
+                        discountId: product?.discountId?.id || null,
+                        discountPercent: product?.discountId?.discount || 0
                     };
                 } else {
                     console.log('Adding new product from DB to cart:', product);
@@ -121,8 +121,8 @@ class MyCart extends Component {
                         name: product?.productId?.name || 'Unknown Name',
                         price: product?.price || 0,
                         quantity: product?.qty || 1,
-                        discountId: product?.productId?.discountId.id || null,
-                        discountPercent: product?.productId?.discountId.discount || 0
+                        discountId: product?.productId?.discountId?.id || null,
+                        discountPercent: product?.productId?.discountId?.discount || 0
                     });
                 }
             });
@@ -143,9 +143,9 @@ class MyCart extends Component {
         }
 
         console.log('Updating Redux cart with merged data:', mergedCart);
-        dispatch(updateCart(mergedCart)); 
+        dispatch(updateCart(mergedCart));
 
-       //toast.success('Cart data successfully updated!', { autoClose: 3000 });
+        //toast.success('Cart data successfully updated!', { autoClose: 3000 });
     };
 
 
