@@ -4713,7 +4713,7 @@ async function productSalesGraph(req) {
         const results = await OrderStatus.aggregate([
             {
                 $match: {
-                    title: "Delivered",
+                    title: "Delivered",         
                     product: { $ne: null },
                     createdAt: {
                         $gte: new Date(`${yearInt}-01-01T00:00:00Z`),

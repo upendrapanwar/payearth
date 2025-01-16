@@ -85,6 +85,7 @@ module.exports = {
   addToCart,
   updateToCart,
   deleteFromCart,
+  clearFromCart,
   productReduceStock,
 
   // updateToCartDiscountId,
@@ -1382,6 +1383,25 @@ async function deleteFromCart(req) {
     const data = await Cart.findOneAndDelete({
       userId: param.user_id,
       'products.productId': param.productId,
+    });
+    if (data) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (err) {
+    console.log("Error", err);
+    return false;
+  }
+}
+
+async function clearFromCart(req) {
+  try {
+     console.log('clearFromCart---', req.body)
+    var param = req.body;
+    // console.log('deleteFromCart---', param)
+    const data = await Cart.deleteMany({ 
+      userId: param.userId,
     });
     if (data) {
       return true;
