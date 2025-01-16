@@ -4915,33 +4915,33 @@ async function getOpenedTicketMessage(req) {
 // Orders
 
 async function getProductOrders(req) {
-  const { status, title } = req.query;
+  const { status, title, sellerId } = req.query; 
   try {
     const query = {
       isActive: status,
-      title: title
+      title: title,
+      service: null
     };
 
-    console.log("query:", query)
-    const fieldsToSelect = "product";
     const data = await OrderStatus.find(query)
-      // .populate([
-      //   {
-      //     path: "product.productId",
-      //     model: Product,
-      //     select: "createdBy",
-      //     populate: [{
-      //       path: "createdBy",
-      //       model: Seller,
-      //       select: "name"
-      //     }]
-      //   }
-      // ])
-      .populate('product.productId') // Populate productId inside product object
-      .populate('product.productId.createdBy', 'name email');
-    console.log("data", data)
+      .populate({
+        path: 'product.productId',
+        populate: { path: 'createdBy', select: 'name email' }, 
+      })
+      .populate('userId');
+      console.log('data---not filterd---',data)
+      
+    const filteredData = data.filter(order =>
+      order.product.productId.some(product =>
+        product.createdBy?._id.toString() === sellerId
+      )
+    );
+
+    const Data = JSON.stringify(filteredData, null, 2);
+    console.log('Filtered Data:', Data);
+    return filteredData;
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching product orders:", error);
   }
 }
 

@@ -4,9 +4,10 @@ import {
   useStripe,
   useElements
 } from "@stripe/react-stripe-js";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { clearCart } from "../../../store/reducers/cart-slice-reducer";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 export default function CheckoutForm() {
   const stripe = useStripe();
@@ -17,10 +18,13 @@ export default function CheckoutForm() {
 
   const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const authInfo = useSelector(state => state.auth.authInfo);
+  const userId = authInfo.id
 
   const remove = () => {
+    console.log('remove----run')
     dispatch(clearCart());
+    clearCartOfdatabase(userId);
   };
 
   const handleSubmit = async (e) => {
@@ -51,6 +55,38 @@ export default function CheckoutForm() {
       return;
     }
   };
+
+
+  const clearCartOfdatabase = async (userId) => {
+    console.log('clearCartOfdatabase----userId', userId)
+
+    axios.delete('user/clearfromcart',  {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Authorization': `Bearer ${authInfo.token}`
+      },
+       data: {
+        userId: userId
+      }
+    }).then(response => {
+      if (response.data.status) {
+        
+      }
+    }).catch(error => {
+      if (error.response) {
+        console.log('error.response',error.response);
+        //toast.error(error.response.data.message, {autoClose: 3000});
+      }
+    }).finally(() => {
+      console.log('removeItem');
+      /*setTimeout(() => {
+          dispatch(setLoading({loading: false}));
+      }, 300);*/
+    });
+
+
+  }
 
   const paymentElementOptions = {
     layout: "tabs"

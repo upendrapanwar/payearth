@@ -177,6 +177,7 @@ router.post("/savelater", addToSaveLater);
 router.post("/addtocart", addToCart);
 router.post("/updatetocart", updateToCart);
 router.post("/deletefromcart", deleteFromCart);
+router.delete("/clearfromcart", clearFromCart);
 router.put("/productReduceStock", productReduceStock);
 // router.post("/updateToCartDiscountId", updateToCartDiscountId);
 
@@ -712,6 +713,21 @@ function updateToCart(req, res, next) {
 function deleteFromCart(req, res, next) {
   userService
     .deleteFromCart(req)
+    .then((cart) =>
+      cart
+        ? res.status(201).json({ status: true, data: cart })
+        : res
+          .status(400)
+          .json({ status: false, message: msg.common.no_data_err, data: {} })
+    )
+    .catch((err) =>
+      next(res.status(400).json({ status: false, message: err }))
+    );
+}
+
+function clearFromCart(req, res, next) {
+  userService
+    .clearFromCart(req)
     .then((cart) =>
       cart
         ? res.status(201).json({ status: true, data: cart })

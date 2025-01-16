@@ -30,6 +30,7 @@ import logoutIcon from "./../../../assets/icons/logout.svg";
 import serviceIcon from "./../../../assets/icons/services_icon.svg";
 import { authVerification } from "../../../helpers/auth-verification";
 import io from 'socket.io-client';
+import { clearCart } from '../../../store/reducers/cart-slice-reducer';
 
 
 const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProductsData }) => {
@@ -135,6 +136,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
     dispatch(setLoginStatus({ isLoggedIn: false }));
     dispatch(setUserInfo({ userInfo: [] }));
     dispatch(setIsService({ isService: 0 }));
+    dispatch(clearCart());
     setIsToggle(false);
     history.push('/');
   };
