@@ -114,7 +114,7 @@ class ServiceCheckOut extends Component {
                 body: JSON.stringify({
                     paymentMethodId: token.id,
                     email: this.userInfo.email,
-                    amount: this.state.serviceDetails.charges * 100,
+                    amount: this.state.serviceDetails.result.charges * 100,
                     authName: this.userInfo.name
                 }),
             });
@@ -361,13 +361,13 @@ class ServiceCheckOut extends Component {
 
             if (this.state.serviceDetails !== null) {
                 const payload = {
-                    status: "Order complete",
+                    status: "charges_paid",
                     userId: this.authInfo.id,
                     paymentId: paymentId,
                     product: null,
                     service: {
-                        serviceId: this.state.serviceDetails.id,
-                        serviceCode: this.state.serviceDetails.serviceCode,
+                        serviceId: this.state.serviceDetails.result.id,
+                        serviceCode: this.state.serviceDetails.result.serviceCode,
                     },
                     serviceCreateCharge: null,
                     subscriptionPlan: null
@@ -602,7 +602,7 @@ class ServiceCheckOut extends Component {
 
         const { expiryDate, selectCard, isLoading, stripeResponse, serviceDetails } = this.state;
         console.log("serviceDetails in service checkout: ", serviceDetails)
-        console.log("serviceDetails charges:>", serviceDetails.charges)
+        console.log("serviceDetails charges:>", serviceDetails.result.charges)
         //  const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
         //  console.log("Date form create banner pages", subscriptionPlanData)
 
@@ -684,15 +684,15 @@ class ServiceCheckOut extends Component {
                                     <div className="payment_method_section">
                                         <div className="payment_list">
                                             <ul>
-                                                <li>Service Name : <b>{serviceDetails.name}</b></li>
-                                                <li>Service Category : <b>{serviceDetails.category.categoryName}</b></li>
-                                                <li>Charges : <b>{serviceDetails.charges} $</b></li>
+                                                <li>Service Name : <b>{serviceDetails.result.name}</b></li>
+                                                <li>Service Category : <b>{serviceDetails.result.category.categoryName}</b></li>
+                                                <li>Charges : <b>{serviceDetails.result.charges} $</b></li>
                                                 {/* <li>Tax(18%) : {this.getTotal().tax}$ </li> */}
                                             </ul>
                                         </div>
                                         <div className="subtotal_wrapper">
                                             <ul>
-                                                <li>Total Amount : <b>{serviceDetails.charges} $</b></li>
+                                                <li>Total Amount : <b>{serviceDetails.result.charges} $</b></li>
                                             </ul>
                                         </div>
                                         {/* STRIPE FORM  */}
@@ -723,7 +723,7 @@ class ServiceCheckOut extends Component {
                                                     }}
                                                 />
                                                 <div className="text-center" >
-                                                    <button type="submit" className="btn btn-success" disabled={isLoading} >  {isLoading ? 'Please wait....' : `PAY ( $ ${serviceDetails.charges})`} </button>
+                                                    <button type="submit" className="btn btn-success" disabled={isLoading} >  {isLoading ? 'Please wait....' : `PAY ( $ ${serviceDetails.result.charges})`} </button>
                                                 </div>
                                             </form>
                                         </div>
