@@ -165,6 +165,7 @@ import EditCoupon from "./containers/admin/EditCoupon";
 
 
 import DealListedItems from "./components/user/home/DealListedItems";
+import AdminManageDeals from "./containers/admin/ManageDeals"
 
 
 function App() {
@@ -1201,6 +1202,14 @@ function App() {
             path="/deal-ofthe-day"
             restricted={false}
             component={DealListedItems}
+            exact
+          />
+
+          <PrivateRoute
+            path="/admin/manage_deals"
+            component={AdminManageDeals}
+            roles={[Role.super_admin, Role.admin, Role.manager]}
+            currentUserRole={userInfo.role}
             exact
           />
 

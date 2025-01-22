@@ -55,11 +55,10 @@ module.exports = {
     statusBrand,
     brandPopularStatus,
 
-    createDeal,
-    editDeal,
+
     getDeals,
-    deleteDeal,
     statusDeal,
+    getDealsById,
 
     createBanner,
     editBanner,
@@ -1122,100 +1121,33 @@ async function brandPopularStatus(req) {
 
 
 //Deal
-
-async function createDeal(req) {
-    var file = req.file;
-    var param = req.body;
-    var bannerUrl = '';
-
-    if (await TodayDeal.findOne({ title: param.title })) { throw 'Deal Title "' + param.title + '" already exists.'; }
-
-    if (typeof file != "undefined") {
-        bannerUrl = file.destination + "/" + file.filename;
-    }
-
-    const input = {
-        "title": param.title,
-        "isActive": param.is_active,
-        "bannerImage": bannerUrl,
-        "categoryId": param.category_id,
-        "subCategoryId": param.subcategory_id,
-        "createdBy": param.admin_id,
-        "updatedBy": param.admin_id,
-    };
-
-    const deal = new Deal(input);
-    const data = await deal.save();
-
-    if (data) {
-        return await TodayDeal.findById(data.id).select();
-    } else {
-        return false;
-    }
-
-}
-
-async function editDeal(req) {
-    var file = req.file;
-    var param = req.body;
-    var bannerUrl = '';
-
-    const id = req.params.id;
-
-    const deal = await TodayDeal.findById(id);
-
-    if (!deal) return false;
-
-    if (deal.title !== param.name && (await TodayDeal.findOne({ title: param.name }))) {
-        throw 'Deal Name "' + param.name + '" already exists.';
-    }
-
-    if (typeof file != "undefined") {
-
-        if (fs.existsSync(brand.bannerImage)) {
-            fs.unlinkSync(brand.bannerImage);
-        }
-
-        bannerUrl = file.destination + "/" + file.filename;
-    }
-
-    const input = {
-        "title": param.name,
-        "isActive": param.is_active,
-        "bannerImage": bannerUrl,
-        "categoryId": param.category_id,
-        "subCategoryId": param.subcategory_id,
-        "createdBy": param.admin_id,
-        "updatedBy": param.admin_id,
-    };
-
-    Object.assign(deal, input);
-
-    const data = await deal.save();
-
-    if (data) {
-        return await TodayDeal.findById(data.id).select();
-    } else {
-        return false;
-    }
-}
-
 async function getDeals() {
-    const result = await TodayDeal.find().select().sort({ createdAt: 'desc' });
-
+    console.log("getDeals");
+    const result = await TodayDeal.find()
+      .select()
+      .sort({ createdAt: "desc" })
+      .populate("sellerId", "name email")
+  
     if (result && result.length > 0) return result;
-
+  
     return false;
-}
-
-
-async function deleteDeal(id) {
-    const admin = TodayDeal.findById(id);
-
-    if (!admin) return false;
-
-    return await TodayDeal.findByIdAndRemove(id);
-}
+  }
+  
+  async function getDealsById(req, res) {
+    const id = req.params.id;
+    console.log("id", id);
+    try {
+      const deal = await TodayDeal.findById(id).populate("productId");
+      if (!deal) {
+        return false;
+      }
+      // console.log('deal',deal)
+      return deal;
+    } catch (error) {
+      console.error("Error fetching the deal", error);
+      return false;
+    }
+  }
 
 
 async function statusDeal(req) {
