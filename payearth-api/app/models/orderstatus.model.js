@@ -11,7 +11,7 @@ const schema = new Schema({
         size: { type: String, default: "" },
     },
     service: {
-        serviceId: { type: Schema.Types.ObjectId, ref: "Service" },
+        serviceId: { type: Schema.Types.ObjectId, ref: "Services" },
         serviceCode: { type: String, default: "" }
     },
     subscriptionPlan: {

@@ -177,7 +177,10 @@ module.exports = {
 
   getTopSellingCategories,
   productSalesGraph,
-
+  serviceSalesGraph,
+  getListedProductData,
+  getListedServicesData,
+  getOrderDetails,
 
 };
 
@@ -1573,7 +1576,7 @@ async function needHelp(req) {
   }
 }
 
-async function contactUs(req) {
+async function contactUs(req, res) {
   const param = req.body;
 
   const result = new SellerContactUs({
@@ -1601,68 +1604,82 @@ async function contactUs(req) {
   }
 }
 
-async function getDashboardCounters(id) {
+async function getDashboardCounters(req) {
+  //  console.log('getDashboardCounters----', req.params.id);
+  const id = req.params.id;
   try {
-    //to get count of total products of seller
-    const totalProducts = await Product.find({
+    const totalProducts = await Product.countDocuments({
       isActive: true,
       isService: false,
       createdBy: id,
-    }).countDocuments();
+    });
 
-    //to get count of total services of seller
-    const totalServices = await Product.find({
+    const totalServices = await Services.countDocuments({
       isActive: true,
-      isService: true,
       createdBy: id,
-    }).countDocuments();
+    });
 
-    //to get count of total orders of seller
-    const totalOrders = await Order.find({
+
+    const totalProductOrders = await OrderStatus.find({
       isActive: true,
-      sellerId: id,
-    }).countDocuments();
+      "product.productId": { $exists: true, $ne: [] }
+    })
+      .populate({
+        path: "product.productId",
+        match: { createdBy: mongoose.Types.ObjectId(id) },
+        select: "createdBy"
+      });
 
-    //to get sum of payments amount of seller
-    const sellerId = mongoose.Types.ObjectId(id);
-    const totalPaymentAmount = await Payment.aggregate([
-      {
-        $match: {
-          sellerId: sellerId,
-          isActive: true,
-        },
-      },
-      {
-        $group: {
-          _id: "$id",
-          total: {
-            $sum: "$amountPaid",
-          },
-        },
-      },
-    ]);
 
-    let result = {
-      totalOrders: totalOrders,
-      totalPaymentAmount:
-        totalPaymentAmount && totalPaymentAmount[0]
-          ? totalPaymentAmount[0].total
-          : 0,
-      totalProducts: totalProducts,
-      totalServices: totalServices,
+    const totalServiceOrders = await OrderStatus.find({
+      isActive: true,
+      "service.serviceId": { $exists: true, $ne: null }
+    })
+      .populate({
+        path: "service.serviceId",
+        match: { createdBy: id },
+        select: "createdBy"
+      });
+
+
+    const filteredProductOrders = totalProductOrders.filter(order => {
+      if (order.product && order.product.productId) {
+        return order.product.productId.some(product =>
+          product.createdBy && product.createdBy.toString() === id.toString()
+        );
+      }
+      return false;
+    });
+
+    const filteredServiceOrders = totalServiceOrders.filter(order => {
+      if (order.service && order.service.serviceId) {
+        return order.service.serviceId.createdBy &&
+          order.service.serviceId.createdBy.toString() === id.toString();
+      }
+      return false;
+    });
+
+    // console.log("Total Product Orders: ", filteredProductOrders.length); 
+    // console.log("Total service Orders: ", filteredServiceOrders.length); 
+
+    const result = {
+      totalProducts: totalProducts || 0,
+      totalServices: totalServices || 0,
+      totalProductOrders: filteredProductOrders.length || 0,
+      totalServiceOrders: filteredServiceOrders.length || 0,
     };
     return result;
   } catch (err) {
-    console.log("Error", err);
-    return false;
+    console.error("Error in getDashboardCounters:", err);
+    throw err;
   }
 }
 
 async function getProductSales(req) {
   try {
     var param = req.body;
-    var id = req.params.id; //seller id
-    var sortOption = { createdAt: "desc" }; //default
+    var id = req.params.id;
+    var sortOption = { createdAt: "desc" };
     var page = 0;
     var limit = 5;
     var skip = 0;
@@ -4915,7 +4932,7 @@ async function getOpenedTicketMessage(req) {
 // Orders
 
 async function getProductOrders(req) {
-  const { status, title, sellerId } = req.query; 
+  const { status, title, sellerId } = req.query;
   try {
     const query = {
       isActive: status,
@@ -4926,11 +4943,11 @@ async function getProductOrders(req) {
     const data = await OrderStatus.find(query)
       .populate({
         path: 'product.productId',
-        populate: { path: 'createdBy', select: 'name email' }, 
+        populate: { path: 'createdBy', select: 'name email' },
       })
       .populate('userId');
-      console.log('data---not filterd---',data)
-      
+    console.log('data---not filterd---', data)
+
     const filteredData = data.filter(order =>
       order.product.productId.some(product =>
         product.createdBy?._id.toString() === sellerId
@@ -5061,132 +5078,195 @@ async function getCreatedDeals(req) {
 
 async function getTopSellingCategories(req) {
   try {
-    const { authorId } = req.body;
-    const topSellingCategories = await OrderStatus.find({ authorId: authorId, title: "Delivered" }).select('product')
-      .populate([
-        {
-          path: "product.productId",
-          model: Product,
-          select: "category",
-          populate: {
-            path: "category",
-            model: Category,
-            select: "categoryName"
-          }
-        }
-      ]);
+    // const sellerId = req.query.authorId;
+    // console.log('getTopSellingCategories---authorId',sellerId)
+    // const topSellingCategories = await OrderStatus.find({ title: "Delivered" }).select('product')
+    //   .populate([
+    //     {
+    //       path: "product.productId",
+    //       model: Product,
+    //       select: "category",
+    //       populate: {
+    //         path: "category",
+    //         model: Category,
+    //         select: "categoryName"
+    //       }
+    //     }
+    //   ]);
 
-    if (!topSellingCategories || topSellingCategories.length === 0) {
-      return {
-        status: false,
-        data: [],
+    // if (!topSellingCategories || topSellingCategories.length === 0) {
+    //   return {
+    //     status: false,
+    //     data: [],
+    //   };
+    // }
+    // const categoryCounts = {};
+    // topSellingCategories.forEach(order => {
+    //   const product = order.product?.productId;
+    //   const category = product[0]?.category;
+    //   if (category) {
+    //     const categoryId = category._id.toString();
+    //     const categoryName = category.categoryName;
+
+    //     if (!categoryCounts[categoryId]) {
+    //       categoryCounts[categoryId] = {
+    //         id: categoryId,
+    //         name: categoryName,
+    //         count: 0,
+    //       };
+    //     }
+    //     categoryCounts[categoryId].count++;
+    //   }
+    // });
+    // const sortedCategories = Object.values(categoryCounts)
+    //   .sort((a, b) => b.count - a.count);
+
+    // const top4Categories = sortedCategories.slice(0, 4);
+    // // console.log('top4Categories---',top4Categories)
+    // return {
+    //   status: true,
+    //   data: top4Categories,
+    // };
+
+
+    const sellerId = req.query.authorId;
+console.log('getTopSellingCategories---authorId', sellerId);
+
+const topSellingCategories = await OrderStatus.find({ title: "Delivered" }).select('product')
+  .populate([
+    {
+      path: "product.productId",
+      model: Product,
+      select: "category createdBy", // Include `createdBy` to filter by sellerId
+      match: { createdBy: mongoose.Types.ObjectId(sellerId) }, // Filter products by `createdBy` field matching sellerId
+      populate: {
+        path: "category",
+        model: Category,
+        select: "categoryName",
+      },
+    },
+  ]);
+
+if (!topSellingCategories || topSellingCategories.length === 0) {
+  return {
+    status: false,
+    data: [],
+  };
+}
+
+const categoryCounts = {};
+topSellingCategories.forEach(order => {
+  const product = order.product?.productId;
+  const category = Array.isArray(product) ? product[0]?.category : product?.category;
+
+  if (category) {
+    const categoryId = category._id.toString();
+    const categoryName = category.categoryName;
+
+    if (!categoryCounts[categoryId]) {
+      categoryCounts[categoryId] = {
+        id: categoryId,
+        name: categoryName,
+        count: 0,
       };
     }
-    const categoryCounts = {};
-    topSellingCategories.forEach(order => {
-      const product = order.product?.productId;
-      const category = product[0]?.category;
-      if (category) {
-        const categoryId = category._id.toString();
-        const categoryName = category.categoryName;
+    categoryCounts[categoryId].count++;
+  }
+});
 
-        if (!categoryCounts[categoryId]) {
-          categoryCounts[categoryId] = {
-            id: categoryId,
-            name: categoryName,
-            count: 0,
-          };
-        }
-        categoryCounts[categoryId].count++;
-      }
-    });
-    const sortedCategories = Object.values(categoryCounts)
-      .sort((a, b) => b.count - a.count);
+const sortedCategories = Object.values(categoryCounts)
+  .sort((a, b) => b.count - a.count);
 
-    const top4Categories = sortedCategories.slice(0, 4);
-    return {
-      status: true,
-      data: top4Categories,
-    };
+const top4Categories = sortedCategories.slice(0, 4);
+
+return {
+  status: true,
+  data: top4Categories,
+};
+
 
   } catch (error) {
     console.log("error", error)
   }
 }
+/****************************************************************************************** */
 
 // async function productSalesGraph(req, res) {
 //   try {
-//     const { year, timeFrame, authorId } = req.query;
+//     const { year, timeFrame, authorId, month } = req.query;
 
-//     // console.log("year", year);
-//     // console.log("timeFrame", timeFrame);
-//     // console.log("authorId", authorId);
+//     console.log("Query Parameters - year:", year, "timeFrame:", timeFrame, "authorId:", authorId, "month:", month);
 
-//     if (!year) {
-//       return { success: false, message: "Year is required" };
-//     }
-
-//     if (!timeFrame || !["week", "month", "year"].includes(timeFrame)) {
-//       return { success: false, message: "Invalid time frame. Use 'week', 'month', or 'year'." };
-//     }
-
-//     if (!authorId) {
-//       return { success: false, message: "Author ID is required" };
+//     // Validate required parameters
+//     if (!year || !timeFrame || !["week", "month", "year"].includes(timeFrame) || !authorId) {
+//       return res.status(400).json({ error: "Invalid query parameters." });
 //     }
 
 //     const yearInt = parseInt(year, 10);
+//     const authorObjectId = mongoose.Types.ObjectId(authorId);
+//     let validMonth = month && month >= 1 && month <= 12 ? parseInt(month, 10) : null;
 
+//     // Ensure month is within valid range (1-12), if invalid, default to 1 (January)
+//     if (validMonth === 0) {
+//       validMonth = 1;
+//     }
+
+//     // Construct the match stage
 //     const matchStage = {
 //       title: "Delivered",
 //       product: { $ne: null },
-//       userId: authorId,
+//       "product.productId": { $exists: true, $not: { $size: 0 } },
 //       createdAt: {
 //         $gte: new Date(`${yearInt}-01-01T00:00:00Z`),
 //         $lte: new Date(`${yearInt}-12-31T23:59:59Z`),
 //       },
 //     };
 
-
-//     let groupStage;
-
-//     if (timeFrame === "week") {
-//       groupStage = {
-//         _id: { week: { $week: "$createdAt" }, year: { $year: "$createdAt" } },
-//         count: { $sum: 1 },
-//       };
-//     } else if (timeFrame === "month") {
-//       groupStage = {
-//         _id: { month: { $month: "$createdAt" }, year: { $year: "$createdAt" } },
-//         count: { $sum: 1 },
-//       };
-//     } else if (timeFrame === "year") {
-//       groupStage = {
-//         _id: { year: { $year: "$createdAt" } },
-//         count: { $sum: 1 },
-//       };
+//     // If a specific month is provided, filter the records by that month
+//     if (validMonth) {
+//       console.log('validMonth---', validMonth);
+//       const startOfMonth = new Date(`${yearInt}-${validMonth < 10 ? '0' + validMonth : validMonth}-01T00:00:00Z`);
+//       const endOfMonth = validMonth === 12
+//         ? new Date(`${yearInt + 1}-01-01T00:00:00Z`)
+//         : new Date(`${yearInt}-${validMonth + 1 < 10 ? '0' + (validMonth + 1) : validMonth + 1}-01T00:00:00Z`);
+//       matchStage.createdAt = { $gte: startOfMonth, $lt: endOfMonth }; // Apply the filter by month
 //     }
 
-//     // console.log("groupStage", groupStage);
-//     // console.log("matchStage", matchStage);
-
+//     // Perform the aggregation
 //     const results = await OrderStatus.aggregate([
 //       { $match: matchStage },
-//       { $group: groupStage },
+//       {
+//         $lookup: {
+//           from: "products",
+//           localField: "product.productId",
+//           foreignField: "_id",
+//           as: "productDetails",
+//         },
+//       },
+//       { $unwind: "$productDetails" },
+//       {
+//         $match: {
+//           "productDetails.createdBy": authorObjectId,
+//         },
+//       },
+//       {
+//         $group: {
+//           _id: timeFrame === "week"
+//             ? { week: { $week: "$createdAt" }, year: { $year: "$createdAt" }, month: { $month: "$createdAt" } }
+//             : timeFrame === "month"
+//               ? { month: { $month: "$createdAt" }, year: { $year: "$createdAt" } }
+//               : { year: { $year: "$createdAt" } },
+//           count: { $sum: 1 },
+//         },
+//       },
 //       { $sort: { "_id.year": 1, "_id.month": 1, "_id.week": 1 } },
 //     ]);
 
-//     console.log("results", results)
+//     console.log("Aggregation Results:", results);
 
-//     let formattedResults;
-
-//     if (timeFrame === "week") {
-//       formattedResults = results.map((item) => ({
-//         week: item._id.week,
-//         year: item._id.year,
-//         count: item.count,
-//       }));
-//       console.log("week")
-//     } else if (timeFrame === "month") {
+//     // Format the results
+//     let formattedResults = [];
+//     if (timeFrame === "month") {
 //       const monthsArray = [
 //         { month: 1, monthName: "Jan" },
 //         { month: 2, monthName: "Feb" },
@@ -5202,170 +5282,671 @@ async function getTopSellingCategories(req) {
 //         { month: 12, monthName: "Dec" },
 //       ];
 
-//       formattedResults = monthsArray.map((month) => {
-//         const found = results.find((r) => r._id.month === month.month);
-
+//       formattedResults = monthsArray.map((monthObj) => {
+//         const found = results.find((r) => r._id.month === monthObj.month);
 //         return {
-//           month: month.month,
-//           monthName: month.monthName,
+//           month: monthObj.month,
+//           monthName: monthObj.monthName,
 //           count: found ? found.count : 0,
 //         };
 //       });
-//       console.log("month")
+//     } else if (timeFrame === "week") {
+//       // Filter by the validMonth if provided
+//       formattedResults = results
+//         .filter((r) => (validMonth ? r._id.month === validMonth : true))
+//         .map((item) => ({
+//           week: item._id.week,
+//           year: item._id.year,
+//           month: item._id.month,
+//           count: item.count,
+//         }));
 //     } else if (timeFrame === "year") {
 //       formattedResults = results.map((item) => ({
 //         year: item._id.year,
 //         count: item.count,
 //       }));
-//       console.log("year")
 //     }
 
-//     console.log("formattedResults", formattedResults)
-//     return { success: true, data: formattedResults };
+//     console.log("Formatted Results:", formattedResults);
+
+//     // Return the formatted results in the response
+//     return formattedResults;
 //   } catch (error) {
-//     console.error("Error fetching data:", error);
-//     res.status(500).json({ success: false, message: "Internal Server Error" });
+//     console.error("Error fetching data:", error.message);
+//     return res.status(500).json({ error: "Internal server error." });
 //   }
-
-
-
-
-
 // }
-
 
 
 async function productSalesGraph(req, res) {
   try {
-    const { year, timeFrame, authorId } = req.query;
+    const { year, timeFrame, authorId, month } = req.query;
 
-    const orders = await OrderStatus.find({ title: "Delivered" })
-      // .populate([
-      //   {
-      //     path: "product.productId",
-      //     match: { createdBy: authorId },
-      //   }
-      // ]);
+    if (!year || !timeFrame || !["week", "month", "year"].includes(timeFrame) || !authorId) {
+      return false;
+    }
 
-      .populate([
+    const yearInt = parseInt(year, 10);
+    const authorObjectId = mongoose.Types.ObjectId(authorId);
+    const validMonth = month && month >= 1 && month <= 12 ? parseInt(month, 10) : null;
+
+
+    const matchStage = {
+      title: "Delivered",
+      product: { $ne: null },
+      "product.productId": { $exists: true, $not: { $size: 0 } },
+      createdAt: {
+        $gte: new Date(`${yearInt}-01-01T00:00:00Z`),
+        $lte: new Date(`${yearInt}-12-31T23:59:59Z`),
+      },
+    };
+
+
+    if (validMonth) {
+      const startOfMonth = new Date(`${yearInt}-${validMonth.toString().padStart(2, "0")}-01T00:00:00Z`);
+      const endOfMonth = validMonth === 12
+        ? new Date(`${yearInt + 1}-01-01T00:00:00Z`)
+        : new Date(`${yearInt}-${(validMonth + 1).toString().padStart(2, "0")}-01T00:00:00Z`);
+      matchStage.createdAt = { $gte: startOfMonth, $lt: endOfMonth };
+    }
+
+    let pipeline = [];
+
+    if (timeFrame === "month") {
+      pipeline = [
+        { $match: matchStage },
         {
-          path: "product.productId",
-          model: Product,
-          select: "createdBy",
-          populate: {
-            path: "createdBy",
-            model: Seller,
-            match: { createdBy: authorId },
-          }
-        }
-      ]);
+          $lookup: {
+            from: "products", 
+            localField: "product.productId",
+            foreignField: "_id",
+            as: "productDetails",
+          },
+        },
+        { $unwind: "$productDetails" },
+        {
+          $match: {
+            "productDetails.createdBy": authorObjectId, 
+          },
+        },
+        {
+          $addFields: {
+            month: { $month: "$createdAt" },
+            year: { $year: "$createdAt" },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              month: "$month",
+              year: "$year",
+            },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } },
+      ];
+    } else if (timeFrame === "week") {
+      pipeline = [
+        { $match: matchStage },
+        {
+          $lookup: {
+            from: "products",
+            localField: "product.productId",
+            foreignField: "_id",
+            as: "productDetails",
+          },
+        },
+        { $unwind: "$productDetails" },
+        {
+          $match: {
+            "productDetails.createdBy": authorObjectId, // Ensures data belongs to the author
+          },
+        },
+        {
+          $addFields: {
+            weekInMonth: {
+              $ceil: {
+                $divide: [
+                  { $subtract: [{ $dayOfMonth: "$createdAt" }, 1] },
+                  7,
+                ],
+              },
+            },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              month: { $month: "$createdAt" },
+              year: { $year: "$createdAt" },
+              week: "$weekInMonth",
+            },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1, "_id.week": 1 } },
+      ];
+    } else if (timeFrame === "year") {
+      pipeline = [
+        { $match: matchStage },
+        {
+          $lookup: {
+            from: "products",
+            localField: "product.productId",
+            foreignField: "_id",
+            as: "productDetails",
+          },
+        },
+        { $unwind: "$productDetails" },
+        {
+          $match: {
+            "productDetails.createdBy": authorObjectId, // Ensures data belongs to the author
+          },
+        },
+        {
+          $match: {
+            createdAt: {
+              $gte: new Date(`${yearInt - 4}-01-01T00:00:00Z`), // Last 5 years
+              $lte: new Date(`${yearInt}-12-31T23:59:59Z`),
+            },
+          },
+        },
+        {
+          $group: {
+            _id: { year: { $year: "$createdAt" } },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { "_id.year": 1 } },
+      ];
+    }
 
-    console.log("orders", orders)
 
-    // if (!year) {
-    //   return { success: false, message: "Year is required" }
-    // }
-    // const yearInt = parseInt(year, 10);
+    const results = await OrderStatus.aggregate(pipeline);
 
-    // const monthsArray = [
-    //   { month: 1, monthName: "Jan" },
-    //   { month: 2, monthName: "Feb" },
-    //   { month: 3, monthName: "Mar" },
-    //   { month: 4, monthName: "Apr" },
-    //   { month: 5, monthName: "May" },
-    //   { month: 6, monthName: "Jun" },
-    //   { month: 7, monthName: "Jul" },
-    //   { month: 8, monthName: "Aug" },
-    //   { month: 9, monthName: "Sep" },
-    //   { month: 10, monthName: "Oct" },
-    //   { month: 11, monthName: "Nov" },
-    //   { month: 12, monthName: "Dec" },
-    // ];
+    let formattedResults = [];
 
-    // const results = await OrderStatus.aggregate([
-    //   {
-    //     $match: {
-    //       title: "Delivered",
-    //       product: { $ne: null },
-    //       createdAt: {
-    //         $gte: new Date(`${yearInt}-01-01T00:00:00Z`),
-    //         $lte: new Date(`${yearInt}-12-31T23:59:59Z`),
-    //       },
-    //     },
-    //   },
-    //   {
-    //     $lookup: {
-    //       from: "products", // Name of the Product collection
-    //       localField: "product.productId",
-    //       foreignField: "_id",
-    //       as: "productDetails",
-    //     },
-    //   },
-    //   {
-    //     $unwind: "$productDetails", // Flatten the productDetails array
-    //   },
-    //   {
-    //     $match: {
-    //       "productDetails.createdBy": authorId,
-    //     },
-    //   },
-    //   {
-    //     $group: {
-    //       _id: { month: { $month: "$createdAt" } },
-    //       count: { $sum: 1 },
-    //     },
-    //   },
-    //   {
-    //     $addFields: {
-    //       monthName: {
-    //         $arrayElemAt: [
-    //           [
-    //             "",
-    //             "Jan",
-    //             "Feb",
-    //             "Mar",
-    //             "Apr",
-    //             "May",
-    //             "Jun",
-    //             "Jul",
-    //             "Aug",
-    //             "Sep",
-    //             "Oct",
-    //             "Nov",
-    //             "Dec",
-    //           ],
-    //           "$_id.month",
-    //         ],
-    //       },
-    //     },
-    //   },
-    //   {
-    //     $project: {
-    //       _id: 0,
-    //       month: "$_id.month",
-    //       monthName: 1,
-    //       count: 1,
-    //     },
-    //   },
-    //   { $sort: { month: 1 } },
-    // ]);
 
-    // console.log("results", results)
+    if (timeFrame === "month") {
+      for (let monthIndex = 1; monthIndex <= 12; monthIndex++) {
+        const monthData = results.find(item => item._id.month === monthIndex);
+        formattedResults.push({
+          month: monthIndex,
+          year: yearInt,
+          count: monthData ? monthData.count : 0,
+        });
+      }
+    }
 
-    // const salesResults = monthsArray.map((month) => {
-    //   const found = results.find((r) => r.month === month.month);
-    //   return {
-    //     month: month.month,
-    //     monthName: month.monthName,
-    //     count: found ? found.count : 0,
-    //   };
-    // });
-    // return salesResults;
+    else if (timeFrame === "week") {
+      formattedResults = results.map(item => ({
+        week: item._id.week,
+        year: item._id.year,
+        count: item.count,
+      }));
+    }
+
+    else if (timeFrame === "year") {
+      formattedResults = results.map(item => ({
+        year: item._id.year,
+        count: item.count,
+      }));
+    }
+
+    //  console.log('product--formattedResults--', formattedResults);
+    return formattedResults;
   } catch (error) {
-    console.error("Error fetching data:", error);
-    return { success: false, message: "Internal Server Error" };
+    console.error("Error fetching data:", error.message);
+    return false;
   }
 }
 
 
 
+// async function serviceSalesGraph(req, res) {
+//   try {
+//     const { year, timeFrame, authorId, month } = req.query;
+//     console.log("Query Parameters - year:", year, "timeFrame:", timeFrame, "authorId:", authorId, "month:", month);
+
+//     if (!year || !timeFrame || !["week", "month", "year"].includes(timeFrame) || !authorId) {
+//       return false;
+//     }
+
+//     const yearInt = parseInt(year, 10);
+//     const authorObjectId = mongoose.Types.ObjectId(authorId);
+//     const validMonth = month && month >= 1 && month <= 12 ? parseInt(month, 10) : null;
+
+//     const matchStage = {
+//       title: "service_completed",
+//       service: { $ne: null },
+//       "service.serviceId": { $exists: true, $not: { $size: 0 } },
+//       createdAt: {
+//         $gte: new Date(`${yearInt}-01-01T00:00:00Z`),
+//         $lte: new Date(`${yearInt}-12-31T23:59:59Z`),
+//       },
+//     };
+
+//     if (validMonth) {
+//       const startOfMonth = new Date(`${yearInt}-${validMonth.toString().padStart(2, "0")}-01T00:00:00Z`);
+//       const endOfMonth = validMonth === 12
+//         ? new Date(`${yearInt + 1}-01-01T00:00:00Z`)
+//         : new Date(`${yearInt}-${(validMonth + 1).toString().padStart(2, "0")}-01T00:00:00Z`);
+//       matchStage.createdAt = { $gte: startOfMonth, $lt: endOfMonth };
+//     }
+
+//     const results = await OrderStatus.aggregate([
+//       { $match: matchStage },
+//       {
+//         $lookup: {
+//           from: "services",
+//           localField: "service.serviceId",
+//           foreignField: "_id",
+//           as: "serviceDetails",
+//         },
+//       },
+//       { $unwind: "$serviceDetails" },
+//       {
+//         $match: {
+//           "serviceDetails.createdBy": authorObjectId,
+//         },
+//       },
+//       ...(timeFrame === "week" || timeFrame === "month"
+//         ? [
+//             {
+//               $addFields: {
+//                 weekInMonth: {
+//                   $ceil: {
+//                     $divide: [
+//                       { $subtract: [{ $dayOfMonth: "$createdAt" }, 1] },
+//                       7,
+//                     ],
+//                   },
+//                 },
+//               },
+//             },
+//             {
+//               $group: {
+//                 _id: {
+//                   month: { $month: "$createdAt" },
+//                   year: { $year: "$createdAt" },
+//                   week: "$weekInMonth",
+//                 },
+//                 count: { $sum: 1 },
+//               },
+//             },
+//             { $sort: { "_id.year": 1, "_id.month": 1, "_id.week": 1 } },
+//           ]
+//         : timeFrame === "year"
+//         ? [
+//             {
+//               $match: {
+//                 createdAt: {
+//                   $gte: new Date(`${yearInt - 4}-01-01T00:00:00Z`), // Last 5 years
+//                   $lte: new Date(`${yearInt}-12-31T23:59:59Z`),
+//                 },
+//               },
+//             },
+//             {
+//               $group: {
+//                 _id: { year: { $year: "$createdAt" } },
+//                 count: { $sum: 1 },
+//               },
+//             },
+//             { $sort: { "_id.year": 1 } },
+//           ]
+//         : []), // Empty array for other cases (no additional stages)
+//     ]);
+
+//     console.log("Aggregation Results:", results);
+
+//     let formattedResults = [];
+//     if (timeFrame === "week" || timeFrame === "month") {
+//       formattedResults = results.map((item) => ({
+//         week: item._id.week,
+//         year: item._id.year,
+//         month: item._id.month,
+//         count: item.count,
+//       }));
+//     } else if (timeFrame === "year") {
+//       formattedResults = results.map((item) => ({
+//         year: item._id.year,
+//         count: item.count,
+//       }));
+//     }
+
+//     console.log("Formatted Results:", formattedResults);
+
+//     return formattedResults;
+//   } catch (error) {
+//     console.error("Error fetching data:", error.message);
+//     return false;
+//   }
+// }
+
+async function serviceSalesGraph(req, res) {
+  try {
+    const { year, timeFrame, authorId, month } = req.query;
+   // console.log("Query Parameters - year:", year, "timeFrame:", timeFrame, "authorId:", authorId, "month:", month);
+
+    if (!year || !timeFrame || !["week", "month", "year"].includes(timeFrame) || !authorId) {
+      return false;
+    }
+
+    const yearInt = parseInt(year, 10);
+    const authorObjectId = mongoose.Types.ObjectId(authorId);
+    const validMonth = month && month >= 1 && month <= 12 ? parseInt(month, 10) : null;
+
+    const matchStage = {
+      title: "service_completed",
+      service: { $ne: null },
+      "service.serviceId": { $exists: true, $not: { $size: 0 } },
+      createdAt: {
+        $gte: new Date(`${yearInt}-01-01T00:00:00Z`),
+        $lte: new Date(`${yearInt}-12-31T23:59:59Z`),
+      },
+    };
+
+    if (validMonth) {
+      const startOfMonth = new Date(`${yearInt}-${validMonth.toString().padStart(2, "0")}-01T00:00:00Z`);
+      const endOfMonth = validMonth === 12
+        ? new Date(`${yearInt + 1}-01-01T00:00:00Z`)
+        : new Date(`${yearInt}-${(validMonth + 1).toString().padStart(2, "0")}-01T00:00:00Z`);
+      matchStage.createdAt = { $gte: startOfMonth, $lt: endOfMonth };
+    }
+
+    const results = await OrderStatus.aggregate([
+      { $match: matchStage },
+      {
+        $lookup: {
+          from: "services",
+          localField: "service.serviceId",
+          foreignField: "_id",
+          as: "serviceDetails",
+        },
+      },
+      { $unwind: "$serviceDetails" },
+      {
+        $match: {
+          "serviceDetails.createdBy": authorObjectId,
+        },
+      },
+
+      ...(timeFrame === "month"
+        ? [
+          {
+            $addFields: {
+              month: { $month: "$createdAt" },
+              year: { $year: "$createdAt" },
+            },
+          },
+          {
+            $group: {
+              _id: {
+                month: "$month",
+                year: "$year",
+              },
+              count: { $sum: 1 },
+            },
+          },
+          { $sort: { "_id.year": 1, "_id.month": 1 } },
+        ]
+        : timeFrame === "week"
+          ? [
+            {
+              $addFields: {
+                weekInMonth: {
+                  $ceil: {
+                    $divide: [
+                      { $subtract: [{ $dayOfMonth: "$createdAt" }, 1] },
+                      7,
+                    ],
+                  },
+                },
+              },
+            },
+            {
+              $group: {
+                _id: {
+                  month: { $month: "$createdAt" },
+                  year: { $year: "$createdAt" },
+                  week: "$weekInMonth",
+                },
+                count: { $sum: 1 },
+              },
+            },
+            { $sort: { "_id.year": 1, "_id.month": 1, "_id.week": 1 } },
+          ]
+          : timeFrame === "year"
+            ? [
+              {
+                $match: {
+                  createdAt: {
+                    $gte: new Date(`${yearInt - 4}-01-01T00:00:00Z`),
+                    $lte: new Date(`${yearInt}-12-31T23:59:59Z`),
+                  },
+                },
+              },
+              {
+                $group: {
+                  _id: { year: { $year: "$createdAt" } },
+                  count: { $sum: 1 },
+                },
+              },
+              { $sort: { "_id.year": 1 } },
+            ]
+            : []),
+    ]);
+
+    // console.log("Aggregation Results:", results);
+
+    let formattedResults = [];
+
+    if (timeFrame === "month") {
+      for (let monthIndex = 1; monthIndex <= 12; monthIndex++) {
+        const monthData = results.find(item => item._id.month === monthIndex);
+        formattedResults.push({
+          month: monthIndex,
+          year: yearInt,
+          count: monthData ? monthData.count : 0,
+        });
+      }
+    }
+
+    else if (timeFrame === "week") {
+      formattedResults = results.map(item => ({
+        week: item._id.week,
+        year: item._id.year,
+        count: item.count,
+      }));
+    }
+
+    else if (timeFrame === "year") {
+      formattedResults = results.map(item => ({
+        year: item._id.year,
+        count: item.count,
+      }));
+    }
+
+    // console.log("Formatted Results:", formattedResults);
+
+    return formattedResults;
+  } catch (error) {
+    console.error("Error fetching data:", error.message);
+    return false;
+  }
+}
+
+
+async function getListedProductData(req) {
+  const { status, sellerId } = req.query;
+  try {
+    const query = {
+      isActive: status,
+      createdBy: sellerId
+    };
+    const fieldsToSelect = "id productCode name category sub_category brand price featuredImage quantity isActive";
+    let result = await Product.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect).limit(5)
+      .populate({
+        path: 'category',
+        match: { isVisible: true },
+        select: 'categoryName isActive'
+      })
+      .populate({
+        path: 'brand',
+        match: { isVisible: true },
+        select: 'brandName'
+      })
+
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function getListedServicesData(req) {
+  const { status, sellerId } = req.query;
+ // console.log('getListedServicesData---', req.query)
+  try {
+    const query = {
+      isActive: status,
+      createdBy: sellerId
+    };
+    const fieldsToSelect = "id serviceCode name category charges featuredImage reviews isActive";
+    let result = await Services.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect).limit(5)
+      .populate({
+        path: 'category',
+        match: { isVisible: true },
+        select: 'categoryName isActive'
+      })
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+async function getOrderDetails(req) {
+  const { status, sellerId } = req.query;
+  try {
+    const productOrders = await Order.find({
+      isService: false, 
+      isSubscription: false,
+      isActive: true, 
+    })
+      .select("orderCode orderStatus total discount")
+      .sort({ createdAt: 'desc' })
+      .limit(5)
+      .populate([
+        {
+          path: "orderStatus",
+          model: OrderStatus,
+          select: "title product", 
+          populate: {
+            path: "product.productId", 
+            match: { createdBy: mongoose.Types.ObjectId(sellerId) }, 
+            select: "createdBy", 
+          },
+        },
+        {
+          path: "paymentId",
+          model: Payment,
+          select: "invoiceNo amountPaid paymentMode",
+        },
+        {
+          path: "userId",
+          model: User,
+          select: "name email",
+        },
+      ])
+      .then(orders => {
+        return orders.filter(order =>
+          order.orderStatus &&
+          order.orderStatus.some(status =>
+            status.product &&
+            status.product.productId &&
+            Array.isArray(status.product.productId) && 
+            status.product.productId.some(product =>
+              product.createdBy && product.createdBy.toString() === sellerId.toString()
+            )
+          )
+        );
+      });
+    
+  //  console.log("Filtered Product Orders:", productOrders);
+    
+
+    const serviceOrders = await Order.find({
+      isService: true, 
+      isSubscription: false,
+      isActive: true, 
+    })
+      .select("orderStatus orderCode total discount userId paymentId")
+      .sort({ createdAt: 'desc' })
+      .limit(5)
+      .populate([
+        {
+          path: "orderStatus",
+          model: OrderStatus,
+          select: "title service",
+          populate: {
+            path: "service.serviceId", 
+            match: { createdBy: mongoose.Types.ObjectId(sellerId) }, 
+            select: "createdBy", 
+          },
+        },
+        {
+          path: "paymentId",
+          model: Payment,
+          select: "invoiceNo amountPaid paymentMode paymentAccount createdAt paymentStatus",
+        },
+        {
+          path: "userId",
+          model: User,
+          select: "name email",
+        },
+      ])
+      .then(orders => {
+        return orders.filter(order =>
+          order.orderStatus &&
+          order.orderStatus.some(status =>
+            status.service &&
+            status.service.serviceId &&
+            status.service.serviceId.createdBy &&
+            status.service.serviceId.createdBy.toString() === sellerId.toString()
+          )
+        );
+      });
+
+  //  console.log("Filtered Service Orders:", serviceOrders);
+
+
+    if (!productOrders.length && !serviceOrders.length) {
+      return {
+        status: false,
+        message: "No orders found for this user.",
+        data: {
+          productOrders: [],
+          serviceOrders: [],
+        },
+      };
+    }
+
+    return {
+      status: true,
+      message: "Orders retrieved successfully.",
+      data: {
+        productOrders,
+        serviceOrders,
+      },
+    };
+
+  } catch (err) {
+    console.error("Error fetching orders:", err);
+    return {
+      status: false,
+      message: "An error occurred while fetching orders.",
+      error: err.message,
+    };
+  }
+}
