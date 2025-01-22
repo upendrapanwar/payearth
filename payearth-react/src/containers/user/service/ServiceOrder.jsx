@@ -532,7 +532,7 @@ function ServiceOrder() {
                       </tbody>
                     </Table>
                     <div className="bg-light py-3 mt-5 px-4 rounded text-center">
-                      ****************************** terms and conditions.
+                      ****************************** terms and conditions*****************************
                     </div>
                   </div>
                 </div>

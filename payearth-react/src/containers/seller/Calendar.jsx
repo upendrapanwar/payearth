@@ -68,62 +68,6 @@ const Calendar = () => {
     }
   };
 
-  // test data
-
-  const eventAddInGoogleCalander = async (eventsData) => {
-    const eventData = {
-      start: eventsData.start,
-      end: eventsData.end,
-      summary: eventsData.title,
-      description: eventsData.description,
-      location: "Online Meeting",
-      conferenceData: {
-        createRequest: {
-          requestId: `meeting-${Date.now()}`, // Unique ID for the request
-          conferenceSolutionKey: {
-            type: "hangoutsMeet" // Specifies Google Meet
-          }
-        }
-      }
-    };
-
-    try {
-      const accessToken = localStorage.getItem("accessToken");
-      const addEvent = await axios.post(
-        `https://www.googleapis.com/calendar/v3/calendars/primary/events?conferenceDataVersion=1`,
-        eventData,
-        {
-          headers: {
-            "Authorization": `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-          },
-        })
-
-      if (addEvent.data.status === "confirmed") {
-
-        console.log("addEvent show..", addEvent)
-
-        //   const meetLink = addEvent.data.conferenceData.entryPoints?.find(
-        //     (entryPoint) => entryPoint.entryPointType === "video"
-        //   )?.uri;
-
-        //   console.log("meetLink", meetLink)
-        //   toast.success("Event added successfully");
-        //   setFormOpen(false);
-        //   // await saveCalendarEvents(meetLink)
-        //   // await fetchGoogleEvents();
-      }
-    } catch (error) {
-      if (error.response && error.response.data.error === 'Request had insufficient authentication scopes.') {
-        // toast.error("Insufficient scope. Please reauthenticate and grant the necessary permissions.");
-      } else {
-        // toast.error("Event hasn't added");
-      }
-      console.error("Error submitting form:", error);
-    }
-  }
-
-
   const handleDeleteEvent = async () => {
     if (!currentEvent || !currentEvent.id) {
       console.error("No event ID found for deletion");

@@ -219,6 +219,8 @@ router.post("/service/save-calendar-events", saveCalendarEvents);
 router.get("/service/get-seller-calendar-events", getSellerCalendarEvents);
 router.delete("/service/delete-calendar-event/:id", delSellerCalendarEvents)
 
+router.get("/getServiceMeeting", getServiceMeeting);
+
 //contact-Us
 router.post("/seller-contact-us", contactUsValidation, seller_contactUs);
 
@@ -1034,6 +1036,12 @@ function delSellerCalendarEvents(req, res, next) {
       console.error("Error in delSellerCalendarEvents:", err);
       res.status(500).json({ status: false, message: "Internal Server Error" });
     });
+}
+
+function getServiceMeeting(req, res, next) {
+  sellerService.getServiceMeeting(req)
+    .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
 }
 
 function seller_contactUs(req, res, next) {

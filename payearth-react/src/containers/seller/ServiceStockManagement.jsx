@@ -16,6 +16,7 @@ import { CalendarAuth } from "./CalendarAuth";
 import Calendar from "./Calendar";
 import Modal from "react-bootstrap/Modal";
 import emptyImg from "./../../assets/images/emptyimage.png";
+import googleMeet from "./../../assets/icons/google-meet-logo.svg";
 import { CalendarLogout } from "./CalendarLogout";
 import 'react-quill/dist/quill.snow.css';
 
@@ -31,12 +32,12 @@ class ServiceStockManagement extends Component {
       selectedRows: [],
       service: [],
       subscriber: [],
-      meeting: [],
+      serviceMeeting: [],
       loading: true,
       error: null,
       showModal: false,
-      editModalOpen: false, // State to manage the edit modal
-      editedData: {}, // State to store edited data
+      editModalOpen: false,
+      editedData: {},
       emptyImg: emptyImg,
       isCalendarAuthorized: accessToken ? true : false,
       paginationPerPage: 5,
@@ -46,37 +47,33 @@ class ServiceStockManagement extends Component {
 
   componentDidMount() {
     this.getAddedServices();
-    this.getSubscriberList();
-    this.getMeetingHistory();
+    this.getServiceMeeting();
   }
-
-  getUpdate = () => {
-    this.getAddedServices();
-    this.getSubscriberList();
-    this.getMeetingHistory();
-  };
 
   handleCalendarAuthorization = () => {
     this.setState({ isCalendarAuthorized: true });
   };
 
-  //$$$$$$$$$$$$$$$$$$$$
   handleTabClick = (tab) => {
     this.setState({ activeTab: tab });
     localStorage.setItem('activeTab', tab);
+    if (tab === "nav-service") {
+      this.getAddedServices();
+    }
+    if (tab === "nav-meeting") {
+      this.getServiceMeeting();
+    }
   };
 
   getAddedServices = () => {
-    axios
-      .get(`seller/service/items/${this.authInfo.id}`, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json;charset=UTF-8",
-          Authorization: `Bearer ${this.authInfo.token}`,
-        },
-      })
+    axios.get(`seller/service/items/${this.authInfo.id}`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json;charset=UTF-8",
+        Authorization: `Bearer ${this.authInfo.token}`,
+      },
+    })
       .then((res) => {
-        //    console.log("Data", res);
         this.setState({
           service: res.data.data,
           loading: false,
@@ -92,42 +89,16 @@ class ServiceStockManagement extends Component {
       });
   };
 
-  getSubscriberList = () => {
-    axios
-      .get(`seller/service/getServiceData`, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json;charset=UTF-8",
-          Authorization: `Bearer ${this.authInfo.token}`,
-        },
-      })
-      .then((res) => {
-        this.setState({
-          subscriber: res.data.data,
-          loading: false,
-          error: null,
-        });
-      })
-      .catch((error) => {
-        this.setState({
-          subscriber: [],
-          loading: false,
-          error: error,
-        });
-      });
-  };
-
   getMeetingHistory = () => {
     let status = "Completed";
 
-    axios
-      .get(`seller/service/getServiceStatus/${status}`, {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json;charset=UTF-8",
-          Authorization: `Bearer ${this.authInfo.token}`,
-        },
-      })
+    axios.get(`seller/service/getServiceStatus/${status}`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json;charset=UTF-8",
+        Authorization: `Bearer ${this.authInfo.token}`,
+      },
+    })
       .then((res) => {
         this.setState({
           meeting: res.data.data,
@@ -150,23 +121,19 @@ class ServiceStockManagement extends Component {
   };
 
   handleUpdateStatus = (id, currentStatus) => {
-    const newStatus = !currentStatus;
-    // console.log('status....',newStatus)
-    axios
-      .put(
-        `seller/service/items/status-update/${id}`,
-        { isActive: newStatus },
-        {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json;charset=UTF-8",
-            Authorization: `Bearer ${this.authInfo.token}`,
-          },
-        }
-      )
+    const newStatus = !currentStatus
+    axios.put(`seller/service/items/status-update/${id}`,
+      { isActive: newStatus },
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json;charset=UTF-8",
+          Authorization: `Bearer ${this.authInfo.token}`,
+        },
+      }
+    )
       .then((res) => {
-        this.getUpdate();
-        //     console.log("Response of Status request", res);
+        this.getAddedServices();
       })
       .catch((error) => {
         console.log("error", error);
@@ -279,190 +246,92 @@ class ServiceStockManagement extends Component {
     },
   ];
 
-  subscriber_column = [
-    // {
-    //   name: "Image",
-    //   selector: (row, i) => (
-    //     <img
-    //       src={row.featuredImage}
-    //       alt="Not selected"
-    //       style={{ width: "150px", height: "100px" }}
-    //     />
-    //   ),
-    //   sortable: true,
-    // },
-    // {
-    //   name: "Subscriber_Name",
-    //   selector: (row, i) => row.userId.name,
-    //   sortable: true,
-    // },
-    // {
-    //   name: "Subscriber_Email",
-    //   selector: (row, i) => row.userId.email,
-    //   sortable: true,
-    // },
-    // {
-    //   name: "Service ID",
-    //   selector: (row, i) => row.serviceId === null ? "" : row.serviceId.serviceCode,
-    //   sortable: true,
-    // },
-    // {
-    //   name: "Service Name",
-    //   selector: (row, i) => row.serviceId === null ? "" : row.serviceId.name,
-    //   sortable: true,
-    // },
-    // {
-    //   name: "Category",
-    //   selector: (row, i) => row.serviceId === null ? "" : row.serviceId.category.categoryName,
-    //   sortable: true,
-    // },
-    // // author
-    // {
-    //   name: "Meeting Date & Time",
-    //   selector: (row, i) => row.createdAt,
-    //   sortable: true,
-    //   width: "200px",
+  service_meeting_column = [
+    {
+      name: "EVENT TITLE",
+      selector: (row, i) => row.event_title,
+      sortable: true,
+    },
+    {
+      name: "SERVICE START DATE & TIME",
+      sortable: true,
+      cell: (row) => {
+        const options = { year: "numeric", month: "long", day: "numeric" };
+        const date = new Date(row.start_datetime).toLocaleDateString(
+          "en-US",
+          options
+        );
+        const Time = new Date(row.start_datetime).toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+        return <>{date} - {Time} </>;
+      },
+    },
+    {
+      name: "MEETING CLIENT EMAIL",
+      selector: (row, i) => row.user_id.email,
+      sortable: true,
+    },
+    {
+      name: "EVENT DESCRIPTION",
+      selector: (row, i) => row.event_description,
+      sortable: true,
+    },
 
-    //   cell: (row) => {
-    //     const options = { year: "numeric", month: "long", day: "numeric" };
-    //     const date = new Date(row.meetingDate).toLocaleDateString(
-    //       "en-US",
-    //       options
-    //     );
-    //     return <div>{date}</div>;
-    //   },
-    // },
-    // {
-    //   name: "Status",
-    //   selector: (row, i) =>
-    //     row.meetingStatus === "Complited" ? (
-    //       <p className="p-1 text-white bg-success  bg-opacity-6 border-info rounded">
-    //         Complited
-    //       </p>
-    //     ) : (
-    //       <p className="p-1 text-white bg-danger  bg-opacity-6 border-info rounded">
-    //         In-Active
-    //       </p>
-    //     ),
-    //   sortable: true,
-    // },
-    // {
-    //   name: "Actions",
-    //   // width: "350px",
-    //   cell: (row) => (
-    //     <>
-    //       <button
-    //         onClick={() => this.handleDetails(row)}
-    //         className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
-    //       >
-    //         Details
-    //       </button>
-    //       <button
-    //         onClick={() => this.handleEdit(row)}
-    //         className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
-    //       >
-    //         Edit
-    //       </button>
-    //       <button
-    //         onClick={() => this.handleUpdateStatus(row._id)}
-    //         className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
-    //       >
-    //         Cancel
-    //       </button>
-    //     </>
-    //   ),
-    // },
+    {
+      name: "",
+      selector: (row, i) => {
+        const date = new Date();
+        const startDate = new Date(row.start_datetime);
+        const endDate = new Date(row.end_datetime);
+        const isActive = startDate <= date && endDate >= date;
+        return (
+          <div>
+            <a
+              href={isActive ? row.meeting_url : '#'}
+              target={isActive ? "_blank" : undefined}
+              rel={isActive ? "noopener noreferrer" : undefined}
+              style={{ pointerEvents: isActive ? "auto" : "none" }}
+            >
+              <img
+                src={googleMeet}
+                alt="Meeting Link"
+                style={{
+                  width: '30px',
+                  height: '30px',
+                  opacity: isActive ? 1 : 0.5,
+                  cursor: isActive ? "pointer" : "not-allowed"
+                }}
+              />
+            </a>
+          </div>
+        );
+      },
+      sortable: true,
+    }
   ];
 
-  meeting_column = [
-    // {
-    //   name: "Image",
-    //   selector: (row, i) => (
-    //     <img
-    //       src={row.featuredImage}
-    //       alt="Not selected"
-    //       style={{ width: "150px", height: "100px" }}
-    //     />
-    //   ),
-    //   sortable: true,
-    // },
-    // {
-    //   name: "Subscriber_Name",
-    //   selector: (row, i) => row.userId.name,
-    //   sortable: true,
-    // },
-    // {
-    //   name: "Subscriber_Email",
-    //   selector: (row, i) => row.userId.email,
-    //   sortable: true,
-    // },
-    // {
-    //   name: "Service ID",
-    //   selector: (row, i) => row.serviceId.serviceCode,
-    //   sortable: true,
-    // },
-    // {
-    //   name: "Service Name",
-    //   selector: (row, i) => row.serviceId.name,
-    //   sortable: true,
-    // },
-    // {
-    //   name: "Category",
-    //   selector: (row, i) => row.serviceId.category.categoryName,
-    //   sortable: true,
-    // },
-    // // author
-    // {
-    //   name: "Service Start Date & Time",
-    //   selector: (row, i) => row.createdAt,
-    //   sortable: true,
-    //   width: "200px",
+  getServiceMeeting = async () => {
+    try {
+      this.setState({ loading: true })
+      const url = "seller/getServiceMeeting";
+      const response = await axios.get(url, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json;charset=UTF-8",
+          Authorization: `Bearer ${this.authInfo.token}`,
+        },
+        params: {
+          sellerId: this.authInfo.id,
+        },
+      });
 
-    //   cell: (row) => {
-    //     const options = { year: "numeric", month: "long", day: "numeric" };
-    //     const date = new Date(row.meetingDate).toLocaleDateString(
-    //       "en-US",
-    //       options
-    //     );
-    //     return <div>{date}</div>;
-    //   },
-    // },
-    // {
-    //   name: "Status",
-    //   selector: (row, i) => (
-    //     <p className="p-1 text-white bg-success  bg-opacity-6 border-info rounded">
-    //       {row.meetingStatus}
-    //     </p>
-    //   ),
-    //   sortable: true,
-    // },
-    // {
-    //   name: "Actions",
-    //   // width: "350px",
-    //   cell: (row) => (
-    //     <>
-    //       <button
-    //         onClick={() => this.handleDetails(row)}
-    //         className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
-    //       >
-    //         Details
-    //       </button>
-    //       <button
-    //         onClick={() => this.handleEdit(row)}
-    //         className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
-    //       >
-    //         Edit
-    //       </button>
-    //       <button
-    //         onClick={() => this.handleUpdateStatus(row._id)}
-    //         className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
-    //       >
-    //         Cancel
-    //       </button>
-    //     </>
-    //   ),
-    // },
-  ];
+      this.setState({ serviceMeeting: response.data.data, loading: false });
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
 
   render() {
     const {
@@ -470,7 +339,7 @@ class ServiceStockManagement extends Component {
       token,
       service,
       subscriber,
-      meeting,
+      serviceMeeting,
       loading,
       error,
       selectedRows,
@@ -523,20 +392,6 @@ class ServiceStockManagement extends Component {
                   <nav className="orders_tabs">
                     <div className="nav nav-tabs" id="nav-tab" role="tablist">
                       <button
-                        // className="nav-link active "
-                        className={`nav-link ${activeTab === 'nav-appointment' ? 'active' : ''}`}
-                        id="nav-appointment-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#nav-appointment"
-                        type="button"
-                        role="tab"
-                        aria-controls="nav-appointment"
-                        aria-selected="true"
-                        onClick={() => this.handleTabClick('nav-appointment')}
-                      >
-                        Appointments
-                      </button>
-                      <button
                         // className="nav-link  "
                         className={`nav-link ${activeTab === 'nav-service' ? 'active' : ''}`}
                         id="nav-service-tab"
@@ -545,27 +400,28 @@ class ServiceStockManagement extends Component {
                         type="button"
                         role="tab"
                         aria-controls="nav-service"
-                        aria-selected="false"
+                        aria-selected="true"
                         onClick={() => this.handleTabClick('nav-service')}
                       >
                         My Services
                       </button>
+
                       <button
-                        // className="nav-link"
-                        className={`nav-link ${activeTab === 'nav-subscriber' ? 'active' : ''}`}
-                        id="nav-subscriber-tab"
+                        // className="nav-link active "
+                        className={`nav-link ${activeTab === 'nav-appointment' ? 'active' : ''}`}
+                        id="nav-appointment-tab"
                         data-bs-toggle="tab"
-                        data-bs-target="#nav-subscriber"
+                        data-bs-target="#nav-appointment"
                         type="button"
                         role="tab"
-                        aria-controls="nav-subscriber"
+                        aria-controls="nav-appointment"
                         aria-selected="false"
-                        onClick={() => this.handleTabClick('nav-subscriber')}
+                        onClick={() => this.handleTabClick('nav-appointment')}
                       >
-                        Subscribers List
+                        Appointments
                       </button>
+
                       <button
-                        //className="nav-link"
                         className={`nav-link ${activeTab === 'nav-meeting' ? 'active' : ''}`}
                         id="nav-meeting-tab"
                         data-bs-toggle="tab"
@@ -576,9 +432,8 @@ class ServiceStockManagement extends Component {
                         aria-selected="false"
                         onClick={() => this.handleTabClick('nav-meeting')}
                       >
-                        Meeting History
+                        Meeting
                       </button>
-                      {/* <button className="nav-link" id="nav-cancelled-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-cancelled-orders" type="button" role="tab" aria-controls="nav-cancelled-orders" aria-selected="true"  onClick={() => this.getAddedProducts(false, null, 'reject')}>Rejected Services</button> */}
                     </div>
                   </nav>
                 </div>
@@ -656,73 +511,18 @@ class ServiceStockManagement extends Component {
                         paginationPerPage={paginationPerPage}
                       />
                     </DataTableExtensions>
-                    {/* <button
-                                                    className="custom_btn btn_yellow_bordered w-auto btn margin_right"
-                                                    onClick={this.handleDeleteSeletedData}
-                                                    hidden={!selectedRows.length}
-                                                >
-                                                    {selectedRows.length === 1 ? 'PERMANENT DELETE' : `PERMANENT DELETE (${selectedRows.length})`}
-                                                </button> */}
-                    {/* <button
-                                                    className="custom_btn btn_yellow_bordered w-auto btn margin_right"
-                                                    hidden={!selectedRows.length}
-                                                >
-                                                    {selectedRows.length === 1 ? 'TRASH' : `TRASH ALL  (${selectedRows.length})`}
-                                                </button> */}
-                  </div>
-
-                  {/* Subscribers List */}
-                  <div
-                    //className="tab-pane fade"
-                    className={`tab-pane fade ${activeTab === 'nav-subscriber' ? 'show active' : ''}`}
-                    id="nav-subscriber"
-                    role="tabpanel"
-                    aria-labelledby="nav-subscriber-tab"
-                  >
-                    {/* <div className="DT_ext_row"> */}
-                    <DataTableExtensions
-                      columns={this.subscriber_column}
-                      data={subscriber}
-                    >
-                      <DataTable
-                        pagination
-                        highlightOnHover
-                        noHeader
-                        defaultSortField="id"
-                        defaultSortAsc={false}
-                        selectableRows
-                        selectedRows={selectedRows}
-                        onSelectedRowsChange={this.handleRowSelected}
-                      />
-                    </DataTableExtensions>
-                    {/* </div> */}
-                    {/* <button
-                                                    className="custom_btn btn_yellow_bordered w-auto btn margin_right"
-                                                    onClick={this.handleDeleteSeletedData}
-                                                    hidden={!selectedRows.length}
-                                                >
-                                                    {selectedRows.length === 1 ? 'DELETE' : `DELETE ALL  (${selectedRows.length})`}
-                                                </button> */}
-                    {/* <button
-                                                    className="custom_btn btn_yellow_bordered w-auto btn margin_right"
-                                                    hidden={!selectedRows.length}
-                                                >
-                                                    {selectedRows.length === 1 ? 'PUBLISH' : `PUBLISH ALL  (${selectedRows.length})`}
-                                                </button> */}
                   </div>
 
                   {/* Meeting History */}
                   <div
-                    //className="tab-pane fade"
                     className={`tab-pane fade ${activeTab === 'nav-meeting' ? 'show active' : ''}`}
                     id="nav-meeting"
                     role="tabpanel"
                     aria-labelledby="nav-meeting-tab"
                   >
-                    {/* <div className="DT_ext_row"> */}
                     <DataTableExtensions
-                      columns={this.meeting_column}
-                      data={meeting}
+                      columns={this.service_meeting_column}
+                      data={serviceMeeting}
                     >
                       <DataTable
                         pagination
@@ -735,20 +535,6 @@ class ServiceStockManagement extends Component {
                         onSelectedRowsChange={this.handleRowSelected}
                       />
                     </DataTableExtensions>
-                    {/* </div> */}
-                    {/* <button
-                                                    className="custom_btn btn_yellow_bordered w-auto btn margin_right"
-                                                    onClick={this.handleDeleteSeletedData}
-                                                    hidden={!selectedRows.length}
-                                                >
-                                                    {selectedRows.length === 1 ? 'DELETE' : `DELETE ALL  (${selectedRows.length})`}
-                                                </button> */}
-                    {/* <button
-                                                    className="custom_btn btn_yellow_bordered w-auto btn margin_right"
-                                                    hidden={!selectedRows.length}
-                                                >
-                                                    {selectedRows.length === 1 ? 'RESTORE' : `RESTORE ALL  (${selectedRows.length})`}
-                                                </button> */}
                   </div>
                 </div>
               </div>

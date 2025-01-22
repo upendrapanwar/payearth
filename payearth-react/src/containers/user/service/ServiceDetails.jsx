@@ -25,6 +25,7 @@ const ServiceDetails = () => {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [reviews, setReviews] = useState([]);
+  const [chargesPayStatus, setChargesPayStatus] = useState(null);
   const myRef = useRef(null);
   const reportRef = useRef(null);
   const [loading, setLoading] = useState(true);
@@ -55,12 +56,12 @@ const ServiceDetails = () => {
         const data = res.data.data;
         sessionStorage.setItem("serviceDetails", JSON.stringify(data));
         const dataArray = Array.isArray(res.data.data) ? res.data.data : [res.data.data];
-        console.log("dataArray", dataArray)
         setCommonServiceData(dataArray);
         setDescription(dataArray[0].result.description);
         setCategory(dataArray[0].result.category.categoryName);
         setReviews(dataArray[0].result.reviews);
         setServiceCreator(dataArray[0].result.createdBy.email);
+        setChargesPayStatus(dataArray[0].chargePay)
         setLoading(false);
       } else {
         const res = await axios.get(`/user/get-common-service/${id}`);
@@ -133,6 +134,7 @@ const ServiceDetails = () => {
     return <ul className="rating">{stars}</ul>;
   };
 
+
   return (
     <React.Fragment>
       {loading === true ? <SpinnerLoader /> : ""}
@@ -193,8 +195,8 @@ const ServiceDetails = () => {
                       </div>
                       {currentUser === true ? (
                         data.chargePay && data.chargePay.title === "charges_paid" ? (
-                          <div className="card-body bg-light d-flex align-items-center justify-content-center gap-4 m-3" onClick={setMeeting}>
-                            <h6 className="card-title">Scheduled your meeting for these service</h6>
+                          <div className="card-body bg-primary-subtle text-primary-emphasis d-flex align-items-center justify-content-center gap-4 m-3" onClick={setMeeting}>
+                            <h6 className="card-title font-monospace">CLICK HERE TO SCHEDULE A MEETING</h6>
                             <img src={googleMeet} alt="Meeting" style={{ width: '50px', height: '50px', cursor: 'pointer' }} onClick={setMeeting} />
                           </div>
                         ) : (
@@ -210,10 +212,7 @@ const ServiceDetails = () => {
                         )
                       ) : (
                         <div className="pdi_fea prod_foot">
-                          <button
-                            className="btn custom_btn btn_yellow mx-4"
-                            onClick={handleCheckout}
-                          >
+                          <button className="btn custom_btn btn_yellow mx-4" onClick={handleCheckout}>
                             <b>{`$${data.result.charges}`}</b>&nbsp; Pay Now
                           </button>
                           <br />
@@ -247,6 +246,7 @@ const ServiceDetails = () => {
           scrollToReviews={scrollToReviews}
           scheduledMeeting={scheduledMeeting}
           serviceCreator={serviceCreator}
+          chargesPayStatus={chargesPayStatus}
         />
       </div>
       <Footer />

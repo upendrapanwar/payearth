@@ -111,6 +111,9 @@ module.exports = {
   saveCalendarEvents,
   getSellerCalendarEvents,
   delSellerCalendarEvents,
+  getServiceMeeting,
+
+
   sellerServiceOrders,
   seller_contactUs,
   createSellerBanner,
@@ -2846,6 +2849,38 @@ async function delSellerCalendarEvents(req) {
   }
 }
 
+async function getServiceMeeting(req) {
+  try {
+    const { sellerId } = req.query;
+    const calendarData = await Calendar.find()
+      .populate({
+        path: "service_id",
+        model: Services,
+        select: "createdBy",
+        populate: {
+          path: 'createdBy',
+          model: Seller,
+          select: "id"
+        }
+      })
+      .populate({
+        path: "user_id",
+        model: User,
+        select: "name email",
+      })
+      .then(calendars => {
+        return calendars.filter(calendar => {
+          return calendar.service_id && String(calendar.service_id.createdBy.id) === String(sellerId);
+        });
+      });
+
+    return calendarData
+  } catch (err) {
+    console.error("Error:", err);
+    return false;
+  }
+}
+
 //seller contact-us email function
 async function seller_contactUs(param) {
   console.log("param", param);
@@ -4915,7 +4950,7 @@ async function getOpenedTicketMessage(req) {
 // Orders
 
 async function getProductOrders(req) {
-  const { status, title, sellerId } = req.query; 
+  const { status, title, sellerId } = req.query;
   try {
     const query = {
       isActive: status,
@@ -4926,11 +4961,11 @@ async function getProductOrders(req) {
     const data = await OrderStatus.find(query)
       .populate({
         path: 'product.productId',
-        populate: { path: 'createdBy', select: 'name email' }, 
+        populate: { path: 'createdBy', select: 'name email' },
       })
       .populate('userId');
-      console.log('data---not filterd---',data)
-      
+    console.log('data---not filterd---', data)
+
     const filteredData = data.filter(order =>
       order.product.productId.some(product =>
         product.createdBy?._id.toString() === sellerId

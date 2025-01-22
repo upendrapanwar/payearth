@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { GoogleLogin } from "react-google-login";
 import { gapi } from "gapi-script";
 import Calendar from '../seller/Calendar'
+import { useEffect } from 'react';
 
 
 export const CalendarAuth = () => {
@@ -31,13 +32,10 @@ export const CalendarAuth = () => {
     }
   };
 
-
   const responseError = (error) => {
     localStorage.removeItem("accessToken");
     console.error("Google authentication error:", error);
   };
-
-
 
   return (
     <React.Fragment>
@@ -59,6 +57,7 @@ export const CalendarAuth = () => {
           {/* Render Calendar if isAuthenticated is true */}
           {isAuthenticated && <Calendar />}
         </div>
+
       </React.Fragment>
     </React.Fragment>
   )
