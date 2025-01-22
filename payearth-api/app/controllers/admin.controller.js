@@ -118,11 +118,10 @@ router.delete('/brands/:id', deleteBrand);
 router.put("/updateBrand/:id", updateBrand);
 
 //Deal
-router.post('/deals', uploadDeal, createDeal);
-router.put('/deals/:id', uploadDeal, editDeal);
 router.put('/deals/status/:id', statusDeal);
-router.get('/deals', listDeal);
-router.delete('/deals/:id', deleteDeal);
+router.get("/deals", listDeal);
+router.get("/getDealsById/:id", getDealsById);
+
 
 
 //Banner
@@ -532,28 +531,16 @@ function brandPopularStatus(req, res, next) {
 
 //Deal
 
-function createDeal(req, res, next) {
-    adminService.createDeal(req)
-        .then(deal => deal ? res.status(201).json({ status: true, message: msg.admin.deal.add.success, data: deal }) : res.status(400).json({ status: false, message: msg.admin.deal.add.error }))
-        .catch(err => next(res.json({ status: false, message: err })));
-}
-
-function editDeal(req, res, next) {
-    adminService.editDeal(req)
-        .then(deal => deal ? res.status(200).json({ status: true, message: msg.admin.deal.edit.success, data: deal }) : res.status(400).json({ status: false, message: msg.admin.deal.edit.error }))
-        .catch(err => next(res.status(400).json({ status: false, message: err })));
-}
-
 function listDeal(req, res, next) {
     adminService.getDeals()
         .then(deals => deals ? res.status(200).json({ status: true, data: deals }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
 
-function deleteDeal(req, res, next) {
-    adminService.deleteDeal(req.params.id)
-        .then(deal => deal ? res.json({ status: true, message: msg.admin.deal.delete }) : res.json({ status: false, message: msg.common.no_data_err }))
-        .catch(err => next(res.json({ status: false, message: err })));
+function getDealsById(req, res, next) {
+    adminService.getDealsById(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
 }
 
 function statusDeal(req, res, next) {

@@ -301,6 +301,11 @@ router.put("/edit-profile/:id", editProfile);
 //dashboard
 router.get("/getTopSellingCategories", getTopSellingCategories);
 router.get("/productSalesGraph", productSalesGraph);
+router.get("/serviceSalesGraph", serviceSalesGraph);
+router.get("/getListedProductData", getListedProductData);
+router.get("/getListedServicesData", getListedServicesData);
+router.get("/getOrderDetails", getOrderDetails);
+
 
 module.exports = router;
 
@@ -793,17 +798,23 @@ function contactUs(req, res, next) {
     );
 }
 
+// function getDashboardCounters(req, res, next) {
+//   sellerService
+//     .getDashboardCounters(req.params)
+//     .then((counters) =>
+//       counters
+//         ? res.status(200).json({ status: true, data: counters })
+//         : res
+//           .status(400)
+//           .json({ status: false, message: msg.common.no_data_err, data: [] })
+//     )
+//     .catch((err) => next(res.json({ status: false, message: err })));
+// }
+
 function getDashboardCounters(req, res, next) {
-  sellerService
-    .getDashboardCounters(req.params.id)
-    .then((counters) =>
-      counters
-        ? res.status(200).json({ status: true, data: counters })
-        : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
-    )
-    .catch((err) => next(res.json({ status: false, message: err })));
+  sellerService.getDashboardCounters(req)
+    .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: msg.common.no_data_err }))
+    .catch((err) => next(res.json({ status: false, message: err.message })));
 }
 
 function getProductSales(req, res, next) {
@@ -1587,12 +1598,36 @@ function getCreatedDeals(req, res, next) {
 
 function getTopSellingCategories(req, res, next) {
   sellerService.getTopSellingCategories(req)
-    .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error updating personal information." }))
+    .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "ERROR" }))
     .catch((err) => next(res.json({ status: false, message: err.message })));
 }
 
 function productSalesGraph(req, res, next) {
   sellerService.productSalesGraph(req)
-    .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error updating personal information." }))
+    .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "ERROR" }))
     .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+ function serviceSalesGraph(req, res, next) {
+  sellerService.serviceSalesGraph(req)
+    .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "ERROR" }))
+    .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getListedProductData(req, res, next) {
+  sellerService.getListedProductData(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function getListedServicesData(req, res, next) {
+  sellerService.getListedServicesData(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function getOrderDetails(req, res, next) {
+  sellerService.getOrderDetails(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
 }
