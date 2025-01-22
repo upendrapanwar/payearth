@@ -20,7 +20,7 @@ const schema = new Schema({
     },
     serviceCreateCharge: { type: Boolean, default: false },
     lname: { type: String, index: true },
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: false },
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
     paymentId: { type: mongoose.Schema.Types.ObjectId, ref: "Payment", required: true },
     isActive: { type: Boolean, default: true },
 }, {

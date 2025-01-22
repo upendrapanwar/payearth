@@ -2986,18 +2986,31 @@ async function getCommonService(req) {
 
 async function CommonServiceById(req) {
   const id = req.params.id;
+  const authorId = req.query.authorId;
   try {
+    const chargePay = await OrderStatus.findOne({
+      "service.serviceId": id,
+      userId: authorId,
+    }).select("title service")
+
+    // if (!chargePay) {
+    //   console.log("chargePay not pay")
+    // }
+
     let result = await Services.findById({ _id: id })
-      .select(
-        "serviceCode name charges featuredImage imageId description isActive createdAt"
-      )
+      .select("serviceCode name charges featuredImage imageId description isActive createdBy createdAt")
       .populate({
         path: "category",
         model: Category,
         select: "categoryName",
       })
+      .populate({
+        path: "createdBy",
+        model: Seller,
+        select: "email",
+      })
       .exec();
-    return result;
+    return { result, chargePay: chargePay || null };
   } catch (err) {
     console.log("Error", err);
     throw err;
@@ -3207,18 +3220,15 @@ async function addGoogleEvent(req) {
         };
 
         data = await Calendar.create(eventData);
-        console.log("calendar data", data)
 
         const serviceData = await Services.find({
           _id: data.service_id
         });
-        console.log("serviceData", serviceData)
 
         resultData = {
           createdBy: serviceData[0].createdBy,
           data: data
         }
-        console.log("resultData", resultData)
 
       } else {
         resultData = [];
@@ -3248,11 +3258,15 @@ async function getGoogleEvent(req) {
         path: "service_id",
         model: Services,
         select: "name createdBy",
+        populate: {
+          path: 'createdBy',
+          model: Seller,
+          select: "name email"
+        }
       })
       .populate({ path: "user_id", model: User, select: "name" })
       .sort({ createdAt: "desc" })
       .exec();
-
     return result;
   } catch (err) {
     console.error("Error:", err);

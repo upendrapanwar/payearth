@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from 'react-router-dom';
 import parse from "html-react-parser";
 import { FaTrash } from "react-icons/fa";
 import ServiceModal from "../services/ServiceModel";
@@ -7,7 +8,11 @@ import ServiceCalendar from "./ServiceCalendar";
 import { isLogin } from "./../../../../helpers/login";
 import { toast } from "react-toastify";
 import ServiceCalendarAuth from "./ServiceCalendarAuth";
+import googleMeet from "./../../../../assets/icons/google-meet-logo.svg"
 import { useHistory } from "react-router-dom";
+import DataTable from 'react-data-table-component';
+import DataTableExtensions from "react-data-table-component-extensions";
+import 'react-data-table-component-extensions/dist/index.css';
 
 function ServiceDetailsTabbing(props) {
   const history = useHistory();
@@ -17,17 +22,24 @@ function ServiceDetailsTabbing(props) {
   const [reviews, setReviews] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [averageRating, setAverageRating] = useState(0);
-  const [isCalendarAuthorized, setIsCalendarAuthorized] = useState(
-    accessToken ? true : false
-  );
-  const { scrollToReviews } = props;
+  const [eventList, setEventList] = useState([]);
+  const [isCalendarAuthorized, setIsCalendarAuthorized] = useState(accessToken ? true : false);
+  const { scrollToReviews, scheduledMeeting, serviceCreator } = props;
   const [activeTab, setActiveTab] = useState("description");
 
   useEffect(() => {
     if (scrollToReviews) {
       setActiveTab("reviews");
+
     }
   }, [scrollToReviews]);
+
+  useEffect(() => {
+    if (scheduledMeeting) {
+      setActiveTab("appointment");
+      eventMeeting();
+    }
+  }, [scheduledMeeting]);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,8 +47,7 @@ function ServiceDetailsTabbing(props) {
 
   useEffect(() => {
     fetchApi();
-    // fetchAcces_token();
-    // listUsers();
+    eventMeeting();
   }, []);
 
   //called get api for user service review
@@ -44,45 +55,11 @@ function ServiceDetailsTabbing(props) {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const serviceId = props.serviceId;
 
-  //Zoom Token fetch
-
-  // const fetchAcces_token = () => {
-  //   const clientId = process.env.REACT_APP_ZOOM_CLIENT_ID;
-  //   const clientSecret = process.env.REACT_APP_ZOOM_CLIENT_SECRET;
-  //   const account_id = process.env.REACT_APP_ZOOM_ACCOUNT_ID;
-  //   try {
-  //     const url = "/user/zoomCreateUserToken";
-  //     axios
-  //       .post(
-  //         url,
-  //         { clientId, clientSecret, account_id },
-  //         {
-  //           headers: {
-  //             Accept: "application/json",
-  //             "Content-Type": "application/json;charset=UTF-8",
-  //             Authorization: `Bearer ${authInfo.token}`,
-  //           },
-  //         }
-  //       )
-  //       .then((response) => {
-  //         // console.log("response", response)
-  //         setZoomAccessToken(response.data.data);
-  //       })
-  //       .catch((error) => {
-  //         console.log("error", error);
-  //       });
-  //   } catch (error) {
-  //     console.log("error", error);
-  //   }
-  // };
-
-  //called get api for user service review
   const fetchApi = async () => {
     try {
       const response = await axios.get(`/user/get-service-review/${serviceId}`);
       const result = response.data.data;
       setReviews(result);
-      // Calculate average rating
       if (result.length > 0) {
         const totalRating = result.reduce((acc, curr) => acc + curr.rating, 0);
         const average = totalRating / result.length;
@@ -93,12 +70,10 @@ function ServiceDetailsTabbing(props) {
     }
   };
 
-  // Handle opening the modal
   const openModal = () => {
     setIsModalOpen(true);
   };
 
-  // Handle Closing the modal
   const closeModal = () => {
     setIsModalOpen(false);
   };
@@ -108,9 +83,7 @@ function ServiceDetailsTabbing(props) {
       const headers = {
         Authorization: `Bearer ${authInfo.token}`,
       };
-
       await axios.delete(`/user/delete-review/${reviewId}`, { headers });
-      // After deleting the review, fetch updated reviews
       fetchApi();
       toast.success("Review Deleted Successfully");
     } catch (error) {
@@ -119,25 +92,6 @@ function ServiceDetailsTabbing(props) {
     }
   };
 
-  //Converted rating value into stars
-  // const renderStarRating = (ratingValue) => {
-  //   const stars = [];
-  //   for (let i = 0; i < 5; i++) {
-  //     if (i < Math.floor(ratingValue)) {
-  //       // Full star
-  //       stars.push(<li className="star rated" key={i}></li>);
-  //     } else {
-  //       // Half star
-  //       if (i - ratingValue === -0.5) {
-  //         stars.push(<li className="star half-star" key={i}></li>);
-  //       } else {
-  //         // Empty star
-  //         stars.push(<li className="star" key={i}></li>);
-  //       }
-  //     }
-  //   }
-  //   return <ul className="rating">{stars}</ul>;
-  // };
   const renderStarRating = (ratingValue) => {
     const stars = [];
     // Calculate full stars
@@ -157,7 +111,6 @@ function ServiceDetailsTabbing(props) {
         stars.push(<li className="star" key={i}></li>);
       }
     }
-
     return <ul className="rating">{stars}</ul>;
   };
 
@@ -337,6 +290,94 @@ function ServiceDetailsTabbing(props) {
     }
   }
 
+  const eventList_column = [
+    {
+      name: "SERVICE NAME",
+      selector: (row, i) => row.service_name,
+      sortable: true,
+    },
+    {
+      name: "SERVICE TITLE",
+      selector: (row, i) => row.title,
+      sortable: true,
+    },
+    {
+      name: "START DATE",
+      selector: (row, i) => {
+        const date = new Date(row.start);
+        return `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+      },
+      sortable: true,
+    },
+    {
+      name: "",
+      selector: (row, i) => {
+        const date = new Date();
+        const startDate = new Date(row.start);
+        const endDate = new Date(row.end);
+        const isActive = startDate <= date && endDate >= date;
+        return (
+          <div>
+            <a
+              href={isActive ? row.meeting_url : '#'}
+              target={isActive ? "_blank" : undefined}
+              rel={isActive ? "noopener noreferrer" : undefined}
+              style={{ pointerEvents: isActive ? "auto" : "none" }}
+            >
+              <img
+                src={googleMeet}
+                alt="Meeting Link"
+                style={{
+                  width: '30px',
+                  height: '30px',
+                  opacity: isActive ? 1 : 0.5,
+                  cursor: isActive ? "pointer" : "not-allowed"
+                }}
+              />
+            </a>
+          </div>
+        );
+      },
+      sortable: true,
+    }
+  ]
+
+  const eventMeeting = async () => {
+    try {
+      const response = await axios.get(`/user/get-calendar-event/${authInfo.id}`, {
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json;charset=UTF-8",
+          "Authorization": `Bearer ${authInfo.token}`,
+        },
+      });
+      if (response.data.data.length === 0) {
+        toast.error("Event's not found.")
+      }
+      const formattedEvents = response.data.data.map((event) => ({
+        event_id: event.event_id,
+        id: event._id,
+        user_name: event.user_id.name,
+        service_name: event.service_id.name,
+        description: event.event_description,
+        meeting_url: event.meeting_url,
+        meetingTitle: event.event_title,
+        start: event.start_datetime,
+        end: event.end_datetime,
+        title: event.event_title,
+        serviceCreator: event.service_id.createdBy.email,
+      }));
+      const sortedEvents = formattedEvents.sort(
+        (a, b) => new Date(a.start) - new Date(b.start)
+      );
+      setEventList(sortedEvents);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    }
+  };
+
+  console.log("eventList::", eventList)
+
   return (
     <React.Fragment>
       <section className="service_details_sec" ref={props.ref}>
@@ -439,17 +480,16 @@ function ServiceDetailsTabbing(props) {
                   ) : (
                     <li className="nav-item" role="presentation">
                       <button
-                        className={`nav-link ${activeTab === "zoommeeting" ? "active" : ""
-                          }`}
-                        id="zoommeeting-tab"
+                        className={`nav-link ${activeTab === "meeting" ? "active" : ""}`}
+                        id="meeting-tab"
                         data-bs-toggle="tab"
-                        data-bs-target="#zoommeeting"
+                        data-bs-target="#meeting"
                         type="button"
                         role="tab"
-                        aria-controls="zoommeeting"
+                        aria-controls="meeting"
                         // aria-selected="false"
-                        aria-selected={activeTab === "zoommeeting"}
-                        onClick={() => setActiveTab("zoommeeting")}
+                        aria-selected={activeTab === "meeting"}
+                        onClick={() => setActiveTab("meeting")}
                       >
                         Meeting
                       </button>
@@ -461,10 +501,7 @@ function ServiceDetailsTabbing(props) {
                   {!currentUser ? (
                     ""
                   ) : !isCalendarAuthorized ? (
-                    <div
-                      //className="tab-pane fade show active"
-                      className={`tab-pane fade ${activeTab === "appointment" ? "show active" : ""
-                        }`}
+                    <div className={`tab-pane fade ${activeTab === "appointment" ? "show active" : ""}`}
                       id="appointment"
                       role="tabpanel"
                       aria-labelledby="appointment-tab"
@@ -475,53 +512,37 @@ function ServiceDetailsTabbing(props) {
                         }}
                         userId={authInfo.id}
                         authToken={authInfo.token}
+                        serviceCreator={serviceCreator}
                       />
                     </div>
                   ) : (
-                    <div
-                      // className="tab-pane fade show active"
-                      className={`tab-pane fade ${activeTab === "appointment" ? "show active" : ""
-                        }`}
+                    <div className={`tab-pane fade ${activeTab === "appointment" ? "show active" : ""}`}
                       id="appointment"
                       role="tabpanel"
                       aria-labelledby="appointment-tab"
                     >
                       <p className="mb-0">
-                        <ServiceCalendar authToken={authInfo.token} />
+                        <ServiceCalendar authToken={authInfo.token} serviceCreator={serviceCreator} />
                       </p>
                     </div>
                   )}
                   {!currentUser ? (
                     ""
                   ) : (
-                    <div
-                      // className="tab-pane fade"
-                      className={`tab-pane fade ${activeTab === "zoommeeting" ? "show active" : ""
-                        }`}
-                      id="zoommeeting"
-                      role="tabpanel"
-                      aria-labelledby="zoommeeting-tab"
-                    >
-                      <h1>Do you want to create a Zoom meeting?</h1>
-                      <button
-                        className="btn custom_btn btn_yellow"
-                        // onClick={authZoom}
-                        //test
-                        // onClick={createZoomMeeting}
-                        onClick={createZoomUser}
-                      >
-                        Yes
-                      </button>
-                      <button
-                        className="btn custom_btn btn_dark"
-                        onClick={handleNo}
-                      >
-                        No
-                      </button>
+                    <div className={`tab-pane fade ${activeTab === "meeting" ? "show active" : ""}`} id="meeting" role="tabpanel" aria-labelledby="meeting-tab">
 
-                      <button onClick={createZoomMeeting}>
-                        create meeting
-                      </button>
+                      <DataTableExtensions
+                        columns={eventList_column}
+                        data={eventList}
+                      >
+                        <DataTable
+                          pagination
+                          highlightOnHover
+                          noHeader
+                          defaultSortField="id"
+                          defaultSortAsc={false}
+                        />
+                      </DataTableExtensions>
                     </div>
                   )}
 

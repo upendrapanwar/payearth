@@ -11,13 +11,11 @@ import moment from "moment";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import io from "socket.io-client";
 
-
-
-function ServiceCalendar() {
+function ServiceCalendar(props) {
+  const { serviceCreator } = props;
   const calendarRef = useRef(null);
   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-
   const user_id = authInfo.id;
   const { id } = useParams();
   const service_id = id;
@@ -27,47 +25,48 @@ function ServiceCalendar() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
 
-
   useEffect(() => {
     fetchEvents();
   }, [id]);
 
-
-
   const handleDateClick = (arg) => {
-    setSelectedDate(moment(arg.date).format("YYYY-MM-DD")); // Set the selected date
-    setFormOpen(true); // Open the form
+    setSelectedDate(moment(arg.date).format("YYYY-MM-DD"));
+    setFormOpen(true);
   };
 
   const handleFormSubmit = async (values) => {
-    // Combine date and time into a single ISO string
     const start_datetime = moment(`${values.meetingDate}T${values.meetingTime}`).toISOString();
-
-    // Validate the start datetime
     if (moment(start_datetime).isBefore(moment(), "minute")) {
       toast.error("Please select the current time or a future time.");
       return;
     }
 
-    // Set the end datetime (for this example, we're assuming the event lasts for 1 hour)
     const end_datetime = moment(start_datetime).add(1, "hour").toISOString();
-
     const eventData = {
-      start: { dateTime: start_datetime, timeZone: "Asia/Kolkata" },
-      end: { dateTime: end_datetime, timeZone: "Asia/Kolkata" },
       summary: values.event_title,
       description: values.description,
-      // location: "https://ZoomMeeting.com",
-      //########## Applying google meet on here..........#####
       location: "Online Meeting",
+      start: {
+        dateTime: start_datetime,
+        timeZone: "Asia/Kolkata"
+      },
+      end: {
+        dateTime: end_datetime,
+        timeZone: "Asia/Kolkata"
+      },
+
       conferenceData: {
         createRequest: {
-          requestId: `meeting-${Date.now()}`, // Unique ID for the request
-          conferenceSolutionKey: {
-            type: "hangoutsMeet" // Specifies Google Meet
-          }
+          requestId: `meeting-${Date.now()}`,
+          conferenceSolutionKey: { type: "hangoutsMeet" }
         }
-      }
+      },
+      attendees: [
+        { email: serviceCreator },
+      ],
+      reminders: {
+        useDefault: true,
+      },
     };
 
     try {
@@ -83,20 +82,13 @@ function ServiceCalendar() {
         })
 
       if (addEvent.data.status === "confirmed") {
-
-        console.log("addEvent show..", addEvent)
-
         const meetLink = addEvent.data.conferenceData.entryPoints?.find(
           (entryPoint) => entryPoint.entryPointType === "video"
         )?.uri;
-
-        console.log("meetLink", meetLink)
         toast.success("Event added successfully");
         setFormOpen(false);
-        // await saveCalendarEvents(meetLink)
         await fetchGoogleEvents();
       }
-
     } catch (error) {
       if (error.response && error.response.data.error === 'Request had insufficient authentication scopes.') {
         toast.error("Insufficient scope. Please reauthenticate and grant the necessary permissions.");
@@ -108,7 +100,6 @@ function ServiceCalendar() {
   }
 
   const fetchEvents = async () => {
-
     try {
       const response = await axios.get(`/user/get-calendar-event/${authInfo.id}`, {
         headers: {
@@ -117,6 +108,8 @@ function ServiceCalendar() {
           "Authorization": `Bearer ${authInfo.token}`,
         },
       });
+
+      console.log("fetch event response", response)
 
       if (response.data.data.length === 0) {
         toast.error("Event's not found.")
@@ -132,6 +125,7 @@ function ServiceCalendar() {
         start: event.start_datetime,
         end: event.end_datetime,
         title: event.event_title,
+        serviceCreator: event.service_id.createdBy.email,
       }));
 
       setEventDetails(formattedEvents);
@@ -140,18 +134,17 @@ function ServiceCalendar() {
     }
   };
 
-  //fetch data from google calendar
   const fetchGoogleEvents = async () => {
     try {
+      const url = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
       const accessToken = localStorage.getItem("accessToken");
-      const response = await axios.get("https://www.googleapis.com/calendar/v3/calendars/primary/events", {
+      const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       })
 
       console.log("response", response)
-
       if (response.status === 200) {
         const eventsData = response.data.items.map((item) => ({
           eventId: item.id,
@@ -161,8 +154,6 @@ function ServiceCalendar() {
           description: item.description,
           meeting_url: item.hangoutLink,
         }));
-
-        console.log("eventsData", eventsData)
 
         if (eventsData.length > 0) {
           const lastEvent = eventsData[eventsData.length - 1];
@@ -176,10 +167,7 @@ function ServiceCalendar() {
     }
   };
 
-  //save data in the data base 
   const saveCalendarEvents = async (eventsData, service_id, user_id) => {
-
-    // console.log("eventsData in saveCalendarEvents ", eventsData);
     try {
       const requestData = eventsData.map((event) => ({
         user_id,
@@ -192,7 +180,6 @@ function ServiceCalendar() {
         meeting_url: event.meeting_url,
       }));
 
-      console.log("requestData in saveCalendarEvents", requestData)
       const response = await axios.post(`/user/add-calendar-event/${authInfo.id}`, requestData, {
         headers: {
           "Accept": "application/json",
@@ -201,10 +188,6 @@ function ServiceCalendar() {
         },
       })
       if (response.data.status === true) {
-
-        // console.log("saveCalendarEvents function ", saveCalendarEvents)
-
-        //send notification to seller
         const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER_URL);
         const notification = {
           message: `${userInfo.name} Added google event for meeting`,
@@ -219,8 +202,6 @@ function ServiceCalendar() {
         }).catch(error => {
           console.log("Error saving notification:", error);
         });
-
-        //fetch data
         await fetchEvents();
       }
     } catch (error) {
@@ -228,13 +209,9 @@ function ServiceCalendar() {
     }
   };
 
-
-
   const handleDeleteEvent = async (id, event_id) => {
     try {
       const accessToken = localStorage.getItem("accessToken");
-
-
       const googleCalendarResponse = await axios.delete(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${event_id}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -293,7 +270,6 @@ function ServiceCalendar() {
       </div>
     );
   };
-
 
   return (
     <React.Fragment>

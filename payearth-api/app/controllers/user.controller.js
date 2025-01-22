@@ -1206,13 +1206,7 @@ function getCommonServiceById(req, res, next) {
   //console.log('iniside');
   userService
     .CommonServiceById(req)
-    .then((service) =>
-      service
-        ? res.status(200).json({ status: true, data: service })
-        : res
-          .status(400)
-          .json({ status: false, message: msg.common.no_data_err, data: [] })
-    )
+    .then((service) => service ? res.status(200).json({ status: true, data: service }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 
