@@ -135,6 +135,7 @@ module.exports = {
   addGoogleEvent,
   getGoogleEvent,
   deleteGoogleEvent,
+  updateServiceOrders,
   getServiceOrder,
   deleteReviews,
   zoomRefreshToken,
@@ -1397,10 +1398,10 @@ async function deleteFromCart(req) {
 
 async function clearFromCart(req) {
   try {
-     console.log('clearFromCart---', req.body)
+    console.log('clearFromCart---', req.body)
     var param = req.body;
     // console.log('deleteFromCart---', param)
-    const data = await Cart.deleteMany({ 
+    const data = await Cart.deleteMany({
       userId: param.userId,
     });
     if (data) {
@@ -2991,6 +2992,7 @@ async function CommonServiceById(req) {
     const chargePay = await OrderStatus.findOne({
       "service.serviceId": id,
       userId: authorId,
+      
     }).select("title service")
 
     // if (!chargePay) {
@@ -3217,6 +3219,7 @@ async function addGoogleEvent(req) {
           start_datetime: event.start_datetime,
           end_datetime: event.end_datetime,
           meeting_url: event.meeting_url,
+          status: event.status
         };
 
         data = await Calendar.create(eventData);
@@ -3249,11 +3252,11 @@ async function getGoogleEvent(req) {
     let result = await Calendar.find({ user_id }).exec();
 
     if (!result || result.length === 0) {
-      console.log("No events found for this user:", user_id);
+      // console.log("No events found for this user:", user_id);
       return [];
     }
 
-    result = await Calendar.find({ user_id })
+    result = await Calendar.find({ user_id, status: true })
       .populate({
         path: "service_id",
         model: Services,
@@ -3278,12 +3281,58 @@ async function getGoogleEvent(req) {
 async function deleteGoogleEvent(req) {
   const id = req.params.id;
   try {
-    const result = await Calendar.deleteOne({ _id: id });
-    return result;
+    const updatedEvent = await Calendar.findOneAndUpdate(
+      { _id: id }, // Find event by ID
+      { status: false }, // Set the status to false
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedEvent) {
+      return { message: "Event not found" };
+    }
+
+    return updatedEvent;
   } catch (error) {
     console.log(error);
   }
 }
+
+
+async function updateServiceOrders(req) {
+  try {
+    const { pastEventIDs } = req.body;
+    console.log("blockByUser", pastEventIDs);
+    const matchingEvents = await Calendar.find({
+      event_id: { $in: pastEventIDs }
+    });
+
+    if (matchingEvents.length === 0) {
+      console.log('No matching events found');
+      return;
+    }
+
+    // Step 2: Extract the service IDs from the matching events
+    const serviceIds = matchingEvents.map(event => event.service_id);
+
+    // // Step 3: Update order status for matching service IDs
+    const updateResult = await OrderStatus.updateMany(
+      {
+        'service.serviceId': { $in: serviceIds },
+        title: 'charges_paid' // Ensure we only update specific statuses
+      },
+      {
+        $set: {
+          title: 'service_completed',
+          updatedAt: new Date()
+        }
+      }
+    );
+    return updateResult
+  } catch (error) {
+    console.error('Error updating order status:', error);
+  }
+}
+
 
 // *******************************************************************************
 // *******************************************************************************
@@ -4394,7 +4443,7 @@ async function getCartData(req) {
 
 async function updateCartData(req) {
   const { userId, cartFromRedux } = req.body
- // console.log('cartFromRedux-----', cartFromRedux)
+  // console.log('cartFromRedux-----', cartFromRedux)
   try {
 
     for (const product of cartFromRedux) {
@@ -4411,11 +4460,11 @@ async function updateCartData(req) {
         userId: userId,
         "products.productId": productId,
       });
-     // console.log('cart data  --', cart)
+      // console.log('cart data  --', cart)
 
       if (cart) {
         // Update the matching product in the cart
-       // console.log('cart data  if--', cart)
+        // console.log('cart data  if--', cart)
         // await Cart.updateOne(
         //   { isActive: true, userId: userId, "products.productId": productId },
         //   {
@@ -4428,7 +4477,7 @@ async function updateCartData(req) {
         // );
       } else {
         // Add the product to the cart if not found
-       // console.log('cart data  else--', cart)
+        // console.log('cart data  else--', cart)
         cart = new Cart({
           userId: userId,
           isActive: true,

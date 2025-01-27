@@ -8,14 +8,22 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { toast } from "react-toastify";
 import moment from "moment";
+import { gapi } from "gapi-script";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import io from "socket.io-client";
+import { isLogin } from "../../../../helpers/login";
+import { useHistory } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 function ServiceCalendar(props) {
   const { serviceCreator } = props;
+  const location = useLocation();
+  const history = useHistory();
+  const currentUser = isLogin();
   const calendarRef = useRef(null);
   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const accessToken = localStorage.getItem("accessToken");
   const user_id = authInfo.id;
   const { id } = useParams();
   const service_id = id;
@@ -24,14 +32,50 @@ function ServiceCalendar(props) {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
-
+  const [event, setEvent] = useState();
+  const [chargesPayModel, setChargesPayModel] = useState(false);
+  // sessionStorage.getItem("paymentResponse")
   useEffect(() => {
     fetchEvents();
   }, [id]);
 
+  useEffect(() => {
+    const date = localStorage.getItem("selectedDate")
+    console.log("date", date)
+    const queryParams = new URLSearchParams(location.search);
+    const paymentStatus = queryParams.get('paymentResponse'); // Get the 'paymentResponse' query parameter
+    if (paymentStatus === 'true') {
+      setSelectedDate(date)
+      setFormOpen(true);
+    } else {
+      setFormOpen(false);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (accessToken) {
+      fetchGoogleEvents();
+    }
+  }, [])
+
   const handleDateClick = (arg) => {
-    setSelectedDate(moment(arg.date).format("YYYY-MM-DD"));
-    setFormOpen(true);
+    // const calenderStatus = sessionStorage.getItem("paymentResponse");
+    // console.log("calenderStatus", calenderStatus)
+    // if (calenderStatus === null) {
+    //   console.log("open event model")
+    //   setFormOpen(true);
+    //   setSelectedDate(moment(arg.date).format("YYYY-MM-DD"));
+    // } else {
+    //   console.log("Open payment model")
+    //   setChargesPayModel(true)
+    // }
+
+    setChargesPayModel(true)
+    // setSelectedDate(moment(arg.date).format("YYYY-MM-DD"));
+    const selectDate = moment(arg.date).format("YYYY-MM-DD")
+    console.log("selectDate.... when click first time", selectDate)
+    localStorage.setItem("selectedDate", selectDate);
+
   };
 
   const handleFormSubmit = async (values) => {
@@ -54,7 +98,6 @@ function ServiceCalendar(props) {
         dateTime: end_datetime,
         timeZone: "Asia/Kolkata"
       },
-
       conferenceData: {
         createRequest: {
           requestId: `meeting-${Date.now()}`,
@@ -71,6 +114,7 @@ function ServiceCalendar(props) {
 
     try {
       const accessToken = localStorage.getItem("accessToken");
+      console.log("accessToken", accessToken)
       const addEvent = await axios.post(
         `https://www.googleapis.com/calendar/v3/calendars/primary/events?conferenceDataVersion=1`,
         eventData,
@@ -82,11 +126,13 @@ function ServiceCalendar(props) {
         })
 
       if (addEvent.data.status === "confirmed") {
+        console.log("addEvent", addEvent)
         const meetLink = addEvent.data.conferenceData.entryPoints?.find(
           (entryPoint) => entryPoint.entryPointType === "video"
         )?.uri;
         toast.success("Event added successfully");
         setFormOpen(false);
+        sessionStorage.setItem("paymentResponse", false);
         await fetchGoogleEvents();
       }
     } catch (error) {
@@ -109,11 +155,11 @@ function ServiceCalendar(props) {
         },
       });
 
-      console.log("fetch event response", response)
+      // console.log("fetch event response", response)
 
-      if (response.data.data.length === 0) {
-        toast.error("Event's not found.")
-      }
+      // if (response.data.data.length === 0) {
+      //   toast.error("Event's not found.")
+      // }
       const formattedEvents = response.data.data.map((event) => ({
         event_id: event.event_id,
         id: event._id,
@@ -136,15 +182,14 @@ function ServiceCalendar(props) {
 
   const fetchGoogleEvents = async () => {
     try {
-      const url = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
+      // const url = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
       const accessToken = localStorage.getItem("accessToken");
-      const response = await axios.get(url, {
+      console.log("accessToken", accessToken)
+      const response = await axios.get("https://www.googleapis.com/calendar/v3/calendars/primary/events", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       })
-
-      console.log("response", response)
       if (response.status === 200) {
         const eventsData = response.data.items.map((item) => ({
           eventId: item.id,
@@ -155,6 +200,8 @@ function ServiceCalendar(props) {
           meeting_url: item.hangoutLink,
         }));
 
+        console.log("eventsData form google calender",)
+        setEvent(eventsData)
         if (eventsData.length > 0) {
           const lastEvent = eventsData[eventsData.length - 1];
           await saveCalendarEvents([lastEvent], service_id, user_id,);
@@ -167,6 +214,7 @@ function ServiceCalendar(props) {
     }
   };
 
+
   const saveCalendarEvents = async (eventsData, service_id, user_id) => {
     try {
       const requestData = eventsData.map((event) => ({
@@ -178,6 +226,7 @@ function ServiceCalendar(props) {
         end_datetime: event.end,
         event_description: event.description,
         meeting_url: event.meeting_url,
+        status: true
       }));
 
       const response = await axios.post(`/user/add-calendar-event/${authInfo.id}`, requestData, {
@@ -230,7 +279,7 @@ function ServiceCalendar(props) {
 
   const deleteFromDatabase = async (id) => {
     try {
-      const dataBaseResponse = await axios.delete(`/user/del-calendar-event/${id}`, {
+      const dataBaseResponse = await axios.put(`/user/del-calendar-event/${id}`, {}, {
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json;charset=UTF-8",
@@ -270,6 +319,16 @@ function ServiceCalendar(props) {
       </div>
     );
   };
+
+  const handleCheckout = () => {
+    if (!currentUser) {
+      toast.error("Please Login", { autoClose: 3000 });
+    } else {
+      history.push("/service_Charge_Checkout");
+    }
+  };
+
+
 
   return (
     <React.Fragment>
@@ -374,6 +433,20 @@ function ServiceCalendar(props) {
                   onClick={() => handleDeleteEvent(selectedEvent.id, selectedEvent.event_id)}
                 >
                   Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {chargesPayModel && (
+        <div className="modal fade show" style={{ display: "block" }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={handleCheckout}>
+                  PAY
                 </button>
               </div>
             </div>

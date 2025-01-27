@@ -259,9 +259,10 @@ router.post("/add-calendar-event/:id", addGoogleEvent);
 // router.get("/get-meeting/:id", getMeeting);
 router.get("/get-calendar-event/:id", getGoogleEvent);
 
-
 // router.delete("/delete-meeting/:id", delMeetingByUser);
-router.delete("/del-calendar-event/:id", deleteGoogleEvent);
+router.put("/del-calendar-event/:id", deleteGoogleEvent);
+
+router.put("/updateServiceOrders", updateServiceOrders);
 
 
 router.get("/service-orders/:id", getServiceOrder);
@@ -1367,6 +1368,13 @@ function deleteGoogleEvent(req, res, next) {
         ? res.json({ status: true, message: "Successfull Delete" })
         : res.json({ status: false, message: "ERROR" })
     )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+
+function updateServiceOrders(req, res, next) {
+  userService.updateServiceOrders(req)
+    .then((result) => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 //*****************************************************************************************/

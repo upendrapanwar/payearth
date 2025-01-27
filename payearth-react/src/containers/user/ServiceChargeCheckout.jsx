@@ -73,6 +73,7 @@ class ServiceCheckOut extends Component {
             showModal: false,
             isLoading: false,
             serviceDetails: "",
+            paymentResponse: false
         };
     }
 
@@ -441,6 +442,8 @@ class ServiceCheckOut extends Component {
                 }
             }).then((response) => {
                 if (response.data.status === true) {
+                    console.log("STRIPE RESPONSE", response.data.status)
+                    this.setState({ paymentResponse: response.data.status })
                     toast.success('Payment Done.', { autoClose: 3000 });
                     this.handleCheckOut();
                     // this.addOrderTimeLine(response.data.data, orderStatus);
@@ -600,7 +603,9 @@ class ServiceCheckOut extends Component {
 
     render() {
 
-        const { expiryDate, selectCard, isLoading, stripeResponse, serviceDetails } = this.state;
+
+        const { expiryDate, selectCard, isLoading, stripeResponse, serviceDetails, orderStatus } = this.state;
+        console.log("orderStatus", orderStatus)
         console.log("serviceDetails in service checkout: ", serviceDetails)
         console.log("serviceDetails charges:>", serviceDetails.result.charges)
         //  const subscriptionPlanData = this.props.location.state && this.props.location.state.subscriptionPlan;
@@ -745,11 +750,9 @@ class ServiceCheckOut extends Component {
                         <div className="alert text-center" role="alert">
                             <img src={successImg} alt="Success" style={{ width: '100px', height: '100px' }} />
                             <h4 className="alert-heading text-success">Your payment was successfull!</h4>
-
-                            {/* <p className="mb-0">Your invoice no is <b>{stripeResponse.status === true ? stripeResponse.data.latest_invoice.number : ""}</b></p> */}
                             <div className="d-grid gap-2 col-6 mx-auto mt-3">
-                                {/* <div className="ctn_btn"><Link to="/my-banners" className="view_more">DONE</Link></div> */}
-                                <Link to="/">
+                                {/* status=${orderStatus[0].title} */}
+                                <Link to={`/service-detail/${serviceDetails.result.id}?paymentResponse=${this.state.paymentResponse}`}>
                                     <button onClick={this.clearSessionStorage} className="btn btn-primary btn-sm mt-2" type="button">Return</button>
                                 </Link>
                             </div>

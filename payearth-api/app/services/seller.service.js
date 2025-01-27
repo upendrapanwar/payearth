@@ -5165,59 +5165,59 @@ async function getTopSellingCategories(req) {
 
 
     const sellerId = req.query.authorId;
-console.log('getTopSellingCategories---authorId', sellerId);
+    console.log('getTopSellingCategories---authorId', sellerId);
 
-const topSellingCategories = await OrderStatus.find({ title: "Delivered" }).select('product')
-  .populate([
-    {
-      path: "product.productId",
-      model: Product,
-      select: "category createdBy", // Include `createdBy` to filter by sellerId
-      match: { createdBy: mongoose.Types.ObjectId(sellerId) }, // Filter products by `createdBy` field matching sellerId
-      populate: {
-        path: "category",
-        model: Category,
-        select: "categoryName",
-      },
-    },
-  ]);
+    const topSellingCategories = await OrderStatus.find({ title: "Delivered" }).select('product')
+      .populate([
+        {
+          path: "product.productId",
+          model: Product,
+          select: "category createdBy", // Include `createdBy` to filter by sellerId
+          match: { createdBy: mongoose.Types.ObjectId(sellerId) }, // Filter products by `createdBy` field matching sellerId
+          populate: {
+            path: "category",
+            model: Category,
+            select: "categoryName",
+          },
+        },
+      ]);
 
-if (!topSellingCategories || topSellingCategories.length === 0) {
-  return {
-    status: false,
-    data: [],
-  };
-}
-
-const categoryCounts = {};
-topSellingCategories.forEach(order => {
-  const product = order.product?.productId;
-  const category = Array.isArray(product) ? product[0]?.category : product?.category;
-
-  if (category) {
-    const categoryId = category._id.toString();
-    const categoryName = category.categoryName;
-
-    if (!categoryCounts[categoryId]) {
-      categoryCounts[categoryId] = {
-        id: categoryId,
-        name: categoryName,
-        count: 0,
+    if (!topSellingCategories || topSellingCategories.length === 0) {
+      return {
+        status: false,
+        data: [],
       };
     }
-    categoryCounts[categoryId].count++;
-  }
-});
 
-const sortedCategories = Object.values(categoryCounts)
-  .sort((a, b) => b.count - a.count);
+    const categoryCounts = {};
+    topSellingCategories.forEach(order => {
+      const product = order.product?.productId;
+      const category = Array.isArray(product) ? product[0]?.category : product?.category;
 
-const top4Categories = sortedCategories.slice(0, 4);
+      if (category) {
+        const categoryId = category._id.toString();
+        const categoryName = category.categoryName;
 
-return {
-  status: true,
-  data: top4Categories,
-};
+        if (!categoryCounts[categoryId]) {
+          categoryCounts[categoryId] = {
+            id: categoryId,
+            name: categoryName,
+            count: 0,
+          };
+        }
+        categoryCounts[categoryId].count++;
+      }
+    });
+
+    const sortedCategories = Object.values(categoryCounts)
+      .sort((a, b) => b.count - a.count);
+
+    const top4Categories = sortedCategories.slice(0, 4);
+
+    return {
+      status: true,
+      data: top4Categories,
+    };
 
 
   } catch (error) {
@@ -5392,7 +5392,7 @@ async function productSalesGraph(req, res) {
         { $match: matchStage },
         {
           $lookup: {
-            from: "products", 
+            from: "products",
             localField: "product.productId",
             foreignField: "_id",
             as: "productDetails",
@@ -5401,7 +5401,7 @@ async function productSalesGraph(req, res) {
         { $unwind: "$productDetails" },
         {
           $match: {
-            "productDetails.createdBy": authorObjectId, 
+            "productDetails.createdBy": authorObjectId,
           },
         },
         {
@@ -5662,7 +5662,7 @@ async function productSalesGraph(req, res) {
 async function serviceSalesGraph(req, res) {
   try {
     const { year, timeFrame, authorId, month } = req.query;
-   // console.log("Query Parameters - year:", year, "timeFrame:", timeFrame, "authorId:", authorId, "month:", month);
+    // console.log("Query Parameters - year:", year, "timeFrame:", timeFrame, "authorId:", authorId, "month:", month);
 
     if (!year || !timeFrame || !["week", "month", "year"].includes(timeFrame) || !authorId) {
       return false;
@@ -5841,7 +5841,7 @@ async function getListedProductData(req) {
 
 async function getListedServicesData(req) {
   const { status, sellerId } = req.query;
- // console.log('getListedServicesData---', req.query)
+  // console.log('getListedServicesData---', req.query)
   try {
     const query = {
       isActive: status,
@@ -5865,9 +5865,9 @@ async function getOrderDetails(req) {
   const { status, sellerId } = req.query;
   try {
     const productOrders = await Order.find({
-      isService: false, 
+      isService: false,
       isSubscription: false,
-      isActive: true, 
+      isActive: true,
     })
       .select("orderCode orderStatus total discount")
       .sort({ createdAt: 'desc' })
@@ -5876,11 +5876,11 @@ async function getOrderDetails(req) {
         {
           path: "orderStatus",
           model: OrderStatus,
-          select: "title product", 
+          select: "title product",
           populate: {
-            path: "product.productId", 
-            match: { createdBy: mongoose.Types.ObjectId(sellerId) }, 
-            select: "createdBy", 
+            path: "product.productId",
+            match: { createdBy: mongoose.Types.ObjectId(sellerId) },
+            select: "createdBy",
           },
         },
         {
@@ -5900,21 +5900,21 @@ async function getOrderDetails(req) {
           order.orderStatus.some(status =>
             status.product &&
             status.product.productId &&
-            Array.isArray(status.product.productId) && 
+            Array.isArray(status.product.productId) &&
             status.product.productId.some(product =>
               product.createdBy && product.createdBy.toString() === sellerId.toString()
             )
           )
         );
       });
-    
-  //  console.log("Filtered Product Orders:", productOrders);
-    
+
+    //  console.log("Filtered Product Orders:", productOrders);
+
 
     const serviceOrders = await Order.find({
-      isService: true, 
+      isService: true,
       isSubscription: false,
-      isActive: true, 
+      isActive: true,
     })
       .select("orderStatus orderCode total discount userId paymentId")
       .sort({ createdAt: 'desc' })
@@ -5925,9 +5925,9 @@ async function getOrderDetails(req) {
           model: OrderStatus,
           select: "title service",
           populate: {
-            path: "service.serviceId", 
-            match: { createdBy: mongoose.Types.ObjectId(sellerId) }, 
-            select: "createdBy", 
+            path: "service.serviceId",
+            match: { createdBy: mongoose.Types.ObjectId(sellerId) },
+            select: "createdBy",
           },
         },
         {
@@ -5953,7 +5953,7 @@ async function getOrderDetails(req) {
         );
       });
 
-  //  console.log("Filtered Service Orders:", serviceOrders);
+    //  console.log("Filtered Service Orders:", serviceOrders);
 
 
     if (!productOrders.length && !serviceOrders.length) {
