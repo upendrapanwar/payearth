@@ -13,9 +13,11 @@ import { useHistory } from "react-router-dom";
 import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
+import { useLocation } from "react-router-dom";
 
 function ServiceDetailsTabbing(props) {
   const history = useHistory();
+  const location = useLocation();
   const accessToken = localStorage.getItem("accessToken");
   const [zoomAccessToken, setZoomAccessToken] = useState(null);
   const [zoom_userId, setZoom_userId] = useState(null);
@@ -27,6 +29,11 @@ function ServiceDetailsTabbing(props) {
   const { scrollToReviews, scheduledMeeting, serviceCreator, chargesPayStatus } = props;
 
   const [activeTab, setActiveTab] = useState("description");
+
+  // useEffect(() => {
+  //   setChargesPayStatus(paymentStatus);
+  // }, [paymentStatus]);
+
 
   useEffect(() => {
     if (scrollToReviews) {
@@ -41,12 +48,25 @@ function ServiceDetailsTabbing(props) {
     }
   }, [scheduledMeeting]);
 
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const paymentStatus = queryParams.get('paymentResponse');
+    if (paymentStatus === 'true') {
+      setActiveTab("appointment");
+    }
+  })
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(3);
 
   useEffect(() => {
     fetchApi();
     eventMeeting();
+    if (accessToken) {
+      console.log("if token then run....")
+      fetchPastEvents();
+    }
+    // updateServiceOrders();
   }, []);
 
   const authInfo = JSON.parse(localStorage.getItem("authInfo"));
@@ -226,6 +246,104 @@ function ServiceDetailsTabbing(props) {
     }
   };
 
+  const fetchPastEvents = async () => {
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      const now = new Date(); // Current timestamp in ISO format
+      const past30Minutes = new Date(now.getTime() - 30 * 60 * 1000).toISOString(); // 30 minutes ago
+      const nowISO = now.toISOString();
+      const response = await axios.get(
+        "https://www.googleapis.com/calendar/v3/calendars/primary/events",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          params: {
+            timeMax: past30Minutes, // @@@@@@ Important line event start time to fetch after 30min , 10min ....
+            singleEvents: true,
+            orderBy: "startTime",
+          },
+        }
+      );
+
+      console.log("response fetchPastEvents", response)
+      // Filter for Google Meet events
+      const eventsWithMeetLinks = response.data.items.filter(
+        (event) =>
+          event.conferenceData &&
+          event.conferenceData.entryPoints &&
+          event.conferenceData.entryPoints.some(
+            (entry) => entry.entryPointType === "video"
+          )
+      );
+
+      // Extract event IDs
+      const pastEventIDs = eventsWithMeetLinks.map((event) => event.id);
+
+      console.log("pastEvents", pastEventIDs)
+      // if (pastEventIDs.length > 0) {
+      //   console.log("event not null....", pastEventIDs)
+      //   const url = "/user/updateServiceOrders"
+      //   const eventId = {
+      //     pastEventIDs: pastEventIDs
+      //   }
+      //   axios.put(url, eventId, {
+      //     headers: {
+      //       'Accept': 'application/json',
+      //       'Content-Type': 'application/json;charset=UTF-8',
+      //       'Authorization': `Bearer ${authInfo.token}`
+      //     }
+      //   }).then((response) => {
+      //     console.log("response", response);
+      //     // closeIframe();
+      //     // toast.success("Advertise Blocked successfully....", { autoClose: 2000 })
+      //     setTimeout(() => {
+      //       // fetchData();
+      //     }, 3000);
+      //   }).catch((error) => {
+      //     console.log("error", error)
+      //   })
+      // } else {
+      //   console.log("no any event found..")
+      // }
+      // return pastEventIDs;
+    } catch (error) {
+      console.error("Error fetching past events:", error);
+      throw error;
+    }
+  };
+
+  //
+
+  // const block = (advertisementId) => {
+  //   const user = isLogin();
+  //   if (user === true) {
+  //     const url = `https://localhost:7700/user/blockBanner/${advertisementId}`
+  //     const blockId = {
+  //       blockByUser: authInfo.id
+  //     }
+  //     axios.put(url, blockId, {
+  //       headers: {
+  //         'Accept': 'application/json',
+  //         'Content-Type': 'application/json;charset=UTF-8',
+  //         'Authorization': `Bearer ${authInfo.token}`
+  //       }
+  //     }).then((response) => {
+  //       closeIframe();
+  //       toast.success("Advertise Blocked successfully....", { autoClose: 2000 })
+  //       setTimeout(() => {
+  //         fetchData();
+  //       }, 3000);
+  //     }).catch((error) => {
+  //       console.log("error", error)
+  //     })
+  //   }
+  // }
+
+
+  // console.log("chargesPayStatus:", chargesPayStatus)
+  // const isButtonDisabled = chargesPayStatus.chargePay === null;
+
   return (
     <React.Fragment>
       <section className="service_details_sec" ref={props.ref}>
@@ -297,7 +415,7 @@ function ServiceDetailsTabbing(props) {
                         aria-controls="appointment"
                         aria-selected={activeTab === "appointment"}
                         onClick={() => setActiveTab("appointment")}
-                        disabled={chargesPayStatus === null ? true : false}
+                      // disabled={chargesPayStatus === null ? true : false}
 
                       >
                         Appointment
@@ -351,7 +469,7 @@ function ServiceDetailsTabbing(props) {
                       aria-labelledby="appointment-tab"
                     >
                       <p className="mb-0">
-                        <ServiceCalendar authToken={authInfo.token} serviceCreator={serviceCreator} />
+                        <ServiceCalendar authToken={authInfo.token} serviceCreator={serviceCreator} chargesPayStatus={chargesPayStatus} />
                       </p>
                     </div>
                   )}

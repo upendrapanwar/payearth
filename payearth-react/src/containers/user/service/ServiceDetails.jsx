@@ -94,13 +94,13 @@ const ServiceDetails = () => {
     setScrollToReviews(false);
   };
 
-  const handleCheckout = () => {
-    if (!currentUser) {
-      toast.error("Please Login", { autoClose: 3000 });
-    } else {
-      history.push("/service_Charge_Checkout");
-    }
-  };
+  // const handleCheckout = () => {
+  //   if (!currentUser) {
+  //     toast.error("Please Login", { autoClose: 3000 });
+  //   } else {
+  //     history.push("/service_Charge_Checkout");
+  //   }
+  // };
 
   const fetchApi = async () => {
     try {
@@ -193,7 +193,7 @@ const ServiceDetails = () => {
                           {data.result.description ? parse(data.result.description) : ""}
                         </div>
                       </div>
-                      {currentUser === true ? (
+                      {/* {currentUser === true ? (
                         data.chargePay && data.chargePay.title === "charges_paid" ? (
                           <div className="card-body bg-primary-subtle text-primary-emphasis d-flex align-items-center justify-content-center gap-4 m-3" onClick={setMeeting}>
                             <h6 className="card-title font-monospace">CLICK HERE TO SCHEDULE A MEETING</h6>
@@ -217,7 +217,7 @@ const ServiceDetails = () => {
                           </button>
                           <br />
                         </div>
-                      )}
+                      )} */}
                       <div className="pdi_share">
                         <p>
                           Created :{" "}
