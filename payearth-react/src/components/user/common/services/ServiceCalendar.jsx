@@ -32,18 +32,16 @@ function ServiceCalendar(props) {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
-  const [event, setEvent] = useState();
   const [chargesPayModel, setChargesPayModel] = useState(false);
-  // sessionStorage.getItem("paymentResponse")
+
   useEffect(() => {
     fetchEvents();
   }, [id]);
 
   useEffect(() => {
     const date = localStorage.getItem("selectedDate")
-    console.log("date", date)
     const queryParams = new URLSearchParams(location.search);
-    const paymentStatus = queryParams.get('paymentResponse'); // Get the 'paymentResponse' query parameter
+    const paymentStatus = queryParams.get('paymentResponse');
     if (paymentStatus === 'true') {
       setSelectedDate(date)
       setFormOpen(true);
@@ -59,23 +57,9 @@ function ServiceCalendar(props) {
   }, [])
 
   const handleDateClick = (arg) => {
-    // const calenderStatus = sessionStorage.getItem("paymentResponse");
-    // console.log("calenderStatus", calenderStatus)
-    // if (calenderStatus === null) {
-    //   console.log("open event model")
-    //   setFormOpen(true);
-    //   setSelectedDate(moment(arg.date).format("YYYY-MM-DD"));
-    // } else {
-    //   console.log("Open payment model")
-    //   setChargesPayModel(true)
-    // }
-
     setChargesPayModel(true)
-    // setSelectedDate(moment(arg.date).format("YYYY-MM-DD"));
     const selectDate = moment(arg.date).format("YYYY-MM-DD")
-    console.log("selectDate.... when click first time", selectDate)
     localStorage.setItem("selectedDate", selectDate);
-
   };
 
   const handleFormSubmit = async (values) => {
@@ -131,8 +115,10 @@ function ServiceCalendar(props) {
           (entryPoint) => entryPoint.entryPointType === "video"
         )?.uri;
         toast.success("Event added successfully");
-        setFormOpen(false);
+        history.push(`/service-detail/${service_id}`);
         sessionStorage.setItem("paymentResponse", false);
+        localStorage.removeItem("selectedDate");
+        // setEventStatus(false)
         await fetchGoogleEvents();
       }
     } catch (error) {
@@ -199,9 +185,7 @@ function ServiceCalendar(props) {
           description: item.description,
           meeting_url: item.hangoutLink,
         }));
-
-        console.log("eventsData form google calender",)
-        setEvent(eventsData)
+        // setEvent(eventsData)
         if (eventsData.length > 0) {
           const lastEvent = eventsData[eventsData.length - 1];
           await saveCalendarEvents([lastEvent], service_id, user_id,);
@@ -328,8 +312,6 @@ function ServiceCalendar(props) {
     }
   };
 
-
-
   return (
     <React.Fragment>
       {formOpen && (
@@ -444,10 +426,20 @@ function ServiceCalendar(props) {
         <div className="modal fade show" style={{ display: "block" }}>
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
+              <div className="modal-body text-center">
+                <p className="mb-0 text-dark fw-bold">
+                  Are you sure you want to confirm this service?
+                </p>
+              </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={handleCheckout}>
-                  PAY
-                </button>
+                <div className="w-100 d-flex justify-content-center">
+                  <button type="button" className="btn btn-primary mx-2" onClick={handleCheckout}>
+                    Confirm
+                  </button>
+                  <button type="button" className="btn btn-secondary mx-2" onClick={() => setChargesPayModel(false)}>
+                    Close
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -469,6 +461,9 @@ function ServiceCalendar(props) {
         eventContent={renderEventContent}
         ref={calendarRef}
         eventClassNames="fc-daygrid-event"
+        validRange={{
+          start: new Date().toISOString().split('T')[0] // Disables dates before today
+        }}
       />
     </React.Fragment>
   );

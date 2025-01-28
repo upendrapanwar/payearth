@@ -13,9 +13,11 @@ import { useHistory } from "react-router-dom";
 import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
+import { useLocation } from "react-router-dom";
 
 function ServiceDetailsTabbing(props) {
   const history = useHistory();
+  const location = useLocation();
   const accessToken = localStorage.getItem("accessToken");
   const [zoomAccessToken, setZoomAccessToken] = useState(null);
   const [zoom_userId, setZoom_userId] = useState(null);
@@ -45,6 +47,14 @@ function ServiceDetailsTabbing(props) {
       eventMeeting();
     }
   }, [scheduledMeeting]);
+
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const paymentStatus = queryParams.get('paymentResponse');
+    if (paymentStatus === 'true') {
+      setActiveTab("appointment");
+    }
+  })
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(3);

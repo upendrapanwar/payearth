@@ -597,9 +597,9 @@ class ServiceCheckOut extends Component {
     /******************************************************************************/
     /******************************************************************************/
 
-    clearSessionStorage = () => {
-        sessionStorage.clear();
-    }
+    // clearSessionStorage = () => {
+    //     sessionStorage.clear();
+    // }
 
     render() {
 
@@ -753,7 +753,9 @@ class ServiceCheckOut extends Component {
                             <div className="d-grid gap-2 col-6 mx-auto mt-3">
                                 {/* status=${orderStatus[0].title} */}
                                 <Link to={`/service-detail/${serviceDetails.result.id}?paymentResponse=${this.state.paymentResponse}`}>
-                                    <button onClick={this.clearSessionStorage} className="btn btn-primary btn-sm mt-2" type="button">Return</button>
+                                    <button
+                                    //  onClick={this.clearSessionStorage} 
+                                     className="btn btn-primary btn-sm mt-2" type="button">Return</button>
                                 </Link>
                             </div>
                         </div>
