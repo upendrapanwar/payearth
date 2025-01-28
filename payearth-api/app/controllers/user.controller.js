@@ -252,7 +252,8 @@ router.get("/get-common-service/:id", getCommonServiceById);
 router.post("/service-review", addServiceReview);
 router.get("/get-service-review/:id", getServiceReviews);
 router.delete("/delete-review/:id", deleteReviews);
-
+router.post("/product-review", addProductReview);
+router.delete("/delete-product-review/:id", deleteProductReview);
 // router.post("/add-meeting-user/:id", addMeetByUser);
 router.post("/add-calendar-event/:id", addGoogleEvent);
 
@@ -305,7 +306,6 @@ router.get("/getProductOrder/:id", getProductOrder);
 
 router.get("/getCartData/:id", getCartData);
 router.post("/updateCartData", updateCartData);
-
 
 module.exports = router;
 
@@ -1269,6 +1269,46 @@ function deleteReviews(req, res, next) {
         : res.json({ status: false, message: "ERROR" })
     )
     .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+ function deleteProductReview(req, res, next) {
+  userService
+    .deleteProductReview(req)
+    .then((review) =>
+      review
+        ? res.json({ status: true, message: "Successfull Delete" })
+        : res.json({ status: false, message: "ERROR" })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+async function addProductReview(req, res, next) {
+  const param = req.body;
+  console.log("addProductReview param", param);
+  try {
+    // if (req.files && req.files.fileValidationError) {
+    //   return res
+    //     .status(400)
+    //     .json({ status: false, message: req.files.fileValidationError });
+    // }
+
+    const review = await userService.addProductReview(req);
+    if (review) {
+      res.status(201).json({
+        status: true,
+        message: "Product review added successfully",
+        data: review,
+      });
+      // console.log('review-------', review)
+    } else {
+      res
+        .status(400)
+        .json({ status: false, message: "Failed to add service review" });
+    }
+  } catch (err) {
+    console.error("Error adding service review:", err);
+    next(res.status(400).json({ status: false, message: err.message }));
+  }
 }
 
 //*****************************************************************************************/
