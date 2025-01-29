@@ -42,7 +42,9 @@ class ProductDetail extends Component {
       category: "",
       mainImage: null,
       selectColorImage: null,
-      selectColor: null
+      selectColor: null,
+      averageRating:'',
+      reviewCount:''
     };
   }
 
@@ -73,6 +75,17 @@ class ProductDetail extends Component {
           } else {
             sizes = [];
           }
+
+          const reviews = response.data.data.reviews; 
+          const reviewCount = response.data.data.reviews?.length;
+
+          // Calculate the average rating
+          const totalRatings = reviews.reduce((sum, review) => sum + review.rating, 0);
+          const averageRating = totalRatings / reviewCount;
+
+          console.log("Average Rating:", averageRating);
+
+
           this.setState({
             id: productId,
             productDetail: resData,
@@ -81,6 +94,8 @@ class ProductDetail extends Component {
             sizeControlls,
             featuredImg: resData.featuredImage,
             thumbnails: resData.images.length ? resData.images[0] : [],
+            averageRating: averageRating.toFixed(1),
+            reviewCount: reviewCount
           });
         }
       })
@@ -170,7 +185,7 @@ class ProductDetail extends Component {
   }
 
   render() {
-    const { sizeControlls, productDetail, featuredImage, mainImage, selectColor, selectColorImage, id } = this.state;
+    const { sizeControlls, productDetail, featuredImage, mainImage, selectColor, selectColorImage, id, averageRating, reviewCount } = this.state;
 
     console.log("productDetail-------11", productDetail)
     var proQuantity = 0;
@@ -280,13 +295,13 @@ class ProductDetail extends Component {
                         <div className="prod_dtl_body">
                           <h2>{productDetail.name}</h2>
                           <div className="pdi_ratings">
-                            <Rating avgRating={productDetail.avgRating} />
+                            <Rating avgRating={averageRating} />
                             <Link
                               to="#"
                               className="reviews_count"
                               onClick={this.scrollToMyRef}
                             >
-                              ( {productDetail.reviewCount} Reviews )
+                              ( {reviewCount} Reviews )
                             </Link>
                           </div>
                           <div className="pdi_price">

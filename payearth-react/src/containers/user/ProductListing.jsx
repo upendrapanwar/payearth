@@ -110,16 +110,41 @@ const ProductListing = () => {
         };
 
         axios.post('front/products/listing', reqBodyUpdated).then((response) => {
+            // if (response.data.status) {
+            //     let res = response.data.data;
+            //     console.log('res------',res)
+            //     res.forEach(product => {
+            //         productsData.push({
+            //             id: product.id,
+            //             image: product.featuredImage,
+            //             name: product.name,
+            //             isService: product.isService,
+            //             price: product.price,
+            //             avgRating: product.avgRating,
+            //             quantity: product.quantity,
+            //             cryptoPrices: product.cryptoPrices
+            //         });
+            //     });
+            // }
+
             if (response.data.status) {
                 let res = response.data.data;
                 res.forEach(product => {
+                    let avgRating = 0;
+                    if (product.reviews && product.reviews.length > 0) {
+                        const totalRatings = product.reviews.reduce((sum, review) => sum + review.rating, 0);
+                        avgRating = totalRatings / product.reviews.length;
+            
+                        avgRating = avgRating % 1 >= 0.8 ? Math.ceil(avgRating) : avgRating.toFixed(1);
+                    }
+            
                     productsData.push({
                         id: product.id,
                         image: product.featuredImage,
                         name: product.name,
                         isService: product.isService,
                         price: product.price,
-                        avgRating: product.avgRating,
+                        avgRating: avgRating,
                         quantity: product.quantity,
                         cryptoPrices: product.cryptoPrices
                     });
@@ -128,7 +153,6 @@ const ProductListing = () => {
             setProductsState(productsData);
         }).catch(error => {
             if (error.response && error.response.data.status === false) {
-                // dispatch(setProducts({ products: [] }));
             }
         }).finally(() => {
             setTimeout(() => {

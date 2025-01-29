@@ -231,11 +231,11 @@ class Dashboard extends Component {
                 selector: (row, i) => `$ ${row.discount}`,
                 sortable: true
             },
-            {
-                name: 'ORDER STATUS',
-                selector: (row, i) => row.orderStatus[0].title,
-                sortable: true
-            },
+            // {
+            //     name: 'ORDER STATUS',
+            //     selector: (row, i) => row.orderStatus[0].title,
+            //     sortable: true
+            // },
             {
                 name: 'PAYMENT MODE',
                 selector: (row, i) => row.paymentId.paymentMode,

@@ -30,7 +30,7 @@ const schema = new Schema({
     cryptoPrices: [{ type: Schema.Types.ObjectId, ref: 'CryptoConversion' }],
     isActive: { type: Boolean, required: false, default: true },
     approveStatus: { type: String, enum: ["none", "pending", "reject"], required: false, default: "none" },
-    reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
+    reviews: [{ type: Schema.Types.ObjectId, ref: 'ProductReview' }],
     reviewCount: { type: Number, required: false, default: 0 },
     totalRatingScore: { type: Number, required: false, default: 0 },
     avgRating: { type: Number, required: false, default: 0 },

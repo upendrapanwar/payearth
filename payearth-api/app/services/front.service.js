@@ -28,6 +28,7 @@ const {
   Services,
   ServiceReview,
   Notification,
+  OrderStatus,
 } = require("../helpers/db");
 
 module.exports = {
@@ -78,7 +79,7 @@ module.exports = {
 };
 
 async function getReviews(id) {
- // console.log('getReviews----',id)
+  // console.log('getReviews----',id)
   const reviews = await ProductReview.find({ isActive: true, productId: id })
     .select("id review rating productId reviewImages createdAt")
     .sort({ createdAt: "desc" })
@@ -135,32 +136,28 @@ async function getRatingCount(productId) {
   console.log("Fetching rating counts for productId:", productId);
 
   try {
-    // Aggregation pipeline
     const ratingsData = [
-      { $match: { productId: mongoose.Types.ObjectId(productId) } }, // Match the product ID
+      { $match: { productId: mongoose.Types.ObjectId(productId) } }, 
       {
         $group: {
-          _id: null, // No grouping key
-          "5": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 5] }, { $lt: ["$rating", 6] }] }, 1, 0] } }, // 5.0 <= rating < 6
-          "4": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 4] }, { $lt: ["$rating", 5] }] }, 1, 0] } }, // 4.0 <= rating < 5
-          "3": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 3] }, { $lt: ["$rating", 4] }] }, 1, 0] } }, // 3.0 <= rating < 4
-          "2": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 2] }, { $lt: ["$rating", 3] }] }, 1, 0] } }, // 2.0 <= rating < 3
-          "1": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 1] }, { $lt: ["$rating", 2] }] }, 1, 0] } }, // 1.0 <= rating < 2
+          _id: null, 
+          "5": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 5] }, { $lt: ["$rating", 6] }] }, 1, 0] } }, 
+          "4": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 4] }, { $lt: ["$rating", 5] }] }, 1, 0] } }, 
+          "3": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 3] }, { $lt: ["$rating", 4] }] }, 1, 0] } }, 
+          "2": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 2] }, { $lt: ["$rating", 3] }] }, 1, 0] } }, 
+          "1": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 1] }, { $lt: ["$rating", 2] }] }, 1, 0] } }, 
         },
       },
     ];
 
-    // Execute the aggregation
     const ratings = await ProductReview.aggregate(ratingsData);
 
-    // Process the result
     if (ratings && ratings.length > 0) {
-      const { _id, ...ratingCounts } = ratings[0]; // Remove the `_id` field from the result
+      const { _id, ...ratingCounts } = ratings[0];
       console.log("Rating counts:", ratingCounts);
       return ratingCounts;
     }
 
-    // If no ratings are found, return default counts
     return { "5": 0, "4": 0, "3": 0, "2": 0, "1": 0 };
   } catch (err) {
     console.error("Error in getRatingCount:", err);
@@ -230,52 +227,240 @@ async function getProductCategory() {
   return false;
 }
 
+// async function getTrendingProducts(req) {
+//   const limit = req.params.limit == "all" ? "" : parseInt(req.params.limit);
+//   const result = await TrendingProduct.find({ isActive: true })
+//     .select("id")
+//     .populate([
+//       {
+//         path: "productId",
+//         model: Product,
+//         select: "id name price featuredImage avgRating isService quantity",
+//         populate: {
+//           path: "cryptoPrices",
+//           model: CryptoConversion,
+//           select: "name code cryptoPriceUSD",
+//           match: { isActive: true, asCurrency: true },
+//         },
+//       },
+//     ])
+//     .limit(limit)
+//     .sort({ createdAt: "desc" });
+//   if (result && result.length > 0) return result;
+//   return false;
+// }
+
 async function getTrendingProducts(req) {
-  const limit = req.params.limit == "all" ? "" : parseInt(req.params.limit);
-  const result = await TrendingProduct.find({ isActive: true })
-    .select("id")
-    .populate([
+  try {
+    const limit = req.params.limit == "all" ? "" : parseInt(req.params.limit);
+
+    const popularProducts = await OrderStatus.aggregate([
       {
-        path: "productId",
-        model: Product,
-        select: "id name price featuredImage avgRating isService quantity",
-        populate: {
-          path: "cryptoPrices",
-          model: CryptoConversion,
-          select: "name code cryptoPriceUSD",
-          match: { isActive: true, asCurrency: true },
-        },
+        $match: {
+          isActive: true,
+          "product.productId": { $exists: true, $ne: [] } 
+        }
       },
-    ])
-    .limit(limit)
-    .sort({ createdAt: "desc" });
-  if (result && result.length > 0) return result;
-  return false;
+      {
+        $unwind: "$product" 
+      },
+      {
+        $group: {
+          _id: "$product.productId", 
+          totalOrders: { $sum: 1 },
+          totalQuantity: { $sum: "$product.quantity" } 
+        }
+      },
+      {
+        $sort: {
+          totalOrders: -1 
+        }
+      },
+      {
+        $limit: limit 
+      },
+      {
+        $lookup: {
+          from: "products", 
+          localField: "_id", 
+          foreignField: "_id", 
+          as: "productDetails" 
+        }
+      },
+      {
+        $unwind: {
+          path: "$productDetails",
+          preserveNullAndEmptyArrays: true 
+        }
+      },
+
+      {
+        $lookup: {
+          from: "productreviews", 
+          localField: "productDetails.reviews", 
+          foreignField: "_id", 
+          as: "productDetails.reviews" 
+        }
+      },
+      {
+        $project: {
+          _id: 0, 
+          productId: "$_id", 
+          totalOrders: 1,
+          totalQuantity: 1,
+          productDetails: {
+            _id: 1,
+            name: 1,
+            lname: 1, 
+            category: 1,
+            sub_category: 1,
+            featuredImage: 1,
+            price: 1,
+            isActive: 1,
+            isService: 1,
+            reviews: { $ifNull: ["$productDetails.reviews", []] }, 
+            quantity: 1,
+            createdBy: 1,
+            updatedBy: 1,
+            productCode: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            __v: 1
+          }
+        }
+      }
+    ]);
+
+    if (popularProducts && popularProducts.length > 0) {
+    //  console.log("Popular Products with Reviews:", popularProducts);
+      return popularProducts;
+    }
+
+    return false;
+  } catch (error) {
+    console.error("Error fetching popular products:", error.message);
+    throw error;
+  }
 }
 
+
+// async function getPopularProducts(req) {
+//   const limit = req.params.limit == "all" ? "" : parseInt(req.params.limit);
+//   const result = await PopularProduct.find({ isActive: true })
+//     .select("id")
+//     //.populate("productId", "id name price featuredImage")
+//     .populate([
+//       {
+//         path: "productId",
+//         model: Product,
+//         select: "id name price featuredImage avgRating isService quantity",
+//         populate: {
+//           path: "cryptoPrices",
+//           model: CryptoConversion,
+//           select: "name code cryptoPriceUSD",
+//           match: { isActive: true, asCurrency: true },
+//         },
+//       },
+//     ])
+//     .limit(limit)
+//     .sort({ createdAt: "desc" });
+//   if (popularProducts && popularProducts.length > 0) return popularProducts;
+//   return false;
+// }
+
 async function getPopularProducts(req) {
-  const limit = req.params.limit == "all" ? "" : parseInt(req.params.limit);
-  const result = await PopularProduct.find({ isActive: true })
-    .select("id")
-    //.populate("productId", "id name price featuredImage")
-    .populate([
+  try {
+    const limit = req.params.limit === "all" ? Number.MAX_SAFE_INTEGER : parseInt(req.params.limit, 10);
+
+    const popularProducts = await OrderStatus.aggregate([
       {
-        path: "productId",
-        model: Product,
-        select: "id name price featuredImage avgRating isService quantity",
-        populate: {
-          path: "cryptoPrices",
-          model: CryptoConversion,
-          select: "name code cryptoPriceUSD",
-          match: { isActive: true, asCurrency: true },
-        },
+        $match: {
+          isActive: true,
+          "product.productId": { $exists: true, $ne: [] } 
+        }
       },
-    ])
-    .limit(limit)
-    .sort({ createdAt: "desc" });
-  if (result && result.length > 0) return result;
-  return false;
+      {
+        $unwind: "$product" 
+      },
+      {
+        $group: {
+          _id: "$product.productId", 
+          totalOrders: { $sum: 1 },
+          totalQuantity: { $sum: "$product.quantity" } 
+        }
+      },
+      {
+        $sort: {
+          totalOrders: -1 
+        }
+      },
+      {
+        $limit: limit 
+      },
+      {
+        $lookup: {
+          from: "products", 
+          localField: "_id", 
+          foreignField: "_id", 
+          as: "productDetails" 
+        }
+      },
+      {
+        $unwind: {
+          path: "$productDetails",
+          preserveNullAndEmptyArrays: true 
+        }
+      },
+
+      {
+        $lookup: {
+          from: "productreviews", 
+          localField: "productDetails.reviews", 
+          foreignField: "_id", 
+          as: "productDetails.reviews" 
+        }
+      },
+      {
+        $project: {
+          _id: 0, 
+          productId: "$_id", 
+          totalOrders: 1,
+          totalQuantity: 1,
+          productDetails: {
+            _id: 1,
+            name: 1,
+            lname: 1, 
+            category: 1,
+            sub_category: 1,
+            featuredImage: 1,
+            price: 1,
+            isActive: 1,
+            isService: 1,
+            reviews: { $ifNull: ["$productDetails.reviews", []] }, 
+            quantity: 1,
+            createdBy: 1,
+            updatedBy: 1,
+            productCode: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            __v: 1
+          }
+        }
+      }
+    ]);
+
+    if (popularProducts && popularProducts.length > 0) {
+    //  console.log("Popular Products with Reviews:", popularProducts);
+      return popularProducts;
+    }
+
+    return false;
+  } catch (error) {
+    console.error("Error fetching popular products:", error.message);
+    throw error;
+  }
 }
+
 
 async function getTodayDeals() {
   const result = await TodayDeal.find({ isActive: true })
@@ -468,7 +653,7 @@ async function getProductsListing(req) {
     }
 
     const products = await Product.find(query)
-      .select("id name price featuredImage avgRating isService quantity")
+      .select("id name price featuredImage avgRating reviews isService quantity")
       .sort({ createdAt: "desc" })
       .populate([
         {
@@ -478,6 +663,7 @@ async function getProductsListing(req) {
           match: { isActive: true, asCurrency: true },
         },
       ])
+      .populate('reviews')
     // console.log("products lengths", products.length)
     // Return the filtered product data
     return products;
@@ -1315,8 +1501,8 @@ async function setNotificationSeen(req, res) {
 
 /****************************************************************************** */
 async function getTodayDealsProductById(param) {
- // console.log('getTodayDealsProductById---',param)
-  const  Id  = param.id;
+  // console.log('getTodayDealsProductById---',param)
+  const Id = param.id;
 
   if (!Id) {
     return { message: 'Product ID is required' };
@@ -1336,9 +1522,9 @@ async function getTodayDealsProductById(param) {
   }
 }
 
- async function getdiscountStatusById(param) {
- // console.log('getdiscountStatusById---',param)
-  const  Id  = param.id;
+async function getdiscountStatusById(param) {
+  // console.log('getdiscountStatusById---',param)
+  const Id = param.id;
 
   if (!Id) {
     return { message: 'discount ID is required' };
@@ -1350,7 +1536,7 @@ async function getTodayDealsProductById(param) {
     if (result) {
       return result;
     } else {
-      return {status:false, message: 'No discountId found with the given ID' };
+      return { status: false, message: 'No discountId found with the given ID' };
     }
   } catch (error) {
     console.error('Error geting discountId:', error);
