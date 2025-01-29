@@ -25,14 +25,22 @@ function ServiceDetailsTabbing(props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [averageRating, setAverageRating] = useState(0);
   const [eventList, setEventList] = useState([]);
-  const [isCalendarAuthorized, setIsCalendarAuthorized] = useState(accessToken ? true : false);
+  // const [isCalendarAuthorized, setIsCalendarAuthorized] = useState(accessToken ? true : false);
+  const [isCalendarAuthorized, setIsCalendarAuthorized] = useState(false);
   const { scrollToReviews, scheduledMeeting, serviceCreator, chargesPayStatus } = props;
 
   const [activeTab, setActiveTab] = useState("description");
 
-  // useEffect(() => {
-  //   setChargesPayStatus(paymentStatus);
-  // }, [paymentStatus]);
+
+
+  useEffect(() => {
+    if (accessToken) {
+      setIsCalendarAuthorized(true)
+    } else {
+      console.log("Calender token is expired....");
+      // setIsCalendarAuthorized(false)
+    }
+  }, []);
 
 
   useEffect(() => {
@@ -249,7 +257,7 @@ function ServiceDetailsTabbing(props) {
   const fetchPastEvents = async () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
-      const now = new Date(); // Current timestamp in ISO format
+      const now = new Date();
       const past30Minutes = new Date(now.getTime() - 30 * 60 * 1000).toISOString(); // 30 minutes ago
       const nowISO = now.toISOString();
       const response = await axios.get(
@@ -265,9 +273,6 @@ function ServiceDetailsTabbing(props) {
           },
         }
       );
-
-      console.log("response fetchPastEvents", response)
-      // Filter for Google Meet events
       const eventsWithMeetLinks = response.data.items.filter(
         (event) =>
           event.conferenceData &&
@@ -277,36 +282,35 @@ function ServiceDetailsTabbing(props) {
           )
       );
 
-      // Extract event IDs
       const pastEventIDs = eventsWithMeetLinks.map((event) => event.id);
 
       console.log("pastEvents", pastEventIDs)
-      // if (pastEventIDs.length > 0) {
-      //   console.log("event not null....", pastEventIDs)
-      //   const url = "/user/updateServiceOrders"
-      //   const eventId = {
-      //     pastEventIDs: pastEventIDs
-      //   }
-      //   axios.put(url, eventId, {
-      //     headers: {
-      //       'Accept': 'application/json',
-      //       'Content-Type': 'application/json;charset=UTF-8',
-      //       'Authorization': `Bearer ${authInfo.token}`
-      //     }
-      //   }).then((response) => {
-      //     console.log("response", response);
-      //     // closeIframe();
-      //     // toast.success("Advertise Blocked successfully....", { autoClose: 2000 })
-      //     setTimeout(() => {
-      //       // fetchData();
-      //     }, 3000);
-      //   }).catch((error) => {
-      //     console.log("error", error)
-      //   })
-      // } else {
-      //   console.log("no any event found..")
-      // }
-      // return pastEventIDs;
+      if (pastEventIDs.length > 0) {
+        console.log("event not null....", pastEventIDs)
+        const url = "/user/updateServiceOrders"
+        const eventId = {
+          pastEventIDs: pastEventIDs
+        }
+        axios.put(url, eventId, {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json;charset=UTF-8',
+            'Authorization': `Bearer ${authInfo.token}`
+          }
+        }).then((response) => {
+          console.log("response", response);
+          // closeIframe();
+          // toast.success("Advertise Blocked successfully....", { autoClose: 2000 })
+          setTimeout(() => {
+            // fetchData();
+          }, 3000);
+        }).catch((error) => {
+          console.log("error", error)
+        })
+      } else {
+        console.log("no any event found..")
+      }
+      return pastEventIDs;
     } catch (error) {
       console.error("Error fetching past events:", error);
       throw error;

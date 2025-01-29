@@ -1377,6 +1377,15 @@ function updateServiceOrders(req, res, next) {
     .then((result) => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
     .catch((err) => next(res.json({ status: false, message: err })));
 }
+
+// fetchDisableTimes
+function fetchDisableTimes(req, res, next) {
+  userService.fetchDisableTimes(req)
+    .then((result) => result ? res.status(200).json({ status: true, data: result }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+
 //*****************************************************************************************/
 //*****************************************************************************************/
 

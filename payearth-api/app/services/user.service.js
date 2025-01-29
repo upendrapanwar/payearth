@@ -136,6 +136,7 @@ module.exports = {
   getGoogleEvent,
   deleteGoogleEvent,
   updateServiceOrders,
+  fetchDisableTimes,
   getServiceOrder,
   deleteReviews,
   zoomRefreshToken,
@@ -2992,7 +2993,7 @@ async function CommonServiceById(req) {
     const chargePay = await OrderStatus.findOne({
       "service.serviceId": id,
       userId: authorId,
-      
+
     }).select("title service")
 
     // if (!chargePay) {
@@ -3328,6 +3329,45 @@ async function updateServiceOrders(req) {
       }
     );
     return updateResult
+  } catch (error) {
+    console.error('Error updating order status:', error);
+  }
+}
+
+// fetchDisableTimes
+
+async function fetchDisableTimes(req) {
+  try {
+    // const { serviceId } = req.body;
+    const serviceId = '67989d5bb0841e2c6829566d'
+    const disableTimes = await Calendar.find({
+      service_id: { $in: serviceId }
+    });
+
+    conbsole.log("disableTimes", disableTimes)
+
+    // if (matchingEvents.length === 0) {
+    //   console.log('No matching events found');
+    //   return;
+    // }
+
+    // Step 2: Extract the service IDs from the matching events
+    // const serviceIds = matchingEvents.map(event => event.service_id);
+
+    // // Step 3: Update order status for matching service IDs
+    // const updateResult = await OrderStatus.updateMany(
+    //   {
+    //     'service.serviceId': { $in: serviceIds },
+    //     title: 'charges_paid' // Ensure we only update specific statuses
+    //   },
+    //   {
+    //     $set: {
+    //       title: 'service_completed',
+    //       updatedAt: new Date()
+    //     }
+    //   }
+    // );
+    // return updateResult
   } catch (error) {
     console.error('Error updating order status:', error);
   }
