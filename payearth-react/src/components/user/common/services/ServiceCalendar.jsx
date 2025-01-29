@@ -56,6 +56,13 @@ function ServiceCalendar(props) {
     }
   }, [])
 
+  const fetchDisableTimes = () => {
+    // Selected service currently disable time get.
+
+
+
+  }
+
   const handleDateClick = (arg) => {
     setChargesPayModel(true)
     const selectDate = moment(arg.date).format("YYYY-MM-DD")
