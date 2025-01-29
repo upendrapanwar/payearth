@@ -94,33 +94,33 @@ class ProductDetail extends Component {
         }, 300);
       });
 
-    axios.get("front/product/similar-products/" + productId)
-      .then((response) => {
-        let productsData = [];
-        if (response.data.status) {
-          let res = response.data.data;
-          res.forEach((product) => {
-            productsData.push({
-              id: product.id,
-              image: product.featuredImage,
-              name: product.name,
-              isService: product.isService,
-              price: product.price,
-              avgRating: product.avgRating,
-              quantity: product.quantity,
-            });
-          });
-        }
-        this.setState({ similarProducts: productsData });
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => {
-        setTimeout(() => {
-          dispatch(setLoading({ loading: false }));
-        }, 300);
-      });
+    // axios.get("front/product/similar-products/" + productId)
+    //   .then((response) => {
+    //     let productsData = [];
+    //     if (response.data.status) {
+    //       let res = response.data.data;
+    //       res.forEach((product) => {
+    //         productsData.push({
+    //           id: product.id,
+    //           image: product.featuredImage,
+    //           name: product.name,
+    //           isService: product.isService,
+    //           price: product.price,
+    //           avgRating: product.avgRating,
+    //           quantity: product.quantity,
+    //         });
+    //       });
+    //     }
+    //     this.setState({ similarProducts: productsData });
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   })
+    //   .finally(() => {
+    //     setTimeout(() => {
+    //       dispatch(setLoading({ loading: false }));
+    //     }, 300);
+    //   });
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -170,9 +170,9 @@ class ProductDetail extends Component {
   }
 
   render() {
-    const { sizeControlls, productDetail, featuredImage, mainImage, selectColor, selectColorImage } = this.state;
+    const { sizeControlls, productDetail, featuredImage, mainImage, selectColor, selectColorImage, id } = this.state;
 
-    console.log("productDetail", productDetail)
+    console.log("productDetail-------11", productDetail)
     var proQuantity = 0;
     const productID = this.state.id;
     //const dispatch = useDispatch();
@@ -481,12 +481,12 @@ class ProductDetail extends Component {
 
         <div ref={this.myRef}>
           <DetailTabbing
-            id={productDetail.id}
+            id={id}
             specifications={productDetail.specifications}
             description={productDetail.description}
-            reviews={productDetail.reviews}
-            avgRating={productDetail.avgRating}
-            reviewsCount={productDetail.reviewCount}
+          // reviews={productDetail.reviews}
+          // avgRating={productDetail.avgRating}
+          // reviewsCount={productDetail.reviewCount}
           />
         </div>
 

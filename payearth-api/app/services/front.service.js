@@ -9,7 +9,7 @@ mongoose.Promise = global.Promise;
 const {
   Category,
   Product,
-  Review,
+  ProductReview,
   User,
   Seller,
   Admin,
@@ -78,11 +78,13 @@ module.exports = {
 };
 
 async function getReviews(id) {
-  const reviews = await Review.find({ isActive: true, productId: id })
+ // console.log('getReviews----',id)
+  const reviews = await ProductReview.find({ isActive: true, productId: id })
     .select("id review rating productId reviewImages createdAt")
     .sort({ createdAt: "desc" })
     .populate("userId", "name");
 
+  //  console.log('reviews----',reviews)
   if (reviews && reviews.length > 0) {
     return (result = {
       reviewCount: reviews.length,
@@ -92,57 +94,80 @@ async function getReviews(id) {
   return false;
 }
 
-async function getRatingCount(id) {
+// async function getRatingCount(productId) {
+//   console.log("Fetching rating counts for productId:", productId);
+
+//   try {
+//     // Aggregation pipeline
+//     const ratingsData = [
+//       { $match: { productId: mongoose.Types.ObjectId(productId) } }, // Match the product ID
+//       {
+//         $group: {
+//           _id: null, // No grouping key
+//           "5": { $sum: { $cond: [{ $eq: ["$rating", 5] }, 1, 0] } }, // Count 5-star ratings
+//           "4": { $sum: { $cond: [{ $eq: ["$rating", 4] }, 1, 0] } }, // Count 4-star ratings
+//           "3": { $sum: { $cond: [{ $eq: ["$rating", 3] }, 1, 0] } }, // Count 3-star ratings
+//           "2": { $sum: { $cond: [{ $eq: ["$rating", 2] }, 1, 0] } }, // Count 2-star ratings
+//           "1": { $sum: { $cond: [{ $eq: ["$rating", 1] }, 1, 0] } }, // Count 1-star ratings
+//         },
+//       },
+//     ];
+
+//     // Execute the aggregation
+//     const ratings = await ProductReview.aggregate(ratingsData);
+
+//     // Process the result
+//     if (ratings && ratings.length > 0) {
+//       const { _id, ...ratingCounts } = ratings[0]; // Remove the `_id` field from the result
+//       console.log("Rating counts:", ratingCounts);
+//       return ratingCounts;
+//     }
+
+//     // If no ratings are found, return default counts
+//     return { "5": 0, "4": 0, "3": 0, "2": 0, "1": 0 };
+//   } catch (err) {
+//     console.error("Error in getRatingCount:", err);
+//     throw new Error("Failed to fetch rating counts.");
+//   }
+// }
+
+async function getRatingCount(productId) {
+  console.log("Fetching rating counts for productId:", productId);
+
   try {
-    const productId = mongoose.Types.ObjectId(id);
-
-    var condition = {
-      _id: "$productId",
-      5: {
-        $sum: {
-          $cond: [{ $eq: ["$rating", 5] }, 1, 0],
-        },
-      },
-      4: {
-        $sum: {
-          $cond: [{ $eq: ["$rating", 4] }, 1, 0],
-        },
-      },
-      3: {
-        $sum: {
-          $cond: [{ $eq: ["$rating", 3] }, 1, 0],
-        },
-      },
-      2: {
-        $sum: {
-          $cond: [{ $eq: ["$rating", 2] }, 1, 0],
-        },
-      },
-      1: {
-        $sum: {
-          $cond: [{ $eq: ["$rating", 1] }, 1, 0],
-        },
-      },
-    };
-
-    var ratingsData = [
-      { $match: { productId: productId } },
+    // Aggregation pipeline
+    const ratingsData = [
+      { $match: { productId: mongoose.Types.ObjectId(productId) } }, // Match the product ID
       {
-        $group: condition,
+        $group: {
+          _id: null, // No grouping key
+          "5": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 5] }, { $lt: ["$rating", 6] }] }, 1, 0] } }, // 5.0 <= rating < 6
+          "4": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 4] }, { $lt: ["$rating", 5] }] }, 1, 0] } }, // 4.0 <= rating < 5
+          "3": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 3] }, { $lt: ["$rating", 4] }] }, 1, 0] } }, // 3.0 <= rating < 4
+          "2": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 2] }, { $lt: ["$rating", 3] }] }, 1, 0] } }, // 2.0 <= rating < 3
+          "1": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 1] }, { $lt: ["$rating", 2] }] }, 1, 0] } }, // 1.0 <= rating < 2
+        },
       },
     ];
 
-    const ratings = await Review.aggregate(ratingsData);
+    // Execute the aggregation
+    const ratings = await ProductReview.aggregate(ratingsData);
 
+    // Process the result
     if (ratings && ratings.length > 0) {
-      return ratings;
+      const { _id, ...ratingCounts } = ratings[0]; // Remove the `_id` field from the result
+      console.log("Rating counts:", ratingCounts);
+      return ratingCounts;
     }
-    return false;
+
+    // If no ratings are found, return default counts
+    return { "5": 0, "4": 0, "3": 0, "2": 0, "1": 0 };
   } catch (err) {
-    console.log("Error", err);
-    return false;
+    console.error("Error in getRatingCount:", err);
+    throw new Error("Failed to fetch rating counts.");
   }
 }
+
 
 async function getSimilarProducts(id) {
   try {
@@ -634,7 +659,7 @@ async function getProductById(id) {
     .populate([
       {
         path: "reviews",
-        model: Review,
+        model: ProductReview,
         select: "id review rating productId userId reviewImages createdAt",
         populate: {
           path: "userId",
@@ -827,7 +852,7 @@ async function getServiceById(id) {
     .populate([
       {
         path: "reviews",
-        model: Review,
+        model: ProductReview,
         select: "id review rating productId userId reviewImages createdAt",
         populate: {
           path: "userId",

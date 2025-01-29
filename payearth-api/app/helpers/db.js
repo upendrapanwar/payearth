@@ -7,7 +7,7 @@ module.exports = {
   Category: require("../models/category.model"),
   Brand: require("../models/brand.model"),
   Coupon: require("../models/coupon.model"),
-  Review: require("../models/review.model"),
+  ProductReview: require("../models/productreview.model"),
   ServiceVideo: require("../models/servicevideo.model"),
   Wishlist: require("../models/wishlist.model"),
   Savelater: require("../models/savelater.model"),

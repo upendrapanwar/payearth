@@ -5113,67 +5113,16 @@ async function getCreatedDeals(req) {
 
 async function getTopSellingCategories(req) {
   try {
-    // const sellerId = req.query.authorId;
-    // console.log('getTopSellingCategories---authorId',sellerId)
-    // const topSellingCategories = await OrderStatus.find({ title: "Delivered" }).select('product')
-    //   .populate([
-    //     {
-    //       path: "product.productId",
-    //       model: Product,
-    //       select: "category",
-    //       populate: {
-    //         path: "category",
-    //         model: Category,
-    //         select: "categoryName"
-    //       }
-    //     }
-    //   ]);
-
-    // if (!topSellingCategories || topSellingCategories.length === 0) {
-    //   return {
-    //     status: false,
-    //     data: [],
-    //   };
-    // }
-    // const categoryCounts = {};
-    // topSellingCategories.forEach(order => {
-    //   const product = order.product?.productId;
-    //   const category = product[0]?.category;
-    //   if (category) {
-    //     const categoryId = category._id.toString();
-    //     const categoryName = category.categoryName;
-
-    //     if (!categoryCounts[categoryId]) {
-    //       categoryCounts[categoryId] = {
-    //         id: categoryId,
-    //         name: categoryName,
-    //         count: 0,
-    //       };
-    //     }
-    //     categoryCounts[categoryId].count++;
-    //   }
-    // });
-    // const sortedCategories = Object.values(categoryCounts)
-    //   .sort((a, b) => b.count - a.count);
-
-    // const top4Categories = sortedCategories.slice(0, 4);
-    // // console.log('top4Categories---',top4Categories)
-    // return {
-    //   status: true,
-    //   data: top4Categories,
-    // };
-
-
     const sellerId = req.query.authorId;
-    console.log('getTopSellingCategories---authorId', sellerId);
+   // console.log('getTopSellingCategories---authorId', sellerId);
 
     const topSellingCategories = await OrderStatus.find({ title: "Delivered" }).select('product')
       .populate([
         {
           path: "product.productId",
           model: Product,
-          select: "category createdBy", // Include `createdBy` to filter by sellerId
-          match: { createdBy: mongoose.Types.ObjectId(sellerId) }, // Filter products by `createdBy` field matching sellerId
+          select: "category createdBy",
+          match: { createdBy: mongoose.Types.ObjectId(sellerId) },
           populate: {
             path: "category",
             model: Category,
@@ -5435,7 +5384,7 @@ async function productSalesGraph(req, res) {
         { $unwind: "$productDetails" },
         {
           $match: {
-            "productDetails.createdBy": authorObjectId, // Ensures data belongs to the author
+            "productDetails.createdBy": authorObjectId,
           },
         },
         {
@@ -5476,13 +5425,13 @@ async function productSalesGraph(req, res) {
         { $unwind: "$productDetails" },
         {
           $match: {
-            "productDetails.createdBy": authorObjectId, // Ensures data belongs to the author
+            "productDetails.createdBy": authorObjectId, 
           },
         },
         {
           $match: {
             createdAt: {
-              $gte: new Date(`${yearInt - 4}-01-01T00:00:00Z`), // Last 5 years
+              $gte: new Date(`${yearInt - 4}-01-01T00:00:00Z`),
               $lte: new Date(`${yearInt}-12-31T23:59:59Z`),
             },
           },

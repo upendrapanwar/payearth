@@ -29,7 +29,7 @@ const {
   Product,
   Wishlist,
   UserCoupon,
-  Review,
+  ProductReview,
   ProductComplaint,
   Order,
   OrderStatus,
@@ -131,6 +131,7 @@ module.exports = {
   getCommonService,
   CommonServiceById,
   addServiceReview,
+  addProductReview,
   getServiceReviews,
   addGoogleEvent,
   getGoogleEvent,
@@ -139,6 +140,7 @@ module.exports = {
   fetchDisableTimes,
   getServiceOrder,
   deleteReviews,
+  deleteProductReview,
   zoomRefreshToken,
   zoomAccessToken,
   createZoomMeeting,
@@ -1704,7 +1706,7 @@ async function getOrderById(id) {
       .exec();
 
     //get review data
-    let reviewData = await Review.findOne({
+    let reviewData = await ProductReview.findOne({
       productId: order.productId._id,
       userId: order.userId._id,
     })
@@ -1857,7 +1859,7 @@ async function addReview(req) {
     var data;
 
     //check for existing entry
-    const reviewData = await Review.findOne({
+    const reviewData = await ProductReview.findOne({
       productId: param.product_id,
       userId: param.user_id,
     }).exec();
@@ -1891,7 +1893,7 @@ async function addReview(req) {
       avgRating = totalRatingScore / NewReviewCount;
 
       //new review
-      review = new Review(input);
+      review = new ProductReview(input);
       //save review data
       data = await review.save();
 
@@ -1907,7 +1909,7 @@ async function addReview(req) {
       const filter = { _id: param.product_id };
       await Product.findOneAndUpdate(filter, updateData, { new: true });
 
-      let result = await Review.findById(data.id).select();
+      let result = await ProductReview.findById(data.id).select();
 
       if (result) {
         return result;
@@ -3025,6 +3027,7 @@ async function CommonServiceById(req) {
 // AddService Review
 async function addServiceReview(req) {
   const param = req.body;
+  console.log('add rating param',param)
   try {
     // Parse rating as float to handle fractional values
     const rating = parseFloat(param.rating);
@@ -3121,6 +3124,184 @@ async function addServiceReview(req) {
   }
 }
 
+// async function addProductReview(req) {
+//   const param = req.body;
+//   console.log('add addProductReview rating param',param)
+//   try {
+//     // Parse rating as float to handle fractional values
+//     const rating = parseFloat(param.rating);
+
+//     var input = {
+//       productId: param.productId,
+//       userId: param.userId,
+//       review: {
+//         title: param.title,
+//         description: param.description,
+//       },
+//       rating: rating,
+//     };
+
+//     // var totalRatingScore;
+//     // var NewReviewCount;
+//     // var avgRating;
+//     var updateData;
+//     var review;
+//     var data;
+
+//     // Check for existing entry
+//     const reviewData = await ProductReview.find({
+//       productId: param.productId,
+//       userId: param.userId,
+//       input: input,
+//     }).exec();
+
+//     if (reviewData && reviewData.length > 0) {
+//       // Existing review
+//       // review = reviewData;
+//       review = reviewData[0];
+
+//       input["updatedAt"] = new Date().toISOString();
+
+//       // Service data
+//       totalRatingScore =
+//         parseFloat(Product.totalRatingScore) -
+//         parseFloat(review.rating) +
+//         rating; // Update totalRatingScore with float values
+//       NewReviewCount = parseInt(Product.reviewCount);
+//       avgRating = totalRatingScore / NewReviewCount;
+//       updateData = { totalRatingScore: totalRatingScore, avgRating: avgRating };
+
+//       Object.assign(review, input);
+
+//       data = await review.save();
+//     } else {
+//       // Service data
+//       totalRatingScore = parseFloat(Product.totalRatingScore) + rating;
+//       NewReviewCount = parseInt(Product.reviewCount) + 1;
+//       avgRating = totalRatingScore / NewReviewCount;
+
+//       // New review
+//       review = new ProductReview(input);
+//       data = await review.save();
+
+//       updateData = {
+//         $push: { reviews: data.id },
+//         $inc: { reviewCount: 1, totalRatingScore: rating },
+//         avgRating: avgRating,
+//       };
+//     }
+
+//     if (data) {
+//       // console.log('data-----11', data)
+//       const filter = { _id: param._id };
+//       await ProductReview.findOneAndUpdate(filter, updateData, { new: true });
+//       // Service reviews update
+//       if (!reviewData || reviewData.length === 0) {
+//         const serviceFilter = { _id: param.serviceId };
+//         await Product.findOneAndUpdate(
+//           serviceFilter,
+//           {
+//             $push: { reviews: data._id },
+//           },
+//           { new: true }
+//         );
+//       }
+
+//       let result = await ProductReview.findById(data.id).select();
+
+//       if (result) {
+//         return result;
+//       } else {
+//         return false;
+//       }
+//     } else {
+//       return false;
+//     }
+//   } catch (err) {
+//     console.error("Error", err);
+//     return false;
+//   }
+// }
+
+async function addProductReview(req) {
+  const param = req.body;
+  console.log('addProductReview request params:', param);
+
+  try {
+    // Parse the rating as a float to handle fractional values
+    const rating = parseFloat(param.rating);
+
+    const input = {
+      productId: param.productId,
+      userId: param.userId,
+      review: {
+        title: param.title,
+        description: param.description,
+      },
+      rating: rating,
+    };
+
+    let data;
+    let updateData;
+    let review;
+
+    // Check if the user has already reviewed this product
+    const existingReview = await ProductReview.findOne({
+      productId: param.productId,
+      userId: param.userId,
+    });
+
+    if (existingReview) {
+      // Update the existing review
+      existingReview.review.title = param.title;
+      existingReview.review.description = param.description;
+      existingReview.rating = rating;
+      existingReview.updatedAt = new Date().toISOString();
+
+      data = await existingReview.save();
+
+      // Update product's average rating and totalRatingScore
+      const product = await Product.findById(param.productId);
+      // const totalRatingScore =
+      //   parseFloat(product.totalRatingScore) -
+      //   parseFloat(existingReview.rating) +
+      //   rating;
+     // const avgRating = totalRatingScore / product.reviewCount;
+
+      // updateData = {
+      //   totalRatingScore: totalRatingScore,
+      //   avgRating: avgRating,
+      // };
+
+      // await Product.findByIdAndUpdate(param.productId, updateData, {
+      //   new: true,
+      // });
+    } else {
+      // Create a new review
+      const newReview = new ProductReview(input);
+      data = await newReview.save();
+
+      // Update product with the new review ID and calculate new average rating
+      const product = await Product.findById(param.productId);
+
+      updateData = {
+        $push: { reviews: data._id },
+      };
+
+      await Product.findByIdAndUpdate(param.productId, updateData, {
+        new: true,
+      });
+    }
+
+    // Return the saved/updated review
+    return data || false;
+  } catch (err) {
+    console.error("Error in addProductReview:", err);
+    return false;
+  }
+}
+
+
 // *******************************************************************************
 // *******************************************************************************
 
@@ -3150,6 +3331,44 @@ async function deleteReviews(req) {
     return result;
   } catch (err) {
     console.log(err);
+    throw err;
+  }
+}
+
+async function deleteProductReview(req) {
+  const _id = req.params.id; // Review ID to delete
+  console.log("Review ID to delete:", _id);
+
+  try {
+    // Find the review to get the associated product ID
+    const review = await ProductReview.findById(_id);
+
+    if (!review) {
+      return { success: false, message: "Review not found" };
+    }
+
+    // Delete the review
+    const result = await ProductReview.findByIdAndDelete(_id);
+
+    // Remove the review ID from the product's reviews array
+    const updatedProduct = await Product.findByIdAndUpdate(
+      review.productId, // Use the productId from the review
+      { $pull: { reviews: _id } }, // Remove the review ID from the array
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedProduct) {
+      return { success: false, message: "Product not found" };
+    }
+
+    console.log("Review deleted and product updated successfully");
+    return { 
+      success: true, 
+      message: "Review deleted and product updated", 
+      updatedProduct 
+    };
+  } catch (err) {
+    console.error("Error deleting review:", err);
     throw err;
   }
 }

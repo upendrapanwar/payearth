@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Rating } from "react-simple-star-rating";
 import axios from "axios";
 
-function ServiceModel({ isOpen, onClose, serviceId, authInfo, fetchApi }) {
+function ProductModel({ isOpen, onClose, productId, authInfo, fetchApi, fetchRating }) {
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState({ title: "", description: "" });
 
@@ -14,16 +14,27 @@ function ServiceModel({ isOpen, onClose, serviceId, authInfo, fetchApi }) {
         title: review.title,
         description: review.description,
         rating: rating,
-        serviceId: serviceId,
+        productId: productId,
         userId: authInfo.id,
       };
 
-      console.log("service reviewData", reviewData);
+      console.log("reviewData", reviewData);
 
-      await axios.post(`/user/service-review`, reviewData);
-      console.log("Review submitted successfully!");
+      // const response = await axios.post(`/user/product-review`, reviewData,
+      //   headers: {
+      //   Authorization: `Bearer ${token}`, // Include the token
+      // },
+      // );
+      const response = await axios.post('/user/product-review', reviewData,{
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json;charset=UTF-8',
+          'Authorization': `Bearer ${authInfo.token}`
+      }});
+      console.log("Review submitted successfully!", response);
       //called get api for show updated data
-      fetchApi();
+      fetchApi(productId);
+      fetchRating(productId);
       // Clear the form fields after successful submission
       setRating(0);
       setReview({ title: "", description: "" });
@@ -107,4 +118,4 @@ function ServiceModel({ isOpen, onClose, serviceId, authInfo, fetchApi }) {
   );
 }
 
-export default ServiceModel;
+export default ProductModel;
