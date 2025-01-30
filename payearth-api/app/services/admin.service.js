@@ -99,6 +99,7 @@ module.exports = {
     filterOrderData,
 
     getProductOrders,
+    getServiceOrders,
 
     //CMS
     createCmsPost,
@@ -1124,30 +1125,30 @@ async function brandPopularStatus(req) {
 async function getDeals() {
     console.log("getDeals");
     const result = await TodayDeal.find()
-      .select()
-      .sort({ createdAt: "desc" })
-      .populate("sellerId", "name email")
-  
+        .select()
+        .sort({ createdAt: "desc" })
+        .populate("sellerId", "name email")
+
     if (result && result.length > 0) return result;
-  
+
     return false;
-  }
-  
-  async function getDealsById(req, res) {
+}
+
+async function getDealsById(req, res) {
     const id = req.params.id;
     console.log("id", id);
     try {
-      const deal = await TodayDeal.findById(id).populate("productId");
-      if (!deal) {
-        return false;
-      }
-      // console.log('deal',deal)
-      return deal;
+        const deal = await TodayDeal.findById(id).populate("productId");
+        if (!deal) {
+            return false;
+        }
+        // console.log('deal',deal)
+        return deal;
     } catch (error) {
-      console.error("Error fetching the deal", error);
-      return false;
+        console.error("Error fetching the deal", error);
+        return false;
     }
-  }
+}
 
 
 async function statusDeal(req) {
@@ -2039,35 +2040,43 @@ async function getOrderById(id) {
     }
 }
 
-// getProductOrders
 async function getProductOrders(req) {
-    const { status } = req.query;
+    const { status, title } = req.query;
     try {
         const query = {
             isActive: status,
+            title: title,
+            service: null
         };
-
-        console.log("query:", query)
-        // const fieldsToSelect = "id productCode name category sub_category brand featuredImage quantity isActive";
-        // let result = await Product.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect)
-        //     .populate({
-        //         path: 'category',
-        //         match: { isVisible: true },
-        //         select: 'categoryName isActive'
-        //     })
-        //     .populate({
-        //         path: 'brand',
-        //         match: { isVisible: true },
-        //         select: 'brandName'
-        //     })
-        //     .populate({
-        //         path: 'createdBy',
-        //         model: Seller,
-        //         select: 'id name email',
-        //     });
-        // return result;
+        const data = await OrderStatus.find(query)
+            .populate({
+                path: 'product.productId',
+                populate: { path: 'createdBy', select: 'name email' },
+            })
+            .populate('userId');
+        return data;
     } catch (error) {
-        console.log(error);
+        console.error("Error fetching product orders:", error);
+    }
+}
+
+async function getServiceOrders(req) {
+    const { status, title } = req.query;
+    try {
+        const query = {
+            isActive: status,
+            title: title,
+            // service: null
+        };
+        const data = await OrderStatus.find(query)
+            .populate({
+                path: 'product.productId',
+                populate: { path: 'createdBy', select: 'name email' },
+            })
+            .populate('userId');
+        return data;
+    } catch (error) {
+        console.error("Error fetching product orders:", error);
     }
 }
 
@@ -4645,7 +4654,7 @@ async function productSalesGraph(req) {
         const results = await OrderStatus.aggregate([
             {
                 $match: {
-                    title: "Delivered",         
+                    title: "Delivered",
                     product: { $ne: null },
                     createdAt: {
                         $gte: new Date(`${yearInt}-01-01T00:00:00Z`),

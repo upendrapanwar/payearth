@@ -233,7 +233,7 @@ class Dashboard extends Component {
             },
             {
                 name: 'ORDER STATUS',
-                selector: (row, i) => row.orderStatus[0].title,
+                // selector: (row, i) => row.orderStatus[0].title,
                 sortable: true
             },
             {

@@ -162,11 +162,19 @@ function Header() {
               </li>
 
               <li>
-                <Link to="/admin/orders" onClick={() => removeBackdrop()}>
+                <Link to="/admin/productOrders" onClick={() => removeBackdrop()}>
                   <i className="icon">
                     <img src={shoppingBagIcon} alt="" />
                   </i>{" "}
-                  Manage Orders
+                  Product Orders
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin/service-order" onClick={() => removeBackdrop()}>
+                  <i className="icon">
+                    <img src={shoppingBagIcon} alt="" />
+                  </i>{" "}
+                  Service Orders
                 </Link>
               </li>
 
@@ -208,14 +216,7 @@ function Header() {
 
                 </ul>
               </li>
-              <li>
-                <Link to="/admin/service-order" onClick={() => removeBackdrop()}>
-                  <i className="icon">
-                    <img src={shoppingBagIcon} alt="" />
-                  </i>{" "}
-                  Manage Service Orders
-                </Link>
-              </li>
+              
 
               <li>
                 <Link to="/admin/payments" onClick={() => removeBackdrop()}>

@@ -5114,7 +5114,7 @@ async function getCreatedDeals(req) {
 async function getTopSellingCategories(req) {
   try {
     const sellerId = req.query.authorId;
-   // console.log('getTopSellingCategories---authorId', sellerId);
+    // console.log('getTopSellingCategories---authorId', sellerId);
 
     const topSellingCategories = await OrderStatus.find({ title: "Delivered" }).select('product')
       .populate([
@@ -5425,7 +5425,7 @@ async function productSalesGraph(req, res) {
         { $unwind: "$productDetails" },
         {
           $match: {
-            "productDetails.createdBy": authorObjectId, 
+            "productDetails.createdBy": authorObjectId,
           },
         },
         {

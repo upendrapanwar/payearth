@@ -7,7 +7,7 @@ import instagramLogo from './../../../assets/images/instagram-logo.png';
 import buyerLogin from './../../../assets/images/buyer-login.jpg';
 
 const BuyerLogin = () => {
-    return(
+    return (
         <div className="modal fade" id="buyerLoginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabIndex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div className="modal-dialog">
                 <div className="modal-content">

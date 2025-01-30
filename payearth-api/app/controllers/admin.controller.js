@@ -158,6 +158,10 @@ router.post('/user-orders', getUserOrders);
 //Order status Management
 router.post('/getorderstatus', getOrderstatus);
 
+// getProductOrders
+router.get('/getProductOrders', getProductOrders);
+router.get('/getServiceOrders', getServiceOrders);
+
 //Payments Management
 router.post('/payments', getPayments);
 router.get('/payments/:id', getPaymentById);
@@ -683,6 +687,19 @@ function getUserOrders(req, res, next) {
 
 function getOrderById(req, res, next) {
     adminService.getOrderById(req.params.id)
+        .then(order => order ? res.status(200).json({ status: true, data: order }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+
+function getProductOrders(req, res, next) {
+    adminService.getProductOrders(req)
+        .then(order => order ? res.status(200).json({ status: true, data: order }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function getServiceOrders(req, res, next) {
+    adminService.getServiceOrders(req)
         .then(order => order ? res.status(200).json({ status: true, data: order }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: {} }))
         .catch(err => next(res.json({ status: false, message: err })));
 }

@@ -7,6 +7,7 @@ const schema = new Schema({
     password: { type: String, required: false, default: '' },
     phone: { type: String, required: false, default: '' },
     role: { type: String, required: false, default: 'user' },
+    terms: { type: Boolean, required: false, default: true },
     social_accounts: {
         google: {
             google_id: { type: String, required: false, default: null, index: true },
