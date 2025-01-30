@@ -8,6 +8,7 @@ import config from '../../../config.json';
 import parse from 'html-react-parser';
 import ProductModal from "./ProductModel";
 import { FaTrash } from "react-icons/fa";
+import Rating from "../../common/Rating";
 
 class DetailTabbing extends Component {
     constructor(props) {
@@ -288,6 +289,7 @@ class DetailTabbing extends Component {
                                                         <p className="review_count" > Average Rating: {averageRating} ({reviewCount || 0} Reviews)</p>
                                                         <p className="rating_point d-inline-flex align-items-center">
                                                             {this.renderStarRating(averageRating)}
+                                                            {/* <Rating avgRating={averageRating} /> */}
                                                         </p>
                                                         <ul className="review_status">
                                                             <li>

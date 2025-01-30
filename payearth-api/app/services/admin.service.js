@@ -1123,7 +1123,7 @@ async function brandPopularStatus(req) {
 
 //Deal
 async function getDeals() {
-    console.log("getDeals");
+   // console.log("getDeals");
     const result = await TodayDeal.find()
         .select()
         .sort({ createdAt: "desc" })
@@ -1136,7 +1136,7 @@ async function getDeals() {
 
 async function getDealsById(req, res) {
     const id = req.params.id;
-    console.log("id", id);
+   // console.log("id", id);
     try {
         const deal = await TodayDeal.findById(id).populate("productId");
         if (!deal) {
@@ -1161,7 +1161,7 @@ async function statusDeal(req) {
         return false;
     } else {
         const input = {
-            "isActive": param.is_active
+            "isActive": param.isActive
         };
 
         Object.assign(deal, input);

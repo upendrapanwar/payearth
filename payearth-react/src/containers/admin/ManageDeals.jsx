@@ -11,8 +11,6 @@ import arrow_back from "./../../assets/icons/arrow-back.svg";
 import emptyImg from "./../../assets/images/emptyimage.png";
 import { Link } from "react-router-dom/cjs/react-router-dom";
 import Switch from "react-input-switch";
-//import { Switch } from 'react-switch';
-// import { Modal } from "react-bootstrap";
 import { Modal, Button } from "react-bootstrap";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
@@ -27,7 +25,7 @@ class ManageDeals extends Component {
     this.apiSecret = process.env.REACT_APP_CLOUD_API_SECRET;
     this.state = {
       emptyImg: emptyImg,
-      data: "",
+      data: [],
       selectedBrand: null,
       showModal: false,
       selectedDeal: null,
@@ -79,21 +77,12 @@ class ManageDeals extends Component {
         cell: (row, i) => {
           return (
             <>
-              {row.isActive ? (
-                <button
-                  className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
-                  onClick={() => this.handleChangeStatus(row, false)}
-                >
-                  Deactivate
-                </button>
-              ) : (
-                <button
-                  className="custom_btn btn_yellow_bordered w-auto btn btn-width action_btn_new"
-                  onClick={() => this.handleChangeStatus(row, true)}
-                >
-                  Activate
-                </button>
-              )}
+              <Switch
+                on={true}
+                off={false}
+                value={row.isActive}
+                onChange={() => this.handleChangeStatus(row.id, !row.isActive)}
+              />
             </>
           );
         },
@@ -123,7 +112,7 @@ class ManageDeals extends Component {
   handleShowModal = async (deal) => {
     console.log("handleShowModal", deal);
     const dealId = deal.id;
-    // console.log("dealId", dealId);
+
     await this.getDealsById(dealId);
 
     this.setState({
@@ -159,7 +148,7 @@ class ManageDeals extends Component {
       showModal: false,
     });
   };
-  //********************************************************* */
+
   // getAllDeals
   getAllDealsDisplayed = async () => {
     console.log("display");
@@ -205,10 +194,12 @@ class ManageDeals extends Component {
     }
   };
 
-  handleChangeStatus = async (row, isActive) => {
+  handleChangeStatus = async (id, isActive) => {
+    console.log("ID:", id);
+    console.log("New isActive Value:", isActive);
     try {
-      const updateStatusUrl = `/admin/deals/status/${row.id}`;
-      await axios.put(
+      const updateStatusUrl = `/admin/deals/status/${id}`;
+      const response = await axios.put(
         updateStatusUrl,
         { isActive },
         {
@@ -219,13 +210,20 @@ class ManageDeals extends Component {
           },
         }
       );
+      console.log("Status updated successfully:", response.data);
     } catch (error) {
-      console.error("There was an error changing the status", error);
+      console.error("There was an error changing the status:", error);
+      alert("Failed to update status. Please try again.");
     }
+    this.getAllDealsDisplayed();
   };
+
+
 
   render() {
     const { data, dealDetailsData } = this.state;
+
+    console.log("dealDetailsData", dealDetailsData);
     return (
       <React.Fragment>
         <div className="seller_dash_wrap pb-5">
@@ -246,7 +244,7 @@ class ManageDeals extends Component {
                   <div className="cp_body">
                     <DataTableExtensions
                       columns={this.deals_column}
-                      data={data}
+                      data= {data}
                     >
                       <DataTable
                         pagination
@@ -276,43 +274,38 @@ class ManageDeals extends Component {
           </Modal.Header>
           <Modal.Body
             style={{
-              // maxWidth: "80%",
-              // width: "80%",
               maxHeight: "calc(100vh - 100px)",
               overflowY: "auto",
             }}
           >
-            {/* ***************************** image logo ************************** */}
-            <img
-              src={dealDetailsData.dealImage}
-              alt="Deal Logo"
-              style={{ width: "20%", height: "auto" }}
-            />
-
+            <div className="d-flex justify-content-center">
+              <img
+                src={dealDetailsData.dealImage}
+                alt="Deal Logo"
+                className="text-center"
+                style={{ width: "20%", height: "auto" }}
+              />
+            </div>
             {dealDetailsData && (
               <div className="d-flex flex-row justify-content-between align-items-start bg-light w-100 p-4">
                 <div className="w-100">
-                  {/* <h3 className="fw-bold my-2 text-bold text-center">{`Thank you for your order #${dealDetailsData.orderCode}`}</h3> */}
                   <div className="p-4 cart-mob-p0">
                     <Row className="mb-4">
                       <Col md={12}>
                         <div>
-                          <h5>{dealDetailsData.dealName}</h5>
-                          <p>
+                          <h2 className="text-center">
+                            {dealDetailsData.dealName}
+                          </h2>
+                          {/* <p>
                             <strong>Seller ID:</strong>{" "}
                             {dealDetailsData.sellerId}
-                          </p>
-                          {/* <img
-                            src={dealDetailsData.dealImage}
-                            alt="Deal Logo"
-                            style={{ width: "100%", height: "auto" }}
-                          /> */}
+                          </p> */}
                         </div>
                       </Col>
                       <Row>
                         <Col md={12} style={{ width: "100%", height: "500px" }}>
                           <Table
-                            className="mb-6 table-responsive"
+                            className="mb-6 mt-4 table-responsive"
                             style={{
                               width: "110%",
                               height: "100%",
@@ -324,6 +317,7 @@ class ManageDeals extends Component {
                                 <th style={{ width: "120px" }}>Image</th>
                                 <th>Product Name</th>
                                 <th>Quantity</th>
+                                <th>Price After Discount</th>
                                 <th>Price</th>
                               </tr>
                             </thead>
@@ -352,8 +346,16 @@ class ManageDeals extends Component {
 
                                       <td>
                                         ➢{" "}
-                                        {item.sellingQuantity ||
+                                        {item.quantity?.stock_qty ||
                                           "No selling quantity available"}
+                                      </td>
+                                      <td>
+                                        {item.price && dealDetailsData.discount
+                                          ? `$${(
+                                              item.price -
+                                              (item.price * dealDetailsData.discount) / 100
+                                            ).toFixed(2)}`
+                                          : "N/A"}
                                       </td>
                                       <td>
                                         $ {item.price || "No price available"}
@@ -389,8 +391,6 @@ class ManageDeals extends Component {
         </Modal>
       </React.Fragment>
     );
-
-    //);
   }
 }
 export default ManageDeals;

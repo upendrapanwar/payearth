@@ -153,7 +153,7 @@ const ProductCard = ({ data, inWishList }) => {
               </Link>
             </p>
           </div>
-          <div className="priceData">
+          {/* <div className="priceData">
             {data.cryptoPrices && data.cryptoPrices.length > 0
               ? data.cryptoPrices.map((val, index) => {
                 let crypPrice = data.price / val.cryptoPriceUSD;
@@ -167,7 +167,7 @@ const ProductCard = ({ data, inWishList }) => {
               })
               : ""}
             <p className="price">{data.price} USD</p>
-          </div>
+          </div> */}
         </div>
         {/* {console.log("data", data.id)} */}
         {data.quantity && data.quantity.stock_qty !== 0 ? (

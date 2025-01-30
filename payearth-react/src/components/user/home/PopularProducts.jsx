@@ -20,18 +20,21 @@ const PopularProducts = () => {
     axios
       .get("front/product/popular/8")
       .then((response) => {
+       // console.log('response----',response)
         if (response.data.status) {
           let res = response.data.data;
           res.forEach((product) => {
+            const totalRatings = product.productDetails.reviews.reduce((sum, review) => sum + review.rating, 0);
+            const avgRating = totalRatings / product.productDetails.reviews.length;
             productsData.push({
-              id: product.productId.id,
-              image: config.apiURI + product.productId.featuredImage,
-              name: product.productId.name,
-              price: product.productId.price,
-              avgRating: product.productId.avgRating,
-              isService: product.productId.isService,
-              quantity: product.productId.quantity,
-              cryptoPrices: product.productId.cryptoPrices,
+              id: product.productDetails._id,
+              image: product.productDetails.featuredImage,
+              name: product.productDetails.name,
+              price: product.productDetails.price,
+              avgRating: avgRating,
+              isService: product.productDetails.isService,
+              quantity: product.productDetails.quantity.stock_qty,
+              // cryptoPrices: product.productDetails.cryptoPrices,
             });
           });
           setProducts(productsData);
