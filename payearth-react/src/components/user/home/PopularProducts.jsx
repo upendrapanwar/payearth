@@ -77,7 +77,7 @@ const PopularProducts = () => {
             </div>
             {products && products.length ? (
               <div className="text-center">
-                <Link to="#" className="view_more float-none">
+                <Link to="/product-listing" className="view_more float-none">
                   View More
                 </Link>
               </div>

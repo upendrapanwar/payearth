@@ -311,6 +311,9 @@ router.patch("/update-customer-status/:id", updateCustomerStatus);
 // report
 router.get("/getWeeklyOrderStatusCount", getWeeklyOrderStatusCount);
 router.get("/productMonthWeekReport", productMonthWeekReport);
+router.get("/getLatestCustomers", getLatestCustomers);
+router.get("/getBestSellingProducts", getBestSellingProducts);
+router.get("/getReportData", getReportData);
 
 
 
@@ -1500,5 +1503,23 @@ function getWeeklyOrderStatusCount(req, res, next) {
 function productMonthWeekReport(req, res, next) {
     adminService.productMonthWeekReport(req)
         .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error updating personal information." }))
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getLatestCustomers(req, res, next) {
+    adminService.getLatestCustomers(req)
+        .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error getting Latest Customers." }))
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getBestSellingProducts(req, res, next) {
+    adminService.getBestSellingProducts(req)
+        .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error getting Best Selling Products." }))
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getReportData(req, res, next) {
+    adminService.getReportData(req)
+        .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error getting Report Data." }))
         .catch((err) => next(res.json({ status: false, message: err.message })));
 }

@@ -8,6 +8,8 @@ import { connect } from 'react-redux';
 import store from '../../store/index';
 import { Link } from 'react-router-dom';
 import nicon from '../../assets/images/nicon.png';
+import DataTable from 'react-data-table-component';
+import DataTableExtensions from "react-data-table-component-extensions";
 
 
 import {
@@ -26,8 +28,170 @@ class ManageReports extends Component {
         this.state = {
             weeksInYear: [], // All weeks in the current year
             currentWeekIndex: 0, // Index of the currently displayed week
+            latestCustomers: [],
+            bestSellingProducts: [],
+            allOrdersData: [],
+            monthlyOrderCounts: [],
         };
         toast.configure();
+
+        this.latest_Customers = [
+            {
+                name: 'NAME',
+                selector: (row, i) => row.userDetails.name,
+                sortable: true
+            },
+            {
+                name: 'CITY',
+                selector: (row, i) => row.userDetails.address?.city,
+                sortable: true
+            },
+            {
+                name: 'STATE',
+                selector: (row, i) => row.userDetails.address?.state,
+                sortable: true
+            },
+            {
+                name: 'ORDER NO',
+                selector: (row, i) => row.orderCode,
+                sortable: true
+            },
+            {
+                name: 'ORDER AMMOUNT',
+                selector: (row, i) => row.total,
+                sortable: true
+            },
+            {
+                name: 'STATUS',
+                selector: (row, i) => row.orderStatusDetails[0]?.title,
+                sortable: true
+            },
+        ];
+
+        this.bestSelling_Products = [
+            {
+                name: '',
+                cell: (row) => (
+                    <img
+                        src={row.featuredImage}
+                        alt="Product Image"
+                        className="img-thumbnail"
+                        style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+                    />
+                ),
+                sortable: false,
+            },
+            {
+                name: 'PRODUCT NAME',
+                selector: (row, i) => row.name,
+                sortable: true,
+            },
+            {
+                name: 'BRAND NAME',
+                selector: (row, i) => row.brand,
+                sortable: true,
+            },
+            {
+                name: 'CATEGORY',
+                selector: (row, i) => row.category,
+                sortable: true,
+            },
+            {
+                name: 'SUB_CATEGORY',
+                selector: (row, i) => row.sub_category,
+                sortable: true,
+            },
+            {
+                name: 'PRICE',
+                selector: (row, i) => row.price,
+                sortable: true
+            },
+            {
+                name: 'SELLING QUANTITY',
+                selector: (row, i) => row.quantity?.selling_qty,
+                sortable: true
+            },
+            {
+                name: '',
+                selector: (row, i) => row.orderStatusDetails[0]?.title,
+                cell: (row) => (
+                    <button
+                        className="btn btn-primary btn-sm"
+                    // onClick={() => handleView(row)}
+                    >
+                        View
+                    </button>
+                ),
+                sortable: false
+            }
+        ];
+
+
+         this.all_Reports = [
+            // {
+            //     name: '',
+            //     cell: (row) => (
+            //         <img
+            //             src={row.featuredImage}
+            //             alt="Product Image"
+            //             className="img-thumbnail"
+            //             style={{ width: '100px', height: '100px', objectFit: 'cover' }}
+            //         />
+            //     ),
+            //     sortable: false,
+            // },
+            {
+                name: 'ORDER NO',
+                selector: (row, i) => row.orderCode,
+                sortable: true,
+            },
+            {
+                name: 'NAME',
+                // selector: (row, i) => row.billingFirstName,
+                selector: (row, i) => {
+                    return `${row.billingFirstName} ${row.billingLastName}`;
+                },
+                sortable: true,
+            },
+            {
+                name: 'EMAIL',
+                selector: (row, i) => row.billingEmail,
+                sortable: true,
+            },
+            {
+                name: 'DATE',
+                // selector: (row, i) => row.createdAt,
+                selector: (row, i) => {
+                    // Format the createdAt date to show only the date (yyyy-mm-dd)
+                    const createdAt = new Date(row.createdAt);
+                    return createdAt.toLocaleDateString('en-US');  // Format as 'MM/DD/YYYY'
+                },
+                sortable: true,
+            },
+            {
+                name: 'TYPE OF PAYMENT',
+                selector: (row, i) => row.paymentDetails[0]?.paymentMode,
+                sortable: true
+            },
+            {
+                name: 'STATUS',
+                selector: (row, i) => row.paymentDetails[0]?.paymentStatus,
+                sortable: true
+            },
+            {
+                name: '',
+                selector: (row, i) => row.orderStatusDetails[0]?.title,
+                cell: (row) => (
+                    <button
+                        className="btn btn-primary btn-sm"
+                    // onClick={() => handleView(row)}
+                    >
+                        Download
+                    </button>
+                ),
+                sortable: false
+            }
+        ];
     }
 
     componentDidMount() {
@@ -37,6 +201,9 @@ class ManageReports extends Component {
             this.getWeeklyOrderStatusCount(weeksInYear);
         }
         // this.setState({ weeksInYear });
+        this.getLatestCustomers();
+        this.getBestSellingProducts();
+        this.getReportData();
     }
 
     getWeeksInYear() {
@@ -147,7 +314,7 @@ class ManageReports extends Component {
             // };
 
 
-            const url = `/admin/productMonthWeekReport?year=${2024}`; // timeFrame = week , month, year
+            const url = `/admin/productMonthWeekReport?year=${2025}`; // timeFrame = week , month, year
             const response = await axios.get(url, {
                 // params: reqParams,
                 headers: {
@@ -192,9 +359,72 @@ class ManageReports extends Component {
         });
     }
 
+
+    getLatestCustomers = async () => {
+        try {
+            this.setState({ loading: true });
+            const url = "admin/getLatestCustomers";
+            const response = await axios.get(url, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            });
+            const data = response.data.data;
+            this.setState({ latestCustomers: data, loading: false });
+        } catch (error) {
+            console.error("There was an error fetching Latest Customers data", error);
+            this.setState({ loading: false });
+        }
+    };
+
+
+    getBestSellingProducts = async () => {
+        try {
+            this.setState({ loading: true });
+            const url = "admin/getBestSellingProducts";
+            const response = await axios.get(url, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            });
+            const data = response.data.data;
+            this.setState({ bestSellingProducts: data, loading: false });
+        } catch (error) {
+            console.error("There was an error fetching Best Selling Products data", error);
+            this.setState({ loading: false });
+        }
+    };
+
+
+    getReportData = async () => {
+        try {
+            this.setState({ loading: true });
+            const url = "admin/getReportData";
+            const response = await axios.get(url, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            });
+            const data = response.data.data;
+            // console.log('getReportData-----data',data)
+            this.setState({ allOrdersData: data.allOrders, loading: false });
+            this.setState({ monthlyOrderCounts: data.monthlyOrderCounts, loading: false });
+        } catch (error) {
+            console.error("There was an error fetching Best Selling Products data", error);
+            this.setState({ loading: false });
+        }
+    };
+
+
     render() {
 
-        // const { weeksInYear, currentWeekIndex } = this.state;
+        const { latestCustomers, bestSellingProducts, allOrdersData, monthlyOrderCounts } = this.state;
 
         // if (weeksInYear.length === 0) {
         //     return <p>Loading weeks...</p>; // Show loading state if weeks are not yet calculated
@@ -202,7 +432,8 @@ class ManageReports extends Component {
 
         // const currentWeek = weeksInYear[currentWeekIndex];
 
-        // console.log("currentWeek", currentWeek);
+        console.log("allOrdersData", allOrdersData);
+        // console.log("monthlyOrderCounts", monthlyOrderCounts);
 
 
         ChartJS.register(CategoryScale,
@@ -222,22 +453,50 @@ class ManageReports extends Component {
                 }
             },
         };
-        const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+        // const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
 
+        // const dataBar = {
+        //     labels,
+        //     datasets: [
+        //         {
+        //             label: 'Dataset 1',
+        //             data: labels.map(() => faker.datatype.number({ min: 0, max: 1000 })),
+        //             backgroundColor: [
+        //                 '#3c8dbc',
+        //                 '#f56954',
+        //                 '#f39c12',
+        //                 '#CCCCCC',
+        //             ],
+        //         },
+
+        //     ],
+        // };
+
+
+        const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+        // Use `monthlyOrderCounts` as the dataset for the bar chart
         const dataBar = {
             labels,
             datasets: [
                 {
-                    label: 'Dataset 1',
-                    data: labels.map(() => faker.datatype.number({ min: 0, max: 1000 })),
+                    label: 'Monthly Orders',
+                    data: monthlyOrderCounts,
                     backgroundColor: [
                         '#3c8dbc',
                         '#f56954',
                         '#f39c12',
                         '#CCCCCC',
+                        '#8e44ad',
+                        '#3498db',
+                        '#e74c3c',
+                        '#2ecc71',
+                        '#f1c40f',
+                        '#e67e22',
+                        '#1abc9c',
+                        '#9b59b6',
                     ],
                 },
-
             ],
         };
 
@@ -317,7 +576,7 @@ class ManageReports extends Component {
                                 </div>
                             </div>
 
-                            <div className="card  bg-white rounded-3 pt-3 pb-5 report_listing_row">
+                            {/* <div className="card  bg-white rounded-3 pt-3 pb-5 report_listing_row">
                                 <div className="dash_inner_wrap">
                                     <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center flex_mob_none">
                                         <div className="dash_title">All Reports</div>
@@ -421,7 +680,35 @@ class ManageReports extends Component {
                                         </div>
                                     </div>
                                 </div>
+                            </div> */}
+
+                            <div className="card  bg-white rounded-3 pt-3 pb-5 report_listing_row">
+                                <div className="dash_inner_wrap">
+                                    <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center flex_mob_none">
+                                        <div className="dash_title">All Reports</div>
+                                    </div>
+                                </div>
+
+                                <DataTableExtensions
+                                    columns={this.all_Reports}
+                                    data={allOrdersData}
+                                >
+                                    <DataTable
+                                        pagination
+                                        noHeader
+                                        highlightOnHover
+                                        defaultSortField="id"
+                                        defaultSortAsc={false}
+                                        paginationPerPage={5}
+                                        paginationRowsPerPageOptions={[5, 10, 15, 30]}
+                                    // selectableRows           
+                                    />
+                                </DataTableExtensions>
+
                             </div>
+
+
+
 
                             <div className="card  bg-white rounded-3 pt-3 pb-5 report_listing_row">
                                 <div className="dash_inner_wrap">
@@ -430,65 +717,22 @@ class ManageReports extends Component {
                                     </div>
                                 </div>
 
-                                <div className="orders_table reports-list-content pt-0 pb-0">
-                                    <div className="tab-pane fade show active">
-                                        <table className="table table-responsive table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>ORDER NO</th>
-                                                    <th>Name</th>
-                                                    <th>Order Ammount</th>
-                                                    <th>City</th>
-                                                    <th>State</th>
-                                                    <th>Status</th>
+                                <DataTableExtensions
+                                    columns={this.latest_Customers}
+                                    data={latestCustomers}
+                                >
+                                    <DataTable
+                                        pagination
+                                        noHeader
+                                        highlightOnHover
+                                        defaultSortField="id"
+                                        defaultSortAsc={false}
+                                        paginationPerPage={5}
+                                        paginationRowsPerPageOptions={[5, 10, 15, 30]}
+                                    // selectableRows           
+                                    />
+                                </DataTableExtensions>
 
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>#587</td>
-                                                    <td>Alexendra</td>
-                                                    <td>$245.45</td>
-                                                    <td>San Francisco</td>
-                                                    <td>California</td>
-                                                    <td>Completed</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>#587</td>
-                                                    <td>Alexendra</td>
-                                                    <td>$245.45</td>
-                                                    <td>San Francisco</td>
-                                                    <td>California</td>
-                                                    <td>Completed</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>#587</td>
-                                                    <td>Alexendra</td>
-                                                    <td>$245.45</td>
-                                                    <td>San Francisco</td>
-                                                    <td>California</td>
-                                                    <td>Completed</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>#587</td>
-                                                    <td>Alexendra</td>
-                                                    <td>$245.45</td>
-                                                    <td>San Francisco</td>
-                                                    <td>California</td>
-                                                    <td>Completed</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>#587</td>
-                                                    <td>Alexendra</td>
-                                                    <td>$245.45</td>
-                                                    <td>San Francisco</td>
-                                                    <td>California</td>
-                                                    <td>Completed</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
                             </div>
 
                             <div className="card  bg-white rounded-3 pt-3 pb-0 report_bestsetting_pro_row">
@@ -498,7 +742,7 @@ class ManageReports extends Component {
                                     </div>
                                 </div>
 
-                                <div className="orders_table reports-list-content pt-0 pb-0">
+                                {/* <div className="orders_table reports-list-content pt-0 pb-0">
                                     <div className="tab-pane fade show active">
                                         <table className="table table-responsive table-bordered">
                                             <thead>
@@ -564,7 +808,24 @@ class ManageReports extends Component {
                                             </tbody>
                                         </table>
                                     </div>
-                                </div>
+                                </div> */}
+
+                                <DataTableExtensions
+                                    columns={this.bestSelling_Products}
+                                    data={bestSellingProducts}
+                                >
+                                    <DataTable
+                                        pagination
+                                        noHeader
+                                        highlightOnHover
+                                        defaultSortField="id"
+                                        defaultSortAsc={false}
+                                        paginationPerPage={5}
+                                        paginationRowsPerPageOptions={[5, 10, 15, 30]}
+                                    // selectableRows           
+                                    />
+                                </DataTableExtensions>
+
                             </div>
                         </div>
 
