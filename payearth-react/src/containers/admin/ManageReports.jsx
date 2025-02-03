@@ -10,8 +10,6 @@ import { Link } from 'react-router-dom';
 import nicon from '../../assets/images/nicon.png';
 import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
-
-
 import {
     Chart as ChartJS, ArcElement, CategoryScale,
     LinearScale,
@@ -111,23 +109,23 @@ class ManageReports extends Component {
                 selector: (row, i) => row.quantity?.selling_qty,
                 sortable: true
             },
-            {
-                name: '',
-                selector: (row, i) => row.orderStatusDetails[0]?.title,
-                cell: (row) => (
-                    <button
-                        className="btn btn-primary btn-sm"
-                    // onClick={() => handleView(row)}
-                    >
-                        View
-                    </button>
-                ),
-                sortable: false
-            }
+            // {
+            //     name: '',
+            //     selector: (row, i) => row.orderStatusDetails[0]?.title,
+            //     cell: (row) => (
+            //         <button
+            //             className="btn btn-primary btn-sm"
+            //         // onClick={() => handleView(row)}
+            //         >
+            //             View
+            //         </button>
+            //     ),
+            //     sortable: false
+            // }
         ];
 
 
-         this.all_Reports = [
+        this.all_Reports = [
             // {
             //     name: '',
             //     cell: (row) => (
@@ -178,19 +176,19 @@ class ManageReports extends Component {
                 selector: (row, i) => row.paymentDetails[0]?.paymentStatus,
                 sortable: true
             },
-            {
-                name: '',
-                selector: (row, i) => row.orderStatusDetails[0]?.title,
-                cell: (row) => (
-                    <button
-                        className="btn btn-primary btn-sm"
-                    // onClick={() => handleView(row)}
-                    >
-                        Download
-                    </button>
-                ),
-                sortable: false
-            }
+            // {
+            //     name: '',
+            //     selector: (row, i) => row.orderStatusDetails[0]?.title,
+            //     cell: (row) => (
+            //         <button
+            //             className="btn btn-primary btn-sm"
+            //         // onClick={() => handleView(row)}
+            //         >
+            //             Download
+            //         </button>
+            //     ),
+            //     sortable: false
+            // }
         ];
     }
 
@@ -453,25 +451,6 @@ class ManageReports extends Component {
                 }
             },
         };
-        // const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
-
-        // const dataBar = {
-        //     labels,
-        //     datasets: [
-        //         {
-        //             label: 'Dataset 1',
-        //             data: labels.map(() => faker.datatype.number({ min: 0, max: 1000 })),
-        //             backgroundColor: [
-        //                 '#3c8dbc',
-        //                 '#f56954',
-        //                 '#f39c12',
-        //                 '#CCCCCC',
-        //             ],
-        //         },
-
-        //     ],
-        // };
-
 
         const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -480,7 +459,7 @@ class ManageReports extends Component {
             labels,
             datasets: [
                 {
-                    label: 'Monthly Orders',
+                    label: 'Orders',
                     data: monthlyOrderCounts,
                     backgroundColor: [
                         '#3c8dbc',
@@ -538,21 +517,20 @@ class ManageReports extends Component {
                         <div className="report_tab_item product_report_tab_item">
                             <div className="rep_chart_wrapper">
                                 <div className="row">
-                                    <div className="col-lg-4">
+                                    <div className="col-lg-6">
                                         <div className="card bg-white rounded-3">
                                             <div className="card-header">
-                                                Monthly Report
+                                                Top categories
                                             </div>
                                             <div className="rep_chart_item chart_left">
                                                 <Doughnut data={data} />
                                             </div>
                                         </div>
-
                                     </div>
-                                    <div className="col-lg-4">
+                                    <div className="col-lg-6">
                                         <div className="card bg-white rounded-3">
                                             <div className="card-header">
-                                                Weekly Report
+                                                Monthly Order Report
                                             </div>
                                             <div className="rep_chart_item chart_right">
                                                 <Bar options={optionsBar} data={dataBar} />
@@ -560,10 +538,10 @@ class ManageReports extends Component {
                                         </div>
                                     </div>
 
-                                    <div className="col-lg-4">
+                                    {/* <div className="col-lg-6">
                                         <div className="card bg-white rounded-3">
                                             <div className="card-header">
-                                                Order this week
+                                                Order this month
                                             </div>
                                             <div className="rep_chart_item orderWeek">
                                                 <div className="total_weeklly_order">
@@ -572,7 +550,7 @@ class ManageReports extends Component {
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
 
@@ -685,7 +663,7 @@ class ManageReports extends Component {
                             <div className="card  bg-white rounded-3 pt-3 pb-5 report_listing_row">
                                 <div className="dash_inner_wrap">
                                     <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center flex_mob_none">
-                                        <div className="dash_title">All Reports</div>
+                                        <div className="dash_title">All Order Reports</div>
                                     </div>
                                 </div>
 
@@ -706,8 +684,6 @@ class ManageReports extends Component {
                                 </DataTableExtensions>
 
                             </div>
-
-
 
 
                             <div className="card  bg-white rounded-3 pt-3 pb-5 report_listing_row">
@@ -741,75 +717,6 @@ class ManageReports extends Component {
                                         <div className="dash_title">Best selling Products</div>
                                     </div>
                                 </div>
-
-                                {/* <div className="orders_table reports-list-content pt-0 pb-0">
-                                    <div className="tab-pane fade show active">
-                                        <table className="table table-responsive table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th width="100px">Product Image</th>
-                                                    <th>Product Title</th>
-                                                    <th width="100px">Quantity</th>
-                                                    <th width="120px">&nbsp;</th>
-
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>
-                                                        <div className="productThumb">
-                                                            <img src={nicon} alt="" />
-                                                        </div>
-                                                    </td>
-                                                    <td><a href="">Milk & Honey Book</a></td>
-                                                    <td>25</td>
-                                                    <td><a className="custom_btn btn_yellow_bordered w-auto btn" href="#">View</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div className="productThumb">
-                                                            <img src={nicon} alt="" />
-                                                        </div>
-                                                    </td>
-                                                    <td><a href="">Milk & Honey Book</a></td>
-                                                    <td>25</td>
-                                                    <td><a className="custom_btn btn_yellow_bordered w-auto btn" href="#">View</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div className="productThumb">
-                                                            <img src={nicon} alt="" />
-                                                        </div>
-                                                    </td>
-                                                    <td><a href="">Milk & Honey Book</a></td>
-                                                    <td>25</td>
-                                                    <td><a className="custom_btn btn_yellow_bordered w-auto btn" href="#">View</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div className="productThumb">
-                                                            <img src={nicon} alt="" />
-                                                        </div>
-                                                    </td>
-                                                    <td><a href="">Milk & Honey Book</a></td>
-                                                    <td>25</td>
-                                                    <td><a className="custom_btn btn_yellow_bordered w-auto btn" href="#">View</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <div className="productThumb">
-                                                            <img src={nicon} alt="" />
-                                                        </div>
-                                                    </td>
-                                                    <td><a href="">Milk & Honey Book</a></td>
-                                                    <td>25</td>
-                                                    <td><a className="custom_btn btn_yellow_bordered w-auto btn" href="#">View</a></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div> */}
-
                                 <DataTableExtensions
                                     columns={this.bestSelling_Products}
                                     data={bestSellingProducts}

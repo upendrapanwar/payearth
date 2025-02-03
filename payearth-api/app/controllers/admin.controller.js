@@ -317,7 +317,8 @@ router.get("/getWeeklyOrderStatusCount", getWeeklyOrderStatusCount);
 router.get("/productMonthWeekReport", productMonthWeekReport);
 router.get("/getLatestCustomers", getLatestCustomers);
 router.get("/getBestSellingProducts", getBestSellingProducts);
-router.get("/getReportData", getReportData);
+router.get("/getReportData", getOrderReportData);
+router.get("/getServiceReport", getServiceReportData);
 
 
 
@@ -1535,8 +1536,15 @@ function getBestSellingProducts(req, res, next) {
         .catch((err) => next(res.json({ status: false, message: err.message })));
 }
 
-function getReportData(req, res, next) {
-    adminService.getReportData(req)
+function getOrderReportData(req, res, next) {
+    adminService.getOrderReportData(req)
+        .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error getting Report Data." }))
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+// getServiceReport
+function getServiceReportData(req, res, next) {
+    adminService.getServiceReportData(req)
         .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error getting Report Data." }))
         .catch((err) => next(res.json({ status: false, message: err.message })));
 }

@@ -223,7 +223,8 @@ module.exports = {
     productMonthWeekReport,
     getLatestCustomers,
     getBestSellingProducts,
-    getReportData,
+    getOrderReportData,
+    getServiceReportData,
 };
 
 // Validator function
@@ -5538,55 +5539,55 @@ async function getLatestCustomers() {
         const latestOrders = await Order.aggregate([
             {
                 $match: {
-                    isActive: true, 
-                    userId: { $exists: true, $ne: null } 
+                    isActive: true,
+                    userId: { $exists: true, $ne: null }
                 }
             },
             {
-                $sort: { updatedAt: -1 } 
+                $sort: { updatedAt: -1 }
             },
             {
                 $group: {
-                    _id: "$userId", 
-                    latestOrder: { $first: "$$ROOT" } 
+                    _id: "$userId",
+                    latestOrder: { $first: "$$ROOT" }
                 }
             },
             {
-                $replaceRoot: { newRoot: "$latestOrder" } 
+                $replaceRoot: { newRoot: "$latestOrder" }
             },
             {
                 $lookup: {
-                    from: "users", 
-                    localField: "userId", 
-                    foreignField: "_id", 
-                    as: "userDetails" 
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userDetails"
                 }
             },
             {
                 $lookup: {
-                    from: "orderstatuses", 
-                    localField: "orderStatus", 
-                    foreignField: "_id", 
-                    as: "orderStatusDetails" 
+                    from: "orderstatuses",
+                    localField: "orderStatus",
+                    foreignField: "_id",
+                    as: "orderStatusDetails"
                 }
             },
             {
                 $unwind: {
                     path: "$userDetails",
-                    preserveNullAndEmptyArrays: false 
+                    preserveNullAndEmptyArrays: false
                 }
             },
             {
                 $setWindowFields: {
-                    sortBy: { updatedAt: -1 }, 
+                    sortBy: { updatedAt: -1 },
                     output: {
-                        serial: { $rank: {} } 
+                        serial: { $rank: {} }
                     }
                 }
             },
             {
                 $project: {
-                    serial: 1, 
+                    serial: 1,
                     _id: 1,
                     paymentId: 1,
                     userId: 1,
@@ -5648,7 +5649,7 @@ async function getLatestCustomers() {
 
 
 async function getBestSellingProducts() {
-  //  console.log('getBestSellingProducts----');
+    //  console.log('getBestSellingProducts----');
     try {
         const bestSellingProducts = await Product.aggregate([
             { $match: { isActive: true } },
@@ -5657,7 +5658,7 @@ async function getBestSellingProducts() {
 
             {
                 $lookup: {
-                    from: "categories", 
+                    from: "categories",
                     localField: "category",
                     foreignField: "_id",
                     as: "categoryDetails"
@@ -5675,7 +5676,7 @@ async function getBestSellingProducts() {
 
             {
                 $lookup: {
-                    from: "brands", 
+                    from: "brands",
                     localField: "brand",
                     foreignField: "_id",
                     as: "brandDetails"
@@ -5689,14 +5690,14 @@ async function getBestSellingProducts() {
                     price: 1,
                     featuredImage: 1,
                     quantity: 1,
-                    category: { $arrayElemAt: ["$categoryDetails.categoryName", 0] }, 
-                    sub_category: { $arrayElemAt: ["$subCategoryDetails.categoryName", 0] }, 
-                    brand: { $arrayElemAt: ["$brandDetails.brandName", 0] } 
+                    category: { $arrayElemAt: ["$categoryDetails.categoryName", 0] },
+                    sub_category: { $arrayElemAt: ["$subCategoryDetails.categoryName", 0] },
+                    brand: { $arrayElemAt: ["$brandDetails.brandName", 0] }
                 }
             }
         ]);
 
-       // console.log('getBestSellingProducts----', bestSellingProducts);
+        // console.log('getBestSellingProducts----', bestSellingProducts);
 
         if (bestSellingProducts && bestSellingProducts.length > 0) {
             return bestSellingProducts;
@@ -5710,8 +5711,8 @@ async function getBestSellingProducts() {
 }
 
 
-async function getReportData() {
-   // console.log('getReportData----');
+async function getOrderReportData() {
+    // console.log('getReportData----');
     try {
         const currentYear = new Date().getFullYear();
 
@@ -5724,7 +5725,7 @@ async function getReportData() {
             },
             {
                 $lookup: {
-                    from: 'payments', 
+                    from: 'payments',
                     localField: 'paymentId',
                     foreignField: '_id',
                     as: 'paymentDetails',
@@ -5732,13 +5733,13 @@ async function getReportData() {
             },
             {
                 $unwind: {
-                    path: "$orderStatus", 
-                    preserveNullAndEmptyArrays: true, 
+                    path: "$orderStatus",
+                    preserveNullAndEmptyArrays: true,
                 },
             },
             {
                 $lookup: {
-                    from: 'orderstatuses', 
+                    from: 'orderstatuses',
                     localField: 'orderStatus',
                     foreignField: '_id',
                     as: 'orderStatusDetails',
@@ -5783,7 +5784,7 @@ async function getReportData() {
             },
         ]);
 
-        const allOrders = reportData[0].allOrders; 
+        const allOrders = reportData[0].allOrders;
         const currentYearOrdersData = reportData[0].currentYearOrders;
 
         const monthlyOrderCounts = Array(12).fill(0);
@@ -5792,11 +5793,106 @@ async function getReportData() {
             monthlyOrderCounts[data._id.month - 1] = data.count;
         });
 
-      //  console.log("Monthly Order Counts:", monthlyOrderCounts);
-      //  console.log("All Orders:", allOrders);
+        //  console.log("Monthly Order Counts:", monthlyOrderCounts);
+        //  console.log("All Orders:", allOrders);
 
         return {
             monthlyOrderCounts,
+            allOrders,
+        };
+    } catch (error) {
+        console.error("Error fetching report data:", error.message);
+        throw error;
+    }
+}
+
+async function getServiceReportData() {
+    // console.log('getReportData----');
+    try {
+        const currentYear = new Date().getFullYear();
+
+        const reportData = await Order.aggregate([
+            {
+                $match: {
+                    isService: true,
+                    isSubscription: false,
+                },
+            },
+            {
+                $lookup: {
+                    from: 'payments',
+                    localField: 'paymentId',
+                    foreignField: '_id',
+                    as: 'paymentDetails',
+                },
+            },
+            {
+                $unwind: {
+                    path: "$orderStatus",
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            {
+                $lookup: {
+                    from: 'orderstatuses',
+                    localField: 'orderStatus',
+                    foreignField: '_id',
+                    as: 'orderStatusDetails',
+                },
+            },
+            {
+                $addFields: {
+                    orderYear: { $year: "$createdAt" },
+                    orderMonth: { $month: "$createdAt" },
+                },
+            },
+            {
+                $facet: {
+                    allOrders: [
+                        {
+                            $project: {
+                                _id: 1,
+                                billingFirstName: 1,
+                                billingLastName: 1,
+                                billingEmail: 1,
+                                orderCode: 1,
+                                price: 1,
+                                paymentDetails: 1,
+                                orderStatusDetails: 1,
+                                createdAt: 1,
+                                total: 1,
+                            },
+                        },
+                    ],
+
+                    currentYearOrders: [
+                        { $match: { orderYear: currentYear } },
+                        {
+                            $group: {
+                                _id: { month: "$orderMonth" },
+                                count: { $sum: 1 },
+                            },
+                        },
+                        { $sort: { "_id.month": 1 } },
+                    ],
+                },
+            },
+        ]);
+
+        const allOrders = reportData[0].allOrders;
+        const currentYearOrdersData = reportData[0].currentYearOrders;
+
+        const monthlyServiceCounts = Array(12).fill(0);
+
+        currentYearOrdersData.forEach((data) => {
+            monthlyServiceCounts[data._id.month - 1] = data.count;
+        });
+
+        //  console.log("Monthly Order Counts:", monthlyOrderCounts);
+        //  console.log("All Orders:", allOrders);
+
+        return {
+            monthlyServiceCounts,
             allOrders,
         };
     } catch (error) {
