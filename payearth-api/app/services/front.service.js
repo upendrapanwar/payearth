@@ -137,15 +137,15 @@ async function getRatingCount(productId) {
 
   try {
     const ratingsData = [
-      { $match: { productId: mongoose.Types.ObjectId(productId) } }, 
+      { $match: { productId: mongoose.Types.ObjectId(productId) } },
       {
         $group: {
-          _id: null, 
-          "5": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 5] }, { $lt: ["$rating", 6] }] }, 1, 0] } }, 
-          "4": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 4] }, { $lt: ["$rating", 5] }] }, 1, 0] } }, 
-          "3": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 3] }, { $lt: ["$rating", 4] }] }, 1, 0] } }, 
-          "2": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 2] }, { $lt: ["$rating", 3] }] }, 1, 0] } }, 
-          "1": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 1] }, { $lt: ["$rating", 2] }] }, 1, 0] } }, 
+          _id: null,
+          "5": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 5] }, { $lt: ["$rating", 6] }] }, 1, 0] } },
+          "4": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 4] }, { $lt: ["$rating", 5] }] }, 1, 0] } },
+          "3": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 3] }, { $lt: ["$rating", 4] }] }, 1, 0] } },
+          "2": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 2] }, { $lt: ["$rating", 3] }] }, 1, 0] } },
+          "1": { $sum: { $cond: [{ $and: [{ $gte: ["$rating", 1] }, { $lt: ["$rating", 2] }] }, 1, 0] } },
         },
       },
     ];
@@ -258,67 +258,67 @@ async function getTrendingProducts(req) {
       {
         $match: {
           isActive: true,
-          "product.productId": { $exists: true, $ne: [] } 
+          "product.productId": { $exists: true, $ne: [] }
         }
       },
       {
-        $unwind: "$product" 
+        $unwind: "$product"
       },
       {
         $group: {
-          _id: "$product.productId", 
+          _id: "$product.productId",
           totalOrders: { $sum: 1 },
-          totalQuantity: { $sum: "$product.quantity" } 
+          totalQuantity: { $sum: "$product.quantity" }
         }
       },
       {
         $sort: {
-          totalOrders: -1 
+          totalOrders: -1
         }
       },
       {
-        $limit: limit 
+        $limit: limit
       },
       {
         $lookup: {
-          from: "products", 
-          localField: "_id", 
-          foreignField: "_id", 
-          as: "productDetails" 
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "productDetails"
         }
       },
       {
         $unwind: {
           path: "$productDetails",
-          preserveNullAndEmptyArrays: true 
+          preserveNullAndEmptyArrays: true
         }
       },
 
       {
         $lookup: {
-          from: "productreviews", 
-          localField: "productDetails.reviews", 
-          foreignField: "_id", 
-          as: "productDetails.reviews" 
+          from: "productreviews",
+          localField: "productDetails.reviews",
+          foreignField: "_id",
+          as: "productDetails.reviews"
         }
       },
       {
         $project: {
-          _id: 0, 
-          productId: "$_id", 
+          _id: 0,
+          productId: "$_id",
           totalOrders: 1,
           totalQuantity: 1,
           productDetails: {
             _id: 1,
             name: 1,
-            lname: 1, 
+            lname: 1,
             category: 1,
             sub_category: 1,
             featuredImage: 1,
             price: 1,
             isActive: 1,
             isService: 1,
-            reviews: { $ifNull: ["$productDetails.reviews", []] }, 
+            reviews: { $ifNull: ["$productDetails.reviews", []] },
             quantity: 1,
             createdBy: 1,
             updatedBy: 1,
@@ -332,7 +332,7 @@ async function getTrendingProducts(req) {
     ]);
 
     if (popularProducts && popularProducts.length > 0) {
-    //  console.log("Popular Products with Reviews:", popularProducts);
+      //  console.log("Popular Products with Reviews:", popularProducts);
       return popularProducts;
     }
 
@@ -376,67 +376,67 @@ async function getPopularProducts(req) {
       {
         $match: {
           isActive: true,
-          "product.productId": { $exists: true, $ne: [] } 
+          "product.productId": { $exists: true, $ne: [] }
         }
       },
       {
-        $unwind: "$product" 
+        $unwind: "$product"
       },
       {
         $group: {
-          _id: "$product.productId", 
+          _id: "$product.productId",
           totalOrders: { $sum: 1 },
-          totalQuantity: { $sum: "$product.quantity" } 
+          totalQuantity: { $sum: "$product.quantity" }
         }
       },
       {
         $sort: {
-          totalOrders: -1 
+          totalOrders: -1
         }
       },
       {
-        $limit: limit 
+        $limit: limit
       },
       {
         $lookup: {
-          from: "products", 
-          localField: "_id", 
-          foreignField: "_id", 
-          as: "productDetails" 
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "productDetails"
         }
       },
       {
         $unwind: {
           path: "$productDetails",
-          preserveNullAndEmptyArrays: true 
+          preserveNullAndEmptyArrays: true
         }
       },
 
       {
         $lookup: {
-          from: "productreviews", 
-          localField: "productDetails.reviews", 
-          foreignField: "_id", 
-          as: "productDetails.reviews" 
+          from: "productreviews",
+          localField: "productDetails.reviews",
+          foreignField: "_id",
+          as: "productDetails.reviews"
         }
       },
       {
         $project: {
-          _id: 0, 
-          productId: "$_id", 
+          _id: 0,
+          productId: "$_id",
           totalOrders: 1,
           totalQuantity: 1,
           productDetails: {
             _id: 1,
             name: 1,
-            lname: 1, 
+            lname: 1,
             category: 1,
             sub_category: 1,
             featuredImage: 1,
             price: 1,
             isActive: 1,
             isService: 1,
-            reviews: { $ifNull: ["$productDetails.reviews", []] }, 
+            reviews: { $ifNull: ["$productDetails.reviews", []] },
             quantity: 1,
             createdBy: 1,
             updatedBy: 1,
@@ -450,7 +450,7 @@ async function getPopularProducts(req) {
     ]);
 
     if (popularProducts && popularProducts.length > 0) {
-    //  console.log("Popular Products with Reviews:", popularProducts);
+      //  console.log("Popular Products with Reviews:", popularProducts);
       return popularProducts;
     }
 
@@ -1352,33 +1352,33 @@ async function saveNotifications(req) {
   // console.log('notification data to save--',data)
   const { type, receiver, sender, message, postId } = data;
 
-  if (!type || !receiver || !sender || !message) {
-    throw new Error('Missing required fields: type, receiver,postId, sender, or message');
-  }
+  // if (!type || !receiver || !sender || !message) {
+  //   throw new Error('Missing required fields: type, receiver,postId, sender, or message');
+  // }
 
-  const newNotification = new Notification({
-    type,
-    receiver: {
-      id: receiver.id,
-      type: receiver.type
-    },
-    sender: {
-      id: sender.id,
-      type: sender.type
-    },
-    postId,
-    message,
-    isRead: false,
-    createdAt: new Date()
-  });
+  // const newNotification = new Notification({
+  //   type,
+  //   receiver: {
+  //     id: receiver.id,
+  //     type: receiver.type
+  //   },
+  //   sender: {
+  //     id: sender.id,
+  //     type: sender.type
+  //   },
+  //   postId,
+  //   message,
+  //   isRead: false,
+  //   createdAt: new Date()
+  // });
 
-  try {
-    const savedNotification = await newNotification.save();
-    return savedNotification;
-  } catch (error) {
-    console.error('Error saving notification:', error);
-    throw new Error('Failed to save notification');
-  }
+  // try {
+  //   const savedNotification = await newNotification.save();
+  //   return savedNotification;
+  // } catch (error) {
+  //   console.error('Error saving notification:', error);
+  //   throw new Error('Failed to save notification');
+  // }
 }
 
 // async function getNotifications(req) {

@@ -754,8 +754,8 @@ class ServiceCheckOut extends Component {
                                 {/* status=${orderStatus[0].title} */}
                                 <Link to={`/service-detail/${serviceDetails.result.id}?paymentResponse=${this.state.paymentResponse}`}>
                                     <button
-                                    //  onClick={this.clearSessionStorage} 
-                                     className="btn btn-primary btn-sm mt-2" type="button">Return</button>
+                                        //  onClick={this.clearSessionStorage} 
+                                        className="btn btn-primary btn-sm mt-2" type="button">Return</button>
                                 </Link>
                             </div>
                         </div>

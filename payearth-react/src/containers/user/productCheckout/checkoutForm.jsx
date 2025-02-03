@@ -38,8 +38,8 @@ export default function CheckoutForm() {
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        // return_url: "https://www.pay.earth/checkOutCompletePage",
-        return_url: "https://localhost:3000/checkOutCompletePage",
+        return_url: "https://www.pay.earth/checkOutCompletePage",
+        // return_url: "https://localhost:3000/checkOutCompletePage",
       },
     });
 
@@ -60,22 +60,22 @@ export default function CheckoutForm() {
   const clearCartOfdatabase = async (userId) => {
     console.log('clearCartOfdatabase----userId', userId)
 
-    axios.delete('user/clearfromcart',  {
+    axios.delete('user/clearfromcart', {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json;charset=UTF-8',
         'Authorization': `Bearer ${authInfo.token}`
       },
-       data: {
+      data: {
         userId: userId
       }
     }).then(response => {
       if (response.data.status) {
-        
+
       }
     }).catch(error => {
       if (error.response) {
-        console.log('error.response',error.response);
+        console.log('error.response', error.response);
         //toast.error(error.response.data.message, {autoClose: 3000});
       }
     }).finally(() => {
