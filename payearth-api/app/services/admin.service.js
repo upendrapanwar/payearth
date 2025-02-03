@@ -99,6 +99,7 @@ module.exports = {
     filterOrderData,
 
     getProductOrders,
+    getServiceOrders,
 
     //CMS
     createCmsPost,
@@ -2041,35 +2042,43 @@ async function getOrderById(id) {
     }
 }
 
-// getProductOrders
 async function getProductOrders(req) {
-    const { status } = req.query;
+    const { status, title } = req.query;
     try {
         const query = {
             isActive: status,
+            title: title,
+            service: null
         };
-
-        console.log("query:", query)
-        // const fieldsToSelect = "id productCode name category sub_category brand featuredImage quantity isActive";
-        // let result = await Product.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect)
-        //     .populate({
-        //         path: 'category',
-        //         match: { isVisible: true },
-        //         select: 'categoryName isActive'
-        //     })
-        //     .populate({
-        //         path: 'brand',
-        //         match: { isVisible: true },
-        //         select: 'brandName'
-        //     })
-        //     .populate({
-        //         path: 'createdBy',
-        //         model: Seller,
-        //         select: 'id name email',
-        //     });
-        // return result;
+        const data = await OrderStatus.find(query)
+            .populate({
+                path: 'product.productId',
+                populate: { path: 'createdBy', select: 'name email' },
+            })
+            .populate('userId');
+        return data;
     } catch (error) {
-        console.log(error);
+        console.error("Error fetching product orders:", error);
+    }
+}
+
+async function getServiceOrders(req) {
+    const { status, title } = req.query;
+    try {
+        const query = {
+            isActive: status,
+            title: title,
+            // service: null
+        };
+        const data = await OrderStatus.find(query)
+            .populate({
+                path: 'product.productId',
+                populate: { path: 'createdBy', select: 'name email' },
+            })
+            .populate('userId');
+        return data;
+    } catch (error) {
+        console.error("Error fetching product orders:", error);
     }
 }
 

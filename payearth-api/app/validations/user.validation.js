@@ -19,6 +19,10 @@ const schema = {
             "string.min": "{{#label}} should not be less than 6 characters.",
             "string.max": "{{#label}} should not be greater than 50 characters."
         }),
+        terms: joi.boolean().valid(true).required().messages({
+            "any.only": "You must accept the Terms and Conditions.",
+            "any.required": "Accepting Terms and Conditions is required."
+        })
     }),
 
     login: joi.object({
@@ -223,3 +227,5 @@ function getMessage(value, res, next) {
 
     }
 }
+
+

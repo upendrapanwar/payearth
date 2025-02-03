@@ -208,13 +208,13 @@ async function userRegister(param) {
   if (await User.findOne({ email: param.email })) {
     throw 'email "' + param.email + '" is already taken';
   }
-
   const user = new User({
     name: param.name,
     email: param.email,
     password: bcrypt.hashSync(param.password, 10),
     role: "user",
     isActive: true,
+    terms: param.terms,
   });
 
   //Email send functionality.
@@ -3027,7 +3027,7 @@ async function CommonServiceById(req) {
 // AddService Review
 async function addServiceReview(req) {
   const param = req.body;
-  console.log('add rating param',param)
+  console.log('add rating param', param)
   try {
     // Parse rating as float to handle fractional values
     const rating = parseFloat(param.rating);
@@ -3266,7 +3266,7 @@ async function addProductReview(req) {
       //   parseFloat(product.totalRatingScore) -
       //   parseFloat(existingReview.rating) +
       //   rating;
-     // const avgRating = totalRatingScore / product.reviewCount;
+      // const avgRating = totalRatingScore / product.reviewCount;
 
       // updateData = {
       //   totalRatingScore: totalRatingScore,
@@ -3362,10 +3362,10 @@ async function deleteProductReview(req) {
     }
 
     console.log("Review deleted and product updated successfully");
-    return { 
-      success: true, 
-      message: "Review deleted and product updated", 
-      updatedProduct 
+    return {
+      success: true,
+      message: "Review deleted and product updated",
+      updatedProduct
     };
   } catch (err) {
     console.error("Error deleting review:", err);
