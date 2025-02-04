@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import heartIconBordered from "./../../assets/icons/heart-icon-bordered.svg";
 import redHeartIcon from "./../../assets/icons/red-heart-icon-filled.svg";
+import coins from "./../../assets/icons/coin.svg";
 import Rating from "./Rating";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
@@ -108,6 +109,13 @@ const ProductCard = ({ data, inWishList }) => {
 
   return (
     <div className="prod_card">
+      {data.super_rewards === true ?
+        <img
+          src={coins}
+          alt="coin-icon"
+          width={45}
+          height={45}
+        /> : ''}
       <div className="img_wrapper">
         {data.isService === true ? (
           <div className="ep_tag shadow">
@@ -131,9 +139,6 @@ const ProductCard = ({ data, inWishList }) => {
               />
             </span>
           </div>
-          {/* <div className="share_option shadow">
-                        <Link to="#"><img src={shareIcon} alt="share-icon" title="Share" /></Link>
-                    </div> */}
         </div>
         <Link
           to={data.isService === false ? `/product-detail/${data.id}` : `/service-detail/${data.id}`}

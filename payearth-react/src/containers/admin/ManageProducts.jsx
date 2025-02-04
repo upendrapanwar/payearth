@@ -81,8 +81,8 @@ class ManageProducts extends Component {
                 name: 'SELLER DETAILS',
                 selector: row => (
                     <>
-                        <p>{row.createdBy[0].name || 'N/A'}</p>
-                        <p>{row.createdBy[0].email || 'N/A'}</p>
+                        <p>{row.createdBy.name || 'N/A'}</p>
+                        <p>{row.createdBy.email || 'N/A'}</p>
                     </>
                 ),
                 sortable: true,
@@ -95,6 +95,20 @@ class ManageProducts extends Component {
             {
                 name: 'SELLING QUANTITY',
                 selector: (row, i) => row.quantity.selling_qty,
+                sortable: true
+            },
+            {
+                name: 'REWARDS',
+                cell: (row, i) => {
+                    return <>
+                        <Switch
+                            on={true}
+                            off={false}
+                            value={row.super_rewards}
+                            onChange={() => this.handleRewardStatus(row.id, row.super_rewards)}
+                        />
+                    </>
+                },
                 sortable: true
             },
             {
@@ -164,6 +178,29 @@ class ManageProducts extends Component {
             const status = !isActive;
             const updateStatusUrl = `/admin/productStatus/${id}`;
             await axios.put(updateStatusUrl, { isActive: status }, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            });
+            if (this.state.currentTab === 'trashTab') {
+                this.getProductStock(false);
+            } else {
+                this.getProductStock(true);
+            }
+
+        } catch (error) {
+            console.error("There was an error changing the status", error);
+        }
+    }
+
+    handleRewardStatus = async (id, super_rewards) => {
+        try {
+            const status = !super_rewards;
+            console.log("status", status)
+            const updateStatusUrl = `/admin/updateSuperRewards/${id}`;
+            await axios.put(updateStatusUrl, { super_rewards: status }, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
@@ -308,8 +345,6 @@ class ManageProducts extends Component {
             pendingProductsPagination,
             rejectedProductsPagination
         } = this.state;
-
-        console.log("data", data)
 
         return (
             <React.Fragment>

@@ -134,10 +134,10 @@ const ProductListing = () => {
                     if (product.reviews && product.reviews.length > 0) {
                         const totalRatings = product.reviews.reduce((sum, review) => sum + review.rating, 0);
                         avgRating = totalRatings / product.reviews.length;
-            
+
                         avgRating = avgRating % 1 >= 0.8 ? Math.ceil(avgRating) : avgRating.toFixed(1);
                     }
-            
+
                     productsData.push({
                         id: product.id,
                         image: product.featuredImage,
@@ -146,7 +146,8 @@ const ProductListing = () => {
                         price: product.price,
                         avgRating: avgRating,
                         quantity: product.quantity,
-                        cryptoPrices: product.cryptoPrices
+                        cryptoPrices: product.cryptoPrices,
+                        super_rewards: product.super_rewards
                     });
                 });
             }

@@ -185,7 +185,7 @@ module.exports = {
     getProductDetailsById,
     getColors,
     productStatus,
-
+    updateSuperRewards,
 
     // Dashboard
     getTopSellingCategories,
@@ -4467,7 +4467,7 @@ async function getProductStock(req) {
         const query = {
             isActive: status,
         };
-        const fieldsToSelect = "id productCode name category sub_category brand featuredImage quantity isActive";
+        const fieldsToSelect = "id productCode name category sub_category brand featuredImage quantity isActive super_rewards";
         let result = await Product.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect)
             .populate({
                 path: 'category',
@@ -4576,6 +4576,23 @@ async function productStatus(req) {
     }
 }
 
+async function updateSuperRewards(req) {
+    const id = req.params.id;
+    const param = req.body;
+    const product = await Product.findById(id);
+    if (!product) {
+        return false;
+    } else {
+        const input = {
+            "super_rewards": param.super_rewards
+        };
+        Object.assign(product, input);
+        if (await product.save()) {
+            return await Product.findById(id).select();
+        }
+    }
+}
+
 async function getTopSellingCategories(req) {
     try {
         const topSellingCategories = await OrderStatus.find({ title: "Delivered" }).select('product')
@@ -4592,7 +4609,7 @@ async function getTopSellingCategories(req) {
                 }
             ]);
 
-        console.log("topSellingCategories", topSellingCategories)
+        // console.log("topSellingCategories", topSellingCategories)
         if (!topSellingCategories || topSellingCategories.length === 0) {
             return {
                 status: false,

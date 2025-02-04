@@ -291,6 +291,7 @@ router.get("/getProductStock", getProductStock);
 router.get("/getProductDetailsById/:id", getProductDetailsById);
 router.get("/colors", getColors);
 router.put('/productStatus/:id', productStatus);
+router.put('/updateSuperRewards/:id', updateSuperRewards);
 
 //dashboard
 router.get("/getProductData", getProductData);
@@ -1428,6 +1429,12 @@ function getColors(req, res, next) {
 
 function productStatus(req, res, next) {
     adminService.productStatus(req)
+        .then(data => data ? res.status(201).json({ status: true, message: msg.admin.brand.status.success, data: data }) : res.status(400).json({ status: false, message: msg.admin.brand.status.error }))
+        .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+// updateSuperRewards
+function updateSuperRewards(req, res, next) {
+    adminService.updateSuperRewards(req)
         .then(data => data ? res.status(201).json({ status: true, message: msg.admin.brand.status.success, data: data }) : res.status(400).json({ status: false, message: msg.admin.brand.status.error }))
         .catch(err => next(res.status(400).json({ status: false, message: err })));
 }

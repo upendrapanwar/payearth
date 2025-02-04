@@ -31,10 +31,10 @@
 //   const getTotal = async () => {
 //     let totalQuantity = 0;
 //     let totalPrice = 0;
-  
+
 //     for (const item of cart) {
 //       let finalPrice = item.price;
-  
+
 //       if (item.discountId) {
 //         // API call to check if the discount is active
 //         try {
@@ -52,7 +52,7 @@
 //         }
 
 //       }
-  
+
 //       totalQuantity += item.quantity;
 //       totalPrice += finalPrice * item.quantity;
 //       //console.log('totalPrice----',totalPrice)
@@ -63,7 +63,7 @@
 
 //     return { totalPrice: totalPrice.toFixed(2), totalQuantity };
 //   };
-  
+
 
 //   const amount = couponData !== null ? `${getTotal().totalPrice - getTotal().totalPrice * couponData.discount_per / 100}` : `${getTotal().totalPrice}`;
 //   const finalAmount = parseFloat(amount);
@@ -228,19 +228,10 @@ function Total({ couponData }) {
     calculateTotal();
   }, [cart, couponData]);
 
-  const finalAmount =
-    couponData !== null
-      ? (total.totalPrice - total.totalPrice * couponData.discount_per / 100).toFixed(2)
-      : total.totalPrice;
-
-  const additionalData = {
-    finalAmount,
-    discount: couponData
-      ? (total.totalPrice * couponData.discount_per / 100).toFixed(2)
-      : "0",
-    deliveryCharge: "0",
-    taxAmount: "0",
-  };
+  const amount = couponData !== null ? (total.totalPrice - total.totalPrice * couponData.discount_per / 100).toFixed(2) : total.totalPrice;
+  const taxRate = 0.05; // 5% tax
+  const finalAmount = (parseFloat(amount) + parseFloat(amount) * taxRate).toFixed(2);
+  const additionalData = { finalAmount, discount: couponData ? (total.totalPrice * couponData.discount_per / 100).toFixed(2) : "0", deliveryCharge: "0", taxAmount: "0", };
 
   const handleCheckout = () => {
     const reqBody = {
@@ -303,11 +294,15 @@ function Total({ couponData }) {
           </div>
           <div className="cfp">
             <span>Final Price</span>
-            <b>${finalAmount}</b>
+            <b>${amount}</b>
           </div>
           <div className="cfp">
             <span>Delivery Charges</span>
             <b>Free</b>
+          </div>
+          <div className="cfp">
+            <span>Tax</span>
+            <b>5%</b>
           </div>
         </div>
       </div>

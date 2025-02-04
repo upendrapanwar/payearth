@@ -34,21 +34,21 @@ class MyCart extends Component {
     async componentDidMount() {
         const authInfo = this.authInfo;
         const cart = this.props.cart;
-      //  console.log('cart data first time ------',cart)
+        //  console.log('cart data first time ------',cart)
         if (!authInfo) {
             return;
         }
 
         const { id, token } = authInfo;
         const cartFromRedux = this.props.cart;
-       // console.log('cartFromRedux', cartFromRedux)
+        // console.log('cartFromRedux', cartFromRedux)
         const updateCartData = {
             cartFromRedux: cartFromRedux,
             userId: id
         }
 
         try {
-          //  console.log('Update cart data on login...');
+            //  console.log('Update cart data on login...');
             const response = await axios.post('user/updateCartData', updateCartData, {
                 headers: {
                     'Accept': 'application/json',
@@ -58,7 +58,7 @@ class MyCart extends Component {
             });
 
             const dbCart = response?.data?.data || [];
-         //   console.log('Cart data fetched from DB:', response);
+            //   console.log('Cart data fetched from DB:', response);
 
             // if (dbCart.length > 0) {
             //     const mergedCart = this.mergeCartData(cartFromRedux, dbCart);
@@ -73,7 +73,7 @@ class MyCart extends Component {
 
 
         try {
-         //   console.log('Fetching cart data...');
+            //   console.log('Fetching cart data...');
             const response = await axios.get(`user/getCartData/${id}`, {
                 headers: {
                     'Accept': 'application/json',
@@ -83,7 +83,7 @@ class MyCart extends Component {
             });
 
             const dbCart = response?.data?.data || [];
-          //  console.log('Cart data fetched from DB:', dbCart);
+            //  console.log('Cart data fetched from DB:', dbCart);
 
             if (dbCart.length > 0) {
                 const mergedCart = this.mergeCartData(cartFromRedux, dbCart);
@@ -106,8 +106,8 @@ class MyCart extends Component {
 
 
     mergeCartData = (reduxCart, dbCart) => {
-      //  console.log('Redux Cart:', reduxCart);
-      //  console.log('Database Cart:', dbCart);
+        //  console.log('Redux Cart:', reduxCart);
+        //  console.log('Database Cart:', dbCart);
 
         const validDbCart = dbCart.filter(dbProduct => {
             if (!Array.isArray(dbProduct?.products) || dbProduct.products.length === 0) {
@@ -137,7 +137,7 @@ class MyCart extends Component {
                 const existingProductIndex = mergedCart.findIndex(item => item.id === dbProductId);
 
                 if (existingProductIndex !== -1) {
-                 //   console.log('Updating existing product in Redux cart:', mergedCart[existingProductIndex]);
+                    //   console.log('Updating existing product in Redux cart:', mergedCart[existingProductIndex]);
                     mergedCart[existingProductIndex] = {
                         ...mergedCart[existingProductIndex],
                         quantity: product?.qty,
@@ -145,7 +145,7 @@ class MyCart extends Component {
                         discountPercent: product?.discountId?.discount || 0
                     };
                 } else {
-                  //  console.log('Adding new product from DB to cart:', product);
+                    //  console.log('Adding new product from DB to cart:', product);
                     mergedCart.push({
                         id: dbProductId || 'Unknown ID',
                         image: product?.productId?.featuredImage || 'default-image-url.jpg',
@@ -173,7 +173,7 @@ class MyCart extends Component {
             return;
         }
 
-      //  console.log('Updating Redux cart with merged data:', mergedCart);
+        //  console.log('Updating Redux cart with merged data:', mergedCart);
         dispatch(updateCart(mergedCart));
 
         //toast.success('Cart data successfully updated!', { autoClose: 3000 });
@@ -223,7 +223,7 @@ class MyCart extends Component {
 
     render() {
         const cart = this.props.cart;
-     //   console.log('final updated cart data of redux cart----', cart)
+        //   console.log('final updated cart data of redux cart----', cart)
         const getTotal = () => {
             let totalQuantity = 0
             let totalPrice = 0
@@ -273,7 +273,7 @@ class MyCart extends Component {
                                                             // return <CartItem key={item.id} id={item.id} image={item.image} title={item.name} price={item.price} quantity={item.quantity} discountId={item.discountId} discountPercent={item.discountPercent} />
                                                         })} */}
                                                         {cart.map((item) => {
-                                                           // console.log('item---for cartItem--', item)
+                                                            // console.log('item---for cartItem--', item)
                                                             return (
                                                                 <CartItem key={item.id} id={item.id} image={item.image} title={item.name} price={item.price} quantity={item.quantity} discountId={item.discountId} discountPercent={item.discountPercent} />
                                                             );
@@ -289,7 +289,7 @@ class MyCart extends Component {
                                     {cart.length === 0 ? "" :
                                         <div className="cart_wrap mb-5">
                                             <div className="items_incart d-flex justify-content-center align-items-center">
-                                                <span>have a coupons <a href="/my-coupons">Click here to have</a> </span>
+                                                <span>have a coupons <Link to="/my-coupons">Click here to have</Link> </span>
                                             </div>
                                             <div className="cart_wrap">
                                                 <div className="checkout_cart_wrap">

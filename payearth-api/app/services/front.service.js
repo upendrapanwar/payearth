@@ -653,7 +653,7 @@ async function getProductsListing(req) {
     }
 
     const products = await Product.find(query)
-      .select("id name price featuredImage avgRating reviews isService quantity")
+      .select("id name price featuredImage avgRating reviews isService quantity super_rewards")
       .sort({ createdAt: "desc" })
       .populate([
         {
@@ -839,9 +839,7 @@ async function getColorsListByProducts(req) {
 //Product
 async function getProductById(id) {
   const product = await Product.findById(id)
-    .select(
-      "productCode name description specifications color_size tier_price price featuredImage images avgRating reviewCount quantity"
-    )
+    .select("productCode name description specifications color_size tier_price price featuredImage images avgRating reviewCount quantity super_rewards")
     .populate([
       {
         path: "reviews",

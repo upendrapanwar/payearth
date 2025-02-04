@@ -12,6 +12,7 @@ import twitterIcon from "./../../assets/icons/twitter.svg";
 import linkedinIcon from "./../../assets/icons/linkedin.svg";
 import fbIcon from "./../../assets/icons/facebook.svg";
 import whatsappIcon from "./../../assets/icons/whatsapp.svg";
+import coins from "./../../assets/icons/coin.svg";
 import DetailTabbing from "../../components/user/common/DetailTabbing";
 import SimilarProducts from "../../components/user/common/SimilarProducts";
 import config from "./../../config.json";
@@ -43,8 +44,8 @@ class ProductDetail extends Component {
       mainImage: null,
       selectColorImage: null,
       selectColor: null,
-      averageRating:'',
-      reviewCount:''
+      averageRating: '',
+      reviewCount: ''
     };
   }
 
@@ -76,7 +77,7 @@ class ProductDetail extends Component {
             sizes = [];
           }
 
-          const reviews = response.data.data.reviews; 
+          const reviews = response.data.data.reviews;
           const reviewCount = response.data.data.reviews?.length;
 
           // Calculate the average rating
@@ -293,6 +294,18 @@ class ProductDetail extends Component {
                     <div className="col-lg-6">
                       <div className="prod_dtl_info">
                         <div className="prod_dtl_body">
+                          {productDetail.super_rewards === true ? <div className="d-flex align-items-center">
+                            <img
+                              src={coins}
+                              alt="coin-icon"
+                              width={40}
+                              height={40}
+                              className="me-2"
+                            />
+                            <p className="mb-0" style={{ fontFamily: 'Arial, sans-serif', fontSize: '16px', fontWeight: 'bold' }}>
+                              You will earn 2 coins for purchasing this product.
+                            </p>
+                          </div> : ''}
                           <h2>{productDetail.name}</h2>
                           <div className="pdi_ratings">
                             <Rating avgRating={averageRating} />

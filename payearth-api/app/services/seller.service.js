@@ -888,6 +888,7 @@ async function addProduct(req) {
       quantity: qtyObj,
       createdBy: param.seller_id,
       updatedBy: param.seller_id,
+      super_rewards: false,
       isActive: true
     };
 
