@@ -213,49 +213,65 @@ class Home extends Component {
             <Banner />
             <Deals />
             {/* PopularProducts Section */}
-            <div ref={this.componentRefs.popularProducts}>
+            {/* <div ref={this.componentRefs.popularProducts}>
               {isComponentVisible.popularProducts ? (
                 <Suspense fallback={<SpinnerLoader />}>
                   <PopularProducts />
                 </Suspense>
               ) : ("")}
-            </div>
+            </div> */}
+
+            <Suspense fallback={<SpinnerLoader />}>
+              <PopularProducts />
+            </Suspense>
 
             {/* SuperRewardsSec Section */}
-            <div ref={this.componentRefs.superRewardsSec}>
+            {/* <div ref={this.componentRefs.superRewardsSec}>
               {isComponentVisible.superRewardsSec ? (
                 <Suspense fallback={<SpinnerLoader />}>
                   <SuperRewardsSec />
                 </Suspense>
               ) : ("")}
-            </div>
+            </div> */}
+
+            <Suspense fallback={<SpinnerLoader />}>
+              <SuperRewardsSec />
+            </Suspense>
 
             {/* TrendingProducts Section */}
-            <div ref={this.componentRefs.trendingProducts}>
+            {/* <div ref={this.componentRefs.trendingProducts}>
               {isComponentVisible.trendingProducts ? (
                 <Suspense fallback={<SpinnerLoader />}>
                   <TrendingProducts />
                 </Suspense>
               ) : ("")}
-            </div>
+            </div> */}
+
+            <Suspense fallback={<SpinnerLoader />}>
+              <TrendingProducts />
+            </Suspense>
 
             {/* PopularBrands Section */}
-            <div ref={this.componentRefs.popularBrands}>
+            {/* <div ref={this.componentRefs.popularBrands}>
               {isComponentVisible.popularBrands ? (
                 <Suspense fallback={<SpinnerLoader />}>
                   <PopularBrands />
                 </Suspense>
               ) : ("")}
-            </div>
+            </div> */}
+
+            <Suspense fallback={<SpinnerLoader />}>
+              <PopularBrands />
+            </Suspense>
 
             {/* RecentSearch Section */}
-            <div ref={this.componentRefs.recentSearch}>
+            {/* <div ref={this.componentRefs.recentSearch}>
               {isComponentVisible.recentSearch ? (
                 <Suspense fallback={<SpinnerLoader />}>
                   <RecentSearch />
                 </Suspense>
               ) : ("")}
-            </div>
+            </div> */}
           </React.Fragment>
         )}
         <Footer />
