@@ -83,7 +83,7 @@ class ProductOrders extends Component {
                 name: 'ORDERED AT',
                 selector: (row) => new Date(row.createdAt).toLocaleDateString(),
                 sortable: true,
-              }
+            }
             // {
             //     name: 'STATUS',
             //     cell: (row, i) => {
@@ -157,7 +157,7 @@ class ProductOrders extends Component {
             },
             {
                 name: 'ORDERED AT',
-                selector: (row) => new Date(row.createdAt).toLocaleDateString(), 
+                selector: (row) => new Date(row.createdAt).toLocaleDateString(),
                 sortable: true,
             }
         ]
@@ -217,7 +217,7 @@ class ProductOrders extends Component {
     }
 
     getProductOrderData = async (currentStatus, title) => {
-        try {          
+        try {
             this.dispatch(setLoading({ loading: true }));
             const url = 'seller/getProductOrders';
             const response = await axios.get(url, {
@@ -231,13 +231,13 @@ class ProductOrders extends Component {
                     'Content-Type': 'application/json',
                 }
             });
-           // console.log('response-------',response)
+            // console.log('response-------',response)
             if (response.data.status === true) {
-               
-                     this.setState({ productOrderData: response.data.data });
-                } else {
-                    // this.setState({ data: response.data.data });
-                
+
+                this.setState({ productOrderData: response.data.data });
+            } else {
+                // this.setState({ data: response.data.data });
+
             }
         } catch (error) {
             console.error('Error fetching products:', error);
@@ -271,11 +271,9 @@ class ProductOrders extends Component {
 
     render() {
         const { loading } = store.getState().global;
-        const {
-            productOrderData,       
-        } = this.state;
+        const { productOrderData } = this.state;
 
-       // console.log("productOrderData", productOrderData)
+        console.log("productOrderData", productOrderData)
 
         return (
             <React.Fragment>
@@ -310,8 +308,8 @@ class ProductOrders extends Component {
                                     <div className="tab-pane fade show active" id="nav-pending-orders" role="tabpanel" aria-labelledby="nav-pending-orders-tab">
                                         <DataTableExtensions
                                             columns={this.pendingOrders_column}
-                                        // data={data}
-                                        data={ productOrderData }
+                                            // data={data}
+                                            data={productOrderData}
                                         >
                                             <DataTable
                                                 pagination
@@ -331,7 +329,7 @@ class ProductOrders extends Component {
                                     <div className="tab-pane fade" id="nav-cancelled&Refunds-orders" role="tabpanel" aria-labelledby="nav-cancelled&Refunds-orders-tab">
                                         <DataTableExtensions
                                             columns={this.cancleRefundsOrders_column}
-                                            data={ productOrderData }
+                                            data={productOrderData}
                                         >
                                             <DataTable
                                                 pagination
@@ -351,7 +349,7 @@ class ProductOrders extends Component {
                                     <div className="tab-pane fade" id="nav-completed-orders" role="tabpanel" aria-labelledby="nav-completed-orders-tab">
                                         <DataTableExtensions
                                             columns={this.completedOrders_column}
-                                            data={ productOrderData }
+                                            data={productOrderData}
                                         >
                                             <DataTable
                                                 pagination

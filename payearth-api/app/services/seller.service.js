@@ -4968,6 +4968,10 @@ async function getOpenedTicketMessage(req) {
 
 async function getProductOrders(req) {
   const { status, title, sellerId } = req.query;
+
+  console.log("status", status);
+  console.log("title", title);
+  console.log("sellerId", sellerId);
   try {
     const query = {
       isActive: status,
@@ -4981,7 +4985,7 @@ async function getProductOrders(req) {
         populate: { path: 'createdBy', select: 'name email' },
       })
       .populate('userId');
-    console.log('data---not filterd---', data)
+    // console.log('data---not filterd---', data)
 
     const filteredData = data.filter(order =>
       order.product.productId.some(product =>
@@ -4990,7 +4994,7 @@ async function getProductOrders(req) {
     );
 
     const Data = JSON.stringify(filteredData, null, 2);
-    console.log('Filtered Data:', Data);
+    // console.log('Filtered Data:', Data);
     return filteredData;
   } catch (error) {
     console.error("Error fetching product orders:", error);

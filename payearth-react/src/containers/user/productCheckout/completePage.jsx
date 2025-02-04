@@ -232,12 +232,10 @@ export default function CompletePage() {
     };
 
     const onUpdateProductStock = (data) => {
-
         const reqBody = {
             productId: data.product.productId[0],
             reduceQty: data.product.quantity[0]
         }
-
         axios.put(`user/productReduceStock`, reqBody, {
             headers: {
                 'Accept': 'application/json',
@@ -251,8 +249,6 @@ export default function CompletePage() {
         }).catch(error => {
             console.log(error);
         });
-
-
     }
 
     const onSubmitHandler = (orderResId, data, paymentId, userData) => {

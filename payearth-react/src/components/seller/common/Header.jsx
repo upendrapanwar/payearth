@@ -213,7 +213,7 @@ const Header = () => {
                   Product Orders
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   to="/seller/service-orders"
                   onClick={() => removeBackdrop()}
@@ -223,7 +223,7 @@ const Header = () => {
                   </i>{" "}
                   Service Orders
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   to="/seller/manage-subscription-plan"
