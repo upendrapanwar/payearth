@@ -2317,6 +2317,17 @@ async function updateOrderStatus(req) {
     }
     const newOrderStatus = new OrderStatus(input);
     const savedOrderStatus = await newOrderStatus.save();
+
+    if (data.status === 'Order placed') {
+      await User.findByIdAndUpdate(
+        data.userId,
+        {
+          $inc: { my_wallet_coins: data.coins }
+        },
+        { new: true }
+      );
+    }
+
     return savedOrderStatus;
   } catch (error) {
     console.error(error);
@@ -2872,7 +2883,8 @@ async function createPaymentIntent(req, res) {
     id: item.id,
     name: item.name,
     price: item.price,
-    quantity: item.quantity
+    quantity: item.quantity,
+    coins: item.coins
   }));
   try {
     const stringifiedCart = JSON.stringify(trimmedCart);

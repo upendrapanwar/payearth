@@ -39,7 +39,16 @@ const ProductListing = () => {
     const [selectedBrands, setSelectedBrands] = useState([]);
     const [categories, setCategories] = useState('');
     const [sideBarToggle, setSideBarToggle] = useState(false);
+    const [super_rewards, setRewards] = useState(false);
 
+    useEffect(() => {
+        try {
+            const reward = location.state?.rewards || false;
+            setRewards(reward);
+        } catch (error) {
+            setRewards(false);
+        }
+    }, [location]);
 
     useEffect(() => {
         if (!category) {
@@ -81,7 +90,7 @@ const ProductListing = () => {
 
     useEffect(() => {
         getProducts()
-    }, [priceRange, selectedCategories, selectedBrands, selectedSubCategories, searchQuery, category, subCat])
+    }, [priceRange, selectedCategories, selectedBrands, selectedSubCategories, searchQuery, category, subCat, super_rewards])
 
     const handlePriceRangeChange = (range) => {
         setPriceRange(range);
@@ -107,26 +116,10 @@ const ProductListing = () => {
             "selectedSubCategories": selectedSubCategories,
             "selectedBrands": selectedBrands,
             "searchQuery": searchQuery,
+            "super_rewards": super_rewards
         };
 
         axios.post('front/products/listing', reqBodyUpdated).then((response) => {
-            // if (response.data.status) {
-            //     let res = response.data.data;
-            //     console.log('res------',res)
-            //     res.forEach(product => {
-            //         productsData.push({
-            //             id: product.id,
-            //             image: product.featuredImage,
-            //             name: product.name,
-            //             isService: product.isService,
-            //             price: product.price,
-            //             avgRating: product.avgRating,
-            //             quantity: product.quantity,
-            //             cryptoPrices: product.cryptoPrices
-            //         });
-            //     });
-            // }
-
             if (response.data.status) {
                 let res = response.data.data;
                 res.forEach(product => {
@@ -195,6 +188,15 @@ const ProductListing = () => {
                             </div> */}
                             <div className="row">
                                 <div className="col-sm-12">
+                                    {super_rewards === true ? <Link
+                                        to={{
+                                            pathname: "/product-listing",
+                                            state: {
+                                                rewards: false,
+                                            }
+                                        }}>
+                                        <h3>All Products</h3>
+                                    </Link> : ''}
                                     {products.length === 0 ? <NotFound msg="Product not found." /> : ''}
                                     <div className="cards_wrapper">
                                         {

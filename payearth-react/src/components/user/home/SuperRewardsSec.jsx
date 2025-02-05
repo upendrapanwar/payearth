@@ -9,7 +9,14 @@ const SuperRewardsSec = () => {
             <div className="container">
                 <div className="row">
                     <div className="col-sm-12">
-                        <Link to="/product-listing"><img src={superRewards} alt="super-rewards" /></Link>
+                        <Link
+                            to={{
+                                pathname: "/product-listing",
+                                state: {
+                                    rewards: true,
+                                }
+                            }}>
+                            <img src={superRewards} alt="super-rewards" /></Link>
                     </div>
                 </div>
             </div>

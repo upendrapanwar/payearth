@@ -158,23 +158,7 @@ const ProductCard = ({ data, inWishList }) => {
               </Link>
             </p>
           </div>
-          {/* <div className="priceData">
-            {data.cryptoPrices && data.cryptoPrices.length > 0
-              ? data.cryptoPrices.map((val, index) => {
-                let crypPrice = data.price / val.cryptoPriceUSD;
-                crypPrice = crypPrice.toFixed(5);
-                return (
-                  <p className="price crypto" key={index}>
-                    {" "}
-                    {crypPrice} {val.code}
-                  </p>
-                );
-              })
-              : ""}
-            <p className="price">{data.price} USD</p>
-          </div> */}
         </div>
-        {/* {console.log("data", data.id)} */}
         {data.quantity && data.quantity.stock_qty !== 0 ? (
           <div className="prod_foot">
             {isLoggedIn ? (
@@ -189,6 +173,7 @@ const ProductCard = ({ data, inWishList }) => {
                         name: data.name,
                         image: data.image,
                         price: data.price,
+                        coins: data.super_rewards === true ? 2 : 0
                       })
                     )
                   }
@@ -207,6 +192,7 @@ const ProductCard = ({ data, inWishList }) => {
                         image: data.image,
                         price: data.price,
                         quantity: 1,
+                        coins: data.super_rewards === true ? 2 : 0
                       })
                     )
                   }
@@ -234,7 +220,8 @@ const ProductCard = ({ data, inWishList }) => {
                         id: data.id,
                         name: data.name,
                         image: data.image,
-                        price: data.price
+                        price: data.price,
+                        coins: data.super_rewards === true ? 2 : 0
                       })
                     )
                   }

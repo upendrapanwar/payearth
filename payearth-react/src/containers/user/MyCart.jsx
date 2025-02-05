@@ -41,7 +41,7 @@ class MyCart extends Component {
 
         const { id, token } = authInfo;
         const cartFromRedux = this.props.cart;
-        // console.log('cartFromRedux', cartFromRedux)
+        console.log('cartFromRedux', cartFromRedux)
         const updateCartData = {
             cartFromRedux: cartFromRedux,
             userId: id
@@ -223,7 +223,7 @@ class MyCart extends Component {
 
     render() {
         const cart = this.props.cart;
-        //   console.log('final updated cart data of redux cart----', cart)
+          console.log('final updated cart data of redux cart----', cart)
         const getTotal = () => {
             let totalQuantity = 0
             let totalPrice = 0
@@ -275,7 +275,7 @@ class MyCart extends Component {
                                                         {cart.map((item) => {
                                                             // console.log('item---for cartItem--', item)
                                                             return (
-                                                                <CartItem key={item.id} id={item.id} image={item.image} title={item.name} price={item.price} quantity={item.quantity} discountId={item.discountId} discountPercent={item.discountPercent} />
+                                                                <CartItem key={item.id} id={item.id} image={item.image} title={item.name} price={item.price} quantity={item.quantity} discountId={item.discountId} discountPercent={item.discountPercent} coins={item.coins} />
                                                             );
                                                         })}
                                                     </div>

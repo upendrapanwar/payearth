@@ -624,8 +624,9 @@ async function getFilterCategories(req) {
 
 async function getProductsListing(req) {
   try {
-    const { selectedCategories, selectedBrands, priceRange, selectedSubCategories, searchQuery } = req.body;
+    const { selectedCategories, selectedBrands, priceRange, selectedSubCategories, searchQuery, super_rewards } = req.body;
 
+    console.log("super_rewards", super_rewards)
     const query = {};
     if (Array.isArray(selectedCategories) && selectedCategories.length > 0) {
       query.category = { $in: selectedCategories }; // No ObjectId conversion, treat as strings
@@ -650,6 +651,10 @@ async function getProductsListing(req) {
       query.$or = [
         { lname: { $regex: searchQuery, $options: "i" } },
       ];
+    }
+
+    if (super_rewards === true) {
+      query.super_rewards = true;
     }
 
     const products = await Product.find(query)

@@ -8,6 +8,7 @@ const schema = new Schema({
     phone: { type: String, required: false, default: '' },
     role: { type: String, required: false, default: 'user' },
     terms: { type: Boolean, required: false, default: true },
+    my_wallet_coins: { type: Number, required: false, default: 0 },
     social_accounts: {
         google: {
             google_id: { type: String, required: false, default: null, index: true },

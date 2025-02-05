@@ -1,4 +1,4 @@
-import React, { useEffect, useState  } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { incrementQuantity, decrementQuantity, removeItem } from "../../../store/reducers/cart-slice-reducer";
 import { setLoading, setIsLoginModalOpen } from '../../../store/reducers/global-reducer';
@@ -7,13 +7,13 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import { useDispatch, useSelector } from "react-redux";
 
-function CartItem({ id, image, title, price, quantity, discountId, discountPercent }) {
+function CartItem({ id, image, title, price, quantity, discountId, discountPercent, coins }) {
   const dispatch = useDispatch()
   const authInfo = useSelector(state => state.auth.authInfo);
   const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
 
   const [discountIdStatus, setDiscountIdStatus] = useState(false);
-console.log('discountId----get in cart---',discountId)
+
 
   useEffect(() => {
     if(discountId){

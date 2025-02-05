@@ -23,14 +23,12 @@ const cartSlice = createSlice({
 
             const productinPayload = action.payload
             const itemInCart = state.cart.find((item) => item.id === action.payload.id);
-            const authInfo = JSON.parse(localStorage.getItem('authInfo')); 
-            console.log('itemInCart----in authInfo--------', authInfo)
+            const authInfo = JSON.parse(localStorage.getItem('authInfo'));
             if (authInfo !== null) {
-                console.log('itemInCart----in cart--------', itemInCart)
-                console.log('itemInCart----in authInfo--------', authInfo)
+             
                 if (itemInCart) {
                     // itemInCart.quantity++;
-                    itemInCart.quantity ++;
+                    itemInCart.quantity++;
                     if (productinPayload.discountId) itemInCart.discountId = productinPayload.discountId;
                     if (productinPayload.discountPercent) itemInCart.discountPercent = productinPayload.discountPercent;
                     let reqBody = {
@@ -107,7 +105,7 @@ const cartSlice = createSlice({
 
         incrementQuantity: (state, action) => {
             console.log('incrementQuantity----run')
-           // const productinPayload = action.payload
+            // const productinPayload = action.payload
             const item = state.cart.find((item) => item.id === action.payload);
             const authInfo = JSON.parse(localStorage.getItem('authInfo'));
             if (authInfo === null) {
@@ -121,7 +119,7 @@ const cartSlice = createSlice({
                     productId: item.id,
                     qty: item.quantity,
                     price: item.price,
-                   // discountId: productinPayload.discountId || null
+                    // discountId: productinPayload.discountId || null
                 };
                 axios.post('user/updateToCart', reqBody, {
                     headers: {
@@ -149,7 +147,7 @@ const cartSlice = createSlice({
         },
 
         decrementQuantity: (state, action) => {
-           // const productinPayload = action.payload
+            // const productinPayload = action.payload
             const item = state.cart.find((item) => item.id === action.payload);
             const authInfo = JSON.parse(localStorage.getItem('authInfo'));
             if (authInfo === null) {
@@ -205,9 +203,9 @@ const cartSlice = createSlice({
             // console.log('state---',state.cart)
             // console.log('action---',action.payload)
             // const removeItem = state.cart.filter((item) => item.id !== action.payload);
-             console.log('removeItem---',removeItem)
+            console.log('removeItem---', removeItem)
             // const removeItem = state.cart.find((item) => item.id == action.payload);
-            
+
             if (authInfo === null) {
                 state.cart = removeItem;
             } else {
@@ -217,10 +215,10 @@ const cartSlice = createSlice({
                     productId: Itemtodelete.id,
                     qty: Itemtodelete.quantity,
                     price: Itemtodelete.price,
-                   // discountId: productinPayload.discountId || null
+                    // discountId: productinPayload.discountId || null
 
                 };
-                console.log('reqBody--',reqBody)
+                console.log('reqBody--', reqBody)
                 axios.post('user/deletefromcart', reqBody, {
                     headers: {
                         'Accept': 'application/json',
