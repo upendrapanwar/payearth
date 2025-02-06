@@ -38,8 +38,8 @@ export default function CheckoutForm() {
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: "https://www.pay.earth/checkOutCompletePage",
-        // return_url: "https://localhost:3000/checkOutCompletePage",
+        //  return_url: "https://www.pay.earth/checkOutCompletePage",
+         return_url: "https://localhost:3000/checkOutCompletePage",
       },
     });
 

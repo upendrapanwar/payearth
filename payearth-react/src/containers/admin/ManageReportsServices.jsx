@@ -18,6 +18,9 @@ import axios from 'axios';
 import nicon from '../../assets/images/nicon.png';
 import DataTable from "react-data-table-component";
 import DataTableExtensions from "react-data-table-component-extensions";
+import { PieChart } from '@mui/x-charts/PieChart';
+import Box from '@mui/material/Box';
+
 
 class ManageReportsServices extends Component {
     constructor(props) {
@@ -30,6 +33,8 @@ class ManageReportsServices extends Component {
             bestSellingProducts: [],
             allServiceOrdersData: [],
             monthlyServiceCounts: [],
+            serviceTopCategories: [],
+            orderThisMonth: [],
         };
         toast.configure();
 
@@ -102,6 +107,8 @@ class ManageReportsServices extends Component {
 
     componentDidMount() {
         this.getReportData();
+        this.getServiceTopSellingCategories();
+        this.getServiceOrdersTotalPriceForMonth();
     }
 
     getReportData = async () => {
@@ -252,9 +259,62 @@ class ManageReportsServices extends Component {
     ];
 
 
+    getServiceTopSellingCategories = () => {
+        axios.get("admin/getServiceTopSellingCategories", {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${this.authInfo.token}`
+            }
+        })
+            .then((response) => {
+                const data = response.data.data.data;
+                const topCategories = data.map((item) => ({
+                    value: item.count,
+                    label: item.name,
+                }));
+                this.setState({ serviceTopCategories: topCategories, loading: false });
+            })
+            .catch((error) => {
+                if (error.response && error.response.data.status === false) {
+                    console.log("error", error.response.data.message)
+                }
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    this.setState({ loading: false });
+                }, 300);
+            });
+    };
+
+    getServiceOrdersTotalPriceForMonth = () => {
+        axios.get("admin/getServiceOrdersTotalPriceForMonth", {
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json;charset=UTF-8",
+                Authorization: `Bearer ${this.authInfo.token}`,
+            },
+        })
+            .then((response) => {
+                const data = response.data.data.data;
+                this.setState({ orderThisMonth: data, loading: false });
+            })
+            .catch((error) => {
+                if (error.response && error.response.data.status === false) {
+                    console.log("error", error.response.data.message)
+                }
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    this.setState({ loading: false });
+                }, 300);
+            });
+    };
 
     render() {
-        const { monthlyServiceCounts, allServiceOrdersData } = this.state;
+        const { monthlyServiceCounts, allServiceOrdersData, serviceTopCategories, orderThisMonth } = this.state;
+        const colors = ['rgb(2, 178, 175)', 'rgb(46, 150, 255)', 'rgb(184, 0, 216)', 'rgb(96, 0, 155)'];
+        console.log('allServiceOrdersData--',allServiceOrdersData)
 
         ChartJS.register(CategoryScale,
             LinearScale,
@@ -338,18 +398,53 @@ class ManageReportsServices extends Component {
                         <div className="report_tab_item service_report_tab_item">
                             <div className="rep_chart_wrapper">
                                 <div className="row">
-                                    <div className="col-lg-6">
+                                    <div className="col-lg-4">
                                         <div className="card bg-white rounded-3">
                                             <div className="card-header">
                                                 Monthly Report
                                             </div>
-                                            <div className="rep_chart_item chart_left">
+                                            {/* <div className="rep_chart_item chart_left">
                                                 <Doughnut data={data} />
+                                            </div> */}
+
+                                            <div className="tsc_box bg-white p-3">
+                                                <div className="row">
+                                                    <div className="col-lg-6 m-0 p-0">
+                                                        <ul className="list-unstyled">
+                                                            {serviceTopCategories.map((item, index) => (
+                                                                <li key={index} className="d-flex align-items-center mb-3 mt-2">
+                                                                    <i style={{ color: colors[index % colors.length] }} className="fa fa-circle"></i>  <span className="small ps-2">{item.label}</span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                    <div className="tsc_img col-lg-6 m-0 p-0">
+                                                        <Box sx={{ width: '100%' }}>
+                                                            <PieChart
+                                                                height={200}
+                                                                slotProps={{
+                                                                    legend: { hidden: true },
+                                                                }}
+                                                                series={[
+                                                                    {
+                                                                        data: serviceTopCategories,
+                                                                        innerRadius: 80,
+                                                                        cx: 120,
+                                                                        cy: 100,
+                                                                        // arcLabel: (params) => params.label ?? '',
+                                                                        // valueFormatter,
+                                                                    }
+                                                                ]}
+                                                            />
+                                                        </Box>
+                                                    </div>
+                                                </div>
                                             </div>
+
                                         </div>
                                     </div>
 
-                                    <div className="col-lg-6">
+                                    <div className="col-lg-4">
                                         <div className="card bg-white rounded-3">
                                             <div className="card-header">
                                                 Monthly Service Report
@@ -360,19 +455,19 @@ class ManageReportsServices extends Component {
                                         </div>
                                     </div>
 
-                                    {/* <div className="col-lg-6">
+                                    <div className="col-lg-4">
                                         <div className="card bg-white rounded-3">
                                             <div className="card-header">
                                                 Order this week
                                             </div>
                                             <div className="rep_chart_item orderWeek">
                                                 <div className="total_weeklly_order">
-                                                    <h2>$578.87</h2>
-                                                    <h4>Avg $50.46/Order</h4>
+                                                    <h2>${orderThisMonth.totalPrice}</h2>
+                                                    <h4>Avg ${orderThisMonth.averagePrice}/Order</h4>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div> */}
+                                    </div>
                                 </div>
                             </div>
 
