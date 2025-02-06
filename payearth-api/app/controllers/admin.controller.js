@@ -320,6 +320,9 @@ router.get("/getLatestCustomers", getLatestCustomers);
 router.get("/getBestSellingProducts", getBestSellingProducts);
 router.get("/getReportData", getOrderReportData);
 router.get("/getServiceReport", getServiceReportData);
+router.get("/getServiceTopSellingCategories", getServiceTopSellingCategories);
+router.get("/getOrdersTotalPriceForMonth", getOrdersTotalPriceForMonth);
+router.get("/getServiceOrdersTotalPriceForMonth", getServiceOrdersTotalPriceForMonth);
 
 
 
@@ -1549,9 +1552,27 @@ function getOrderReportData(req, res, next) {
         .catch((err) => next(res.json({ status: false, message: err.message })));
 }
 
+function getOrdersTotalPriceForMonth(req, res, next) {
+    adminService.getOrdersTotalPriceForMonth(req)
+        .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error getting getOrdersTotalPriceForMonth Data." }))
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
 // getServiceReport
 function getServiceReportData(req, res, next) {
     adminService.getServiceReportData(req)
         .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error getting Report Data." }))
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getServiceTopSellingCategories(req, res, next) {
+    adminService.getServiceTopSellingCategories(req)
+        .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error getting getServiceTopSellingCategories Data." }))
+        .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+function getServiceOrdersTotalPriceForMonth(req, res, next) {
+    adminService.getServiceOrdersTotalPriceForMonth(req)
+        .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error getting getOrdersTotalPriceForMonth Data." }))
         .catch((err) => next(res.json({ status: false, message: err.message })));
 }

@@ -225,6 +225,9 @@ module.exports = {
     getBestSellingProducts,
     getOrderReportData,
     getServiceReportData,
+    getServiceTopSellingCategories,
+    getOrdersTotalPriceForMonth,
+    getServiceOrdersTotalPriceForMonth,
 };
 
 // Validator function
@@ -5805,7 +5808,7 @@ async function getOrderReportData() {
             },
         ]);
 
-        const allOrders = reportData[0].allOrders;
+        const allOrders = reportData[0].allOrders.reverse();;
         const currentYearOrdersData = reportData[0].currentYearOrders;
 
         const monthlyOrderCounts = Array(12).fill(0);
@@ -5900,7 +5903,7 @@ async function getServiceReportData() {
             },
         ]);
 
-        const allOrders = reportData[0].allOrders;
+        const allOrders = reportData[0].allOrders.reverse();;
         const currentYearOrdersData = reportData[0].currentYearOrders;
 
         const monthlyServiceCounts = Array(12).fill(0);
@@ -5919,5 +5922,155 @@ async function getServiceReportData() {
     } catch (error) {
         console.error("Error fetching report data:", error.message);
         throw error;
+    }
+}
+
+
+async function getServiceTopSellingCategories(req) {
+    try {
+        const result = await OrderStatus.find({ title: "service_completed" }).populate({
+            path: "service.serviceId",
+            select: "category",
+            populate: { path: "category", select: "categoryName" }
+        });
+
+        // console.log("ServiceTopSellingCategories", ServiceTopSellingCategories)
+        if (!result || result.length === 0) {
+            return {
+                status: false,
+                data: [],
+            };
+        }
+        const categoryCounts = {};
+        result.forEach(order => {
+            const service = order.service?.serviceId;
+            const category = service.category;
+
+            if (category) {
+                const categoryId = category._id.toString();
+                const categoryName = category.categoryName;
+                if (!categoryCounts[categoryId]) {
+                    categoryCounts[categoryId] = {
+                        id: categoryId,
+                        name: categoryName,
+                        count: 0,
+                    };
+                }
+                categoryCounts[categoryId].count++;
+            }
+        });
+        const sortedCategories = Object.values(categoryCounts)
+            .sort((a, b) => b.count - a.count);
+
+        const top4Categories = sortedCategories.slice(0, 4);
+        return {
+            status: true,
+            data: top4Categories,
+        };
+
+    } catch (error) {
+        console.log("error", error)
+    }
+}
+
+async function getOrdersTotalPriceForMonth(req) {
+    try {
+        // Get the first and last dates of the current month
+        const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+
+        const result = await Order.aggregate([
+            {
+                $match: {
+                    isActive: true,
+                    isService: false,
+                    isSubscription: false,
+                    createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalPrice: { $sum: "$total" },
+                    averagePrice: { $avg: "$total" },
+                },
+            },
+        ]);
+
+        if (result.length > 0) {
+            // console.log("Result:", result[0]);
+            const totalPrice = parseFloat(Number(result[0].totalPrice).toFixed(2));
+            const averagePrice = parseFloat(Number(result[0].averagePrice).toFixed(2));
+            return {
+                status: true,
+                data: {
+                    totalPrice,
+                    averagePrice,
+                },
+            };
+        } else {
+            console.log("No orders found for the current month.");
+            return {
+                status: false,
+                message: "No orders found for the current month.",
+            };
+        }
+    } catch (error) {
+        console.log("Error:", error);
+        return {
+            status: false,
+            message: "An error occurred while calculating total and average price.",
+        };
+    }
+}
+
+async function getServiceOrdersTotalPriceForMonth(req) {
+    try {
+        // Get the first and last dates of the current month
+        const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+
+        const result = await Order.aggregate([
+            {
+                $match: {
+                    isActive: true,
+                    isService: true,
+                    isSubscription: false,
+                    createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalPrice: { $sum: "$total" },
+                    averagePrice: { $avg: "$total" },
+                },
+            },
+        ]);
+
+        if (result.length > 0) {
+            // console.log("Result:", result[0]);
+            const totalPrice = parseFloat(Number(result[0].totalPrice).toFixed(2));
+            const averagePrice = parseFloat(Number(result[0].averagePrice).toFixed(2));
+            return {
+                status: true,
+                data: {
+                    totalPrice,
+                    averagePrice,
+                },
+            };
+        } else {
+            console.log("No orders found for the current month.");
+            return {
+                status: false,
+                message: "No orders found for the current month.",
+            };
+        }
+    } catch (error) {
+        console.log("Error:", error);
+        return {
+            status: false,
+            message: "An error occurred while calculating total and average price.",
+        };
     }
 }

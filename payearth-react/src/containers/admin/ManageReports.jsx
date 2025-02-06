@@ -18,18 +18,23 @@ import {
 import { Bar, Doughnut } from 'react-chartjs-2';
 import { faker } from '@faker-js/faker';
 import axios from 'axios';
+import { PieChart } from '@mui/x-charts/PieChart';
+import Box from '@mui/material/Box';
+
 
 class ManageReports extends Component {
     constructor(props) {
         super(props)
         this.authInfo = store.getState().auth.authInfo;
         this.state = {
-            weeksInYear: [], // All weeks in the current year
-            currentWeekIndex: 0, // Index of the currently displayed week
+            // weeksInYear: [], // All weeks in the current year
+            // currentWeekIndex: 0, // Index of the currently displayed week
             latestCustomers: [],
             bestSellingProducts: [],
             allOrdersData: [],
             monthlyOrderCounts: [],
+            topCategories: [],
+            orderThisMonth: [],
         };
         toast.configure();
 
@@ -109,35 +114,10 @@ class ManageReports extends Component {
                 selector: (row, i) => row.quantity?.selling_qty,
                 sortable: true
             },
-            // {
-            //     name: '',
-            //     selector: (row, i) => row.orderStatusDetails[0]?.title,
-            //     cell: (row) => (
-            //         <button
-            //             className="btn btn-primary btn-sm"
-            //         // onClick={() => handleView(row)}
-            //         >
-            //             View
-            //         </button>
-            //     ),
-            //     sortable: false
-            // }
         ];
 
 
         this.all_Reports = [
-            // {
-            //     name: '',
-            //     cell: (row) => (
-            //         <img
-            //             src={row.featuredImage}
-            //             alt="Product Image"
-            //             className="img-thumbnail"
-            //             style={{ width: '100px', height: '100px', objectFit: 'cover' }}
-            //         />
-            //     ),
-            //     sortable: false,
-            // },
             {
                 name: 'ORDER NO',
                 selector: (row, i) => row.orderCode,
@@ -145,7 +125,6 @@ class ManageReports extends Component {
             },
             {
                 name: 'NAME',
-                // selector: (row, i) => row.billingFirstName,
                 selector: (row, i) => {
                     return `${row.billingFirstName} ${row.billingLastName}`;
                 },
@@ -158,11 +137,9 @@ class ManageReports extends Component {
             },
             {
                 name: 'DATE',
-                // selector: (row, i) => row.createdAt,
                 selector: (row, i) => {
-                    // Format the createdAt date to show only the date (yyyy-mm-dd)
                     const createdAt = new Date(row.createdAt);
-                    return createdAt.toLocaleDateString('en-US');  // Format as 'MM/DD/YYYY'
+                    return createdAt.toLocaleDateString('en-US');
                 },
                 sortable: true,
             },
@@ -176,92 +153,81 @@ class ManageReports extends Component {
                 selector: (row, i) => row.paymentDetails[0]?.paymentStatus,
                 sortable: true
             },
-            // {
-            //     name: '',
-            //     selector: (row, i) => row.orderStatusDetails[0]?.title,
-            //     cell: (row) => (
-            //         <button
-            //             className="btn btn-primary btn-sm"
-            //         // onClick={() => handleView(row)}
-            //         >
-            //             Download
-            //         </button>
-            //     ),
-            //     sortable: false
-            // }
         ];
     }
 
     componentDidMount() {
-        this.productMonthWeekReport();
-        const weeksInYear = this.getWeeksInYear();
-        if (weeksInYear !== null) {
-            this.getWeeklyOrderStatusCount(weeksInYear);
-        }
+        // this.productMonthWeekReport();
+        // const weeksInYear = this.getWeeksInYear();
+        // if (weeksInYear !== null) {
+        //     this.getWeeklyOrderStatusCount(weeksInYear);
+        // }
         // this.setState({ weeksInYear });
         this.getLatestCustomers();
         this.getBestSellingProducts();
         this.getReportData();
+        this.getProductTopSellingCategories();
+        this.getOrdersTotalPriceForMonth();
     }
 
-    getWeeksInYear() {
-        const now = new Date();
-        const year = now.getFullYear(); // Current year
+    // getWeeksInYear() {
+    //     const now = new Date();
+    //     const year = now.getFullYear(); // Current year
 
-        // Helper function to get weeks in a specific month
-        const getWeeksInMonth = (year, month) => {
-            const startOfMonth = new Date(year, month, 1);
-            const endOfMonth = new Date(year, month + 1, 0); // Last day of the month
-            const weeks = [];
+    //     // Helper function to get weeks in a specific month
+    //     const getWeeksInMonth = (year, month) => {
+    //         const startOfMonth = new Date(year, month, 1);
+    //         const endOfMonth = new Date(year, month + 1, 0); // Last day of the month
+    //         const weeks = [];
 
-            let startOfWeek = new Date(startOfMonth);
-            while (startOfWeek <= endOfMonth) {
-                const endOfWeek = new Date(
-                    Math.min(
-                        new Date(startOfWeek).setDate(startOfWeek.getDate() + 6), // End of the week
-                        endOfMonth // Ensure it doesn't exceed the month's last day
-                    )
-                );
+    //         let startOfWeek = new Date(startOfMonth);
+    //         while (startOfWeek <= endOfMonth) {
+    //             const endOfWeek = new Date(
+    //                 Math.min(
+    //                     new Date(startOfWeek).setDate(startOfWeek.getDate() + 6), // End of the week
+    //                     endOfMonth // Ensure it doesn't exceed the month's last day
+    //                 )
+    //             );
 
-                weeks.push({ startOfWeek: new Date(startOfWeek), endOfWeek });
-                startOfWeek.setDate(startOfWeek.getDate() + 7); // Move to the next week
-            }
-            return weeks;
-        };
+    //             weeks.push({ startOfWeek: new Date(startOfWeek), endOfWeek });
+    //             startOfWeek.setDate(startOfWeek.getDate() + 7); // Move to the next week
+    //         }
+    //         return weeks;
+    //     };
 
-        // Iterate over all months and get weeks
-        const allWeeks = [];
-        for (let month = 0; month < 12; month++) {
-            const weeks = getWeeksInMonth(year, month);
-            allWeeks.push(...weeks); // Flatten weeks into a single array
-        }
+    //     // Iterate over all months and get weeks
+    //     const allWeeks = [];
+    //     for (let month = 0; month < 12; month++) {
+    //         const weeks = getWeeksInMonth(year, month);
+    //         allWeeks.push(...weeks); // Flatten weeks into a single array
+    //     }
 
-        return allWeeks;
-    }
+    //     return allWeeks;
+    // }
 
-    handleNextWeek = () => {
-        this.setState((prevState) => {
-            const nextIndex = prevState.currentWeekIndex + 1;
-            if (nextIndex < prevState.weeksInYear.length) {
-                return { currentWeekIndex: nextIndex };
-            } else {
-                alert("No more weeks left in the year!");
-                return null;
-            }
-        });
-    };
+    // handleNextWeek = () => {
+    //     this.setState((prevState) => {
+    //         const nextIndex = prevState.currentWeekIndex + 1;
+    //         if (nextIndex < prevState.weeksInYear.length) {
+    //             return { currentWeekIndex: nextIndex };
+    //         } else {
+    //             alert("No more weeks left in the year!");
+    //             return null;
+    //         }
+    //     });
+    // };
 
-    handlePreviousWeek = () => {
-        this.setState((prevState) => {
-            const prevIndex = prevState.currentWeekIndex - 1;
-            if (prevIndex >= 0) {
-                return { currentWeekIndex: prevIndex };
-            } else {
-                alert("No previous weeks available!");
-                return null;
-            }
-        });
-    };
+    // handlePreviousWeek = () => {
+    //     this.setState((prevState) => {
+    //         const prevIndex = prevState.currentWeekIndex - 1;
+    //         if (prevIndex >= 0) {
+    //             return { currentWeekIndex: prevIndex };
+    //         } else {
+    //             alert("No previous weeks available!");
+    //             return null;
+    //         }
+    //     });
+    // };
 
 
 
@@ -303,59 +269,59 @@ class ManageReports extends Component {
         }
     }
 
-    productMonthWeekReport = async () => {
-        try {
-            this.setState({ loading: true });
-            // const reqParams = {
-            //     // authorId: this.authInfo.id,
-            //     // timeFrame: selectedTimeFrame,
-            // };
+    // productMonthWeekReport = async () => {
+    //     try {
+    //         this.setState({ loading: true });
+    //         // const reqParams = {
+    //         //     // authorId: this.authInfo.id,
+    //         //     // timeFrame: selectedTimeFrame,
+    //         // };
 
 
-            const url = `/admin/productMonthWeekReport?year=${2025}`; // timeFrame = week , month, year
-            const response = await axios.get(url, {
-                // params: reqParams,
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json;charset=UTF-8',
-                    'Authorization': `Bearer ${this.authInfo.token}`
-                }
-            });
-            const data = response.data.data;
-            console.log(" productMonthWeekReport data", data)
-            // this.setState({ productSalesData: data, loading: false });
-        } catch (error) {
-            console.error("There was an error fetching service list category data", error);
-            this.setState({ loading: false });
-        }
-    }
+    //         const url = `/admin/productMonthWeekReport?year=${2025}`; // timeFrame = week , month, year
+    //         const response = await axios.get(url, {
+    //             // params: reqParams,
+    //             headers: {
+    //                 'Accept': 'application/json',
+    //                 'Content-Type': 'application/json;charset=UTF-8',
+    //                 'Authorization': `Bearer ${this.authInfo.token}`
+    //             }
+    //         });
+    //         const data = response.data.data;
+    //         console.log(" productMonthWeekReport data", data)
+    //         // this.setState({ productSalesData: data, loading: false });
+    //     } catch (error) {
+    //         console.error("There was an error fetching service list category data", error);
+    //         this.setState({ loading: false });
+    //     }
+    // }
 
-    handleSubmit = (values, { resetForm }) => {
-        const { dispatch } = this.props;
-        dispatch(setLoading({ loading: true }));
-        axios.post('admin/coupons', values, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8',
-                'Authorization': `Bearer ${this.authInfo.token}`
-            }
-        }).then(response => {
-            toast.dismiss();
-            if (response.data.status) {
-                toast.success(response.data.message, { autoClose: 3000 });
-                resetForm();
-            }
-        }).catch(error => {
-            toast.dismiss();
-            if (error.response) {
-                toast.error(error.response.data.message, { autoClose: 3000 });
-            }
-        }).finally(() => {
-            setTimeout(() => {
-                dispatch(setLoading({ loading: false }));
-            }, 300);
-        });
-    }
+    // handleSubmit = (values, { resetForm }) => {
+    //     const { dispatch } = this.props;
+    //     dispatch(setLoading({ loading: true }));
+    //     axios.post('admin/coupons', values, {
+    //         headers: {
+    //             'Accept': 'application/json',
+    //             'Content-Type': 'application/json;charset=UTF-8',
+    //             'Authorization': `Bearer ${this.authInfo.token}`
+    //         }
+    //     }).then(response => {
+    //         toast.dismiss();
+    //         if (response.data.status) {
+    //             toast.success(response.data.message, { autoClose: 3000 });
+    //             resetForm();
+    //         }
+    //     }).catch(error => {
+    //         toast.dismiss();
+    //         if (error.response) {
+    //             toast.error(error.response.data.message, { autoClose: 3000 });
+    //         }
+    //     }).finally(() => {
+    //         setTimeout(() => {
+    //             dispatch(setLoading({ loading: false }));
+    //         }, 300);
+    //     });
+    // }
 
 
     getLatestCustomers = async () => {
@@ -420,17 +386,71 @@ class ManageReports extends Component {
     };
 
 
+    getProductTopSellingCategories = () => {
+        axios.get("admin/getTopSellingCategories", {
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json;charset=UTF-8",
+                Authorization: `Bearer ${this.authInfo.token}`,
+            },
+        })
+            .then((response) => {
+                const data = response.data.data.data;
+                const topCategories = data.map((item) => ({
+                    value: item.count,
+                    label: item.name,
+                }));
+                this.setState({ topCategories: topCategories, loading: false });
+            })
+            .catch((error) => {
+                if (error.response && error.response.data.status === false) {
+                    console.log("error", error.response.data.message)
+                }
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    this.setState({ loading: false });
+                }, 300);
+            });
+    };
+
+
+
+    getOrdersTotalPriceForMonth = () => {
+        axios.get("admin/getOrdersTotalPriceForMonth", {
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json;charset=UTF-8",
+                Authorization: `Bearer ${this.authInfo.token}`,
+            },
+        })
+            .then((response) => {
+                const data = response.data.data.data;
+                this.setState({ orderThisMonth: data, loading: false });
+            })
+            .catch((error) => {
+                if (error.response && error.response.data.status === false) {
+                    console.log("error", error.response.data.message)
+                }
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    this.setState({ loading: false });
+                }, 300);
+            });
+    };
+
     render() {
 
-        const { latestCustomers, bestSellingProducts, allOrdersData, monthlyOrderCounts } = this.state;
-
+        const { latestCustomers, bestSellingProducts, allOrdersData, monthlyOrderCounts, topCategories, orderThisMonth } = this.state;
+        const colors = ['rgb(2, 178, 175)', 'rgb(46, 150, 255)', 'rgb(184, 0, 216)', 'rgb(96, 0, 155)'];
         // if (weeksInYear.length === 0) {
         //     return <p>Loading weeks...</p>; // Show loading state if weeks are not yet calculated
         // }
 
         // const currentWeek = weeksInYear[currentWeekIndex];
 
-        console.log("allOrdersData", allOrdersData);
+        console.log("orderThisMonth", orderThisMonth);
         // console.log("monthlyOrderCounts", monthlyOrderCounts);
 
 
@@ -479,25 +499,6 @@ class ManageReports extends Component {
             ],
         };
 
-        const data = {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-            datasets: [
-                {
-                    labels: [
-                        'Total Payment',
-                        'Received Payment',
-                        'Earning',
-                    ],
-                    data: [10, 20, 30],
-                    backgroundColor: [
-                        '#3c8dbc',
-                        '#f56954',
-                        '#f39c12',
-                    ],
-
-                },
-            ],
-        };
         return (
             <React.Fragment>
                 <Header />
@@ -517,17 +518,49 @@ class ManageReports extends Component {
                         <div className="report_tab_item product_report_tab_item">
                             <div className="rep_chart_wrapper">
                                 <div className="row">
-                                    <div className="col-lg-6">
+                                    <div className="col-lg-4">
                                         <div className="card bg-white rounded-3">
                                             <div className="card-header">
-                                                Top categories
+                                                Top selling categories
                                             </div>
-                                            <div className="rep_chart_item chart_left">
-                                                <Doughnut data={data} />
+
+                                            <div className="tsc_box bg-white p-3">
+                                                <div className="row">
+                                                    <div className="col-lg-6 m-0 p-0">
+                                                        <ul className="list-unstyled">
+                                                            {topCategories.map((item, index) => (
+                                                                <li key={index} className="d-flex align-items-center mb-3 mt-2">
+                                                                    <i style={{ color: colors[index % colors.length] }} className="fa fa-circle"></i>  <span className="small ps-2">{item.label}</span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                    <div className="tsc_img col-lg-6 m-0 p-0">
+                                                        <Box sx={{ width: '100%' }}>
+                                                            <PieChart
+                                                                height={200}
+                                                                slotProps={{
+                                                                    legend: { hidden: true },
+                                                                }}
+                                                                series={[
+                                                                    {
+                                                                        data: topCategories,
+                                                                        innerRadius: 80,
+                                                                        cx: 120,
+                                                                        cy: 100,
+                                                                        // arcLabel: (params) => params.label ?? '',
+                                                                        // valueFormatter,
+                                                                    }
+                                                                ]}
+                                                            />
+                                                        </Box>
+                                                    </div>
+                                                </div>
+
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="col-lg-6">
+                                    <div className="col-lg-4">
                                         <div className="card bg-white rounded-3">
                                             <div className="card-header">
                                                 Monthly Order Report
@@ -538,19 +571,19 @@ class ManageReports extends Component {
                                         </div>
                                     </div>
 
-                                    {/* <div className="col-lg-6">
+                                    <div className="col-lg-4">
                                         <div className="card bg-white rounded-3">
                                             <div className="card-header">
                                                 Order this month
                                             </div>
                                             <div className="rep_chart_item orderWeek">
                                                 <div className="total_weeklly_order">
-                                                    <h2>$578.87</h2>
-                                                    <h4>Avg $50.46/Order</h4>
+                                                    <h2>${orderThisMonth.totalPrice}</h2>
+                                                    <h4>Avg ${orderThisMonth.averagePrice}/Order</h4>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div> */}
+                                    </div>
                                 </div>
                             </div>
 
