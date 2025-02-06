@@ -113,25 +113,25 @@ class ManageBrands extends Component {
     getBrandPermission = async () => {
         const admin_Id = this.authInfo.id;
         try {
-          const res = await axios.get(`admin/getBrandPermission/${admin_Id}`, {
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json;charset=UTF-8',
-              'Authorization': `Bearer ${this.authInfo.token}`
+            const res = await axios.get(`admin/getBrandPermission/${admin_Id}`, {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`
+                }
+            })
+
+            if (res.data.status === true && res.data.data) {
+                this.setState({ permissions: res.data.data }, () => {
+                    console.log("Checking Response permission", this.state.permissions);
+                });
             }
-          })
-    
-          if (res.data.status === true && res.data.data) {
-            this.setState({ permissions: res.data.data }, () => {
-              console.log("Checking Response permission", this.state.permissions);
-            });
-          }
-    
+
         } catch (error) {
-          toast.error(error.response.data.message);
-          console.error("Error fetching data: ", error);
+            toast.error(error.response.data.message);
+            console.error("Error fetching data: ", error);
         }
-      }
+    }
 
     fetchBrandList = async () => {
         this.setState({ loading: true });
@@ -376,7 +376,7 @@ class ManageBrands extends Component {
                         </Helmet>
                         <div className="row">
                             <div className="col-lg-3">
-                                <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
+                                <div className="createpost bg-white rounded-3 mt-2 addPost_left_container">
                                     <div className="cp_top">
                                         {isEditMode ? <>
                                             <div className="row">
@@ -584,7 +584,7 @@ class ManageBrands extends Component {
                                                         </div>
 
                                                         <div className="cre_ser_pay col-md-12 pt-4 pb-4 text-center">
-                                                            <button type="submit" className="btn custom_btn btn_yellow w-auto" 
+                                                            <button type="submit" className="btn custom_btn btn_yellow w-auto"
                                                                 disabled={!this.state.permissions.add}>
                                                                 Create Brand
                                                             </button>
@@ -597,9 +597,12 @@ class ManageBrands extends Component {
                                 </div>
                             </div>
                             <div className="col-lg-9">
-                                <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
-                                    <div className="cp_top">
-                                        <div className="cumm_title">All Brands</div>
+                                <div className="createpost bg-white rounded-3 mt-2 addPost_left_container">
+                                    <div className="dash_inner_wrap pb-2">
+                                        <div className="col-md-12 pb-3 d-flex justify-content-between align-items-center">
+                                            <div className="dash_title">All Brands</div>
+                                            <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link>
+                                        </div>
                                     </div>
                                     <div className="cp_body">
                                         <DataTableExtensions

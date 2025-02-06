@@ -6,15 +6,11 @@ import axios from 'axios';
 import arrow_back from '../../assets/icons/arrow-back.svg'
 
 const SupportUser = () => {
-
     const history = useHistory();
-
     const handleSupportChat = async () => {
         const authInfo = JSON.parse(localStorage.getItem('authInfo'));
         const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-
         const user_id = authInfo.id
-
 
         try {
             const url = '/user/accessChat';
@@ -64,9 +60,8 @@ const SupportUser = () => {
             </div>
             <section className="admin-dashboard-wrapper">
                 <div className="inr_wrap dash_inner_wrap support_manager_wrapper">
-
                     <div className="col-md-12">
-                        <div className="seller_dash_wrap pt-5 pb-5">
+                        <div className="seller_dash_wrap pt-2 pb-5">
                             <div className="container ">
                                 <div className="bg-white rounded-3 pt-3 pb-5">
                                     <div className="noti_wrap">

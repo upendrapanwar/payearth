@@ -367,11 +367,13 @@ class ManageBannerList extends Component {
     return (
       <React.Fragment>
         <Header />
+        <div className="inr_top_page_title">
+          <h2>Manage Advertisement</h2>
+        </div>
+        <Helmet>
+          <title>{"Manage Advertisement - Pay Earth"}</title>
+        </Helmet>
         <section className="inr_wrap">
-          <Helmet>
-            <title>{"Manage Advertisement - Pay Earth"}</title>
-          </Helmet>
-
           <div className="container">
             <div className="row">
               <div className="col-md-12">
@@ -381,25 +383,25 @@ class ManageBannerList extends Component {
                       <div className="dash_title">Manage Advertisement</div>
                       <div className="search_customer_field">
                         <div className="noti_wrap">
-                          <div className="">
-                            <span>
-                              <Link
-                                className={`btn custom_btn mx-auto ${this.state.permissions.add ? 'btn_yellow' : 'btn_disabled'}`}
-                                to={this.state.permissions.add ? "/admin/add-service" : "#"}
-                                onClick={(e) => {
-                                  if (!this.state.permissions.add) {
-                                    e.preventDefault(); }
-                                }}
-                              >
-                                Create New Advertisement
-                              </Link>
-                              {/* <Link
-                                className="btn custom_btn btn_yellow mx-auto"
-                                to="/admin/manage-banner-advertisement"
-                              >
-                                Create New Advertisement
-                              </Link> */}
-                            </span>
+                          <div className="d-flex gap-2">
+                            <Link
+                              className={`btn custom_btn mx-auto ${this.state.permissions.add ? 'btn_yellow' : 'btn_disabled'}`}
+                              to={this.state.permissions.add ? "/admin/add-service" : "#"}
+                              onClick={(e) => {
+                                if (!this.state.permissions.add) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            >
+                              Create New Advertisement
+                            </Link>
+                            <Link
+                              className="btn custom_btn btn_yellow mx-auto"
+                              to="/admin/dashboard"
+                            >
+                              Back
+                            </Link>
+
                           </div>
                         </div>
                       </div>

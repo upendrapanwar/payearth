@@ -57,28 +57,28 @@ class AdminManageSubPlan extends Component {
         this.setState({ loading: true })
         // Axios API call without async/await
         axios
-          .get(`admin/getSubscriptionPermission/${admin_Id}`, {
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json;charset=UTF-8',
-              Authorization: `Bearer ${this.authInfoString.token}`,
-            },
-          })
-          .then((res) => {
-            if (res.data.status === true && res.data.data) {
-              this.setState({ permissions: res.data.data }, () => {
-                console.log("Checking Response permission", this.state.permissions);
+            .get(`admin/getSubscriptionPermission/${admin_Id}`, {
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    Authorization: `Bearer ${this.authInfoString.token}`,
+                },
+            })
+            .then((res) => {
+                if (res.data.status === true && res.data.data) {
+                    this.setState({ permissions: res.data.data }, () => {
+                        console.log("Checking Response permission", this.state.permissions);
+                        this.setState({ loading: false })
+                    });
+                }
+            })
+            .catch((error) => {
                 this.setState({ loading: false })
-              });
-            }
-          })
-          .catch((error) => {
-            this.setState({ loading: false })
-            toast.error(error.response.data.message);
-            console.error("Error fetching data: ", error);
-          });
-      };
-      
+                toast.error(error.response.data.message);
+                console.error("Error fetching data: ", error);
+            });
+    };
+
     // getSubscriptionPermission = async () => {
     //     const admin_Id = this.authInfo.id;
     //     try {
@@ -222,7 +222,7 @@ class AdminManageSubPlan extends Component {
                         className="custom_btn btn_yellow_bordered w-auto btn btn-width"
                         onClick={() => this.handleDeletePlan(row.id)}
                         disabled={!this.state.permissions.delete}
-                        // disabled={true}
+                    // disabled={true}
                     >
                         Delete
                     </button>
@@ -244,13 +244,16 @@ class AdminManageSubPlan extends Component {
             <React.Fragment>
                 {loading === true ? <SpinnerLoader /> : ""}
                 <Header />
+                <div className="inr_top_page_title">
+                    <h2>Manage Subscription</h2>
+                </div>
+                <Helmet>
+                    <title>{"Manage Subscription - Pay Earth"}</title>
+                </Helmet>
                 <div className="container">
-                    <Helmet>
-                        <title>{"Manage Subscription - Pay Earth"}</title>
-                    </Helmet>
                     <div className="row">
                         <div className="col-lg-4">
-                            <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
+                            <div className="createpost bg-white rounded-3 mt-2 addPost_left_container">
                                 <div className="cp_top">
                                     <div className="cumm_title">
                                         Create New Plan
@@ -395,10 +398,13 @@ class AdminManageSubPlan extends Component {
                             </div>
                         </div>
                         <div className="col-lg-8">
-                            <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
-                                <div className="cp_top">
-                                    <div className="cumm_title">Plan List</div>
-                                </div>
+                            <div className="createpost bg-white rounded-3 mt-2 addPost_left_container">                        
+                                <div className="dash_inner_wrap pb-2">
+                                        <div className="col-md-12 pb-3 d-flex justify-content-between align-items-center">
+                                            <div className="dash_title">Plan lists</div>
+                                            <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link>
+                                        </div>
+                                    </div>
                                 <div>
                                     <DataTableExtensions
                                         columns={this.category_column}

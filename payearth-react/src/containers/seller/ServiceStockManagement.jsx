@@ -367,7 +367,7 @@ class ServiceStockManagement extends Component {
         {loading === true ? <SpinnerLoader /> : ""}
         <Header />
         <div className="seller_body">
-          <div className="seller_dash_wrap pt-5 pb-5">
+          <div className="seller_dash_wrap pt-2 pb-5">
             <div className="container ">
               <div className="bg-white rounded-3 pt-3 pb-5">
                 <div className="dash_inner_wrap">

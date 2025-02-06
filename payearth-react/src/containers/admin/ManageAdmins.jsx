@@ -12,6 +12,7 @@ import adminRegistrationSchema from '../../validation-schemas/adminRegistrationS
 import invisibleIcon from '../../assets/icons/invisible-icon.svg';
 import visibleIcon from '../../assets/icons/eye-icon.svg';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+import { Helmet } from 'react-helmet';
 
 const ManageAdmins = () => {
     const authInfo = JSON.parse(localStorage.getItem('authInfo'));
@@ -54,7 +55,7 @@ const ManageAdmins = () => {
 
     const ManageCapability = (row) => {
         const id = row;
-        history.push(`/admin/admin-manage-Capabilities`,{id});     
+        history.push(`/admin/admin-manage-Capabilities`, { id });
     }
 
 
@@ -139,7 +140,13 @@ const ManageAdmins = () => {
         <React.Fragment>
             <div className="seller_body">
                 <Header />
-                <div className="seller_dash_wrap pt-5 pb-5">
+                <div className="inr_top_page_title">
+                    <h2>Manage Admins</h2>
+                </div>
+                <Helmet>
+                    <title>{"Manage Admins - Pay Earth"}</title>
+                </Helmet>
+                <div className="seller_dash_wrap pt-2 pb-5">
                     <div className="container">
                         <div className="bg-white rounded-3 pt-3 pb-5">
                             <div className="dash_inner_wrap">

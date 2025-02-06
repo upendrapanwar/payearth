@@ -90,41 +90,95 @@ const ManageNotifications = () => {
     }
 
     const notification_column = [
+        // {
+        //     selector: (row, i) => <>
+        //         <Link
+        //             to={
+        //                 row.notification.type === 'comment' || row.notification.type === 'like'
+        //                     ? `/admin-profile?postId=${row.notification.postId}`
+        //                     : '#' //  for like and other types of notifications
+        //             }
+        //             onClick={() => updateReadStatus(row.notification._id)}
+        //         >
+        //             <div className={`card border border-2 border-info-subtle mb-2 mt-2 ${!row.notification.isSeen ? 'bg-info-subtle' : 'bg-light'}`} >
+        //                 <div className="card-header d-flex justify-content-between align-items-center text-primary">
+        //                     <span>{row.notification.type || "not available"}</span>
+        //                 </div>
+        //                 <div className="card-body">
+        //                     {/* <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5> */}
+        //                     <div className="d-flex justify-content-between">
+        //                         <h5 className="card-title mb-0">
+        //                             {row.senderDetails.name || "Special title not defined"}
+        //                         </h5>
+        //                         <small className="text-muted">{new Date(row.notification.createdAt).toLocaleString() || "Just now"}</small>
+        //                     </div>
+        //                     <p className="card-text">
+        //                         {row.notification.message || " No message."}
+        //                     </p>
+        //                 </div>
+        //             </div>
+        //         </Link>
+        //         {!row.notification.isSeen ? "" : <i className="bi bi-trash fs-3 text-danger"
+        //             onClick={() => removeNotification(row.notification._id)}
+        //         ></i>}
+        //     </>,
+        //     sortable: true,
+        // },
+
+
         {
-            selector: (row, i) => <>
-                <Link
-                    to={
-                        row.notification.type === 'comment' || row.notification.type === 'like'
-                            ? `/admin-profile?postId=${row.notification.postId}`
-                            : '#' //  for like and other types of notifications
-                    }
-                    onClick={() => updateReadStatus(row.notification._id)}
-                >
-                    <div className={`card border border-2 border-info-subtle mb-2 mt-2 ${!row.notification.isSeen ? 'bg-info-subtle' : 'bg-light'}`} >
-                        <div className="card-header d-flex justify-content-between align-items-center text-primary">
-                            <span>{row.notification.type || "not available"}</span>
+            selector: (row, i) => {
+                if (!row || Object.keys(row).length === 0) {
+                    return (
+                        <div className="text-center text-muted my-3">
+                            <p>No data available</p>
                         </div>
-                        <div className="card-body">
-                            {/* <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5> */}
-                            <div className="d-flex justify-content-between">
-                                <h5 className="card-title mb-0">
-                                    {row.senderDetails.name || "Special title not defined"}
-                                </h5>
-                                <small className="text-muted">{new Date(row.notification.createdAt).toLocaleString() || "Just now"}</small>
+                    );
+                }
+
+                return (
+                    <>
+                        <Link
+                            to={
+                                row.notification.type === 'comment' || row.notification.type === 'like'
+                                    ? `/admin-profile?postId=${row.notification.postId}`
+                                    : '#' // for like and other types of notifications
+                            }
+                            onClick={() => updateReadStatus(row.notification._id)}
+                        >
+                            <div className={`card border border-2 border-info-subtle mb-2 mt-2 ${!row.notification.isSeen ? 'bg-info-subtle' : 'bg-light'}`}>
+                                <div className="card-header d-flex justify-content-between align-items-center text-primary">
+                                    <span>{row.notification.type || "Not available"}</span>
+                                </div>
+                                <div className="card-body">
+                                    <div className="d-flex justify-content-between">
+                                        <h5 className="card-title mb-0">
+                                            {row.senderDetails?.name || "Special title not defined"}
+                                        </h5>
+                                        <small className="text-muted">
+                                            {new Date(row.notification.createdAt).toLocaleString() || "Just now"}
+                                        </small>
+                                    </div>
+                                    <p className="card-text">
+                                        {row.notification.message || "No message."}
+                                    </p>
+                                </div>
                             </div>
-                            <p className="card-text">
-                                {row.notification.message || " No message."}
-                            </p>
-                        </div>
-                    </div>
-                </Link>
-                {!row.notification.isSeen ? "" : <i className="bi bi-trash fs-3 text-danger"
-                    onClick={() => removeNotification(row.notification._id)}
-                ></i>}
-            </>,
+                        </Link>
+                        {!row.notification.isSeen ? "" : (
+                            <i
+                                className="bi bi-trash fs-3 text-danger"
+                                onClick={() => removeNotification(row.notification._id)}
+                            ></i>
+                        )}
+                    </>
+                );
+            },
             sortable: true,
-        },
+        }
     ]
+
+    console.log("notification", notification)
 
     return (
         <>
@@ -136,17 +190,17 @@ const ManageNotifications = () => {
             <section className="inr_wrap">
                 <div className="container">
                     <div className="row">
-                        <div className="col-md-12">
-                            {/* {Array.isArray(notification) && notification.length > 0 ? (
+                        <div className="col-md-12 mt-4">
+                            {Array.isArray(notification) && notification.length > 0 ? (
                                 notification.map((notifications, index) => {
-                                    console.log('Notification:', notifications); 
+                                    console.log('Notification:', notifications);
                                     return (
                                         <Link
                                             key={index}
                                             to={
                                                 notifications.notification.type === 'comment' || notifications.notification.type === 'like'
                                                     ? `/admin-profile?postId=${notifications.notification.postId}`
-                                                    : '#' 
+                                                    : '#'
                                             }
                                             onClick={() => updateReadStatus(notifications.notification._id)}
                                         >
@@ -174,27 +228,20 @@ const ManageNotifications = () => {
                                 })
                             ) : (
                                 <div className="alert alert-info" role="alert">
-                                    Notification not available
+                                    {notification.message}
                                 </div>
-                            )} */}
+                            )}
 
                             {/* NOTIFICATION */}
-                            <div className="cart_list">
+                            {/* <div className="cart_list">
                                 <div
                                     className="tab-pane fade show active"
                                     id="nav-draft-post"
                                     role="tabpanel"
                                     aria-labelledby="nav-draft-post-tab"
-                                >
-
-                                    {/* <div className=" date-wrapper col-md-3">
-                                        <DateRangePicker
-                                            // ranges={[dateRange]}
-                                            // onChange={this.handleDateRangeChange}
-                                            />
-                                    </div> */}
+                                >                   
+                                    
                                     <div className="notification_wapper col-md-12">
-                                        {/* <button>Filter</button> */}
                                         <DataTableExtensions
                                             columns={notification_column}
                                             data={notification}
@@ -206,15 +253,12 @@ const ManageNotifications = () => {
                                                 defaultSortField="id"
                                                 defaultSortAsc={false}
                                                 paginationPerPage={6}
-                                                // selectedRows={selectedRows}
-                                                // onSelectedRowsChange={this.handleRowSelected}
-                                                // paginationPerPage={this.itemsPerPage}
                                                 paginationRowsPerPageOptions={[6, 10, 15, 20]}
                                             />
                                         </DataTableExtensions>
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>

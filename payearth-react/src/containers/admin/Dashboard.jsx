@@ -28,6 +28,7 @@ class Dashboard extends Component {
             userCount: "0",
             sellerCount: "0",
             orderCount: "0",
+            stockQty: "0",
             totalPaymentAmount: "0",
             hasRun: false,
             listedServices: [],
@@ -416,6 +417,7 @@ class Dashboard extends Component {
                 userCount: data.userCount,
                 sellerCount: data.sellerCount,
                 orderCount: data.orderCount,
+                stockQty: data.stockQty,
                 totalPaymentAmount: data.totalPaymentAmount,
                 loading: false
             });
@@ -560,7 +562,7 @@ class Dashboard extends Component {
     };
 
     render() {
-        const { loading, activeTab, productCount, serviceCount, userCount, sellerCount, orderCount, totalPaymentAmount, listedServices, listedProducts, listedVendors, listedBuyers, topCategories, productSalesData, serviceSalesData, productOrders, serviceOrders, subscriptionOrders } = this.state;
+        const { loading, activeTab, productCount, serviceCount, userCount, sellerCount, orderCount, stockQty, totalPaymentAmount, listedServices, listedProducts, listedVendors, listedBuyers, topCategories, productSalesData, serviceSalesData, productOrders, serviceOrders, subscriptionOrders } = this.state;
         const colors = ['rgb(2, 178, 175)', 'rgb(46, 150, 255)', 'rgb(184, 0, 216)', 'rgb(96, 0, 155)'];
         const xLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         // const valueFormatter = (item) => `${item.value}%`;
@@ -585,11 +587,14 @@ class Dashboard extends Component {
                         <div className="container">
                             <div className="row">
                                 <div className="col-md-3 col-sm-6 col-12">
-                                    <div className="count_box">
-                                        <div className="cb_count">{productCount}</div>
-                                        <div className="cb_name">No. of products</div>
-                                    </div>
+                                    <Link to="/admin/manage-products">
+                                        <div className="count_box">
+                                            <div className="cb_count">{productCount}</div>
+                                            <div className="cb_name">No. of products</div>
+                                        </div>
+                                    </Link>
                                 </div>
+
                                 <div className="col-md-3 col-sm-6 col-12">
                                     <div className="count_box">
                                         <div className="cb_count">{`$${totalPaymentAmount}`}</div>
@@ -597,34 +602,44 @@ class Dashboard extends Component {
                                     </div>
                                 </div>
                                 <div className="col-md-3 col-sm-6 col-12">
-                                    <div className="count_box">
-                                        <div className="cb_count">{orderCount}</div>
-                                        <div className="cb_name">Total Orders</div>
-                                    </div>
+                                    <Link to="/admin/manage-reports">
+                                        <div className="count_box">
+                                            <div className="cb_count">{orderCount}</div>
+                                            <div className="cb_name">{`(Product/Services)`}<small>Orders</small></div>
+                                        </div>
+                                    </Link>
                                 </div>
                                 <div className="col-md-3 col-sm-6 col-12">
-                                    <div className="count_box">
-                                        <div className="cb_count">50</div>
-                                        <div className="cb_name">Stock low by Units</div>
-                                    </div>
+                                    <Link to="/admin/manage-products">
+                                        <div className="count_box">
+                                            <div className="cb_count">{stockQty}</div>
+                                            <div className="cb_name">Stock low by Units</div>
+                                        </div>
+                                    </Link>
                                 </div>
                                 <div className="col-md-3 col-sm-6 col-12 offset-lg-1">
-                                    <div className="count_box">
-                                        <div className="cb_count">{sellerCount}</div>
-                                        <div className="cb_name">No. of Vendors</div>
-                                    </div>
+                                    <Link to="/admin/manage-vendors">
+                                        <div className="count_box">
+                                            <div className="cb_count">{sellerCount}</div>
+                                            <div className="cb_name">No. of Vendors</div>
+                                        </div>
+                                    </Link>
                                 </div>
                                 <div className="col-md-3 col-sm-6 col-12">
-                                    <div className="count_box">
-                                        <div className="cb_count">{userCount}</div>
-                                        <div className="cb_name">No. of Customers</div>
-                                    </div>
+                                    <Link to="/admin/manage-customers">
+                                        <div className="count_box">
+                                            <div className="cb_count">{userCount}</div>
+                                            <div className="cb_name">No. of Customers</div>
+                                        </div>
+                                    </Link>
                                 </div>
                                 <div className="col-md-3 col-sm-6 col-12">
-                                    <div className="count_box">
-                                        <div className="cb_count">{serviceCount}</div>
-                                        <div className="cb_name">Total no of services</div>
-                                    </div>
+                                    <Link to="/admin/manage-services">
+                                        <div className="count_box">
+                                            <div className="cb_count">{serviceCount}</div>
+                                            <div className="cb_name">Total no of services</div>
+                                        </div>
+                                    </Link>
                                 </div>
                             </div>
                             <div className="row mt-4">

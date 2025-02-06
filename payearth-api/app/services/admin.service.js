@@ -4830,12 +4830,16 @@ async function serviceSalesGraph(req) {
 
 async function getDashboardData(req) {
     try {
-        const [productCount, serviceCount, userCount, sellerCount, orderCount, totalPaymentAmount] = await Promise.all([
+        const [productCount, serviceCount, userCount, sellerCount, orderCount, stockQty, totalPaymentAmount] = await Promise.all([
             Product.countDocuments({ isActive: true }),
             Services.countDocuments({ isActive: true }),
             User.countDocuments({ isActive: true }),
             Seller.countDocuments({ isActive: true }),
             Order.countDocuments({ isActive: true }),
+            Product.countDocuments({
+                isActive: true,
+                "quantity.stock_qty": { $lte: 3 }
+            }),
             Payment.aggregate([
                 {
                     $match: {
@@ -4851,7 +4855,6 @@ async function getDashboardData(req) {
                 },
             ])
                 .then(result => (result[0] ? result[0].amountPaid : 0))
-
         ]);
 
         const data = {
@@ -4860,6 +4863,7 @@ async function getDashboardData(req) {
             userCount,
             sellerCount,
             orderCount,
+            stockQty,
             totalPaymentAmount
         }
         return data

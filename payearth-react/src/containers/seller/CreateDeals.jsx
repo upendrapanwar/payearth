@@ -458,7 +458,7 @@ class ManageDeals extends Component {
                         </Helmet>
                         <div className="row">
                             <div className="col-lg-4">
-                                <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
+                                <div className="createpost bg-white rounded-3 mt-2 addPost_left_container">
                                     <div className="cp_top">
                                         {isEditMode ? <>
                                             <div className="row">
@@ -725,9 +725,12 @@ class ManageDeals extends Component {
                             </div>
 
                             <div className="col-lg-8">
-                                <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
-                                    <div className="cp_top">
-                                        <div className="cumm_title">All Deals</div>
+                                <div className="createpost bg-white rounded-3 mt-2 addPost_left_container">
+                                    <div className="dash_inner_wrap pb-2">
+                                        <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
+                                            <div className="dash_title">All Deals</div>
+                                            <Link to="/seller/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link>
+                                        </div>
                                     </div>
                                     <div className="row">
                                         {createdDeals && createdDeals.map((deal, index) => (

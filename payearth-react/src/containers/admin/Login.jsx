@@ -150,7 +150,6 @@ class Login extends Component {
                                                                     <div className="mt-2 text-end"><Link to="/admin/forgot-password">Forgot Password?</Link></div>
                                                                 </div>
                                                                 <button type="submit" className="btn custom_btn btn_yellow text-uppercase w-100 p-3" disabled={!isValid}>Login</button>
-                                                                <div className="tog_user_form mt-3"><p>Not a registered vendor ? <Link to="/admin/register" className="view_more text-capitalize">Signup</Link></p></div>
                                                             </div>
                                                         </div>
                                                     </form>

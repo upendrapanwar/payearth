@@ -216,16 +216,16 @@ function Header() {
 
                 </ul>
               </li>
-              
 
-              <li>
+
+              {/* <li>
                 <Link to="/admin/payments" onClick={() => removeBackdrop()}>
                   <i className="icon">
                     <img src={creditCardIcon} alt="" />
                   </i>{" "}
                   Manage Payments
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link to="/admin/chat" onClick={() => removeBackdrop()}>
                   <i className="icon">
@@ -270,7 +270,7 @@ function Header() {
                   <i className="icon">
                     <img src={discountIcon} alt="" />
                   </i>{" "}
-                  Manage Discounts
+                  Manage Coupons
                 </Link>
               </li>
               <li>

@@ -11,7 +11,7 @@ import 'react-data-table-component-extensions/dist/index.css';
 import { NotFound } from '../../components/common/NotFound';
 import arrow_back from '../../assets/icons/arrow-back.svg';
 import Switch from 'react-input-switch';
-
+import { Helmet } from 'react-helmet';
 
 const ManageCustomers = () => {
   const authInfo = JSON.parse(localStorage.getItem('authInfo'));
@@ -157,7 +157,13 @@ const ManageCustomers = () => {
       {loading && <SpinnerLoader />}
       <div className="seller_body">
         <Header />
-        <div className="seller_dash_wrap pt-5 pb-5">
+        <div className="inr_top_page_title">
+          <h2>Manage Customers</h2>
+        </div>
+        <Helmet>
+          <title>{"Manage Customers - Pay Earth"}</title>
+        </Helmet>
+        <div className="seller_dash_wrap pt-2 pb-5">
           <div className="container">
             <div className="bg-white rounded-3 pt-3 pb-5">
               <div className="dash_inner_wrap">

@@ -1471,7 +1471,7 @@ function getListedServicesData(req, res, next) {
 
 function getDashboardData(req, res, next) {
     adminService.getDashboardData(req)
-        .then((data) => data ? res.json({ status: true, data: data, message: "Personal information updated successfully." }) : res.json({ status: false, data: {}, message: "Error updating personal information." }))
+        .then((data) => data ? res.json({ status: true, data: data, message: "Data get successfully." }) : res.json({ status: false, data: {}, message: "Error updating personal information." }))
         .catch((err) => next(res.json({ status: false, message: err.message })));
 }
 
