@@ -149,7 +149,7 @@ class Login extends Component {
                                                                     ) : null}
                                                                     <div className="mt-2 text-end"><Link to="/admin/forgot-password">Forgot Password?</Link></div>
                                                                 </div>
-                                                                <button type="submit" className="btn custom_btn btn_yellow text-uppercase w-100 p-3" disabled={!isValid}>Login</button>
+                                                                <button  type="submit" className="btn custom_btn btn_yellow text-uppercase w-100 p-3" disabled={!isValid}>Login</button>
                                                             </div>
                                                         </div>
                                                     </form>
