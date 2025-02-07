@@ -1425,7 +1425,7 @@ async function getNotifications(req) {
     }).sort({ createdAt: 'desc' });
 
     if (!notifications || notifications.length === 0) {
-      return { message: "No notifications found" };
+      return
     }
 
     // Iterate over notifications to get sender details for each notification

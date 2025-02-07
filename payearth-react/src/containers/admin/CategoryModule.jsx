@@ -7,6 +7,7 @@ import SpinnerLoader from '../../components/common/SpinnerLoader';
 import NotFound from '../../components/common/NotFound';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import arrow_back from '../../assets/icons/arrow-back.svg';
 import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
@@ -53,7 +54,7 @@ class AdminCategoryModel extends Component {
 
             if (res.data.status === true && res.data.data) {
                 this.setState({ permissions: res.data.data });
-                console.log("permissions",this.state.permissions);
+                console.log("permissions", this.state.permissions);
 
             }
         } catch (error) {
@@ -225,7 +226,7 @@ class AdminCategoryModel extends Component {
             <React.Fragment>
                 {loading === true ? <SpinnerLoader /> : ''}
                 <div className="container">
-                    <Header/>
+                    <Header />
                     <Helmet>
                         <title>{"Blog Category - Pay Earth"}</title>
                     </Helmet>
@@ -267,7 +268,7 @@ class AdminCategoryModel extends Component {
                                                         toolbar: [
                                                             [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
                                                             [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                                                            ['bold', 'italic', 'underline', 'strike'],                                                          
+                                                            ['bold', 'italic', 'underline', 'strike'],
                                                         ]
                                                     }}
                                                 />
@@ -290,7 +291,12 @@ class AdminCategoryModel extends Component {
                         <div className="col-lg-8">
                             <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
                                 <div className="cp_top">
-                                    <div className="cumm_title">Category List</div>
+                                    <div className="d-flex justify-content-between align-items-center gap-2">
+                                        <div className="cumm_title">Category List</div>
+                                        <Link className="btn custom_btn btn_yellow ms-auto" to="/admin/dashboard">
+                                            <img src={arrow_back} alt="linked-in" />&nbsp;Back
+                                        </Link>
+                                    </div>
                                 </div>
                                 <div className="cp_body">
                                     <DataTableExtensions
@@ -313,7 +319,7 @@ class AdminCategoryModel extends Component {
                         </div>
                     </div>
                 </div>
-            <Footer/>
+                <Footer />
             </React.Fragment>
         );
     }

@@ -166,7 +166,7 @@ import EditCoupon from "./containers/admin/EditCoupon";
 
 import DealListedItems from "./components/user/home/DealListedItems";
 import AdminManageDeals from "./containers/admin/ManageDeals"
-
+     
 
 function App() {
   const userInfo = useSelector((state) => state.auth.userInfo);

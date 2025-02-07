@@ -417,22 +417,19 @@ class ManageServices extends Component {
               <div className="dash_inner_wrap">
                 <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
                   <div className="dash_title">Manage Service</div>
-                  {/* <a className="custom_btn btn_yellow w-auto btn" href='#'>Add Service</a> */}
-                  <div className="text-center">
-                    <span>
-                      <Link
-                        className={`btn custom_btn mx-auto ${this.state.permissions.add ? 'btn_yellow' : 'btn_disabled'}`}
-                        to={this.state.permissions.add ? "/admin/add-service" : "#"}
-                        onClick={(e) => {
-                          if (!this.state.permissions.add) {
-                            e.preventDefault(); // Prevent navigation
-                            // this.clearSessionStorage();
-                          }
-                        }}
-                      >
-                        Add New Service
-                      </Link>
-                    </span>
+                  <div className="d-flex gap-2">
+                    <Link
+                      className={`btn custom_btn mx-auto ${this.state.permissions.add ? 'btn_yellow' : 'btn_disabled'}`}
+                      to={this.state.permissions.add ? "/admin/add-service" : "#"}
+                      onClick={(e) => {
+                        if (!this.state.permissions.add) {
+                          e.preventDefault();
+                        }
+                      }}
+                    >
+                      Add New Service
+                    </Link>
+                    <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link>
                   </div>
                 </div>
               </div>
@@ -457,8 +454,8 @@ class ManageServices extends Component {
                   >
                     Added Services
                   </button>
-                  <button
-                    //  className="nav-link"
+                  {/* <button
+                    
                     className={`nav-link ${activeTab === "nav-ongoing-orders" ? "active" : ""
                       }`}
                     id="nav-ongoing-orders-tab"
@@ -471,7 +468,7 @@ class ManageServices extends Component {
                     onClick={() => this.handleTabClick("nav-ongoing-orders")}
                   >
                     Pending for approval
-                  </button>
+                  </button> */}
                   <button
                     // className="nav-link"
                     className={`nav-link ${activeTab === "nav-cancelled-orders" ? "active" : ""

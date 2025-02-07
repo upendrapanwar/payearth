@@ -69,7 +69,7 @@ const UserContact = () => {
                 <Header />
                 <PageTitle title="Contact" />
                 <Helmet><title>{"Contact - Pay Earth"}</title></Helmet>
-                <div className="seller_dash_wrap pt-5 pb-5">
+                <div className="seller_dash_wrap pt-2 pb-5">
                     <div className="container ">
                         <div className="bg-white rounded-3">
                             <div className="dash_inner_wrap contact_form_page">

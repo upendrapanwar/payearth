@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory, Link} from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import Footer from '../../components/common/Footer';
 import Header from '../../components/admin/common/Header';
 import { toast } from 'react-toastify';
@@ -118,14 +118,14 @@ const CouponsListing = (props) => {
         } catch (error) {
             toast.error("Failed to update status");
             console.error("There was an error changing the status", error);
-        }finally{
+        } finally {
             setLoading(false);
         }
     }
 
     const handleDelete = async (id) => {
-        console.log("id",id);
-        try{
+        console.log("id", id);
+        try {
             const res = await axios.delete(`/admin/delete-coupon/${id}`, {
                 headers: {
                     'Accept': 'application/json',
@@ -134,15 +134,15 @@ const CouponsListing = (props) => {
                 }
             })
 
-            if(res.data.status===true){
-                console.log("res",res); 
+            if (res.data.status === true) {
+                console.log("res", res);
                 getCoupons(cuponType, selectedSortingOption.value);
-                toast.success("Coupon deleted successfully");       
+                toast.success("Coupon deleted successfully");
             }
-        }catch(error){
+        } catch (error) {
             toast.error("Failed to delete coupon");
             console.error("There was an error deleting the coupon", error);
-        }finally{
+        } finally {
             setLoading(false);
         }
     }
@@ -241,7 +241,10 @@ const CouponsListing = (props) => {
             {loading && <SpinnerLoader />}
             <div className="seller_body">
                 <Header />
-                <div className="seller_dash_wrap pt-5 pb-5">
+                <div className="inr_top_page_title">
+                    <h2>Manage Coupons</h2>
+                </div>
+                <div className="seller_dash_wrap pt-2 pb-5">
                     <div className="container">
                         <div className="bg-white rounded-3 p-3 p-5">
                             <div className="dash_inner_wrap">

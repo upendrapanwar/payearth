@@ -237,14 +237,17 @@ class ManageDeals extends Component {
             </Helmet>
             <div className="row">
               <div className="col-lg-12">
-                <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
-                  <div className="cp_top">
-                    <div className="cumm_title">Manage Deals</div>
+                <div className="createpost bg-white rounded-3 mt-2 addPost_left_container">
+                  <div className="dash_inner_wrap pb-2">
+                    <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
+                      <div className="dash_title">Manage Deals</div>
+                      <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link>
+                    </div>
                   </div>
                   <div className="cp_body">
                     <DataTableExtensions
                       columns={this.deals_column}
-                      data= {data}
+                      data={data}
                     >
                       <DataTable
                         pagination
@@ -352,9 +355,9 @@ class ManageDeals extends Component {
                                       <td>
                                         {item.price && dealDetailsData.discount
                                           ? `$${(
-                                              item.price -
-                                              (item.price * dealDetailsData.discount) / 100
-                                            ).toFixed(2)}`
+                                            item.price -
+                                            (item.price * dealDetailsData.discount) / 100
+                                          ).toFixed(2)}`
                                           : "N/A"}
                                       </td>
                                       <td>

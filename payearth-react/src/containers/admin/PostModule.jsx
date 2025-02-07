@@ -507,31 +507,30 @@ class AdminPostModule extends Component {
                 {loading === true ? <SpinnerLoader /> : ''}
                 <Header />
                 <section className="admin-dashboard-wrapper post-module">
+                    <div className="inr_top_page_title">
+                        <h2>Post</h2>
+                    </div>
                     <Helmet>
                         <title>{"Post - Pay Earth"}</title>
                     </Helmet>
                     <div className="inr_wrap dash_inner_wrap admin_manage_banner">
                         <div className="col-md-12">
-                            <div className="seller_dash_wrap pt-5 pb-5">
+                            <div className="seller_dash_wrap pt-2 pb-5">
                                 <div className="container cnt_mob_lr0">
                                     <div className="bg-white rounded-3 pt-3 pb-5">
                                         <div className="dash_inner_wrap">
                                             <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center flex_mob_none">
                                                 <div className="dash_title">Post</div>
                                                 <div className="search_customer_field">
-                                                    <div className="noti_wrap">
-                                                        <div className="">
-
-                                                            <span>
-                                                                <Link className={`btn custom_btn mx-auto ${this.state.permissions.add ? 'btn_yellow' : 'btn_disabled'}`}
-                                                                    to={this.state.permissions.add ? "/admin/post-module-add-new" : "#"}
-                                                                    onClick={(e) => {
-                                                                        if (!this.state.permissions.add) {
-                                                                            e.preventDefault(); // Prevent navigation
-                                                                        }
-                                                                    }}> Create New Post</Link>
-                                                            </span>
-                                                        </div>
+                                                    <div className="d-flex gap-2">
+                                                        <Link className={`btn custom_btn mx-auto ${this.state.permissions.add ? 'btn_yellow' : 'btn_disabled'}`}
+                                                            to={this.state.permissions.add ? "/admin/post-module-add-new" : "#"}
+                                                            onClick={(e) => {
+                                                                if (!this.state.permissions.add) {
+                                                                    e.preventDefault(); // Prevent navigation
+                                                                }
+                                                            }}> Create New Post</Link>
+                                                        <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link>
                                                     </div>
                                                 </div>
                                             </div>

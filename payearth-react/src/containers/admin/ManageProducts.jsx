@@ -363,7 +363,7 @@ class ManageProducts extends Component {
                                 <div className="dash_inner_wrap pb-2">
                                     <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
                                         <div className="dash_title">Product Management</div>
-                                        {/* <Link to="#" className="custom_btn btn_yellow w-auto btn">Add Product</Link> */}
+                                        <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link>
                                     </div>
                                 </div>
                                 <nav className="orders_tabs">
