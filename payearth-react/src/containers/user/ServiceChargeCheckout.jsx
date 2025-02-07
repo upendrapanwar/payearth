@@ -358,7 +358,7 @@ class ServiceCheckOut extends Component {
             // console.log("paymentId", this.state.paymentId);
             // console.log("data", data);
             // console.log("serviceDetails", this.state.serviceDetails);
-            const orderResId = [];
+            const orderRes = [];
 
             if (this.state.serviceDetails !== null) {
                 const payload = {
@@ -380,9 +380,10 @@ class ServiceCheckOut extends Component {
                         Authorization: `Bearer ${this.authInfo.token}`,
                     },
                 });
-                orderResId.push(response.data.data.id);
+                console.log('response------i need -------------------',)
+                orderRes.push(response.data.data);
             }
-            this.onSubmitHandler(orderResId)
+            this.onSubmitHandler(orderRes)
         } catch (error) {
             alert("Failed to create some order statuses.");
             console.error("Error updating order status:", error);
@@ -395,9 +396,9 @@ class ServiceCheckOut extends Component {
      * 
      * @param {*} event 
      */
-    onSubmitHandler = (orderResId) => {
+    onSubmitHandler = (orderRes) => {
         const { stripeResponse, paymentId } = this.state;
-        console.log("orderResId", orderResId)
+        console.log("orderRes", orderRes)
         console.log("stripeResponse: ", stripeResponse)
         console.log("amount", stripeResponse.data.paymentIntent.amount_received / 100);
         const url = 'user/saveorder';
@@ -409,23 +410,27 @@ class ServiceCheckOut extends Component {
                     userId: this.authInfo.id,
                     paymentId: paymentId,
                     sellerId: null,
-                    billingFirstName: this.state.billingFirstName,
-                    billingLastName: this.state.billingLastName,
-                    billingCity: this.state.billingCity,
+                    // billingFirstName: orderRes[0].userId?.name,
+                    billingFirstName: orderRes[0].userId?.name?.split(' ')[0] || '',
+                    // billingLastName: this.state.billingLastName,
+                    billingLastName: orderRes[0].userId?.name
+                        ? orderRes[0].userId.name.trim().split(/\s+/).pop() || ''
+                        : '',
+                    billingCity: orderRes[0].userId?.address.city,
                     billingCompanyName: this.state.billingCompanyName,
-                    billingCounty: this.state.billingCounty,
-                    billingPhone: this.state.billingPhone,
-                    billingPostCode: this.state.billingPostCode,
-                    billingStreetAddress: this.state.billingStreetAddress,
-                    billingStreetAddress1: this.state.billingStreetAddress1,
-                    billingEmail: this.state.billingEmail,
+                    billingCounty: orderRes[0].userId?.address.country,
+                    billingPhone: orderRes[0].userId?.phone,
+                    billingPostCode: orderRes[0].userId?.address.zip,
+                    billingStreetAddress: orderRes[0].userId?.address.street,
+                    billingStreetAddress1: orderRes[0].userId?.address.street,
+                    billingEmail: orderRes[0].userId.email,
                     deliveryCharge: 0,
                     taxPercent: 0,
                     taxAmount: 0,
                     discount: 0,
                     price: stripeResponse.data.paymentIntent.amount_received / 100,
                     total: stripeResponse.data.paymentIntent.amount_received / 100,
-                    orderStatus: orderResId,
+                    orderStatus: orderRes[0].id,
                     isActive: true,
                     isService: true,
                     isSubscription: false,
