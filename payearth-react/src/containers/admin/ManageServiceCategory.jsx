@@ -207,7 +207,7 @@ class ManageServiceCategory extends Component {
             const authInfo = JSON.parse(localStorage.getItem('authInfo'));
             const token = authInfo ? authInfo.token : '';
 
-            await axios.patch(updateCategoryUrl, { categoryName: values.editCategoryName }, {
+            await axios.put(updateCategoryUrl, { categoryName: values.editCategoryName }, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',

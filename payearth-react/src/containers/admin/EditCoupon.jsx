@@ -49,7 +49,7 @@ const EditCoupon = () => {
     const handleSubmit = async (values, { resetForm }) => {
         console.log("Values to update", values);
         try {
-            const res = await axios.patch(`admin/edit-coupons/${id}`, values, {
+            const res = await axios.put(`admin/edit-coupons/${id}`, values, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',

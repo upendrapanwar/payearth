@@ -1355,33 +1355,34 @@ async function saveNotifications(req) {
   // console.log('notification data to save--',data)
   const { type, receiver, sender, message, postId } = data;
 
-  // if (!type || !receiver || !sender || !message) {
-  //   throw new Error('Missing required fields: type, receiver,postId, sender, or message');
-  // }
+  if (!type || !receiver || !sender || !message) {
+    throw new Error('Missing required fields: type, receiver,postId, sender, or message');
+  }
 
-  // const newNotification = new Notification({
-  //   type,
-  //   receiver: {
-  //     id: receiver.id,
-  //     type: receiver.type
-  //   },
-  //   sender: {
-  //     id: sender.id,
-  //     type: sender.type
-  //   },
-  //   postId,
-  //   message,
-  //   isRead: false,
-  //   createdAt: new Date()
-  // });
+  const newNotification = new Notification({
+    type,
+    receiver: {
+      id: receiver.id,
+      type: receiver.type
+    },
+    sender: {
+      id: sender.id,
+      type: sender.type
+    },
+    postId,
+    message,
+    isRead: false,
+    createdAt: new Date()
+  });
 
-  // try {
-  //   const savedNotification = await newNotification.save();
-  //   return savedNotification;
-  // } catch (error) {
-  //   console.error('Error saving notification:', error);
-  //   throw new Error('Failed to save notification');
-  // }
+  try {
+    const savedNotification = await newNotification.save();
+    console.log('savedNotification--',savedNotification)
+    return savedNotification;
+  } catch (error) {
+    console.error('Error saving notification:', error);
+    throw new Error('Failed to save notification');
+  }
 }
 
 // async function getNotifications(req) {
@@ -1425,7 +1426,7 @@ async function getNotifications(req) {
     }).sort({ createdAt: 'desc' });
 
     if (!notifications || notifications.length === 0) {
-      return
+        return [];
     }
 
     // Iterate over notifications to get sender details for each notification

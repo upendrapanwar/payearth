@@ -214,9 +214,12 @@ module.exports = {
     getAllVendors,
     getVendorsPermission,
     updateVendorsStatus,
+    getVendorDataById,
+    updateVendore,
     getAllCustomers,
     getcustomerPermission,
     updateCustomerStatus,
+    updateCustomer,
 
     //Report
     getWeeklyOrderStatusCount,
@@ -5351,6 +5354,49 @@ async function updateVendorsStatus(req) {
     }
 }
 
+async function getVendorDataById(req) {
+    const { id } = req.params;
+
+    try {
+        const result = await Seller.findById({ _id: id });
+        if (!result) {
+            return false;
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error fetching vendors", error);
+        return false;
+    }
+}
+
+async function updateVendore(req) {
+    const data = req.body
+    const id = data.id;
+    const updateData = {
+        name: data.name,
+        email: data.email,
+        seller_type: data.seller_type,
+        want_to_sell: data.want_to_sell,
+        full_address: {
+            address: data.address,
+            country: data.country,
+            state: data.state
+        }
+    }
+    try {
+        const result = await Seller.findByIdAndUpdate(
+            id,
+            { $set: updateData },
+            { new: true, runValidators: true }
+        );
+
+        return result;
+    } catch (error) {
+        console.error("Error fetching vendors", error);
+        return false;
+    }
+}
 
 async function updateCustomerStatus(req) {
     const { id } = req.params;
@@ -5361,6 +5407,28 @@ async function updateCustomerStatus(req) {
         if (!result) {
             return false;
         }
+
+        return result;
+    } catch (error) {
+        console.error("Error fetching vendors", error);
+        return false;
+    }
+}
+
+ async function updateCustomer(req) {
+    const  data  = req.body;
+    const id = data.id;
+    const updateData = {
+        name: data.name,
+        email: data.email,
+    }
+    try {
+        const result = await User.findByIdAndUpdate(
+            id,
+            { $set: updateData },
+            { new: true, runValidators: true }
+        );
+
 
         return result;
     } catch (error) {

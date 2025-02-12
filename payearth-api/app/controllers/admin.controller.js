@@ -100,7 +100,7 @@ router.get('/sellers/:id', getSellerById);
 
 //Category
 router.post('/categories', createCategory);
-router.patch('/categories/:id', editServiceCategory);
+router.put('/categories/:id', editServiceCategory);
 router.put('/categories/status/:id', statusCategory);
 router.get('/categories', listCategory);
 router.get('/service-categories-list', ServiceCategorylist);
@@ -282,8 +282,8 @@ router.post('/coupons', createCoupon);
 router.post('/coupons/new', getNewCoupons);
 router.post('/coupons/expired', getExpiredCoupons);
 router.get('/get-coupons/:id', getCoupon);
-router.patch('/edit-coupons/:id', editCoupon);
-router.patch('/couponStatus/:id', couponStatus);
+router.put('/edit-coupons/:id', editCoupon);
+router.put('/couponStatus/:id', couponStatus);
 router.delete('/delete-coupon/:id', deleteCoupon);
 
 // Product 
@@ -306,12 +306,16 @@ router.get("/getOrderDetails", getOrderDetails);
 
 // manage vendors(sellers)
 router.get("/get-all-vendors", getAllVendors);
-router.patch("/update-vendors-status/:id", updateVendorsStatus);
+router.put("/update-vendors-status/:id", updateVendorsStatus);
+router.get("/get-VendorData-ById/:id", getVendorDataById);
+router.put("/vendore-update", updateVendore);
+
 
 
 //manage Customers(buyers)
 router.get("/get-all-customers", getAllCustomers);
-router.patch("/update-customer-status/:id", updateCustomerStatus);
+router.put("/update-customer-status/:id", updateCustomerStatus);
+router.put("/update-customer", updateCustomer);
 
 // report
 router.get("/getWeeklyOrderStatusCount", getWeeklyOrderStatusCount);
@@ -1507,8 +1511,26 @@ function updateVendorsStatus(req, res, next) {
         .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch((err) => next(res.json({ status: false, message: err })));
 }
+
+ function getVendorDataById(req, res, next) {
+    adminService.getVendorDataById(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+   function updateVendore(req, res, next) {
+    adminService.updateVendore(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
 function updateCustomerStatus(req, res, next) {
     adminService.updateCustomerStatus(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+ function updateCustomer(req, res, next) {
+    adminService.updateCustomer(req)
         .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch((err) => next(res.json({ status: false, message: err })));
 }

@@ -312,6 +312,7 @@ class Dashboard extends Component {
         }
         if (prevState.productYear !== this.state.productYear) {
             this.getProductSalesGraph();
+            this.getServiceSalesGraph();
         }
     }
 
@@ -364,6 +365,7 @@ class Dashboard extends Component {
         try {
             this.setState({ loading: true });
             const url = `/admin/productSalesGraph?year=${this.state.productYear}`;
+            console.log('getProductSalesGraph---url',url)
             const response = await axios.get(url, {
                 headers: {
                     'Accept': 'application/json',
@@ -382,7 +384,8 @@ class Dashboard extends Component {
     getServiceSalesGraph = async () => {
         try {
             this.setState({ loading: true });
-            const url = `/admin/serviceSalesGraph?year=${this.state.serviceYear}`;
+            const url = `/admin/serviceSalesGraph?year=${this.state.productYear}`;
+            console.log('getServiceSalesGraph----url',url)
             const response = await axios.get(url, {
                 headers: {
                     'Accept': 'application/json',
@@ -570,10 +573,11 @@ class Dashboard extends Component {
         const productData = productSalesData.map(item => item.count);
 
         console.log("productData", productData);
+       
         console.log("topCategories", topCategories);
         const serviceData = serviceSalesData.map(item => item.count);
         const currentYear = new Date().getFullYear();
-
+        console.log("serviceData", serviceData);
         // console.log("productOrders", productOrders);
         // console.log("serviceOrders", serviceOrders);
         // console.log("subscriptionOrders", subscriptionOrders);
@@ -885,7 +889,7 @@ class Dashboard extends Component {
                                         <div className='admin_dashboard p-2'>
                                             <div className="d-flex align-items-center justify-content-between mb-3 m-3">
                                                 <div className="dash_title">Newly Listed Buyers</div>
-                                                <Link to="#" className="btn_yellow_bordered w-auto btn btn-width action_btn_new">View More</Link>
+                                                <Link to="/admin/manage-customers" className="btn_yellow_bordered w-auto btn btn-width action_btn_new">View More</Link>
                                             </div>
                                             <DataTableExtensions
                                                 columns={this.listed_Buyers}

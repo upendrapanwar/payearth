@@ -81,7 +81,7 @@ class BlogDetail extends Component {
                     <h2>Blog Detail</h2>
                 </div> */}
                 <section className="inr_wrap">
-                    {blogDetails.map(item => <>                 
+                    {blogDetails.map(item => <>
                         <div className="container">
                             <BannerTopIframe keywords={item.keywords} />
                             {/* <h4><i>  Title :  <b>{item.title}</b></i></h4> */}
@@ -94,8 +94,20 @@ class BlogDetail extends Component {
                                                 <meta name="description" content={item.seodescription} />
                                                 <meta name="keywords" content={item.keywords} />
                                             </Helmet>
-                                            <div className='cart-single-heading'>
+                                            <div className='cart-single-heading d-flex flex-row '>
                                                 <h1>{item.title}</h1>
+
+                                                <Link
+                                                    to="#"
+                                                    className="custom_btn btn_yellow w-auto btn mt-2  ms-auto"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        window.history.back();
+                                                    }}
+                                                >
+                                                    Back
+                                                </Link>
+
                                             </div>
                                             <div className='blog-list-meta'>
                                                 <span className="post_cat_col">{item.category}</span>

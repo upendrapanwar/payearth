@@ -495,6 +495,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
   const fetchNotification = async (userId) => {
     try {
       axios.get(`front/notifications/${userId}`).then(response => {
+        console.log('response-- of notification',response)
         const responseData = response.data.data
         if (Array.isArray(responseData) && responseData.length > 0) {
           const offlineNotifications = response.data.data.filter(notification => !notification.notification.isRead);

@@ -90,7 +90,7 @@ const CouponsListing = (props) => {
             setLoading(true);
             const status = !isActive;
             const updateStatusUrl = `/admin/couponStatus/${id}`;
-            const res = await axios.patch(updateStatusUrl, { isActive: status }, {
+            const res = await axios.put(updateStatusUrl, { isActive: status }, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',

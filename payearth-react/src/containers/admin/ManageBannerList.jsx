@@ -386,7 +386,7 @@ class ManageBannerList extends Component {
                           <div className="d-flex gap-2">
                             <Link
                               className={`btn custom_btn mx-auto ${this.state.permissions.add ? 'btn_yellow' : 'btn_disabled'}`}
-                              to={this.state.permissions.add ? "/admin/add-service" : "#"}
+                              to={this.state.permissions.add ? "/admin/manage-banner-advertisement" : "#"}
                               onClick={(e) => {
                                 if (!this.state.permissions.add) {
                                   e.preventDefault();
