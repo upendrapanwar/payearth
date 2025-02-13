@@ -155,7 +155,11 @@ class SellerDashboard extends Component {
             },
             {
                 name: 'ADVERTISE URL',
-                selector: (row, i) => `${row.siteUrl}`,
+                selector: (row) => (
+                    <a href={row.siteUrl} target="_blank" rel="noopener noreferrer">
+                        {row.siteUrl}
+                    </a>
+                ),
                 sortable: true
             },
             {
@@ -717,8 +721,9 @@ class SellerDashboard extends Component {
             topVisitedAdvertisements,
             topAdvertiseViewedList,
         } = this.state;
-        // 
-        const colors = ['rgb(2, 178, 175)', 'rgb(184, 0, 216)', 'rgb(46, 150, 255)', 'rgb(96, 0, 155)'];
+
+        const colors = ['rgb(2, 178, 175)', 'rgb(46, 150, 255)', 'rgb(184, 0, 216)', 'rgb(96, 0, 155)'];
+        const palette = ['#4BC0C0', '#FF6384', '#0d76df'];
         //const xLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const xLabels = this.generateXLabels(defaultSelectedOptionChart.value, productMonth + 1, productSalesData, serviceSalesData);
         const currentYear = new Date().getFullYear();
@@ -827,6 +832,7 @@ class SellerDashboard extends Component {
                                                     <div className="tsc_img col-lg-6 m-0 p-0">
                                                         {topVisitedAdvertisements.length > 0 ?
                                                             <PieChart
+                                                                colors={palette}
                                                                 series={[
                                                                     { data: topVisitedAdvertisements }
                                                                 ]}
