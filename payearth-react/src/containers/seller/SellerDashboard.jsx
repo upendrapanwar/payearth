@@ -696,28 +696,36 @@ class SellerDashboard extends Component {
                         <div className="container">
                             <div className="row">
                                 <div className="col-md-3 col-sm-6 col-12">
-                                    <div className="count_box">
-                                        <div className="cb_count">{data.totalProducts}</div>
-                                        <div className="cb_name">No. of products</div>
-                                    </div>
+                                    <Link to="/seller/product-stock-management">
+                                        <div className="count_box">
+                                            <div className="cb_count">{data.totalProducts}</div>
+                                            <div className="cb_name">No. of products</div>
+                                        </div>
+                                    </Link>
                                 </div>
                                 <div className="col-md-3 col-sm-6 col-12">
-                                    <div className="count_box">
-                                        <div className="cb_count">{data.totalServices}</div>
-                                        <div className="cb_name">No. of services</div>
-                                    </div>
+                                    <Link to="/seller/service-stock-management">
+                                        <div className="count_box">
+                                            <div className="cb_count">{data.totalServices}</div>
+                                            <div className="cb_name">No. of services</div>
+                                        </div>
+                                    </Link>
                                 </div>
                                 <div className="col-md-3 col-sm-6 col-12">
-                                    <div className="count_box">
-                                        <div className="cb_count">{data.totalProductOrders}</div>
-                                        <div className="cb_name">No. of product orders</div>
-                                    </div>
+                                    <Link to="/seller/product-orders">
+                                        <div className="count_box">
+                                            <div className="cb_count">{data.totalProductOrders}</div>
+                                            <div className="cb_name">No. of product orders</div>
+                                        </div>
+                                    </Link>
                                 </div>
                                 <div className="col-md-3 col-sm-6 col-12">
-                                    <div className="count_box">
-                                        <div className="cb_count">{data.totalServiceOrders}</div>
-                                        <div className="cb_name">No. of services orders</div>
-                                    </div>
+                                    <Link to="/seller/service-stock-management">
+                                        <div className="count_box">
+                                            <div className="cb_count">{data.totalServiceOrders}</div>
+                                            <div className="cb_name">No. of services orders</div>
+                                        </div>
+                                    </Link>
                                 </div>
                             </div>
                             {/* // google analytics data */}

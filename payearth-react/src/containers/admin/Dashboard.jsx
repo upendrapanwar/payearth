@@ -293,6 +293,24 @@ class Dashboard extends Component {
                 sortable: true
             },
         ];
+
+        this.pageViewCount = [
+            {
+                name: 'PAGE PATH',
+                selector: (row, i) => row.pagePath,
+                sortable: true
+            },
+            {
+                name: 'PAGE TITLE',
+                selector: (row, i) => row.pageTitle,
+                sortable: true
+            },
+            {
+                name: 'VIEW COUNTS',
+                selector: (row, i) => row.viewCount,
+                sortable: true
+            },
+        ];
     }
 
     componentDidMount() {
@@ -372,7 +390,7 @@ class Dashboard extends Component {
         try {
             this.setState({ loading: true });
             const url = `/admin/productSalesGraph?year=${this.state.productYear}`;
-            console.log('getProductSalesGraph---url',url)
+            console.log('getProductSalesGraph---url', url)
             const response = await axios.get(url, {
                 headers: {
                     'Accept': 'application/json',
@@ -392,7 +410,7 @@ class Dashboard extends Component {
         try {
             this.setState({ loading: true });
             const url = `/admin/serviceSalesGraph?year=${this.state.productYear}`;
-            console.log('getServiceSalesGraph----url',url)
+            console.log('getServiceSalesGraph----url', url)
             const response = await axios.get(url, {
                 headers: {
                     'Accept': 'application/json',
@@ -660,22 +678,18 @@ class Dashboard extends Component {
     render() {
         const { loading, activeTab, productCount, serviceCount, userCount, sellerCount, orderCount, stockQty, totalPaymentAmount, listedServices, listedProducts,
             listedVendors, listedBuyers, topCategories, productSalesData, serviceSalesData, productOrders, serviceOrders,
-            subscriptionOrders, countryWiseAnalytics, activeAndNewUsers } = this.state;
+            subscriptionOrders, countryWiseAnalytics, activeAndNewUsers, pathViewAnalytics } = this.state;
         const colors = ['rgb(2, 178, 175)', 'rgb(46, 150, 255)', 'rgb(184, 0, 216)', 'rgb(96, 0, 155)'];
         const xLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         // const valueFormatter = (item) => `${item.value}%`;
         // const valueFormatter = (item) => `${(item.value * 100) / 10}%`;
         const productData = productSalesData.map(item => item.count);
-
-        console.log("productData", productData);
-       
-        console.log("topCategories", topCategories);
         const serviceData = serviceSalesData.map(item => item.count);
         const currentYear = new Date().getFullYear();
         console.log("serviceData", serviceData);
         // console.log("productOrders", productOrders);
         // console.log("serviceOrders", serviceOrders);
-        console.log("countryWiseAnalytics", countryWiseAnalytics);
+        console.log("pathViewAnalytics pathViewAnalytics", pathViewAnalytics);
 
         // TEST
         const desktopOS = [
@@ -897,29 +911,24 @@ class Dashboard extends Component {
                                         zIndex: 10, // Ensure it stays above the scrolling content
                                         borderBottom: '1px solid #ddd',
                                     }}>
-                                        Total Advertise Viewed
+                                        Page View Analytics
                                     </div>
-                                    <div className="rep_chart_item orderWeek">
-                                        <div className="total_weeklly_order">
-                                            <h2>430</h2>
-                                            <h4>This month</h4>
-                                        </div>
-                                        <div className="total_weeklly_order">
-                                            <h2>430</h2>
-                                            <h4>This month</h4>
-                                        </div>
-                                        <div className="total_weeklly_order">
-                                            <h2>430</h2>
-                                            <h4>This month</h4>
-                                        </div>
-                                        <div className="total_weeklly_order">
-                                            <h2>430</h2>
-                                            <h4>This month</h4>
-                                        </div>
-                                        <div className="total_weeklly_order">
-                                            <h2>430</h2>
-                                            <h4>This month</h4>
-                                        </div>
+                                    <div className="rep_chart_item orderWeek m-4">
+                                        <DataTableExtensions
+                                            columns={this.pageViewCount}
+                                            data={pathViewAnalytics}
+                                            filter={false}
+                                        >
+                                            <DataTable
+                                                noHeader
+                                                highlightOnHover
+                                                defaultSortField="id"
+                                                defaultSortAsc={false}
+                                                paginationPerPage={5}
+                                                paginationRowsPerPageOptions={[5, 10, 15, 30]}
+                                                noDataTableExtensions
+                                            />
+                                        </DataTableExtensions>
                                     </div>
                                 </div>
                             </div>
