@@ -155,12 +155,12 @@ class SellerDashboard extends Component {
             },
             {
                 name: 'ADVERTISE URL',
-                selector: (row, i) => `$ ${row.siteUrl}`,
+                selector: (row, i) => `${row.siteUrl}`,
                 sortable: true
             },
             {
                 name: 'COUNTS',
-                selector: (row, i) => `$ ${row.value}`,
+                selector: (row, i) => `${row.value}`,
                 sortable: true
             },
         ];

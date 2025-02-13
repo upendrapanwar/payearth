@@ -316,10 +316,11 @@ class Dashboard extends Component {
     componentDidMount() {
         this.getTopSellingCategories();
         this.getDashboardData();
+        this.countryWiseAnalyticsData();
+        this.activeAndNewUsersData();
         this.getOrdersDetails();
         this.getProductSalesGraph();
         this.getServiceSalesGraph();
-
         window.addEventListener('scroll', this.handleScroll);
     }
 
@@ -340,10 +341,7 @@ class Dashboard extends Component {
     handleScroll = () => {
         const { hasRun } = this.state;
         if (!hasRun) {
-            // this.getAnalyticsData();
-            this.countryWiseAnalyticsData();
             this.pathViewAnalyticsData();
-            this.activeAndNewUsersData();
             this.getListedServices();
             this.getListedproducts();
             this.getListedVendors();
