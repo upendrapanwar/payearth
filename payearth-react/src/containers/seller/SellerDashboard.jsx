@@ -42,7 +42,8 @@ class SellerDashboard extends Component {
             productOrders: [],
             serviceOrders: [],
             activeTab: "productOrders",
-
+            topVisitedAdvertisements: [],
+            topAdvertiseViewedList: [],
             // week: "",
             // month: "",
             // year: "",
@@ -146,6 +147,23 @@ class SellerDashboard extends Component {
             },
         ];
 
+        this.topAdvertise_ViewedList = [
+            {
+                name: 'ADVERTISE NAME',
+                selector: (row, i) => row.label,
+                sortable: true
+            },
+            {
+                name: 'ADVERTISE URL',
+                selector: (row, i) => `$ ${row.siteUrl}`,
+                sortable: true
+            },
+            {
+                name: 'COUNTS',
+                selector: (row, i) => `$ ${row.value}`,
+                sortable: true
+            },
+        ];
 
         this.listed_productOrders = [
             {
@@ -209,6 +227,8 @@ class SellerDashboard extends Component {
         this.getListedServices();
         this.getOrdersDetails();
         this.getCounters();
+        this.topVisitedAdvertisements();
+        this.getAdvertiseViewedList();
 
         // this.getProductSales();
         // this.getTopSellingCatData();
@@ -251,6 +271,59 @@ class SellerDashboard extends Component {
         });
     }
 
+    topVisitedAdvertisements = () => {
+        this.dispatch(setLoading({ loading: true }));
+        axios.get(`seller/get-topvisited-advertisements/${this.authInfo.id}`, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${this.authInfo.token}`
+            }
+        }).then((response) => {
+            // console.log('topVisitedAdvertisements--response', response)
+            if (response.data.status) {
+                this.setState({
+                    topVisitedAdvertisements: response.data.data
+                });
+            }
+        }).catch(error => {
+            // if (error.response && error.response.data.status === false) {
+            //     toast.error(error.response.data.message);
+            // }
+            console.log(error);
+        }).finally(() => {
+            setTimeout(() => {
+                this.dispatch(setLoading({ loading: false }));
+            }, 300);
+        });
+    }
+
+    getAdvertiseViewedList = () => {
+        this.dispatch(setLoading({ loading: true }));
+        axios.get(`seller/get-advertise-viewedlist/${this.authInfo.id}`, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${this.authInfo.token}`
+            }
+        }).then((response) => {
+            console.log('topadvertise-viewedlist-response', response)
+            if (response.data.status) {
+                this.setState({
+                    topAdvertiseViewedList: response.data.data
+                });
+            }
+        }).catch(error => {
+            // if (error.response && error.response.data.status === false) {
+            //     toast.error(error.response.data.message);
+            // }
+            console.log(error);
+        }).finally(() => {
+            setTimeout(() => {
+                this.dispatch(setLoading({ loading: false }));
+            }, 300);
+        });
+    }
 
     getListedproducts = async () => {
         try {
@@ -640,7 +713,9 @@ class SellerDashboard extends Component {
             listedProducts,
             activeTab,
             serviceOrders,
-            productOrders
+            productOrders,
+            topVisitedAdvertisements,
+            topAdvertiseViewedList,
         } = this.state;
 
         const colors = ['rgb(2, 178, 175)', 'rgb(46, 150, 255)', 'rgb(184, 0, 216)', 'rgb(96, 0, 155)'];
@@ -683,7 +758,7 @@ class SellerDashboard extends Component {
         });
         // console.log('serviceData', serviceData)
         // console.log('productData-----', productData);
-        //  console.log("topCategories", topCategories)
+        console.log("Top AdvertiseViewedList:", topAdvertiseViewedList);
         return (
             <React.Fragment >
                 {loading === true ? <SpinnerLoader /> : ''}
@@ -750,19 +825,24 @@ class SellerDashboard extends Component {
                                                         </ul>
                                                     </div> */}
                                                     <div className="tsc_img col-lg-6 m-0 p-0">
-                                                        <PieChart
-                                                            series={[
-                                                                {
-                                                                    data: [
-                                                                        { id: 0, value: 10, label: 'series A' },
-                                                                        { id: 1, value: 15, label: 'series B' },
-                                                                        { id: 2, value: 20, label: 'series C' },
-                                                                    ],
-                                                                },
-                                                            ]}
-                                                            width={400}
-                                                            height={200}
-                                                        />
+                                                        {topVisitedAdvertisements.length > 0 ?
+                                                            <PieChart
+                                                                series={[
+                                                                    { data: topVisitedAdvertisements }
+                                                                ]}
+                                                                width={400}
+                                                                height={200}
+                                                            /> :
+                                                            <PieChart
+                                                                series={[
+                                                                    {
+                                                                        data: [],
+                                                                    }
+                                                                ]}
+                                                                width={400}
+                                                                height={200}
+                                                            />
+                                                        }
                                                     </div>
                                                 </div>
 
@@ -792,26 +872,21 @@ class SellerDashboard extends Component {
                                                 Total Advertise Viewed
                                             </div>
                                             <div className="rep_chart_item orderWeek">
-                                                <div className="total_weeklly_order">
-                                                    <h2>430</h2>
-                                                    <h4>This month</h4>
-                                                </div>
-                                                <div className="total_weeklly_order">
-                                                    <h2>430</h2>
-                                                    <h4>This month</h4>
-                                                </div>
-                                                <div className="total_weeklly_order">
-                                                    <h2>430</h2>
-                                                    <h4>This month</h4>
-                                                </div>
-                                                <div className="total_weeklly_order">
-                                                    <h2>430</h2>
-                                                    <h4>This month</h4>
-                                                </div>
-                                                <div className="total_weeklly_order">
-                                                    <h2>430</h2>
-                                                    <h4>This month</h4>
-                                                </div>
+                                                <DataTableExtensions
+                                                    columns={this.topAdvertise_ViewedList}
+                                                    data={topAdvertiseViewedList}
+                                                    export={false}
+                                                    filter={false}
+                                                >
+                                                    <DataTable
+                                                        pagination={false}
+                                                        noHeader
+                                                        highlightOnHover
+                                                        fixedHeader 
+                                                        fixedHeaderScrollHeight="400px" 
+                                                    // selectableRows           
+                                                    />
+                                                </DataTableExtensions>
                                             </div>
                                         </div>
                                     </div>
@@ -969,21 +1044,7 @@ class SellerDashboard extends Component {
 
                                             {activeTab === "productOrders" && (
                                                 <div className='admin_dashboard p-4'>
-                                                    <DataTableExtensions
-                                                        columns={this.listed_productOrders}
-                                                        data={productOrders}
-                                                    >
-                                                        <DataTable
-                                                            pagination
-                                                            noHeader
-                                                            highlightOnHover
-                                                            defaultSortField="id"
-                                                            defaultSortAsc={false}
-                                                            paginationPerPage={5}
-                                                            paginationRowsPerPageOptions={[5, 10, 15, 30]}
-                                                        // selectableRows           
-                                                        />
-                                                    </DataTableExtensions>
+
                                                 </div>
                                             )}
 

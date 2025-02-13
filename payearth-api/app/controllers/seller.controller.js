@@ -305,6 +305,8 @@ router.get("/serviceSalesGraph", serviceSalesGraph);
 router.get("/getListedProductData", getListedProductData);
 router.get("/getListedServicesData", getListedServicesData);
 router.get("/getOrderDetails", getOrderDetails);
+router.get("/get-topvisited-advertisements/:id", getTopVisitedAdvertisements);
+router.get("/get-advertise-viewedlist/:id", getAdvertiseViewedList);
 
 
 module.exports = router;
@@ -1628,6 +1630,18 @@ function getListedServicesData(req, res, next) {
 
 function getOrderDetails(req, res, next) {
   sellerService.getOrderDetails(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function getTopVisitedAdvertisements(req, res, next) {
+  sellerService.getTopVisitedAdvertisements(req)
+        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function getAdvertiseViewedList(req, res, next) {
+  sellerService.getAdvertiseViewedList(req)
         .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch((err) => next(res.json({ status: false, message: err })));
 }
