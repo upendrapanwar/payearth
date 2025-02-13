@@ -965,6 +965,7 @@ async function getNewCoupons(req) {
     var param = req.body;
     var whereCondition = { end: { $gte: now } }; //default
     const result = await Coupon.paginate(whereCondition).then((data) => {
+      console.log('getNewCoupons',data)
       let res = {
         coupons: data.docs,
       };

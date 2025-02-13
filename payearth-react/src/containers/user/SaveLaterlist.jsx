@@ -155,7 +155,7 @@ class SaveLaterlist extends Component {
                                                 return <div className={`cl_items ${cls}`} key={index}>
                                                     <div className="cl_pro_info">
                                                         <div className="clp_item">
-                                                            <div className="clp_item_img"><img src={config.apiURI + value.productId.featuredImage} alt="mens-jacket" /></div>
+                                                            <div className="clp_item_img"><img src={value.productId.featuredImage} alt={value.productId.name} /></div>
                                                             <div className="clp_item_info">
                                                                 <Rating avgRating={value.productId.avgRating} />
                                                                 <div className="cl_pro_name">{value.productId.name}</div>

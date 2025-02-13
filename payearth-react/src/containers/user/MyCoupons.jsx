@@ -52,7 +52,7 @@ class MyCoupons extends Component {
         }
 
         dispatch(setLoading({ loading: true }));
-        axios.post('user/my-coupons/' + this.authInfo.id, reqBody, {
+        axios.post('user//coupons/new', reqBody, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
@@ -60,6 +60,7 @@ class MyCoupons extends Component {
             }
         }).then((response) => {
             if (response.data.status) {
+                console.log('response.data.data',response.data.data)
                 this.setState({ data: response.data.data, reqBody });
             }
         }).catch(error => {
@@ -77,7 +78,7 @@ class MyCoupons extends Component {
         const { loading } = store.getState().global;
         const { availableCoupons, coupons, totalCoupons } = this.state.data;
 
-        console.log("coupons :::", coupons)
+        console.log("this.state.data :::", this.state.data)
 
         return (
             <React.Fragment>
@@ -91,43 +92,43 @@ class MyCoupons extends Component {
                                 <div className="cart wishlist">
                                     <div className="cart_wrap">
                                         <div className="items_incart">
-                                            <span>{availableCoupons !== undefined ? availableCoupons : 0} Coupon available</span>
+                                        <span>{Array.isArray(coupons) ? coupons.length : 0} Coupon available</span>
                                         </div>
 
                                         <div className="row coupons_wrap pb-5">
                                             {coupons !== undefined ? coupons.map((value, index) => {
-                                                if (value.isActive && value.couponId !== null) {
-                                                    let date = new Date(value.couponId.end)
+                                                // if (value.isActive && value.couponId !== null) {
+                                                    // let date = new Date(value.couponId?.end)
                                                     return <div className="col-md-4" key={index}>
                                                         <div className="voucher">
                                                             <div className="vhr_offer">
                                                                 <div className="vhr_img"><img src={voucherIcon} alt="voucher_icon" /></div>
-                                                                <div className="vhr_off">{value.couponId.discount_per}%</div>
+                                                                <div className="vhr_off">{value.discount_per}%</div>
                                                             </div>
                                                             <div className="vhr_coupon">
-                                                                <div className="vhr_code">{value.couponId.code}</div>
-                                                                <div className="vhr_date">Expiry on {`${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`}</div>
+                                                                <div className="vhr_code">{value.code}</div>
+                                                                <div className="vhr_date">Expiry on {new Date(value.end).toLocaleDateString()}</div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                } else {
-                                                    if (value.isActive === false && value.couponId !== null) {
-                                                        return <div className="col-md-4" key={index}>
-                                                            <div className="voucher expired">
-                                                                <div className="vhr_offer">
-                                                                    <div className="vhr_img"><img src={voucherIcon} alt="voucher_icon" /></div>
-                                                                    <div className="vhr_off">{value.couponId.discount_per}%</div>
-                                                                </div>
-                                                                <div className="vhr_coupon">
-                                                                    <div className="vhr_code">{value.couponId.code}</div>
-                                                                    <div className="vhr_date">Expired</div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    } else {
-                                                        return '';
-                                                    }
-                                                }
+                                                // } else {
+                                                //     if (value.isActive === false && value.couponId !== null) {
+                                                //         return <div className="col-md-4" key={index}>
+                                                //             <div className="voucher expired">
+                                                //                 <div className="vhr_offer">
+                                                //                     <div className="vhr_img"><img src={voucherIcon} alt="voucher_icon" /></div>
+                                                //                     <div className="vhr_off">{value.couponId.discount_per}%</div>
+                                                //                 </div>
+                                                //                 <div className="vhr_coupon">
+                                                //                     <div className="vhr_code">{value.couponId.code}</div>
+                                                //                     <div className="vhr_date">Expired</div>
+                                                //                 </div>
+                                                //             </div>
+                                                //         </div>
+                                                //     } else {
+                                                //         return '';
+                                                //     }
+                                                // }
                                             }) : ''}
 
                                             {coupons !== undefined && coupons.length !== 0 && coupons.length < totalCoupons ?

@@ -168,7 +168,7 @@ const TrendingProducts = () => {
             {randomProducts.length > 0 ? (
               <SectionTitle
                 title="Trending Products"
-                viewMore={true}
+                viewMore={false}
                 route={"#"}
               />
             ) : null}

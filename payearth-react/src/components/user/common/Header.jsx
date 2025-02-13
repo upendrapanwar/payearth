@@ -729,14 +729,14 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                     Blog
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link to="/my-payments" onClick={() => removeBackdrop()}>
                     <i className="icon">
                       <img src={creditCardIcon} alt="credit-card" />
                     </i>{" "}
                     Payments
                   </Link>
-                </li>
+                </li> */}
                 <li>
                   <Link to="/notifications">
                     <i className="icon">
