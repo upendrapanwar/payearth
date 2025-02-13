@@ -184,6 +184,8 @@ module.exports = {
   getListedProductData,
   getListedServicesData,
   getOrderDetails,
+  getTopVisitedAdvertisements,
+  getAdvertiseViewedList,
 
 };
 
@@ -5937,5 +5939,88 @@ async function getOrderDetails(req) {
       message: "An error occurred while fetching orders.",
       error: err.message,
     };
+  }
+}
+
+async function getTopVisitedAdvertisements(req) {
+  // console.log('getTopVisitedAdvertisements---', req.params)
+  let id = req.params.id
+  try {
+
+    const formattedData = await bannerAdvertisement.aggregate([
+      { $match: { "author": id } },
+      { $unwind: "$clickCount" },
+      {
+        $group: {
+          _id: "$_id",
+          totalClicks: { $sum: "$clickCount.count" },
+          advertisementName: { $first: "$bannerName" },
+        },
+      },
+      { $sort: { totalClicks: -1 } },
+      { $limit: 3 },
+      {
+        $project: {
+          id: { $toString: "$_id" },
+          value: "$totalClicks",
+          label: "$advertisementName",
+        },
+      },
+    ]);
+
+    // console.log("Formatted Data:", formattedData);
+
+    if (!formattedData.length) {
+      return res.status(404).json({ status: false, message: "No advertisements found for this author" });
+    }
+
+
+    return formattedData;
+
+  } catch (error) {
+    console.error(error);
+    return { status: false, message: error.message };
+  }
+}
+
+ async function getAdvertiseViewedList(req) {
+  // console.log('getTopVisitedAdvertisements---', req.params)
+  let id = req.params.id
+  try {
+
+    const formattedData = await bannerAdvertisement.aggregate([
+      { $match: { "author": id } },
+      { $unwind: "$clickCount" },
+      {
+        $group: {
+          _id: "$_id",
+          totalClicks: { $sum: "$clickCount.count" },
+          advertisementName: { $first: "$bannerName" },
+          siteUrl: {$first: "$siteUrl"}
+        },
+      },
+      { $sort: { totalClicks: -1 } },
+      {
+        $project: {
+          id: { $toString: "$_id" },
+          value: "$totalClicks",
+          label: "$advertisementName",
+          siteUrl: "$siteUrl",
+        },
+      },
+    ]);
+
+    // console.log("Formatted Data11:", formattedData);
+
+    if (!formattedData.length) {
+      return res.status(404).json({ status: false, message: "No advertisements found for this author" });
+    }
+
+
+    return formattedData;
+
+  } catch (error) {
+    console.error(error);
+    return { status: false, message: error.message };
   }
 }
