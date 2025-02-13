@@ -717,8 +717,8 @@ class SellerDashboard extends Component {
             topVisitedAdvertisements,
             topAdvertiseViewedList,
         } = this.state;
-
-        const colors = ['rgb(2, 178, 175)', 'rgb(46, 150, 255)', 'rgb(184, 0, 216)', 'rgb(96, 0, 155)'];
+        // 
+        const colors = ['rgb(2, 178, 175)', 'rgb(184, 0, 216)', 'rgb(46, 150, 255)', 'rgb(96, 0, 155)'];
         //const xLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const xLabels = this.generateXLabels(defaultSelectedOptionChart.value, productMonth + 1, productSalesData, serviceSalesData);
         const currentYear = new Date().getFullYear();
@@ -882,8 +882,8 @@ class SellerDashboard extends Component {
                                                         pagination={false}
                                                         noHeader
                                                         highlightOnHover
-                                                        fixedHeader 
-                                                        fixedHeaderScrollHeight="400px" 
+                                                        fixedHeader
+                                                        fixedHeaderScrollHeight="400px"
                                                     // selectableRows           
                                                     />
                                                 </DataTableExtensions>
