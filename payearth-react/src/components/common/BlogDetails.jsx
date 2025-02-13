@@ -81,7 +81,7 @@ class BlogDetail extends Component {
                 <div className="inr_top_page_title">
                     <h2>Blog Detail</h2>
                 </div>
-                <section className="inr_wrap mt-2">
+                <section className="inr_wrap mt-2"> 
                     {blogDetails.map(item => <>
                         <div className="container">
                             <BannerTopIframe keywords={item.keywords} />
