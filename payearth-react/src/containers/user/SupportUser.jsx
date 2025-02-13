@@ -4,6 +4,7 @@ import Footer from '../../components/common/Footer';
 import { Link, useHistory } from 'react-router-dom';
 import axios from 'axios';
 import arrow_back from '../../assets/icons/arrow-back.svg'
+import { Helmet } from 'react-helmet';
 
 const SupportUser = () => {
     const history = useHistory();
@@ -54,6 +55,7 @@ const SupportUser = () => {
 
     return (
         <React.Fragment>
+            <Helmet><title>{"Support - Pay Earth"}</title></Helmet>
             <Header />
             <div className="inr_top_page_title">
                 <h2>Support</h2>

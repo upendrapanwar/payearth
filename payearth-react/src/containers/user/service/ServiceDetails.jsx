@@ -13,6 +13,7 @@ import { BannerTopIframe } from "../../../components/common/BannerFrame";
 import arrow_back from "../../../assets/icons/arrow-back.svg";
 import googleMeet from "../../../assets/icons/google-meet-logo.svg";
 import { useHistory } from "react-router-dom";
+import { Helmet } from 'react-helmet';
 import { toast } from "react-toastify";
 import { isLogin } from "./../../../helpers/login";
 
@@ -135,9 +136,12 @@ const ServiceDetails = () => {
   };
 
 
+  console.log("commonServiceData", commonServiceData)
+
   return (
     <React.Fragment>
       {loading === true ? <SpinnerLoader /> : ""}
+
       <BannerTopIframe keywords={category} />
       <Header />
       <PageTitle title={"Service-Details"} />
@@ -146,6 +150,7 @@ const ServiceDetails = () => {
           {commonServiceData.length > 0 &&
             commonServiceData.map((data, index) => (
               <div className="row g-0 bg-white rounded" key={index}>
+                <Helmet><title>{`Service-detail/${data.result.serviceCode} - Pay Earth`}</title></Helmet>
                 <div className="d-flex justify-content-end">
                   <Link className="btn custom_btn btn_yellow  mt-3 mx-3" to="/">
                     <img src={arrow_back} alt="Back" />

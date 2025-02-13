@@ -27,7 +27,7 @@ class BlogDetail extends Component {
 
     componentDidMount() {
         this.getBlogDetails();
-    }
+    } 
 
     getBlogDetails = () => {
         const { slug } = this.props.match.params;
@@ -53,6 +53,7 @@ class BlogDetail extends Component {
                     description: description,
                     updatedAt: date,
                     seo: result[0].seo,
+                    slug: result[0].slug,
                     seodescription: result[0].seodescription,
                     keywords: result[0].keywords
                 })
@@ -69,7 +70,7 @@ class BlogDetail extends Component {
             return <SpinnerLoader />
         }
         if (error) {
-            return <div>Error: {error}</div>;
+            return <div>Error: {error}</div>; 
         }
 
         console.log("blog Details under render", blogDetails)
@@ -77,25 +78,36 @@ class BlogDetail extends Component {
             <React.Fragment>
                 {loading === true ? <SpinnerLoader /> : ''}
                 <Header />
-                {/* <div className="inr_top_page_title">
+                <div className="inr_top_page_title">
                     <h2>Blog Detail</h2>
-                </div> */}
-                <section className="inr_wrap">
-                    {blogDetails.map(item => <>                 
+                </div>
+                <section className="inr_wrap mt-2">
+                    {blogDetails.map(item => <>
                         <div className="container">
                             <BannerTopIframe keywords={item.keywords} />
-                            {/* <h4><i>  Title :  <b>{item.title}</b></i></h4> */}
                             <div className="row">
                                 <div className="col-md-12 cart-single-page-wrapper">
                                     <div className="cart my_cart">
                                         <div className="cl_head ">
                                             <Helmet>
-                                                <title>{item.seo}{" - Pay Earth"}</title>
+                                                <title>{`Blog-detail/${item.slug}`}</title>
                                                 <meta name="description" content={item.seodescription} />
                                                 <meta name="keywords" content={item.keywords} />
                                             </Helmet>
-                                            <div className='cart-single-heading'>
+                                            <div className='cart-single-heading d-flex flex-row '>
                                                 <h1>{item.title}</h1>
+
+                                                <Link
+                                                    to="#"
+                                                    className="custom_btn btn_yellow w-auto btn mt-2  ms-auto"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        window.history.back();
+                                                    }}
+                                                >
+                                                    Back
+                                                </Link>
+
                                             </div>
                                             <div className='blog-list-meta'>
                                                 <span className="post_cat_col">{item.category}</span>

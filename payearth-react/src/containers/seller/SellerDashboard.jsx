@@ -12,7 +12,6 @@ import Select from 'react-select';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { Chart } from "react-google-charts";
 import { Helmet } from 'react-helmet';
-
 import { LineChart } from '@mui/x-charts/LineChart';
 import Box from '@mui/material/Box';
 import { PieChart } from '@mui/x-charts/PieChart';
@@ -212,7 +211,7 @@ class SellerDashboard extends Component {
         this.getCounters();
 
         // this.getProductSales();
-       // this.getTopSellingCatData();
+        // this.getTopSellingCatData();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -224,7 +223,6 @@ class SellerDashboard extends Component {
             this.getProductSalesGraph('week');
             this.getServiceSalesGraph('week');
         }
-
     }
 
     getCounters = () => {
@@ -268,7 +266,7 @@ class SellerDashboard extends Component {
                     'Content-Type': 'application/json',
                 }
             });
-           // console.log('product---response--', response)
+            // console.log('product---response--', response)
             if (response.data.status === true) {
                 this.setState({ listedProducts: response.data.data, loading: false })
             }
@@ -296,7 +294,7 @@ class SellerDashboard extends Component {
                     'Content-Type': 'application/json',
                 }
             });
-           // console.log('service---response--', response)
+            // console.log('service---response--', response)
             if (response.data.status === true) {
                 this.setState({ listedServices: response.data.data, loading: false })
             }
@@ -332,8 +330,6 @@ class SellerDashboard extends Component {
             this.setState({ loading: false });
         }
     };
-
-
 
     getProductSales = (pagination, param) => {
         let reqBody = {};
@@ -397,34 +393,6 @@ class SellerDashboard extends Component {
         this.setState({ defaultSelectedOption: selectedOption, reqBody });
         this.getProductSales(false, this.state.pagination.currentPage);
     }
-
-
-    // getTopSellingCatData = () => {
-    //     this.dispatch(setLoading({ loading: true }));
-    //     axios.get(`seller/selling-category-donut-chart/${this.authInfo.id}`, {
-    //         headers: {
-    //             'Accept': 'application/json',
-    //             'Content-Type': 'application/json;charset=UTF-8',
-    //             'Authorization': `Bearer ${this.authInfo.token}`
-    //         }
-    //     }).then(response => {
-    //         if (response.data.status) {
-    //             if (response.data.data.length > 0) {
-    //                 let data = [...this.state.topSellingCategoriesData];
-    //                 response.data.data.forEach(value => {
-    //                     data.push([value.name, value.count]);
-    //                 })
-    //                 this.setState({ topSellingCategoriesData: data });
-    //             }
-    //         }
-    //     }).catch(error => {
-    //         console.log(error);
-    //     }).finally(() => {
-    //         setTimeout(() => {
-    //             this.dispatch(setLoading({ loading: false }));
-    //         }, 300);
-    //     });
-    // }
 
     getTopSellingCategories = () => {
         const reqParams = {
@@ -629,7 +597,7 @@ class SellerDashboard extends Component {
                 .filter(item => item.month === month)
                 .map(item => item.week);
 
- 
+
             const allWeeks = Array.from(new Set([...productWeeks, ...serviceWeeks]));
 
             return validWeeks.map(week =>
@@ -752,6 +720,96 @@ class SellerDashboard extends Component {
                                     </div>
                                 </div>
                             </div>
+                            {/* // google analytics data */}
+
+                            <div className="rep_chart_wrapper">
+                                <div className="row">
+                                    <div className="col-lg-4">
+                                        <div className="card bg-white rounded-3">
+                                            <div className="card-header">
+                                                Top Visited Advertisements
+                                            </div>
+
+                                            <div className="tsc_box bg-white p-3">
+                                                <div className="row">
+                                                    {/* <div className="col-lg-6 m-0 p-0">
+                                                        <ul className="list-unstyled">
+                                                            {topCategories.map((item, index) => (
+                                                                <li key={index} className="d-flex align-items-center mb-3 mt-2">
+                                                                    <i style={{ color: colors[index % colors.length] }} className="fa fa-circle"></i>  <span className="small ps-2">{item.label}</span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div> */}
+                                                    <div className="tsc_img col-lg-6 m-0 p-0">
+                                                        <PieChart
+                                                            series={[
+                                                                {
+                                                                    data: [
+                                                                        { id: 0, value: 10, label: 'series A' },
+                                                                        { id: 1, value: 15, label: 'series B' },
+                                                                        { id: 2, value: 20, label: 'series C' },
+                                                                    ],
+                                                                },
+                                                            ]}
+                                                            width={400}
+                                                            height={200}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {/* <div className="col-lg-4">
+                                        <div className="card bg-white rounded-3">
+                                            <div className="card-header">
+                                                Monthly Order Report
+                                            </div>
+                                            <div className="rep_chart_item chart_right">
+                                                <Bar options={optionsBar} data={dataBar} />
+                                            </div>
+                                        </div>
+                                    </div> */}
+
+                                    <div className="col-lg-8">
+                                        <div className="card bg-white rounded-3" style={{ overflowY: 'auto', maxHeight: '67vh', border: '1px solid #ddd', scrollbarWidth: 'thin', }}>
+                                            <div className="card-header" style={{
+                                                position: 'sticky',
+                                                top: 0,
+                                                backgroundColor: 'white',
+                                                zIndex: 10, // Ensure it stays above the scrolling content
+                                                borderBottom: '1px solid #ddd',
+                                            }}>
+                                                Total Advertise Viewed
+                                            </div>
+                                            <div className="rep_chart_item orderWeek">
+                                                <div className="total_weeklly_order">
+                                                    <h2>430</h2>
+                                                    <h4>This month</h4>
+                                                </div>
+                                                <div className="total_weeklly_order">
+                                                    <h2>430</h2>
+                                                    <h4>This month</h4>
+                                                </div>
+                                                <div className="total_weeklly_order">
+                                                    <h2>430</h2>
+                                                    <h4>This month</h4>
+                                                </div>
+                                                <div className="total_weeklly_order">
+                                                    <h2>430</h2>
+                                                    <h4>This month</h4>
+                                                </div>
+                                                <div className="total_weeklly_order">
+                                                    <h2>430</h2>
+                                                    <h4>This month</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="row mt-4">
                                 <div className="col-md-8">
                                     <div className="dash_graph bg-white">

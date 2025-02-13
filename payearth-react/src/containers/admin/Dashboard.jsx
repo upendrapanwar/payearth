@@ -6,7 +6,7 @@ import axios from 'axios';
 import SpinnerLoader from "./../../components/common/SpinnerLoader";
 import { LineChart } from '@mui/x-charts/LineChart';
 import Box from '@mui/material/Box';
-import { PieChart } from '@mui/x-charts/PieChart';
+import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
 import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
@@ -42,7 +42,10 @@ class Dashboard extends Component {
             listedBuyers: [],
             productOrders: [],
             serviceOrders: [],
-            subscriptionOrders: []
+            subscriptionOrders: [],
+            countryWiseAnalytics: [],
+            pathViewAnalytics: [],
+            activeAndNewUsers: []
         };
 
         // console.log("productYear", this.state.productYear)
@@ -258,7 +261,7 @@ class Dashboard extends Component {
             },
             {
                 name: 'ORDER STATUS',
-                selector: (row, i) => row.orderStatus[0].title,
+                selector: (row, i) => row.orderStatus[0]?.title,
                 sortable: true
             },
             {
@@ -312,12 +315,17 @@ class Dashboard extends Component {
         }
         if (prevState.productYear !== this.state.productYear) {
             this.getProductSalesGraph();
+            this.getServiceSalesGraph();
         }
     }
 
     handleScroll = () => {
         const { hasRun } = this.state;
         if (!hasRun) {
+            // this.getAnalyticsData();
+            this.countryWiseAnalyticsData();
+            this.pathViewAnalyticsData();
+            this.activeAndNewUsersData();
             this.getListedServices();
             this.getListedproducts();
             this.getListedVendors();
@@ -364,6 +372,7 @@ class Dashboard extends Component {
         try {
             this.setState({ loading: true });
             const url = `/admin/productSalesGraph?year=${this.state.productYear}`;
+            console.log('getProductSalesGraph---url',url)
             const response = await axios.get(url, {
                 headers: {
                     'Accept': 'application/json',
@@ -382,7 +391,8 @@ class Dashboard extends Component {
     getServiceSalesGraph = async () => {
         try {
             this.setState({ loading: true });
-            const url = `/admin/serviceSalesGraph?year=${this.state.serviceYear}`;
+            const url = `/admin/serviceSalesGraph?year=${this.state.productYear}`;
+            console.log('getServiceSalesGraph----url',url)
             const response = await axios.get(url, {
                 headers: {
                     'Accept': 'application/json',
@@ -561,8 +571,96 @@ class Dashboard extends Component {
         }));
     };
 
+    getAnalyticsData = () => {
+        const url = '/admin/googleAnalyticsData';
+        const data = {
+            propertyId: "433479675"
+        };
+
+        axios.post(url, data, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${this.authInfo.token}`
+            }
+        }).then((response) => {
+            console.log(" getAnalyticsData response ", response);
+
+        }).catch((error) => {
+            console.log("error in save banner date", error);
+        });
+    }
+
+    countryWiseAnalyticsData = () => {
+        const url = '/admin/countryWiseAnalyticsData';
+        const data = {
+            propertyId: "433479675"
+        };
+        axios.post(url, data, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${this.authInfo.token}`
+            }
+        }).then((response) => {
+            const data = response.data.data;
+            const countryData = data.map(item => ({
+                label: item.country,
+                value: item.userCount
+            }));
+            this.setState({ countryWiseAnalytics: countryData })
+        }).catch((error) => {
+            console.log("error in save banner date", error);
+        });
+    }
+
+    pathViewAnalyticsData = () => {
+        const url = '/admin/pathViewAnalyticsData';
+        const data = {
+            propertyId: "433479675"
+        };
+        axios.post(url, data, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${this.authInfo.token}`
+            }
+        }).then((response) => {
+            console.log(" pathViewAnalytics response ", response.data.data);
+            this.setState({ pathViewAnalytics: response.data.data })
+        }).catch((error) => {
+            console.log("error in save banner date", error);
+        });
+    }
+
+    activeAndNewUsersData = () => {
+        const url = '/admin/activeAndNewUsersData';
+        const data = {
+            propertyId: "433479675"
+        };
+        axios.post(url, data, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${this.authInfo.token}`
+            }
+        }).then((response) => {
+            console.log(" activeAndNewUsers response _____", response.data.data);
+            const data = response.data.data;
+            const transformedData = [
+                { label: "Active Users", value: data[0].activeUsers },
+                { label: "New Users", value: data[0].newUsers }
+            ];
+            this.setState({ activeAndNewUsers: transformedData })
+        }).catch((error) => {
+            console.log("error in save banner date", error);
+        });
+    }
+
     render() {
-        const { loading, activeTab, productCount, serviceCount, userCount, sellerCount, orderCount, stockQty, totalPaymentAmount, listedServices, listedProducts, listedVendors, listedBuyers, topCategories, productSalesData, serviceSalesData, productOrders, serviceOrders, subscriptionOrders } = this.state;
+        const { loading, activeTab, productCount, serviceCount, userCount, sellerCount, orderCount, stockQty, totalPaymentAmount, listedServices, listedProducts,
+            listedVendors, listedBuyers, topCategories, productSalesData, serviceSalesData, productOrders, serviceOrders,
+            subscriptionOrders, countryWiseAnalytics, activeAndNewUsers } = this.state;
         const colors = ['rgb(2, 178, 175)', 'rgb(46, 150, 255)', 'rgb(184, 0, 216)', 'rgb(96, 0, 155)'];
         const xLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         // const valueFormatter = (item) => `${item.value}%`;
@@ -570,13 +668,91 @@ class Dashboard extends Component {
         const productData = productSalesData.map(item => item.count);
 
         console.log("productData", productData);
+       
         console.log("topCategories", topCategories);
         const serviceData = serviceSalesData.map(item => item.count);
         const currentYear = new Date().getFullYear();
-
+        console.log("serviceData", serviceData);
         // console.log("productOrders", productOrders);
         // console.log("serviceOrders", serviceOrders);
-        // console.log("subscriptionOrders", subscriptionOrders);
+        console.log("countryWiseAnalytics", countryWiseAnalytics);
+
+        // TEST
+        const desktopOS = [
+            {
+                label: 'Windows',
+                value: 72.72,
+            },
+            {
+                label: 'OS X',
+                value: 16.38,
+            },
+            {
+                label: 'Linux',
+                value: 3.83,
+            },
+            {
+                label: 'Chrome OS',
+                value: 2.42,
+            },
+            {
+                label: 'Other',
+                value: 4.65,
+            },
+        ];
+
+        const mobileOS = [
+            {
+                label: 'Android',
+                value: 70.48,
+            },
+            {
+                label: 'iOS',
+                value: 28.8,
+            },
+            {
+                label: 'Other',
+                value: 0.71,
+            },
+        ];
+
+        const platforms = [
+            {
+                label: 'Mobile',
+                value: 59.12,
+            },
+            {
+                label: 'Desktop',
+                value: 40.88,
+            },
+        ];
+
+        // console.log("activeAndNewUsers", activeAndNewUsers)
+
+        const normalize = (v, v2) => Number.parseFloat(((v * v2) / 100).toFixed(2));
+
+        const mobileAndDesktopOS = [
+            ...mobileOS.map((v) => ({
+                ...v,
+                label: v.label === 'Other' ? 'Other (Mobile)' : v.label,
+                value: normalize(v.value, platforms[0].value),
+            })),
+            ...desktopOS.map((v) => ({
+                ...v,
+                label: v.label === 'Other' ? 'Other (Desktop)' : v.label,
+                value: normalize(v.value, platforms[1].value),
+            })),
+        ];
+
+        const valueFormatter = (item) => `${item.value}`;
+
+        const palette = ['#4BC0C0', '#FF6384'];
+        const pieParams = {
+            height: 280,
+            // margin: { right: 5 },
+            // slotProps: { legend: { hidden: true } },
+        };
+        // TEST
 
         return (
             <React.Fragment>
@@ -642,6 +818,186 @@ class Dashboard extends Component {
                                     </Link>
                                 </div>
                             </div>
+
+                            {/* // google analytics data */}
+                            <div className="col-lg-12 ">
+                                <div className="card bg-white rounded-3">
+                                    <div className="tsc_box bg-white p-3">
+                                        <div className="row">
+                                            <div className="d-flex ">
+                                                <div className="tsc_img col-lg-6 m-0 p-0">
+                                                    <div className="d-flex mb-2 justify-content-between">
+                                                        <p className="text-start">Active and New users</p>
+                                                    </div>
+                                                    <PieChart
+                                                        colors={palette}
+                                                        series={[
+                                                            {
+                                                                arcLabel: (item) => `${item.label}\n${item.value}`,
+                                                                data: activeAndNewUsers,
+                                                            },
+                                                        ]}
+                                                        sx={{
+                                                            [`& .${pieArcLabelClasses.root}`]: {
+                                                                fontWeight: 'bold',
+                                                            },
+                                                        }}
+                                                        {...pieParams}
+
+                                                    />
+                                                </div>
+                                                <div className="tsc_img col-lg-6 m-0 p-0">
+                                                    <div className="d-flex mb-2 justify-content-between">
+                                                        <p className="text-start">Active users by Country over time</p>
+                                                        <p className="text-end">Last 30 days</p>
+                                                    </div>
+                                                    <PieChart
+                                                        series={[
+                                                            {
+                                                                data: countryWiseAnalytics.map((item, index) => ({
+                                                                    ...item,
+                                                                    color: [
+                                                                        '#FF9F40',
+                                                                        '#36A2EB',
+                                                                        '#E91E63',
+                                                                        '#4BC0C0',
+                                                                        '#9966FF',
+                                                                        '#FF6384',
+                                                                        '#8BC34A',
+                                                                        '#FFCE56',
+                                                                        '#607D8B',
+                                                                        '#D4E157'
+                                                                    ][index % 10],
+                                                                })),
+                                                                highlightScope: { fade: 'global', highlight: 'item' },
+                                                                faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+                                                                valueFormatter,
+                                                            },
+                                                        ]}
+                                                        sx={{
+                                                            [`& .${pieArcLabelClasses.root}`]: {
+                                                                fontWeight: 'bold',
+                                                            },
+                                                        }}
+                                                        height={280}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="col-lg-12 mt-4">
+                                <div className="card bg-white rounded-3" style={{ overflowY: 'auto', maxHeight: '67vh', border: '1px solid #ddd', scrollbarWidth: 'thin', }}>
+                                    <div className="card-header" style={{
+                                        position: 'sticky',
+                                        top: 0,
+                                        backgroundColor: 'white',
+                                        zIndex: 10, // Ensure it stays above the scrolling content
+                                        borderBottom: '1px solid #ddd',
+                                    }}>
+                                        Total Advertise Viewed
+                                    </div>
+                                    <div className="rep_chart_item orderWeek">
+                                        <div className="total_weeklly_order">
+                                            <h2>430</h2>
+                                            <h4>This month</h4>
+                                        </div>
+                                        <div className="total_weeklly_order">
+                                            <h2>430</h2>
+                                            <h4>This month</h4>
+                                        </div>
+                                        <div className="total_weeklly_order">
+                                            <h2>430</h2>
+                                            <h4>This month</h4>
+                                        </div>
+                                        <div className="total_weeklly_order">
+                                            <h2>430</h2>
+                                            <h4>This month</h4>
+                                        </div>
+                                        <div className="total_weeklly_order">
+                                            <h2>430</h2>
+                                            <h4>This month</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* <div className="col-lg-12 mt-4">
+                                <div className="card bg-white rounded-3">
+                                    <div className="tsc_box bg-white p-3">
+                                        <div className="row">
+                                            <div className="d-flex ">
+                                                <div className="tsc_img col-lg-6 m-0 p-0">
+                                                    <div className="d-flex mb-2 justify-content-between">
+                                                        <p className="text-start">Active and New users</p>
+                                                    </div>
+                                                    <PieChart
+                                                        colors={palette}
+                                                        series={[
+                                                            {
+                                                                arcLabel: (item) => `${item.label}\n${item.value}`,
+                                                                data: activeAndNewUsers,
+                                                            },
+                                                        ]}
+                                                        sx={{
+                                                            [`& .${pieArcLabelClasses.root}`]: {
+                                                                fontWeight: 'bold',
+                                                            },
+                                                        }}
+                                                        {...pieParams}
+
+                                                    />
+                                                </div>
+                                                <div className="tsc_img col-lg-6 m-0 p-0">
+                                                    <div className="d-flex mb-2 justify-content-between">
+                                                        <p className="text-start">Active users by Country over time</p>
+                                                        <p className="text-end">Last 30 days</p>
+                                                    </div>
+                                                    <PieChart
+                                                        series={[
+                                                            {
+                                                                data: countryWiseAnalytics.map((item, index) => ({
+                                                                    ...item,
+                                                                    color: [
+                                                                        '#FF9F40',
+                                                                        '#36A2EB',
+                                                                        '#E91E63',
+                                                                        '#4BC0C0',
+                                                                        '#9966FF',
+                                                                        '#FF6384',
+                                                                        '#8BC34A',
+                                                                        '#FFCE56',
+                                                                        '#607D8B',
+                                                                        '#D4E157'
+                                                                    ][index % 10],
+                                                                })),
+                                                                highlightScope: { fade: 'global', highlight: 'item' },
+                                                                faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+                                                                valueFormatter,
+                                                            },
+                                                        ]}
+                                                        sx={{
+                                                            [`& .${pieArcLabelClasses.root}`]: {
+                                                                fontWeight: 'bold',
+                                                            },
+                                                        }}
+                                                        height={280}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> */}
+
+
+
+                            {/* // google analytics data */}
+
+
+
                             <div className="row mt-4">
                                 <div className="col-md-8">
                                     <div className="dash_graph bg-white">
@@ -708,8 +1064,6 @@ class Dashboard extends Component {
                                     </div>
                                 </div>
                             </div>
-
-
                             <div className="bg-white rounded-3 pt-3 pb-5 mt-4">
                                 <div className="col-md-12">
                                     <div className="dash_title m-4">Newly Listed Orders</div>
@@ -796,8 +1150,6 @@ class Dashboard extends Component {
                                     </div>
                                 </div>
                             </div>
-
-
                             <div className="row mt-4">
                                 <div className="col-md-6">
                                     <div className="my_pro_cart bg-white">
@@ -851,8 +1203,6 @@ class Dashboard extends Component {
                                     </div>
                                 </div>
                             </div>
-
-
                             <div className="row mt-4">
                                 <div className="col-md-6">
                                     <div className="my_pro_cart bg-white">
@@ -885,7 +1235,7 @@ class Dashboard extends Component {
                                         <div className='admin_dashboard p-2'>
                                             <div className="d-flex align-items-center justify-content-between mb-3 m-3">
                                                 <div className="dash_title">Newly Listed Buyers</div>
-                                                <Link to="#" className="btn_yellow_bordered w-auto btn btn-width action_btn_new">View More</Link>
+                                                <Link to="/admin/manage-customers" className="btn_yellow_bordered w-auto btn btn-width action_btn_new">View More</Link>
                                             </div>
                                             <DataTableExtensions
                                                 columns={this.listed_Buyers}
@@ -906,8 +1256,6 @@ class Dashboard extends Component {
                                     </div>
                                 </div>
                             </div>
-
-
                         </div>
                     </div>
                     <Footer />

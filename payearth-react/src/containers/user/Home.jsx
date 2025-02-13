@@ -101,6 +101,7 @@ import Footer from "./../../components/common/Footer";
 // import ServicesDisplay from "./service/ServicesDisplay";
 import { GetAllBanner } from "../../components/common/BannerFrame";
 import SpinnerLoader from '../../components/common/SpinnerLoader';
+import { Helmet } from 'react-helmet';
 
 // Lazy load components
 const Header = lazy(() => import("./../../components/user/common/Header"));
@@ -199,6 +200,7 @@ class Home extends Component {
 
     return (
       <React.Fragment>
+        <Helmet><title>{"Home - Pay Earth"}</title></Helmet>
         <InfoAlert />
         <GetAllBanner />
         <Suspense fallback={<SpinnerLoader />}>

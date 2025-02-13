@@ -16,6 +16,7 @@ import { setProducts, setReqBody, setTotalProducts, setMaxPrice } from './../../
 import { setLoading } from './../../store/reducers/global-reducer';
 import readUrl from './../../helpers/read-product-listing-url';
 import { getBrands, getColors } from './../../helpers/product-listing';
+import { Helmet } from 'react-helmet';
 import GoToTop from './../../helpers/GoToTop';
 
 const ServicesListing = () => {
@@ -134,12 +135,9 @@ const ServicesListing = () => {
         });
     }
 
-
-
-    console.log("services", services)
-
     return (
         <React.Fragment>
+            <Helmet><title>{"Services - Pay Earth"}</title></Helmet>
             {loading === true ? <SpinnerLoader /> : ''}
             <Header
                 pageName="service-listing"
@@ -150,6 +148,15 @@ const ServicesListing = () => {
             <section className="inr_wrap">
                 <div className="container">
                     <div className="row">
+                        <div className="col-md-12 text-end mt-2">
+                            <button
+                                type="button"
+                                className="btn custom_btn btn_yellow"
+                                onClick={() => window.history.back()}
+                            >
+                                Back
+                            </button>
+                        </div>
                         <div className="col-md-3 mt-3" style={{ overflowY: 'auto', maxHeight: '120vh', border: '1px solid #ddd', scrollbarWidth: 'thin', }}>
                             <div className='mob-show'>
                                 <button class="filter-mob-catShow px-2" type="button" aria-controls="navbarExampleOnHover" aria-expanded="false" aria-label="Toggle navigation" onClick={() => setSideBarToggle(prevState => !prevState)}><span class="fa fa-bars"></span> Filter</button>

@@ -14,6 +14,7 @@ import Rating from '../../components/common/Rating';
 import config from './../../config.json';
 import { confirmation } from './../../helpers/confirmation';
 import { setSelectedWishItems } from './../../store/reducers/wishlist-reducer';
+import { Helmet } from 'react-helmet';
 
 
 class MyWishlist extends Component {
@@ -122,6 +123,7 @@ class MyWishlist extends Component {
 
         return (
             <React.Fragment>
+                <Helmet><title>{"My Wishlist - Pay Earth"}</title></Helmet>
                 {loading === true ? <SpinnerLoader /> : ''}
                 <Header />
                 <PageTitle title="My Wishlist" />

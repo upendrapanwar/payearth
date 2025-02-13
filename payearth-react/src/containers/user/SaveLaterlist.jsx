@@ -14,6 +14,7 @@ import Rating from '../../components/common/Rating';
 import config from './../../config.json';
 import { confirmation } from './../../helpers/confirmation';
 import { setSelectedSavedItems } from './../../store/reducers/savelaterlist-reducer';
+import { Helmet } from 'react-helmet';
 
 
 class SaveLaterlist extends Component {
@@ -124,6 +125,7 @@ class SaveLaterlist extends Component {
 
         return (
             <React.Fragment>
+                <Helmet><title>{"Savelater - Pay Earth"}</title></Helmet>
                 {loading === true ? <SpinnerLoader /> : ''}
                 <Header />
                 <PageTitle title="Save Later" />
@@ -155,7 +157,7 @@ class SaveLaterlist extends Component {
                                                 return <div className={`cl_items ${cls}`} key={index}>
                                                     <div className="cl_pro_info">
                                                         <div className="clp_item">
-                                                            <div className="clp_item_img"><img src={config.apiURI + value.productId.featuredImage} alt="mens-jacket" /></div>
+                                                            <div className="clp_item_img"><img src={value.productId.featuredImage} alt={value.productId.name} /></div>
                                                             <div className="clp_item_info">
                                                                 <Rating avgRating={value.productId.avgRating} />
                                                                 <div className="cl_pro_name">{value.productId.name}</div>

@@ -17,7 +17,7 @@ const Deals = () => {
     axios.get("front/product/today-deals")
       .then((response) => {
         if (response.data.status) {
-           console.log("deals card data : ", response.data.data);
+          console.log("deals card data : ", response.data.data);
           const data = response.data.data;
           for (var i = 0; i < data.length; i++) {
             deals.push({
@@ -27,7 +27,7 @@ const Deals = () => {
               clickEvent: ((id) => () => handleDealClick(id))(data[i].id),
             })
           }
-         // console.log("deals check......", deals)
+          // console.log("deals check......", deals)
           setData(deals);
         } else {
           toast.error(response.data.message);
@@ -41,11 +41,11 @@ const Deals = () => {
   /***************************************************************************/
 
 
-    const handleDealClick = (deal) => {
-     // toast.info(`Clicked on: ${deal}`);
-     // console.log("Clicked deal details: ", deal);
-     history.push(`/deal-ofthe-day?id=${deal}`); 
-    };
+  const handleDealClick = (deal) => {
+    // toast.info(`Clicked on: ${deal}`);
+    // console.log("Clicked deal details: ", deal);
+    history.push(`/deal-ofthe-day?id=${deal}`);
+  };
 
   /***************************************************************************/
   /***************************************************************************/
@@ -59,7 +59,7 @@ const Deals = () => {
               <>
                 <SectionTitle
                   title="Deals Of the day"
-                  viewMore={true}
+                  viewMore={false}
                   route={"#"}
                 />
                 <ReactCardSlider slides={data} />

@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux';
 import { clearCart } from '../../store/reducers/cart-slice-reducer';
 import { updateCart } from "../../store/reducers/cart-slice-reducer";
 import emptyCart from './../../assets/images/empty-cart.png';
+import { Helmet } from 'react-helmet';
 class MyCart extends Component {
     constructor(props) {
         super(props);
@@ -223,7 +224,7 @@ class MyCart extends Component {
 
     render() {
         const cart = this.props.cart;
-          console.log('final updated cart data of redux cart----', cart)
+        console.log('final updated cart data of redux cart----', cart)
         const getTotal = () => {
             let totalQuantity = 0
             let totalPrice = 0
@@ -236,6 +237,7 @@ class MyCart extends Component {
 
         return (
             <React.Fragment>
+                <Helmet><title>{"My Cart - Pay Earth"}</title></Helmet>
                 <Header />
                 <PageTitle title="My Cart" />
                 <section className="inr_wrap">

@@ -10,6 +10,12 @@ const nodemailer = require('nodemailer');
 const db = require("../helpers/db");
 const msg = require('../helpers/messages.json');
 const fs = require('fs');
+const { BetaAnalyticsDataClient } = require("@google-analytics/data");
+const path = require('path');
+
+const analyticsDataClient = new BetaAnalyticsDataClient({
+    keyFilename: path.resolve(__dirname, '../config/testga4_December_test-417806-7566dd1c2dba.json')
+});
 
 const { Admin, User, Seller, Coupon, Product, Category, Brand,
     TodayDeal, BannerImage, TrendingProduct, PopularProduct, Color,
@@ -198,6 +204,11 @@ module.exports = {
     getBuyersData,
     getOrderDetails,
 
+    countryWiseAnalyticsData,
+    pathViewAnalyticsData,
+    activeAndNewUsersData,
+    googleAnalyticsData,
+
     // permission
     getPostPermission,
     getProductCatePermission,
@@ -214,9 +225,12 @@ module.exports = {
     getAllVendors,
     getVendorsPermission,
     updateVendorsStatus,
+    getVendorDataById,
+    updateVendore,
     getAllCustomers,
     getcustomerPermission,
     updateCustomerStatus,
+    updateCustomer,
 
     //Report
     getWeeklyOrderStatusCount,
@@ -5031,6 +5045,129 @@ async function getOrderDetails() {
     }
 }
 
+async function countryWiseAnalyticsData(req, res) {
+    try {
+        const { propertyId } = req.body;
+        const id = `${propertyId}`
+
+        const [response] = await analyticsDataClient.runReport({
+            property: `properties/${id}`,
+            dateRanges: [
+                { startDate: "30daysAgo", endDate: "today" }, // 365daysAgo
+            ],
+            dimensions: [
+                { name: "country" },
+            ],
+            metrics: [
+                { name: 'activeUsers' },
+            ],
+        })
+        const countryUserCounts = response.rows.map(row => ({
+            country: row.dimensionValues[0].value,
+            userCount: parseInt(row.metricValues[0].value, 10)
+        }));
+        return countryUserCounts
+    } catch (error) {
+        console.log("error", error)
+    }
+}
+
+async function pathViewAnalyticsData(req, res) {
+    try {
+        const { propertyId } = req.body;
+        const id = `${propertyId}`
+
+        const [response] = await analyticsDataClient.runReport({
+            property: `properties/${id}`,
+            dateRanges: [
+                { startDate: "30daysAgo", endDate: "today" }, // 365daysAgo
+            ],
+            dimensions: [
+                { name: "pagePath" },
+                { name: "pageTitle" }
+            ],
+            metrics: [
+                { name: "screenPageViews" }
+            ],
+            orderBys: [
+                {
+                    metric: {
+                        metricName: "screenPageViews"
+                    },
+                    desc: true // Sort in descending order to get the top results
+                }
+            ],
+            limit: 20
+        })
+        const pageViewData = response.rows.map(row => ({
+            pagePath: row.dimensionValues[0].value,
+            pageTitle: row.dimensionValues[1].value,
+            viewCount: parseInt(row.metricValues[0].value, 10)
+        }));
+        return pageViewData
+    } catch (error) {
+        console.log("error", error)
+    }
+}
+
+async function activeAndNewUsersData(req, res) {
+    try {
+        const { propertyId } = req.body;
+        const id = `${propertyId}`
+
+        const [response] = await analyticsDataClient.runReport({
+            property: `properties/${id}`,
+            dateRanges: [
+                { startDate: "30daysAgo", endDate: "today" }, // 365daysAgo
+            ],
+            metrics: [
+                { name: "activeUsers" },
+                { name: "newUsers" }
+            ],
+        })
+        const result = response.rows.map(row => ({
+            activeUsers: row.metricValues[0].value,
+            newUsers: row.metricValues[1].value
+        }));
+        return result
+    } catch (error) {
+        console.log("error", error)
+    }
+}
+
+
+async function googleAnalyticsData(req, res) {
+    try {
+        const { propertyId } = req.body;
+        const id = `${propertyId}`
+        const [response] = await analyticsDataClient.runReport({
+            property: `properties/${id}`,
+            dateRanges: [
+                { startDate: "30daysAgo", endDate: "today" }, // 365daysAgo
+            ],
+            dimensions: [
+                { name: "eventCategory" }, // Retrieve event_category dimension
+                { name: "eventName" }      // Optionally keep eventName if needed
+            ],
+            metrics: [{ name: "eventCount" }],
+            // dimensionFilter: {
+            //     filter: {
+            //         fieldName: "eventCategory", // Filter by event_category
+            //         stringFilter: { value: "button_click" } // Replace with actual category value
+            //     }
+            // }
+        });
+
+        response.rows.forEach(row => {
+            console.log(row.dimensionValues[0].value); // Print each unique event category
+        });
+        // return response;
+    } catch (error) {
+        console.error("Error fetching analytics data:", error);
+    }
+}
+
+
 async function getPostPermission(req) {
     const { admin_Id } = req.params;
     try {
@@ -5351,6 +5488,49 @@ async function updateVendorsStatus(req) {
     }
 }
 
+async function getVendorDataById(req) {
+    const { id } = req.params;
+
+    try {
+        const result = await Seller.findById({ _id: id });
+        if (!result) {
+            return false;
+        }
+
+        return result;
+    } catch (error) {
+        console.error("Error fetching vendors", error);
+        return false;
+    }
+}
+
+async function updateVendore(req) {
+    const data = req.body
+    const id = data.id;
+    const updateData = {
+        name: data.name,
+        email: data.email,
+        seller_type: data.seller_type,
+        want_to_sell: data.want_to_sell,
+        full_address: {
+            address: data.address,
+            country: data.country,
+            state: data.state
+        }
+    }
+    try {
+        const result = await Seller.findByIdAndUpdate(
+            id,
+            { $set: updateData },
+            { new: true, runValidators: true }
+        );
+
+        return result;
+    } catch (error) {
+        console.error("Error fetching vendors", error);
+        return false;
+    }
+}
 
 async function updateCustomerStatus(req) {
     const { id } = req.params;
@@ -5361,6 +5541,28 @@ async function updateCustomerStatus(req) {
         if (!result) {
             return false;
         }
+
+        return result;
+    } catch (error) {
+        console.error("Error fetching vendors", error);
+        return false;
+    }
+}
+
+ async function updateCustomer(req) {
+    const  data  = req.body;
+    const id = data.id;
+    const updateData = {
+        name: data.name,
+        email: data.email,
+    }
+    try {
+        const result = await User.findByIdAndUpdate(
+            id,
+            { $set: updateData },
+            { new: true, runValidators: true }
+        );
+
 
         return result;
     } catch (error) {

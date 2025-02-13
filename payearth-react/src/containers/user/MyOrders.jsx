@@ -18,7 +18,7 @@ import Col from "react-bootstrap/Col";
 import Table from "react-bootstrap/Table";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-
+import { Helmet } from 'react-helmet';
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -331,6 +331,7 @@ class MyOrders extends Component {
     ];
     return (
       <React.Fragment>
+        <Helmet><title>{"My Order - Pay Earth"}</title></Helmet>
         {loading === true ? <SpinnerLoader /> : ""}
         {downloading === true ? <SpinnerLoader /> : ""}
         <Header />
@@ -341,10 +342,22 @@ class MyOrders extends Component {
               <div className="col-md-12">
                 <div className="cart wishlist">
                   <div className="cart_wrap">
-                    <div className="items_incart">
+                    {/* <div className="items_incart">
                       <span className="text-uppercase">
                         {data.length} ORDER FOUND
                       </span>
+                    </div> */}
+                    <div className="items_incart d-flex justify-content-between align-items-center">
+                      <span className="text-uppercase">
+                        {data.length} ORDER FOUND
+                      </span>
+                      <button
+                        type="button"
+                        className="btn custom_btn btn_yellow"
+                        onClick={() => window.history.back()}
+                      >
+                        Back
+                      </button>
                     </div>
                   </div>
                   <div className="cart_list cart_wrap pb-5">
@@ -537,6 +550,11 @@ class MyOrders extends Component {
           dialogClassName="modal-90w"
           aria-labelledby="example-custom-modal-styling-title"
         >
+          <Modal.Header closeButton>
+            <Modal.Title id="example-custom-modal-styling-title">
+              Order Tracking
+            </Modal.Title>
+          </Modal.Header>
           <Modal.Body
             style={{ maxHeight: "calc(100vh - 100px)", overflowY: "auto" }}
           >

@@ -16,6 +16,7 @@ import Col from "react-bootstrap/Col";
 import Table from "react-bootstrap/Table";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { Helmet } from 'react-helmet';
 import Select from "react-select";
 import { NotFound } from "../../../components/common/NotFound";
 
@@ -279,6 +280,7 @@ function ServiceOrder() {
 
   return (
     <React.Fragment>
+      <Helmet><title>{"My Order - Pay Earth"}</title></Helmet>
       {loading === true ? <SpinnerLoader /> : ""}
       {downloading === true ? <SpinnerLoader /> : ""}
       <Header />
@@ -289,10 +291,22 @@ function ServiceOrder() {
             <div className="col-md-12">
               <div className="cart wishlist">
                 <div className="cart_wrap">
-                  <div className="items_incart">
+                  {/* <div className="items_incart">
                     <span className="text-uppercase">
                       {serviceOrders.length} ORDER FOUND
                     </span>
+                  </div> */}
+                  <div className="items_incart d-flex justify-content-between align-items-center">
+                    <span className="text-uppercase">
+                      {serviceOrders.length} ORDER FOUND
+                    </span>
+                    <button
+                      type="button"
+                      className="btn custom_btn btn_yellow"
+                      onClick={() => window.history.back()}
+                    >
+                      Back
+                    </button>
                   </div>
                 </div>
                 <div className="cart_list cart_wrap pb-5">
@@ -464,6 +478,11 @@ function ServiceOrder() {
         dialogClassName="modal-90w"
         aria-labelledby="example-custom-modal-styling-title"
       >
+        <Modal.Header closeButton>
+          <Modal.Title id="example-custom-modal-styling-title">
+            Service Tracking
+          </Modal.Title>
+        </Modal.Header>
         <Modal.Body
           style={{ maxHeight: "calc(100vh - 100px)", overflowY: "auto" }}
         >

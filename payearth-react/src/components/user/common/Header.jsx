@@ -4,7 +4,7 @@ import config from "./../../../config.json";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
-import { Helmet } from 'react-helmet';
+// import { Helmet } from 'react-helmet';
 import { setLoginStatus, setUserInfo } from "../../../store/reducers/auth-reducer";
 import { setProducts, setReqBody, setTotalProducts, setCategories, setMaxPrice, } from "../../../store/reducers/product-reducer";
 import { setServices, setServiceReqBody, setTotalServices, setServiceCategories, setServiceMaxPrice, } from "../../../store/reducers/service-reducer";
@@ -495,6 +495,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
   const fetchNotification = async (userId) => {
     try {
       axios.get(`front/notifications/${userId}`).then(response => {
+        console.log('response-- of notification',response)
         const responseData = response.data.data
         if (Array.isArray(responseData) && responseData.length > 0) {
           const offlineNotifications = response.data.data.filter(notification => !notification.notification.isRead);
@@ -630,7 +631,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
 
   return (
     <React.Fragment>
-      <Helmet><title>{"Home - Pay Earth"}</title></Helmet>
+      {/* <Helmet><title>{"Home - Pay Earth"}</title></Helmet> */}
       {loginModal && (
         <LoginModal
           onloginHide={closemodalHandler}
@@ -728,14 +729,14 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                     Blog
                   </Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link to="/my-payments" onClick={() => removeBackdrop()}>
                     <i className="icon">
                       <img src={creditCardIcon} alt="credit-card" />
                     </i>{" "}
                     Payments
                   </Link>
-                </li>
+                </li> */}
                 <li>
                   <Link to="/notifications">
                     <i className="icon">

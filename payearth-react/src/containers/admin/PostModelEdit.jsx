@@ -182,9 +182,21 @@ class AdminPostEdit extends Component {
                 <div className="container">
                     <form onSubmit={this.handlePublishUpdate} >
                         <div className="row">
+                            <div className="col-lg-12  d-flex justify-content-end">
+                                <Link
+                                    to="#"
+                                    className="custom_btn btn_yellow w-auto btn mt-2 rounded-lg"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        window.history.back();
+                                    }}
+                                >
+                                    Back
+                                </Link>
+                            </div>
                             <div className="col-lg-9">
 
-                                <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
+                                <div className="createpost bg-white rounded-3 mt-2 addPost_left_container">
                                     <div className="cp_top addPost_button_singleRow">
                                         <div className="cumm_title">Edit Post</div>
                                         <div className="search_customer_field">
@@ -302,7 +314,7 @@ class AdminPostEdit extends Component {
                                 </div>
                             </div>
                             <div className="col-lg-3">
-                                <div className="cumm_sidebar_box bg-white p-3 rounded-3 mt-4">
+                                <div className="cumm_sidebar_box bg-white p-3 rounded-3 mt-2">
                                     <div className="cumm_title">Featured Image</div>
                                     <div className="filter_box">
                                         <div align="center">

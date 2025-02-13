@@ -83,7 +83,23 @@ const schema = new Schema({
     blockByUser: [{
         type: String,
         required: false,
-    }]
+    }],
+    clickCount: [
+        {
+            userId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User',  // Reference to the User collection
+            },
+            count: {
+                type: Number,
+                default: 0,
+            },
+            unknown_User: {
+                type: String,
+                required: false,
+            }
+        },
+    ]
 }, { timestamps: true });
 
 schema.set("toJSON", { virtuals: true, versionKey: false });

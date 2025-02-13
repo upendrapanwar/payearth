@@ -15,7 +15,6 @@ import { Helmet } from 'react-helmet';
 
 const ManageVendors = () => {
     const authInfo = JSON.parse(localStorage.getItem('authInfo'));
-
     const [loading, setLoading] = useState(false);
     const [vendors, setVendors] = useState([]);
     const [tableData, setTableData] = useState({ columns: [], data: [] });
@@ -79,7 +78,7 @@ const ManageVendors = () => {
         try {
             const status = !isActive;
 
-            const res = await axios.patch(`admin/update-vendors-status/${id}`, { isActive: status }, {
+            const res = await axios.put(`admin/update-vendors-status/${id}`, { isActive: status }, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
@@ -142,7 +141,7 @@ const ManageVendors = () => {
             name: 'Actions',
             cell: row => (
                 <div>
-                    <button className="btn custom_btn btn_yellow mx-auto ms-2">Edit</button>
+                    <Link className="btn custom_btn btn_yellow mx-auto ms-2" to={`/admin/vandor_register?vendorId=${row.id}`}>Edit</Link>
                     {/* <button className="btn custom_btn btn_yellow mx-auto ms-2">Delete</button> */}
                 </div>
             ),
@@ -168,8 +167,8 @@ const ManageVendors = () => {
                                     <div className="dash_title">Manage Vendors</div>
                                     <span className="d-flex justify-content-between align-items-center">
                                         <Link
-                                            className={`btn custom_btn ${permissions.add ? 'btn_yellow' : 'btn_disabled'}`}
-                                            to={permissions.add ? '/admin/add-coupon' : '#'}
+                                            className= 'btn custom_btn btn_yellow'
+                                            to= '/admin/vandor_register'
                                         >
                                             Add Vendors
                                         </Link>

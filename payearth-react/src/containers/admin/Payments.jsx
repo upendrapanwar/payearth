@@ -387,7 +387,7 @@ class AdminPayments extends Component {
                 
                 if (typeof value != 'undefined' && (value != 'N/A')) {
                     //console.log('inside');
-                    for (var k = 0; (k < value.productId.length && k <10); k++) {    
+                    for (var k = 0; (k < value.productId?.length && k <10); k++) {    
                         const productID = value.productId[k].productId;
                         const quantity = value.productId[k].quantity;
                         const paymentId = value.paymentId;

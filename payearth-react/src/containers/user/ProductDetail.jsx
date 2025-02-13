@@ -15,6 +15,7 @@ import whatsappIcon from "./../../assets/icons/whatsapp.svg";
 import coins from "./../../assets/icons/coin.svg";
 import DetailTabbing from "../../components/user/common/DetailTabbing";
 import SimilarProducts from "../../components/user/common/SimilarProducts";
+import { Helmet } from 'react-helmet';
 import config from "./../../config.json";
 import parse from "html-react-parser";
 import { addToCart } from "../../store/reducers/cart-slice-reducer";
@@ -207,6 +208,7 @@ class ProductDetail extends Component {
     const { dispatch } = this.props;
     return (
       <React.Fragment>
+        <Helmet><title>{`Product-detail/${productDetail.productCode} - Pay Earth`}</title></Helmet>
         <BannerTopIframe keywords={this.state.category} />
         <Header />
         <PageTitle title={'Product Detail'} />

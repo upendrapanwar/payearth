@@ -51,6 +51,7 @@ router.get('/pageDetail/:slug', cmsPageDetails);
 router.get('/advertisement/:slug', advertismentBySlug);
 router.get('/advBanner-list/:keywords', getAllBannersData);
 router.get('/getAllAdvBanner-list', getAllAdvBannerData);
+router.post('/advertiseEventcount', advertiseEventcount);
 
 router.get("/searchFilterProducts", searchFilterProducts);
 router.get("/searchFilterServices", searchFilterServices);
@@ -62,7 +63,7 @@ router.get('/notifications/:id', getNotifications);
 router.put('/updateNotifications/:id', updateNotifications);
 router.put('/setNotificationSeen', setNotificationSeen);
 
-router.get('/product/today-dealsById/:id',getTodayDealsProductById)
+router.get('/product/today-dealsById/:id', getTodayDealsProductById)
 router.get('/discount-status/:id', getdiscountStatusById)
 
 
@@ -257,6 +258,13 @@ function getAllBannersData(req, res, next) {
 function getAllAdvBannerData(req, res, next) {
     frontService.getAllAdvBannerData(req)
         .then(banner => banner ? res.status(200).json({ status: true, data: banner }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch(err => next(res.json({ status: false, message: err })));
+}
+
+// 
+function advertiseEventcount(req, res, next) {
+    frontService.advertiseEventcount(req)
+        .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
 }
 

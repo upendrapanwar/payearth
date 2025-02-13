@@ -123,6 +123,8 @@ import AddCoupon from "./containers/admin/AddCoupon";
 import CouponsListing from "./containers/admin/CouponsListing";
 import EditProduct from "./containers/seller/EditProduct";
 import ManageVendors from "./containers/admin/ManageVendors";
+import VandorRegister from "./containers/admin/VandorRegister";
+import UserRegister from "./containers/admin/UserRegister";
 import SellerNotifications from "./containers/seller/Notifications";
 import Community from "./containers/community/Community";
 import CommunityProfile from "./containers/community/CommunityProfile";
@@ -973,6 +975,22 @@ function App() {
           <PrivateRoute
             path="/admin/manage-vendors"
             component={ManageVendors}
+            roles={[Role.super_admin, Role.admin, Role.manager]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/admin/vandor_register"
+            component={VandorRegister}
+            roles={[Role.super_admin, Role.admin, Role.manager]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/admin/user_register"
+            component={UserRegister}
             roles={[Role.super_admin, Role.admin, Role.manager]}
             currentUserRole={userInfo.role}
             exact

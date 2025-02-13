@@ -965,6 +965,7 @@ async function getNewCoupons(req) {
     var param = req.body;
     var whereCondition = { end: { $gte: now } }; //default
     const result = await Coupon.paginate(whereCondition).then((data) => {
+      console.log('getNewCoupons',data)
       let res = {
         coupons: data.docs,
       };
@@ -2318,6 +2319,8 @@ async function updateOrderStatus(req) {
     const newOrderStatus = new OrderStatus(input);
     const savedOrderStatus = await newOrderStatus.save();
 
+    const populatedsavedOrderStatus = await savedOrderStatus.populate('userId');
+
     if (data.status === 'Order placed') {
       await User.findByIdAndUpdate(
         data.userId,
@@ -2328,7 +2331,7 @@ async function updateOrderStatus(req) {
       );
     }
 
-    return savedOrderStatus;
+    return populatedsavedOrderStatus;
   } catch (error) {
     console.error(error);
   }

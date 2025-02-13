@@ -189,15 +189,16 @@ class Payments extends Component {
                                                 </thead>
                                                 <tbody>
                                                     {data.length && data.map((value, index) => {
+                                                        console.log('value----',value)
                                                         return (
                                                             <tr key={index}>
                                                                 <td>
-                                                                    <div className="odr_item_img"><img src={config.apiURI + value.orderId.productId.featuredImage} className="img-fluid" alt={value.orderId.productId.name} /></div>
-                                                                    <span>{value.orderId.productId._id}</span>
+                                                                    <div className="odr_item_img"><img src={config.apiURI + value.orderId?.productId.featuredImage} className="img-fluid" alt={value.orderId?.productId.name} /></div>
+                                                                    <span>{value.orderId?.productId._id}</span>
                                                                 </td>
                                                                 <td>${value.amountPaid}</td>
                                                                 <td>{value.createdAt}</td>
-                                                                <td>{value.orderId.orderCode}</td>
+                                                                <td>{value.orderId?.orderCode}</td>
                                                                 <td>${value.paymentAccount} Account</td>
                                                             </tr>
                                                         )
