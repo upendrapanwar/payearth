@@ -170,7 +170,7 @@ const ServicesListing = () => {
                             // onBrandChange={handleBrandChange}
                             />
                         </div>
-                        <div className="col-md-9">
+                        <div className="col-md-9 my-3" style={{ overflowY: 'auto', maxHeight: '120vh', border: '1px solid #ddd', scrollbarWidth: 'thin', }}>
                             <div className="row">
                                 <div className="col-sm-12">
                                     {services.length === 0 ? <NotFound msg="Product not found." /> : ''}

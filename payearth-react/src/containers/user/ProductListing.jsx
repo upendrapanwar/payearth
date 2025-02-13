@@ -191,7 +191,7 @@ const ProductListing = () => {
                                 onBrandChange={handleBrandChange}
                             />
                         </div>
-                        <div className="col-md-9">
+                        <div className="col-md-9 mt-3" style={{ overflowY: 'auto', maxHeight: '120vh', border: '1px solid #ddd', scrollbarWidth: 'thin', }}>
                             {/* <div className="row">
                                 <div className="col">
                                     <ListingHead title="Products" count={products.length} />
