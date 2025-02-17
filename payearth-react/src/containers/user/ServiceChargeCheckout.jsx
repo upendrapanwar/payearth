@@ -92,56 +92,61 @@ class ServiceCheckOut extends Component {
         this.setState({ showModal: true });
     };
 
+
     handleSubmit = async (event, elements, stripe) => {
         this.setState({ isLoading: true });
         event.preventDefault();
 
         if (!stripe || !elements) {
+            this.setState({ isLoading: false });
             return;
         }
+
         const cardElement = elements.getElement(CardElement);
         const { token, error } = await stripe.createToken(cardElement);
+
         if (error) {
             toast.error(error.message);
             this.setState({ isLoading: false });
-        } else {
-            const response = await fetch('/user/serviceCharge', {
-                method: 'POST',
+            return;
+        }
+
+        try {
+            const response = await axios.post('/user/serviceCharge', {
+                paymentMethodId: token.id,
+                email: this.userInfo.email,
+                amount: this.state.serviceDetails.result.charges * 100,
+                authName: this.userInfo.name
+            }, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
                     'Authorization': `Bearer ${this.authInfo.token}`
-                },
-                body: JSON.stringify({
-                    paymentMethodId: token.id,
-                    email: this.userInfo.email,
-                    amount: this.state.serviceDetails.result.charges * 100,
-                    authName: this.userInfo.name
-                }),
+                }
             });
-            const paymentIntent = await response.json();
+
+            const paymentIntent = response.data;
+
             if (paymentIntent.status === true) {
-                // this.setState({ stripeResponse: paymentIntent });
                 const paymentData = [{
-                    'userId': this.authInfo.id,
-                    'sellerId': null,
-                    'amountPaid': paymentIntent.data.paymentIntent.amount_received / 100,
-                    // 'paymentMode': "",
-                    'paymentAccount': 'Stripe',
-                    'invoiceUrl': paymentIntent.data.invoice.invoice_pdf,
-                    'paymentStatus': paymentIntent.data.invoice.status,
+                    userId: this.authInfo.id,
+                    sellerId: null,
+                    amountPaid: paymentIntent.data.paymentIntent.amount_received / 100,
+                    paymentAccount: 'Stripe',
+                    invoiceUrl: paymentIntent.data.invoice.invoice_pdf,
+                    paymentStatus: paymentIntent.data.invoice.status,
                 }];
 
-                var paymentIds = this.managePaymentData(paymentData);
-                let paymentId;
-                paymentIds.then((result) => {
-                    paymentId = result;
-                    this.setState({ "paymentId": paymentId })
-                    // this.onSubmitHandler();
-                    this.manageOrderStatus()
-                })
-                this.setState({ stripeResponse: paymentIntent });
+                const paymentIds = await this.managePaymentData(paymentData);
+                this.setState({ paymentId: paymentIds, stripeResponse: paymentIntent });
+
+                await this.manageOrderStatus();
             }
+        } catch (err) {
+            console.error('Error:', err.response ? err.response.data : err.message);
+            toast.error('Failed to process the payment.');
+        } finally {
+            this.setState({ isLoading: false });
         }
     };
 
@@ -697,7 +702,6 @@ class ServiceCheckOut extends Component {
                                                 <li>Service Name : <b>{serviceDetails.result.name}</b></li>
                                                 <li>Service Category : <b>{serviceDetails.result.category.categoryName}</b></li>
                                                 <li>Charges : <b>{serviceDetails.result.charges} $</b></li>
-                                                {/* <li>Tax(18%) : {this.getTotal().tax}$ </li> */}
                                             </ul>
                                         </div>
                                         <div className="subtotal_wrapper">

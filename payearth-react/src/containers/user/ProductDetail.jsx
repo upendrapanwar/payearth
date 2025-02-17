@@ -16,6 +16,7 @@ import coins from "./../../assets/icons/coin.svg";
 import DetailTabbing from "../../components/user/common/DetailTabbing";
 import SimilarProducts from "../../components/user/common/SimilarProducts";
 import { Helmet } from 'react-helmet';
+import arrow_back from '../../assets/icons/arrow-back.svg';
 import config from "./../../config.json";
 import parse from "html-react-parser";
 import { addToCart } from "../../store/reducers/cart-slice-reducer";
@@ -215,6 +216,12 @@ class ProductDetail extends Component {
         <section className="inr_wrap">
           <div className="container">
             <div className="bg-white rounded-3 pt-3 pb-5">
+              <div className="d-flex justify-content-end">
+                <Link className="btn custom_btn btn_yellow  mt-3 mx-3" to="/product-listing">
+                  <img src={arrow_back} alt="Back" />
+                  &nbsp;Back
+                </Link>
+              </div>
               <div className="dash_inner_wrap row">
                 <div className="col-md-12">
                   <div className="row">
@@ -402,7 +409,7 @@ class ProductDetail extends Component {
                               ""
                             )}
                           </div>
-                          <div className="pdi_fea">
+                          {/* <div className="pdi_fea">
                             <div className="pdi_fea_box ">
                               <div className="heading">Delivery</div>
                               <div className="pin_select">
@@ -428,7 +435,7 @@ class ProductDetail extends Component {
                                 </small>
                               </div>
                             </div>
-                          </div>
+                          </div> */}
                           {productDetail.quantity &&
                             productDetail.quantity.stock_qty > 0 ? (
                             <div className="prod_foot">

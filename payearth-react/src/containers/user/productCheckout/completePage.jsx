@@ -184,6 +184,8 @@ export default function CompletePage() {
 
     const manageOrderStatus = async (data, paymentId, userData) => {
         try {
+            console.log("userData", userData);
+            console.log("paymentId", paymentId);
             const productData = JSON.parse(data.invoiceItem.metadata.cart);
             console.log("productData", productData)
             const orderResId = [];
@@ -212,6 +214,7 @@ export default function CompletePage() {
                     subscriptionPlan: null
                 };
 
+                console.log("payload", payload)
                 const response = await axios.post("user/updateorderstatus", payload, {
                     headers: {
                         Accept: "application/json",
