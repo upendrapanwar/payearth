@@ -64,7 +64,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
     const currentUserId = authInfo.id;
-    const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId.id : posts.sellerId.id;
+    const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId?.id : posts.sellerId?.id;
     const adminIdToSend = process.env.REACT_APP_SUPPER_ADMIN_ID;
     const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
 
@@ -706,7 +706,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                         </div>
                         <div className="poster_info">
                             <div className="poster_name">
-                                {posts.isAdmin ? posts.adminId.name : posts.isSeller ? posts.sellerId.name : posts.userId.name}
+                                {posts.isAdmin ? posts.adminId.name : posts.isSeller ? posts.sellerId?.name : posts.userId?.name}
                             </div>
                             <ReactTimeAgo date={date} locale="en-US" timeStyle="round-minute" />
                             {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseFollow${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseFollow${posts.id}`}>
@@ -715,14 +715,14 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                             {
                                 userInfo.role === 'seller' && posts.isAdmin === false &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
-                                    {posts.isSeller === true && posts.sellerId.id === authInfo.id
+                                    {posts.isSeller === true && posts.sellerId?.id === authInfo.id
                                         ? "" : isFollowing ? 'Unfollow' : 'Follow'}
                                 </Link>
                             }
                             {
                                 userInfo.role === 'user' && posts.isAdmin === false &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
-                                    {posts.isSeller === false && posts.userId.id === authInfo.id ? "" : isFollowing ? 'Unfollow' : 'Follow'}
+                                    {posts.isSeller === false && posts.userId?.id === authInfo.id ? "" : isFollowing ? 'Unfollow' : 'Follow'}
                                 </Link>
                             }
                             {

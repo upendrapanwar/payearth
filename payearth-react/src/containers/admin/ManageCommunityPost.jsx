@@ -59,7 +59,7 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
     const [reportOption, setReportOption] = useState(null);
 
     const currentUserId = authInfo.id;
-    const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId.id : posts.sellerId.id;
+    const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId?.id : posts.sellerId?.id;
     const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
     const date = new Date(posts.createdAt);
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
