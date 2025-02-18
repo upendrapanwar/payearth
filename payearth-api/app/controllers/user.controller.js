@@ -262,6 +262,7 @@ router.get("/get-calendar-event/:id", getGoogleEvent);
 
 // router.delete("/delete-meeting/:id", delMeetingByUser);
 router.put("/del-calendar-event/:id", deleteGoogleEvent);
+router.get("/find-seller-available", findSellerAvailable);
 
 router.put("/updateServiceOrders", updateServiceOrders);
 
@@ -1411,6 +1412,16 @@ function deleteGoogleEvent(req, res, next) {
     .catch((err) => next(res.json({ status: false, message: err })));
 }
 
+ function findSellerAvailable(req, res, next) {
+  userService
+    .findSellerAvailable(req)
+    .then((SellerAvailable) =>
+      SellerAvailable
+    ? res.status(200).json({ status: true, data: SellerAvailable })
+    : res.status(400).json({ status: false, message: "ERROR ", data: [] })
+    )
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
 
 function updateServiceOrders(req, res, next) {
   userService.updateServiceOrders(req)

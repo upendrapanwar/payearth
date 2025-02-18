@@ -4,7 +4,7 @@ import { gapi } from "gapi-script";
 import ServiceCalendar from "./ServiceCalendar";
 
 function ServiceCalendarAuth(props) {
-  const { serviceCreator } = props;
+  const { serviceCreator, serviceName} = props;
   const [refreshTimer, setRefreshTimer] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -43,7 +43,7 @@ function ServiceCalendarAuth(props) {
             scope={process.env.REACT_APP_SCOPES}
           />
         )}
-        {isAuthenticated && <ServiceCalendar serviceCreator={serviceCreator} />}
+        {isAuthenticated && <ServiceCalendar serviceCreator={serviceCreator} serviceName={serviceName}/>}
       </div>
     </React.Fragment>
   );

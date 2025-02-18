@@ -12,6 +12,7 @@ const schema = new Schema(
     end_datetime: { type: Date, required: false, default: null },
     meeting_url: { type: String, required: false, default: null },
     status: { type: Boolean, required: false, default: false },
+    sellerId: { type: Schema.Types.ObjectId, ref: "Seller", required: false, default: null, },
   },
   {
     timestamps: true,
