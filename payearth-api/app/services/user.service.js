@@ -136,6 +136,7 @@ module.exports = {
   addGoogleEvent,
   getGoogleEvent,
   deleteGoogleEvent,
+  findSellerAvailable,
   updateServiceOrders,
   fetchDisableTimes,
   getServiceOrder,
@@ -965,7 +966,7 @@ async function getNewCoupons(req) {
     var param = req.body;
     var whereCondition = { end: { $gte: now } }; //default
     const result = await Coupon.paginate(whereCondition).then((data) => {
-      console.log('getNewCoupons',data)
+    console.log('getNewCoupons', data)
       let res = {
         coupons: data.docs,
       };
@@ -3454,7 +3455,8 @@ async function addGoogleEvent(req) {
           start_datetime: event.start_datetime,
           end_datetime: event.end_datetime,
           meeting_url: event.meeting_url,
-          status: event.status
+          status: event.status,
+          sellerId: event.sellerId
         };
 
         data = await Calendar.create(eventData);
@@ -3532,6 +3534,52 @@ async function deleteGoogleEvent(req) {
   }
 }
 
+async function findSellerAvailable(req) {
+  const { selectedDate, sellerId } = req.query;
+  
+  // console.log("Received selectedDate:", selectedDate);
+  // console.log("Received sellerId:", sellerId);
+
+  if (!selectedDate || isNaN(Date.parse(selectedDate))) {
+    console.error("Invalid selectedDate provided:", selectedDate);
+    return false;
+  }
+
+  try {
+    const startOfDay = new Date(selectedDate);
+    startOfDay.setUTCHours(0, 0, 0, 0);
+
+    const endOfDay = new Date(selectedDate);
+    endOfDay.setUTCHours(23, 59, 59, 999);
+
+   // console.log("Searching for slots between:", startOfDay, "and", endOfDay);
+
+    let result = await Calendar.find(
+      {
+        sellerId,
+        status: true,
+        start_datetime: { $gte: startOfDay, $lte: endOfDay },
+      },
+      {
+        _id: 0,
+        start_datetime: 1,
+        end_datetime: 1
+      }
+    ).sort({ start_datetime: 1 }).exec();
+
+   // console.log("Available time slots:", result);
+
+    if (!result || result.length === 0) {
+      return [];
+    }
+
+    return result
+
+  } catch (err) {
+    console.error("Error fetching available slots:", err);
+    return false;
+  }
+}
 
 async function updateServiceOrders(req) {
   try {

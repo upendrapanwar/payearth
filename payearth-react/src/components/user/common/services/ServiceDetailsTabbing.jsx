@@ -27,7 +27,7 @@ function ServiceDetailsTabbing(props) {
   const [eventList, setEventList] = useState([]);
   // const [isCalendarAuthorized, setIsCalendarAuthorized] = useState(accessToken ? true : false);
   const [isCalendarAuthorized, setIsCalendarAuthorized] = useState(false);
-  const { scrollToReviews, scheduledMeeting, serviceCreator, chargesPayStatus } = props;
+  const { scrollToReviews, scheduledMeeting, serviceCreator, chargesPayStatus, serviceName, sellerId } = props;
 
   const [activeTab, setActiveTab] = useState("description");
 
@@ -473,7 +473,7 @@ function ServiceDetailsTabbing(props) {
                       aria-labelledby="appointment-tab"
                     >
                       <p className="mb-0">
-                        <ServiceCalendar authToken={authInfo.token} serviceCreator={serviceCreator} chargesPayStatus={chargesPayStatus} />
+                        <ServiceCalendar authToken={authInfo.token} serviceCreator={serviceCreator} chargesPayStatus={chargesPayStatus}  serviceName={serviceName} sellerId={sellerId} />
                       </p>
                     </div>
                   )}

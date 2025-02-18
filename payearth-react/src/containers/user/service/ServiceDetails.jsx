@@ -23,6 +23,7 @@ const ServiceDetails = () => {
   const { id } = useParams();
   const [commonServiceData, setCommonServiceData] = useState([]);
   const [serviceCreator, setServiceCreator] = useState([]);
+  const [sellerId, setSellerId] = useState([]);
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [reviews, setReviews] = useState([]);
@@ -62,6 +63,7 @@ const ServiceDetails = () => {
         setCategory(dataArray[0].result.category.categoryName);
         setReviews(dataArray[0].result.reviews);
         setServiceCreator(dataArray[0].result.createdBy.email);
+        setSellerId(dataArray[0].result.createdBy.id);
         setChargesPayStatus(dataArray[0].chargePay)
         setLoading(false);
       } else {
@@ -136,7 +138,7 @@ const ServiceDetails = () => {
   };
 
 
-  console.log("commonServiceData", commonServiceData)
+  console.log("sellerId", sellerId)
 
   return (
     <React.Fragment>
@@ -247,10 +249,12 @@ const ServiceDetails = () => {
       <div name="myRef" ref={myRef}>
         <ServiceDetailsTabbing
           serviceId={id}
+          serviceName={commonServiceData[0]?.result.name}
           description={description}
           scrollToReviews={scrollToReviews}
           scheduledMeeting={scheduledMeeting}
           serviceCreator={serviceCreator}
+          sellerId={sellerId}
           chargesPayStatus={chargesPayStatus}
         />
       </div>

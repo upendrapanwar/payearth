@@ -16,7 +16,8 @@ import { useHistory } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
 function ServiceCalendar(props) {
-  const { serviceCreator } = props;
+  const { serviceCreator, sellerId } = props;
+  const serviceName = props.serviceName
   const location = useLocation();
   const history = useHistory();
   const currentUser = isLogin();
@@ -33,6 +34,23 @@ function ServiceCalendar(props) {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [chargesPayModel, setChargesPayModel] = useState(false);
+  const [selectedTime, setSelectedTime] = useState(null);
+  const [sellerAvailableData, setSellerAvailableData] = useState(null);
+  const [formValues, setFormValues] = useState({
+    event_title: serviceName || "",
+    meetingDate: selectedDate || "",
+    meetingTime: selectedTime ? moment(selectedTime, ["h:mm A", "HH:mm"]).format("HH:mm") : "",
+    description: "",
+  });
+
+  const timeSlots = [
+    "11:00 AM",
+    "12:00 PM",
+    "3:00 PM",
+    "4:00 PM",
+    "5:00 PM",
+    "6:00 PM",
+  ];
 
   useEffect(() => {
     fetchEvents();
@@ -40,10 +58,12 @@ function ServiceCalendar(props) {
 
   useEffect(() => {
     const date = localStorage.getItem("selectedDate")
+    const time = localStorage.getItem('selectedTime')
     const queryParams = new URLSearchParams(location.search);
     const paymentStatus = queryParams.get('paymentResponse');
     if (paymentStatus === 'true') {
       setSelectedDate(date)
+      setSelectedTime(time)
       setFormOpen(true);
     } else {
       setFormOpen(false);
@@ -56,6 +76,15 @@ function ServiceCalendar(props) {
     }
   }, [])
 
+  useEffect(() => {
+    setFormValues({
+      event_title: serviceName || "",
+      meetingDate: selectedDate || "",
+      meetingTime: selectedTime ? moment(selectedTime, ["h:mm A", "HH:mm"]).format("HH:mm") : "",
+      description: "",
+    });
+  }, [serviceName, selectedDate, selectedTime]);
+
   const fetchDisableTimes = () => {
     // Selected service currently disable time get.
 
@@ -64,13 +93,54 @@ function ServiceCalendar(props) {
   }
 
   const handleDateClick = (arg) => {
+    const selectedDate = moment(arg.date).format("YYYY-MM-DD")
+    localStorage.setItem("selectedDate", selectedDate);
+    findSellerAvailable(selectedDate);
     setChargesPayModel(true)
-    const selectDate = moment(arg.date).format("YYYY-MM-DD")
-    localStorage.setItem("selectedDate", selectDate);
   };
 
   const handleFormSubmit = async (values) => {
-    const start_datetime = moment(`${values.meetingDate}T${values.meetingTime}`).toISOString();
+    // console.log('values in handlesubmit',values)
+    // const start_datetime = moment(`${values.meetingDate}T${values.meetingTime}`).toISOString();
+    // // const formattedTime = moment(selectedTime, ["h:mm A"]).format("HH:mm"); 
+    // // const start_datetime = moment(`${selectedDate}T${formattedTime}:00`).utc().toISOString();
+    // if (moment(start_datetime).isBefore(moment(), "minute")) {
+    //   toast.error("Please select the current time or a future time.");
+    //   return;
+    // }
+    // console.log('start_datetime',start_datetime)
+
+    // const end_datetime = moment(start_datetime).add(1, "hour").toISOString();
+    // const eventData = {
+    //   summary: values.event_title,
+    //   description: values.description,
+    //   location: "Online Meeting",
+    //   start: {
+    //     dateTime: start_datetime,
+    //     timeZone: "Asia/Kolkata"
+    //   },
+    //   end: {
+    //     dateTime: end_datetime,
+    //     timeZone: "Asia/Kolkata"
+    //   },
+    //   conferenceData: {
+    //     createRequest: {
+    //       requestId: `meeting-${Date.now()}`,
+    //       conferenceSolutionKey: { type: "hangoutsMeet" }
+    //     }
+    //   },
+    //   attendees: [
+    //     { email: serviceCreator },
+    //   ],
+    //   reminders: {
+    //     useDefault: true,
+    //   },
+    // };
+
+    const formattedTime = moment(values.meetingTime, ["HH:mm", "h:mm A"]).format("HH:mm");
+
+    const start_datetime = moment(`${values.meetingDate} ${formattedTime}`, "YYYY-MM-DD HH:mm").toISOString();
+
     if (moment(start_datetime).isBefore(moment(), "minute")) {
       toast.error("Please select the current time or a future time.");
       return;
@@ -80,32 +150,29 @@ function ServiceCalendar(props) {
     const eventData = {
       summary: values.event_title,
       description: values.description,
+      // sellerId: sellerId,
       location: "Online Meeting",
       start: {
         dateTime: start_datetime,
-        timeZone: "Asia/Kolkata"
+        timeZone: "Asia/Kolkata",
       },
       end: {
         dateTime: end_datetime,
-        timeZone: "Asia/Kolkata"
+        timeZone: "Asia/Kolkata",
       },
       conferenceData: {
         createRequest: {
           requestId: `meeting-${Date.now()}`,
-          conferenceSolutionKey: { type: "hangoutsMeet" }
-        }
+          conferenceSolutionKey: { type: "hangoutsMeet" },
+        },
       },
-      attendees: [
-        { email: serviceCreator },
-      ],
-      reminders: {
-        useDefault: true,
-      },
+      attendees: [{ email: serviceCreator }],
+      reminders: { useDefault: true },
     };
-
+   // console.log("Final Event Data:", eventData);
     try {
       const accessToken = localStorage.getItem("accessToken");
-      console.log("accessToken", accessToken)
+      // console.log("accessToken", accessToken)
       const addEvent = await axios.post(
         `https://www.googleapis.com/calendar/v3/calendars/primary/events?conferenceDataVersion=1`,
         eventData,
@@ -117,7 +184,7 @@ function ServiceCalendar(props) {
         })
 
       if (addEvent.data.status === "confirmed") {
-        console.log("addEvent", addEvent)
+        // console.log("addEvent", addEvent)
         const meetLink = addEvent.data.conferenceData.entryPoints?.find(
           (entryPoint) => entryPoint.entryPointType === "video"
         )?.uri;
@@ -125,6 +192,8 @@ function ServiceCalendar(props) {
         history.push(`/service-detail/${service_id}`);
         sessionStorage.setItem("paymentResponse", false);
         localStorage.removeItem("selectedDate");
+        localStorage.removeItem("selectedTime");
+        setSelectedTime(null)
         // setEventStatus(false)
         await fetchGoogleEvents();
       }
@@ -183,6 +252,7 @@ function ServiceCalendar(props) {
           Authorization: `Bearer ${accessToken}`,
         },
       })
+   //   console.log('fetchGoogleEvents----response', response)
       if (response.status === 200) {
         const eventsData = response.data.items.map((item) => ({
           eventId: item.id,
@@ -190,12 +260,13 @@ function ServiceCalendar(props) {
           start: item.start.dateTime,
           end: item.end.dateTime,
           description: item.description,
+          // sellerId: iten.sellerId,
           meeting_url: item.hangoutLink,
         }));
-        // setEvent(eventsData)
+
         if (eventsData.length > 0) {
           const lastEvent = eventsData[eventsData.length - 1];
-          await saveCalendarEvents([lastEvent], service_id, user_id,);
+          await saveCalendarEvents([lastEvent], service_id, user_id, sellerId);
         } else {
           console.log("No events fetched.");
         }
@@ -206,11 +277,12 @@ function ServiceCalendar(props) {
   };
 
 
-  const saveCalendarEvents = async (eventsData, service_id, user_id) => {
+  const saveCalendarEvents = async (eventsData, service_id, user_id, sellerId) => {
     try {
       const requestData = eventsData.map((event) => ({
         user_id,
         service_id,
+        sellerId,
         event_id: event.eventId,
         event_title: event.title,
         start_datetime: event.start,
@@ -292,7 +364,9 @@ function ServiceCalendar(props) {
     setSelectedEvent({
       ...info.event.extendedProps,
       id: info.event.id,
-      event_id: info.event.extendedProps.event_id
+      event_id: info.event.extendedProps.event_id,
+      start: info.event.start ? info.event.start.toISOString() : null,
+      end: info.event.end ? info.event.end.toISOString() : null
     });
     setModalOpen(true);
   };
@@ -315,9 +389,52 @@ function ServiceCalendar(props) {
     if (!currentUser) {
       toast.error("Please Login", { autoClose: 3000 });
     } else {
+      localStorage.setItem("selectedTime", selectedTime);
       history.push("/service_Charge_Checkout");
     }
   };
+
+  const findSellerAvailable = async (selectedDate) => {
+    try {
+      const SellerAvailableData = await axios.get('/user/find-seller-available', {
+        params: {
+          sellerId: sellerId,
+          selectedDate: selectedDate
+        },
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json;charset=UTF-8",
+          "Authorization": `Bearer ${authInfo.token}`,
+        },
+      })
+      if (SellerAvailableData.data.status === true) {
+        setSellerAvailableData(SellerAvailableData.data.data);
+        // toast.success("SellerAvailableData get successfully");
+      } else {
+        // toast.error("failed getting SellerAvailableData");
+        console.error("Error getting SellerAvailableData:");
+      }
+    } catch (error) {
+      console.error("Error getting SellerAvailableData:", error);
+    }
+  }
+
+  const isBooked = (slot) => {
+    if (!sellerAvailableData || sellerAvailableData.length === 0) {
+      return false; 
+    }
+    const slotTime = moment(slot, "hh:mm A").format("HH:mm"); 
+  
+    return sellerAvailableData.some(({ start_datetime, end_datetime }) => {
+      const startTime = moment.utc(start_datetime).local().format("HH:mm"); 
+      const endTime = moment.utc(end_datetime).local().format("HH:mm"); 
+  
+      return slotTime >= startTime && slotTime < endTime; 
+    });
+  };
+
+  // console.log('sellerAvailableData---', sellerAvailableData)
+  // console.log('selectedEvent', selectedEvent)
 
   return (
     <React.Fragment>
@@ -327,71 +444,52 @@ function ServiceCalendar(props) {
             <div className="modal-content">
               <div className="modal-header" style={{ background: "rgb(255 252 118)" }}>
                 <h5 className="modal-title">Schedule Event</h5>
-                <button type="button" className="btn-close" onClick={() => setFormOpen(false)} aria-label="Close"></button>
+                <button type="button" className="btn-close" onClick={() => { setFormOpen(false); setSelectedTime(null) }} aria-label="Close"></button>
               </div>
 
               <div className="modal-body">
-                <Formik
-                  initialValues={{
-                    event_title: "",
-                    meetingDate: selectedDate,
-                    meetingTime: "",
-                    description: "",
-                  }}
-                  validationSchema={userCalendarAddEventSchema}
-                  onSubmit={handleFormSubmit}
-                >
-                  {({ errors, touched, setFieldValue }) => (
-                    <Form>
-                      <div className="mb-3">
-                        <label className="form-label">Title:</label>
-                        <Field
-                          type="text"
-                          className="form-control"
-                          name="event_title"
-                        />
-                        <ErrorMessage name="event_title" component="div" className="text-danger" />
-                      </div>
-                      <div className="mb-3">
-                        <label className="form-label">Meeting Date:</label>
-                        <Field
-                          type="date"
-                          className="form-control"
-                          name="meetingDate"
-                          value={selectedDate} // Ensure the selectedDate is shown
-                          onChange={(e) => setFieldValue("meetingDate", e.target.value)}
-                        />
-                        <ErrorMessage name="meetingDate" component="div" className="text-danger" />
-                      </div>
-                      <div className="mb-3">
-                        <label className="form-label">Start Time:</label>
-                        <Field
-                          type="time"
-                          className="form-control"
-                          name="meetingTime"
-                        />
-                        <ErrorMessage name="meetingTime" component="div" className="text-danger" />
-                      </div>
-                      <div className="mb-3">
-                        <label className="form-label">Description:</label>
-                        <Field
-                          as="textarea"
-                          className="form-control"
-                          name="description"
-                        />
-                        <ErrorMessage name="description" component="div" className="text-danger" />
-                      </div>
-                      <div className="mb-3">
-                        <button type="submit" className="btn custom_btn btn_yellow">
-                          Submit
-                        </button>
-                        <button type="button" className="btn btn-secondary" onClick={() => setFormOpen(false)}>
-                          Cancel
-                        </button>
-                      </div>
-                    </Form>
-                  )}
-                </Formik>
+                {serviceName ?
+                  <Formik
+                    initialValues={formValues}
+                    enableReinitialize 
+                    validationSchema={userCalendarAddEventSchema}
+                    onSubmit={(values) => {
+                     // console.log("Final Submitted Data:", values);
+                      handleFormSubmit(values);
+                    }}
+                  >
+                    {({ values }) => (
+                      <Form>
+                        <div className="mb-3">
+                          <label className="form-label">Title:</label>
+                          <Field type="text" className="form-control" name="event_title" readOnly />
+                          <ErrorMessage name="event_title" component="div" className="text-danger" />
+                        </div>
+
+                        <div className="mb-3">
+                          <label className="form-label">Meeting Date:</label>
+                          <Field type="date" className="form-control" name="meetingDate" readOnly />
+                        </div>
+
+                        <div className="mb-3">
+                          <label className="form-label">Start Time:</label>
+                          <Field type="time" className="form-control" name="meetingTime" readOnly />
+                        </div>
+
+                        <div className="mb-3">
+                          <label className="form-label">Description:</label>
+                          <Field as="textarea" className="form-control" name="description" />
+                          <ErrorMessage name="description" component="div" className="text-danger" />
+                        </div>
+
+                        <div className="d-flex justify-content-between">
+                          <button type="submit" className="btn custom_btn btn_yellow">Submit</button>
+                          <button type="button" className="btn btn-secondary" onClick={() => { setFormOpen(false); setSelectedTime(null) }}>Cancel</button>
+                        </div>
+                      </Form>
+                    )}
+                  </Formik>
+                  : ''}
               </div>
             </div>
           </div>
@@ -434,16 +532,43 @@ function ServiceCalendar(props) {
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body text-center">
-                <p className="mb-0 text-dark fw-bold">
-                  Are you sure you want to confirm this service?
+                <p className="mb-3 text-dark fw-bold">
+                  Select Your time
                 </p>
+                <div className="d-flex flex-wrap justify-content-center gap-4">
+                  {timeSlots.map((slot, index) => (
+                    <button
+                    key={index}
+                    className={`btn ${selectedTime === slot ? "btn-primary" : "btn-outline-primary"}`}
+                    onClick={() => setSelectedTime(selectedTime === slot ? null : slot)}
+                    disabled={isBooked(slot)} 
+                  >
+                    {slot}
+                  </button>
+                  ))}
+                </div>
               </div>
+
               <div className="modal-footer">
                 <div className="w-100 d-flex justify-content-center">
-                  <button type="button" className="btn btn-primary mx-2" onClick={handleCheckout}>
+                  <p className="mb-3 text-dark fw-bold">
+                    Are you sure you want to confirm this service?
+                  </p>
+                </div>
+                <div className="w-100 d-flex justify-content-center" >
+                  <button
+                    type="button"
+                    className="btn btn-primary mx-2"
+                    onClick={handleCheckout}
+                    disabled={!selectedTime}
+                  >
                     Confirm
                   </button>
-                  <button type="button" className="btn btn-secondary mx-2" onClick={() => setChargesPayModel(false)}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary mx-2"
+                    onClick={() => { setChargesPayModel(false); setSelectedTime(null) }}
+                  >
                     Close
                   </button>
                 </div>
