@@ -237,8 +237,17 @@ class MyProfile extends Component {
                             <div className="col-md-12">
                                 <div className="cart">
                                     <div className="cart_wrap">
-                                        <div className="items_incart">
-                                            <span>Personal Information</span>
+                                        <div className="items_incart d-flex justify-content-between align-items-center">
+                                            <span className="text-uppercase">
+                                            Personal Information
+                                            </span>
+                                            <button
+                                                type="button"
+                                                className="btn custom_btn btn_yellow"
+                                                onClick={() => window.history.back()}
+                                            >
+                                                Back
+                                            </button>
                                         </div>
                                     </div>
                                     <div className="profile_edit_wrap">
