@@ -356,7 +356,7 @@ class DetailTabbing extends Component {
                                                                         <p className="title mr-auto">
                                                                             {reviewData?.review.title}
                                                                         </p>
-                                                                        {reviewData?.userId.id === authInfo.id && (
+                                                                        {reviewData?.userId?.id === authInfo.id && (
                                                                             <button
                                                                                 style={{ marginTop: "-14px", float: "right" }}
                                                                                 className="btn btn-link text-danger"
@@ -374,7 +374,7 @@ class DetailTabbing extends Component {
                                                                         {this.renderStarRating(reviewData.rating)}
                                                                     </p>
                                                                     <p className="date mb-0">
-                                                                        {reviewData.userId.name} |{" "}
+                                                                        {reviewData.userId?.name} |{" "}
                                                                         {this.formatDate(reviewData.createdAt)}
                                                                     </p>
                                                                 </div>

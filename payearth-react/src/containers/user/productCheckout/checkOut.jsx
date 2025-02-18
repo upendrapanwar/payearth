@@ -563,39 +563,78 @@ class CheckOut extends Component {
     /******************************************************************************/
     /******************************************************************************/
 
-    handleSubmit = (values) => {
+    // handleSubmit = (values) => {
+
+
+    //     const updatedValues = {
+    //         ...values,
+    //         role: 'user'
+    //     };
+    //     const { dispatch } = this.props;
+    //     dispatch(setLoading({ loading: true }));
+    //     axios.put(`user/edit-profile/${this.authInfo.id}`, updatedValues, {
+    //         headers: {
+    //             'Accept': 'application/json',
+    //             'Content-Type': 'application/json;charset=UTF-8',
+    //             "Authorization": `Bearer ${this.authInfo.token}`
+    //         }
+    //     }).then((response) => {
+    //         if (response.data.status) {
+    //             toast.success(response.data.message, { autoClose: 3000 });
+    //             this.handleEdit();
+    //         }
+    //     }).catch(error => {
+    //         toast.dismiss();
+    //         if (error.response && error.response.data.status === false) {
+    //             toast.error(error.response.data.message, { autoClose: 3000 });
+    //         }
+    //     }).finally(() => {
+    //         setTimeout(() => {
+    //             dispatch(setLoading({ loading: false }));
+    //         }, 300);
+    //     });
+    // }
+
+    handleSubmit = (values, { setSubmitting }) => {
         const updatedValues = {
             ...values,
             role: 'user'
         };
+
         const { dispatch } = this.props;
         dispatch(setLoading({ loading: true }));
+
         axios.put(`user/edit-profile/${this.authInfo.id}`, updatedValues, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8',
                 "Authorization": `Bearer ${this.authInfo.token}`
             }
-        }).then((response) => {
-            if (response.data.status) {
-                toast.success(response.data.message, { autoClose: 3000 });
-                this.handleEdit();
-            }
-        }).catch(error => {
-            toast.dismiss();
-            if (error.response && error.response.data.status === false) {
-                toast.error(error.response.data.message, { autoClose: 3000 });
-            }
-        }).finally(() => {
-            setTimeout(() => {
-                dispatch(setLoading({ loading: false }));
-            }, 300);
-        });
-    }
+        })
+            .then((response) => {
+                if (response.data.status) {
+                    toast.success(response.data.message, { autoClose: 3000 });
+                    this.setState({ editProfile: false });
+                }
+            })
+            .catch(error => {
+                toast.dismiss();
+                if (error.response && error.response.data.status === false) {
+                    toast.error(error.response.data.message, { autoClose: 3000 });
+                }
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    dispatch(setLoading({ loading: false }));
+                    setSubmitting(false);
+                }, 300);
+            });
+    };
 
     handleEdit = () => {
         this.setState({ userDetails: this.state.userDetails })
         let editProfile = localStorage.getItem('editProfile');
+        console.log('editProfile testttt', editProfile)
         if (editProfile !== null && editProfile === 'false') {
             localStorage.setItem('editProfile', true);
             this.setState({ editProfile: true });
@@ -717,6 +756,7 @@ class CheckOut extends Component {
                                                 })
                                             })}
                                             onSubmit={(values, { setSubmitting }) => {
+
                                                 this.handleSubmit(values);
                                                 setTimeout(() => {
                                                     setSubmitting(false);
@@ -807,7 +847,7 @@ class CheckOut extends Component {
                                                                     onChange={handleChange}
                                                                     // onBlur={handleBlur}
                                                                     value={values.phone}
-                                                                    disabled={!editProfile}
+                                                                    disabled={true}
                                                                 />
                                                                 {touched.phone && errors.phone && (
                                                                     <small className="text-danger">{errors.phone}</small>
@@ -825,7 +865,7 @@ class CheckOut extends Component {
                                                                     onChange={handleChange}
                                                                     // onBlur={handleBlur}
                                                                     value={values.address.country}
-                                                                    disabled={!editProfile}
+                                                                    disabled={true}
                                                                 />
                                                                 {touched.address?.country && errors.address?.country && (
                                                                     <small className="text-danger">{errors.address.country}</small>
@@ -842,7 +882,7 @@ class CheckOut extends Component {
                                                                     onChange={handleChange}
                                                                     // onBlur={handleBlur}
                                                                     value={values.address.street}
-                                                                    disabled={!editProfile}
+                                                                    disabled={true}
                                                                 />
                                                                 {touched.address?.street && errors.address?.street && (
                                                                     <small className="text-danger">{errors.address.street}</small>
@@ -859,7 +899,7 @@ class CheckOut extends Component {
                                                                     onChange={handleChange}
                                                                     // onBlur={handleBlur}
                                                                     value={values.address.city}
-                                                                    disabled={!editProfile}
+                                                                    disabled={true}
                                                                 />
                                                                 {touched.address?.city && errors.address?.city && (
                                                                     <small className="text-danger">{errors.address.city}</small>
@@ -876,7 +916,7 @@ class CheckOut extends Component {
                                                                     onChange={handleChange}
                                                                     // onBlur={handleBlur}
                                                                     value={values.address.zip}
-                                                                    disabled={!editProfile}
+                                                                    disabled={true}
                                                                 />
                                                                 {touched.address?.zip && errors.address?.zip && (
                                                                     <small className="text-danger">{errors.address.zip}</small>
@@ -885,18 +925,26 @@ class CheckOut extends Component {
 
 
                                                             <div className="form-group text-center mb-4">
-                                                                {editProfile ? (
+                                                                <Link
+                                                                    className="btn custom_btn btn_yellow mx-auto" to="/my-profile"
+                                                                >
+                                                                    Update Profile
+                                                                </Link>
+
+
+                                                                {/* {editProfile ? (
                                                                     <div>
                                                                         <button type="submit" className="btn custom_btn btn_yellow_bordered">Save</button>
                                                                         <button type="button" className="btn custom_btn btn_yellow_bordered ms-2" onClick={this.handleEdit}>Cancel</button>
                                                                     </div>
                                                                 ) : (
                                                                     <button type="button" className="btn custom_btn btn_yellow_bordered" onClick={this.handleEdit}>Click to Update</button>
-                                                                )}
+                                                                )} */}
                                                             </div>
                                                         </div>
 
-                                                        {/* ******************************************PAYMENT FORM ********************************** */}
+
+
                                                         <div className="col-md-6">
                                                             <h5 className="text-md font-semibold mb-4 text-center">Review Your Order</h5>
                                                             <div className="checkout_cart_element mt-2">
@@ -904,12 +952,10 @@ class CheckOut extends Component {
                                                                     {reviewOrder.map((item, index) => (
                                                                         <div className="d-flex justify-content-between align-items-center border-bottom py-2">
                                                                             <div className="product-data text-start">
-                                                                                {/* <h6 className="mb-1">{`${index + 1}) ${item.name}`}</h6> */}
+
                                                                                 <h6 className="mb-1">{`${index + 1}) ${item.name.split(' ').slice(0, 4).join(' ')}${item.name.split(' ').length > 4 ? '...' : ''}`}</h6>
                                                                             </div>
-                                                                            {/* <div className="product-quantity text-start">
-                                                                                <h6 className="mb-1">{`x`}</h6>
-                                                                            </div> */}
+
                                                                             <div className="product-quantity text-end">
                                                                                 <h6 className="mb-1"><b>{`${item.quantity}`}</b> qty.</h6>
                                                                             </div>
@@ -935,6 +981,9 @@ class CheckOut extends Component {
                                                 </form>
                                             )}
                                         </Formik>
+
+
+
                                     </div>
                                 </div>
                             </div>

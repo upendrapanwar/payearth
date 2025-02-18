@@ -64,7 +64,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
     var options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
     const currentUserId = authInfo.id;
-    const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId.id : posts.sellerId.id;
+    const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId?.id : posts.sellerId?.id;
     const adminIdToSend = process.env.REACT_APP_SUPPER_ADMIN_ID;
     const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
 
@@ -110,14 +110,12 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                     message: `${userInfo.name} comment on your post: "${comments}"`,
                     postId: postId,
                     sender: { id: currentUserId, name: userInfo.name },
-                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name },
+                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId?.name : posts.userId ? posts.userId?.name : posts.sellerId?.name },
                     type: 'comment'
                 };
                 // Emit follow notification to the followed user
                 socket.emit('comment', {
-                    notification
-                    // follower: { id: currentUserId, name: userInfo.name },
-                    // followed: { id: userIdToFollow, name: posts.userId === null ? posts.sellerId.name : posts.userId.name },
+                    notification                  
                 });
 
                 const notificationReqBody = {
@@ -227,7 +225,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                     message: `${userInfo.name} likes your post`,
                     postId: postId,
                     sender: { id: currentUserId, name: userInfo.name },
-                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name },
+                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId?.name : posts.sellerId?.name },
                     type: 'like'
                 };
                 // Emit liked notification to the user
@@ -382,7 +380,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                 // Emit follow notification to the followed user
                 socket.emit('follow', {
                     follower: { id: currentUserId, name: userInfo.name },
-                    followed: { id: userIdToFollow, name: posts.userId === null ? posts.sellerId.name : posts.userId.name },
+                    followed: { id: userIdToFollow, name: posts.userId === null ? posts.sellerId?.name : posts.userId?.name },
                 });
 
                 const notificationReqBody = {
@@ -706,7 +704,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                         </div>
                         <div className="poster_info">
                             <div className="poster_name">
-                                {posts.isAdmin ? posts.adminId.name : posts.isSeller ? posts.sellerId.name : posts.userId.name}
+                                {posts.isAdmin ? posts.adminId.name : posts.isSeller ? posts.sellerId?.name : posts.userId?.name}
                             </div>
                             <ReactTimeAgo date={date} locale="en-US" timeStyle="round-minute" />
                             {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseFollow${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseFollow${posts.id}`}>
@@ -715,14 +713,14 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                             {
                                 userInfo.role === 'seller' && posts.isAdmin === false &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
-                                    {posts.isSeller === true && posts.sellerId.id === authInfo.id
+                                    {posts.isSeller === true && posts.sellerId?.id === authInfo.id
                                         ? "" : isFollowing ? 'Unfollow' : 'Follow'}
                                 </Link>
                             }
                             {
                                 userInfo.role === 'user' && posts.isAdmin === false &&
                                 <Link to="#" className="post_follow" onClick={() => handleModel()}>
-                                    {posts.isSeller === false && posts.userId.id === authInfo.id ? "" : isFollowing ? 'Unfollow' : 'Follow'}
+                                    {posts.isSeller === false && posts.userId?.id === authInfo.id ? "" : isFollowing ? 'Unfollow' : 'Follow'}
                                 </Link>
                             }
                             {
@@ -739,7 +737,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                         <div className="post_by">
                                             <div className="poster_img" ><img src={posts.isSeller ? posts.sellerId.image_url : posts.userId.image_url !== null ? posts.userId.image_url : userImg} alt="" /></div>
                                             <div className="poster_info">
-                                                <div className="poster_name">{posts.isSeller ? posts.sellerId.name : posts.userId.name}</div>
+                                                <div className="poster_name">{posts.isSeller ? posts.sellerId?.name : posts.userId?.name}</div>
                                                 <small>{posts.isSeller ? 'Seller' : 'User'}</small>
                                             </div>
                                         </div>

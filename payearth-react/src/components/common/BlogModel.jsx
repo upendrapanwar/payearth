@@ -84,10 +84,10 @@ class Blog extends Component {
     };
 
     render() {
-        const { blogs, currentPage, itemsPerPage, searchQuery, 
-            
+        const { blogs, currentPage, itemsPerPage, searchQuery,
+
             loading, error
-        
+
         } = this.state;
         if (loading) {
             return <SpinnerLoader />
@@ -119,9 +119,24 @@ class Blog extends Component {
                         <div className="col-md-12">
                             <div className="cart my_cart">
                                 <div className="cl_head">
-                                    <div className='blog-search-wrapper'>
-                                        <input type="text" className="form-control" placeholder="Search" value={searchQuery} onChange={this.handleSearch} />
+                                    <div className="cart wishlist">
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            <span className="text-uppercase">
+                                                {filteredItems.length} BLOG FOUND
+                                            </span>
+                                            <div className='blog-search-wrapper'>
+                                                <input type="text" className="form-control" placeholder="Search" value={searchQuery} onChange={this.handleSearch} />
+                                            </div>
+                                            <button
+                                                type="button"
+                                                className="btn custom_btn btn_yellow"
+                                                onClick={() => window.history.back()}
+                                            >
+                                                Back
+                                            </button>
+                                        </div>
                                     </div>
+
                                     <div className="blog_listing_wrapper">
                                         {blogData.map(item =>
                                             <div className=" col-md-4 blog_item" key={item.id}>

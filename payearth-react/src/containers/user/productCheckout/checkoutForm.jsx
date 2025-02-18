@@ -9,7 +9,8 @@ import { clearCart } from "../../../store/reducers/cart-slice-reducer";
 import { toast } from "react-toastify";
 import axios from "axios";
 
-export default function CheckoutForm() {
+export default function CheckoutForm(userDataAvailable) {
+  console.log('userDataAvailable-----',userDataAvailable)
   const stripe = useStripe();
   const elements = useElements();
   const dispatch = useDispatch();

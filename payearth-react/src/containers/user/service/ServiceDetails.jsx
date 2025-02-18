@@ -97,14 +97,6 @@ const ServiceDetails = () => {
     setScrollToReviews(false);
   };
 
-  // const handleCheckout = () => {
-  //   if (!currentUser) {
-  //     toast.error("Please Login", { autoClose: 3000 });
-  //   } else {
-  //     history.push("/service_Charge_Checkout");
-  //   }
-  // };
-
   const fetchApi = async () => {
     try {
       const response = await axios.get(`/user/get-service-review/${serviceId}`);
@@ -154,7 +146,7 @@ const ServiceDetails = () => {
               <div className="row g-0 bg-white rounded" key={index}>
                 <Helmet><title>{`Service-detail/${data.result.serviceCode} - Pay Earth`}</title></Helmet>
                 <div className="d-flex justify-content-end">
-                  <Link className="btn custom_btn btn_yellow  mt-3 mx-3" to="/">
+                  <Link className="btn custom_btn btn_yellow  mt-3 mx-3" to="/service-listing">
                     <img src={arrow_back} alt="Back" />
                     &nbsp;Back
                   </Link>
