@@ -63,7 +63,7 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
     const [isCommentOpen, setIsCommentOpen] = useState({});
 
     const currentUserId = authInfo.id;
-    const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId.id : posts.sellerId.id;
+    const userIdToSend = posts.adminId ? posts.adminId.id : posts.userId ? posts.userId?.id : posts.sellerId?.id;
     const adminIdToSend = process.env.REACT_APP_SUPPER_ADMIN_ID;
     const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
     const date = new Date(posts.createdAt);
@@ -118,14 +118,12 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                     message: `${userInfo.name} comment on your post: "${comments}"`,
                     postId: postId,
                     sender: { id: currentUserId, name: userInfo.name },
-                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name },
+                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId?.name : posts.sellerId?.name },
                     type: 'comment'
                 };
                 // Emit follow notification to the followed user
                 socket.emit('comment', {
-                    notification
-                    // follower: { id: currentUserId, name: userInfo.name },
-                    // followed: { id: userIdToFollow, name: posts.userId === null ? posts.sellerId.name : posts.userId.name },
+                    notification                   
                 });
 
                 const notificationReqBody = {
@@ -234,7 +232,7 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                     message: `${userInfo.name} likes your post`,
                     postId: postId,
                     sender: { id: currentUserId, name: userInfo.name },
-                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name },
+                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId?.name : posts.sellerId?.name },
                     type: 'like'
                 };
                 console.log('liked notification---', notification)
@@ -364,7 +362,7 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
 
     const handleFollow = (posts) => {
         const currentUserId = authInfo.id;
-        const userIdToFollow = posts.userId === null ? posts.sellerId.id : posts.userId.id;
+        const userIdToFollow = posts.userId === null ? posts.sellerId?.id : posts.userId?.id;
         const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
         const receiverRole = posts.adminId ? posts.adminId.role : posts.userId ? posts.userId.role : posts.sellerId ? posts.sellerId.role : null;
 
@@ -388,7 +386,7 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                 // Emit follow notification to the followed user
                 socket.emit('follow', {
                     follower: { id: currentUserId, name: userInfo.name },
-                    followed: { id: userIdToFollow, name: posts.userId === null ? posts.sellerId.name : posts.userId.name },
+                    followed: { id: userIdToFollow, name: posts.userId === null ? posts.sellerId?.name : posts.userId?.name },
                 });
 
                 const notificationReqBody = {
@@ -426,7 +424,7 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
 
     const handleUnfollow = (posts) => {
         const currentUserId = authInfo.id;
-        const userIdToUnfollow = posts.userId === null ? posts.sellerId.id : posts.userId.id;
+        const userIdToUnfollow = posts.userId === null ? posts.sellerId?.id : posts.userId?.id;
         const role = posts.userId === null ? posts.sellerId.role : posts.userId.role;
         var reqBody = {
             role: role,
@@ -754,7 +752,7 @@ const SellerPost = forwardRef(({ posts, sendEditData, onFollowStatusChange }, re
                                         <div className="post_by">
                                             <div className="poster_img" ><img src={posts.isSeller ? config.apiURI + posts.sellerId.image_url : posts.userId.image_url !== null ? config.apiURI + posts.userId.image_url : userImg} alt="" /></div>
                                             <div className="poster_info">
-                                                <div className="poster_name">{posts.isSeller ? posts.sellerId.name : posts.userId.name}</div>
+                                                <div className="poster_name">{posts.isSeller ? posts.sellerId?.name : posts.userId?.name}</div>
                                                 <small>{posts.isSeller ? 'Seller' : 'User'}</small>
                                             </div>
                                         </div>

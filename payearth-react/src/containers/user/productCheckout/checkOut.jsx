@@ -730,7 +730,7 @@ class CheckOut extends Component {
                             <div className="col-md-12">
                                 <div className="cart my_cart">
                                     <div className="dash_inner_wrap">
-                                        {/* <Formik
+                                        <Formik
                                             initialValues={{
                                                 name: this.state.userDetails.name,
                                                 email: this.state.userDetails.email,
@@ -847,7 +847,7 @@ class CheckOut extends Component {
                                                                     onChange={handleChange}
                                                                     // onBlur={handleBlur}
                                                                     value={values.phone}
-                                                                // disabled={!editProfile}
+                                                                    disabled={true}
                                                                 />
                                                                 {touched.phone && errors.phone && (
                                                                     <small className="text-danger">{errors.phone}</small>
@@ -865,7 +865,7 @@ class CheckOut extends Component {
                                                                     onChange={handleChange}
                                                                     // onBlur={handleBlur}
                                                                     value={values.address.country}
-                                                                // disabled={!editProfile}
+                                                                    disabled={true}
                                                                 />
                                                                 {touched.address?.country && errors.address?.country && (
                                                                     <small className="text-danger">{errors.address.country}</small>
@@ -882,7 +882,7 @@ class CheckOut extends Component {
                                                                     onChange={handleChange}
                                                                     // onBlur={handleBlur}
                                                                     value={values.address.street}
-                                                                // disabled={!editProfile}
+                                                                    disabled={true}
                                                                 />
                                                                 {touched.address?.street && errors.address?.street && (
                                                                     <small className="text-danger">{errors.address.street}</small>
@@ -899,7 +899,7 @@ class CheckOut extends Component {
                                                                     onChange={handleChange}
                                                                     // onBlur={handleBlur}
                                                                     value={values.address.city}
-                                                                // disabled={!editProfile}
+                                                                    disabled={true}
                                                                 />
                                                                 {touched.address?.city && errors.address?.city && (
                                                                     <small className="text-danger">{errors.address.city}</small>
@@ -916,7 +916,7 @@ class CheckOut extends Component {
                                                                     onChange={handleChange}
                                                                     // onBlur={handleBlur}
                                                                     value={values.address.zip}
-                                                                // disabled={!editProfile}
+                                                                    disabled={true}
                                                                 />
                                                                 {touched.address?.zip && errors.address?.zip && (
                                                                     <small className="text-danger">{errors.address.zip}</small>
@@ -925,18 +925,25 @@ class CheckOut extends Component {
 
 
                                                             <div className="form-group text-center mb-4">
-                                                                {editProfile ? (
+                                                                <Link
+                                                                    className="btn custom_btn btn_yellow mx-auto" to="/my-profile"
+                                                                >
+                                                                    Update Profile
+                                                                </Link>
+
+
+                                                                {/* {editProfile ? (
                                                                     <div>
                                                                         <button type="submit" className="btn custom_btn btn_yellow_bordered">Save</button>
                                                                         <button type="button" className="btn custom_btn btn_yellow_bordered ms-2" onClick={this.handleEdit}>Cancel</button>
                                                                     </div>
                                                                 ) : (
                                                                     <button type="button" className="btn custom_btn btn_yellow_bordered" onClick={this.handleEdit}>Click to Update</button>
-                                                                )}
+                                                                )} */}
                                                             </div>
                                                         </div>
 
-                                                        
+
 
                                                         <div className="col-md-6">
                                                             <h5 className="text-md font-semibold mb-4 text-center">Review Your Order</h5>
@@ -945,10 +952,10 @@ class CheckOut extends Component {
                                                                     {reviewOrder.map((item, index) => (
                                                                         <div className="d-flex justify-content-between align-items-center border-bottom py-2">
                                                                             <div className="product-data text-start">
-                                                                                
+
                                                                                 <h6 className="mb-1">{`${index + 1}) ${item.name.split(' ').slice(0, 4).join(' ')}${item.name.split(' ').length > 4 ? '...' : ''}`}</h6>
                                                                             </div>
-                                                                           
+
                                                                             <div className="product-quantity text-end">
                                                                                 <h6 className="mb-1"><b>{`${item.quantity}`}</b> qty.</h6>
                                                                             </div>
@@ -968,210 +975,6 @@ class CheckOut extends Component {
                                                                         <CheckoutForm />
                                                                     </Elements>
                                                                 </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            )}
-                                        </Formik> */}
-
-                                        <Formik
-                                            initialValues={{
-                                                name: userDetails.name,
-                                                email: userDetails.email,
-                                                phone: userDetails.phone || '',
-                                                address: {
-                                                    street: userDetails?.address?.street || '',
-                                                    city: userDetails?.address?.city || '',
-                                                    state: userDetails?.address?.state || '',
-                                                    country: userDetails?.address?.country || '',
-                                                    zip: userDetails?.address?.zip || ''
-                                                }
-                                            }}
-                                            validationSchema={Yup.object().shape({
-                                                name: Yup.string().required("Name is required.").min(3, 'Name is too short - should be 3 chars minimum.').max(50, 'Name is too long - should be 50 chars maximum.'),
-                                                email: Yup.string().email().required("Email is required."),
-                                                phone: Yup.string().matches(/^[0-9]+$/, "Phone number is not valid").min(10, 'Phone number is too short').max(15, 'Phone number is too long').required("Phone is required."),
-                                                address: Yup.object().shape({
-                                                    street: Yup.string().required("Street is required."),
-                                                    city: Yup.string().required("City is required."),
-                                                    state: Yup.string().required("State is required."),
-                                                    country: Yup.string().required("Country is required."),
-                                                    zip: Yup.number().required("Zip code is required.").positive().integer()
-                                                })
-                                            })}
-                                            onSubmit={this.handleSubmit}
-                                            enableReinitialize={true}
-                                        >
-                                            {({
-                                                values,
-                                                errors,
-                                                touched,
-                                                handleChange,
-                                                handleSubmit,
-                                                isSubmitting
-                                            }) => (
-                                                <form onSubmit={handleSubmit} encType="multipart/form-data">
-                                                    <div className="row">
-                                                        <div className="col-md-12 pt-4 d-flex justify-content-between align-items-center">
-                                                            <div className="dash_title">Getting Your Order</div>
-                                                            <div>
-                                                                <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/product-stock-management">
-                                                                    <img src={arrow_back} alt="Back" />&nbsp; Back
-                                                                </Link>
-                                                            </div>
-                                                        </div>
-                                                        <hr className="my-3" />
-                                                        <div className="col-md-6">
-                                                            <h5 className="font-semibold">Shipping Information</h5>
-                                                            <div className="row mt-5">
-                                                                <div className="col-md-6 mb-4">
-                                                                    <label htmlFor="firstName" className="form-label">
-                                                                        First Name <small className="text-danger">*</small>
-                                                                    </label>
-                                                                    <input
-                                                                        type="text"
-                                                                        className="form-control"
-                                                                        name="firstName"
-                                                                        placeholder="First Name"
-                                                                        value={first}
-                                                                        disabled={true}
-                                                                    />
-                                                                </div>
-                                                                <div className="col-md-6 mb-4">
-                                                                    <label htmlFor="lastName" className="form-label">
-                                                                        Last Name <small className="text-danger">*</small>
-                                                                    </label>
-                                                                    <input
-                                                                        type="text"
-                                                                        className="form-control"
-                                                                        name="lastName"
-                                                                        placeholder="Last Name"
-                                                                        value={last}
-                                                                        disabled={true}
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                            {/* Email */}
-                                                            <div className="mb-4">
-                                                                <label htmlFor="email" className="form-label">
-                                                                    Email <small className="text-danger">*</small>
-                                                                </label>
-                                                                <input
-                                                                    type="email"
-                                                                    className="form-control"
-                                                                    name="email"
-                                                                    value={values.email}
-                                                                    onChange={handleChange}
-                                                                    disabled
-                                                                    maxLength="50"
-                                                                />
-                                                                {touched.email && errors.email && <small className="text-danger">{errors.email}</small>}
-                                                            </div>
-                                                            {/* Phone */}
-                                                            <div className="mb-4">
-                                                                <label htmlFor="phone" className="form-label">
-                                                                    Phone <small className="text-danger">*</small>
-                                                                </label>
-                                                                <input
-                                                                    type="text"
-                                                                    className="form-control"
-                                                                    name="phone"
-                                                                    value={values.phone}
-                                                                    onChange={handleChange}
-                                                                    disabled={!editProfile}
-                                                                />
-                                                                {touched.phone && errors.phone && <small className="text-danger">{errors.phone}</small>}
-                                                            </div>
-                                                            {/* Address Fields */}
-                                                            {['country', 'street', 'city', 'zip'].map((field) => (
-                                                                <div className="mb-4" key={field}>
-                                                                    <label className="form-label">
-                                                                        {field.charAt(0).toUpperCase() + field.slice(1)} <small className="text-danger">*</small>
-                                                                    </label>
-                                                                    <input
-                                                                        type={field === 'zip' ? 'number' : 'text'}
-                                                                        className="form-control"
-                                                                        name={`address.${field}`}
-                                                                        value={values.address[field]}
-                                                                        onChange={handleChange}
-                                                                        disabled={!editProfile}
-                                                                    />
-                                                                    {touched.address?.[field] && errors.address?.[field] && (
-                                                                        <small className="text-danger">{errors.address[field]}</small>
-                                                                    )}
-                                                                </div>
-                                                            ))}
-                                                            {/* <div className="form-group text-center mb-4">
-                                                                {editProfile ? (
-                                                                    <>
-                                                                        <button type="submit" className="btn custom_btn btn_yellow_bordered" disabled={isSubmitting}>
-                                                                            Save
-                                                                        </button>
-                                                                        <button type="button" className="btn custom_btn btn_yellow_bordered ms-2" onClick={() => this.setState({ editProfile: false })}>
-                                                                            Cancel
-                                                                        </button>
-                                                                    </>
-                                                                ) : (
-                                                                    <button type="button" className="btn custom_btn btn_yellow_bordered" onClick={() => this.setState({ editProfile: true })}>
-                                                                        Click to Update
-                                                                    </button>
-                                                                )}
-                                                            </div> */}
-
-                                                            <div className="form-group text-center mb-4">
-                                                                {this.state.editProfile ? (
-                                                                    <>
-                                                                        <button
-                                                                            type="submit"
-                                                                            className="btn custom_btn btn_yellow_bordered"
-                                                                            disabled={isSubmitting}
-                                                                        >
-                                                                            {isSubmitting ? "Saving..." : "Save"}
-                                                                        </button>
-                                                                        <button
-                                                                            type="button"
-                                                                            className="btn custom_btn btn_yellow_bordered ms-2"
-                                                                            onClick={() => this.setState({ editProfile: false })}
-                                                                        >
-                                                                            Cancel
-                                                                        </button>
-                                                                    </>
-                                                                ) : (
-                                                                    <button
-                                                                        type="button"
-                                                                        className="btn custom_btn btn_yellow_bordered"
-                                                                        onClick={() => this.setState({ editProfile: true })}
-                                                                    >
-                                                                        Click to Update
-                                                                    </button>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                        {/* Review Order Section */}
-                                                        <div className="col-md-6">
-                                                            <h5 className="text-md font-semibold mb-4 text-center">Review Your Order</h5>
-                                                            <div className="checkout_cart_element mt-2">
-                                                                {reviewOrder.map((item, index) => (
-                                                                    <div className="d-flex justify-content-between align-items-center border-bottom py-2" key={index}>
-                                                                        <div className="product-data text-start">
-                                                                            <h6 className="mb-1">{`${index + 1}) ${item.name.split(' ').slice(0, 4).join(' ')}${item.name.split(' ').length > 4 ? '...' : ''}`}</h6>
-                                                                        </div>
-                                                                        <div className="product-quantity text-end">
-                                                                            <h6 className="mb-1"><b>{item.quantity}</b> qty.</h6>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                                <div className="cart_footer cart_wrap border-bottom">
-                                                                    <div className="cart_foot_price">
-                                                                        <div className="cfp"><span>Total Item</span> <b>{reviewOrder.length}</b></div>
-                                                                        <div className="cfp"><span>Subtotal</span> <b>{`$${stripeData.amount / 100}`}</b></div>
-                                                                        <div className="cfp"><span>Grand Total</span> <b>{`$${stripeData.amount / 100}`}</b></div>
-                                                                    </div>
-                                                                </div>
-                                                                <Elements options={options} stripe={stripePromise} >
-                                                                    <CheckoutForm />
-                                                                </Elements>
                                                             </div>
                                                         </div>
                                                     </div>

@@ -110,14 +110,12 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                     message: `${userInfo.name} comment on your post: "${comments}"`,
                     postId: postId,
                     sender: { id: currentUserId, name: userInfo.name },
-                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name },
+                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId?.name : posts.userId ? posts.userId?.name : posts.sellerId?.name },
                     type: 'comment'
                 };
                 // Emit follow notification to the followed user
                 socket.emit('comment', {
-                    notification
-                    // follower: { id: currentUserId, name: userInfo.name },
-                    // followed: { id: userIdToFollow, name: posts.userId === null ? posts.sellerId.name : posts.userId.name },
+                    notification                  
                 });
 
                 const notificationReqBody = {
@@ -227,7 +225,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                     message: `${userInfo.name} likes your post`,
                     postId: postId,
                     sender: { id: currentUserId, name: userInfo.name },
-                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name },
+                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId?.name : posts.sellerId?.name },
                     type: 'like'
                 };
                 // Emit liked notification to the user
@@ -382,7 +380,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                 // Emit follow notification to the followed user
                 socket.emit('follow', {
                     follower: { id: currentUserId, name: userInfo.name },
-                    followed: { id: userIdToFollow, name: posts.userId === null ? posts.sellerId.name : posts.userId.name },
+                    followed: { id: userIdToFollow, name: posts.userId === null ? posts.sellerId?.name : posts.userId?.name },
                 });
 
                 const notificationReqBody = {
@@ -739,7 +737,7 @@ const Post = ({ posts, sendEditData, sendShareData }) => {
                                         <div className="post_by">
                                             <div className="poster_img" ><img src={posts.isSeller ? posts.sellerId.image_url : posts.userId.image_url !== null ? posts.userId.image_url : userImg} alt="" /></div>
                                             <div className="poster_info">
-                                                <div className="poster_name">{posts.isSeller ? posts.sellerId.name : posts.userId.name}</div>
+                                                <div className="poster_name">{posts.isSeller ? posts.sellerId?.name : posts.userId?.name}</div>
                                                 <small>{posts.isSeller ? 'Seller' : 'User'}</small>
                                             </div>
                                         </div>

@@ -189,6 +189,12 @@ function Total({ couponData }) {
     dealDiscountAmount: 0,  // To store only the deal discount amount
   });
 
+  const [userDataAvailable, setUserDataAvailable] = useState(false)
+
+  useEffect(() => {
+    getUserData();
+  }, [])
+
   useEffect(() => {
     const calculateTotal = async () => {
       let totalQuantity = 0;
@@ -266,6 +272,47 @@ function Total({ couponData }) {
       });
   };
 
+  const getUserData = () => {
+    const userId = authInfo.id
+    axios.get('user/my-profile/' + userId, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Authorization': `Bearer ${authInfo.token}`
+      }
+    }).then((response) => {
+      if (response.data.status) {
+        let resData = response.data.data;
+        // console.log("resData", resData)
+        // this.setState({
+        //   userDetails: resData,
+        // });
+
+        const isValid = resData?.name &&
+          resData?.email &&
+          resData?.phone &&
+          resData?.address?.street &&
+          resData?.address?.city &&
+          resData?.address?.state &&
+          resData?.address?.country &&
+          resData?.address?.zip;
+
+        if (isValid) {
+          setUserDataAvailable(true)
+        } else {
+          setUserDataAvailable(false)
+          console.log("Some fields are missing. User data set to false.");
+        }
+      }
+    }).catch(error => {
+      console.log(error)
+    }).finally(() => {
+      setTimeout(() => {
+        // dispatch(setLoading({ loading: false }));
+      }, 300);
+    });
+  }
+
   const openmodalHandler = () => {
     if (!authInfo) {
       toast.error("Buyer login failed...");
@@ -275,6 +322,8 @@ function Total({ couponData }) {
       handleCheckout();
     }
   };
+
+  console.log("userDataAvailable", userDataAvailable)
 
   return (
     <div>
@@ -313,10 +362,23 @@ function Total({ couponData }) {
             <b>${finalAmount}</b>
           </div>
           <div className="cfp mt-4 text-center">
+            {userDataAvailable === true ? ''
+              :
+              <div class="alert alert-danger" role="alert">
+                Profile update required! Complete your details to proceed with your order.
+              </div>}
             <div className="d-grid col-6 mx-auto">
-              <button className="btn custom_btn btn_yellow m-2" onClick={openmodalHandler}>
+
+              {userDataAvailable === true ?
+                <button className="btn custom_btn btn_yellow m-2" onClick={openmodalHandler}>
+                  Place Order
+                </button>
+                :
+                <Link className="btn custom_btn btn_yellow m-2" to="/my-profile">Complete Profile</Link>
+              }
+              {/* <button className="btn custom_btn btn_yellow m-2" onClick={openmodalHandler}>
                 Place Order
-              </button>
+              </button> */}
             </div>
             <br /> OR
             <div className="ctn_btn m-4">

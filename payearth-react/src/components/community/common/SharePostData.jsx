@@ -600,7 +600,7 @@ const SharePostData = () => {
                                         <div className="post_by">
                                             <div className="poster_img" ><img src={isSeller ? sellerId.image_url : userId.image_url !== null ? userId.image_url : userImg} alt="" /></div>
                                             <div className="poster_info">
-                                                <div className="poster_name">{posts.isSeller ? posts.sellerId.name : posts.userId.name}</div>
+                                                <div className="poster_name">{posts.isSeller ? posts.sellerId?.name : posts.userId?.name}</div>
                                                 <small>{isSeller ? 'Seller' : 'User'}</small>
                                             </div>
                                         </div>

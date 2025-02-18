@@ -123,7 +123,7 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                     message: `${userInfo.name} comment on your post: "${comments}"`,
                     postId: postId,
                     sender: { id: currentUserId, name: userInfo.name },
-                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId.name : posts.sellerId.name },
+                    receiver: { id: userIdToSend, name: posts.adminId ? posts.adminId.name : posts.userId ? posts.userId?.name : posts.sellerId?.name },
                     type: 'comment'
                 };
 
@@ -500,7 +500,7 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                         </div>
                         <div className="poster_info">
                             <div className="poster_name">
-                                {posts.isAdmin ? posts.adminId.name : posts.isSeller ? posts.sellerId.name : posts.userId.name}
+                                {posts.isAdmin ? posts.adminId?.name : posts.isSeller ? posts.sellerId?.name : posts.userId?.name}
                             </div>
                             <ReactTimeAgo date={date} locale="en-US" timeStyle="round-minute" />
                             {/* <Link className="post_follow" data-bs-toggle="collapse" to={`#collapseFollow${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseFollow${posts.id}`}>
@@ -549,7 +549,7 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                                         <div className="post_by">
                                             <div className="poster_img" ><img src={posts.isSeller ? config.apiURI + posts.sellerId.image_url : posts.userId.image_url !== null ? config.apiURI + posts.userId.image_url : userImg} alt="" /></div>
                                             <div className="poster_info">
-                                                <div className="poster_name">{posts.isSeller ? posts.sellerId.name : posts.userId.name}</div>
+                                                <div className="poster_name">{posts.isSeller ? posts.sellerId?.name : posts.userId?.name}</div>
                                                 <small>{posts.isSeller ? 'Seller' : 'User'}</small>
                                             </div>
                                         </div>
