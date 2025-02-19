@@ -202,21 +202,38 @@ const ServiceDetails = () => {
                         <p>Service Code : {data.result.serviceCode}</p>
                         <p>Category : {data.result.category.categoryName}</p>
                       </div>
-                      {/* <div className="pdi_desc">
-                      <p className="text-dark p-2 rounded">How to book appointment:</p>
-                        <div className="step">
-                          <p> <strong>Step 1:</strong> Select the service you want to book.</p>
+                      <div className="pdi_desc bg-light border rounded shadow-sm ps-2">
+                        <p className="text-dark rounded bg-light fw-bold">How to Book an Appointment:</p>
+                        <p className="text-muted small mb-2">Follow these steps to book your appointment:</p>
+
+                        {/* <div className="step">
+                          <p className="mb-1"><strong className="text-primary">Step 1:</strong> Select the service you want to book.</p>
                         </div>
                         <div className="step">
-                          <p> <strong>Step 2:</strong> Select the service you want to book.</p>
+                          <p className="mb-1"><strong className="text-primary">Step 2:</strong> Choose an available date and time.</p>
                         </div>
                         <div className="step">
-                          <p> <strong>Step 3:</strong> Select the service you want to book.</p>
+                          <p className="mb-1"><strong className="text-primary">Step 3:</strong> Provide your details and confirm.</p>
                         </div>
                         <div className="step">
-                          <p> <strong>Step 4:</strong> Select the service you want to book.</p>
-                        </div>
-                      </div> */}
+                          <p className="mb-1"><strong className="text-primary">Step 4:</strong> Complete the payment and receive confirmation.</p>
+                        </div> */}
+                         <ol className="list-group ">
+    <li className="list-group-item border-0 p-1">
+      <strong className="text-primary">Step 1:</strong> Navigate to the Appointment section.
+    </li>
+    <li className="list-group-item border-0 p-1">
+      <strong className="text-primary">Step 2:</strong> Sign in to your calendar account.
+    </li>
+    <li className="list-group-item border-0 p-1">
+      <strong className="text-primary">Step 3:</strong> Select your preferred date and time slot, then proceed with the payment.
+    </li>
+    <li className="list-group-item border-0 p-1">
+      <strong className="text-primary">Step 4:</strong> Save the event to confirm your meeting.
+    </li>
+  </ol>
+                      </div>
+
 
                       <div className="pdi_desc">
                         <p>Description :</p>
