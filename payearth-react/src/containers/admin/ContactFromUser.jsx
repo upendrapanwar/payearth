@@ -16,7 +16,7 @@ import { Helmet } from 'react-helmet';
 
 
 const ContactFromUser = () => {
-    const isLoged_In = isLogin(); 
+    const isLoged_In = isLogin();
     const authInfo = JSON.parse(localStorage.getItem('authInfo'));
     const [loading, setLoading] = React.useState(false);
     const [customers, setCustomers] = useState([]);
@@ -83,8 +83,8 @@ const ContactFromUser = () => {
             return;
         }
         const requestData = {
-            ...values,           // Form values
-            selectedUsers       // Add selectedUsers to the request data
+            ...values,
+            selectedUsers
         };
 
         setLoading(true);

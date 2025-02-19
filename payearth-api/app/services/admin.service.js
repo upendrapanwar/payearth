@@ -5099,7 +5099,6 @@ async function countryWiseAnalyticsData(req, res) {
     try {
         const { propertyId } = req.body;
         const id = `${propertyId}`
-
         const [response] = await analyticsDataClient.runReport({
             property: `properties/${id}`,
             dateRanges: [
@@ -5116,7 +5115,12 @@ async function countryWiseAnalyticsData(req, res) {
             country: row.dimensionValues[0].value,
             userCount: parseInt(row.metricValues[0].value, 10)
         }));
-        return countryUserCounts
+
+        const topCountries = countryUserCounts
+            .sort((a, b) => b.userCount - a.userCount)
+            .slice(0, 7);
+
+        return topCountries;
     } catch (error) {
         console.log("error", error)
     }

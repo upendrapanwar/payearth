@@ -297,7 +297,7 @@ class Dashboard extends Component {
         this.pageViewCount = [
             {
                 name: 'PAGE PATH',
-                selector: (row, i) => row.pagePath,
+                selector: (row) => `https://www.pay.earth/${row.pagePath}`,
                 sortable: true
             },
             {
