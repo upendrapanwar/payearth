@@ -12,6 +12,7 @@ const msg = require('../helpers/messages.json');
 const fs = require('fs');
 const { BetaAnalyticsDataClient } = require("@google-analytics/data");
 const path = require('path');
+const SendEmail = require("../helpers/email");
 
 const analyticsDataClient = new BetaAnalyticsDataClient({
     keyFilename: path.resolve(__dirname, '../config/testga4_December_test-417806-7566dd1c2dba.json')
@@ -141,6 +142,7 @@ module.exports = {
     deleteService,
     statusChange,
     userServiceOrders,
+    contactFromUser,
 
     getAllUser,
     accessChat,
@@ -3057,6 +3059,54 @@ async function userServiceOrders(req) {
     }
 }
 
+async function contactFromUser(param) {
+    const subject = param.subject;
+    const message = param.message;
+    const selectedUsers = param.selectedUsers;
+    try {
+        for (const user of selectedUsers) {
+            const mailOptions = {
+                from: `"Payearth Support" <${config.mail_auth_user}>`,
+                replyTo: config.mail_auth_user,
+                to: user.email,
+                subject: `${subject}`,
+                text: "You have received a message from Pay Earth",
+                html: `
+                      <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; color: #555;">
+                        <!-- Header -->
+                         <div style="background-color: #6772E5; padding: 20px; text-align: center;">
+                           <img src="https://pay.earth:7700/uploads/logo.png" alt="Payearth" style="height: 40px;" />
+                          </div>
+
+                        <!-- body -->
+                        <div style="padding: 20px; background-color: #f9f9f9;">
+                            <h2 style="color: #333;">SEND BY PAYEARTH</h2>
+                            <p>Hello ${user.name},</p>
+                            <p>You have received a new message from Payearth. Here are the details:</p>
+                            <div style="margin-bottom: 20px;">
+                                <p><strong>Subject:</strong> ${subject}</p>
+                                <p><strong>Message:</strong> ${message}</p>
+                            </div>
+                            <p>Please review the message and respond as needed.</p>
+                            <p style="font-style: italic;">— The Payearth Team</p>
+                        </div>
+
+                        <!-- Footer -->
+                           <div style="padding: 10px; background-color: #6772E5; text-align: center; font-size: 12px; color: #aaa;">
+                            <p>Payearth, 1234 Street Name, City, State, 12345</p>
+                            <p>&copy; ${new Date().getFullYear()} Payearth. All rights reserved.</p>
+                            </div>
+                     </div>
+                       `
+            };
+            await SendEmail(mailOptions);
+            return true
+        }
+    } catch (error) {
+        console.error("Error sending email:", error);
+    }
+}
+
 // Chat ******************************************************
 //getAllUser
 
@@ -5549,8 +5599,8 @@ async function updateCustomerStatus(req) {
     }
 }
 
- async function updateCustomer(req) {
-    const  data  = req.body;
+async function updateCustomer(req) {
+    const data = req.body;
     const id = data.id;
     const updateData = {
         name: data.name,

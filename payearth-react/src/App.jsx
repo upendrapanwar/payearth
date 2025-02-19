@@ -98,6 +98,7 @@ import ManageProductDetails from "./containers/admin/ManageProductDetails";
 import ManageServices from "./containers/admin/ManageServices";
 import ManageServiceDetails from "./containers/admin/ManageServiceDetails";
 import ManageNotifications from "./containers/admin/ManageNotifications";
+import ContactFromUser from "./containers/admin/ContactFromUser";
 import ManageCustomers from "./containers/admin/ManageCustomers";
 import ManageCommunity from "./containers/admin/ManageCommunity";
 import ManageReports from "./containers/admin/ManageReports";
@@ -898,6 +899,7 @@ function App() {
             exact
           />
 
+
           <PrivateRoute
             path="/admin/manage-reports-services"
             component={ManageReportsServices}
@@ -910,6 +912,15 @@ function App() {
             path="/admin/manage-notifications"
             restricted={false}
             component={ManageNotifications}
+            roles={[Role.super_admin, Role.admin, Role.manager]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
+            path="/admin/contact_form_users"
+            restricted={false}
+            component={ContactFromUser}
             roles={[Role.super_admin, Role.admin, Role.manager]}
             currentUserRole={userInfo.role}
             exact

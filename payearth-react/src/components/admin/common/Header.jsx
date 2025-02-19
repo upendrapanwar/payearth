@@ -373,6 +373,18 @@ function Header() {
                   Manage Support
                 </Link>
               </li>
+              {/* /admin/contact_form_users */}
+              <li>
+                <Link
+                  to="/admin/contact_form_users"
+                  onClick={() => removeBackdrop()}
+                >
+                  <i className="icon">
+                    <img src={notificationBellIcon} alt="" />
+                  </i>{" "}
+                  Contact Users
+                </Link>
+              </li>
               <li>
                 <Link
                   to="/admin/manage-notifications"

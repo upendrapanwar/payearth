@@ -179,7 +179,7 @@ router.delete('/deletePost/:id', deletePost);
 router.put("/cmsUpdatePost/:id", cmsUpdatePost);
 router.get("/cmsGetPostById/:id", cmsGetPostById)
 router.get("/cmsGetByStatus/:status", cmsGetByStatus);
-router.get('/postSlug', getAllPostSlug)
+router.get('/postSlug', getAllPostSlug);
 router.post("/cmsPage", createCmsPage);
 router.get("/cmsPageByStatus/:status", cmsPageGetByStatus);
 router.get("/cmsGetPageById/:id", cmsGetPageById);
@@ -205,6 +205,7 @@ router.put('/service/edit/:id', editService);
 router.delete("/services/delete/:id", deleteService);
 router.put("/service/status/:id", statusChange);
 router.get("/service-order", userServiceOrders);
+router.post("/contactFromUser", contactFromUser);
 
 router.get("/getAllUser", getAllUser);
 router.post("/accessChat", accessChat);
@@ -1062,6 +1063,13 @@ function statusChange(req, res, next) {
         .catch(err => next(res.json({ status: false, message: err.message })));
 }
 
+// ContactFromUser
+function contactFromUser(req, res, next) {
+    adminService.contactFromUser(req.body)
+        .then((user) => user ? res.status(200).json({ status: true, message: "Email sent successfully." }) : res.status(400).json({ status: false, message: "Email has not sent. Please, try again." }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
 // Chat
 function getAllUser(req, res, next) {
     adminService.getAllUser(req)
@@ -1540,13 +1548,13 @@ function updateVendorsStatus(req, res, next) {
         .catch((err) => next(res.json({ status: false, message: err })));
 }
 
- function getVendorDataById(req, res, next) {
+function getVendorDataById(req, res, next) {
     adminService.getVendorDataById(req)
         .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch((err) => next(res.json({ status: false, message: err })));
 }
 
-   function updateVendore(req, res, next) {
+function updateVendore(req, res, next) {
     adminService.updateVendore(req)
         .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch((err) => next(res.json({ status: false, message: err })));
@@ -1557,7 +1565,7 @@ function updateCustomerStatus(req, res, next) {
         .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch((err) => next(res.json({ status: false, message: err })));
 }
- function updateCustomer(req, res, next) {
+function updateCustomer(req, res, next) {
     adminService.updateCustomer(req)
         .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch((err) => next(res.json({ status: false, message: err })));

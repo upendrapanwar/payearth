@@ -966,7 +966,7 @@ async function getNewCoupons(req) {
     var param = req.body;
     var whereCondition = { end: { $gte: now } }; //default
     const result = await Coupon.paginate(whereCondition).then((data) => {
-    console.log('getNewCoupons', data)
+      console.log('getNewCoupons', data)
       let res = {
         coupons: data.docs,
       };
@@ -3536,7 +3536,7 @@ async function deleteGoogleEvent(req) {
 
 async function findSellerAvailable(req) {
   const { selectedDate, sellerId } = req.query;
-  
+
   // console.log("Received selectedDate:", selectedDate);
   // console.log("Received sellerId:", sellerId);
 
@@ -3552,7 +3552,7 @@ async function findSellerAvailable(req) {
     const endOfDay = new Date(selectedDate);
     endOfDay.setUTCHours(23, 59, 59, 999);
 
-   // console.log("Searching for slots between:", startOfDay, "and", endOfDay);
+    // console.log("Searching for slots between:", startOfDay, "and", endOfDay);
 
     let result = await Calendar.find(
       {
@@ -3567,7 +3567,7 @@ async function findSellerAvailable(req) {
       }
     ).sort({ start_datetime: 1 }).exec();
 
-   // console.log("Available time slots:", result);
+    // console.log("Available time slots:", result);
 
     if (!result || result.length === 0) {
       return [];

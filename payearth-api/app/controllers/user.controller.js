@@ -1702,7 +1702,7 @@ function removeNotification(req, res, next) {
 //*****************************************************************************************/
 //User Contact-Us
 
-function userContactUs(req, res, next) {
+function userContactUs(req, res, next) { 
   userService
     .userContactUs(req.body)
     .then((user) =>
