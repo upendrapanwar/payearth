@@ -512,7 +512,7 @@ class ManageReports extends Component {
                                 <ul className="d-flex mb-0">
                                     <li className="activeNav"><Link to="/admin/manage-reports">Product</Link></li>
                                     <li><Link to="/admin/manage-reports-services">Service</Link></li>
-                                </ul>
+                                </ul>    
                             </div>
                             <button className="custom_btn btn_yellow w-auto btn" onClick={() => window.history.back()}>Back</button>
                         </div>
