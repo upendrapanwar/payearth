@@ -98,7 +98,7 @@ function ServiceCalendar(props) {
   const handleDateClick = (arg) => {
     const selectedDate = moment(arg.date).format("YYYY-MM-DD")
     localStorage.setItem("selectedDate", selectedDate);
-   const result = findSellerAvailable(selectedDate);
+    findSellerAvailable(selectedDate);
     setChargesPayModel(true)
   };
 
@@ -383,19 +383,54 @@ function ServiceCalendar(props) {
     }
   }
 
+  // const isBooked = (slot) => {
+  //   const slotDate = localStorage.getItem("selectedDate")
+  //        console.log("slotDate Date:", slotDate);
+
+  //   if (!sellerAvailableData || sellerAvailableData.length === 0) {
+  //     return false;
+  //   }
+  //   const slotTime = moment(slot, "hh:mm A").format("HH:mm");
+
+  //   return sellerAvailableData.some(({ start_datetime, end_datetime }) => {
+  //     const startTime = moment.utc(start_datetime).local().format("HH:mm");
+  //     const endTime = moment.utc(end_datetime).local().format("HH:mm");
+
+  //     return slotTime >= startTime && slotTime < endTime;
+  //   });
+  // };
+
   const isBooked = (slot) => {
-    if (!sellerAvailableData || sellerAvailableData.length === 0) {
-      return false;
+    const slotDate = localStorage.getItem("selectedDate");
+    console.log("Selected Date:", slotDate);
+    console.log("Seller Available Data:", sellerAvailableData);
+
+    const currentDateTime = moment(); 
+    const selectedDate = moment(slotDate, "YYYY-MM-DD");
+    const slotTime = moment(slot, "hh:mm A"); 
+
+    if (selectedDate.isBefore(currentDateTime, "day")) {
+        return true; 
     }
-    const slotTime = moment(slot, "hh:mm A").format("HH:mm");
+
+    if (selectedDate.isSame(currentDateTime, "day") && slotTime.isBefore(currentDateTime, "minute")) {
+        return true; 
+    }
+
+    if (!Array.isArray(sellerAvailableData) || sellerAvailableData.length === 0) {
+        return false;
+    }
 
     return sellerAvailableData.some(({ start_datetime, end_datetime }) => {
-      const startTime = moment.utc(start_datetime).local().format("HH:mm");
-      const endTime = moment.utc(end_datetime).local().format("HH:mm");
+        if (!start_datetime || !end_datetime) return false;
 
-      return slotTime >= startTime && slotTime < endTime;
+        const startTime = moment.utc(start_datetime).local().format("HH:mm");
+        const endTime = moment.utc(end_datetime).local().format("HH:mm");
+        const slotFormatted = slotTime.format("HH:mm");
+
+        return slotFormatted >= startTime && slotFormatted < endTime;
     });
-  };
+};
 
 
   const getUserData = () => {
@@ -536,7 +571,7 @@ function ServiceCalendar(props) {
                 <div className="modal-content">
                   <div className="modal-body text-center">
                     <div class="alert alert-danger" role="alert">
-                    "Update your profile to proceed with your order!"
+                      "Update your profile to proceed with your order!"
                     </div>
                     <div className="d-flex flex-wrap justify-content-center gap-4">
                       <div className="ctn_btn">
@@ -551,7 +586,6 @@ function ServiceCalendar(props) {
                       </button>
                     </div>
                   </div>
-
                 </div>
               </div>
             </div>
