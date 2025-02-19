@@ -23,15 +23,19 @@ const cartSlice = createSlice({
 
             const productinPayload = action.payload
             const itemInCart = state.cart.find((item) => item.id === action.payload.id);
+            console.log("itemInCart>>>>", itemInCart)
+            console.log("productinPayload>>>>", productinPayload)
             const authInfo = JSON.parse(localStorage.getItem('authInfo'));
             if (authInfo !== null) {
-             
+
                 if (itemInCart) {
                     // itemInCart.quantity++;
+                    console.log("itemInCart.coins", itemInCart.coins)
                     itemInCart.quantity++;
                     if (productinPayload.discountId) itemInCart.discountId = productinPayload.discountId;
                     if (productinPayload.discountPercent) itemInCart.discountPercent = productinPayload.discountPercent;
                     let reqBody = {
+                        coins: itemInCart.coins,
                         user_id: authInfo.id,
                         productId: itemInCart.id,
                         qty: itemInCart.quantity,
@@ -59,14 +63,16 @@ const cartSlice = createSlice({
                             dispatch(setLoading({loading: false}));
                         }, 300);*/
                     });
-                }else{
+                } else {
                     let reqBody = {
+                        coins: productinPayload.coins,
                         user_id: authInfo.id,
                         productId: productinPayload.id,
                         qty: productinPayload.quantity,
                         price: productinPayload.price,
                         discountId: productinPayload.discountId || null
                     };
+                    console.log("reqBody", reqBody)
                     axios.post('user/addtocart', reqBody, {
                         headers: {
                             'Accept': 'application/json',

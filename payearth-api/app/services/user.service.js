@@ -1249,7 +1249,7 @@ async function addToCart(req) {
     const param = req.body;
 
 
-    if (!param.user_id || !param.productId || !param.qty || !param.price) {
+    if (!param.user_id || !param.productId || !param.qty || !param.price || !param.coins) {
       console.error('Missing required fields in request body');
       return false;
     }
@@ -1267,6 +1267,7 @@ async function addToCart(req) {
           'products.$.qty': param.qty,
           'products.$.price': param.price,
           'products.$.discountId': param.discountId,
+          'products.$.coins': param.coins,
         },
       };
 
@@ -1293,6 +1294,7 @@ async function addToCart(req) {
             qty: param.qty,
             price: param.price,
             discountId: param.discountId,
+            coins: param.coins,
           },
         ],
       });

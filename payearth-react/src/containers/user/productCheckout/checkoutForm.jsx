@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 export default function CheckoutForm(userDataAvailable) {
-  console.log('userDataAvailable-----',userDataAvailable)
+  console.log('userDataAvailable-----', userDataAvailable)
   const stripe = useStripe();
   const elements = useElements();
   const dispatch = useDispatch();
@@ -39,8 +39,8 @@ export default function CheckoutForm(userDataAvailable) {
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        //  return_url: "https://www.pay.earth/checkOutCompletePage",
-         return_url: "https://localhost:3000/checkOutCompletePage",
+        // return_url: "https://www.pay.earth/checkOutCompletePage",
+        return_url: "https://localhost:3000/checkOutCompletePage",
       },
     });
 

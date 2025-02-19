@@ -218,20 +218,20 @@ const ServiceDetails = () => {
                         <div className="step">
                           <p className="mb-1"><strong className="text-primary">Step 4:</strong> Complete the payment and receive confirmation.</p>
                         </div> */}
-                         <ol className="list-group ">
-    <li className="list-group-item border-0 p-1">
-      <strong className="text-primary">Step 1:</strong> Navigate to the Appointment section.
-    </li>
-    <li className="list-group-item border-0 p-1">
-      <strong className="text-primary">Step 2:</strong> Sign in to your calendar account.
-    </li>
-    <li className="list-group-item border-0 p-1">
-      <strong className="text-primary">Step 3:</strong> Select your preferred date and time slot, then proceed with the payment.
-    </li>
-    <li className="list-group-item border-0 p-1">
-      <strong className="text-primary">Step 4:</strong> Save the event to confirm your meeting.
-    </li>
-  </ol>
+                        <ol className="list-group ">
+                          <li className="list-group-item border-0 p-1">
+                            <strong className="text-primary">Step 1:</strong> Navigate to the Appointment section.
+                          </li>
+                          <li className="list-group-item border-0 p-1">
+                            <strong className="text-primary">Step 2:</strong> Sign in to your calendar account.
+                          </li>
+                          <li className="list-group-item border-0 p-1">
+                            <strong className="text-primary">Step 3:</strong> Select your preferred date and time slot, then proceed with the payment.
+                          </li>
+                          <li className="list-group-item border-0 p-1">
+                            <strong className="text-primary">Step 4:</strong> Save the event to confirm your meeting.
+                          </li>
+                        </ol>
                       </div>
 
 
