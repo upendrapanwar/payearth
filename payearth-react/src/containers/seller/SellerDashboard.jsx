@@ -1006,7 +1006,7 @@ class SellerDashboard extends Component {
                                                             innerRadius: 60,
                                                             cx: 180,
                                                             cy: 110,
-                                                            arcLabel: (params) => params.label ?? '',
+                                                            // arcLabel: (params) => params.label ?? '',
                                                             // valueFormatter,
                                                         }
                                                     ]}
@@ -1050,7 +1050,20 @@ class SellerDashboard extends Component {
 
                                             {activeTab === "productOrders" && (
                                                 <div className='admin_dashboard p-4'>
-
+                                                    <DataTableExtensions
+                                                        columns={this.listed_productOrders}
+                                                        data={productOrders}
+                                                    >
+                                                        <DataTable
+                                                            pagination
+                                                            noHeader
+                                                            highlightOnHover
+                                                            defaultSortField="id"
+                                                            defaultSortAsc={false}
+                                                            paginationPerPage={5}
+                                                            paginationRowsPerPageOptions={[5, 10, 15, 30]}
+                                                        />
+                                                    </DataTableExtensions>
                                                 </div>
                                             )}
 

@@ -68,6 +68,7 @@ class Chat extends Component {
         this.handleMessageContent = this.handleMessageContent.bind(this)
         // this.accessChat = this.accessChat.bind(this)
         this.sendMessage = this.sendMessage.bind(this)
+        this.chatBoardRef = React.createRef(); 
 
 
 
@@ -198,6 +199,13 @@ class Chat extends Component {
     //     });
     // }
 
+
+    componentDidUpdate(prevProps, prevState) {
+        // Scroll to the bottom of the chat board whenever new messages are added
+        if (prevState.userChat !== this.state.userChat && this.chatBoardRef.current) {
+          this.chatBoardRef.current.scrollTop = this.chatBoardRef.current.scrollHeight;
+        }
+      }
 
     fetchAllUserData = () => {
         this.setState({ users: "" })
@@ -1129,7 +1137,7 @@ class Chat extends Component {
                                                         </>}
                                                 </div>
 
-                                                <div className="msg-body">
+                                                <div className="msg-body" ref={this.chatBoardRef}>
                                                     {userChat.length !== 0 ? (
                                                         <>
                                                             {userChat.map((item, index) => (

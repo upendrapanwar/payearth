@@ -464,6 +464,8 @@ function ServiceDetailsTabbing(props) {
                         userId={authInfo.id}
                         authToken={authInfo.token}
                         serviceCreator={serviceCreator}
+                        serviceName={serviceName} 
+                        sellerId={sellerId}
                       />
                     </div>
                   ) : (
