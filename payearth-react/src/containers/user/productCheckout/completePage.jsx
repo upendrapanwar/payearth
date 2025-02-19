@@ -200,7 +200,7 @@ export default function CompletePage() {
                     ...product,
                     status: "Order placed", // Processing // Shipped // Delivered
                     userId: authInfo.id,
-                    coins: product.coins,
+                    coins: product.coins || 0,
                     paymentId: paymentId,
                     product: {
                         productId: product.id,
