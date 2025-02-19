@@ -84,7 +84,7 @@ class MyCart extends Component {
             });
 
             const dbCart = response?.data?.data || [];
-            //  console.log('Cart data fetched from DB:', dbCart);
+            console.log('Cart data fetched from DB:', dbCart);
 
             if (dbCart.length > 0) {
                 const mergedCart = this.mergeCartData(cartFromRedux, dbCart);
@@ -148,6 +148,7 @@ class MyCart extends Component {
                 } else {
                     //  console.log('Adding new product from DB to cart:', product);
                     mergedCart.push({
+                        coins: product.coins,
                         id: dbProductId || 'Unknown ID',
                         image: product?.productId?.featuredImage || 'default-image-url.jpg',
                         name: product?.productId?.name || 'Unknown Name',
@@ -167,6 +168,7 @@ class MyCart extends Component {
 
 
     updateCartInRedux = (mergedCart) => {
+        console.log('mergedCart--', mergedCart)
         const { dispatch } = this.props;
 
         if (typeof dispatch !== 'function') {

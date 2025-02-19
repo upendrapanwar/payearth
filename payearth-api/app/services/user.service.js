@@ -4806,6 +4806,7 @@ async function updateCartData(req) {
           userId: userId,
           isActive: true,
           products: [{
+            coins: product.coins,
             productId: product.id,
             quantity: product.quantity,
             price: product.price,
