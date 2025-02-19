@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import userCalendarAddEventSchema from '../../../../validation-schemas/userCalendarAddEventSchema'
 import FullCalendar from "@fullcalendar/react";
@@ -16,8 +16,9 @@ import { useHistory } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
 function ServiceCalendar(props) {
-  const { serviceCreator, sellerId } = props;
-  const serviceName = props.serviceName
+  const { serviceCreator } = props;
+  const serviceName = props.serviceName;
+  const sellerId = props.sellerId;
   const location = useLocation();
   const history = useHistory();
   const currentUser = isLogin();
@@ -36,6 +37,7 @@ function ServiceCalendar(props) {
   const [chargesPayModel, setChargesPayModel] = useState(false);
   const [selectedTime, setSelectedTime] = useState(null);
   const [sellerAvailableData, setSellerAvailableData] = useState(null);
+  const [userDataAvailable, setUserDataAvailable] = useState(null);
   const [formValues, setFormValues] = useState({
     event_title: serviceName || "",
     meetingDate: selectedDate || "",
@@ -54,6 +56,7 @@ function ServiceCalendar(props) {
 
   useEffect(() => {
     fetchEvents();
+    getUserData();
   }, [id]);
 
   useEffect(() => {
@@ -95,50 +98,12 @@ function ServiceCalendar(props) {
   const handleDateClick = (arg) => {
     const selectedDate = moment(arg.date).format("YYYY-MM-DD")
     localStorage.setItem("selectedDate", selectedDate);
-    findSellerAvailable(selectedDate);
+   const result = findSellerAvailable(selectedDate);
     setChargesPayModel(true)
   };
 
   const handleFormSubmit = async (values) => {
-    // console.log('values in handlesubmit',values)
-    // const start_datetime = moment(`${values.meetingDate}T${values.meetingTime}`).toISOString();
-    // // const formattedTime = moment(selectedTime, ["h:mm A"]).format("HH:mm"); 
-    // // const start_datetime = moment(`${selectedDate}T${formattedTime}:00`).utc().toISOString();
-    // if (moment(start_datetime).isBefore(moment(), "minute")) {
-    //   toast.error("Please select the current time or a future time.");
-    //   return;
-    // }
-    // console.log('start_datetime',start_datetime)
-
-    // const end_datetime = moment(start_datetime).add(1, "hour").toISOString();
-    // const eventData = {
-    //   summary: values.event_title,
-    //   description: values.description,
-    //   location: "Online Meeting",
-    //   start: {
-    //     dateTime: start_datetime,
-    //     timeZone: "Asia/Kolkata"
-    //   },
-    //   end: {
-    //     dateTime: end_datetime,
-    //     timeZone: "Asia/Kolkata"
-    //   },
-    //   conferenceData: {
-    //     createRequest: {
-    //       requestId: `meeting-${Date.now()}`,
-    //       conferenceSolutionKey: { type: "hangoutsMeet" }
-    //     }
-    //   },
-    //   attendees: [
-    //     { email: serviceCreator },
-    //   ],
-    //   reminders: {
-    //     useDefault: true,
-    //   },
-    // };
-
     const formattedTime = moment(values.meetingTime, ["HH:mm", "h:mm A"]).format("HH:mm");
-
     const start_datetime = moment(`${values.meetingDate} ${formattedTime}`, "YYYY-MM-DD HH:mm").toISOString();
 
     if (moment(start_datetime).isBefore(moment(), "minute")) {
@@ -169,7 +134,7 @@ function ServiceCalendar(props) {
       attendees: [{ email: serviceCreator }],
       reminders: { useDefault: true },
     };
-   // console.log("Final Event Data:", eventData);
+    // console.log("Final Event Data:", eventData);
     try {
       const accessToken = localStorage.getItem("accessToken");
       // console.log("accessToken", accessToken)
@@ -252,7 +217,7 @@ function ServiceCalendar(props) {
           Authorization: `Bearer ${accessToken}`,
         },
       })
-   //   console.log('fetchGoogleEvents----response', response)
+      //   console.log('fetchGoogleEvents----response', response)
       if (response.status === 200) {
         const eventsData = response.data.items.map((item) => ({
           eventId: item.id,
@@ -396,7 +361,7 @@ function ServiceCalendar(props) {
 
   const findSellerAvailable = async (selectedDate) => {
     try {
-      const SellerAvailableData = await axios.get('/user/find-seller-available', {
+      const SellerAvailableDataresponse = await axios.get('/user/find-seller-available', {
         params: {
           sellerId: sellerId,
           selectedDate: selectedDate
@@ -407,11 +372,10 @@ function ServiceCalendar(props) {
           "Authorization": `Bearer ${authInfo.token}`,
         },
       })
-      if (SellerAvailableData.data.status === true) {
-        setSellerAvailableData(SellerAvailableData.data.data);
-        // toast.success("SellerAvailableData get successfully");
+      // console.log('SellerAvailableDataresponse--',SellerAvailableDataresponse)
+      if (SellerAvailableDataresponse.data.status === true) {
+        setSellerAvailableData(SellerAvailableDataresponse.data.data);
       } else {
-        // toast.error("failed getting SellerAvailableData");
         console.error("Error getting SellerAvailableData:");
       }
     } catch (error) {
@@ -421,20 +385,57 @@ function ServiceCalendar(props) {
 
   const isBooked = (slot) => {
     if (!sellerAvailableData || sellerAvailableData.length === 0) {
-      return false; 
+      return false;
     }
-    const slotTime = moment(slot, "hh:mm A").format("HH:mm"); 
-  
+    const slotTime = moment(slot, "hh:mm A").format("HH:mm");
+
     return sellerAvailableData.some(({ start_datetime, end_datetime }) => {
-      const startTime = moment.utc(start_datetime).local().format("HH:mm"); 
-      const endTime = moment.utc(end_datetime).local().format("HH:mm"); 
-  
-      return slotTime >= startTime && slotTime < endTime; 
+      const startTime = moment.utc(start_datetime).local().format("HH:mm");
+      const endTime = moment.utc(end_datetime).local().format("HH:mm");
+
+      return slotTime >= startTime && slotTime < endTime;
     });
   };
 
+
+  const getUserData = () => {
+    const userId = authInfo.id
+    axios.get('user/my-profile/' + userId, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Authorization': `Bearer ${authInfo.token}`
+      }
+    }).then((response) => {
+      if (response.data.status) {
+        let resData = response.data.data;
+        const isValid = resData?.name &&
+          resData?.email &&
+          resData?.phone &&
+          resData?.address?.street &&
+          resData?.address?.city &&
+          resData?.address?.state &&
+          resData?.address?.country &&
+          resData?.address?.zip;
+
+        if (isValid) {
+          setUserDataAvailable(true);
+        } else {
+          setUserDataAvailable(false);
+          //   console.log("Some fields are missing. User data set to false.");
+        }
+      }
+    }).catch(error => {
+      console.log(error)
+    }).finally(() => {
+      setTimeout(() => {
+        // dispatch(setLoading({ loading: false }));
+      }, 300);
+    });
+  }
+
   // console.log('sellerAvailableData---', sellerAvailableData)
-  // console.log('selectedEvent', selectedEvent)
+  // console.log('userDataAvailable', userDataAvailable)
 
   return (
     <React.Fragment>
@@ -451,10 +452,10 @@ function ServiceCalendar(props) {
                 {serviceName ?
                   <Formik
                     initialValues={formValues}
-                    enableReinitialize 
+                    enableReinitialize
                     validationSchema={userCalendarAddEventSchema}
                     onSubmit={(values) => {
-                     // console.log("Final Submitted Data:", values);
+                      // console.log("Final Submitted Data:", values);
                       handleFormSubmit(values);
                     }}
                   >
@@ -528,54 +529,83 @@ function ServiceCalendar(props) {
       )}
 
       {chargesPayModel && (
-        <div className="modal fade show" style={{ display: "block" }}>
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-body text-center">
-                <p className="mb-3 text-dark fw-bold">
-                  Select Your time
-                </p>
-                <div className="d-flex flex-wrap justify-content-center gap-4">
-                  {timeSlots.map((slot, index) => (
-                    <button
-                    key={index}
-                    className={`btn ${selectedTime === slot ? "btn-primary" : "btn-outline-primary"}`}
-                    onClick={() => setSelectedTime(selectedTime === slot ? null : slot)}
-                    disabled={isBooked(slot)} 
-                  >
-                    {slot}
-                  </button>
-                  ))}
-                </div>
-              </div>
+        <>
+          {userDataAvailable === false ? (
+            <div className="modal fade show" style={{ display: "block" }}>
+              <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content">
+                  <div className="modal-body text-center">
+                    <div class="alert alert-danger" role="alert">
+                    "Update your profile to proceed with your order!"
+                    </div>
+                    <div className="d-flex flex-wrap justify-content-center gap-4">
+                      <div className="ctn_btn">
+                        <Link className="btn btn_yellow " to="/my-profile">Complete Profile</Link>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn btn-secondary mx-2"
+                        onClick={() => { setChargesPayModel(false); setSelectedTime(null) }}
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
 
-              <div className="modal-footer">
-                <div className="w-100 d-flex justify-content-center">
-                  <p className="mb-3 text-dark fw-bold">
-                    Are you sure you want to confirm this service?
-                  </p>
-                </div>
-                <div className="w-100 d-flex justify-content-center" >
-                  <button
-                    type="button"
-                    className="btn btn-primary mx-2"
-                    onClick={handleCheckout}
-                    disabled={!selectedTime}
-                  >
-                    Confirm
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary mx-2"
-                    onClick={() => { setChargesPayModel(false); setSelectedTime(null) }}
-                  >
-                    Close
-                  </button>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          ) : (
+            <div className="modal fade show" style={{ display: "block" }}>
+              <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content">
+                  <div className="modal-body text-center">
+                    <p className="mb-3 text-dark fw-bold">
+                      Select Your slot
+                    </p>
+                    <div className="d-flex flex-wrap justify-content-center gap-4">
+                      {timeSlots.map((slot, index) => (
+                        <button
+                          key={index}
+                          className={`btn ${selectedTime === slot ? "btn-primary" : "btn-outline-primary"}`}
+                          onClick={() => setSelectedTime(selectedTime === slot ? null : slot)}
+                          disabled={isBooked(slot)}
+                        >
+                          {slot}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="modal-footer">
+                    <div className="w-100 d-flex justify-content-center">
+                      <p className="mb-3 text-dark fw-bold">
+                        Are you sure you want to confirm this service?
+                      </p>
+                    </div>
+                    <div className="w-100 d-flex justify-content-center" >
+                      <button
+                        type="button"
+                        className="btn btn_yellow mx-2"
+                        onClick={handleCheckout}
+                        disabled={!selectedTime}
+                      >
+                        Confirm
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-secondary mx-2"
+                        onClick={() => { setChargesPayModel(false); setSelectedTime(null) }}
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       <FullCalendar

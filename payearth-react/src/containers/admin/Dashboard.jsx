@@ -1054,7 +1054,7 @@ class Dashboard extends Component {
                                                             innerRadius: 60,
                                                             cx: 180,
                                                             cy: 110,
-                                                            arcLabel: (params) => params.label ?? '',
+                                                            // arcLabel: (params) => params.label ?? '',
                                                             // valueFormatter,
                                                         }
                                                     ]}

@@ -16,6 +16,8 @@ import { useHistory } from "react-router-dom";
 import { Helmet } from 'react-helmet';
 import { toast } from "react-toastify";
 import { isLogin } from "./../../../helpers/login";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Tooltip } from 'bootstrap';
 
 const ServiceDetails = () => {
   const history = useHistory();
@@ -43,6 +45,21 @@ const ServiceDetails = () => {
     fetchApi();
     fetchData();
   }, []);
+
+  useEffect(() => {
+    // Initialize tooltips after the component mounts
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltipTriggerList.forEach(tooltipTriggerEl => new Tooltip(tooltipTriggerEl));
+  }, []);
+
+  // useEffect(() => {
+  //   // Initialize tooltips after the component mounts
+  //   const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  //   tooltipTriggerList.forEach(tooltipTriggerEl => new Tooltip(tooltipTriggerEl, {
+  //     html: true, // Allow HTML content in tooltip
+  //   }));
+  // }, []);
+
 
   const fetchData = async () => {
     try {
@@ -185,6 +202,22 @@ const ServiceDetails = () => {
                         <p>Service Code : {data.result.serviceCode}</p>
                         <p>Category : {data.result.category.categoryName}</p>
                       </div>
+                      {/* <div className="pdi_desc">
+                      <p className="text-dark p-2 rounded">How to book appointment:</p>
+                        <div className="step">
+                          <p> <strong>Step 1:</strong> Select the service you want to book.</p>
+                        </div>
+                        <div className="step">
+                          <p> <strong>Step 2:</strong> Select the service you want to book.</p>
+                        </div>
+                        <div className="step">
+                          <p> <strong>Step 3:</strong> Select the service you want to book.</p>
+                        </div>
+                        <div className="step">
+                          <p> <strong>Step 4:</strong> Select the service you want to book.</p>
+                        </div>
+                      </div> */}
+
                       <div className="pdi_desc">
                         <p>Description :</p>
                         <div className="ql-editor ql-discription">
