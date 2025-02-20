@@ -192,7 +192,9 @@ function Total({ couponData }) {
   const [userDataAvailable, setUserDataAvailable] = useState(false)
 
   useEffect(() => {
-    getUserData();
+    if (authInfo) {
+      getUserData();
+    }
   }, [])
 
   useEffect(() => {
@@ -361,32 +363,50 @@ function Total({ couponData }) {
             <span>Sub Total</span>
             <b>${finalAmount}</b>
           </div>
-          <div className="cfp mt-4 text-center">
-            {userDataAvailable === true ? ''
-              :
-              <div class="alert alert-danger" role="alert">
-                Profile update required! Complete your details to proceed with your order.
-              </div>}
-            <div className="d-grid col-6 mx-auto">
+          {authInfo ? (
 
-              {userDataAvailable === true ?
-                <button className="btn custom_btn btn_yellow m-2" onClick={openmodalHandler}>
-                  Place Order
-                </button>
+            <div className="cfp mt-4 text-center">
+              {userDataAvailable === true ? ''
                 :
-                <Link className="btn custom_btn btn_yellow m-2" to="/my-profile">Complete Profile</Link>
-              }
-              {/* <button className="btn custom_btn btn_yellow m-2" onClick={openmodalHandler}>
+                <div class="alert alert-danger" role="alert">
+                  Profile update required! Complete your details to proceed with your order.
+                </div>}
+              <div className="d-grid col-6 mx-auto">
+
+                {userDataAvailable === true ?
+                  <button className="btn custom_btn btn_yellow m-2" onClick={openmodalHandler}>
+                    Place Order
+                  </button>
+                  :
+                  <Link className="btn custom_btn btn_yellow m-2" to="/my-profile">Complete Profile</Link>
+                }
+                {/* <button className="btn custom_btn btn_yellow m-2" onClick={openmodalHandler}>
                 Place Order
               </button> */}
+              </div>
+              <br /> OR
+              <div className="ctn_btn m-4">
+                <Link to="/" className="view_more">
+                  Continue shopping
+                </Link>
+              </div>
             </div>
-            <br /> OR
-            <div className="ctn_btn m-4">
-              <Link to="/" className="view_more">
-                Continue shopping
-              </Link>
+          ) : (
+            <div className="cfp mt-4 text-center">
+                <div class="alert alert-danger" role="alert">
+                  Login required! Login to proceed with your order.
+                </div>
+              {/* <div className="d-grid col-6 mx-auto">
+                  <Link className="btn custom_btn btn_yellow m-2" to="/my-profile">Login</Link>
+              </div> */}
+              <br /> OR
+              <div className="ctn_btn m-4">
+                <Link to="/" className="view_more">
+                  Continue shopping
+                </Link>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
