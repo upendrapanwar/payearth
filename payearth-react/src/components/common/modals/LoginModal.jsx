@@ -152,7 +152,7 @@ const Modal = (props) => {
                         </div>
                         <button type="submit" className="btn custom_btn btn_yellow text-uppercase" disabled={!formik.isValid}>Login</button>
                     </form>
-                    <div className="social_box d-block">
+                    <div className="social_box d-block">  
                         <p><span>Or</span> Login with</p>
                         <div>
                             <GLogin closeModal={props.onClick} role="user" />
