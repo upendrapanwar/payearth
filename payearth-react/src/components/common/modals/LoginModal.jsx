@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux';
 import { setLoginStatus, setUserInfo, setAuthInfo } from '../../../store/reducers/auth-reducer';
 import GLogin from './../login/GLogin';
 import FBLogin from './../login/FBLogin';
+import FacebookLoginComponent from '../login/FacebookLogin';
 import { setSelectedWishItems } from './../../../store/reducers/wishlist-reducer';
 
 const Modal = (props) => {
@@ -156,6 +157,7 @@ const Modal = (props) => {
                         <div>
                             <GLogin closeModal={props.onClick} role="user" />
                             <FBLogin closeModal={props.onClick} role="user" />
+                            <FacebookLoginComponent role="user" />
                         </div>
                         <p>Not a registered customer? <Link to="#" className="view_more text-capitalize" onClick={props.onShow}>Signup</Link></p>
                     </div>
