@@ -191,8 +191,8 @@ class SellerDashboard extends Component {
                 sortable: true
             },
             {
-                name: 'PAYMENT MODE',
-                selector: (row, i) => row.paymentId.paymentMode,
+                name: 'PAYMENT ACCOUNT',
+                selector: (row, i) => row.paymentId.paymentAccount,
                 sortable: true
             },
         ];
@@ -215,8 +215,8 @@ class SellerDashboard extends Component {
                 sortable: true
             },
             {
-                name: 'PAYMENT MODE',
-                selector: (row, i) => row.paymentId.paymentMode,
+                name: 'PAYMENT ACCOUNT',
+                selector: (row, i) => row.paymentId.paymentAccount,
                 sortable: true
             },
         ];
@@ -834,19 +834,27 @@ class SellerDashboard extends Component {
                                                             <PieChart
                                                                 colors={palette}
                                                                 series={[
-                                                                    { data: topVisitedAdvertisements }
+                                                                    {
+                                                                        data: topVisitedAdvertisements,
+                                                                        outerRadius: 100, 
+                                                                        cx: "40%", 
+                                                                        cy: "50%", 
+                                                                    },
                                                                 ]}
                                                                 width={400}
-                                                                height={200}
+                                                                height={325}
                                                             /> :
                                                             <PieChart
                                                                 series={[
                                                                     {
                                                                         data: [],
+                                                                        outerRadius: 100, 
+                                                                        cx: "50%", 
+                                                                        cy: "50%",
                                                                     }
                                                                 ]}
                                                                 width={400}
-                                                                height={200}
+                                                                height={325}
                                                             />
                                                         }
                                                     </div>
@@ -867,7 +875,7 @@ class SellerDashboard extends Component {
                                     </div> */}
 
                                     <div className="col-lg-8">
-                                        <div className="card bg-white rounded-3" style={{ overflowY: 'auto', maxHeight: '67vh', border: '1px solid #ddd', scrollbarWidth: 'thin', }}>
+                                        <div className="card bg-white rounded-3" style={{ overflowY: 'auto', minHeight: '400px', maxHeight: '400px', border: '1px solid #ddd', scrollbarWidth: 'thin', }}>
                                             <div className="card-header" style={{
                                                 position: 'sticky',
                                                 top: 0,
@@ -900,8 +908,8 @@ class SellerDashboard extends Component {
                             </div>
 
                             <div className="row mt-4">
-                                <div className="col-md-8">
-                                    <div className="dash_graph bg-white">
+                                <div className="col-md-8" >
+                                    <div className="dash_graph bg-white border" style={{ borderColor: '#ddd' }}>
                                         <div className="dash_graph_head">
                                             {
                                                 defaultSelectedOptionChart.value === 'week' ? (
@@ -991,7 +999,7 @@ class SellerDashboard extends Component {
                                     </div>
                                 </div>
                                 <div className="col-md-4">
-                                    <div className="tsc_box bg-white p-3">
+                                    <div className="tsc_box bg-white p-3" style={{ overflowY: 'auto', minHeight: '550px', maxHeight: '550px', border: '1px solid #ddd', scrollbarWidth: 'thin', }}>
                                         <div className="dash_title">my top selling categories</div>
                                         <div className="tsc_img mt-4 mb-4">
                                             <Box sx={{ width: '100%' }}>
@@ -1003,7 +1011,7 @@ class SellerDashboard extends Component {
                                                     series={[
                                                         {
                                                             data: topCategories,
-                                                            innerRadius: 60,
+                                                            // innerRadius: 60,
                                                             cx: 180,
                                                             cy: 110,
                                                             // arcLabel: (params) => params.label ?? '',
@@ -1024,7 +1032,7 @@ class SellerDashboard extends Component {
                                 </div>
 
 
-                                <div className="bg-white rounded-3 pt-3 pb-5 mt-4">
+                                <div className="bg-white rounded-3 pt-3 pb-5 mt-4 border" style={{ borderColor: '#ddd' }}>
                                     <div className="col-md-12">
                                         <div className="dash_title m-4">Newly Listed Orders</div>
                                         <div className="report_tabing_nav m-2">
@@ -1111,8 +1119,8 @@ class SellerDashboard extends Component {
                                 </div>
 
                                 <div className="row mt-4">
-                                    <div className="col-md-6">
-                                        <div className="my_pro_cart bg-white">
+                                    <div className="col-md-6" >
+                                        <div className="my_pro_cart bg-white" style={{ overflowY: 'auto', minHeight: '550px', maxHeight: '550px', border: '1px solid #ddd', scrollbarWidth: 'thin', }}>
                                             <div className='admin_dashboard p-2'>
                                                 <div className="d-flex align-items-center justify-content-between mb-3 m-3">
                                                     <div className="dash_title">Newly Listed Products</div>
@@ -1138,7 +1146,7 @@ class SellerDashboard extends Component {
                                     </div>
 
                                     <div className="col-md-6">
-                                        <div className="my_pro_cart bg-white">
+                                        <div className="my_pro_cart bg-white" style={{ overflowY: 'auto', minHeight: '550px', maxHeight: '550px', border: '1px solid #ddd', scrollbarWidth: 'thin', }}>
                                             <div className='admin_dashboard p-2'>
                                                 <div className="d-flex align-items-center justify-content-between mb-3 m-3">
                                                     <div className="dash_title">Newly Listed Services</div>

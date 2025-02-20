@@ -83,39 +83,100 @@ const SellerNotifications = () => {
   const notification_column = [
     {
       selector: (row, i) => <>
-        <Link
+        {/* <Link
           to={row.notification.type === 'comment' || row.notification.type === 'like'
             ? `/seller-profile?postId=${row.notification.postId}`
             : '#'
           }
           onClick={() => updateReadStatus(row.notification._id)}
-        >
-          <div className={`card border border-2 border-info-subtle mb-2 mt-2 ${!row.notification.isSeen ? 'bg-info-subtle' : 'bg-light'}`} >
-            <div className="card-header d-flex justify-content-between align-items-center text-primary">
-              <span>{row.notification.type || "not available"}</span>
-            </div>
-            <div className="card-body">
-              {/* <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5> */}
-              <div className="d-flex justify-content-between">
-                <h5 className="card-title mb-0">
-                  {row.senderDetails.name || "Special title not defined"}
-                </h5>
-                <small className="text-muted">{new Date(row.notification.createdAt).toLocaleString() || "Just now"}</small>
+        > */}
+        {/* <div className="d-flex justify-content-between align-items-center">
+          <Link
+            to={
+              {
+                comment: `/seller-profile?postId=${row.notification.postId}`,
+                like: `/seller-profile?postId=${row.notification.postId}`,
+                chat: `/seller/chat`,
+                Meeting_Request: `/seller/service-stock-management`,
+              }[row.notification.type] || '#'
+            }
+            onClick={() => updateReadStatus(row.notification._id)}
+          >
+            <div className={`card border border-2 border-info-subtle mb-2 mt-2 ${!row.notification.isSeen ? 'bg-info-subtle' : 'bg-light'}`} >
+              <div className="card-header d-flex justify-content-between align-items-center text-primary">
+                <span>{row.notification.type || "not available"}</span>
               </div>
-              <p className="card-text">
-                {row.notification.message || " No message."}
-              </p>
+              <div className="card-body">
+                {/* <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5> 
+                <div className="d-flex justify-content-between">
+                  <h5 className="card-title mb-0">
+                    {row.senderDetails.name || "Special title not defined"}
+                  </h5>
+                  <small className="text-muted">{new Date(row.notification.createdAt).toLocaleString() || "Just now"}</small>
+                </div>
+                <p className="card-text">
+                  {row.notification.message || " No message."}
+                </p>
+              </div>
             </div>
+          </Link>
+          {!row.notification.isSeen ? "" : <i className="bi bi-trash fs-3 text-danger"
+            onClick={() => removeNotification(row.notification._id)}
+          ></i>}
+        </div> */}
+
+        {/* <div className="d-flex justify-content-between align-items-center"> */}
+        {/* Notification Link */}
+        <div className={`card border border-2 border-info-subtle mb-2 mt-2 flex-grow-1 ${!row.notification.isSeen ? 'bg-info-subtle' : 'bg-light'}`}>
+          <div className="d-flex justify-content-between align-items-center">
+            <Link
+              to={
+                {
+                  comment: `/seller-profile?postId=${row.notification.postId}`,
+                  like: `/seller-profile?postId=${row.notification.postId}`,
+                  chat: `/seller/chat`,
+                  Meeting_Request: `/seller/service-stock-management`,
+                }[row.notification.type] || '#'
+              }
+              onClick={() => updateReadStatus(row.notification._id)}
+            className="flex-grow-1" // This ensures the card takes full width
+            >
+
+              <div className="card-header d-flex justify-content-between align-items-center text-primary">
+                <span>{row.notification.type || "Not available"}</span>
+              </div>
+              <div className="card-body">
+                <div className="d-flex justify-content-between">
+                  <h5 className="card-title mb-0">
+                    {row.senderDetails.name || "Special title not defined"}
+                  </h5>
+                  <small className="text-muted">
+                    {new Date(row.notification.createdAt).toLocaleString() || "Just now"}
+                  </small>
+                </div>
+                <p className="card-text">
+                  {row.notification.message || "No message."}
+                </p>
+              </div>
+
+            </Link>
+          
+          {/* Delete Icon (only if notification is seen) */}
+          {row.notification.isSeen && (
+            <i
+              className="bi bi-trash fs-3 text-danger m-3"
+              onClick={() => removeNotification(row.notification._id)}
+              style={{ cursor: "pointer" }}
+            ></i>
+          )}
           </div>
-        </Link>
-        {!row.notification.isSeen ? "" : <i className="bi bi-trash fs-3 text-danger"
-          onClick={() => removeNotification(row.notification._id)}
-        ></i>}
+        </div>
+        {/* </div> */}
       </>,
       sortable: true,
     },
   ]
-
+  console.log('notification----', notification)
   return (
     <>
       {loading === true ? <SpinnerLoader /> : ''}
@@ -162,23 +223,31 @@ const SellerNotifications = () => {
               )} */}
 
               <div className="notification_wapper col-md-12">
-                {/* <button>Filter</button> */}
-                <DataTableExtensions
+                <div className="d-flex justify-content-between align-items-center m-2">
+                  <div></div>
+                  <button
+                    type="button"
+                    className="btn custom_btn btn_yellow"
+                    onClick={() => window.history.back()}
+                  >
+                    Back
+                  </button>
+                </div>
+                {/* <DataTableExtensions
                   columns={notification_column}
                   data={notification}
-                >
-                  <DataTable
-                    pagination
-                    highlightOnHover
-                    noHeader
-                    defaultSortField="id"
-                    defaultSortAsc={false}
-                    // selectedRows={selectedRows}
-                    // onSelectedRowsChange={this.handleRowSelected}
-                    // paginationPerPage={this.itemsPerPage}
-                    paginationRowsPerPageOptions={[6, 10, 15, 20]}
-                  />
-                </DataTableExtensions>
+                > */}
+                <DataTable
+                  columns={notification_column}
+                  data={notification}
+                  pagination
+                  highlightOnHover
+                  noHeader
+                  defaultSortField="id"
+                  defaultSortAsc={false}
+                  paginationRowsPerPageOptions={[6, 10, 15, 20]}
+                />
+                {/* </DataTableExtensions> */}
               </div>
             </div>
           </div>
