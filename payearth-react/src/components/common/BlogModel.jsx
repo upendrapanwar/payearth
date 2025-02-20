@@ -84,11 +84,7 @@ class Blog extends Component {
     };
 
     render() {
-        const { blogs, currentPage, itemsPerPage, searchQuery,
-
-            loading, error
-
-        } = this.state;
+        const { blogs, currentPage, itemsPerPage, searchQuery, loading, error } = this.state;
         if (loading) {
             return <SpinnerLoader />
         }
