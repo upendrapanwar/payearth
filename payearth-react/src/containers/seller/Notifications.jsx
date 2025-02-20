@@ -83,10 +83,21 @@ const SellerNotifications = () => {
   const notification_column = [
     {
       selector: (row, i) => <>
-        <Link
+        {/* <Link
           to={row.notification.type === 'comment' || row.notification.type === 'like'
             ? `/seller-profile?postId=${row.notification.postId}`
             : '#'
+          }
+          onClick={() => updateReadStatus(row.notification._id)}
+        > */}
+        <Link
+          to={
+            {
+              comment: `/seller-profile?postId=${row.notification.postId}`,
+              like: `/seller-profile?postId=${row.notification.postId}`,
+              chat: `/chat?userId=${row.notification.userId}`,
+              order: `/order-details?orderId=${row.notification.orderId}`,
+            }[row.notification.type] || '#'
           }
           onClick={() => updateReadStatus(row.notification._id)}
         >
@@ -115,7 +126,7 @@ const SellerNotifications = () => {
       sortable: true,
     },
   ]
-
+  console.log('notification----', notification)
   return (
     <>
       {loading === true ? <SpinnerLoader /> : ''}
@@ -162,23 +173,31 @@ const SellerNotifications = () => {
               )} */}
 
               <div className="notification_wapper col-md-12">
-                {/* <button>Filter</button> */}
-                <DataTableExtensions
+                <div className="d-flex justify-content-between align-items-center m-2">
+                  <div></div>
+                  <button
+                    type="button"
+                    className="btn custom_btn btn_yellow"
+                    onClick={() => window.history.back()}
+                  >
+                    Back
+                  </button>
+                </div>
+                {/* <DataTableExtensions
                   columns={notification_column}
                   data={notification}
-                >
-                  <DataTable
-                    pagination
-                    highlightOnHover
-                    noHeader
-                    defaultSortField="id"
-                    defaultSortAsc={false}
-                    // selectedRows={selectedRows}
-                    // onSelectedRowsChange={this.handleRowSelected}
-                    // paginationPerPage={this.itemsPerPage}
-                    paginationRowsPerPageOptions={[6, 10, 15, 20]}
-                  />
-                </DataTableExtensions>
+                > */}
+                <DataTable
+                  columns={notification_column}
+                  data={notification}
+                  pagination
+                  highlightOnHover
+                  noHeader
+                  defaultSortField="id"
+                  defaultSortAsc={false}
+                  paginationRowsPerPageOptions={[6, 10, 15, 20]}
+                />
+                {/* </DataTableExtensions> */}
               </div>
             </div>
           </div>

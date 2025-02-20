@@ -5842,7 +5842,7 @@ async function getOrderDetails(req) {
         {
           path: "paymentId",
           model: Payment,
-          select: "invoiceNo amountPaid paymentMode",
+          select: "invoiceNo amountPaid paymentMode paymentAccount",
         },
         {
           path: "userId",
