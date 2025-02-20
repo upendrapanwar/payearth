@@ -1164,7 +1164,7 @@ class Chat extends Component {
 
                                                     {sendChatData.isBlock === false && sendChatData.isGroup !== true ? <>
                                                         <div className="mr-auto">
-                                                            <a href="#"><img src={block_icon} alt="add" width={"20px"} height={"20px"} onClick={() => this.handleChatBlock(sendChatData)} /></a>
+                                                            <a href="#" data-toggle="tooltip" data-placement="top" title="Block"><img src={block_icon} alt="add" width={"20px"} height={"20px"} onClick={() => this.handleChatBlock(sendChatData)} /></a>
                                                         </div>
                                                     </> :
                                                         <>
