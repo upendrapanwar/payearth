@@ -16,6 +16,7 @@ import 'react-quill/dist/quill.snow.css';
 import arrow_back from './../../assets/icons/arrow-back.svg'
 import CryptoJS from 'crypto-js';
 import editServiceSchema from '../../validation-schemas/editServiceSchema';
+import { Helmet } from 'react-helmet';
 
 class EditService extends Component {
 
@@ -38,12 +39,12 @@ class EditService extends Component {
             featuredImage: '',
             imageId: '',
             charges: '',
-         //*   
+            //*   
             newImageUploaded: false, // Flag to indicate a new image has been uploaded
             previousImageId: '', // Store the previous image ID
             selectedFile: null, // To store the selected file
             selectedImageUrl: '', // To display the selected image immediately
-      //*
+            //*
         };
 
     }
@@ -155,7 +156,7 @@ class EditService extends Component {
     //         // Delete existing image if it exists
     //         if (this.state.imageId) {
     //          //   console.log("this.apiKey .env", this.apiKey);
-                
+
     //             const timestamp = Math.floor(Date.now() / 1000); // Current timestamp in seconds
     //             const stringToSign = `public_id=${this.state.imageId}&timestamp=${timestamp}${this.apiSecret}`;
     //             const signature = CryptoJS.SHA1(stringToSign).toString(CryptoJS.enc.Hex);
@@ -232,7 +233,7 @@ class EditService extends Component {
                             newImageUploaded: true, // Flag to indicate a new image has been uploaded
                             selectedImageUrl: '', // Clear the selected image URL after upload
                         });
-                      //  toast.success("New image uploaded successfully");
+                        //  toast.success("New image uploaded successfully");
                         this.saveService(); // Call save service after image upload
                     }).catch(error => {
                         console.error("Error uploading new image:", error);
@@ -245,7 +246,7 @@ class EditService extends Component {
             this.saveService(); // Call save service without uploading a new image
         }
     };
-    
+
 
 
     // handleSubmit = values => {
@@ -301,7 +302,7 @@ class EditService extends Component {
             featuredImage: this.state.featuredImage,
             imageId: this.state.imageId,
         };
-       // console.log("FormData", formData);
+        // console.log("FormData", formData);
 
         this.dispatch(setLoading({ loading: true }));
 
@@ -325,8 +326,8 @@ class EditService extends Component {
                     })
                 }).then(response => response.json())
                     .then(data => {
-                      //  console.log("Image deleted successfully:", data);
-                     //   toast.success("Existing image deleted successfully");
+                        //  console.log("Image deleted successfully:", data);
+                        //   toast.success("Existing image deleted successfully");
                     }).catch(error => {
                         console.error("Error deleting image:", error);
                         toast.error("Error deleting existing image");
@@ -358,7 +359,7 @@ class EditService extends Component {
                 }
             })
             .finally(() => {
-             //   console.log('inside the finally block');
+                //   console.log('inside the finally block');
                 setTimeout(() => {
                     this.dispatch(setLoading({ loading: false }));
                 }, 300);
@@ -389,21 +390,27 @@ class EditService extends Component {
                 {loading === true ? <SpinnerLoader /> : ''}
                 <div className="seller_body">
                     <Header />
-                    <div className="seller_dash_wrap pt-5 pb-5">
+                    <div className="inr_top_page_title">
+                        <h2>Edit Service</h2>
+                    </div>
+                    <Helmet>
+                        <title>{"Seller - Edit Service - Pay Earth"}</title>
+                    </Helmet>
+                    <div className="seller_dash_wrap pb-5">
                         <div className="container ">
                             <div className="bg-white rounded-3 pt-3 pb-5">
                                 <div className="dash_inner_wrap">
                                     <Formik
                                         initialValues={{
-                                            name: serviceName ||'',
-                                            charges: charges ||'',
+                                            name: serviceName || '',
+                                            charges: charges || '',
                                             category: defaultCatOption?.value,
                                             description: '',
                                             featuredImg: ''
                                         }}
                                         enableReinitialize
                                         onSubmit={values => this.handleSubmit(values)}
-                                     validationSchema={editServiceSchema}
+                                        validationSchema={editServiceSchema}
                                     >
                                         {({ values,
                                             errors,
@@ -418,10 +425,18 @@ class EditService extends Component {
                                                     <div className="col-md-12 pt-4 pb-4  d-flex justify-content-between align-items-center">
                                                         <div className="dash_title">Edit Service</div>
                                                         <div className=""><span>
-                                                            <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/service-stock-management">
+                                                            {/* <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/service-stock-management">
                                                                 <img src={arrow_back} alt="linked-in" />&nbsp;
                                                                 Back
-                                                            </Link>
+                                                            </Link> */}
+                                                            <button
+                                                                type="button"
+                                                                className="btn custum_back_btn btn_yellow mx-auto"
+                                                                onClick={() => window.history.back()}
+                                                            >
+                                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                                Back
+                                                            </button>
                                                         </span></div>
                                                     </div>
                                                     <div className="col-md-7">
@@ -466,8 +481,8 @@ class EditService extends Component {
                                                                 onBlur={handleBlur}
                                                                 value={defaultCatOption}
                                                                 onChange={(selectedOption) => {
-                                                                 //   console.log("SelectedOption", selectedOption)
-                                                                  //  console.log("SelectedOption in state", this.state.defaultCatOption)
+                                                                    //   console.log("SelectedOption", selectedOption)
+                                                                    //  console.log("SelectedOption in state", this.state.defaultCatOption)
                                                                     this.setState({ serviceCategory: selectedOption.value, defaultCatOption: selectedOption });
                                                                     // this.getCategories(selectedOption.value);
                                                                 }}

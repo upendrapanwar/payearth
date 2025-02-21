@@ -14,6 +14,7 @@ import 'react-data-table-component-extensions/dist/index.css';
 import Stripe from 'stripe';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { Helmet } from 'react-helmet';
+import arrow_back from './../../assets/icons/arrow-back.svg'
 
 const stripe = new Stripe(process.env.REACT_APP_STRIPE_SECRET_KEY);
 
@@ -321,7 +322,7 @@ class SellerManageSubscription extends Component {
                     <h2>Buy Advertising Subscriptions</h2>
                 </div>
                 <Helmet>
-                    <title>{"Manage Subscription - Pay Earth"}</title>
+                    <title>{"Seller - Advertising Subscriptions - Pay Earth"}</title>
                 </Helmet>
                 <section className="inr_wrap">
                     <div className="container">
@@ -330,7 +331,18 @@ class SellerManageSubscription extends Component {
                                 <div className="row mt-3">
                                     {getAllSubscriptionPlan !== "" ? <>
                                         <div className='subPlan'>
-                                            <div className="dash_title">My Active Subscriptions</div>
+                                            <div className='d-flex justify-content-between align-items-center'>
+                                                <div className="dash_title">My Active Subscriptions</div>
+                                                <button
+                                                    type="button"
+                                                    className="btn custom_btn btn_yellow rounded-pill px-4 py-1 ms-4"
+                                                    onClick={() => window.history.back()}
+                                                    style={{ height: "40px" }}
+                                                >
+                                                    <img src={arrow_back} alt="back" />&nbsp;
+                                                    Back
+                                                </button>
+                                            </div>
                                             <DataTableExtensions
                                                 columns={this.subPlan_column}
                                                 data={getAllSubscriptionPlan}

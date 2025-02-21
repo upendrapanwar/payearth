@@ -258,7 +258,7 @@ function Header() {
                 </Link>
               </li>
               <li>
-                <Link to="/admin/manage_deals" onClick={() => removeBackdrop()}>
+                <Link to="/admin/manage-deals" onClick={() => removeBackdrop()}>
                   <i className="icon">
                     <img src={discountIcon} alt="" />
                   </i>{" "}
@@ -342,7 +342,7 @@ function Header() {
               </li>
               <li>
                 <Link
-                  to="/admin/manage-banner-list"
+                  to="/admin/manage-advertisement"
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">

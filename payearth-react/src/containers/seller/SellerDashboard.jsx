@@ -770,13 +770,13 @@ class SellerDashboard extends Component {
                 <div className="seller_body">
                     <Header />
                     <Helmet>
-                        <title>{"Seller Dashboard - Pay Earth"}</title>
+                        <title>{"Seller - Dashboard - Pay Earth"}</title>
                     </Helmet>
                     <div className="seller_dash_wrap pt-5 pb-5">
                         <div className="container">
                             <div className="row">
                                 <div className="col-md-3 col-sm-6 col-12">
-                                    <Link to="/seller/product-stock-management">
+                                    <Link to="/seller/product-management">
                                         <div className="count_box">
                                             <div className="cb_count">{data.totalProducts}</div>
                                             <div className="cb_name">No. of products</div>
@@ -784,7 +784,7 @@ class SellerDashboard extends Component {
                                     </Link>
                                 </div>
                                 <div className="col-md-3 col-sm-6 col-12">
-                                    <Link to="/seller/service-stock-management">
+                                    <Link to="/seller/service-management">
                                         <div className="count_box">
                                             <div className="cb_count">{data.totalServices}</div>
                                             <div className="cb_name">No. of services</div>
@@ -800,7 +800,7 @@ class SellerDashboard extends Component {
                                     </Link>
                                 </div>
                                 <div className="col-md-3 col-sm-6 col-12">
-                                    <Link to="/seller/service-stock-management">
+                                    <Link to="/seller/service-management">
                                         <div className="count_box">
                                             <div className="cb_count">{data.totalServiceOrders}</div>
                                             <div className="cb_name">No. of services orders</div>
@@ -1124,7 +1124,7 @@ class SellerDashboard extends Component {
                                             <div className='admin_dashboard p-2'>
                                                 <div className="d-flex align-items-center justify-content-between mb-3 m-3">
                                                     <div className="dash_title">Newly Listed Products</div>
-                                                    <Link to="/seller/product-stock-management" className="btn_yellow_bordered w-auto btn btn-width action_btn_new">View More</Link>
+                                                    <Link to="/seller/product-management" className="btn_yellow_bordered w-auto btn btn-width action_btn_new">View More</Link>
                                                 </div>
                                                 <DataTableExtensions
                                                     columns={this.listed_Product}
@@ -1150,7 +1150,7 @@ class SellerDashboard extends Component {
                                             <div className='admin_dashboard p-2'>
                                                 <div className="d-flex align-items-center justify-content-between mb-3 m-3">
                                                     <div className="dash_title">Newly Listed Services</div>
-                                                    <Link to="/seller/service-stock-management" className="btn_yellow_bordered w-auto btn btn-width action_btn_new">View More</Link>
+                                                    <Link to="/seller/service-management" className="btn_yellow_bordered w-auto btn btn-width action_btn_new">View More</Link>
                                                 </div>
                                                 <DataTableExtensions
                                                     columns={this.listed_Service}

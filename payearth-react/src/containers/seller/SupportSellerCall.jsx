@@ -10,6 +10,7 @@ import axios from 'axios';
 import SupportCallSchema from '../../validation-schemas/supportCallSchemas';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import arrow_back from '../../assets/icons/arrow-back.svg'
+import { Helmet } from 'react-helmet';
 
 export const SupportSellerCall = () => {
 
@@ -64,6 +65,9 @@ export const SupportSellerCall = () => {
             {loading && <SpinnerLoader />}
             <div className="seller_body">
                 <Header />
+                <Helmet>
+                    <title>{"Seller - Support Call - Pay Earth"}</title>
+                </Helmet>
                 <PageTitle title="Support call" />
                 <div className="seller_dash_wrap pt-5 pb-5">
                     <div className="container">

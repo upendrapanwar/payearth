@@ -202,7 +202,7 @@ class ManageBannerListEdit extends Component {
         toast.success("Banner Update succesfully..", { autoClose: 3000 })
         // this.saveBanner("pending");
         this.updateBanner();
-        this.props.history.push('/admin/manage-banner-list')
+        this.props.history.push('/admin/manage-advertisement')
     }
     updateBanner = (status) => {
         const { id } = this.props.match.params;
@@ -412,7 +412,7 @@ class ManageBannerListEdit extends Component {
                                 <div className="cart adv_banner_wrapper">
                                     <div className="noti_wrap">
                                         <div className=""><span>
-                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-banner-list">My Advertisement</Link>
+                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-advertisement">My Advertisement</Link>
                                         </span></div>
                                     </div>
                                     <div className="cart_list adv_banner_panel">

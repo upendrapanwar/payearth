@@ -49,7 +49,19 @@ const ProductDetail = ({ data, colors, type }) => {
                                 <div className="dash_title">{itemDetail?.name}</div>
                                 <div className="d-flex justify-content-end ml-auto gap-2">
                                     <Link to={itemDetail ? `${url}${itemDetail.id}` : '#'} className="custom_btn btn_yellow_bordered w-auto btn">Edit Details</Link>
-                                    <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/product-stock-management"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link>
+                                    {/* <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/product-management"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link> */}
+                                    <div className="">
+                                        <span>
+                                            <button
+                                                type="button"
+                                                className="btn custum_back_btn btn_yellow mx-auto"
+                                                onClick={() => window.history.back()}
+                                            >
+                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                Back 
+                                            </button>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                             <div className="col-md-12">

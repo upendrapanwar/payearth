@@ -13,6 +13,7 @@ import { Helmet } from 'react-helmet';
 import { setLoading } from '../../store/reducers/global-reducer';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { NotFound } from '../../components/common/NotFound';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 class ProductStockManagement extends Component {
     constructor(props) {
@@ -308,7 +309,7 @@ class ProductStockManagement extends Component {
                         <h2>Product Management</h2>
                     </div>
                     <Helmet>
-                        <title>{"Product Management - Pay Earth"}</title>
+                        <title>{"Seller - Product Management - Pay Earth"}</title>
                     </Helmet>
                     <div className="seller_dash_wrap pt-2 pb-5">
                         <div className="container ">
@@ -316,7 +317,21 @@ class ProductStockManagement extends Component {
                                 <div className="dash_inner_wrap pb-2">
                                     <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
                                         <div className="dash_title">Product Stock Management</div>
-                                        <Link to="/seller/add-product" className="custom_btn btn_yellow w-auto btn">Add Product</Link>
+                                        <div className='d-flex justify-content-between align-items-center'>
+                                            <Link to="/seller/add-product" className="custom_btn btn_yellow w-auto btn">Add Product</Link>
+                                            <div className="ms-4">
+                                                <span>
+                                                    <button
+                                                        type="button"
+                                                        className="btn custum_back_btn btn_yellow mx-auto"
+                                                        onClick={() => window.history.back()}
+                                                    >
+                                                        <img src={arrow_back} alt="back" />&nbsp;
+                                                        Back
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <nav className="orders_tabs">

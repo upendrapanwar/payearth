@@ -26,6 +26,7 @@ import twitterIcon from './../../assets/icons/twitter.svg';
 import facebook from './../../assets/icons/facebook.svg';
 import instagram from './../../assets/icons/instagram.svg'
 import { Helmet } from 'react-helmet';
+import arrow_back from './../../assets/icons/arrow-back.svg'
 
 
 
@@ -186,7 +187,7 @@ class SellerBannerList extends Component {
   }
 
   handleEdit = (id) => {
-    this.props.history.push(`/seller/banner-edit/${id}`);
+    this.props.history.push(`/seller/edit-Advertisement/${id}`);
   }
 
   onWebsiteMove = (url) => {
@@ -315,18 +316,33 @@ class SellerBannerList extends Component {
           <h2>Manage Advertisement</h2>
         </div>
         <Helmet>
-          <title>{"Manage Advertisement - Pay Earth"}</title>
+          <title>{"Seller - Manage Advertisement - Pay Earth"}</title>
         </Helmet>
         <section className="inr_wrap">
           <div className="container">
             <div className="row">
               <div className="col-md-12">
                 <div className="cart adv_banner_wrapper">
-                  <div className="noti_wrap">
-                    <div className="">
-                      <span>
-                        <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/manage-banner-advertisement">Create New Advertisement</Link>
-                      </span>
+                  <div className="noti_wrap d-flex justify-content-between align-items-center">
+                    <div></div>
+                    <div className='d-flex justify-content-between align-items-center'>
+                      <div className="">
+                        <span>
+                          <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/create-advertisement">Create New Advertisement</Link>
+                        </span>
+                      </div>
+                      <div className="ms-4">
+                        <span>
+                          <button
+                            type="button"
+                            className="btn custum_back_btn btn_yellow mx-auto"
+                            onClick={() => window.history.back()}
+                          >
+                            <img src={arrow_back} alt="back" />&nbsp;
+                            Back
+                          </button>
+                        </span>
+                      </div>
                     </div>
                   </div>
                   <div className="cart_list adv_banner_panel">

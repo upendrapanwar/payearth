@@ -31,6 +31,7 @@ import moment from 'moment';
 import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data';
 import { Helmet } from 'react-helmet';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 class Chat extends Component {
     constructor(props) {
@@ -858,9 +859,22 @@ class Chat extends Component {
                 <Header />
                 <PageTitle title="Chat" />
                 <section className="inr_wrap">
-                    <Helmet><title>{"Chat - Pay Earth"}</title></Helmet>
+                    <Helmet><title>{"Seller - Chat - Pay Earth"}</title></Helmet>
                     <div className="container">
                         <div className="row">
+                            <div className="col-md-12 d-flex justify-content-between align-items-center">
+                                <div></div>
+                                <div className='mt-2 mb-2 me-4'>
+                                    <button
+                                        type="button"
+                                        className="btn custum_back_btn btn_yellow mx-auto"
+                                        onClick={() => window.history.back()}
+                                    >
+                                        <img src={arrow_back} alt="back" />&nbsp;
+                                        Back
+                                    </button>
+                                </div>
+                            </div>
                             <div className="col-md-12">
                                 <div className="chatUser_wrapper">
                                     <div className="chatlist_panel">

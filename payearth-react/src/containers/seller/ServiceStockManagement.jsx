@@ -19,6 +19,7 @@ import emptyImg from "./../../assets/images/emptyimage.png";
 import googleMeet from "./../../assets/icons/google-meet-logo.svg";
 import { CalendarLogout } from "./CalendarLogout";
 import 'react-quill/dist/quill.snow.css';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 class ServiceStockManagement extends Component {
   constructor(props) {
@@ -366,6 +367,12 @@ class ServiceStockManagement extends Component {
       <React.Fragment>
         {loading === true ? <SpinnerLoader /> : ""}
         <Header />
+        <div className="inr_top_page_title">
+          <h2>SErvice Management</h2>
+        </div>
+        <Helmet>
+          <title>{"Seller - Service Management - Pay Earth"}</title>
+        </Helmet>
         <div className="seller_body">
           <div className="seller_dash_wrap pt-2 pb-5">
             <div className="container ">
@@ -374,7 +381,7 @@ class ServiceStockManagement extends Component {
                   <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center flex_mob_none">
                     <div className="dash_title">Service Stock Management</div>
                     <div className="search_customer_field">
-                      <div className="noti_wrap">
+                      <div className="noti_wrap d-flex justify-content-between align-items-center">
                         <div className="">
                           <span>
                             <Link
@@ -384,6 +391,18 @@ class ServiceStockManagement extends Component {
                             >
                               Add New Service
                             </Link>
+                          </span>
+                        </div>
+                        <div className="ms-4">
+                          <span>
+                            <button
+                              type="button"
+                              className="btn custum_back_btn btn_yellow mx-auto"
+                              onClick={() => window.history.back()}
+                            >
+                              <img src={arrow_back} alt="back" />&nbsp;
+                              Back
+                            </button>
                           </span>
                         </div>
                       </div>

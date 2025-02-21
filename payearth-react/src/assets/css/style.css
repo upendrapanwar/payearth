@@ -83,6 +83,14 @@ ul {
   transition: var(--transition);
 }
 
+.custum_back_btn {
+  font-size: 16px;
+  font-family: var(--font_roboto);
+  width: 126px;
+  border-radius: 80px  !important;
+  transition: var(--transition);
+}
+
 .custom_btn_order {
   width: 250px !important;
 }

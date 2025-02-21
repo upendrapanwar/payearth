@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 import emptyImg from '../../assets/images/user.png';
 import UploadSellerProfile from './UploadSellerProfile';
 import MyProfileValidation from '../../validation-schemas/sellerMyProfileSchema'
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 export const SellerMyProfile = () => {
     // Global variable
@@ -120,7 +121,7 @@ export const SellerMyProfile = () => {
             <Header />
             <PageTitle title="My Profile" />
             <section className="inr_wrap">
-                <Helmet><title>{"Profile - Pay Earth"}</title></Helmet>
+                <Helmet><title>{"Seller - My Profile - Pay Earth"}</title></Helmet>
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-12">
@@ -153,6 +154,17 @@ export const SellerMyProfile = () => {
                                         <small>Blocked</small>
                                     </li>
                                 </ul>
+
+                                <div className=''>
+                                    <button
+                                        type="button"
+                                        className="btn custum_back_btn btn_yellow mx-auto"
+                                        onClick={() => window.history.back()}
+                                    >
+                                        <img src={arrow_back} alt="back" />&nbsp;
+                                        Back
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -8,6 +8,8 @@ import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
 import { v4 as uuidv4 } from 'uuid';
 import SupportTicketValidation from '../../validation-schemas/supportTicketSchema';
+import { Helmet } from 'react-helmet';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 const SupportTicketSeller = () => {
     // Global variables
@@ -134,10 +136,25 @@ const SupportTicketSeller = () => {
             <div className="inr_top_page_title">
                 <h2>Support Tickets</h2>
             </div>
+            <Helmet>
+                <title>{"Seller - Support Tickets - Pay Earth"}</title>
+            </Helmet>
             <section className="admin-dashboard-wrapper">
+                <div className='d-flex justify-content-between align-items-center pt-3 pb-3 me-4 '>
+                    <div className=""></div>
+                    <button
+                        type="button"
+                        className="btn custom_btn btn_yellow rounded-pill px-4 py-1 ms-4"
+                        onClick={() => window.history.back()}
+                        style={{ height: "40px" }}
+                    >
+                        <img src={arrow_back} alt="back" />&nbsp;
+                        Back
+                    </button>
+                </div>
                 <div className="inr_wrap dash_inner_wrap support_manager_wrapper">
                     <div className="col-md-12">
-                        <div className="seller_dash_wrap pt-5 pb-5">
+                        <div className="seller_dash_wrap pb-5">
                             <div className="container ">
                                 <div className="bg-white rounded-3 pt-3 pb-5">
                                     <div className="d-flex justify-content-between align-items-center mx-3">

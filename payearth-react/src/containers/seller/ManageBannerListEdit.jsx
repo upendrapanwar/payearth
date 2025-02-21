@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import arrow_back from './../../assets/icons/arrow-back.svg'
 import { date } from 'yup';
+import { Helmet } from 'react-helmet';
 
 
 class SellerBannerEdit extends Component {
@@ -173,7 +174,7 @@ class SellerBannerEdit extends Component {
     updateSave = () => {
         toast.success("Banner Update succesfully..", { autoClose: 3000 })
         this.updateBanner();
-        this.props.history.push('/seller/manage-banner-list')
+        this.props.history.push('/seller/manage-advertisement')
     }
 
     updateBanner = (status) => {
@@ -369,6 +370,9 @@ class SellerBannerEdit extends Component {
                 <div className="inr_top_page_title">
                     <h2>Edit Advertisement</h2>
                 </div>
+                <Helmet>
+                    <title>{"Seller - Edit Advertisement - Pay Earth"}</title>
+                </Helmet>
                 <section className="inr_wrap">
                     <div className="container">
                         <div className="row">
@@ -376,7 +380,7 @@ class SellerBannerEdit extends Component {
                                 <div className="cart adv_banner_wrapper">
                                     <div className="noti_wrap">
                                         <div className=""><span>
-                                            <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/manage-banner-list">
+                                            <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/manage-advertisement">
                                                 <img src={arrow_back} alt="linked-in" />&nbsp;
                                                 Back
                                             </Link>

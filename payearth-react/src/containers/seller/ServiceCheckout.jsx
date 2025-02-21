@@ -496,7 +496,7 @@ class ServiceCheckout extends Component {
 
                             <div className="d-grid gap-2 col-6 mx-auto mt-3">
                                 {selectCard === null ?
-                                    <Link to="/seller/service-stock-management">
+                                    <Link to="/seller/service-management">
                                         <button onClick={this.clearSessionStorage} className="btn btn-primary btn-sm mt-2" type="button">Return</button>
                                     </Link> :
                                     <Link to="/seller/dashboard">

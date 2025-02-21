@@ -780,7 +780,7 @@ class CheckOut extends Component {
 
                                                             <div className="">
                                                                 <span>
-                                                                    <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/product-stock-management">
+                                                                    <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/product-management">
                                                                         <img src={arrow_back} alt="linked-in" />&nbsp;
                                                                         Back
                                                                     </Link>

@@ -18,6 +18,7 @@ import 'react-quill/dist/quill.snow.css';
 import emptyImg from './../../assets/images/emptyimage.png'
 import arrow_back from './../../assets/icons/arrow-back.svg'
 import { bottom } from '@popperjs/core';
+import { Helmet } from "react-helmet";
 
 class AddService extends Component {
     constructor(props) {
@@ -291,24 +292,24 @@ class AddService extends Component {
     handleSubmit = async (values) => {
         this.dispatch(setLoading({ loading: true }));
 
-    //    const checkServiceExists = async (name) => {
-    //         try {
-    //             const response = await axios.get('seller/services_checkName', {
-    //                 headers: {
-    //                     'Authorization': `Bearer ${this.authInfo.token}`
-    //                 }
-    //             });
-    //             console.log('sercice exist response',response);
-    //             const exists = response.data.data.some(service => service.name === name);
-    //           //  return response.data.exists;
-    //           console.log('exist',exists)
-    //           return exists;
-    //         } catch (error) {
-    //             console.error("Error checking service name:", error);
-    //             return false;
-    //         }
-    //     };
-//
+        //    const checkServiceExists = async (name) => {
+        //         try {
+        //             const response = await axios.get('seller/services_checkName', {
+        //                 headers: {
+        //                     'Authorization': `Bearer ${this.authInfo.token}`
+        //                 }
+        //             });
+        //             console.log('sercice exist response',response);
+        //             const exists = response.data.data.some(service => service.name === name);
+        //           //  return response.data.exists;
+        //           console.log('exist',exists)
+        //           return exists;
+        //         } catch (error) {
+        //             console.error("Error checking service name:", error);
+        //             return false;
+        //         }
+        //     };
+        //
         // const serviceExists = await checkServiceExists(values.name);
         //     if (serviceExists) {
         //         toast.error("A service with this name already exists. Please choose a different name.", { autoClose: 3000 });
@@ -340,7 +341,7 @@ class AddService extends Component {
             } else {
                 imageData = { secure_url: emptyImg, public_id: '' };
             }
-           // const imageData = await uploadImage();
+            // const imageData = await uploadImage();
             const slug = this.generateUniqueSlug(values.name);
 
             const formData = {
@@ -348,7 +349,7 @@ class AddService extends Component {
                 name: values.name,
                 charges: values.charges,
                 category: values.category.value,
-                categoryName:values.category.label,
+                categoryName: values.category.label,
                 description: this.state.description,
                 image: imageData.secure_url,
                 imageId: imageData.public_id,
@@ -390,7 +391,13 @@ class AddService extends Component {
                 {loading === true ? <SpinnerLoader /> : ''}
                 <div className="seller_body">
                     <Header />
-                    <div className="seller_dash_wrap pt-5 pb-5">
+                    <div className="inr_top_page_title">
+                        <h2>Add Service</h2>
+                    </div>
+                    <Helmet>
+                        <title>{"Seller - Add Service - Pay Earth"}</title>
+                    </Helmet>
+                    <div className="seller_dash_wrap pb-5">
                         <div className="container ">
                             <div className="bg-white rounded-3 pt-3 pb-5">
                                 <div className="dash_inner_wrap">
@@ -405,7 +412,7 @@ class AddService extends Component {
                                             featuredImg: ''
                                         }}
                                         onSubmit={values => this.handleSubmit(values)}
-                                     validationSchema={addServiceSchema}
+                                        validationSchema={addServiceSchema}
                                     >
                                         {({ values,
                                             errors,
@@ -418,12 +425,21 @@ class AddService extends Component {
                                             <form onSubmit={handleSubmit} encType="multipart/form-data" >
                                                 <div className="row">
                                                     <div className="col-md-12 pt-4 pb-4  d-flex justify-content-between align-items-center">
-                                                        <div className="dash_title">Add Service</div>                                            
+                                                        <div className="dash_title">Add Service</div>
                                                         <div className=""><span>
-                                                            <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/service-stock-management">
+                                                            {/* <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/service-management">
                                                                 <img src={arrow_back} alt="linked-in" />&nbsp;
                                                                 Back
-                                                            </Link>
+                                                            </Link> */}
+                                                            <button
+                                                                type="button"
+                                                                className="btn custom_btn btn_yellow rounded-pill px-4 py-1 ms-4"
+                                                                onClick={() => window.history.back()}
+                                                                style={{ height: "40px" }}
+                                                            >
+                                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                                Back
+                                                            </button>
                                                         </span></div>
                                                     </div>
                                                     <div className="col-md-7">
@@ -468,7 +484,7 @@ class AddService extends Component {
                                                                     values.category = selectedOption;
                                                                     this.setState({ defaultCatOption: selectedOption });
                                                                     this.setState({ serviceCategory: selectedOption.value });
-                                                                   // this.getCategories(selectedOption.value);
+                                                                    // this.getCategories(selectedOption.value);
                                                                 }}
                                                                 onBlur={handleBlur}
                                                             />

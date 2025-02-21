@@ -12,6 +12,7 @@ import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { NotFound } from '../../components/common/NotFound';
 import Select from 'react-select';
 import { Helmet } from 'react-helmet';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 class ListedProducts extends Component {
     constructor(props) {
@@ -188,7 +189,7 @@ class ListedProducts extends Component {
                         <h2>Listed Items</h2>
                     </div>
                     <Helmet>
-                        <title>{"Listed Items - Pay Earth"}</title>
+                        <title>{"Seller - Listed Items - Pay Earth"}</title>
                     </Helmet>
                     <div className="seller_dash_wrap pt-2 pb-5">
                         <div className="container ">
@@ -224,6 +225,15 @@ class ListedProducts extends Component {
                                                     onChange={this.handleChangeProducts}
                                                 />
                                             }
+                                            <button
+                                                type="button"
+                                                className="btn custom_btn btn_yellow rounded-pill px-4 py-1 ms-4"
+                                                onClick={() => window.history.back()}
+                                                style={{ height: "40px" }}
+                                            >
+                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                Back
+                                            </button>
                                         </div>
                                     </nav>
                                     <div className="tab-content" id="nav-tabContent">

@@ -23,6 +23,7 @@ import { Helmet } from 'react-helmet';
 import PageTitle from './../../components/user/common/PageTitle';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
 import { Modal } from 'react-bootstrap';
+import arrow_back from './../../assets/icons/arrow-back.svg'
 
 
 const SellerProfile = () => {
@@ -590,12 +591,12 @@ const SellerProfile = () => {
             <div className='seller_body'>
                 <Header />
                 <PageTitle title="Account" />
-                <Helmet><title>{"Account - Pay Earth"}</title></Helmet>
+                <Helmet><title>{"Seller - Account - Pay Earth"}</title></Helmet>
                 <div className="cumm_page_wrap pt-2 pb-5">
                     <div className="container">
                         <div className="row">
                             <div className="col-lg-12">
-                                <div className="comm_profile">
+                                <div className='comm_profile'>
                                     <div className="post_by">
                                         <div className="poster_img position-relative d-inline-block">
                                             {/* User profile image */}
@@ -610,7 +611,7 @@ const SellerProfile = () => {
                                             <small>{userInfo.role}</small>
                                         </div>
                                     </div>
-                                    <ul className='text-center' >
+                                    <ul className='text-center'>
                                         <li className="w-25" onClick={() => handleClick('followers')}>
                                             <div className="fp_fc">{followers !== null ? followers.length : "0"}</div>
                                             <small>Followers</small>
@@ -628,7 +629,7 @@ const SellerProfile = () => {
                                             <small>Posts</small>
                                         </li>
                                     </ul>
-
+                                         
                                     <Modal
                                         show={AccountshowModal}
                                         onHide={() => setAccountShowModal(false)}
@@ -669,6 +670,17 @@ const SellerProfile = () => {
                                         )}
 
                                     </Modal>
+
+                                    <div className=''>
+                                        <button
+                                            type="button"
+                                            className="btn custum_back_btn btn_yellow mx-auto"
+                                            onClick={() => window.history.back()}
+                                        >
+                                            <img src={arrow_back} alt="back" />&nbsp;
+                                            Back
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <div className="col-lg-9">

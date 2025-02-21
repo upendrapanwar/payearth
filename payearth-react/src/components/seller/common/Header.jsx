@@ -145,11 +145,11 @@ const Header = () => {
                 </Link>
               </li>
 
-              {/* /manage_deals */}
+              {/* /manage-deals */}
 
               <li>
                 <Link
-                  to="/seller/manage_deals"
+                  to="/seller/manage-deals"
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
@@ -160,7 +160,7 @@ const Header = () => {
               </li>
               <li>
                 <Link
-                  to="/seller/manage-banner-list"
+                  to="/seller/manage-advertisement"
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
@@ -177,12 +177,12 @@ const Header = () => {
                   <i className="icon">
                     <img src={shoppingBagIcon} alt="" />
                   </i>{" "}
-                  Listed Products
+                  Listed Items
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/seller/product-stock-management"
+                  to="/seller/product-management"
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
@@ -193,7 +193,7 @@ const Header = () => {
               </li>
               <li>
                 <Link
-                  to="/seller/service-stock-management"
+                  to="/seller/service-management"
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
@@ -226,7 +226,7 @@ const Header = () => {
               </li> */}
               <li>
                 <Link
-                  to="/seller/manage-subscription-plan"
+                  to="/seller/advertising-subscription"
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
@@ -237,14 +237,14 @@ const Header = () => {
                   Subscriptions
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link to="/seller/payments" onClick={() => removeBackdrop()}>
                   <i className="icon">
                     <img src={creditCardIcon} alt="" />
                   </i>{" "}
                   Payments
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link to="/seller/support" onClick={() => removeBackdrop()}>
                   <i className="icon">
@@ -371,9 +371,9 @@ const Header = () => {
                               </div>
                             </Link>
                             <ul className="dropdown-menu dropdown-menu-end mt-5" aria-labelledby="navbarDropdown">
-                              <li><Link className="dropdown-item" to="/Seller-MyProfile">My Profile</Link></li>
+                              <li><Link className="dropdown-item" to="/seller/myprofile">My Profile</Link></li>
                               <li><hr className="dropdown-divider" /></li>
-                              <li><Link className="dropdown-item" to="/seller-profile">Account</Link></li>
+                              <li><Link className="dropdown-item" to="/seller/account">Account</Link></li>
                               {/* <li><Link className="dropdown-item" to="#">Setting</Link></li> */}
                               <li><hr className="dropdown-divider" /></li>
                               <li><Link className="dropdown-item" to="#" onClick={() => logout()} >Log Out</Link></li>
