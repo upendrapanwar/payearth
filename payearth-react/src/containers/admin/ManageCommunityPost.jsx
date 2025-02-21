@@ -102,6 +102,17 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                 user: 'admin',
             };
         }
+        // else if (userInfo.role === 'super_admin') {
+        //     reqBody = {
+        //         content: comments,
+        //         isSeller: false,
+        //         isAdmin: true,
+        //         user_id: null,
+        //         seller_id: null,
+        //         admin_id: authInfo.id,
+        //         user: 'super_admin',
+        //     };
+        // }
         setComments('');
         dispatch(setLoading({ loading: true }))
         axios.post(`admin/postComments/${postId}`, reqBody, {
@@ -481,6 +492,7 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
         ],
     };
 
+
     return (
         <React.Fragment>
             {/* {loading === true ? <SpinnerLoader /> : ''} */}
@@ -521,26 +533,8 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                                 </Link>
                             }
                         </div>
-                        {/* <div className="post_action">
-                            <div className="post-opts">
-                                <a href="#" title="" className="ed-opts-open">
-                                    <img
-                                        src={ellipsis}
-                                        alt="1"
-                                        onClick={onClickMenu}
-                                    />
-                                </a>
-                                <ul className={(selectedMenu === "1") ? 'ed-options showEmoji' : 'ed-options hideEmoji'}>
-                                    <li><a href="#" title={selectedMenu}>Block user</a></li>
-                                    <li><a href="#" title="test">Ban user</a></li>
-                                    <li><a href="#" title="">Hide Post</a></li>
-                                    <li><a href="#" title="">Report Abuse</a></li>
-                                    <li><a href="#" title="">Unfollow User</a></li>
-                                </ul>
-                            </div>
-                        </div> */}
                     </div>
-                    {/* <div className={`${openModal ? '' : 'collapse'} post_follow_pop collapse`} id={`collapseFollow${posts.id}`}> */}
+
                     <div ref={followRef}>
                         {
                             openModal ?
@@ -820,7 +814,7 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                                                                 {val.isSeller
                                                                     ? (val.sellerId && val.sellerId.name ? val.sellerId.name : 'N/A')
                                                                     : val.isAdmin
-                                                                        ? (val.adminId && val.adminId.name ? val.adminId.name : 'N/A')
+                                                                        ? (val.adminId && val.adminId.name + "- Pay earth" ? val.adminId.name + "- Pay earth" : 'N/A')
                                                                         : (val.userId && val.userId.name ? val.userId.name : 'N/A')
                                                                 }
                                                                 {/* {val.isSeller ? (val.sellerId && val.sellerId.name ? val.sellerId.name : 'N/A') : (val.userId && val.userId.name ? val.userId.name : 'N/A')} */}
@@ -841,27 +835,25 @@ const ManageCommunityPost = forwardRef(({ posts, sendEditData, getPosts }, ref) 
                                 </li>
 
                                 <li>
-                                    <div className="add_commnt">
-                                        <div className="avtar_img">
-                                            {/* <img className="img-fluid" src={userImg} alt="" /> */}
-                                            <img
-                                                src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
-                                                alt=""
-                                                className="img-fluid"
-                                            />
-                                        </div>
-                                        <div className="add_comnt">
-                                            <div className="ac_box">
-                                                <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
-                                                <button type="submit" className="btn btn_yellow custom_btn" onClick={() => addNewComment(posts.id)} disabled={!comments.trim()}>
-                                                    {/* <Link data-bs-toggle="collapse" to={`#collapseComment${posts.id}`} role="button" aria-expanded="false" aria-controls={`collapseComment${posts.id}`}>
+                                    {userInfo.role === "super_admin" ? '' :
+                                        <div className="add_commnt">
+                                            <div className="avtar_img">
+                                                <img
+                                                    src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}
+                                                    alt=""
+                                                    className="img-fluid"
+                                                />
+                                            </div>
+                                            <div className="add_comnt">
+                                                <div className="ac_box">
+                                                    <textarea className="form-control" placeholder="Add Comment" name="" id="" rows="3" value={comments} onChange={(e) => handleComments(e)}></textarea>
+                                                    <button type="submit" className="btn btn_yellow custom_btn" onClick={() => addNewComment(posts.id)} disabled={!comments.trim()}>
                                                         Add Comment
-                                                    </Link> */}
-                                                    Add Comment
-                                                </button>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    }
                                 </li>
                             </ul>
                         </div>
