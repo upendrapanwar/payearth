@@ -129,15 +129,12 @@ class Chat extends Component {
 
     componentDidMount() {
         this.fetchAllUserData();
-
         this.socket.emit("active", this.authInfo.id);
-    
         this.socket.on('receive_notification', (notification) => {
             if (notification.id === this.authInfo.id) {
                 this.setState({ notification });
             }
         });
-    
         // this.socket.on('user_online', (userID) => {
         //     this.setState(prevState => ({
         //         onlineUsers: [...prevState.onlineUsers, userID]
@@ -205,7 +202,7 @@ class Chat extends Component {
         if (prevState.userChat !== this.state.userChat && this.chatBoardRef.current) {
           this.chatBoardRef.current.scrollTop = this.chatBoardRef.current.scrollHeight;
         }
-      }
+   }
 
     fetchAllUserData = () => {
         this.setState({ users: "" })

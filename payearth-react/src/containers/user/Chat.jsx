@@ -71,71 +71,6 @@ class Chat extends Component {
         this.sendMessage = this.sendMessage.bind(this)
         this.onEmojiClick = this.onEmojiClick.bind(this);
         this.chatBoardRef = React.createRef();
-
-
-        // this.socket.on('receive_notification', (notification) => {
-        //     if (notification === this.authInfo.id) {
-        //         // this.notify();
-        //     }
-        // });
-
-
-        // this.socket.on('user_online', (userID) => {
-        //     console.log("userId", userID)
-        //     this.setState(prevState => ({
-        //         onlineUsers: [...prevState.onlineUsers, userID]
-        //     }));
-        //     // setOnlineUsers(prevUsers => ({ ...prevUsers, [userID]: true }));
-        // });
-
-        // // this.socket.on('user_offline', (userID) => {
-        // //     this.setState(prevState => {
-        // //       const updatedUsers = { ...prevState.onlineUsers };
-        // //       delete updatedUsers[userID];
-        // //       return { onlineUsers: updatedUsers };
-        // //     });
-        // //   });
-
-        // this.socket.on('message_recieved', (data) => {
-
-        //     // console.log("chat select id ", this.state.sendChatData.chatId);
-        //     // console.log(" msg reciving chat id", data.chat._id);
-
-        //     if (data.chat._id === this.state.sendChatData.chatId) {
-        //         this.fetchAllUserData();
-        //         // this.notify();   Waiting for notification task..
-        //         this.setState(prevState => ({
-        //             userChat: [...prevState.userChat, data]
-        //         }));
-        //     }
-        //     this.fetchAllUserData();
-
-        //     // if (data) { data.chat._id !== this.state.allChatUsers._id ? <> No NOTIFICATION </> : <> YES NOTIFICATION</> }
-
-
-
-        //     // if (this.allChatUsers.id !== data.chat.id) {
-        //     //     if (!this.notification.includes(data)) {
-        //     //         this.setState({
-        //     //             notification: [data, ...this.notification]
-        //     //         })
-        //     //         // update list of chat
-        //     //     }
-        //     // } else {
-        //     //     this.setState(prevState => ({
-        //     //         userChat: [...prevState.userChat, data]
-        //     //     }));
-
-        //     // }
-
-        //     // if (this.allChatUsers._id === data.chat._id) {
-        //     //     console.log(`chatID is match ${this.allChatUsers._id} or ${data.chat._id}`)
-        //     // }
-
-        //     // this.setState(prevState => ({
-        //     //     userChat: [...prevState.userChat, data]
-        //     // }));
-        // })
     }
 
 
@@ -190,25 +125,6 @@ class Chat extends Component {
 
     }
 
-
-    // componentDidUpdate() {
-    //     const {allChatUsers} = this.setState;
-    //     console.log("allChatUsers in component did mount...", allChatUsers)
-    //     this.socket.on('message_recieved', (data) => {
-    //         console.log("message_recieved in componentDidUpdate.....", data)
-    //         // if (data.chat._id !== this.allChatUsers._id) {
-    //         //     console.log("no NOTIFICATION")
-    //         // } else {
-    //         //     console.log("yes NOTIFICATION")
-    //         // }
-    //     })
-    // }
-
-
-    // componentWillUnmount() {
-    //     this.socket.close();
-    // }
-
     componentDidUpdate(prevProps, prevState) {
         // Scroll to the bottom of the chat board whenever new messages are added
         if (prevState.userChat !== this.state.userChat && this.chatBoardRef.current) {
@@ -230,16 +146,7 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             }).then((response) => {
-                const users = response.data.data;
-                // console.log("fetchChat", users)
-
-                // const isGroupchat = users.filter(item => item.isGroupChat === true && item.chatUsers.length > 2)
-
-
-                // const isOneChat = users.filter(item => item.isGroupChat === false)
-                // const data = res.map(item => item.usersAll[0].users)
-                // // const data = users.map(item => item.usersAll[0].users)
-                // console.log("chatName", res.map(item => item.chatName))
+                const users = response.data.data;             
                 this.setState({ allChatUsers: users });
                 this.supportAdminChat()
             }).catch((error) => {

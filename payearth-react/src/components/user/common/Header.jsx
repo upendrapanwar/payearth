@@ -152,7 +152,17 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
 
   const handleCatChange = (selectedOption) => setCatSelectedOption(selectedOption);
 
-  const handleSearchInput = (event) => setSearchOption(event.target.value);
+  // const handleSearchInput = (event) => setSearchOption(event.target.value);
+
+
+  const handleSearchInput = (event) => {
+    const value = event.target.value;
+    setSearchOption(value); // Update state
+
+    if (value === "") {
+      handleSearchProductFilter(); // Call function when input is empty
+    }
+  };
 
   const handleIsService = (event) => {
     const isServiceValue = parseInt(event.target.value);
@@ -380,14 +390,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
       getCategories(catId);
       setFlag(true);
     }
-    // if (isToggle === false) {
-    //   console.log("isToggle ????", isToggle)
-    //   if (location.pathname === "/service-listing") {
-    //     dispatch(setIsService({ isService: 1 }));
-    //   } else if (location.pathname === "/product-listing") {
-    //     dispatch(setIsService({ isService: 0 }));
-    //   }
-    // }
+
     let requestBody = isService === 0 ? { is_service: false } : { is_service: true };
     axios.post("front/product/categories/menu", requestBody)
       .then((response) => {
@@ -495,7 +498,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
   const fetchNotification = async (userId) => {
     try {
       axios.get(`front/notifications/${userId}`).then(response => {
-        console.log('response-- of notification',response)
+        console.log('response-- of notification', response)
         const responseData = response.data.data
         if (Array.isArray(responseData) && responseData.length > 0) {
           const offlineNotifications = response.data.data.filter(notification => !notification.notification.isRead);
@@ -524,28 +527,6 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
   };
 
   const handleSearchServiceFilter = async () => {
-    // try {
-    //   const query = new URLSearchParams();
-    //   if (catSelectedOption.label !== 'All') query.append('category', catSelectedOption.label);
-    //   if (searchOption) query.append('name', searchOption);
-    //   const response = await axios.get(`/front/searchFilterServices?${query.toString()}`, {
-    //     headers: {
-    //       'Accept': 'application/json',
-    //       'Content-Type': 'application/json;charset=UTF-8',
-    //     },
-    //   });
-    //   console.log("response form searching..:", response.data.data);
-    //   history.push("/service-listing")
-    //   if (window.location.pathname === "/service-listing") {
-    //     sendServiceData(response.data.data);
-    //   }
-
-    // } catch (error) {
-    //   toast.error("Data Not Found", { autoClose: 3000 })
-    //   console.error('Error fetching users:', error);
-    // }
-
-
     try {
       const query = new URLSearchParams();
       if (catSelectedOption.label !== 'All') query.append('category', catSelectedOption.label);
@@ -575,6 +556,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
           'Content-Type': 'application/json;charset=UTF-8',
         },
       });
+      console.log("response form search product >>>>.", response.data.data)
       history.push(`/product-listing?cat=${catSelectedOption.value}&searchText=${searchOption || ''}`)
     } catch (error) {
       toast.error("Data Not Found", { autoClose: 3000 })
@@ -964,13 +946,12 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                       </div>
                       <div className="offcanvas-body d-block">
                         <div className="nav_wrapper w-100 mt-2">
-                          <form className="drop d-lg-flex">
+                          <form className="drop d-lg-flex justify-content-end">
                             <Select
                               className="custom_select w-50"
                               options={categoryOptions}
                               value={catSelectedOption}
                               onChange={handleCatChange}
-                              placeholder={<div>Select</div>}
                             />
                             <input
                               className="form-control border-start height-auto"
@@ -988,6 +969,12 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                                 className="btn btn_dark"
                                 type="button"
                                 onClick={handleSearchProductFilter}
+                                disabled={
+                                  !(
+                                    catSelectedOption?.label === 'All' ||
+                                    (catSelectedOption?.label !== 'All' && (searchOption || '').trim() !== '')
+                                  )
+                                }
                               >
                                 Search
                               </button>

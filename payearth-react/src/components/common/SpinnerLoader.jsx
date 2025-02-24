@@ -1,7 +1,7 @@
 import React from 'react';
 
 const SpinnerLoader = (props) => {
-    return(
+    return (
         <div className="spinner_loader">
             <div className="spinner-border" role="status">
                 <span className="sr-only">Loading...</span>
