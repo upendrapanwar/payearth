@@ -74,12 +74,12 @@ const Header = () => {
                         {userInfo.role === 'seller' &&
                             <ul className="side_menu_links">
                                 <li><Link to="/seller/dashboard" onClick={() => removeBackdrop()} ><i className="icon"><img src={dashboardIcon} alt="" /></i>Dashboard</Link></li>
-                                <li><Link to="/seller/listed-items" onClick={() => removeBackdrop()} ><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Listed Products</Link></li>
-                                <li><Link to="/seller/product-stock-management" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Product Management</Link></li>
-                                <li><Link to="/seller/service-stock-management" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Service Management</Link></li>
+                                <li><Link to="/seller/listed-items" onClick={() => removeBackdrop()} ><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Listed Items</Link></li>
+                                <li><Link to="/seller/product-management" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Product Management</Link></li>
+                                <li><Link to="/seller/service-management" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Service Management</Link></li>
                                 <li><Link to="/seller/product-orders" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Product Orders</Link></li>
                                 <li><Link to="/seller/service-orders" onClick={() => removeBackdrop()}><i className="icon"><img src={shoppingBagIcon} alt="" /></i> Service Orders</Link></li>
-                                <li><Link to="/seller/payments" onClick={() => removeBackdrop()}><i className="icon"><img src={creditCardIcon} alt="" /></i> Payments</Link></li>
+                                {/* <li><Link to="/seller/payments" onClick={() => removeBackdrop()}><i className="icon"><img src={creditCardIcon} alt="" /></i> Payments</Link></li> */}
                                 <li><Link to="#" onClick={() => logout()}><i className="icon"><img src={logoutIcon} alt="" /></i> Logout</Link></li>
                             </ul>
                         }

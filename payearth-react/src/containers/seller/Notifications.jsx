@@ -15,6 +15,7 @@ import "react-data-table-component-extensions/dist/index.css";
 // import { DateRangePicker } from "react-date-range";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css";
+import arrow_back from "../../assets/icons/arrow-back.svg"
 
 const SellerNotifications = () => {
   const [notification, setNotification] = useState([]);
@@ -132,14 +133,14 @@ const SellerNotifications = () => {
             <Link
               to={
                 {
-                  comment: `/seller-profile?postId=${row.notification.postId}`,
-                  like: `/seller-profile?postId=${row.notification.postId}`,
+                  comment: `/seller/account?postId=${row.notification.postId}`,
+                  like: `/seller/account?postId=${row.notification.postId}`,
                   chat: `/seller/chat`,
-                  Meeting_Request: `/seller/service-stock-management`,
+                  Meeting_Request: `/seller/service-management`,
                 }[row.notification.type] || '#'
               }
               onClick={() => updateReadStatus(row.notification._id)}
-            className="flex-grow-1" // This ensures the card takes full width
+              className="flex-grow-1" // This ensures the card takes full width
             >
 
               <div className="card-header d-flex justify-content-between align-items-center text-primary">
@@ -160,15 +161,15 @@ const SellerNotifications = () => {
               </div>
 
             </Link>
-          
-          {/* Delete Icon (only if notification is seen) */}
-          {row.notification.isSeen && (
-            <i
-              className="bi bi-trash fs-3 text-danger m-3"
-              onClick={() => removeNotification(row.notification._id)}
-              style={{ cursor: "pointer" }}
-            ></i>
-          )}
+
+            {/* Delete Icon (only if notification is seen) */}
+            {row.notification.isSeen && (
+              <i
+                className="bi bi-trash fs-3 text-danger m-3"
+                onClick={() => removeNotification(row.notification._id)}
+                style={{ cursor: "pointer" }}
+              ></i>
+            )}
           </div>
         </div>
         {/* </div> */}
@@ -182,7 +183,7 @@ const SellerNotifications = () => {
       {loading === true ? <SpinnerLoader /> : ''}
       <Header readStatus={read} />
       <PageTitle title="Notifications" />
-      <Helmet><title>{"Notification - Pay Earth"}</title></Helmet>
+      <Helmet><title>{"Seller - Notification - Pay Earth"}</title></Helmet>
       <section className="inr_wrap">
         <div className="container">
           <div className="row">
@@ -227,9 +228,10 @@ const SellerNotifications = () => {
                   <div></div>
                   <button
                     type="button"
-                    className="btn custom_btn btn_yellow"
+                    className="btn custum_back_btn btn_yellow"
                     onClick={() => window.history.back()}
                   >
+                    <img src={arrow_back} alt="back" />&nbsp;
                     Back
                   </button>
                 </div>

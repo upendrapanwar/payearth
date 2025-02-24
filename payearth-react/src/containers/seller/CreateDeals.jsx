@@ -454,7 +454,7 @@ class ManageDeals extends Component {
                             <h2>Manage Deals</h2>
                         </div>
                         <Helmet>
-                            <title>{"Manage Deals - Pay Earth"}</title>
+                            <title>{"Seller - Manage Deals - Pay Earth"}</title>
                         </Helmet>
                         <div className="row">
                             <div className="col-lg-4">
@@ -729,7 +729,19 @@ class ManageDeals extends Component {
                                     <div className="dash_inner_wrap pb-2">
                                         <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
                                             <div className="dash_title">All Deals</div>
-                                            <Link to="/seller/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link>
+                                            {/* <Link to="/seller/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link> */}
+                                            <div className="">
+                                                <span>
+                                                    <button
+                                                        type="button"
+                                                        className="btn custum_back_btn btn_yellow mx-auto"
+                                                        onClick={() => window.history.back()}
+                                                    >
+                                                        <img src={arrow_back} alt="back" />&nbsp;
+                                                        Back
+                                                    </button>
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="row">

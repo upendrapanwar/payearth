@@ -210,7 +210,7 @@ class ManageBannerAdvertisement extends Component {
             }
         }).then((response) => {
             console.log("SUCCESS BANNER POST", response.date);
-            this.props.history.push('/admin/manage-banner-list')
+            this.props.history.push('/admin/manage-advertisement')
         }).catch((error) => {
             console.log("error in save banner date", error);
         });
@@ -357,14 +357,14 @@ class ManageBannerAdvertisement extends Component {
                     <h2>Create New Advertisement</h2>
                 </div>
                 <section className="inr_wrap">
-                    <Helmet><title>{"Manage Advertisement - Pay Earth"}</title></Helmet>
+                    <Helmet><title>{"Create Advertisement - Pay Earth"}</title></Helmet>
                     <div className="container">
                         <div className="row">
                             <div className="col-md-12">
                                 <div className="cart adv_banner_wrapper">
                                     <div className="noti_wrap">
                                         <div className=""><span>
-                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-banner-list">My Advertisement</Link>
+                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-advertisement">My Advertisement</Link>
                                         </span></div>
                                     </div>
                                     <div className="cart_list adv_banner_panel">

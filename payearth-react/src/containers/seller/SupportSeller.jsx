@@ -4,6 +4,7 @@ import Footer from '../../components/common/Footer';
 import { Link, useHistory } from 'react-router-dom';
 import axios from 'axios';
 import arrow_back from '../../assets/icons/arrow-back.svg'
+import { Helmet } from 'react-helmet';
 
 
 const SupportSeller = () => {
@@ -62,6 +63,9 @@ const SupportSeller = () => {
             <div className="inr_top_page_title">
                 <h2>Support</h2>
             </div>
+            <Helmet>
+                <title>{"Seller - Support - Pay Earth"}</title>
+            </Helmet>
             <section className="admin-dashboard-wrapper">
                 <div className="inr_wrap dash_inner_wrap support_manager_wrapper">
                     <div className="col-md-12">
@@ -88,7 +92,7 @@ const SupportSeller = () => {
 
                                                 <div className="support_button">
                                                     {/* <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/seller-support-email" id="email" >Email on your Question</Link> */}
-                                                    <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/support_ticket_seller"  >Request for support ticket</Link>
+                                                    <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/support-tickets"  >Request for support ticket</Link>
                                                     <Link className="btn custom_btn btn_yellow mx-auto" to="/seller/support-call" id="call" >Request a call</Link>
                                                     <Link className="btn custom_btn btn_yellow mx-auto" to="#" onClick={() => handleSupportChat()}>Chat</Link>
                                                 </div>

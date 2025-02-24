@@ -357,7 +357,7 @@ class SellerManageBannerAdvertisement extends Component {
                         console.log("error", error)
                     }
                     toast.success("Advertise Create Succesfully..", { autoClose: 3000 })
-                    this.props.history.push('/seller/manage-banner-list');
+                    this.props.history.push('/seller/manage-advertisement');
                 } else {
                     toast.error("Somthing went wrong....", { autoClose: 3000 })
                 }
@@ -698,7 +698,7 @@ class SellerManageBannerAdvertisement extends Component {
                     <h2>Create New Advertisement</h2>
                 </div>
                 <Helmet>
-                    <title>{"Manage Advertisement - Pay Earth"}</title>
+                    <title>{"Seller - Create Advertisement - Pay Earth"}</title>
                 </Helmet>
                 <section className="inr_wrap">
                     <div className="container">
@@ -708,7 +708,7 @@ class SellerManageBannerAdvertisement extends Component {
                                     {sellerSubscriptionPlan !== "" ? <>
                                         <h3 className="text-center selectPlanHeading text-bg-success p-3">Your Subscription Plan Is Active </h3> </> : <>
                                         <h2 className="text-center text-bg-danger p-3 position-relative">No Any Subscription Plan Is Active
-                                            <Link to="/seller/manage-subscription-plan" className="position-absolute top-1 end-0">
+                                            <Link to="/seller/advertising-subscription" className="position-absolute top-1 end-0">
                                                 <span className="text-bg-success">Buy Subscription....</span>
                                             </Link>
                                         </h2>
@@ -718,7 +718,7 @@ class SellerManageBannerAdvertisement extends Component {
                                 <div className="cart adv_banner_wrapper">
                                     <div className="noti_wrap">
                                         <div className=""><span>
-                                            <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/manage-banner-list">
+                                            <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/manage-advertisement">
                                                 <img src={arrow_back} alt="linked-in" />&nbsp;
                                                 Back
                                             </Link>

@@ -178,7 +178,7 @@ class MyBanner extends Component {
   }
 
   handleEdit = (id) => {
-    this.props.history.push(`/user/banner-edit/${id}`);
+    this.props.history.push(`/user/edit-Advertisement/${id}`);
   }
 
 

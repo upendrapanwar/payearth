@@ -12,6 +12,7 @@ import { NotFound } from '../../components/common/NotFound';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 class ProductOrders extends Component {
     constructor(props) {
@@ -284,7 +285,7 @@ class ProductOrders extends Component {
                         <h2>Product Orders</h2>
                     </div>
                     <Helmet>
-                        <title>{"Product Orders - Pay Earth"}</title>
+                        <title>{"Seller - Product Orders - Pay Earth"}</title>
                     </Helmet>
                     <div className="seller_dash_wrap pt-2 pb-5">
                         <div className="container">
@@ -293,6 +294,15 @@ class ProductOrders extends Component {
                                     <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
                                         <div className="dash_title">Product Orders</div>
                                         {/* <Link to="#" className="custom_btn btn_yellow w-auto btn">Add Product</Link> */}
+                                        <button
+                                            type="button"
+                                            className="btn custom_btn btn_yellow rounded-pill px-4 py-1 ms-4"
+                                            onClick={() => window.history.back()}
+                                            style={{ height: "40px" }}
+                                        >
+                                            <img src={arrow_back} alt="back" />&nbsp;
+                                            Back
+                                        </button>
                                     </div>
                                 </div>
                                 <nav className="orders_tabs">

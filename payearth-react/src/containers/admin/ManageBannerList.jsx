@@ -180,7 +180,7 @@ class ManageBannerList extends Component {
   };
 
   handleEdit = (id) => {
-    this.props.history.push(`/admin/manage-banner-list-edit/${id}`);
+    this.props.history.push(`/admin/manage-advertisement-edit/${id}`);
   };
 
   handleStatusUpdate = (id) => {
@@ -386,7 +386,7 @@ class ManageBannerList extends Component {
                           <div className="d-flex gap-2">
                             <Link
                               className={`btn custom_btn mx-auto ${this.state.permissions.add ? 'btn_yellow' : 'btn_disabled'}`}
-                              to={this.state.permissions.add ? "/admin/manage-banner-advertisement" : "#"}
+                              to={this.state.permissions.add ? "/admin/create-advertisement" : "#"}
                               onClick={(e) => {
                                 if (!this.state.permissions.add) {
                                   e.preventDefault();

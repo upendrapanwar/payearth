@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { setLoading } from '../../store/reducers/global-reducer';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import DetailComponent from '../../components/seller/common/ProductDetail';
+import { Helmet } from 'react-helmet';
 
 class ServiceDetail extends Component {
     constructor(props) {
@@ -77,6 +78,9 @@ class ServiceDetail extends Component {
                 {loading === true ? <SpinnerLoader /> : ''}
                 <div className="seller_body">
                     <Header />
+                    <Helmet>
+                        <title>{"Seller - Service Detail - Pay Earth"}</title>
+                    </Helmet>
                     <DetailComponent data={serviceDetail} colors={colors} type="service" />
                     <Footer />
                 </div>

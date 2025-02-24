@@ -366,7 +366,7 @@ function App() {
           />
 
           <PrivateRoute
-            path="/user/banner-edit/:id"
+            path="/user/edit-Advertisement/:id"
             component={MyBannerEdit}
             roles={[Role.user]}
             currentUserRole={userInfo.role}
@@ -406,7 +406,7 @@ function App() {
           {/* ManageDeals */}
 
           <PrivateRoute
-            path="/seller/manage_deals"
+            path="/seller/manage-deals"
             component={ManageDeals}
             roles={[Role.seller]}
             currentUserRole={userInfo.role}
@@ -452,7 +452,7 @@ function App() {
 
           {/* SellerManageSubscription */}
           <PrivateRoute
-            path="/seller/manage-subscription-plan"
+            path="/seller/advertising-subscription"
             component={SellerManageSubscription}
             roles={[Role.seller]}
             currentUserRole={userInfo.role}
@@ -460,7 +460,7 @@ function App() {
           />
 
           <PrivateRoute
-            path="/seller/manage-banner-advertisement"
+            path="/seller/create-advertisement"
             component={SellerManageBannerAdvertisement}
             roles={[Role.seller]}
             currentUserRole={userInfo.role}
@@ -468,7 +468,7 @@ function App() {
           />
 
           <PrivateRoute
-            path="/seller/manage-banner-list"
+            path="/seller/manage-advertisement"
             component={SellerBannerList}
             roles={[Role.seller]}
             currentUserRole={userInfo.role}
@@ -476,7 +476,7 @@ function App() {
           />
 
           <PrivateRoute
-            path="/seller/banner-edit/:id"
+            path="/seller/edit-Advertisement/:id"
             component={SellerBannerEdit}
             roles={[Role.seller]}
             currentUserRole={userInfo.role}
@@ -484,7 +484,7 @@ function App() {
           />
 
           <PrivateRoute
-            path="/seller/product-stock-management"
+            path="/seller/product-management"
             component={ProductStockManagement}
             roles={[Role.seller]}
             currentUserRole={userInfo.role}
@@ -508,7 +508,7 @@ function App() {
           />
 
           <PrivateRoute
-            path="/seller/service-stock-management"
+            path="/seller/service-management"
             component={ServiceStockManagement}
             roles={[Role.seller]}
             currentUserRole={userInfo.role}
@@ -1024,7 +1024,7 @@ function App() {
           />
           {/* Community Routes */}
           <PrivateRoute
-            path="/admin/manage-banner-advertisement"
+            path="/admin/create-advertisement"
             component={ManageBannerAdvertisement}
             roles={[Role.super_admin, Role.admin, Role.manager]}
             currentUserRole={userInfo.role}
@@ -1048,7 +1048,7 @@ function App() {
           />
 
           <PrivateRoute
-            path="/admin/manage-banner-list"
+            path="/admin/manage-advertisement"
             component={ManageBannerList}
             roles={[Role.super_admin, Role.admin, Role.manager]}
             currentUserRole={userInfo.role}
@@ -1056,7 +1056,7 @@ function App() {
           />
 
           <PrivateRoute
-            path="/admin/manage-banner-list-edit/:id"
+            path="/admin/manage-advertisement-edit/:id"
             component={ManageBannerListEdit}
             roles={[Role.super_admin, Role.admin, Role.manager]}
             currentUserRole={userInfo.role}
@@ -1109,7 +1109,7 @@ function App() {
           />
 
           <PrivateRoute
-            path="/seller-profile"
+            path="/seller/account"
             restricted={false}
             component={SellerProfile}
             exact
@@ -1138,7 +1138,7 @@ function App() {
           />
 
           <PrivateRoute
-            path="/seller/support_ticket_seller"
+            path="/seller/support-tickets"
             restricted={false}
             component={SupportTicketSeller}
             exact
@@ -1159,7 +1159,7 @@ function App() {
           />
 
           <PrivateRoute
-            path="/Seller-MyProfile"
+            path="/seller/myprofile"
             roles={[Role.seller]}
             currentUserRole={userInfo.role}
             component={SellerMyProfile}
@@ -1235,7 +1235,7 @@ function App() {
           />
 
           <PrivateRoute
-            path="/admin/manage_deals"
+            path="/admin/manage-deals"
             component={AdminManageDeals}
             roles={[Role.super_admin, Role.admin, Role.manager]}
             currentUserRole={userInfo.role}

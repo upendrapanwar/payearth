@@ -22,6 +22,7 @@ import { toast } from 'react-toastify';
 import { Helmet } from 'react-helmet';
 import PageTitle from './../../components/user/common/PageTitle';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 
 // const Header = lazy(() => import("../../components/seller/common/Header"));
@@ -491,14 +492,14 @@ const SellerCommunity = () => {
 
                 <Header />
                 <PageTitle title="Community" />
-                <Helmet><title>{"Community - Pay Earth"}</title></Helmet>
+                <Helmet><title>{"Seller - Community - Pay Earth"}</title></Helmet>
                 <div className="cumm_page_wrap pt-2 pb-5">
                     <div className="container">
                         <div className="row">
                             <div className="col-lg-12">
                                 <div className="comm_profile myComm_profile_panel">
                                     <div className="post_by">
-                                        <Link to="/Seller-MyProfile" className="pointer poster_img"><img src={userInfo.imgUrl} alt="" /></Link>
+                                        <Link to="/seller/myprofile" className="pointer poster_img"><img src={userInfo.imgUrl} alt="" /></Link>
                                         <div className="poster_info">
                                             <div className="poster_name">{userInfo.name}</div>
                                         </div>
@@ -557,6 +558,17 @@ const SellerCommunity = () => {
                                         )}
 
                                     </Modal>
+
+                                    <div className=''>
+                                        <button
+                                            type="button"
+                                            className="btn custum_back_btn btn_yellow mx-auto"
+                                            onClick={() => window.history.back()}
+                                        >
+                                            <img src={arrow_back} alt="back" />&nbsp;
+                                            Back
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -573,7 +585,7 @@ const SellerCommunity = () => {
                                     </div>
                                     <div className="cp_body">
                                         <div className="com_user_acc">
-                                            <Link to='/Seller-MyProfile'>
+                                            <Link to='/seller/myprofile'>
                                                 <div className="com_user_img">
                                                     <img
                                                         src={userInfo.imgUrl && userInfo.imgUrl.trim() !== "" ? userInfo.imgUrl : userImg}

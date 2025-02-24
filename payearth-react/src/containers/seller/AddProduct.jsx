@@ -306,7 +306,7 @@ class AddProduct extends Component {
                 toast.dismiss();
                 toast.success(successMsg, { autoClose: 3000 });
                 this.dispatch(setLoading({ loading: true }));
-                this.props.history.push('/seller/product-stock-management');
+                this.props.history.push('/seller/product-management');
             }
         }).catch(error => {
             if (error.response && error.response.data.status === false) {
@@ -394,7 +394,7 @@ class AddProduct extends Component {
                         <h2>Add Product</h2>
                     </div>
                     <Helmet>
-                        <title>{"Add Product - Pay Earth"}</title>
+                        <title>{"Seller - Add Product - Pay Earth"}</title>
                     </Helmet>
                     <div className="seller_dash_wrap pt-1 pb-5">
                         <div className="container ">
@@ -410,12 +410,24 @@ class AddProduct extends Component {
                                                 <div className="row">
                                                     <div className="col-md-12 pt-4 pb-5  d-flex justify-content-between align-items-center">
                                                         <div className="dash_title">Add Product</div>
-                                                        <div className=""><span>
-                                                            <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/product-stock-management">
+                                                        {/* <div className=""><span>
+                                                            <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/product-management">
                                                                 <img src={arrow_back} alt="linked-in" />&nbsp;
                                                                 Back
                                                             </Link>
-                                                        </span></div>
+                                                        </span></div> */}
+                                                        <div className="">
+                                                            <span>
+                                                                <button
+                                                                    type="button"
+                                                                    className="btn custum_back_btn btn_yellow mx-auto"
+                                                                    onClick={() => window.history.back()}
+                                                                >
+                                                                    <img src={arrow_back} alt="back" />&nbsp;
+                                                                    Back
+                                                                </button>
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                     <div className="col-md-4">
                                                         <div className="mb-4">

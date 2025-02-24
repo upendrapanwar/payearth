@@ -383,7 +383,7 @@ class EditProduct extends Component {
                 toast.dismiss();
                 toast.success(successMsg, { autoClose: 3000 });
                 this.dispatch(setLoading({ loading: true }));
-                this.props.history.push('/seller/product-stock-management');
+                this.props.history.push('/seller/product-management');
             }
         }).catch(error => {
             if (error.response && error.response.data.status === false) {
@@ -438,7 +438,7 @@ class EditProduct extends Component {
                     toast.dismiss();
                     this.dispatch(setLoading({ loading: true }));
                     toast.success(response.data.message, { autoClose: 3000 });
-                    this.props.history.push('/seller/product-stock-management');
+                    this.props.history.push('/seller/product-management');
                     console.log("run if Condition")
                 } else {
                     console.log("run else condition")
@@ -489,7 +489,7 @@ class EditProduct extends Component {
                         <h2>Edit Product</h2>
                     </div>
                     <Helmet>
-                        <title>{"Edit Product - Pay Earth"}</title>
+                        <title>{"Seller - Edit Product - Pay Earth"}</title>
                     </Helmet>
                     <div className="seller_dash_wrap pt-2 pb-5">
                         <div className="container ">
@@ -525,10 +525,15 @@ class EditProduct extends Component {
                                                     <div className="col-md-12 pt-4 pb-5  d-flex justify-content-between align-items-center">
                                                         <div className="dash_title">Edit Product</div>
                                                         <div className=""><span>
-                                                            <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/product-stock-management">
-                                                                <img src={arrow_back} alt="linked-in" />&nbsp;
+                                                            {/* <Link className="btn custom_btn btn_yellow mx-auto " to="/seller/product-management"> */}
+                                                            <button
+                                                                type="button"
+                                                                className="btn custum_back_btn btn_yellow mx-auto"
+                                                                onClick={() => window.history.back()}
+                                                            >
+                                                                <img src={arrow_back} alt="back" />&nbsp;
                                                                 Back
-                                                            </Link>
+                                                            </button>
                                                         </span></div>
                                                     </div>
                                                     <div className="col-md-4">
