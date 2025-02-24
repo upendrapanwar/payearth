@@ -20,7 +20,6 @@ import { Helmet } from 'react-helmet';
 import GoToTop from './../../helpers/GoToTop';
 
 const ServicesListing = () => {
-    // const dispatch = useDispatch();
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const category = queryParams.get("cat");
