@@ -4,7 +4,6 @@ import PageTitle from '../../components/user/common/PageTitle';
 import Footer from '../../components/common/Footer';
 import { Link } from 'react-router-dom';
 import add_user_icon from './../../assets/icons/add_user_icon.svg';
-import defaultPdf_icon from './../../assets/icons/document_icon.svg';
 import delete_icone from './../../assets/icons/delete_icone.svg';
 import edit_icon from './../../assets/icons/edit_icon.svg';
 import block_icon from './../../assets/icons/block_icon.svg';
@@ -14,6 +13,9 @@ import group_profile from './../../assets/icons/grp_icone.svg';
 import back_icon_circle from './../../assets/icons/back_icon_circle.svg'
 import lets_chats from './../../assets/icons/Chats.svg';
 import chat_not_found from './../../assets/icons/lets_chats.svg';
+import docx from './../../assets/icons/docx.svg';
+import defaultPdf_icon from './../../assets/icons/document_icon.svg';
+import excel from "./../../assets/icons/excel.svg";
 import chatThumb from './../../assets/images/chat-thumb.jpg';
 import { setLoading } from '../../store/reducers/global-reducer';
 import SpinnerLoader from './../../components/common/SpinnerLoader';
@@ -769,7 +771,7 @@ class Chat extends Component {
             return 'image';
         } else if (['mp4', 'webm', 'ogg'].includes(extension)) {
             return 'video';
-        } else if (['pdf', 'docx'].includes(extension)) {
+        } else if (['pdf', 'docx', 'xlsx'].includes(extension)) {
             return 'document';
         } else {
             return 'unknown';
@@ -789,21 +791,40 @@ class Chat extends Component {
                     </video>
                 );
             case 'document':
-                return (
-                    <embed
-                        src={url} type="application/pdf"
-                        width="300px"
-                        height="300px"
-                        // alt={defaultPdf_icon}
-
-                        onError={(e) => {
-                            e.target.style.display = 'none';
-                            <img src={defaultPdf_icon} alt="Failed to load PDF" />
-                        }}
-                    />
-                );
-            default:
-                return <p>Unsupported media type</p>;
+                if (url.endsWith(".docx") || url.endsWith(".doc")) {
+                    return (
+                        <div>
+                            <a href={url} download target="_blank" rel="noopener noreferrer">
+                                <img src={docx} alt="Document" width={120} height={120} />
+                            </a>
+                        </div>
+                    );
+                } else if (url.endsWith(".pdf")) {
+                    return (
+                        <div>
+                            <a href={url} download target="_blank" rel="noopener noreferrer">
+                                <img src={defaultPdf_icon} alt="PDF Document" width={120} height={120} />
+                            </a>
+                        </div>
+                    );
+                } else if (url.endsWith(".txt")) {
+                    return (
+                        <div>
+                            <a href={url} download target="_blank" rel="noopener noreferrer">
+                                <img src={''} alt="Text Document" width={120} height={120} />
+                            </a>
+                        </div>
+                    );
+                } else if (url.endsWith(".xlsx") || url.endsWith(".xls")) {
+                    return (
+                        <div>
+                            <a href={url} download target="_blank" rel="noopener noreferrer">
+                                <img src={excel} alt="Excel Document" width={120} height={120} />
+                            </a>
+                        </div>
+                    );
+                }
+                return <p>Unsupported document type</p>;
         }
     }
 

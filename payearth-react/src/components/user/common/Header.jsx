@@ -20,6 +20,7 @@ import ResetPwdModal from "../../common/modals/ResetPwdModal";
 import logo from "./../../../assets/images/logo.png";
 import closeIcon from "./../../../assets/icons/close_icon.svg";
 import shoppingBagIcon from "./../../../assets/icons/shopping-bag.svg";
+import payearth_qr_code from "./../../../assets/icons/payearth-qr-code.svg";
 import creditCardIcon from "./../../../assets/icons/credit-card.svg";
 import notificationBellIcon from "./../../../assets/icons/notification-bell.svg";
 import notificationBellWhiteIcon from "./../../../assets/icons/notification-bell-white.svg";
@@ -31,6 +32,7 @@ import serviceIcon from "./../../../assets/icons/services_icon.svg";
 import { authVerification } from "../../../helpers/auth-verification";
 import io from 'socket.io-client';
 import { clearCart } from '../../../store/reducers/cart-slice-reducer';
+import BarcodeScannerComponent from "react-qr-barcode-scanner";
 
 
 const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProductsData }) => {
@@ -921,6 +923,9 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                     <Link className="navbar-brand py-0" to="/">
                       <img src={logo} alt="logo" className="img-fluid" />
                     </Link>
+                    {/* <Link className="" to="#"> */}
+                      <img src={payearth_qr_code} alt="qr-code" className="img-fluid" width={100} height={100} />
+                    {/* </Link> */}
                     <button
                       className="navbar-toggler"
                       type="button"

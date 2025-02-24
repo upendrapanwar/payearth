@@ -3,8 +3,9 @@ import Header from '../../components/admin/common/Header';
 import PageTitle from '../../components/user/common/PageTitle';
 import Footer from '../../components/common/Footer';
 import { Link } from 'react-router-dom';
-import add_user_icon from './../../assets/icons/add_user_icon.svg';
+import docx from './../../assets/icons/docx.svg';
 import defaultPdf_icon from './../../assets/icons/document_icon.svg';
+import excel from "./../../assets/icons/excel.svg";
 import delete_icone from './../../assets/icons/delete_icone.svg';
 import edit_icon from './../../assets/icons/edit_icon.svg';
 import block_icon from './../../assets/icons/block_icon.svg';
@@ -68,7 +69,7 @@ class Chat extends Component {
         this.handleMessageContent = this.handleMessageContent.bind(this)
         // this.accessChat = this.accessChat.bind(this)
         this.sendMessage = this.sendMessage.bind(this)
-        this.chatBoardRef = React.createRef(); 
+        this.chatBoardRef = React.createRef();
 
 
 
@@ -200,9 +201,9 @@ class Chat extends Component {
     componentDidUpdate(prevProps, prevState) {
         // Scroll to the bottom of the chat board whenever new messages are added
         if (prevState.userChat !== this.state.userChat && this.chatBoardRef.current) {
-          this.chatBoardRef.current.scrollTop = this.chatBoardRef.current.scrollHeight;
+            this.chatBoardRef.current.scrollTop = this.chatBoardRef.current.scrollHeight;
         }
-   }
+    }
 
     fetchAllUserData = () => {
         this.setState({ users: "" })
@@ -825,7 +826,7 @@ class Chat extends Component {
             return 'image';
         } else if (['mp4', 'webm', 'ogg'].includes(extension)) {
             return 'video';
-        } else if (['pdf', 'docx'].includes(extension)) {
+        } else if (['pdf', 'docx', 'xlsx'].includes(extension)) {
             return 'document';
         } else {
             return 'unknown';
@@ -845,21 +846,40 @@ class Chat extends Component {
                     </video>
                 );
             case 'document':
-                return (
-                    <embed
-                        src={url} type="application/pdf"
-                        width="300px"
-                        height="300px"
-                        // alt={defaultPdf_icon}
-
-                        onError={(e) => {
-                            e.target.style.display = 'none';
-                            <img src={defaultPdf_icon} alt="Failed to load PDF" />
-                        }}
-                    />
-                );
-            default:
-                return <p>Unsupported media type</p>;
+                if (url.endsWith(".docx") || url.endsWith(".doc")) {
+                    return (
+                        <div>
+                            <a href={url} download target="_blank" rel="noopener noreferrer">
+                                <img src={docx} alt="Document" width={120} height={120} />
+                            </a>
+                        </div>
+                    );
+                } else if (url.endsWith(".pdf")) {
+                    return (
+                        <div>
+                            <a href={url} download target="_blank" rel="noopener noreferrer">
+                                <img src={defaultPdf_icon} alt="PDF Document" width={120} height={120} />
+                            </a>
+                        </div>
+                    );
+                } else if (url.endsWith(".txt")) {
+                    return (
+                        <div>
+                            <a href={url} download target="_blank" rel="noopener noreferrer">
+                                <img src={''} alt="Text Document" width={120} height={120} />
+                            </a>
+                        </div>
+                    );
+                } else if (url.endsWith(".xlsx") || url.endsWith(".xls")) {
+                    return (
+                        <div>
+                            <a href={url} download target="_blank" rel="noopener noreferrer">
+                                <img src={excel} alt="Excel Document" width={120} height={120} />
+                            </a>
+                        </div>
+                    );
+                }
+                return <p>Unsupported document type</p>;
         }
     }
 
