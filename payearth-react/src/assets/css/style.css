@@ -546,6 +546,11 @@ ul {
   border-radius: 80px;
   border: 1px solid #d7d7d7;
   margin-right: 18px;
+
+  /* width: 534px;
+  border-radius: 80px;
+  border: 1px solid #d7d7d7;
+  margin-right: 25px; */
 }
 
 .header .main_nav form .custom_select {
@@ -3491,7 +3496,8 @@ span.rate_sts {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.5);
+  /* background-color: rgba(0, 0, 0, 0.5); */
+  background-color: #c8c8c8;
   z-index: 1060;
 }
 

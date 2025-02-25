@@ -3013,17 +3013,28 @@ input[type="search"] {
 
 
 
-.cp_body .spinner_loader {
+/* .cp_body .spinner_loader {
   padding: 40px;
   position: relative;
+} */
+.spinner_loader {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* background-color: rgba(0, 0, 0, 0.5); */
+  background-color: #c8c8c8;
+  /* #c8c8c8 */
+  z-index: 1060;
 }
 
-.advertisement-banner {
-  /* border: 1px solid #ddd; */
-  /* padding: 20px; */
-  /* background-color: #f9f9f9; */
-  /* margin-top: 10px; */
-  /* border-radius: 5px; */
+.spinner_loader .spinner-border {
+  width: 136px;
+  height: 136px;
+  color: var(--primary_color);
+  border-width: 6px;
 }
 
 .small-advertise-tag {

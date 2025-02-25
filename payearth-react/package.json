@@ -96,6 +96,7 @@
         "react-input-switch": "^2.2.2",
         "react-multi-date-picker": "^4.4.1",
         "react-owl-carousel": "^2.3.3",
+        "react-qr-barcode-scanner": "^2.0.0",
         "react-quill": "^2.0.0",
         "react-range": "^1.8.11",
         "react-rating-stars-component": "^2.2.0",

@@ -4,12 +4,14 @@ import PageTitle from '../../components/user/common/PageTitle';
 import Footer from '../../components/common/Footer';
 import { Link } from 'react-router-dom';
 import chat_icon from './../../assets/icons/chat_icon.svg';
-import defaultPdf_icon from './../../assets/icons/document_icon.svg'
 import delete_icone from './../../assets/icons/delete_icone.svg'
 import edit_icon from './../../assets/icons/edit_icon.svg'
 import group_profile from './../../assets/icons/grp_icone.svg'
 import block_icon from './../../assets/icons/block_icon.svg'
 import back_icon_circle from './../../assets/icons/back_icon_circle.svg'
+import docx from './../../assets/icons/docx.svg';
+import defaultPdf_icon from './../../assets/icons/document_icon.svg';
+import excel from "./../../assets/icons/excel.svg";
 import lets_chats from './../../assets/icons/Chats.svg';
 import chat_not_found from './../../assets/icons/lets_chats.svg';
 import chatThumb from './../../assets/images/chat-thumb.jpg';
@@ -71,71 +73,6 @@ class Chat extends Component {
         this.sendMessage = this.sendMessage.bind(this)
         this.onEmojiClick = this.onEmojiClick.bind(this);
         this.chatBoardRef = React.createRef();
-
-
-        // this.socket.on('receive_notification', (notification) => {
-        //     if (notification === this.authInfo.id) {
-        //         // this.notify();
-        //     }
-        // });
-
-
-        // this.socket.on('user_online', (userID) => {
-        //     console.log("userId", userID)
-        //     this.setState(prevState => ({
-        //         onlineUsers: [...prevState.onlineUsers, userID]
-        //     }));
-        //     // setOnlineUsers(prevUsers => ({ ...prevUsers, [userID]: true }));
-        // });
-
-        // // this.socket.on('user_offline', (userID) => {
-        // //     this.setState(prevState => {
-        // //       const updatedUsers = { ...prevState.onlineUsers };
-        // //       delete updatedUsers[userID];
-        // //       return { onlineUsers: updatedUsers };
-        // //     });
-        // //   });
-
-        // this.socket.on('message_recieved', (data) => {
-
-        //     // console.log("chat select id ", this.state.sendChatData.chatId);
-        //     // console.log(" msg reciving chat id", data.chat._id);
-
-        //     if (data.chat._id === this.state.sendChatData.chatId) {
-        //         this.fetchAllUserData();
-        //         // this.notify();   Waiting for notification task..
-        //         this.setState(prevState => ({
-        //             userChat: [...prevState.userChat, data]
-        //         }));
-        //     }
-        //     this.fetchAllUserData();
-
-        //     // if (data) { data.chat._id !== this.state.allChatUsers._id ? <> No NOTIFICATION </> : <> YES NOTIFICATION</> }
-
-
-
-        //     // if (this.allChatUsers.id !== data.chat.id) {
-        //     //     if (!this.notification.includes(data)) {
-        //     //         this.setState({
-        //     //             notification: [data, ...this.notification]
-        //     //         })
-        //     //         // update list of chat
-        //     //     }
-        //     // } else {
-        //     //     this.setState(prevState => ({
-        //     //         userChat: [...prevState.userChat, data]
-        //     //     }));
-
-        //     // }
-
-        //     // if (this.allChatUsers._id === data.chat._id) {
-        //     //     console.log(`chatID is match ${this.allChatUsers._id} or ${data.chat._id}`)
-        //     // }
-
-        //     // this.setState(prevState => ({
-        //     //     userChat: [...prevState.userChat, data]
-        //     // }));
-        // })
     }
 
 
@@ -190,25 +127,6 @@ class Chat extends Component {
 
     }
 
-
-    // componentDidUpdate() {
-    //     const {allChatUsers} = this.setState;
-    //     console.log("allChatUsers in component did mount...", allChatUsers)
-    //     this.socket.on('message_recieved', (data) => {
-    //         console.log("message_recieved in componentDidUpdate.....", data)
-    //         // if (data.chat._id !== this.allChatUsers._id) {
-    //         //     console.log("no NOTIFICATION")
-    //         // } else {
-    //         //     console.log("yes NOTIFICATION")
-    //         // }
-    //     })
-    // }
-
-
-    // componentWillUnmount() {
-    //     this.socket.close();
-    // }
-
     componentDidUpdate(prevProps, prevState) {
         // Scroll to the bottom of the chat board whenever new messages are added
         if (prevState.userChat !== this.state.userChat && this.chatBoardRef.current) {
@@ -231,15 +149,6 @@ class Chat extends Component {
                 }
             }).then((response) => {
                 const users = response.data.data;
-                // console.log("fetchChat", users)
-
-                // const isGroupchat = users.filter(item => item.isGroupChat === true && item.chatUsers.length > 2)
-
-
-                // const isOneChat = users.filter(item => item.isGroupChat === false)
-                // const data = res.map(item => item.usersAll[0].users)
-                // // const data = users.map(item => item.usersAll[0].users)
-                // console.log("chatName", res.map(item => item.chatName))
                 this.setState({ allChatUsers: users });
                 this.supportAdminChat()
             }).catch((error) => {
@@ -430,7 +339,6 @@ class Chat extends Component {
 
 
     sendNotification = (id, datas) => {
-        // console.log("Send Notification function is run.....");
         this.socket.emit('send_notification', { id, message: datas });
     };
 
@@ -847,7 +755,7 @@ class Chat extends Component {
             return 'image';
         } else if (['mp4', 'webm', 'ogg'].includes(extension)) {
             return 'video';
-        } else if (['pdf', 'docx'].includes(extension)) {
+        } else if (['pdf', 'docx', 'xlsx'].includes(extension)) {
             return 'document';
         } else {
             return 'unknown';
@@ -867,21 +775,40 @@ class Chat extends Component {
                     </video>
                 );
             case 'document':
-                return (
-                    <embed
-                        src={url} type="application/pdf"
-                        width="300px"
-                        height="300px"
-                        // alt={defaultPdf_icon}
-
-                        onError={(e) => {
-                            e.target.style.display = 'none';
-                            <img src={defaultPdf_icon} alt="Failed to load PDF" />
-                        }}
-                    />
-                );
-            default:
-                return <p>Unsupported media type</p>;
+                if (url.endsWith(".docx") || url.endsWith(".doc")) {
+                    return (
+                        <div>
+                            <a href={url} download target="_blank" rel="noopener noreferrer">
+                                <img src={docx} alt="Document" width={120} height={120} />
+                            </a>
+                        </div>
+                    );
+                } else if (url.endsWith(".pdf")) {
+                    return (
+                        <div>
+                            <a href={url} download target="_blank" rel="noopener noreferrer">
+                                <img src={defaultPdf_icon} alt="PDF Document" width={120} height={120} />
+                            </a>
+                        </div>
+                    );
+                } else if (url.endsWith(".txt")) {
+                    return (
+                        <div>
+                            <a href={url} download target="_blank" rel="noopener noreferrer">
+                                <img src={''} alt="Text Document" width={120} height={120} />
+                            </a>
+                        </div>
+                    );
+                } else if (url.endsWith(".xlsx") || url.endsWith(".xls")) {
+                    return (
+                        <div>
+                            <a href={url} download target="_blank" rel="noopener noreferrer">
+                                <img src={excel} alt="Excel Document" width={120} height={120} />
+                            </a>
+                        </div>
+                    );
+                }
+                return <p>Unsupported document type</p>;
         }
     }
 
@@ -953,7 +880,6 @@ class Chat extends Component {
         // console.log("allChatUsers in render() :-", allChatUsers)
         // console.log(" sendChatData", sendChatData)
         // console.log("notAddedUser : ", notAddedUser)
-        // console.log("userChat :", userChat);
         // console.log("onlineUsers Active :>>>>", onlineUsers)
 
         return (

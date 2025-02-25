@@ -8,6 +8,7 @@ import axios from 'axios';
 import RangeTwoThumbs from './RangeTwoThumbs';
 import { getColors } from '../../../helpers/product-listing';
 import { useLocation } from 'react-router-dom';
+import queryString from 'query-string';
 
 const Sidebar = (props) => {
     const {
@@ -27,7 +28,57 @@ const Sidebar = (props) => {
     const [selectedBrands, setSelectedBrands] = useState([]);
     const [productSubCategory, setProductSubCategory] = useState([]);
     const [max, setMax] = useState();
+    const location = useLocation();
 
+
+    // useEffect(() => {
+    //     const params = queryString.parse(location.search);
+    //     if (params.cat && params.cat !== '') {
+    //         setSelectedCategories([params.cat]);
+    //         onCategoryChange([params.cat]);
+    //         getSubCat(params.cat);
+    //     }
+    //     if (params.subcat && params.subcat !== '') {
+    //         setSelectedSubCategories([params.subcat]);
+    //         onSubCategoryChange([params.subcat]);
+    //     }
+    // }, [location.search]);
+
+    useEffect(() => {
+        const params = queryString.parse(location.search);
+
+        if ((!params.cat || params.cat.trim() === '') && (!params.searchText || params.searchText.trim() === '')) {
+            setSelectedCategories([]);
+            setSelectedSubCategories([]);
+            setSelectedBrands([]);
+            setPriceRange();
+            onCategoryChange([]);
+            onSubCategoryChange([]);
+            onBrandChange([]);
+            onPriceRangeChange();
+            return; // Exit early to prevent unnecessary processing
+        }
+
+        if (params.cat && params.cat.trim() !== '') {
+            console.log("params.cat", params.cat)
+            setSelectedCategories([params.cat]);
+            onCategoryChange([params.cat]);
+            getSubCat(params.cat);
+        }
+
+        if (params.subcat && params.subcat.trim() !== '') {
+            setSelectedSubCategories([params.subcat]);
+            onSubCategoryChange([params.subcat]);
+        }
+
+        if (params.cat !== null) {
+            const categoryId = params.cat;
+
+
+        }
+    }, [location.search]);
+
+    console.log("selectedCategories", selectedCategories)
 
     useEffect(() => {
         axios
@@ -83,13 +134,9 @@ const Sidebar = (props) => {
         const updatedCategories = event.target.checked
             ? [...selectedCategories, categoryId]
             : selectedCategories.filter(id => id !== categoryId);
+        console.log("updatedCategories::::", updatedCategories)
         setSelectedCategories(updatedCategories);
         onCategoryChange(updatedCategories);
-        // if (event.target.checked) {
-        //     setSelectedCategories(prevSelected => [...prevSelected, categoryId]);
-        // } else {
-        //     setSelectedCategories(prevSelected => prevSelected.filter(id => id !== categoryId));
-        // }
     };
 
     const handleSubCheckbox = (event) => {
@@ -147,6 +194,7 @@ const Sidebar = (props) => {
             </div>
         );
     };
+
 
     return (
         <div className={`side_bar mob-hide ${sideBarToggle ? '' : 'filter-mob-catShow'}`}>

@@ -86,12 +86,20 @@ const ProductListing = () => {
         let reqBodyUpdated = { ...reqBody };
         reqBodyUpdated = readUrl(dispatch, reqBodyUpdated, window.location, setReqBody, 'product-listing');
         setReqBodyState(reqBodyUpdated);
-        getProducts('didMount');
+        // getProducts('didMount');
     }, []);
 
     useEffect(() => {
         getProducts()
-    }, [priceRange, selectedCategories, selectedBrands, selectedSubCategories, searchQuery, category, subCat, super_rewards])
+    }, [priceRange, selectedBrands, selectedCategories, selectedSubCategories, super_rewards, searchQuery])
+
+    // category, subCat
+    // useEffect(() => {
+    //     console.log("run third")
+    //     if (subCat !== null || category !== null) {
+    //         getProducts();
+    //     }
+    // }, [])
 
     const handlePriceRangeChange = (range) => {
         setPriceRange(range);
@@ -102,6 +110,9 @@ const ProductListing = () => {
     };
 
     const handleSubCategoryChange = (categories) => {
+        if (subCat) {
+            console.log("subCat test", subCat)
+        }
         setSelectedSubCategories(categories);
     };
 
@@ -109,30 +120,34 @@ const ProductListing = () => {
         setSelectedBrands(brands);
     };
 
-    const getProducts = () => {
-        let productsData = [];
+
+
+    const getProducts = async () => {
+        setLoading(true); // Start loading
+
         let reqBodyUpdated = {
-            "priceRange": priceRange,
-            "selectedCategories": selectedCategories,
-            "selectedSubCategories": selectedSubCategories,
-            "selectedBrands": selectedBrands,
-            "searchQuery": searchQuery,
-            "super_rewards": super_rewards
+            priceRange,
+            selectedCategories,
+            selectedSubCategories,
+            selectedBrands,
+            searchQuery,
+            super_rewards
         };
 
-        axios.post('front/products/listing', reqBodyUpdated).then((response) => {
+        try {
+            const response = await axios.post('front/products/listing', reqBodyUpdated);
+
             if (response.data.status) {
-                let res = response.data.data;
-                res.forEach(product => {
+                const res = response.data.data;
+                const productsData = res.map(product => {
                     let avgRating = 0;
-                    if (product.reviews && product.reviews.length > 0) {
+                    if (product.reviews?.length > 0) {
                         const totalRatings = product.reviews.reduce((sum, review) => sum + review.rating, 0);
                         avgRating = totalRatings / product.reviews.length;
-
                         avgRating = avgRating % 1 >= 0.8 ? Math.ceil(avgRating) : avgRating.toFixed(1);
                     }
 
-                    productsData.push({
+                    return {
                         id: product.id,
                         image: product.featuredImage,
                         name: product.name,
@@ -142,20 +157,20 @@ const ProductListing = () => {
                         quantity: product.quantity,
                         cryptoPrices: product.cryptoPrices,
                         super_rewards: product.super_rewards
-                    });
+                    };
                 });
-            }
-            setProductsState(productsData);
-        }).catch(error => {
-            if (error.response && error.response.data.status === false) {
-            }
-        }).finally(() => {
-            setTimeout(() => {
-                setLoading(false);
-            }, 300);
-        });
-    }
 
+                setProductsState(productsData);
+            }
+        } catch (error) {
+            console.error("Error fetching products:", error);
+        } finally {
+            setLoading(false); // Stop loading after request completes
+        }
+    };
+
+
+    console.log("products", products)
     return (
         <React.Fragment>
             <Helmet><title>{"Products - Pay Earth"}</title></Helmet>
