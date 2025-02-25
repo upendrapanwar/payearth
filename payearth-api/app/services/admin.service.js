@@ -5009,7 +5009,7 @@ async function getOrderDetails() {
                 {
                     path: "paymentId",
                     model: Payment,
-                    select: "invoiceNo amountPaid paymentMode",
+                    select: "invoiceNo amountPaid paymentMode paymentStatus paymentAccount",
                 },
                 {
                     path: "userId",

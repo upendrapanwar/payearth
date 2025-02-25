@@ -22,5 +22,6 @@ export default Yup.object().shape({
     state: Yup.string().required("State is required."),
     address: Yup.string().required("Address is required."),
     seller_type: Yup.string().required("Seller type is required."),
-    want_to_sell: Yup.string().required("Sell type is required.")
+    want_to_sell: Yup.string().required("Sell type is required."),
+    terms: Yup.boolean().oneOf([true], 'You must accept the Terms and Conditions.')
 });

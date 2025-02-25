@@ -159,10 +159,11 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
 
   const handleSearchInput = (event) => {
     const value = event.target.value;
-    setSearchOption(value); // Update state
-
-    if (value === "") {
-      handleSearchProductFilter(); // Call function when input is empty
+    setSearchOption(value);
+    if (isService === 0 && value === "") {
+      handleSearchProductFilter();
+    } else if (isService === 1 && value === "") {
+      handleSearchServiceFilter();
     }
   };
 
@@ -924,7 +925,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                       <img src={logo} alt="logo" className="img-fluid" />
                     </Link>
                     {/* <Link className="" to="#"> */}
-                      <img src={payearth_qr_code} alt="qr-code" className="img-fluid" width={100} height={100} />
+                    <img src={payearth_qr_code} alt="qr-code" className="img-fluid" width={100} height={100} />
                     {/* </Link> */}
                     <button
                       className="navbar-toggler"
@@ -959,7 +960,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                               onChange={handleCatChange}
                             />
                             <input
-                              className="form-control border-start height-auto"
+                              className="form-control border-start height-auto "
                               type="search"
                               placeholder={
                                 isService === 0

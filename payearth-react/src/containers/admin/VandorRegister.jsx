@@ -78,7 +78,7 @@ class VandorRegister extends Component {
   getStates = countryCode => {
     let reqBody = { ...this.state.reqBody, country_code: countryCode };
     this.setState({ reqBody });
-    this.dispatch(setLoading({ loading: true }));
+    // this.dispatch(setLoading({ loading: true }));
     axios.post(`seller/states`, reqBody)
       .then(response => {
         if (response.data.status) {
@@ -96,7 +96,7 @@ class VandorRegister extends Component {
       })
       .finally(() => {
         setTimeout(() => {
-          this.dispatch(setLoading({ loading: false }));
+          // this.dispatch(setLoading({ loading: false }));
         }, 300);
       });
   };
@@ -295,7 +295,8 @@ class VandorRegister extends Component {
                           want_to_sell: vendoreData.want_to_sell || '',
                           address: vendoreData.full_address?.address || '',
                           country: vendoreData.full_address?.country || '',
-                          state: vendoreData.full_address?.state || ''
+                          state: vendoreData.full_address?.state || '',
+                          terms: vendorId !== null
                         }}
                         enableReinitialize={true}
                         onSubmit={(values, { resetForm }) => {
@@ -564,6 +565,23 @@ class VandorRegister extends Component {
                                     </div>
                                   </div>
                                 </div>
+
+                                {/* Terms & Conditions Checkbox */}
+                                <div className="mb-3 form-check">
+                                  <input type="checkbox" className="form-check-input" id="terms" name="terms"
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    checked={values.terms || vendorId !== null}
+                                    disabled={vendorId !== null}
+                                  />
+                                  <label className="form-check-labe mt-1" htmlFor="terms">
+                                    I agree to the <Link to="/terms">Terms and Conditions</Link>
+                                  </label>
+                                  {touched.terms && errors.terms ? (
+                                    <small className="text-danger d-block">{errors.terms}</small>
+                                  ) : null}
+                                </div>
+
                               </div>
                               <div className="col-md-6 mt-4">
                                 {vendorId === null ? (
