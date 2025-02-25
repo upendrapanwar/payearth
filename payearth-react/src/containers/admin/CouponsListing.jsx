@@ -13,6 +13,7 @@ import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { setLoading } from '../../store/reducers/global-reducer';
 import arrow_back from '../../assets/icons/arrow-back.svg';
 import Switch from 'react-input-switch';
+import { Helmet } from 'react-helmet';
 
 const CouponsListing = (props) => {
     const history = useHistory();
@@ -73,6 +74,7 @@ const CouponsListing = (props) => {
                 }
             );
             if (type === 'new') {
+                console.log('res---', res)
                 setData(res.data.data.coupons);
             } else {
                 setExpiredData(res.data.data.coupons);
@@ -244,6 +246,9 @@ const CouponsListing = (props) => {
                 <div className="inr_top_page_title">
                     <h2>Manage Coupons</h2>
                 </div>
+                <Helmet>
+                    <title>{"Admin - Manage Coupons - Pay Earth"}</title>
+                </Helmet>
                 <div className="seller_dash_wrap pt-2 pb-5">
                     <div className="container">
                         <div className="bg-white rounded-3 p-3 p-5">
@@ -258,7 +263,17 @@ const CouponsListing = (props) => {
                                             Add Coupon
                                         </Link>
                                         &nbsp;
-                                        <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/dashboard"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link>
+                                        {/* <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/dashboard"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link> */}
+                                        <div>
+                                            <button
+                                                type="button"
+                                                className="btn custum_back_btn btn_yellow mx-auto"
+                                                onClick={() => window.history.back()}
+                                            >
+                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                Back
+                                            </button>
+                                        </div>
                                     </span>
                                 </div>
                             </div>
@@ -296,7 +311,7 @@ const CouponsListing = (props) => {
                                     highlightOnHover
                                 />
                             ) : (
-                                <NotFound msg="Data not found." />
+                                <NotFound msg="Coupons not available." />
                             )}
                         </div>
                     </div>

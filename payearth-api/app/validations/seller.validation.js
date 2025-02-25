@@ -6,6 +6,9 @@ const schema = {
         name: joi.string().max(50).required(),
         email: joi.string().email().message('Email address must be valid.').required(),
         address: joi.string().max(100).required(),
+        terms: joi.boolean().valid(true).required().messages({
+            "any.only": "You must accept the Terms and Conditions."
+          }),
         state: joi.string().max(50).required(),
         country: joi.string().max(50).required(),
         seller_type: joi.string().required(),

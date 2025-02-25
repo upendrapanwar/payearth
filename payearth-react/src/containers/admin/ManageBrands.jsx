@@ -372,7 +372,7 @@ class ManageBrands extends Component {
                             <h2>Manage Brands</h2>
                         </div>
                         <Helmet>
-                            <title>{"Brands - Pay Earth"}</title>
+                            <title>{"Admin - Manage Brands - Pay Earth"}</title>
                         </Helmet>
                         <div className="row">
                             <div className="col-lg-3">
@@ -601,7 +601,17 @@ class ManageBrands extends Component {
                                     <div className="dash_inner_wrap pb-2">
                                         <div className="col-md-12 pb-3 d-flex justify-content-between align-items-center">
                                             <div className="dash_title">All Brands</div>
-                                            <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link>
+                                            {/* <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link> */}
+                                            <div>
+                                                <button
+                                                    type="button"
+                                                    className="btn custum_back_btn btn_yellow mx-auto"
+                                                    onClick={() => window.history.back()}
+                                                >
+                                                    <img src={arrow_back} alt="back" />&nbsp;
+                                                    Back
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="cp_body">

@@ -14,6 +14,9 @@ import "react-data-table-component-extensions/dist/index.css";
 import Modal from "react-bootstrap/Modal";
 import CryptoJS from "crypto-js";
 import "react-quill/dist/quill.snow.css";
+import { Helmet } from "react-helmet";
+import arrow_back from '../../assets/icons/arrow-back.svg'
+
 class ManageServices extends Component {
   constructor(props) {
     super(props);
@@ -411,7 +414,13 @@ class ManageServices extends Component {
       <React.Fragment>
         {loading === true ? <SpinnerLoader /> : ""}
         <Header />
-        <div className="seller_dash_wrap pt-5 pb-5">
+        <div className="inr_top_page_title">
+          <h2>Manage Services</h2>
+        </div>
+        <Helmet>
+          <title>{"Admin - Manage Services - Pay Earth"}</title>
+        </Helmet>
+        <div className="seller_dash_wrap pb-5">
           <div className="container ">
             <div className="bg-white rounded-3 pt-3 pb-5">
               <div className="dash_inner_wrap">
@@ -429,7 +438,17 @@ class ManageServices extends Component {
                     >
                       Add New Service
                     </Link>
-                    <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link>
+                    {/* <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link> */}
+                    <div>
+                      <button
+                        type="button"
+                        className="btn custum_back_btn btn_yellow mx-auto"
+                        onClick={() => window.history.back()}
+                      >
+                        <img src={arrow_back} alt="back" />&nbsp;
+                        Back
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -12,6 +12,8 @@ import 'react-quill/dist/quill.snow.css';
 import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
+import { Helmet } from 'react-helmet';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 class AdminCategoryModelEdit extends Component {
     constructor(props) {
@@ -179,7 +181,7 @@ class AdminCategoryModelEdit extends Component {
                 console.error('Error saving post:', error);
             });
         this.getCategory();
-        this.props.history.push('/admin/category-module');
+        this.props.history.push('manage-blog-Categories');
     };
 
     render() {
@@ -195,6 +197,12 @@ class AdminCategoryModelEdit extends Component {
             <React.Fragment>
                 {loading === true ? <SpinnerLoader /> : ''}
                 <Header />
+                <Helmet>
+                    <title>{"Admin - Edit Blog Category - Pay Earth"}</title>
+                </Helmet>
+                <div className="inr_top_page_title">
+                    <h2>Edit Blog Category</h2>
+                </div>
                 <div className="container">
                     <form onSubmit={this.updateCategory}>
                         <div className="row">
@@ -262,10 +270,20 @@ class AdminCategoryModelEdit extends Component {
                                         <div className="cumm_title">Category List</div>
                                         <div className="search_customer_field">
                                             <div className="noti_wrap">
-                                                <div className="">
+                                                {/* <div className="">
                                                     <span>
                                                         <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/category-module"> Create New Category</Link>
                                                     </span>
+                                                </div> */}
+                                                <div className=''>
+                                                    <button
+                                                        type="button"
+                                                        className="btn custum_back_btn btn_yellow mx-auto"
+                                                        onClick={() => window.history.back()}
+                                                    >
+                                                        <img src={arrow_back} alt="back" />&nbsp;
+                                                        Back
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>

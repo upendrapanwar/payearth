@@ -31,6 +31,7 @@ import moment from 'moment';
 import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data';
 import { Helmet } from 'react-helmet';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 class Chat extends Component {
     constructor(props) {
@@ -68,7 +69,7 @@ class Chat extends Component {
         this.handleMessageContent = this.handleMessageContent.bind(this)
         // this.accessChat = this.accessChat.bind(this)
         this.sendMessage = this.sendMessage.bind(this)
-        this.chatBoardRef = React.createRef(); 
+        this.chatBoardRef = React.createRef();
 
 
 
@@ -131,13 +132,13 @@ class Chat extends Component {
         this.fetchAllUserData();
 
         this.socket.emit("active", this.authInfo.id);
-    
+
         this.socket.on('receive_notification', (notification) => {
             if (notification.id === this.authInfo.id) {
                 this.setState({ notification });
             }
         });
-    
+
         // this.socket.on('user_online', (userID) => {
         //     this.setState(prevState => ({
         //         onlineUsers: [...prevState.onlineUsers, userID]
@@ -203,9 +204,9 @@ class Chat extends Component {
     componentDidUpdate(prevProps, prevState) {
         // Scroll to the bottom of the chat board whenever new messages are added
         if (prevState.userChat !== this.state.userChat && this.chatBoardRef.current) {
-          this.chatBoardRef.current.scrollTop = this.chatBoardRef.current.scrollHeight;
+            this.chatBoardRef.current.scrollTop = this.chatBoardRef.current.scrollHeight;
         }
-      }
+    }
 
     fetchAllUserData = () => {
         this.setState({ users: "" })
@@ -905,10 +906,23 @@ class Chat extends Component {
                 {loading === true ? <SpinnerLoader /> : ''}
                 <Header />
                 <PageTitle title="Chat" />
+                <Helmet><title>{"Admin - Chat - Pay Earth"}</title></Helmet>
                 <section className="inr_wrap">
-                    <Helmet><title>{"Chat - Pay Earth"}</title></Helmet>
                     <div className="container">
                         <div className="row">
+                            <div className='col-md-12 d-flex justify-content-between align-items-center'>
+                                <div></div>
+                                <div className=' mt-2 mb-2 me-4'>
+                                    <button
+                                        type="button"
+                                        className="btn custum_back_btn btn_yellow mx-auto"
+                                        onClick={() => window.history.back()}
+                                    >
+                                        <img src={arrow_back} alt="back" />&nbsp;
+                                        Back
+                                    </button>
+                                </div>
+                            </div>
                             <div className="col-md-12">
                                 <div className="chatUser_wrapper">
                                     <div className="chatlist_panel">

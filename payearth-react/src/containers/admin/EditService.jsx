@@ -15,6 +15,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import arrow_back from './../../assets/icons/arrow-back.svg';
 import CryptoJS from 'crypto-js';
+import { Helmet } from 'react-helmet';
 
 class AdminEditService extends Component {
     constructor(props) {
@@ -35,7 +36,7 @@ class AdminEditService extends Component {
             description: "",
             featuredImage: '',
             imageId: '',
-            charges:'',
+            charges: '',
             newImageUploaded: false, // Flag to indicate a new image has been uploaded
             previousImageId: '', // Store the previous image ID
             selectedFile: null, // To store the selected file
@@ -257,21 +258,27 @@ class AdminEditService extends Component {
                 {loading === true ? <SpinnerLoader /> : ''}
                 <div className="seller_body">
                     <Header />
-                    <div className="seller_dash_wrap pt-5 pb-5">
+                    <div className="inr_top_page_title">
+                        <h2>Edit Service</h2>
+                    </div>
+                    <Helmet>
+                        <title>{"Admin - Edit Service - Pay Earth"}</title>
+                    </Helmet>
+                    <div className="seller_dash_wrap pb-5">
                         <div className="container ">
                             <div className="bg-white rounded-3 pt-3 pb-5">
                                 <div className="dash_inner_wrap">
                                     <Formik
                                         initialValues={{
-                                            name: serviceName ||'',
-                                            charges: charges ||'',
+                                            name: serviceName || '',
+                                            charges: charges || '',
                                             category: defaultCatOption?.value,
                                             description: '',
                                             featuredImg: ''
                                         }}
                                         enableReinitialize
                                         onSubmit={values => this.handleSubmit(values)}
-                                     validationSchema={editServiceSchema}
+                                        validationSchema={editServiceSchema}
                                     >
                                         {({ values,
                                             errors,
@@ -285,10 +292,20 @@ class AdminEditService extends Component {
                                                 <div className="row">
                                                     <div className="col-md-12 pt-4 pb-4 d-flex justify-content-between align-items-center">
                                                         <div className="dash_title">Edit Service</div>
-                                                        <div className="">
+                                                        {/* <div className="">
                                                             <Link className="btn custom_btn btn_yellow mx-auto " to="/admin/manage-services">
                                                                 <img src={arrow_back} alt="linked-in" />&nbsp;
                                                                 Go back</Link>
+                                                        </div> */}
+                                                        <div>
+                                                            <button
+                                                                type="button"
+                                                                className="btn custum_back_btn btn_yellow mx-auto"
+                                                                onClick={() => window.history.back()}
+                                                            >
+                                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                                Back
+                                                            </button>
                                                         </div>
                                                     </div>
                                                     <div className="col-md-7">

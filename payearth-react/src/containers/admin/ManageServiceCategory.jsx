@@ -305,8 +305,11 @@ class ManageServiceCategory extends Component {
                     <div className="container">
                         <Header />
                         <Helmet>
-                            <title>{"Service Category - Pay Earth"}</title>
+                            <title>{"Admin - Manage Service Categories - Pay Earth"}</title>
                         </Helmet>
+                        <div className="inr_top_page_title">
+                            <h2>Manage Service Categories</h2>
+                        </div>
                         <div className="row">
                             <div className="col-md-6">
                                 {/* Modal */}
@@ -377,10 +380,20 @@ class ManageServiceCategory extends Component {
                                                         to="#"
                                                         onClick={this.state.permissions.add ? this.handleAddCategory : null}
                                                     >
-                                                        Add-Cate
+                                                        Add Category
                                                     </Link>
                                                 </span>
-                                                <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/dashboard"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link>
+                                                {/* <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/dashboard"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link> */}
+                                                <div className=''>
+                                                    <button
+                                                        type="button"
+                                                        className="btn custum_back_btn btn_yellow mx-auto"
+                                                        onClick={() => window.history.back()}
+                                                    >
+                                                        <img src={arrow_back} alt="back" />&nbsp;
+                                                        Back
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

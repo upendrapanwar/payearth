@@ -153,7 +153,7 @@ function Header() {
                 </Link>
               </li>
               <li>
-                <Link to="/admin/post-module" onClick={() => removeBackdrop()}>
+                <Link to="/admin/manage-posts" onClick={() => removeBackdrop()}>
                   <i className="icon">
                     <img src={shoppingBagIcon} alt="" />
                   </i>{" "}
@@ -162,7 +162,7 @@ function Header() {
               </li>
 
               <li>
-                <Link to="/admin/productOrders" onClick={() => removeBackdrop()}>
+                <Link to="/admin/product-orders" onClick={() => removeBackdrop()}>
                   <i className="icon">
                     <img src={shoppingBagIcon} alt="" />
                   </i>{" "}
@@ -170,7 +170,7 @@ function Header() {
                 </Link>
               </li>
               <li>
-                <Link to="/admin/service-order" onClick={() => removeBackdrop()}>
+                <Link to="/admin/service-orders" onClick={() => removeBackdrop()}>
                   <i className="icon">
                     <img src={shoppingBagIcon} alt="" />
                   </i>{" "}
@@ -196,20 +196,20 @@ function Header() {
                 <ul className="dropdown-menu" aria-labelledby="categoryDropdown">
                   {/* Products Category */}
                   <li>
-                    <Link to="/admin/manage-categories-product" className="dropdown-item">
+                    <Link to="/admin/manage-product-categories" className="dropdown-item">
                       Products Category
                     </Link>
                   </li>
 
                   {/* Service Category */}
                   <li>
-                    <Link to="/admin/manage-categories-services" className="dropdown-item">
+                    <Link to="/admin/manage-service-categories" className="dropdown-item">
                       Service Category
                     </Link>
                   </li>
 
                   <li>
-                    <Link to="/admin/category-module" className="dropdown-item">
+                    <Link to="/admin/manage-blog-Categories" className="dropdown-item">
                       Blog Category
                     </Link>
                   </li>
@@ -266,7 +266,7 @@ function Header() {
                 </Link>
               </li>
               <li>
-                <Link to="/admin/coupons" onClick={() => removeBackdrop()}>
+                <Link to="/admin/manage-coupons" onClick={() => removeBackdrop()}>
                   <i className="icon">
                     <img src={discountIcon} alt="" />
                   </i>{" "}
@@ -320,7 +320,7 @@ function Header() {
 
               <li>
                 <Link
-                  to="/admin/manage-reports"
+                  to="/admin/product-reports"
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
@@ -331,13 +331,13 @@ function Header() {
               </li>
               <li>
                 <Link
-                  to="/admin/manage-community"
+                  to="/admin/community"
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
                     <img src={communityIcon} alt="" />
                   </i>{" "}
-                  Manage Community
+                   Community
                 </Link>
               </li>
               <li>
@@ -353,7 +353,7 @@ function Header() {
               </li>
               <li>
                 <Link
-                  to="/admin/admin-manage-subscriptionplan"
+                  to="/admin/manage-subscription"
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
@@ -376,18 +376,18 @@ function Header() {
               {/* /admin/contact_form_users */}
               <li>
                 <Link
-                  to="/admin/contact_form_users"
+                  to="/admin/buyers-contact"
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
                     <img src={notificationBellIcon} alt="" />
                   </i>{" "}
-                  Contact Users
+                  Contact Buyers
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/admin/manage-notifications"
+                  to="/admin/notifications"
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
@@ -456,7 +456,7 @@ function Header() {
                       <div className="offcanvas-body d-block">
                         <ul className="seller_menu navbar-nav justify-content-end flex-grow-1 pe-0">
                           <li className="nav-item">
-                            <Link className="nav-link" to="/admin/manage-notifications" onClick={handleNotificationClick}>
+                            <Link className="nav-link" to="/admin/notifications" onClick={handleNotificationClick}>
                               <div className="sm_icon">
                                 <img src={blackBellIcon} alt="" />
                                 {unreadCount > 0 && <span className="notification-count">{unreadCount}</span>}
@@ -475,7 +475,7 @@ function Header() {
                           <li className="nav-item">
                             <Link
                               className="nav-link"
-                              to="/admin/manage-community"
+                              to="/admin/community"
                             >
                               <div className="sm_icon">
                                 <img src={smcommunityIcon} alt="" />
@@ -518,9 +518,9 @@ function Header() {
                               </div>
                             </Link>
                             <ul className="dropdown-menu dropdown-menu-end mt-5" aria-labelledby="navbarDropdown">
-                              <li><Link className="dropdown-item" to="/admin-MyProfile">My Profile</Link></li>
+                              <li><Link className="dropdown-item" to="/admin/my-profile">My Profile</Link></li>
                               <li><hr className="dropdown-divider" /></li>
-                              <li><Link className="dropdown-item" to="/admin-profile">Account</Link></li>
+                              <li><Link className="dropdown-item" to="/admin/account">Account</Link></li>
                               {/* <li><Link className="dropdown-item" to="#">Setting</Link></li> */}
                               <li><hr className="dropdown-divider" /></li>
                               <li><Link className="dropdown-item" to="#" onClick={() => logout()} >Log Out</Link></li>

@@ -675,7 +675,7 @@ async function getNewCoupons(req) {
                 };
                 return res;
             });
-        if (result.coupons && result.coupons.length > 0) {
+        if (result) {
             return result;
         } else {
             return false;
@@ -740,7 +740,7 @@ async function getExpiredCoupons(req) {
                 };
                 return res;
             });
-        if (result.coupons && result.coupons.length > 0) {
+        if (result) {
             return result;
         } else {
             return false;

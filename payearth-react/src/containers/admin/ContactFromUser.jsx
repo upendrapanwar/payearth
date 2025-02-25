@@ -13,7 +13,7 @@ import axios from 'axios';
 import AdminContactUser from '../../validation-schemas/AdminContactUser'
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { Helmet } from 'react-helmet';
-
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 const ContactFromUser = () => {
     const isLoged_In = isLogin();
@@ -125,8 +125,8 @@ const ContactFromUser = () => {
             {loading && <SpinnerLoader />}
             <div className="seller_body">
                 <Header />
-                <PageTitle title="Contact" />
-                <Helmet><title>{"Contact - Pay Earth"}</title></Helmet>
+                <PageTitle title="Buyers Contact" />
+                <Helmet><title>{"Admin - Buyers Contact - Pay Earth"}</title></Helmet>
                 <div className="seller_dash_wrap pt-2 pb-5">
                     <div className="container ">
                         <div className="bg-white rounded-3">
@@ -135,34 +135,46 @@ const ContactFromUser = () => {
                                     <div className="col-lg-4 pt-5 pb-5">
                                         <div className="contact_info p-3 border rounded">
                                             <div className=" text-center dash_title mb-3 fw-bold">Select Users</div>
-                                            <div className="d-flex align-items-center justify-content-between mb-2 bg-light">
-                                                <input
-                                                    type="checkbox"
-                                                    className="me-2"
-                                                    checked={selectAll}
-                                                    onChange={handleSelectAll}
-                                                />
-                                                <label className="mb-0 text-bold">All</label>
+                                            <div className='' style={{ overflowY: 'auto', maxHeight: '60vh', border: '1px solid #ddd', scrollbarWidth: 'thin', }}>
+                                                <div className="d-flex align-items-center justify-content-between mb-2 bg-light">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="me-2"
+                                                        checked={selectAll}
+                                                        onChange={handleSelectAll}
+                                                    />
+                                                    <label className="mb-0 text-bold">All</label>
+                                                </div>
+                                                <ul className="list-unstyled">
+                                                    {customers.map((user) => (
+                                                        <li key={user.id} className="d-flex align-items-center justify-content-between mb-2">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="me-2"
+                                                                checked={selectedUsers.some((u) => u.id === user.id)}
+                                                                onChange={() => handleUserSelection(user)}
+                                                            />
+                                                            <label className="mb-0 ms-auto">{user.name}</label>
+                                                        </li>
+                                                    ))}
+                                                </ul>
                                             </div>
-                                            <ul className="list-unstyled">
-                                                {customers.map((user) => (
-                                                    <li key={user.id} className="d-flex align-items-center justify-content-between mb-2">
-                                                        <input
-                                                            type="checkbox"
-                                                            className="me-2"
-                                                            checked={selectedUsers.some((u) => u.id === user.id)}
-                                                            onChange={() => handleUserSelection(user)}
-                                                        />
-                                                        <label className="mb-0 ms-auto">{user.name}</label>
-                                                    </li>
-                                                ))}
-                                            </ul>
                                         </div>
                                     </div>
                                     <div className="col-lg-8">
                                         <div className="contact_form_wrap">
-                                            <div className="form_wrapper">
-                                                <h4 className="form_title m-4 mb-4">Write us</h4>
+                                            <div className="form_wrapper pt-3">
+                                                <div className='d-flex justify-content-end'>
+                                                    <button
+                                                        type="button"
+                                                        className="btn custum_back_btn btn_yellow me-4"
+                                                        onClick={() => window.history.back()}
+                                                    >
+                                                        <img src={arrow_back} alt="back" />&nbsp;
+                                                        Back
+                                                    </button>
+                                                </div>
+                                                <h4 className="form_title m-4 mt-0 mb-4">Write us</h4>
                                                 <Formik
                                                     initialValues={{
                                                         subject: '',

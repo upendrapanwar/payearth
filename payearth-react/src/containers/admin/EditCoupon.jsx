@@ -8,14 +8,15 @@ import addCouponSchema from '../../validation-schemas/addCouponSchema';
 import arrow_back from '../../assets/icons/arrow-back.svg';
 import { Link, useLocation } from 'react-router-dom';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
+import { Helmet } from 'react-helmet';
 
 const EditCoupon = () => {
     const location = useLocation();
     const { id } = location.state || {};
     const authInfo = JSON.parse(localStorage.getItem("authInfo"));
 
-    const [loading, setLoading] = useState(true);  
-    const [couponData, setCouponData] = useState(null);  
+    const [loading, setLoading] = useState(true);
+    const [couponData, setCouponData] = useState(null);
 
     useEffect(() => {
         if (id) {
@@ -34,7 +35,7 @@ const EditCoupon = () => {
             });
 
             if (res.data.status === true) {
-                setCouponData(res.data.data.data);  
+                setCouponData(res.data.data.data);
                 console.log("Fetched coupon data", res.data.data.data);
             }
 
@@ -42,7 +43,7 @@ const EditCoupon = () => {
             toast.error('Failed to fetch coupons');
             console.error("Error fetching coupons:", error);
         } finally {
-            setLoading(false);  
+            setLoading(false);
         }
     };
 
@@ -68,33 +69,49 @@ const EditCoupon = () => {
         }
     };
 
-    if (loading) return <SpinnerLoader />; 
+    if (loading) return <SpinnerLoader />;
 
     return (
         <>
             <div className="seller_body">
                 <Header />
-                <div className="seller_dash_wrap pt-5 pb-5">
+                <div className="inr_top_page_title">
+                    <h2>Edit Coupon</h2>
+                </div>
+                <Helmet>
+                    <title>{"Admin - Edit Coupon - Pay Earth"}</title>
+                </Helmet>
+                <div className="seller_dash_wrap pb-5">
                     <div className="container ">
                         <div className="bg-white rounded-3 pt-3 pb-5">
                             <div className="dash_inner_wrap">
                                 <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center mb-4">
                                     <div className="dash_title">Edit Coupon</div>
-                                    <span className="d-flex justify-content-between align-items-center">
-                                        <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/coupons">
+                                    {/* <span className="d-flex justify-content-between align-items-center">
+                                        <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-coupons">
                                             <img src={arrow_back} alt="back" />&nbsp;Back
                                         </Link>
-                                    </span>
+                                    </span> */}
+                                    <div>
+                                        <button
+                                            type="button"
+                                            className="btn custum_back_btn btn_yellow mx-auto"
+                                            onClick={() => window.history.back()}
+                                        >
+                                            <img src={arrow_back} alt="back" />&nbsp;
+                                            Back
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <Formik
                                     initialValues={{
-                                        coupon_code: couponData?.code || '',  
+                                        coupon_code: couponData?.code || '',
                                         start_date: couponData?.start ? couponData.start.split('T')[0] : '',
                                         end_date: couponData?.end ? couponData.end.split('T')[0] : '',
                                         discount_percentage: couponData?.discount_per || '',
                                     }}
-                                    enableReinitialize={true}  
+                                    enableReinitialize={true}
                                     onSubmit={handleSubmit}
                                     validationSchema={addCouponSchema}
                                 >

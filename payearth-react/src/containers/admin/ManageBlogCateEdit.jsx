@@ -179,7 +179,7 @@ class ManageBlogCateEdit extends Component {
                 console.error('Error saving post:', error);
             });
         this.getCategory();
-        this.props.history.push('/admin/category-module');
+        this.props.history.push('/admin/manage-blog-Categories');
     };
 
     render() {
@@ -264,7 +264,7 @@ class ManageBlogCateEdit extends Component {
                                             <div className="noti_wrap">
                                                 <div className="">
                                                     <span>
-                                                        <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/category-module"> Create New Category</Link>
+                                                        <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-blog-Categories"> Create New Category</Link>
                                                     </span>
                                                 </div>
                                             </div>

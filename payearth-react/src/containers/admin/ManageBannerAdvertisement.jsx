@@ -11,6 +11,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import { Helmet } from 'react-helmet';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 class ManageBannerAdvertisement extends Component {
 
@@ -223,7 +224,7 @@ class ManageBannerAdvertisement extends Component {
         console.log("select IMAGE OR VIDEO", e.target.value)
         this.setState({ selectImageOrVideo: e.target.value });
     }
-    
+
     selectImageOrVideo = () => {
         const { image, video } = this.state;
 
@@ -354,17 +355,20 @@ class ManageBannerAdvertisement extends Component {
             <React.Fragment>
                 <Header />
                 <div className="inr_top_page_title">
-                    <h2>Create New Advertisement</h2>
+                    <h2>Create Advertisement</h2>
                 </div>
                 <section className="inr_wrap">
-                    <Helmet><title>{"Create Advertisement - Pay Earth"}</title></Helmet>
+                    <Helmet><title>{"Admin - Create Advertisement - Pay Earth"}</title></Helmet>
                     <div className="container">
                         <div className="row">
                             <div className="col-md-12">
                                 <div className="cart adv_banner_wrapper">
                                     <div className="noti_wrap">
                                         <div className=""><span>
-                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-advertisement">My Advertisement</Link>
+                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-advertisement">
+                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                Back
+                                            </Link>
                                         </span></div>
                                     </div>
                                     <div className="cart_list adv_banner_panel">

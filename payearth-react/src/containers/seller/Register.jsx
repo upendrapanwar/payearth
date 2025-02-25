@@ -162,7 +162,8 @@ class Register extends Component {
                                                     want_to_sell: '',
                                                     address: '',
                                                     country: '',
-                                                    state: ''
+                                                    state: '',
+                                                    terms: false
                                                 }}
                                                 onSubmit={(values, { resetForm }) => {
                                                     this.handleSubmit(values, { resetForm });
@@ -315,7 +316,7 @@ class Register extends Component {
                                                                                 value={values.seller_type}
                                                                             >
                                                                                 <option value="">Please select</option>
-                                                                                <option value="wholeseller">wholeseller</option>
+                                                                                <option value="wholesaler">wholesaler</option>
                                                                                 <option value="retailer">retailer</option>
                                                                             </select>
                                                                             {touched.seller_type && errors.seller_type ? (
@@ -331,13 +332,29 @@ class Register extends Component {
                                                                                 value={values.want_to_sell}
                                                                             >
                                                                                 <option value="">Please select</option>
-                                                                                <option value="wholeseller">wholeseller</option>
+                                                                                <option value="wholesaler">wholesaler</option>
                                                                                 <option value="retailer">retailer</option>
                                                                             </select>
                                                                             {touched.want_to_sell && errors.want_to_sell ? (
                                                                                 <small className="text-danger">{errors.want_to_sell}</small>
                                                                             ) : null}
                                                                         </div>
+
+                                                                        {/* Terms & Conditions Checkbox */}
+                                                                        <div className="mb-3 form-check">
+                                                                            <input type="checkbox" className="form-check-input" id="terms" name="terms"
+                                                                                onChange={handleChange}
+                                                                                onBlur={handleBlur}
+                                                                                checked={values.terms}
+                                                                            />
+                                                                            <label className="form-check-label" htmlFor="terms">
+                                                                                I agree to the <Link to="/terms">Terms and Conditions</Link>
+                                                                            </label>
+                                                                            {touched.terms && errors.terms ? (
+                                                                                <small className="text-danger d-block">{errors.terms}</small>
+                                                                            ) : null}
+                                                                        </div>
+
                                                                     </div>
                                                                 </div>
                                                             </div>

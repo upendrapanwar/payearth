@@ -10,6 +10,7 @@ import axios from 'axios';
 import addCouponSchema from '../../validation-schemas/addCouponSchema';
 import arrow_back from '../../assets/icons/arrow-back.svg';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 
 const AddCupon = ({ dispatch }) => {
@@ -45,16 +46,31 @@ const AddCupon = ({ dispatch }) => {
         <React.Fragment>
             <div className="seller_body">
                 <Header />
-
-                <div className="seller_dash_wrap pt-5 pb-5">
+                <div className="inr_top_page_title">
+                    <h2>Add Coupon</h2>
+                </div>
+                <Helmet>
+                    <title>{"Admin - Add Coupon - Pay Earth"}</title>
+                </Helmet>
+                <div className="seller_dash_wrap pb-5">
                     <div className="container ">
                         <div className="bg-white rounded-3 pt-3 pb-5">
                             <div className="dash_inner_wrap">
                                 <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center mb-4">
                                     <div className="dash_title">Add New Coupon</div>
-                                    <span className="d-flex justify-content-between align-items-center">
-                                        <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/coupons"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link>
-                                    </span>
+                                    {/* <span className="d-flex justify-content-between align-items-center">
+                                        <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-coupons"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link>
+                                    </span> */}
+                                    <div>
+                                        <button
+                                            type="button"
+                                            className="btn custum_back_btn btn_yellow mx-auto"
+                                            onClick={() => window.history.back()}
+                                        >
+                                            <img src={arrow_back} alt="back" />&nbsp;
+                                            Back
+                                        </button>
+                                    </div>
 
                                 </div>
                                 <Formik

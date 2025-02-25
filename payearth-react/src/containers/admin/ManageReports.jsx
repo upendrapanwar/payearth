@@ -20,7 +20,8 @@ import { faker } from '@faker-js/faker';
 import axios from 'axios';
 import { PieChart } from '@mui/x-charts/PieChart';
 import Box from '@mui/material/Box';
-
+import { Helmet } from 'react-helmet';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 class ManageReports extends Component {
     constructor(props) {
@@ -503,18 +504,29 @@ class ManageReports extends Component {
             <React.Fragment>
                 <Header />
                 <div className="inr_top_page_title">
-                    <h2>Report Dashboard</h2>
+                    <h2>Product Reports</h2>
                 </div>
+                <Helmet>
+                    <title>{"Admin - Reports - Pay Earth"}</title>
+                </Helmet>
                 <div className="cumm_page_wrap pt-4 pb-1 admin-dashboard-wrapper reports_page_wrapper">
                     <div className="container">
                         <div className="d-flex align-items-center justify-content-between report_tabing_nav">
                             <div className="report_tab_link">
                                 <ul className="d-flex mb-0">
-                                    <li className="activeNav"><Link to="/admin/manage-reports">Product</Link></li>
-                                    <li><Link to="/admin/manage-reports-services">Service</Link></li>
-                                </ul>    
+                                    <li className="activeNav"><Link to="/admin/product-reports">Product</Link></li>
+                                    <li><Link to="/admin/service-reports">Service</Link></li>
+                                </ul>
                             </div>
-                            <button className="custom_btn btn_yellow w-auto btn" onClick={() => window.history.back()}>Back</button>
+                            {/* <button className="custom_btn btn_yellow w-auto btn" onClick={() => window.history.back()}>Back</button> */}
+                            <button
+                                type="button"
+                                className="btn custum_back_btn btn_yellow w-auto"
+                                onClick={() => window.history.back()}
+                            >
+                                <img src={arrow_back} alt="back" />&nbsp;
+                                Back
+                            </button>
                         </div>
                         <div className="report_tab_item product_report_tab_item">
                             <div className="rep_chart_wrapper">

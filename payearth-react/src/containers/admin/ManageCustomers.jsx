@@ -406,7 +406,7 @@ const ManageCustomers = () => {
           <h2>Manage Customers</h2>
         </div>
         <Helmet>
-          <title>Manage Customers - Pay Earth</title>
+          <title>{"Admin - Manage Customers - Pay Earth"}</title>
         </Helmet>
         <div className="seller_dash_wrap pt-2 pb-5">
           <div className="container">
@@ -423,9 +423,19 @@ const ManageCustomers = () => {
                       Add Customers
                     </Link>
                     &nbsp;
-                    <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/dashboard">
+                    {/* <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/dashboard">
                       <img src={arrow_back} alt="linked-in" />&nbsp;Back
-                    </Link>
+                    </Link> */}
+                    <div>
+                      <button
+                        type="button"
+                        className="btn custum_back_btn btn_yellow mx-auto"
+                        onClick={() => window.history.back()}
+                      >
+                        <img src={arrow_back} alt="back" />&nbsp;
+                        Back
+                      </button>
+                    </div>
                   </span>
                 </div>
               </div>

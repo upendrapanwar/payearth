@@ -311,20 +311,23 @@ const ManageProductsCategory = () => {
             <div className="container">
                 <Header />
                 <Helmet>
-                    <title>{"Product category - Pay Earth"}</title>
+                    <title>{"Admin - Manage Product Categories - Pay Earth"}</title>
                 </Helmet>
                 <div className="row">
                     {showSubCategory ? (
                         <AddProductSubCategory cateData={selectedCateData} toggleShowSubCategory={toggleShowSubCategory} />
                     ) : (
                         <div className="col-lg-12">
-                            <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
+                            <div className="inr_top_page_title">
+                                <h2>Manage Product Categories</h2>
+                            </div>
+                            <div className="createpost bg-white rounded-3 addPost_left_container">
                                 <div className="cp_top d-flex justify-content-between align-items-center">
-                                    <div className="cumm_title">Products Category List</div>
+                                    <div className="cumm_title">Product Categories List</div>
                                     <div className="d-flex justify-content-end ml-auto gap-2">
                                         {/* <Link className="btn custom_btn btn_yellow ml-auto " to='#' disabled={!permission.add} onClick={() => setIsModalOpen(true)}>Add-Cate</Link> */}
                                         <Link
-                                            className={`btn custom_btn mx-auto ${permission.add ? 'btn_yellow' : 'btn_disabled'}`}
+                                            className={`btn custom_btn w-auto ${permission.add ? 'btn_yellow' : 'btn_disabled'}`}
                                             to={permission.add ? "#" : "#"}
                                             onClick={(e) => {
                                                 if (!permission.add) {
@@ -334,10 +337,20 @@ const ManageProductsCategory = () => {
                                                 }
                                             }}
                                         >
-                                            Add-Cate
+                                            Add-Category
                                         </Link>
-                                       
-                                        <Link className="btn custom_btn btn_yellow mx-auto " to="/admin/dashboard"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link>
+
+                                        {/* <Link className="btn custom_btn btn_yellow mx-auto " to="/admin/dashboard"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link> */}
+                                        <div className=''>
+                                            <button
+                                                type="button"
+                                                className="btn custum_back_btn btn_yellow mx-auto"
+                                                onClick={() => window.history.back()}
+                                            >
+                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                Back
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -413,10 +426,10 @@ const ManageProductsCategory = () => {
 
                                                     <button
                                                         type="submit"
-                                                        className="btn custom_btn btn_yellow"
+                                                        className="btn custom_btn btn_yellow w-auto"
                                                         disabled={isSubmitting}
                                                     >
-                                                        {isSubmitting ? 'Adding...' : 'Add Cate'}
+                                                        {isSubmitting ? 'Adding...' : 'Add Category'}
                                                     </button>
                                                 </Form>
                                             )}
