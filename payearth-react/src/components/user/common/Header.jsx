@@ -960,7 +960,7 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                               onChange={handleCatChange}
                             />
                             <input
-                              className="form-control border-start height-auto"
+                              className="form-control border-start height-auto "
                               type="search"
                               placeholder={
                                 isService === 0
