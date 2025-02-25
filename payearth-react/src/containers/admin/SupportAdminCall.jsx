@@ -12,6 +12,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button } from 'react-bootstrap';
 import arrow_back from '../../assets/icons/arrow-back.svg'
 import { Link } from 'react-router-dom';
+import PageTitle from './../../components/user/common/PageTitle';
 
 export const SupportAdminCall = () => {
     const [loading, setLoading] = useState(true);
@@ -153,18 +154,19 @@ export const SupportAdminCall = () => {
 
             <div className="seller_dash_wrap pb-5">
                 <div className="container">
+                    <PageTitle title="Support Call" />
                     <Helmet>
-                        <title>{"Support"}</title>
+                        <title>{"Admin - Support Call - Pay Earth"}</title>
                     </Helmet>
 
                     <div className="row mt-4">
                         <div className="col-12">
                             <div className="createpost bg-white rounded-3 addPost_left_container p-3">
-                                <div className="cp_top mb-3">
+                                <div className="cp_top d-flex justify-content-between align-items-center">
                                     <div className="cumm_title">Request for callback-list</div>
                                     <div className="noti_wrap">
                                         <div className='d-flex justify-content-end'><span>
-                                            <Link className="btn custom_btn btn_yellow mx-auto mt-2" to="/admin/manage-support">
+                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-support">
                                                 <img src={arrow_back} alt="linked-in" />&nbsp;
                                                 Back
                                             </Link>

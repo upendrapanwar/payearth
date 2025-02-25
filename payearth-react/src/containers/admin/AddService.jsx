@@ -18,6 +18,7 @@ import 'react-quill/dist/quill.snow.css';
 import emptyImg from './../../assets/images/emptyimage.png'
 import arrow_back from './../../assets/icons/arrow-back.svg'
 import { bottom } from '@popperjs/core';
+import { Helmet } from 'react-helmet';
 
 class adminAddService extends Component {
     constructor(props) {
@@ -230,7 +231,13 @@ class adminAddService extends Component {
                 {loading === true ? <SpinnerLoader /> : ''}
                 <div className="seller_body">
                     <Header />
-                    <div className="seller_dash_wrap pt-5 pb-5">
+                    <div className="inr_top_page_title">
+                        <h2>Add Service</h2>
+                    </div>
+                    <Helmet>
+                        <title>{"Admin - Add Services - Pay Earth"}</title>
+                    </Helmet>
+                    <div className="seller_dash_wrap pb-5">
                         <div className="container ">
                             <div className="bg-white rounded-3 pt-3 pb-5">
                                 <div className="dash_inner_wrap">
@@ -260,15 +267,23 @@ class adminAddService extends Component {
                                                     <div className="col-md-12 pt-4 pb-4  d-flex justify-content-between align-items-center">
                                                         <div className="dash_title">Add Service</div>
 
-                                                        {/* <div className="col-md-4 pt-4 pb-4"> */}
-                                                        {/* <button type="submit" className="btn  custom_btn btn_yellow w-auto" onClick={() => window.history.back()}>Back</button> */}
-                                                        {/* </div> */}
-                                                        <div className=""><span>
+
+                                                        {/* <div className=""><span>
                                                             <Link className="btn custom_btn btn_yellow mx-auto " to="/admin/manage-services">
                                                                 <img src={arrow_back} alt="linked-in" />&nbsp;
                                                                 Back
                                                             </Link>
-                                                        </span></div>
+                                                        </span></div> */}
+                                                        <div>
+                                                            <button
+                                                                type="button"
+                                                                className="btn custum_back_btn btn_yellow mx-auto"
+                                                                onClick={() => window.history.back()}
+                                                            >
+                                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                                Back
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                     <div className="col-md-7">
                                                         <div className="mb-4">

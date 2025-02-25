@@ -12,6 +12,7 @@ import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 import { Helmet } from 'react-helmet';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 class AdminPostModule extends Component {
     constructor(props) {
@@ -149,7 +150,7 @@ class AdminPostModule extends Component {
     }
 
     handleEdit = (id) => {
-        this.props.history.push(`/admin/post-module-edit/${id}`);
+        this.props.history.push(`/admin/edit-post/${id}`);
     }
 
     blogDetails = (slug) => {
@@ -508,10 +509,10 @@ class AdminPostModule extends Component {
                 <Header />
                 <section className="admin-dashboard-wrapper post-module">
                     <div className="inr_top_page_title">
-                        <h2>Post</h2>
+                        <h2> Manage Posts</h2>
                     </div>
                     <Helmet>
-                        <title>{"Post - Pay Earth"}</title>
+                        <title>{"Admin - Manage Posts - Pay Earth"}</title>
                     </Helmet>
                     <div className="inr_wrap dash_inner_wrap admin_manage_banner">
                         <div className="col-md-12">
@@ -520,17 +521,27 @@ class AdminPostModule extends Component {
                                     <div className="bg-white rounded-3 pt-3 pb-5">
                                         <div className="dash_inner_wrap">
                                             <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center flex_mob_none">
-                                                <div className="dash_title">Post</div>
+                                                <div className="dash_title">Posts</div>
                                                 <div className="search_customer_field">
                                                     <div className="d-flex gap-2">
                                                         <Link className={`btn custom_btn mx-auto ${this.state.permissions.add ? 'btn_yellow' : 'btn_disabled'}`}
-                                                            to={this.state.permissions.add ? "/admin/post-module-add-new" : "#"}
+                                                            to={this.state.permissions.add ? "/admin/create-post" : "#"}
                                                             onClick={(e) => {
                                                                 if (!this.state.permissions.add) {
                                                                     e.preventDefault(); // Prevent navigation
                                                                 }
                                                             }}> Create New Post</Link>
-                                                        <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link>
+                                                        {/* <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link> */}
+                                                        <div className=''>
+                                                            <button
+                                                                type="button"
+                                                                className="btn custum_back_btn btn_yellow mx-auto"
+                                                                onClick={() => window.history.back()}
+                                                            >
+                                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                                Back
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

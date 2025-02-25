@@ -19,6 +19,7 @@ import "react-data-table-component-extensions/dist/index.css";
 // import { DateRangePicker } from "react-date-range";
 import "react-date-range/dist/styles.css"; // main style file
 import "react-date-range/dist/theme/default.css";
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 
 const ManageNotifications = () => {
@@ -141,7 +142,7 @@ const ManageNotifications = () => {
                         <Link
                             to={
                                 row.notification.type === 'comment' || row.notification.type === 'like'
-                                    ? `/admin-profile?postId=${row.notification.postId}`
+                                    ? `/admin/account?postId=${row.notification.postId}`
                                     : '#' // for like and other types of notifications
                             }
                             onClick={() => updateReadStatus(row.notification._id)}
@@ -186,11 +187,24 @@ const ManageNotifications = () => {
             {/* <Header readStatus={read} /> */}
             <Header />
             <PageTitle title="Notifications" />
-            <Helmet><title>{"Notification - Pay Earth"}</title></Helmet>
+            <Helmet><title>{"Admin - Notifications - Pay Earth"}</title></Helmet>
             <section className="inr_wrap">
                 <div className="container">
                     <div className="row">
-                        <div className="col-md-12 mt-4">
+                        <div className="col-md-12 mt-2 d-flex justify-content-between align-items-center">
+                            <div></div>
+                            <div>
+                                <button
+                                    type="button"
+                                    className="btn custum_back_btn btn_yellow me-4"
+                                    onClick={() => window.history.back()}
+                                >
+                                    <img src={arrow_back} alt="back" />&nbsp;
+                                    Back
+                                </button>
+                            </div>
+                        </div>
+                        <div className="col-md-12 ">
                             {Array.isArray(notification) && notification.length > 0 ? (
                                 notification.map((notifications, index) => {
                                     console.log('Notification:', notifications);
@@ -199,7 +213,7 @@ const ManageNotifications = () => {
                                             key={index}
                                             to={
                                                 notifications.notification.type === 'comment' || notifications.notification.type === 'like'
-                                                    ? `/admin-profile?postId=${notifications.notification.postId}`
+                                                    ? `/admin/account?postId=${notifications.notification.postId}`
                                                     : '#'
                                             }
                                             onClick={() => updateReadStatus(notifications.notification._id)}

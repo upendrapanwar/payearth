@@ -12,6 +12,8 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import CryptoJS from 'crypto-js';
 import { date } from 'yup';
+import { Helmet } from 'react-helmet';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 
 class ManageBannerListEdit extends Component {
@@ -23,7 +25,7 @@ class ManageBannerListEdit extends Component {
         this.cloudName = process.env.REACT_APP_CLOUD_NAME
         this.apiKey = process.env.REACT_APP_CLOUD_API_KEY
         this.apiSecret = process.env.REACT_APP_CLOUD_API_SECRET
-   
+
         this.authInfo = store.getState().auth.authInfo;
 
         this.state = {
@@ -405,6 +407,9 @@ class ManageBannerListEdit extends Component {
                 <div className="inr_top_page_title">
                     <h2>Edit Advertisement</h2>
                 </div>
+                <Helmet>
+                    <title>{"Admin - Edit Advertisement - Pay Earth"}</title>
+                </Helmet>
                 <section className="inr_wrap">
                     <div className="container">
                         <div className="row">
@@ -412,7 +417,10 @@ class ManageBannerListEdit extends Component {
                                 <div className="cart adv_banner_wrapper">
                                     <div className="noti_wrap">
                                         <div className=""><span>
-                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-advertisement">My Advertisement</Link>
+                                            <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-advertisement">
+                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                Back
+                                            </Link>
                                         </span></div>
                                     </div>
                                     <div className="cart_list adv_banner_panel">
@@ -697,7 +705,7 @@ class ManageBannerListEdit extends Component {
                                                                     className="btn custom_btn btn_yellow mx-auto"
                                                                     onClick={this.updateSave}
                                                                 >
-                                                                    Update 
+                                                                    Update
                                                                 </button>
                                                             </div>
                                                         </div>

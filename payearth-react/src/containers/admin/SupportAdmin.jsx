@@ -10,8 +10,8 @@ const SupportAdmin = () => {
     return (
         <React.Fragment>
             <Header />
-            <PageTitle title="Support" />
-            <Helmet><title>{"Support - Pay Earth"}</title></Helmet>
+            <PageTitle title="Manage Support" />
+            <Helmet><title>{"Admin - Manage Support - Pay Earth"}</title></Helmet>
             <section className="admin-dashboard-wrapper">
                 <div className="inr_wrap dash_inner_wrap support_manager_wrapper">
                     <div className="col-md-12">
@@ -20,10 +20,18 @@ const SupportAdmin = () => {
                                 <div className="bg-white rounded-3 pt-3 pb-5">
                                     <div className="noti_wrap">
                                         <div className='d-flex justify-content-end'><span>
-                                            <Link className="btn custom_btn btn_yellow mx-auto mt-2" to="/admin/dashboard">
+                                            {/* <Link className="btn custom_btn btn_yellow mx-auto mt-2" to="/admin/dashboard">
                                                 <img src={arrow_back} alt="linked-in" />&nbsp;
                                                 Back
-                                            </Link>
+                                            </Link> */}
+                                            <button
+                                                type="button"
+                                                className="btn custum_back_btn btn_yellow mx-auto me-4"
+                                                onClick={() => window.history.back()}
+                                            >
+                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                Back
+                                            </button>
                                         </span></div>
                                     </div>
                                     <div className="dash_inner_wrap">

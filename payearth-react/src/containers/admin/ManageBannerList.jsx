@@ -21,6 +21,7 @@ import Modal from "react-bootstrap/Modal";
 import { Helmet } from "react-helmet";
 import noImg from "./../../assets/images/noimage.png";
 import ModalBody from "react-bootstrap/esm/ModalBody";
+import arrow_back from "../../assets/icons/arrow-back.svg"
 
 class ManageBannerList extends Component {
   constructor(props) {
@@ -180,7 +181,7 @@ class ManageBannerList extends Component {
   };
 
   handleEdit = (id) => {
-    this.props.history.push(`/admin/manage-advertisement-edit/${id}`);
+    this.props.history.push(`/admin/edit-advertisement/${id}`);
   };
 
   handleStatusUpdate = (id) => {
@@ -371,7 +372,7 @@ class ManageBannerList extends Component {
           <h2>Manage Advertisement</h2>
         </div>
         <Helmet>
-          <title>{"Manage Advertisement - Pay Earth"}</title>
+          <title>{"Admin - Manage Advertisement - Pay Earth"}</title>
         </Helmet>
         <section className="inr_wrap">
           <div className="container">
@@ -383,7 +384,7 @@ class ManageBannerList extends Component {
                       <div className="dash_title">Manage Advertisement</div>
                       <div className="search_customer_field">
                         <div className="noti_wrap">
-                          <div className="d-flex gap-2">
+                          <div className="d-flex gap-4">
                             <Link
                               className={`btn custom_btn mx-auto ${this.state.permissions.add ? 'btn_yellow' : 'btn_disabled'}`}
                               to={this.state.permissions.add ? "/admin/create-advertisement" : "#"}
@@ -395,13 +396,22 @@ class ManageBannerList extends Component {
                             >
                               Create New Advertisement
                             </Link>
-                            <Link
+                            {/* <Link
                               className="btn custom_btn btn_yellow mx-auto"
                               to="/admin/dashboard"
                             >
                               Back
-                            </Link>
-
+                            </Link> */}
+                            <div>
+                              <button
+                                type="button"
+                                className="btn custum_back_btn btn_yellow mx-auto"
+                                onClick={() => window.history.back()}
+                              >
+                                <img src={arrow_back} alt="back" />&nbsp;
+                                Back
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>

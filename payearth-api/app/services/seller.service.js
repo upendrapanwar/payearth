@@ -217,7 +217,7 @@ module.exports = {
 async function signup(req) {
   // const file = req.file;
   const param = req.body;
-
+console.log('param----seller--',param)
   // var fullUrl = '';
 
   if (await Seller.findOne({ email: param.email })) {
@@ -242,6 +242,7 @@ async function signup(req) {
     //pdf_url: fullUrl,
     full_address: address_data,
     isActive: true,
+    terms: param.terms,
   });
 
   //Email send functionality.

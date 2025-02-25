@@ -14,6 +14,7 @@ import { Helmet } from 'react-helmet';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import NotFound from '../../components/common/NotFound';
 import axios from 'axios';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 class AdminPostModuleAddNew extends Component {
     constructor(props) {
@@ -137,12 +138,12 @@ class AdminPostModuleAddNew extends Component {
     handleSaveDraft = () => {
         toast.success("POST SAVE IN DRAFT", { autoClose: 3000 })
         this.savePost("draft");
-        this.props.history.push('/admin/post-module')
+        this.props.history.push('/admin/manage-posts')
     }
     handlePublish = () => {
         toast.success("POST PUBLISHED", { autoClose: 3000 })
         this.savePost("published");
-        this.props.history.push('/admin/post-module')
+        this.props.history.push('/admin/manage-posts')
     }
 
     savePost = (status) => {
@@ -183,13 +184,29 @@ class AdminPostModuleAddNew extends Component {
         return (
             <React.Fragment>
                 <Header />
+                <div className="inr_top_page_title">
+                    <h2> Create Post</h2>
+                </div>
+                <Helmet>
+                    <title>{"Admin - Create Post - Pay Earth"}</title>
+                </Helmet>
                 <div className="container">
-                    <Helmet>
-                        <title>{"Create new post - Pay Earth"}</title>
-                    </Helmet>
                     <div className="row">
+                        <div className='col-lg-12 d-flex justify-content-between align-items-center'>
+                            <div></div>
+                            <div className='mt-2 mb-2'>
+                                <button
+                                    type="button"
+                                    className="btn custum_back_btn btn_yellow mx-auto"
+                                    onClick={() => window.history.back()}
+                                >
+                                    <img src={arrow_back} alt="back" />&nbsp;
+                                    Back
+                                </button>
+                            </div>
+                        </div>
                         <div className="col-lg-9">
-                            <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
+                            <div className="createpost bg-white rounded-3  addPost_left_container">
                                 <div className="cp_top">
                                     <div className="cumm_title">Add New Post</div>
                                 </div>
@@ -287,7 +304,7 @@ class AdminPostModuleAddNew extends Component {
                             </div>
                         </div>
                         <div className="col-lg-3">
-                            <div className="cumm_sidebar_box bg-white p-3 rounded-3 mt-4">
+                            <div className="cumm_sidebar_box bg-white p-3 rounded-3 ">
                                 <div className="cumm_title">Featured Image</div>
                                 <div className="filter_box">
                                     <div align="center">

@@ -55,7 +55,7 @@ const ManageAdmins = () => {
 
     const ManageCapability = (row) => {
         const id = row;
-        history.push(`/admin/admin-manage-Capabilities`, { id });
+        history.push(`/admin/manage-Capabilities`, { id });
     }
 
 
@@ -137,24 +137,25 @@ const ManageAdmins = () => {
 
 
     return (
+
         <React.Fragment>
-            <div className="seller_body">
-                <Header />
-                <div className="inr_top_page_title">
-                    <h2>Manage Admins</h2>
-                </div>
-                <Helmet>
-                    <title>{"Manage Admins - Pay Earth"}</title>
-                </Helmet>
-                <div className="seller_dash_wrap pt-2 pb-5">
-                    <div className="container">
-                        <div className="bg-white rounded-3 pt-3 pb-5">
-                            <div className="dash_inner_wrap">
-                                {loading ? (
-                                    <SpinnerLoader />
-                                ) : (
+            {loading ? (
+                <SpinnerLoader />
+            ) : (
+                <div className="seller_body">
+                    <Header />
+                    <div className="inr_top_page_title">
+                        <h2>Manage Admins</h2>
+                    </div>
+                    <Helmet>
+                        <title>{"Admin - Manage Admins - Pay Earth"}</title>
+                    </Helmet>
+                    <div className="seller_dash_wrap pb-5">
+                        <div className="container">
+                            <div className="bg-white rounded-3  pb-5">
+                                <div className="dash_inner_wrap">
                                     <div className="col-lg-12">
-                                        <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
+                                        <div className="createpost bg-white rounded-3  addPost_left_container">
                                             <div className="cp_top d-flex justify-content-between align-items-center">
                                                 <div className="cumm_title">Admins List</div>
                                                 <div className="d-flex justify-content-end ml-auto gap-2">
@@ -179,14 +180,15 @@ const ManageAdmins = () => {
                                             </div>
                                         </div>
                                     </div>
-                                )}
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <Footer />
                 </div>
-                <Footer />
-            </div>
+            )}
         </React.Fragment>
+
     )
 }
 

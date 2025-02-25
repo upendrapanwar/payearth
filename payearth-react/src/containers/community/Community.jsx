@@ -548,7 +548,75 @@ const Community = () => {
                             </div>
                         </div>
                         <div className="row create_comm_wrapper">
-                            <div className="col-lg-9">
+
+                            {/* Filter */}
+                            <div className="col-lg-12 mb-3">
+                                {/* <CommunityAdvertise keywords={advertiseCat} /> */}
+                                <div className="cumm_sidebar_box bg-white p-3 rounded-3">
+                                    <div className="cumm_title">advanced filter</div>
+                                    <div className="filter_box">
+                                        <div className='d-flex flex-row'>
+                                            <select
+                                                className="form-select mb-3 me-4 w-auto"
+                                                aria-label="Default select example"
+                                                onChange={(e) => setSelectFilterCategory(e.target.value)}
+                                                value={selectFilterCategory}
+                                            >
+                                                {categoryOption.map(category => (
+                                                    <option key={category.value} value={category.value} >
+                                                        {category.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+
+                                            <div className="form-check mt-3 me-4">
+                                                <input
+                                                    className="form-check-input border-warning"
+                                                    type="radio"
+                                                    value=""
+                                                    id="popularPost"
+                                                    checked={showMostLiked}
+                                                    onChange={(e) => {
+                                                        setShowMostLiked(e.target.checked);
+                                                        setShowMostCommented(false);
+                                                    }}
+                                                />
+                                                <label className="form-check-label mt-1" htmlFor="popularPost">
+                                                    Most Popular Post
+                                                </label>
+                                            </div>
+                                            <div className="form-check mt-3 me-4">
+                                                <input
+                                                    className="form-check-input border-warning"
+                                                    type="radio"
+                                                    value=""
+                                                    id="CommentedPost"
+                                                    checked={showMostCommented}
+                                                    onChange={(e) => {
+                                                        setShowMostCommented(e.target.checked)
+                                                        setShowMostLiked(false);
+                                                    }}
+                                                />
+                                                <label className="form-check-label mt-1" htmlFor="CommentedPost">
+                                                    Most Commented Post
+                                                </label>
+                                            </div>
+
+                                            <div className="filter_btn_box ms-4">
+                                                <Link
+                                                    to="#"
+                                                     className="btn custum_back_btn btn_yellow"
+                                                    onClick={handleFilterCategory}
+                                                >
+                                                    Filter
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="col-lg-12">
                                 <div className="createpost bg-white rounded-3">
                                     <div className="cp_top d-flex justify-content-between align-items-center">
                                         <div className="cumm_title">Create your post</div>
@@ -703,70 +771,6 @@ const Community = () => {
                                 }
                             </div >
 
-                            {/* Filter */}
-                            <div className="col-lg-3">
-                                {/* <CommunityAdvertise keywords={advertiseCat} /> */}
-                                <div className="cumm_sidebar_box bg-white p-3 rounded-3">
-                                    <div className="cumm_title">advanced filter</div>
-                                    <div className="filter_box">
-                                        <select
-                                            className="form-select mb-3"
-                                            aria-label="Default select example"
-                                            onChange={(e) => setSelectFilterCategory(e.target.value)}
-                                            value={selectFilterCategory}
-                                        >
-                                            {categoryOption.map(category => (
-                                                <option key={category.value} value={category.value} >
-                                                    {category.label}
-                                                </option>
-                                            ))}
-                                        </select>
-
-                                        <div className="form-check mb-3">
-                                            <input
-                                                className="form-check-input"
-                                                type="radio"
-                                                value=""
-                                                id="popularPost"
-                                                checked={showMostLiked}
-                                                onChange={(e) => {
-                                                    setShowMostLiked(e.target.checked);
-                                                    setShowMostCommented(false);
-                                                }}
-                                            />
-                                            <label className="form-check-label" htmlFor="popularPost">
-                                                Most Popular Post
-                                            </label>
-                                        </div>
-                                        <div className="form-check mb-3">
-                                            <input
-                                                className="form-check-input"
-                                                type="radio"
-                                                value=""
-                                                id="CommentedPost"
-                                                checked={showMostCommented}
-                                                onChange={(e) => {
-                                                    setShowMostCommented(e.target.checked)
-                                                    setShowMostLiked(false);
-                                                }}
-                                            />
-                                            <label className="form-check-label" htmlFor="CommentedPost">
-                                                Most Commented Post
-                                            </label>
-                                        </div>
-
-                                        <div className="filter_btn_box">
-                                            <Link
-                                                to="#"
-                                                className="btn custom_btn btn_yellow_bordered"
-                                                onClick={handleFilterCategory}
-                                            >
-                                                Filter
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>

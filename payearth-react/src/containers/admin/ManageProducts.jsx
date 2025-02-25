@@ -14,6 +14,7 @@ import { Helmet } from 'react-helmet';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { NotFound } from '../../components/common/NotFound';
 //import { stubTrue } from 'lodash';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 
 
@@ -130,7 +131,7 @@ class ManageProducts extends Component {
                 cell: (row, i) => {
                     return (
                         <>
-                            <Link to={`/admin/manage-product-details/${row.id}`}>
+                            <Link to={`/admin/product-details/${row.id}`}>
                                 <button className="custom_btn btn_yellow_bordered w-auto btn">DETAIL</button>
                             </Link>
                         </>
@@ -352,10 +353,10 @@ class ManageProducts extends Component {
                 <div className="seller_body">
                     <Header />
                     <div className="inr_top_page_title">
-                        <h2>Product Management</h2>
+                        <h2>Manage Products</h2>
                     </div>
                     <Helmet>
-                        <title>{"Product Management - Pay Earth"}</title>
+                        <title>{"Admin - Manage Products - Pay Earth"}</title>
                     </Helmet>
                     <div className="seller_dash_wrap pt-2 pb-5">
                         <div className="container ">
@@ -363,7 +364,17 @@ class ManageProducts extends Component {
                                 <div className="dash_inner_wrap pb-2">
                                     <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
                                         <div className="dash_title">Product Management</div>
-                                        <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link>
+                                        {/* <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link> */}
+                                        <div className=' mt-2 mb-2 me-4'>
+                                            <button
+                                                type="button"
+                                                className="btn custum_back_btn btn_yellow mx-auto"
+                                                onClick={() => window.history.back()}
+                                            >
+                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                Back
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 <nav className="orders_tabs">

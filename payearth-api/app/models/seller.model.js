@@ -8,6 +8,7 @@ const schema = new Schema({
     password: { type: String, required: false, default: '' },
     phone: { type: String, required: false, default: '' },
     role: { type: String, required: false, default: 'seller' },
+    terms: { type: Boolean, required: true, default: false },
     address: {
         street: String,
         city: String,

@@ -15,6 +15,8 @@ import { toast } from 'react-toastify';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import NotFound from '../../components/common/NotFound';
 import axios from 'axios';
+import { Helmet } from 'react-helmet';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 class AdminPostEdit extends Component {
     constructor(props) {
@@ -133,11 +135,11 @@ class AdminPostEdit extends Component {
     };
     handleSaveDraft = () => {
         this.updatePost("draft");
-        this.props.history.push('/admin/post-module')
+        this.props.history.push('/admin/manage-posts')
     }
     handlePublishUpdate = () => {
         this.updatePost("published")
-        this.props.history.push('/admin/post-module')
+        this.props.history.push('/admin/manage-posts')
     }
 
     updatePost = (status) => {
@@ -179,20 +181,26 @@ class AdminPostEdit extends Component {
         return (
             <React.Fragment>
                 <Header />
+                <div className="inr_top_page_title">
+                    <h2>Edit Post</h2>
+                </div>
+                <Helmet>
+                    <title>{"Admin - Edit Posts - Pay Earth"}</title>
+                </Helmet>
                 <div className="container">
                     <form onSubmit={this.handlePublishUpdate} >
                         <div className="row">
                             <div className="col-lg-12  d-flex justify-content-end">
-                                <Link
-                                    to="#"
-                                    className="custom_btn btn_yellow w-auto btn mt-2 rounded-lg"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        window.history.back();
-                                    }}
-                                >
-                                    Back
-                                </Link>
+                                <div className=' mt-2'>
+                                    <button
+                                        type="button"
+                                        className="btn custum_back_btn btn_yellow mx-auto"
+                                        onClick={() => window.history.back()}
+                                    >
+                                        <img src={arrow_back} alt="back" />&nbsp;
+                                        Back
+                                    </button>
+                                </div>
                             </div>
                             <div className="col-lg-9">
 
@@ -203,7 +211,7 @@ class AdminPostEdit extends Component {
                                             <div className="noti_wrap">
                                                 <div className="">
                                                     <span>
-                                                        <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/post-module-add-new"> Create New Post</Link>
+                                                        <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/create-post"> Create New Post</Link>
                                                     </span>
                                                 </div>
                                             </div>

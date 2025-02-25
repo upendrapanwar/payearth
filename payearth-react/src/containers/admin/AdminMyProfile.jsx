@@ -10,12 +10,13 @@ import { toast } from 'react-toastify';
 import emptyImg from '../../assets/images/user.png';
 import UploadAdminProfile from './UploadAdminProfile';
 import adminValidation from '../../validation-schemas/adminmyProfileSchema'
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 
 const AdminMyProfile = () => {
     // Global variable
     const authInfo = JSON.parse(localStorage.getItem('authInfo'));
-    const userInfo = JSON.parse(localStorage.getItem('userInfo'));   
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
     // State
     const [loading, setLoading] = useState(false);
@@ -112,9 +113,9 @@ const AdminMyProfile = () => {
         <React.Fragment>
             {loading && <SpinnerLoader />}
             <Header />
-            <PageTitle title="Admin Profile" />
+            <PageTitle title="My Profile" />
             <section className="inr_wrap">
-                <Helmet><title>{"Admin Profile - Pay Earth"}</title></Helmet>
+                <Helmet><title>{"Admin - My Profile - Pay Earth"}</title></Helmet>
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-12">
@@ -132,6 +133,16 @@ const AdminMyProfile = () => {
                                             <i className="bi bi-eye"></i>
                                         </button>
                                     </div>
+                                </div>
+                                <div className=' me-4'>
+                                    <button
+                                        type="button"
+                                        className="btn custum_back_btn btn_yellow mx-auto"
+                                        onClick={() => window.history.back()}
+                                    >
+                                        <img src={arrow_back} alt="back" />&nbsp;
+                                        Back
+                                    </button>
                                 </div>
                             </div>
                         </div>

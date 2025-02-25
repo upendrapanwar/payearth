@@ -14,6 +14,7 @@ import { Button } from '@mui/material';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 // import GoogleAnalyticsEvents from './GoogleAnalyticsEvents';
+import { Helmet } from 'react-helmet';
 
 class Dashboard extends Component {
     constructor(props) {
@@ -771,6 +772,7 @@ class Dashboard extends Component {
                 {loading === true ? <SpinnerLoader /> : ""}
                 <div className="seller_body">
                     <Header />
+                    <Helmet><title>{"Admin - Dashboard - Pay Earth"}</title></Helmet>
                     <div className="seller_dash_wrap pt-5 pb-5">
                         <div className="container">
                             <div className="row">
@@ -790,7 +792,7 @@ class Dashboard extends Component {
                                     </div>
                                 </div>
                                 <div className="col-md-3 col-sm-6 col-12">
-                                    <Link to="/admin/manage-reports">
+                                    <Link to="/admin/product-reports">
                                         <div className="count_box">
                                             <div className="cb_count">{orderCount}</div>
                                             <div className="cb_name">{`(Product/Services)`}<small>Orders</small></div>

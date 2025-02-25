@@ -13,11 +13,13 @@ import store from '../../store';
 import SpinnerLoader from './../../components/common/SpinnerLoader';
 import Select from 'react-select';
 import Header from '../../components/admin/common/Header';
+import { Helmet } from 'react-helmet';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 class VandorRegister extends Component {
   constructor(props) {
     super(props);
-    const  {dispatch}  = props;
+    const { dispatch } = props;
     this.dispatch = dispatch;
     this.state = {
       authInfo: [],
@@ -162,7 +164,7 @@ class VandorRegister extends Component {
     console.log("Registration vendorId", vendorId);
     if (vendorId === null) {
       console.log("Registration values", values);
-      const { id, ...valuesData } = values; 
+      const { id, ...valuesData } = values;
       this.dispatch(setLoading({ loading: true }));
       axios.post('seller/signup', valuesData)
         .then(response => {
@@ -232,24 +234,56 @@ class VandorRegister extends Component {
       <React.Fragment>
         {loading === true && <SpinnerLoader />}
         <div className="seller_body">
-        <Header />
-          <div className="sel_reg_bg">
+          <Header />
+          <div className="inr_top_page_title">
+            {vendorId === null ? (
+              <h2>Add Vendor</h2>
+            ) : (<h2>Update Vendor</h2>)}
+          </div>
+          {/* {vendorId === null ? (
+          <Helmet>
+            <title>{"Admin - Add Vendor - Pay Earth"}</title>
+          </Helmet>
+          ) : (
+            <Helmet>
+            <title>{"Admin - Update Vendor - Pay Earth"}</title>
+          </Helmet>
+          )} */}
+          <div className="">
             <div className="container">
               <div className="row">
+                <div className="col-md-12  d-flex justify-content-between align-items-center mt-3">
+                  <div></div>
+                  <div>
+                    <button
+                      type="button"
+                      className="btn custum_back_btn btn_yellow mx-auto"
+                      onClick={() => window.history.back()}
+                    >
+                      <img src={arrow_back} alt="back" />&nbsp;
+                      Back
+                    </button>
+                  </div>
+                </div>
                 <div className="col-md-12">
                   {/* <Link to="/" className="navbar-brand py-0">
                     <img src={logo} alt="logo" className="img-fluid" />
                   </Link> */}
-                  <div className="sel_register mt-5">
-                    <div className="form_wrapper">
-                      <button
+                  <div className="sel_register" style={{ marginLeft: "200px" }}>
+                    <div className="form_wrapper pt-2">
+                      {/* <button
                         onClick={this.handleClose}
                         type="button"
                         className="btn-close mo_btn"
                         style={{ float: "right" }}
                         aria-label="Close"
-                      ></button>
-                      <h4 className="form_title mb-4">Seller Register</h4>
+                      ></button> */}
+                      {vendorId === null ? (
+                        <h4 className="form_title mb-4">Add Seller</h4>
+                      ) : (
+                        <h4 className="form_title mb-4">Update Seller</h4>
+                      )}
+
                       <Formik
                         initialValues={{
                           id: vendoreData._id || '',
@@ -346,7 +380,8 @@ class VandorRegister extends Component {
                                       />
                                     )}
                                     {vendorId !== null ? (
-                                      <img src={invisibleIcon} alt="invisible" />
+                                      // <img src={invisibleIcon} alt="invisible" />
+                                      ''
                                     ) : (
                                       this.state.seePassword ? (
                                         <img
@@ -396,7 +431,8 @@ class VandorRegister extends Component {
                                       />
                                     )}
                                     {vendorId !== null ? (
-                                      <img src={invisibleIcon} alt="invisible" />
+                                      // <img src={invisibleIcon} alt="invisible" />
+                                      ""
                                     ) : (
                                       this.state.seeConfirmPassword ? (
                                         <img

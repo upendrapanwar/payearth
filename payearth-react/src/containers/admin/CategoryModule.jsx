@@ -210,7 +210,7 @@ class AdminCategoryModel extends Component {
     ]
 
     handleEdit = (id) => {
-        this.props.history.push(`/admin/category-module-edit/${id}`)
+        this.props.history.push(`/admin/edit-blog-category/${id}`)
     }
 
     render() {
@@ -228,8 +228,11 @@ class AdminCategoryModel extends Component {
                 <div className="container">
                     <Header />
                     <Helmet>
-                        <title>{"Blog Category - Pay Earth"}</title>
+                        <title>{"Admin - Manage Blog Categories - Pay Earth"}</title>
                     </Helmet>
+                    <div className="inr_top_page_title">
+                        <h2>Manage Blog Categories</h2>
+                    </div>
                     <div className="row">
                         <div className="col-lg-4">
                             <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
@@ -293,9 +296,19 @@ class AdminCategoryModel extends Component {
                                 <div className="cp_top">
                                     <div className="d-flex justify-content-between align-items-center gap-2">
                                         <div className="cumm_title">Category List</div>
-                                        <Link className="btn custom_btn btn_yellow ms-auto" to="/admin/dashboard">
+                                        {/* <Link className="btn custom_btn btn_yellow ms-auto" to="/admin/dashboard">
                                             <img src={arrow_back} alt="linked-in" />&nbsp;Back
-                                        </Link>
+                                        </Link> */}
+                                        <div className=''>
+                                            <button
+                                                type="button"
+                                                className="btn custum_back_btn btn_yellow mx-auto"
+                                                onClick={() => window.history.back()}
+                                            >
+                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                Back
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="cp_body">

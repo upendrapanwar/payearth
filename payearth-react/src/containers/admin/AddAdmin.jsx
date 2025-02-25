@@ -8,7 +8,8 @@ import { Link } from 'react-router-dom';
 import createAdmin from '../../validation-schemas/AddAdminSchema';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { toast } from 'react-toastify';
- 
+import { Helmet } from 'react-helmet';
+
 
 
 
@@ -19,7 +20,7 @@ const AddAdmin = () => {
 
     const handleSubmit = async (values) => {
         try {
-            const res = await axios.post('admin/addAdmin', values,{
+            const res = await axios.post('admin/addAdmin', values, {
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8',
@@ -27,14 +28,14 @@ const AddAdmin = () => {
                 }
             })
 
-            if(res.data.status === true){
+            if (res.data.status === true) {
                 console.log("testing res", res);
-                const id = res.data.data.id;           
+                const id = res.data.data.id;
                 accessPermission(id);
             }
-          
+
         } catch (error) {
-            toast.error("Data has not saved.",error);
+            toast.error("Data has not saved.", error);
             console.error("Data has not saved.", error)
         }
     };
@@ -50,18 +51,32 @@ const AddAdmin = () => {
         <React.Fragment>
             <div className="seller_body">
                 <Header />
-                <div className="seller_dash_wrap pt-5 pb-5">
+                <div className="inr_top_page_title">
+                    <h2>Add Admin</h2>
+                </div>
+                <Helmet>
+                    <title>{"Admin - Add Admin - Pay Earth"}</title>
+                </Helmet>
+                <div className="seller_dash_wrap pb-5">
                     <div className="container">
-                        <div className="bg-white rounded-3 pt-3 pb-5">
+                        <div className="bg-white rounded-3 pb-5">
                             <div className="dash_inner_wrap">
                                 <div className="col-lg-12">
-                                    <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
-                                        <div className="cp_top d-flex justify-content-between align-items-center">
+                                    <div className="createpost bg-white rounded-3 mt-2 addPost_left_container">
+                                        <div className="cp_top d-flex justify-content-between align-items-center mb-2">
                                             <div className="cumm_title">Add New Admins</div>
                                             <div className="d-flex justify-content-end ml-auto gap-2">
-                                                <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-admins">
+                                                {/* <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-admins">
                                                     <img src={arrow_back} alt="linked-in" />&nbsp;Back
-                                                </Link>
+                                                </Link> */}
+                                                <button
+                                                    type="button"
+                                                    className="btn custum_back_btn btn_yellow mx-auto"
+                                                    onClick={() => window.history.back()}
+                                                >
+                                                    <img src={arrow_back} alt="back" />&nbsp;
+                                                    Back
+                                                </button>
                                             </div>
                                         </div>
 

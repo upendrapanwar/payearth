@@ -91,6 +91,10 @@ ul {
   transition: var(--transition);
 }
 
+.custum_back_btn:hover {
+  border: 2px solid var(--primary_color);
+}
+
 .custom_btn_order {
   width: 250px !important;
 }

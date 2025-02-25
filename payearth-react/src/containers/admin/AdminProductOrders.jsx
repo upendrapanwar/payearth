@@ -12,6 +12,7 @@ import { NotFound } from '../../components/common/NotFound';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 class AdminProductOrders extends Component {
     constructor(props) {
@@ -265,7 +266,7 @@ class AdminProductOrders extends Component {
                         <h2>Product Orders</h2>
                     </div>
                     <Helmet>
-                        <title>{"Product Orders - Pay Earth"}</title>
+                        <title>{"Admin - Product Orders - Pay Earth"}</title>
                     </Helmet>
                     <div className="seller_dash_wrap pt-2 pb-5">
                         <div className="container">
@@ -273,7 +274,17 @@ class AdminProductOrders extends Component {
                                 <div className="dash_inner_wrap pb-2">
                                     <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center">
                                         <div className="dash_title">Product Orders</div>
-                                        <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link>
+                                        {/* <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link> */}
+                                        <div>
+                                            <button
+                                                type="button"
+                                                className="btn custum_back_btn btn_yellow mx-auto"
+                                                onClick={() => window.history.back()}
+                                            >
+                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                Back
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 <nav className="orders_tabs">

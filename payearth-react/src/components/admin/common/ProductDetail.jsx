@@ -6,6 +6,7 @@ import parse from 'html-react-parser';
 import SpinnerLoader from '../../../components/common/SpinnerLoader';
 import PageTitle from '../../user/common/PageTitle';
 import arrow_back from '../../../assets/icons/arrow-back.svg';
+import { Helmet } from 'react-helmet';
 
 const ProductDetail = ({ data, colors, type }) => {
     const [loading, setLoading] = useState(true);
@@ -40,7 +41,10 @@ const ProductDetail = ({ data, colors, type }) => {
     return (
         <>
             {loading === true ? <SpinnerLoader /> : ''}
-            <PageTitle title={`${type} Detail`} />
+            <PageTitle title={`${type} Details`} />
+            <Helmet>
+                <title>{`Admin - ${type.charAt(0).toUpperCase() + type.slice(1)} Details - Pay Earth`}</title>
+            </Helmet>
             <div className="seller_dash_wrap pt-2 pb-5">
                 <div className="container">
                     <div className="bg-white rounded-3 pt-3 pb-5">
@@ -49,7 +53,15 @@ const ProductDetail = ({ data, colors, type }) => {
                                 <div className="dash_title">{itemDetail?.name}</div>
                                 <div className="d-flex justify-content-end ml-auto gap-2">
                                     {/* <Link to={itemDetail ? `${url}${itemDetail.id}` : '#'} className="custom_btn btn_yellow_bordered w-auto btn">Edit Details</Link> */}
-                                    <Link className="btn custom_btn btn_yellow mx-auto " to="/admin/manage-products"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link>
+                                    {/* <Link className="btn custom_btn btn_yellow mx-auto " to="/admin/manage-products"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link> */}
+                                    <button
+                                        type="button"
+                                        className="btn custum_back_btn btn_yellow mx-auto"
+                                        onClick={() => window.history.back()}
+                                    >
+                                        <img src={arrow_back} alt="back" />&nbsp;
+                                        Back
+                                    </button>
                                 </div>
                             </div>
                             <div className="col-md-12">

@@ -341,8 +341,11 @@ const AddProductSubCategory = (props) => {
         <React.Fragment>
             {loading && <SpinnerLoader />}
             <div className="container">
+                <div className="inr_top_page_title">
+                    <h2>Manage Sub-Category</h2>
+                </div>
                 <Helmet>
-                    <title>{"Add Sub-Category - Pay Earth"}</title>
+                    <title>{"Admin - Manage Product Categories - Pay Earth"}</title>
                 </Helmet>
                 <div className="row">
                     <div className="col-lg-12">

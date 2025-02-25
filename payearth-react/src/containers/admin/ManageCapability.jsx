@@ -10,6 +10,7 @@ import { useLocation, Link } from "react-router-dom";
 import { toast } from 'react-toastify';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import arrow_back from '../../assets/icons/arrow-back.svg';
+import { Helmet } from 'react-helmet';
 
 
 const ManageCapability = () => {
@@ -155,15 +156,22 @@ const ManageCapability = () => {
 
   return (
     <>
-      <Header />
+     
       <div className="container">
-        {loading && <SpinnerLoader />}
-        <div className="bg-white rounded-3 pt-3 pb-5 mt-4">
+      {loading && <SpinnerLoader />}
+      <Header />
+      <div className="inr_top_page_title">
+        <h2>Manage Capabilities</h2>
+      </div>
+      <Helmet>
+        <title>{"Admin - Manage Capabilities - Pay Earth"}</title>
+      </Helmet>
+        <div className="bg-white rounded-3 pt-3 pb-5 ">
           <div className="dash_inner_wrap">
             <div className="col-lg-12">
-              <div className="createpost bg-white rounded-3 mt-4 addPost_left_container">
+              <div className="createpost bg-white rounded-3 mt-2 addPost_left_container">
                 <div className="cp_top d-flex justify-content-between align-items-center">
-                  <div className="cumm_title">Update Capability</div>
+                  <div className="cumm_title">Manage Capabilities</div>
                   <div className="d-flex justify-content-end ml-auto gap-2">
                     <Link className="btn custom_btn btn_yellow mx-auto" to="/admin/manage-admins"><img src={arrow_back} alt="linked-in" />&nbsp;Back</Link>
                   </div>

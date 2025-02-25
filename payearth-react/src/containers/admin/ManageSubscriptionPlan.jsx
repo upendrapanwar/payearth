@@ -13,7 +13,7 @@ import DataTable from 'react-data-table-component';
 import DataTableExtensions from "react-data-table-component-extensions";
 import 'react-data-table-component-extensions/dist/index.css';
 import { Helmet } from 'react-helmet';
-
+import arrow_back from '../../assets/icons/arrow-back.svg'
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.REACT_APP_STRIPE_SECRET_KEY);
@@ -248,7 +248,7 @@ class AdminManageSubPlan extends Component {
                     <h2>Manage Subscription</h2>
                 </div>
                 <Helmet>
-                    <title>{"Manage Subscription - Pay Earth"}</title>
+                    <title>{"Admin - Manage Subscription - Pay Earth"}</title>
                 </Helmet>
                 <div className="container">
                     <div className="row">
@@ -398,13 +398,23 @@ class AdminManageSubPlan extends Component {
                             </div>
                         </div>
                         <div className="col-lg-8">
-                            <div className="createpost bg-white rounded-3 mt-2 addPost_left_container">                        
+                            <div className="createpost bg-white rounded-3 mt-2 addPost_left_container">
                                 <div className="dash_inner_wrap pb-2">
-                                        <div className="col-md-12 pb-3 d-flex justify-content-between align-items-center">
-                                            <div className="dash_title">Plan lists</div>
-                                            <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link>
+                                    <div className="col-md-12 pb-3 d-flex justify-content-between align-items-center">
+                                        <div className="dash_title">Plan lists</div>
+                                        {/* <Link to="/admin/dashboard" className="custom_btn btn_yellow w-auto btn">Back</Link> */}
+                                        <div>
+                                            <button
+                                                type="button"
+                                                className="btn custum_back_btn btn_yellow mx-auto"
+                                                onClick={() => window.history.back()}
+                                            >
+                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                Back
+                                            </button>
                                         </div>
                                     </div>
+                                </div>
                                 <div>
                                     <DataTableExtensions
                                         columns={this.category_column}
