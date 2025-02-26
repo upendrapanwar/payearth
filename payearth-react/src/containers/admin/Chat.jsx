@@ -1231,7 +1231,7 @@ class Chat extends Component {
                                                                                 <br />
                                                                                 {item.mediaContent !== null && item.messageContent !== null ? <p>{item.messageContent}</p> : <></>}
                                                                                 <span className='time'>{moment(item.timestamp).format('hh:mm A')}</span>
-                                                                            </li>
+                                                                            </li> 
                                                                         </ul>
                                                                     ) : (
                                                                         <ul>
