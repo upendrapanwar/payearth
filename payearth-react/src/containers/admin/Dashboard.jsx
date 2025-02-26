@@ -242,8 +242,8 @@ class Dashboard extends Component {
             //     sortable: true
             // },
             {
-                name: 'PAYMENT MODE',
-                selector: (row, i) => row.paymentId.paymentMode,
+                name: 'PAYMENT ACCOUNT',
+                selector: (row, i) => row.paymentId.paymentAccount,
                 sortable: true
             },
         ];
@@ -266,8 +266,8 @@ class Dashboard extends Component {
                 sortable: true
             },
             {
-                name: 'PAYMENT MODE',
-                selector: (row, i) => row.paymentId.paymentMode,
+                name: 'PAYMENT ACCOUNT',
+                selector: (row, i) => row.paymentId.paymentAccount,
                 sortable: true
             },
         ];
@@ -289,8 +289,8 @@ class Dashboard extends Component {
                 sortable: true
             },
             {
-                name: 'PAYMENT MODE',
-                selector: (row, i) => row.paymentId.paymentMode,
+                name: 'PAYMENT ACCOUNT',
+                selector: (row, i) => row.paymentId.paymentAccount,
                 sortable: true
             },
         ];

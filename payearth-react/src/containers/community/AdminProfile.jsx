@@ -524,71 +524,6 @@ const AdminProfile = () => {
                                 </div>
                             </div>
 
-                            {/* Filter */}
-                            <div className="col-lg-12 mb-3">
-                                <div className="cumm_sidebar_box bg-white p-3 rounded-3">
-                                    <div className="cumm_title">advanced filter</div>
-                                    <div className="filter_box">
-                                    <div className='d-flex flex-row'>
-                                        <select
-                                            className="form-select mb-3 me-4 w-25"
-                                            aria-label="Default select example"
-                                            onChange={(e) => setSelectFilterCategory(e.target.value)}
-                                            value={selectFilterCategory}
-                                        >
-                                            {categoryOption.map(category => (
-                                                <option key={category.value} value={category.value} >
-                                                    {category.label}
-                                                </option>
-                                            ))}
-                                        </select>
-                                        <div className="form-check mt-3 me-4">
-                                            <input
-                                                className="form-check-input border-warning"
-                                                type="radio"
-                                                value=""
-                                                id="popularPost"
-                                                checked={showMostLiked}
-                                                onChange={(e) => {
-                                                    setShowMostLiked(e.target.checked);
-                                                    setShowMostCommented(false);
-                                                }}
-
-                                            />
-                                            <label className="form-check-label mt-1" htmlFor="popularPost">
-                                                Most Popular Post
-                                            </label>
-                                        </div>
-                                        <div className="form-check mt-3 me-4">
-                                            <input
-                                                className="form-check-input border-warning"
-                                                type="radio"
-                                                value=""
-                                                id="CommentedPost"
-                                                checked={showMostCommented}
-                                                onChange={(e) => {
-                                                    setShowMostCommented(e.target.checked)
-                                                    setShowMostLiked(false);
-                                                }}
-                                            />
-                                            <label className="form-check-label mt-1" htmlFor="CommentedPost">
-                                                Most Commented Post
-                                            </label>
-                                        </div>
-                                        <div className="filter_btn_box ms-4">
-                                            <Link
-                                                to="#"
-                                                className="btn custum_back_btn btn_yellow"
-                                                onClick={handleFilterCategory}
-                                            >
-                                                Filter
-                                            </Link>
-                                        </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
                             <div className="col-lg-12">
                                 <div className="createpost bg-white rounded-3">
                                     <div className="cp_top  d-flex justify-content-between align-items-center">
@@ -733,6 +668,71 @@ const AdminProfile = () => {
                                         </div>
                                     </div>
                                 </div>
+
+
+                                {/* Filter */}
+                                <div className="cumm_sidebar_box bg-white p-3 rounded-3 mb-3">
+                                    <div className="cumm_title">advanced filter</div>
+                                    <div className="filter_box">
+                                        <div className='d-flex flex-row'>
+                                            <select
+                                                className="form-select mb-3 me-4 w-25"
+                                                aria-label="Default select example"
+                                                onChange={(e) => setSelectFilterCategory(e.target.value)}
+                                                value={selectFilterCategory}
+                                            >
+                                                {categoryOption.map(category => (
+                                                    <option key={category.value} value={category.value} >
+                                                        {category.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <div className="form-check mt-3 me-4">
+                                                <input
+                                                    className="form-check-input border-warning"
+                                                    type="radio"
+                                                    value=""
+                                                    id="popularPost"
+                                                    checked={showMostLiked}
+                                                    onChange={(e) => {
+                                                        setShowMostLiked(e.target.checked);
+                                                        setShowMostCommented(false);
+                                                    }}
+
+                                                />
+                                                <label className="form-check-label mt-1" htmlFor="popularPost">
+                                                    Most Popular Post
+                                                </label>
+                                            </div>
+                                            <div className="form-check mt-3 me-4">
+                                                <input
+                                                    className="form-check-input border-warning"
+                                                    type="radio"
+                                                    value=""
+                                                    id="CommentedPost"
+                                                    checked={showMostCommented}
+                                                    onChange={(e) => {
+                                                        setShowMostCommented(e.target.checked)
+                                                        setShowMostLiked(false);
+                                                    }}
+                                                />
+                                                <label className="form-check-label mt-1" htmlFor="CommentedPost">
+                                                    Most Commented Post
+                                                </label>
+                                            </div>
+                                            <div className="filter_btn_box ms-4">
+                                                <Link
+                                                    to="#"
+                                                    className="btn custum_back_btn btn_yellow"
+                                                    onClick={handleFilterCategory}
+                                                >
+                                                    Filter
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {/* {
                                     SellerPostsData.length > 0 ?
                                         <div>
