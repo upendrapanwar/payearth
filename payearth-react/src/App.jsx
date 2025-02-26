@@ -1078,7 +1078,7 @@ function App() {
             currentUserRole={userInfo.role}
             exact
           />
-          {/* AdminManageSubPlan */}
+
 
           <PrivateRoute path="/admin/edit-service/:id"
             component={AdminEditService}

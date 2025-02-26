@@ -353,7 +353,8 @@
 
 .chatUser_wrapper .chat_board_view .msg-body {
   overflow-y: auto;
-  max-height: 500px;
+  /* max-height: 500px; */
+  height: 500px;
 }
 
 .chatUser_wrapper .chat_board_view .msg-body ul {
@@ -562,6 +563,16 @@
   /* margin-bottom: 20px; */
   padding: 20px;
 }
+
+/*  ADD CHAT RESPONSE*/
+
+/* .chatUser_wrapper .chatlist_panel .chat_board_view.show {
+  display: block;
+}
+
+.chatUser_wrapper .chatlist_panel .chat_board_view.hide {
+  display: none;
+} */
 
 .user-list-container .chatGrpSelect {
   margin-bottom: 20px;
@@ -2913,7 +2924,64 @@ input[type="search"] {
   }
 }
 
+.chatUser_wrapper .chatlist_panel .chat_board_view .desktop-hide {
+  display: none !important;
+}
+
+.chatUser_wrapper .chatlist_panel .chat-lists .chat_user_list .chat_left-head .chat_head_panel .desktop-hide {
+  display: none !important;
+}
+
+.chatUser_wrapper .chatlist_panel .chat-lists .chat_left-head .desktop-hide {
+  display: none !important;
+}
+
+.chatUser_wrapper .chatlist_panel .chat_board_view .desktop-show {
+  display: none !important;
+}
+
+.chatUser_wrapper .chatlist_panel .chat-not-found {
+  display: none !important;
+}
+
+
 @media (max-width: 767px) {
+
+  .chatUser_wrapper .chatlist_panel .chat-lists .chat_user_list .chat_left-head .chat_head_panel .desktop-hide {
+    display: block !important;
+  }
+
+  .chatUser_wrapper .chatlist_panel .chat_board_view {
+    display: none !important;
+  }
+
+  .chatUser_wrapper .chatlist_panel .chat-not-found {
+    display: block !important;
+  }
+
+  .chatUser_wrapper .chatlist_panel .chat_board_view .desktop-dashboard {
+    display: none !important;
+  }
+
+  .chatUser_wrapper .chatlist_panel .chat_board_view .desktop-hide {
+    display: none !important;
+  }
+
+  .chatUser_wrapper .chatlist_panel .chat_board_view .desktop-show {
+    display: block !important;
+  }
+
+  .chatUser_wrapper .chatlist_panel .chat_board_view.show {
+    display: block !important;
+  }
+
+  .chatUser_wrapper .chatlist_panel .chat-lists.hide {
+    display: none !important;
+  }
+
+  .chatUser_wrapper .chatlist_panel .chat-lists .chat_left-head .desktop-hide {
+    display: block !important;
+  }
 
   .notification_listing_table .noti_head>.noti_wrap,
   .notification_listing_table .notification_wrap .cl_items {
@@ -2990,6 +3058,8 @@ input[type="search"] {
   .input-group .form-select {
     max-width: 290px;
   }
+
+
 }
 
 /* Side banner css */

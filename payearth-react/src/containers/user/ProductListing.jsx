@@ -206,12 +206,7 @@ const ProductListing = () => {
                                 onBrandChange={handleBrandChange}
                             />
                         </div>
-                        <div className="col-md-9 mt-3" style={{ overflowY: 'auto', maxHeight: '120vh', border: '1px solid #ddd', scrollbarWidth: 'thin', }}>
-                            {/* <div className="row">
-                                <div className="col">
-                                    <ListingHead title="Products" count={products.length} />
-                                </div>
-                            </div> */}
+                        <div className="col-md-9 mt-3" style={{ overflowY: 'auto', maxHeight: '120vh', border: '1px solid #ddd', scrollbarWidth: 'thin', }}>                      
                             <div className="row">
                                 <div className="col-sm-12">
                                     {super_rewards === true ? <Link
@@ -241,32 +236,7 @@ const ProductListing = () => {
                                         <button type="button" onClick={() => getProducts('viewMore')} className="view_more">View More</button>
                                     </div>
                                 )}
-                            </div>
-
-                            {/* <div className="row">
-                                <div className="col-sm-12">
-                                    {(searchingProducts.length === 0 ? products : searchingProducts).length === 0
-                                        ? <NotFound msg="Product not found." />
-                                        : ''}
-                                    <div className="cards_wrapper">
-                                        {
-                                            (searchingProducts.length === 0 ? products : searchingProducts).map((product, index) => (
-                                                <ProductCard
-                                                    data={product}
-                                                    key={index}
-                                                    inWishList={selectedWishItems.length !== 0 && selectedWishItems.includes(product.id)}
-                                                />
-                                            ))
-                                        }
-                                    </div>
-                                </div>
-                                {((searchingProducts.length === 0 ? products : searchingProducts).length !== 0) &&
-                                    (searchingProducts.length === 0 ? products : searchingProducts).length < totalProducts && (
-                                        <div className="col-md-12 more_pord_load_btn">
-                                            <button type="button" onClick={() => getProducts('viewMore')} className="view_more">View More</button>
-                                        </div>
-                                    )}
-                            </div> */}
+                            </div>                           
                         </div>
                     </div>
                 </div>
