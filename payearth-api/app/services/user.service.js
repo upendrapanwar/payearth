@@ -3889,7 +3889,7 @@ async function createGroupChat(req) {
       // console.log("fullChatData", fullChat)
       return fullChat;
     } catch (error) {
-      console.log("error", error)
+      console.log("error", error) 
     }
   }
 }
