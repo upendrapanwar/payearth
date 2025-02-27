@@ -391,6 +391,7 @@ class Chat extends Component {
                 blockByUser: data.blockByUser
             }
             this.setState({ sendChatData: result })
+            this.fetchAllUserData();
 
         } else {
             const groupData = data.chatUsers
@@ -410,6 +411,7 @@ class Chat extends Component {
             // console.log("Group data result", result)
             // this.setState({ allChatUsers: result.groupData });
             this.setState({ sendChatData: result })
+            this.fetchAllUserData();
         }
     }
 
@@ -425,6 +427,7 @@ class Chat extends Component {
                 this.setState({
                     userChat: data
                 })
+                this.fetchAllUserData();
             } else {
                 this.setState({
                     userChat: ""
@@ -476,8 +479,8 @@ class Chat extends Component {
                         const sendData = {
                             authorId: {
                                 id: this.authInfo.id,
-                                name: this.userInfo.name,
-                                image_url: this.userInfo.imgUrl,
+                                name: "",
+                                image_url: "",
                             },
                             chatId: sendChatData.chatId,
                             messageContent: messageContent || null,
@@ -521,8 +524,8 @@ class Chat extends Component {
                 const sendData = {
                     authorId: {
                         id: this.authInfo.id,
-                        name: this.userInfo.name,
-                        image_url: this.userInfo.imgUrl,
+                        name: "",
+                        image_url: "",
                     },
                     chatId: sendChatData.chatId,
                     messageContent: !messageContent ? null : messageContent,
@@ -1114,28 +1117,9 @@ class Chat extends Component {
                                                         <div className="mr-auto">
                                                             <a href="#" data-toggle="tooltip" title="Block"><img src={block_icon} alt="add" width={"20px"} height={"20px"} onClick={() => this.handleChatBlock(sendChatData)} /></a>
                                                         </div>
-                                                        {/* <div ref={this.dropdownRef}>
-                                                            <img
-                                                                src={three_dots}
-                                                                alt="Toggle Dropdown"
-                                                                width={"20px"} height={"20px"}
-                                                                onClick={this.toggleDropdown}
-                                                                style={{ cursor: 'pointer' }}
-                                                            />
-                                                            {this.state.isOpen && (
-                                                                <ul>
-                                                                    <li onClick={() => this.handleChatBlock(sendChatData)}>Block</li>
-                                                                    <li>Option 2</li>
-                                                                    <li>Option 3</li>
-                                                                </ul>
-                                                            )}
-                                                        </div> */}
                                                     </> :
                                                         <>
                                                             {showChatUsers === false ?
-                                                                // <div className="justify-content-md-end">
-                                                                //     <a href="#"><img src={back_icon_circle} alt="add" width={"25px"} height={"25px"} onClick={this.toggleChatGroupUsers} /></a>
-                                                                // </div>
                                                                 <div className="ms-auto">
                                                                     <Link className="btn btn-sm custom_btn btn_yellow" to="#" onClick={this.toggleChatGroupUsers}>
                                                                         <img src={arrow_back} alt="Back" />
@@ -1253,7 +1237,11 @@ class Chat extends Component {
 
                                                             {showEmojiPicker && <Picker data={data} onEmojiSelect={this.onEmojiClick} />}
 
-                                                            <button type="button" onClick={this.sendMessage}>
+                                                            <button
+                                                                type="button"
+                                                                onClick={this.sendMessage}
+                                                                disabled={!this.state.messageContent && (!this.state.selectedFile || this.state.selectedFile.length === 0) && !this.state.showEmojiPicker}
+                                                            >
                                                                 <i className="fa fa-paper-plane" aria-hidden="true"></i>
                                                                 Send
                                                             </button>

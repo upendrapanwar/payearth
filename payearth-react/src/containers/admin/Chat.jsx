@@ -557,8 +557,8 @@ class Chat extends Component {
                         const sendData = {
                             authorId: {
                                 id: this.authInfo.id,
-                                name: this.userInfo.name,
-                                image_url: this.userInfo.imgUrl,
+                                name: "",
+                                image_url: "",
                             },
                             chatId: sendChatData.chatId,
                             messageContent: messageContent || null,
@@ -602,8 +602,8 @@ class Chat extends Component {
                 const sendData = {
                     authorId: {
                         id: this.authInfo.id,
-                        name: this.userInfo.name,
-                        image_url: this.userInfo.imgUrl,
+                        name: "",
+                        image_url: "",
                     },
                     chatId: sendChatData.chatId,
                     messageContent: !messageContent ? null : messageContent,
@@ -1293,7 +1293,11 @@ class Chat extends Component {
 
                                                             {showEmojiPicker && <Picker data={data} onEmojiSelect={this.onEmojiClick} />}
 
-                                                            <button type="button" onClick={this.sendMessage}>
+                                                            <button
+                                                                type="button"
+                                                                onClick={this.sendMessage}
+                                                                disabled={!this.state.messageContent && (!this.state.selectedFile || this.state.selectedFile.length === 0) && !this.state.showEmojiPicker}
+                                                            >
                                                                 <i className="fa fa-paper-plane" aria-hidden="true"></i>
                                                                 Send
                                                             </button>
