@@ -333,6 +333,9 @@ router.get("/getServiceTopSellingCategories", getServiceTopSellingCategories);
 router.get("/getOrdersTotalPriceForMonth", getOrdersTotalPriceForMonth);
 router.get("/getServiceOrdersTotalPriceForMonth", getServiceOrdersTotalPriceForMonth);
 
+// Notifications
+router.delete("/removeNotification/:id", removeNotification);
+
 
 
 
@@ -1633,4 +1636,11 @@ function getServiceOrdersTotalPriceForMonth(req, res, next) {
     adminService.getServiceOrdersTotalPriceForMonth(req)
         .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "Error getting getOrdersTotalPriceForMonth Data." }))
         .catch((err) => next(res.json({ status: false, message: err.message })));
+}
+
+// Notification
+function removeNotification(req, res, next) {
+    adminService.removeNotification(req)
+        .then((result) => result ? res.status(200).json({ status: true, data: result, message: "Notification Remove Successfully", }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
 }

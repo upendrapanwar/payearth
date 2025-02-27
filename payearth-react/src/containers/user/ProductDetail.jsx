@@ -6,6 +6,8 @@ import PageTitle from "./../../components/user/common/PageTitle";
 import Footer from "./../../components/common/Footer";
 import axios from "axios";
 import { setLoading } from "../../store/reducers/global-reducer";
+import SpinnerLoader from '../../components/common/SpinnerLoader';
+import store from '../../store/index';
 import { connect, useSelector, useDispatch } from "react-redux";
 import Rating from "../../components/common/Rating";
 import twitterIcon from "./../../assets/icons/twitter.svg";
@@ -53,7 +55,8 @@ class ProductDetail extends Component {
 
   componentDidMount() {
     const { dispatch } = this.props;
-
+    dispatch(setLoading({ loading: true }));
+    
     let productId = window.location.pathname.split("/")[2];
     axios.get("front/product/detail/" + productId)
       .then((response) => {
@@ -188,6 +191,7 @@ class ProductDetail extends Component {
   }
 
   render() {
+    const { loading } = store.getState().global;
     const { sizeControlls, productDetail, featuredImage, mainImage, selectColor, selectColorImage, id, averageRating, reviewCount } = this.state;
 
     console.log("productDetail-------11", productDetail)
@@ -209,6 +213,7 @@ class ProductDetail extends Component {
     const { dispatch } = this.props;
     return (
       <React.Fragment>
+        {loading === true ? <SpinnerLoader /> : ''}
         <Helmet><title>{`Product-detail/${productDetail.productCode} - Pay Earth`}</title></Helmet>
         <BannerTopIframe keywords={this.state.category} />
         <Header />
@@ -217,10 +222,20 @@ class ProductDetail extends Component {
           <div className="container">
             <div className="bg-white rounded-3 pt-3 pb-5">
               <div className="d-flex justify-content-end">
-                <Link className="btn custom_btn btn_yellow  mt-3 mx-3" to="/product-listing">
+                {/* <Link className="btn custom_btn btn_yellow  mt-3 mx-3" to="/product-listing">
                   <img src={arrow_back} alt="Back" />
                   &nbsp;Back
-                </Link>
+                </Link> */}
+                <div className=''>
+                  <button
+                    type="button"
+                    className="btn custum_back_btn btn_yellow mx-3"
+                    onClick={() => window.history.back()}
+                  >
+                    <img src={arrow_back} alt="back" />&nbsp;
+                    Back
+                  </button>
+                </div>
               </div>
               <div className="dash_inner_wrap row">
                 <div className="col-md-12">

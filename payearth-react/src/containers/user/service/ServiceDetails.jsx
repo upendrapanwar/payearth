@@ -163,10 +163,16 @@ const ServiceDetails = () => {
               <div className="row g-0 bg-white rounded" key={index}>
                 <Helmet><title>{`Service-detail/${data.result.serviceCode} - Pay Earth`}</title></Helmet>
                 <div className="d-flex justify-content-end">
-                  <Link className="btn custom_btn btn_yellow  mt-3 mx-3" to="/service-listing">
-                    <img src={arrow_back} alt="Back" />
-                    &nbsp;Back
-                  </Link>
+                  <div className=''>
+                    <button
+                      type="button"
+                      className="btn custum_back_btn btn_yellow mt-3 mx-3"
+                      onClick={() => window.history.back()}
+                    >
+                      <img src={arrow_back} alt="back" />&nbsp;
+                      Back
+                    </button>
+                  </div>
                 </div>
                 <div className="col-md-6">
                   <div className="ser_thumb_div">

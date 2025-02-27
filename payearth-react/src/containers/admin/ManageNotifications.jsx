@@ -45,7 +45,7 @@ const ManageNotifications = () => {
                 .get(`front/notifications/${userId}`)
                 .then((response) => {
                     const data = response.data.data;
-                    console.log("data", data)
+                    // console.log("data", data)
                     setNotification(data);
                 })
                 .catch((error) => {
@@ -72,6 +72,7 @@ const ManageNotifications = () => {
                 )
             );
         });
+        fetchNotification(authInfo.id)
     }
 
     const removeNotification = async (id) => {
@@ -90,96 +91,7 @@ const ManageNotifications = () => {
         }
     }
 
-    const notification_column = [
-        // {
-        //     selector: (row, i) => <>
-        //         <Link
-        //             to={
-        //                 row.notification.type === 'comment' || row.notification.type === 'like'
-        //                     ? `/admin-profile?postId=${row.notification.postId}`
-        //                     : '#' //  for like and other types of notifications
-        //             }
-        //             onClick={() => updateReadStatus(row.notification._id)}
-        //         >
-        //             <div className={`card border border-2 border-info-subtle mb-2 mt-2 ${!row.notification.isSeen ? 'bg-info-subtle' : 'bg-light'}`} >
-        //                 <div className="card-header d-flex justify-content-between align-items-center text-primary">
-        //                     <span>{row.notification.type || "not available"}</span>
-        //                 </div>
-        //                 <div className="card-body">
-        //                     {/* <h5 className="card-title">{notifications.sender.id?.name || "Special title not define"}</h5> */}
-        //                     <div className="d-flex justify-content-between">
-        //                         <h5 className="card-title mb-0">
-        //                             {row.senderDetails.name || "Special title not defined"}
-        //                         </h5>
-        //                         <small className="text-muted">{new Date(row.notification.createdAt).toLocaleString() || "Just now"}</small>
-        //                     </div>
-        //                     <p className="card-text">
-        //                         {row.notification.message || " No message."}
-        //                     </p>
-        //                 </div>
-        //             </div>
-        //         </Link>
-        //         {!row.notification.isSeen ? "" : <i className="bi bi-trash fs-3 text-danger"
-        //             onClick={() => removeNotification(row.notification._id)}
-        //         ></i>}
-        //     </>,
-        //     sortable: true,
-        // },
-
-
-        {
-            selector: (row, i) => {
-                if (!row || Object.keys(row).length === 0) {
-                    return (
-                        <div className="text-center text-muted my-3">
-                            <p>No data available</p>
-                        </div>
-                    );
-                }
-
-                return (
-                    <>
-                        <Link
-                            to={
-                                row.notification.type === 'comment' || row.notification.type === 'like'
-                                    ? `/admin/account?postId=${row.notification.postId}`
-                                    : '#' // for like and other types of notifications
-                            }
-                            onClick={() => updateReadStatus(row.notification._id)}
-                        >
-                            <div className={`card border border-2 border-info-subtle mb-2 mt-2 ${!row.notification.isSeen ? 'bg-info-subtle' : 'bg-light'}`}>
-                                <div className="card-header d-flex justify-content-between align-items-center text-primary">
-                                    <span>{row.notification.type || "Not available"}</span>
-                                </div>
-                                <div className="card-body">
-                                    <div className="d-flex justify-content-between">
-                                        <h5 className="card-title mb-0">
-                                            {row.senderDetails?.name || "Special title not defined"}
-                                        </h5>
-                                        <small className="text-muted">
-                                            {new Date(row.notification.createdAt).toLocaleString() || "Just now"}
-                                        </small>
-                                    </div>
-                                    <p className="card-text">
-                                        {row.notification.message || "No message."}
-                                    </p>
-                                </div>
-                            </div>
-                        </Link>
-                        {!row.notification.isSeen ? "" : (
-                            <i
-                                className="bi bi-trash fs-3 text-danger"
-                                onClick={() => removeNotification(row.notification._id)}
-                            ></i>
-                        )}
-                    </>
-                );
-            },
-            sortable: true,
-        }
-    ]
-
-    console.log("notification", notification)
+    // console.log("notification", notification)
 
     return (
         <>
@@ -207,22 +119,46 @@ const ManageNotifications = () => {
                         <div className="col-md-12 ">
                             {Array.isArray(notification) && notification.length > 0 ? (
                                 notification.map((notifications, index) => {
-                                    console.log('Notification:', notifications);
+                                    // console.log('Notification:', notifications);
                                     return (
                                         <Link
                                             key={index}
+                                            // to={
+                                            //     notifications.notification.type === 'comment' || notifications.notification.type === 'like'
+                                            //         ? `/admin/account?postId=${notifications.notification.postId}`
+                                            //         : '#'
+                                            // }
+                                            // onClick={() => updateReadStatus(notifications.notification._id)}
                                             to={
-                                                notifications.notification.type === 'comment' || notifications.notification.type === 'like'
-                                                    ? `/admin/account?postId=${notifications.notification.postId}`
-                                                    : '#'
+                                                {
+                                                    comment: `/admin/account?postId=${notifications.notification.postId}`,
+                                                    like: `/admin/account?postId=${notifications.notification.postId}`,
+                                                    chat: `/admin/chat`,
+                                                    report: '/admin/community',
+                                                    follow: '#',
+                                                }[notifications.notification.type] || '#'
                                             }
-                                            onClick={() => updateReadStatus(notifications.notification._id)}
+                                            // onClick={() => updateReadStatus(row.notification._id)}
+                                            onClick={(e) => {
+
+                                                if (notifications.notification.type === 'follow') {
+                                                    e.preventDefault();
+                                                    updateReadStatus(notifications.notification._id);
+                                                } else {
+                                                    updateReadStatus(notifications.notification._id);
+                                                }
+                                            }}
                                         >
                                             <div className={`card border border-2 border-info-subtle mb-2 mt-2 ${!notifications.notification.isSeen ? 'bg-info-subtle' : 'bg-light'}`} >
                                                 <div className="card-header d-flex justify-content-between align-items-center text-primary">
                                                     <span>{notifications.notification.type || "not available"}</span>
                                                     {!notifications.notification.isSeen ? "" : <i className="bi bi-trash fs-3 text-danger"
-                                                        onClick={() => removeNotification(notifications.notification._id)}
+                                                        // onClick={() => removeNotification(notifications.notification._id)}
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            removeNotification(notifications.notification._id);
+                                                        }}
                                                     ></i>}
                                                 </div>
                                                 <div className="card-body">
@@ -241,38 +177,11 @@ const ManageNotifications = () => {
                                     );
                                 })
                             ) : (
-                                <div className="alert alert-info" role="alert">
-                                    {notification.message}
+                                <div className=" text-center m-5 p-5 ">
+                                    <span className="text-uppercase">No notifications available</span>
                                 </div>
                             )}
 
-                            {/* NOTIFICATION */}
-                            {/* <div className="cart_list">
-                                <div
-                                    className="tab-pane fade show active"
-                                    id="nav-draft-post"
-                                    role="tabpanel"
-                                    aria-labelledby="nav-draft-post-tab"
-                                >                   
-                                    
-                                    <div className="notification_wapper col-md-12">
-                                        <DataTableExtensions
-                                            columns={notification_column}
-                                            data={notification}
-                                        >
-                                            <DataTable
-                                                pagination
-                                                highlightOnHover
-                                                noHeader
-                                                defaultSortField="id"
-                                                defaultSortAsc={false}
-                                                paginationPerPage={6}
-                                                paginationRowsPerPageOptions={[6, 10, 15, 20]}
-                                            />
-                                        </DataTableExtensions>
-                                    </div>
-                                </div>
-                            </div> */}
                         </div>
                     </div>
                 </div>

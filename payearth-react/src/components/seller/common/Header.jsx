@@ -332,7 +332,7 @@ const Header = () => {
                             </Link>
                           </li>
                           <li className="nav-item">
-                            <Link className="nav-link" to="/seller_community">
+                            <Link className="nav-link" to="/seller/community">
                               <div className="sm_icon">
                                 <img src={communityIcon} alt="" />
                               </div>

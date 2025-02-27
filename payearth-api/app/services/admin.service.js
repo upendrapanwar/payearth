@@ -23,7 +23,7 @@ const { Admin, User, Seller, Coupon, Product, Category, Brand,
     OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline,
     ProductSales, cmsPost, cmsPage, cmsCategory, bannerAdvertisement,
     Chat, ChatMessage, Services, OrderDetails, Post, PostLike, PostVideos,
-    PostImages, PostComment, Support, AccessPermission, UsedCoupons,
+    PostImages, PostComment, Support, AccessPermission, UsedCoupons, Notification,
 } = require("../helpers/db");
 
 module.exports = {
@@ -244,6 +244,9 @@ module.exports = {
     getServiceTopSellingCategories,
     getOrdersTotalPriceForMonth,
     getServiceOrdersTotalPriceForMonth,
+
+    // Notification
+    removeNotification,
 };
 
 // Validator function
@@ -6330,3 +6333,15 @@ async function getServiceOrdersTotalPriceForMonth(req) {
         };
     }
 }
+
+// Notification
+async function removeNotification(req) {
+    // console.log('removeNotification',req.params.id)
+    try {
+      const id = req.params.id;
+      const result = await Notification.deleteOne({ _id: id });
+      return result;
+    } catch (error) {
+      console.log(error);
+    }
+  }

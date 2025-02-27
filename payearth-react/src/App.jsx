@@ -1095,7 +1095,7 @@ function App() {
           />
 
           <PrivateRoute
-            path="/seller_community"
+            path="/seller/community"
             restricted={false}
             component={SellerCommunity}
             exact
