@@ -56,7 +56,7 @@ class ProductDetail extends Component {
   componentDidMount() {
     const { dispatch } = this.props;
     dispatch(setLoading({ loading: true }));
-    
+
     let productId = window.location.pathname.split("/")[2];
     axios.get("front/product/detail/" + productId)
       .then((response) => {

@@ -432,7 +432,7 @@ class ManageBannerList extends Component {
                             onChange={this.handleDateRangeChange}
                           />
                         </div>
-                        <div className="tablewrapper col-md-9">
+                        <div className="tablewrapper col-md-12">
                           <div className="cart_wrap">
                             <div className="items_incart">
                               <span className="text-uppercase">

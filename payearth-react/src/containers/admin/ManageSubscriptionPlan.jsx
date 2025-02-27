@@ -269,7 +269,7 @@ class AdminManageSubPlan extends Component {
                                                     onChange={this.handlePlanType}
                                                     className="form-control" name="" id="">
                                                     <option value="default">Select Type</option>
-                                                    <option value="Service">Service</option>
+                                                    {/* <option value="Service">Service</option> */}
                                                     <option value="Advertisement">Advertisement</option>
                                                 </select>
                                             </div>

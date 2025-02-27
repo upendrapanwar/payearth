@@ -15,6 +15,7 @@ import lets_chats from './../../assets/icons/Chats.svg';
 import chat_not_found from './../../assets/icons/lets_chats.svg';
 import docx from './../../assets/icons/docx.svg';
 import defaultPdf_icon from './../../assets/icons/document_icon.svg';
+import arrow_back from './../../assets/icons/arrow-back.svg';
 import excel from "./../../assets/icons/excel.svg";
 import chatThumb from './../../assets/images/chat-thumb.jpg';
 import { setLoading } from '../../store/reducers/global-reducer';
@@ -33,7 +34,7 @@ import moment from 'moment';
 import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data';
 import { Helmet } from 'react-helmet';
-import arrow_back from '../../assets/icons/arrow-back.svg'
+
 
 class Chat extends Component {
     constructor(props) {
@@ -62,6 +63,7 @@ class Chat extends Component {
             selectedFile: null,
             onlineUsers: [],
             showEmojiPicker: false,
+            showChatBoard: false,
         };
         this.dropdownRef = createRef();
         this.toggleDropdown = this.toggleDropdown.bind(this);
@@ -373,6 +375,7 @@ class Chat extends Component {
     // };
 
     fetchAllMessage = (data) => {
+        this.setState({ showChatBoard: true });
         if (data && data.isGroupChat === false) {
             const userID = data.chatUsers[0].id !== this.authInfo.id ? data.chatUsers[0].id : data.chatUsers[1].id;
             this.setState({ selectUserId: userID });
@@ -762,7 +765,12 @@ class Chat extends Component {
     }
 
     toggleChatGroupUsers = () => {
+        this.setState({ showChatBoard: false });
         this.setState((prevState) => ({ showChatUsers: !prevState.showChatUsers }));
+    }
+
+    handleBack = () => {
+        this.setState({ showChatBoard: false });
     }
 
     media = (url) => {
@@ -867,7 +875,7 @@ class Chat extends Component {
 
 
     render() {
-        const { showChatUsers, users, allChatUsers, sendChatData, userChat, notAddedUser, selectedUsers, selectedFile, onlineUsers, showEmojiPicker } = this.state;
+        const { showChatUsers, users, allChatUsers, sendChatData, userChat, notAddedUser, selectedUsers, selectedFile, onlineUsers, showEmojiPicker, showChatBoard } = this.state;
         const { loading } = store.getState().global;
         // console.log(" notAddedUser", notAddedUser)
         // console.log("selectedFile : ", selectedFile)
@@ -883,32 +891,28 @@ class Chat extends Component {
                     <Helmet><title>{"Seller - Chat - Pay Earth"}</title></Helmet>
                     <div className="container">
                         <div className="row">
-                            <div className="col-md-12 d-flex justify-content-between align-items-center">
-                                <div></div>
-                                <div className='mt-2 mb-2 me-4'>
-                                    <button
-                                        type="button"
-                                        className="btn custum_back_btn btn_yellow mx-auto"
-                                        onClick={() => window.history.back()}
-                                    >
-                                        <img src={arrow_back} alt="back" />&nbsp;
-                                        Back
-                                    </button>
-                                </div>
-                            </div>
                             <div className="col-md-12">
                                 <div className="chatUser_wrapper">
                                     <div className="chatlist_panel">
-                                        <div className="chat-lists">
+                                        <div className={`chat-lists ${showChatBoard === true ? 'hide' : ''}`}>
                                             {showChatUsers === true ? <>
                                                 <div className="chat_left-head">
-                                                    <div className="chat_head_panel">
+                                                    <div className="chat_head_panel d-flex align-items-center justify-content-between">
                                                         <div className="chat-heading">
                                                             <h3>Inbox</h3>
                                                         </div>
-                                                        <div className="chat-filter">
-                                                            <a href="#" onClick={this.fetchAllUserData}>All</a>
-                                                            <a href="#" onClick={() => { this.fetchAllBlockChat() }}>Blocked Users </a>
+                                                        <div className="chat-filter d-flex gap-2">
+                                                            <a href="#" data-bs-toggle="tooltip" title="All Users" onClick={this.fetchAllUserData}>All</a>
+                                                            <a href="#" data-bs-toggle="tooltip" title="Blocked Users" onClick={() => { this.fetchAllBlockChat() }}>Blocked Users</a>
+                                                        </div>
+                                                        <div className='desktop-hide'>
+                                                            <Link
+                                                                type="button"
+                                                                className="btn btn-sm custum_back_btn btn_yellow d-flex align-items-center"
+                                                                to="/seller/dashboard"
+                                                            >
+                                                                <img src={arrow_back} alt="back" />&nbsp;Back
+                                                            </Link>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -923,7 +927,7 @@ class Chat extends Component {
                                                             value={this.state.search}
                                                             onChange={this.handleSearchText}
                                                         />
-                                                        <button type="button" className="btn" onClick={this.handleCreateGroup}>Create Group</button>
+                                                        <button type="button" className="btn" data-bs-toggle="tooltip" title="Create a Group" onClick={this.handleCreateGroup}>Create Group</button>
                                                     </div>
                                                 </div>
                                             </> : <></>}
@@ -1020,14 +1024,34 @@ class Chat extends Component {
                                                         ) :
                                                             <>
                                                                 <div className="chat_left-head">
-                                                                    <div className="chat_head_panel">
+                                                                    <div className="chat_head_panel d-flex align-items-center justify-content-between">
                                                                         <div className="chat-heading">
                                                                             <h3>All Group Members</h3>
                                                                         </div>
-                                                                        <a className="add" href="#"><img src={group_icon} alt="add" width={"30px"} height={"30px"} /><small>{sendChatData.groupData.length}</small></a>
+                                                                        {/* <a className="add" href="#"><img src={group_icon} alt="add" width={"30px"} height={"30px"} /><small>{sendChatData.groupData.length}</small></a>
                                                                         {sendChatData.groupData.filter(item => item.isGroupAdmin === true && item.id === this.authInfo.id).map(item => <div className="chat-filter" key={item.id}>
                                                                             <a href="#" onClick={() => { this.notAddedUsers(sendChatData) }}> Add Users</a>
-                                                                        </div>)}
+                                                                        </div>)} */}
+                                                                        <div className="d-flex align-items-center">
+                                                                            <a className="add d-flex align-items-center me-3" href="#">
+                                                                                <img src={group_icon} alt="add" width="30px" height="30px" />
+                                                                                <small className="ms-1">{sendChatData.groupData.length}</small>
+                                                                            </a>
+                                                                            {sendChatData.groupData.filter(item => item.isGroupAdmin === true && item.id === this.authInfo.id)
+                                                                                .map(item => (
+                                                                                    <div className="chat-filter" key={item.id}>
+                                                                                        <a href="#" onClick={() => { this.notAddedUsers(sendChatData) }}>
+                                                                                            Add Users
+                                                                                        </a>
+                                                                                    </div>
+                                                                                ))}
+                                                                        </div>
+                                                                        <div className='desktop-hide'>
+                                                                            <Link className="btn btn-sm custom_btn btn_yellow" to="#" onClick={this.toggleChatGroupUsers} >
+                                                                                <img src={arrow_back} alt="Back" width="15px" height="15px" />
+                                                                                &nbsp;Back
+                                                                            </Link>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                                 {sendChatData.groupData.map(item => <>
@@ -1059,8 +1083,8 @@ class Chat extends Component {
                                             </div>
                                         </div>
                                         {sendChatData !== '' ? <>
-                                            <div className="chat_board_view">
-                                                <div className="d-flex align-items-center message-user-head">
+                                            <div className={`chat_board_view ${showChatBoard === true ? 'show' : ''}`}>
+                                                <div className="d-flex align-items-center message-user-head w-100">
                                                     <div className="userInfo-col userThumb">
                                                         {sendChatData.isGroup === true ?
                                                             <div className="user_thumb">
@@ -1088,7 +1112,7 @@ class Chat extends Component {
 
                                                     {sendChatData.isBlock === false && sendChatData.isGroup !== true ? <>
                                                         <div className="mr-auto">
-                                                            <a href="#"><img src={block_icon} alt="add" width={"20px"} height={"20px"} onClick={() => this.handleChatBlock(sendChatData)} /></a>
+                                                            <a href="#" data-toggle="tooltip" title="Block"><img src={block_icon} alt="add" width={"20px"} height={"20px"} onClick={() => this.handleChatBlock(sendChatData)} /></a>
                                                         </div>
                                                         {/* <div ref={this.dropdownRef}>
                                                             <img
@@ -1109,13 +1133,43 @@ class Chat extends Component {
                                                     </> :
                                                         <>
                                                             {showChatUsers === false ?
-                                                                <div className="justify-content-md-end">
-                                                                    <a href="#"><img src={back_icon_circle} alt="add" width={"25px"} height={"25px"} onClick={this.toggleChatGroupUsers} /></a>
+                                                                // <div className="justify-content-md-end">
+                                                                //     <a href="#"><img src={back_icon_circle} alt="add" width={"25px"} height={"25px"} onClick={this.toggleChatGroupUsers} /></a>
+                                                                // </div>
+                                                                <div className="ms-auto">
+                                                                    <Link className="btn btn-sm custom_btn btn_yellow" to="#" onClick={this.toggleChatGroupUsers}>
+                                                                        <img src={arrow_back} alt="Back" />
+                                                                        &nbsp;Back
+                                                                    </Link>
                                                                 </div>
                                                                 :
                                                                 (sendChatData.isGroup === true ? <a class="add" href="#"><img src={group_icon} alt="add" onClick={this.toggleChatGroupUsers} width={"25px"} height={"25px"} /><small>{sendChatData.groupData.length}</small></a> : <></>)
                                                             }
                                                         </>}
+                                                    <div className="desktop-hide ms-auto">
+                                                        <Link className="btn btn-sm custom_btn btn_yellow" to="#" onClick={this.handleBack}>
+                                                            <img src={arrow_back} alt="Back" />
+                                                            &nbsp;Back
+                                                        </Link>
+                                                    </div>
+                                                    <div className="desktop-show ms-auto">
+                                                        <Link className="btn btn-sm custom_btn btn_yellow" to="#" onClick={this.handleBack}>
+                                                            <img src={arrow_back} alt="Back" />
+                                                            &nbsp;Back
+                                                        </Link>
+                                                    </div>
+                                                    {showChatUsers === false ? null :
+                                                        <div className="desktop-dashboard ms-auto">
+                                                            <Link
+                                                                type="button"
+                                                                className="btn custum_back_btn btn_yellow mx-auto"
+                                                                to="/seller/dashboard"
+                                                            >
+                                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                                Back
+                                                            </Link>
+                                                        </div>
+                                                    }
                                                 </div>
 
                                                 <div className="msg-body" ref={this.chatBoardRef}>
@@ -1156,7 +1210,13 @@ class Chat extends Component {
                                                     ) : (
                                                         <>
                                                             <div className="chat_board_view d-flex flex-column align-items-center justify-content-center">
-                                                                {/* <NotFound msg="Chat not selected" /> */}
+                                                                <div className="text-center chat_notfound">
+                                                                    <img src={chat_not_found} alt='...' width="200px" height="200px" />
+                                                                    &nbsp;
+                                                                    <h1 className="text-center">Chat not found..!</h1>
+                                                                </div>
+                                                            </div>
+                                                            <div className="chat-not-found d-flex flex-column align-items-center justify-content-center">
                                                                 <div className="text-center chat_notfound">
                                                                     <img src={chat_not_found} alt='...' width="200px" height="200px" />
                                                                     &nbsp;

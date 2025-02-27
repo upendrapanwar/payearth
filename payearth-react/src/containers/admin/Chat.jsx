@@ -9,10 +9,7 @@ import excel from "./../../assets/icons/excel.svg";
 import delete_icone from './../../assets/icons/delete_icone.svg';
 import edit_icon from './../../assets/icons/edit_icon.svg';
 import block_icon from './../../assets/icons/block_icon.svg';
-import verified_icon from './../../assets/icons/verified_icon.svg';
-import three_dots from './../../assets/icons/three_dots.svg';
 import group_profile from './../../assets/icons/grp_icone.svg';
-import back_icon_circle from './../../assets/icons/back_icon_circle.svg'
 import lets_chats from './../../assets/icons/Chats.svg';
 import chat_not_found from './../../assets/icons/lets_chats.svg';
 import chatThumb from './../../assets/images/chat-thumb.jpg';
@@ -32,7 +29,7 @@ import moment from 'moment';
 import Picker from '@emoji-mart/react';
 import data from '@emoji-mart/data';
 import { Helmet } from 'react-helmet';
-import arrow_back from '../../assets/icons/arrow-back.svg'
+import arrow_back from './../../assets/icons/arrow-back.svg';
 
 class Chat extends Component {
     constructor(props) {
@@ -61,6 +58,8 @@ class Chat extends Component {
             selectedFile: null,
             onlineUsers: [],
             showEmojiPicker: false,
+            showChatBoard: false,
+            loading: true
         };
         this.dropdownRef = createRef();
         this.toggleDropdown = this.toggleDropdown.bind(this);
@@ -143,7 +142,7 @@ class Chat extends Component {
         //     }));
         // });
 
-        
+
         this.socket.on('user_online', (userID) => {
             this.setState(prevState => ({
                 onlineUsers: [...prevState.onlineUsers, userID]
@@ -374,6 +373,7 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             }).then((response) => {
+                this.setState({ showChatBoard: true });
                 const datas = response.data.data
                 // console.log("accessChat function ", data.id);
                 // console.log("Join room ", datas._id)
@@ -432,7 +432,7 @@ class Chat extends Component {
     // };
 
     fetchAllMessage = (data) => {
-        // console.log("fetchAllMessage function ", data)
+        this.setState({ showChatBoard: true, loading: true });
         if (data.isGroupChat === false) {
             const userID = data.chatUsers[0].id !== this.authInfo.id ? data.chatUsers[0].id : data.chatUsers[1].id;
             this.setState({ selectUserId: userID });
@@ -450,13 +450,11 @@ class Chat extends Component {
             this.setState({ sendChatData: result })
 
         } else {
-            // console.log(" group data", data);
             const groupData = data.chatUsers
             const groupUsers = groupData.map(item => item.id);
             this.socket.emit("setup", groupUsers);
             const isGroupAdmin = groupData.filter(item => item.isGroupAdmin === true)
             this.getAllMessage(data._id)
-            // console.log('Its a group chat...');
             const result = {
                 chatId: data._id,
                 name: data.chatName,
@@ -465,13 +463,36 @@ class Chat extends Component {
                 isGroupAdmin: isGroupAdmin,
                 isGroup: true
             }
-            // console.log("Group data result", result)
-            // this.setState({ allChatUsers: result.groupData });
-            this.setState({ sendChatData: result })
+            this.setState({ sendChatData: result, loading: false })
         }
     }
 
+    // getAllMessage = (chatId) => {
+    //     axios.get(`admin/allMessages/${chatId}`, {
+    //         headers: {
+    //             'Authorization': `Bearer ${this.authInfo.token}`
+    //         },
+    //     }).then((response) => {
+    //         if (response.data.status === true) {
+    //             const data = response.data.data;
+    //             // console.log("getAllMessage function ", data)
+    //             this.setState({
+    //                 userChat: data
+    //             })
+    //         } else {
+    //             this.setState({
+    //                 userChat: ""
+    //             })
+    //         }
+    //         this.socket.emit('join chat', chatId);
+    //     }).catch((error) => {
+    //         console.log("Error", error)
+    //     })
+    // }
+
     getAllMessage = (chatId) => {
+        this.setState({ loading: true }); // Start loading
+
         axios.get(`admin/allMessages/${chatId}`, {
             headers: {
                 'Authorization': `Bearer ${this.authInfo.token}`
@@ -479,20 +500,22 @@ class Chat extends Component {
         }).then((response) => {
             if (response.data.status === true) {
                 const data = response.data.data;
-                // console.log("getAllMessage function ", data)
                 this.setState({
-                    userChat: data
-                })
+                    userChat: data,
+                    loading: false // Stop loading
+                });
             } else {
                 this.setState({
-                    userChat: ""
-                })
+                    userChat: "",
+                    loading: false // Stop loading
+                });
             }
             this.socket.emit('join chat', chatId);
         }).catch((error) => {
-            console.log("Error", error)
-        })
-    }
+            console.log("Error", error);
+            this.setState({ loading: false }); // Stop loading on error
+        });
+    };
 
     handleMessageContent = (e) => {
         this.setState({ messageContent: e.target.value })
@@ -819,7 +842,12 @@ class Chat extends Component {
     }
 
     toggleChatGroupUsers = () => {
+        this.setState({ showChatBoard: false });
         this.setState((prevState) => ({ showChatUsers: !prevState.showChatUsers }));
+    }
+
+    handleBack = () => {
+        this.setState({ showChatBoard: false });
     }
 
     media = (url) => {
@@ -898,7 +926,6 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             }).then((response) => {
-                // this.getAllMessage(sendChatData.chatId);
                 this.fetchAllUserData();
                 this.setState({ sendChatData: "" });
             }).catch((error) => {
@@ -912,12 +939,11 @@ class Chat extends Component {
 
 
     render() {
-        const { showChatUsers, users, allChatUsers, sendChatData, userChat, notAddedUser, selectedUsers, selectedFile, onlineUsers, showEmojiPicker } = this.state;
+        const { showChatUsers, users, allChatUsers, sendChatData, userChat, notAddedUser, selectedUsers, selectedFile, onlineUsers, showEmojiPicker, showChatBoard } = this.state;
         const { loading } = store.getState().global;
         // console.log("allChatUsers in render() :-", allChatUsers)
-        // console.log(" sendChatData", sendChatData)
-        // console.log("selectedUsers : ", selectedUsers)
-        // console.log("users:>>>>", users)
+        console.log(" userChat", userChat)
+
 
         return (
             <React.Fragment>
@@ -928,32 +954,28 @@ class Chat extends Component {
                 <section className="inr_wrap">
                     <div className="container">
                         <div className="row">
-                            <div className='col-md-12 d-flex justify-content-between align-items-center'>
-                                <div></div>
-                                <div className=' mt-2 mb-2 me-4'>
-                                    <button
-                                        type="button"
-                                        className="btn custum_back_btn btn_yellow mx-auto"
-                                        onClick={() => window.history.back()}
-                                    >
-                                        <img src={arrow_back} alt="back" />&nbsp;
-                                        Back
-                                    </button>
-                                </div>
-                            </div>
                             <div className="col-md-12">
                                 <div className="chatUser_wrapper">
                                     <div className="chatlist_panel">
-                                        <div className="chat-lists">
+                                        <div className={`chat-lists ${showChatBoard === true ? 'hide' : ''}`}>
                                             {showChatUsers === true ? <>
                                                 <div className="chat_left-head">
-                                                    <div className="chat_head_panel">
+                                                    <div className="chat_head_panel d-flex align-items-center justify-content-between">
                                                         <div className="chat-heading">
                                                             <h3>Inbox</h3>
                                                         </div>
-                                                        <div className="chat-filter">
-                                                            <a href="#" onClick={this.fetchAllUserData}>All</a>
-                                                            <a href="#" onClick={() => { this.fetchAllBlockChat() }}>Blocked Users </a>
+                                                        <div className="chat-filter d-flex gap-2">
+                                                            <a href="#" data-bs-toggle="tooltip" title="All Users" onClick={this.fetchAllUserData}>All</a>
+                                                            <a href="#" data-bs-toggle="tooltip" title="Blocked Users" onClick={() => { this.fetchAllBlockChat() }}>Blocked Users</a>
+                                                        </div>
+                                                        <div className='desktop-hide'>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-sm custum_back_btn btn_yellow d-flex align-items-center"
+                                                                onClick={() => window.history.back()}
+                                                            >
+                                                                <img src={arrow_back} alt="back" />&nbsp;Back
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -968,7 +990,7 @@ class Chat extends Component {
                                                             value={this.state.search}
                                                             onChange={this.handleSearchText}
                                                         />
-                                                        <button type="button" className="btn" onClick={this.handleCreateGroup}>Create Group</button>
+                                                        <button type="button" className="btn" data-bs-toggle="tooltip" title="Create a Group" onClick={this.handleCreateGroup}>Create Group</button>
                                                     </div>
                                                 </div>
                                             </> : <></>}
@@ -977,15 +999,12 @@ class Chat extends Component {
                                                     All Search result
                                                     {users.map((item, index) =>
                                                         <div className="chat_user_item"
-                                                            //  old   onClick={() => this.accessChat(item.seller === null ? item.user : item.seller)}
-                                                            // onClick={() => this.accessChat(item.admin !== null ? item.admin : item.seller === null ? item.user : item.seller)}
                                                             onClick={() => this.accessChat(item.admin || item.seller || item.user)}
                                                             key={item.id || index}
                                                         >
                                                             <a href="#" className="d-flex align-items-center chatUser_info">
                                                                 <div className="userInfo-col userThumb">
                                                                     <div className="user_thumb">
-                                                                        {/* old    <img className="img-fluid" src={item.seller === null ? item.user.image_url : item.seller.image_url} alt="user img" /> */}
                                                                         <img
                                                                             className="img-fluid"
                                                                             src={
@@ -998,10 +1017,9 @@ class Chat extends Component {
                                                                             alt="user img"
                                                                         />
                                                                     </div>
-                                                                    {/* <span className="user-inactive user-active"></span> */}
+
                                                                 </div>
                                                                 <div className="userInfo-col userInfo">
-                                                                    {/* old    {item.seller === null ? <h3>{item.user.name} <span className="badge text-bg-primary">{item.user.role}</span></h3> : <h3>{item.seller.name} <span className="badge text-bg-success">{item.seller.id === this.authInfo.id ? "YOU" : ""}</span>  </h3>} */}
                                                                     {item.seller !== null ? (
                                                                         <h3>
                                                                             {item.seller.name} <span className="badge text-bg-warning">{item.seller.role}</span>
@@ -1028,7 +1046,6 @@ class Chat extends Component {
                                                                     <div className="chat_user_item"
                                                                         onClick={() => {
                                                                             this.fetchAllMessage(item);
-                                                                            // this.setState({ showChatUsers: false }); // Hide the component on click
                                                                         }}
                                                                         key={item.id || index}
                                                                     >
@@ -1069,16 +1086,30 @@ class Chat extends Component {
                                                         ) :
                                                             <>
                                                                 <div className="chat_left-head">
-                                                                    <div className="chat_head_panel">
+                                                                    <div className="chat_head_panel d-flex align-items-center justify-content-between">
                                                                         <div className="chat-heading">
                                                                             <h3>All Group Members</h3>
                                                                         </div>
-                                                                        <a className="add" href="#"><img src={group_icon} alt="add" width={"30px"} height={"30px"} /><small>{sendChatData.groupData.length}</small></a>
-                                                                        {sendChatData.groupData.filter(item => item.isGroupAdmin === true && item.id === this.authInfo.id).map(item => <div className="chat-filter" key={item.id}>
-                                                                            <a href="#"
-                                                                                onClick={() => { this.notAddedUsers(sendChatData) }}
-                                                                            >Add Users</a>
-                                                                        </div>)}
+                                                                        <div className="d-flex align-items-center">
+                                                                            <a className="add d-flex align-items-center me-3" href="#">
+                                                                                <img src={group_icon} alt="add" width="30px" height="30px" />
+                                                                                <small className="ms-1">{sendChatData.groupData.length}</small>
+                                                                            </a>
+                                                                            {sendChatData.groupData.filter(item => item.isGroupAdmin === true && item.id === this.authInfo.id)
+                                                                                .map(item => (
+                                                                                    <div className="chat-filter" key={item.id}>
+                                                                                        <a href="#" onClick={() => { this.notAddedUsers(sendChatData) }}>
+                                                                                            Add Users
+                                                                                        </a>
+                                                                                    </div>
+                                                                                ))}
+                                                                        </div>
+                                                                        <div className='desktop-hide'>
+                                                                            <Link className="btn btn-sm custom_btn btn_yellow" to="#" onClick={this.toggleChatGroupUsers} >
+                                                                                <img src={arrow_back} alt="Back" width="15px" height="15px" />
+                                                                                &nbsp;Back
+                                                                            </Link>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                                 {sendChatData.groupData.map(item => <>
@@ -1110,8 +1141,8 @@ class Chat extends Component {
                                             </div>
                                         </div>
                                         {sendChatData !== '' ? <>
-                                            <div className="chat_board_view">
-                                                <div className="d-flex align-items-center message-user-head">
+                                            <div className={`chat_board_view ${showChatBoard === true ? 'show' : ''}`} >
+                                                <div className="d-flex align-items-center message-user-head w-100">
                                                     <div className="userInfo-col userThumb">
                                                         {sendChatData.isGroup === true ?
                                                             <div className="user_thumb">
@@ -1125,7 +1156,6 @@ class Chat extends Component {
                                                     </div>
                                                     <div className="userInfo-col userInfo">
                                                         <h3>{sendChatData.name}</h3>
-                                                        {/* {sendChatData.role === 'admin' ? <img src={verified_icon} width={"15px"} height={"15px"} alt="verified_user" /> : <h3>{sendChatData.name}</h3>} */}
                                                     </div>
 
                                                     {sendChatData.isGroup === true ?
@@ -1139,34 +1169,47 @@ class Chat extends Component {
 
                                                     {sendChatData.isBlock === false && sendChatData.isGroup !== true ? <>
                                                         <div className="mr-auto">
-                                                            <a href="#"><img src={block_icon} alt="add" width={"20px"} height={"20px"} onClick={() => this.handleChatBlock(sendChatData)} /></a>
+                                                            <a href="#" data-toggle="tooltip" title="Block"><img src={block_icon} alt="add" width={"20px"} height={"20px"} onClick={() => this.handleChatBlock(sendChatData)} /></a>
                                                         </div>
-                                                        {/* <div ref={this.dropdownRef}>
-                                                            <img
-                                                                src={three_dots}
-                                                                alt="Toggle Dropdown"
-                                                                width={"20px"} height={"20px"}
-                                                                onClick={this.toggleDropdown}
-                                                                style={{ cursor: 'pointer' }}
-                                                            />
-                                                            {this.state.isOpen && (
-                                                                <ul>
-                                                                    <li onClick={() => this.handleChatBlock(sendChatData)}>Block</li>
-                                                                    <li>Option 2</li>
-                                                                    <li>Option 3</li>
-                                                                </ul>
-                                                            )}
-                                                        </div> */}
                                                     </> :
                                                         <>
                                                             {showChatUsers === false ?
-                                                                <div className="justify-content-md-end">
-                                                                    <a href="#"><img src={back_icon_circle} alt="add" width={"25px"} height={"25px"} onClick={this.toggleChatGroupUsers} /></a>
+                                                                <div className="ms-auto">
+                                                                    <Link className="btn btn-sm custom_btn btn_yellow" to="#" onClick={this.toggleChatGroupUsers}>
+                                                                        <img src={arrow_back} alt="Back" />
+                                                                        &nbsp;Back
+                                                                    </Link>
                                                                 </div>
                                                                 :
                                                                 (sendChatData.isGroup === true ? <a class="add" href="#"><img src={group_icon} alt="add" onClick={this.toggleChatGroupUsers} width={"25px"} height={"25px"} /><small>{sendChatData.groupData.length}</small></a> : <></>)
                                                             }
                                                         </>}
+                                                    <div className="desktop-hide ms-auto">
+                                                        <Link className="btn btn-sm custom_btn btn_yellow" to="#" onClick={this.handleBack}>
+                                                            <img src={arrow_back} alt="Back" />
+                                                            &nbsp;Back
+                                                        </Link>
+                                                    </div>
+
+                                                    <div className="desktop-show ms-auto">
+                                                        <Link className="btn btn-sm custom_btn btn_yellow" to="#" onClick={this.handleBack}>
+                                                            <img src={arrow_back} alt="Back" />
+                                                            &nbsp;Back
+                                                        </Link>
+                                                    </div>
+
+                                                    {showChatUsers === false ? null :
+                                                        <div className="desktop-dashboard ms-auto">
+                                                            <Link
+                                                                type="button"
+                                                                className="btn custum_back_btn btn_yellow mx-auto"
+                                                                to="/admin/dashboard"
+                                                            >
+                                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                                Back
+                                                            </Link>
+                                                        </div>
+                                                    }
                                                 </div>
 
                                                 <div className="msg-body" ref={this.chatBoardRef}>
@@ -1184,11 +1227,11 @@ class Chat extends Component {
                                                                                     <span className="user-inactive user-active"></span>
                                                                                 </div>
                                                                                 {item.mediaContent === null ? (item.messageContent === null ? <></> : <p>{item.messageContent}</p>) : this.renderMedia(item.mediaContent)}
-                                                                                {/* <a href="#"><img src={delete_icone} alt="add" width={"20px"} height={"20px"} onClick={() => { this.handleMessageDelete(item._id) }} /></a> */}
+
                                                                                 <br />
                                                                                 {item.mediaContent !== null && item.messageContent !== null ? <p>{item.messageContent}</p> : <></>}
                                                                                 <span className='time'>{moment(item.timestamp).format('hh:mm A')}</span>
-                                                                            </li>
+                                                                            </li> 
                                                                         </ul>
                                                                     ) : (
                                                                         <ul>
@@ -1207,7 +1250,13 @@ class Chat extends Component {
                                                     ) : (
                                                         <>
                                                             <div className="chat_board_view d-flex flex-column align-items-center justify-content-center">
-                                                                {/* <NotFound msg="Chat not selected" /> */}
+                                                                <div className="text-center chat_notfound">
+                                                                    <img src={chat_not_found} alt='...' width="200px" height="200px" />
+                                                                    &nbsp;
+                                                                    <h1 className="text-center">Chat not found..!</h1>
+                                                                </div>
+                                                            </div>
+                                                            <div className="chat-not-found d-flex flex-column align-items-center justify-content-center">
                                                                 <div className="text-center chat_notfound">
                                                                     <img src={chat_not_found} alt='...' width="200px" height="200px" />
                                                                     &nbsp;
@@ -1251,18 +1300,13 @@ class Chat extends Component {
                                                         </form>
                                                     </div>
                                                 </> : <>
-                                                    {/* <NotFound msg="Chat blocked" /> */}
                                                     <div class="alert alert-danger text-center" role="alert">
                                                         Chat was blocked..!
                                                     </div>
-                                                    {/*<div className='text-center'>
-                                                        <a href='#' className='fw-bold text-primary' onClick={() => { this.handleUnblockChat(sendChatData.chatId) }}>Click to Unblock</a>
-                                                    </div> */}
                                                 </>}
                                             </div>
                                         </> : <>
                                             <div className="chat_board_view d-flex flex-column align-items-center justify-content-center">
-                                                {/* <NotFound msg="Chat not selected" /> */}
                                                 <div className="text-center chat_letstalk">
                                                     <img src={lets_chats} alt='...' width="200px" height="200px" />
                                                     &nbsp;
