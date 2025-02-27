@@ -8,6 +8,7 @@ import noImg from './../../assets/images/noimage.png'
 import DOMPurify from 'dompurify';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
+import arrow_back from './../../assets/icons/arrow-back.svg'
 
 class Blog extends Component {
     constructor(props) {
@@ -123,11 +124,19 @@ class Blog extends Component {
                                             <div className='blog-search-wrapper'>
                                                 <input type="text" className="form-control" placeholder="Search" value={searchQuery} onChange={this.handleSearch} />
                                             </div>
-                                            <button
+                                            {/* <button
                                                 type="button"
                                                 className="btn custom_btn btn_yellow"
                                                 onClick={() => window.history.back()}
                                             >
+                                                Back
+                                            </button> */}
+                                            <button
+                                                type="button"
+                                                className="btn custum_back_btn btn_yellow"
+                                                onClick={() => window.history.back()}
+                                            >
+                                                <img src={arrow_back} alt="back" />&nbsp;
                                                 Back
                                             </button>
                                         </div>

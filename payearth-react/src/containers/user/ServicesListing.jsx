@@ -18,6 +18,7 @@ import readUrl from './../../helpers/read-product-listing-url';
 import { getBrands, getColors } from './../../helpers/product-listing';
 import { Helmet } from 'react-helmet';
 import GoToTop from './../../helpers/GoToTop';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 const ServicesListing = () => {
     const location = useLocation();
@@ -147,12 +148,28 @@ const ServicesListing = () => {
             <section className="inr_wrap">
                 <div className="container">
                     <div className="row">
-                        <div className="col-md-12 text-end mt-2">
+                        {/* <div className="col-md-12 text-end mt-2">
                             <button
                                 type="button"
                                 className="btn custom_btn btn_yellow"
                                 onClick={() => window.history.back()}
                             >
+                                Back
+                            </button>
+                        </div> */}
+                        <div className="col-md-12 mt-3 d-flex justify-content-between align-items-center flex-wrap">
+                            <div className="pt-2 d-flex flex-wrap gap-3">
+                                <span className="text-uppercase fw-bold">CATEGORIES: {categories.length || 0}</span>
+                                {/* <span className="text-uppercase fw-bold">BRANDS: {brands.length || 0}</span> */}
+                                <span className="text-uppercase fw-bold">SERVICES: {services.length || 0}</span> 
+                            </div>
+
+                            <button
+                                type="button"
+                                className="btn custum_back_btn btn_yellow d-flex align-items-center"
+                                onClick={() => window.history.back()}
+                            >
+                                <img src={arrow_back} alt="back" className="me-2" />
                                 Back
                             </button>
                         </div>

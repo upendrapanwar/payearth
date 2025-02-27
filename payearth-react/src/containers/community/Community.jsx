@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, Suspense, lazy } from 'react';
 import Footer from '../../components/common/Footer';
 // import Header from '../../components/user/common/Header';
 import userImg from '../../assets/images/user.png'
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import InputEmoji from 'react-input-emoji'
 import Post from '../../components/community/common/Post';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
@@ -22,6 +22,7 @@ import { toast } from 'react-toastify';
 import { Helmet } from 'react-helmet';
 import { CommunityAdvertise } from '../../components/common/BannerFrame';
 import { BannerIframe2 } from '../../components/common/BannerFrame';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 const Header = lazy(() => import("../../components/user/common/Header"));
 
@@ -35,6 +36,10 @@ const Community = () => {
     const postCategories = useSelector(state => state.post.postCategories);
     const postProducts = useSelector(state => state.post.postProducts);
     const dispatch = useDispatch();
+    // const location = useLocation();
+    // const postRefs = useRef({});
+    // const searchParams = new URLSearchParams(location.search);
+    // const postId = searchParams.get("postId");
 
     const [text, setText] = useState('');
     const [images, setImages] = useState([]);
@@ -102,6 +107,18 @@ const Community = () => {
         };
 
     }, [postsData, modalContent])
+
+    // useEffect(() => {
+    //     if (postId) {
+    //         setTimeout(() => {
+    //             if (postRefs.current[postId]) {
+    //                 postRefs.current[postId].scrollIntoView({ behavior: "smooth" });
+    //             } else {
+    //                 console.log("Post not found in postRefs:", postRefs);
+    //             }
+    //         }, 300);
+    //     }
+    // }, [postId]);
 
     const handleClick = (type) => {
         let data = [];
@@ -544,6 +561,17 @@ const Community = () => {
                                         )}
 
                                     </Modal>
+
+                                    <div className=''>
+                                        <button
+                                            type="button"
+                                            className="btn custum_back_btn btn_yellow mx-auto"
+                                            onClick={() => window.history.back()}
+                                        >
+                                            <img src={arrow_back} alt="back" />&nbsp;
+                                            Back
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -654,7 +682,7 @@ const Community = () => {
                                     </div>
                                 </div>
 
-                                 {/* Filter */}
+                                {/* Filter */}
                                 <div className="cumm_sidebar_box bg-white p-3 rounded-3 mb-3">
                                     <div className="cumm_title">advanced filter</div>
                                     <div className="filter_box">
@@ -708,7 +736,7 @@ const Community = () => {
                                             <div className="filter_btn_box ms-4">
                                                 <Link
                                                     to="#"
-                                                     className="btn custum_back_btn btn_yellow"
+                                                    className="btn custum_back_btn btn_yellow"
                                                     onClick={handleFilterCategory}
                                                 >
                                                     Filter
@@ -717,7 +745,7 @@ const Community = () => {
                                         </div>
                                     </div>
                                 </div>
-                            
+
 
                                 {
                                     filteredData === null ? (
@@ -736,7 +764,11 @@ const Community = () => {
                                                         }
                                                     })
                                                     .map((value, index) => (
-                                                        <Post key={index} posts={value} sendEditData={handleEdit} />
+                                                        <Post key={index} posts={value} sendEditData={handleEdit} 
+                                                        // ref={(el) => {
+                                                        //     postRefs.current[value._id] = el;
+                                                        // }}
+                                                        />
                                                     ))}
                                             </div>
                                         )
@@ -759,7 +791,11 @@ const Community = () => {
                                                         }
                                                     })
                                                     .map((value, index) => (
-                                                        <Post key={index} posts={value} sendEditData={handleEdit} />
+                                                        <Post key={index} posts={value} sendEditData={handleEdit} 
+                                                        // ref={(el) => {
+                                                        //     postRefs.current[value._id] = el;
+                                                        // }}
+                                                        />
                                                     ))}
                                             </div>
                                         ) : (

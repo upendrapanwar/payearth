@@ -18,6 +18,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal } from 'react-bootstrap';
 import UploadMyprofile from './UploadMyprofile';
 import { Helmet } from 'react-helmet';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 class MyProfile extends Component {
     constructor(props) {
@@ -232,6 +233,16 @@ class MyProfile extends Component {
                                             <small>Blocked</small>
                                         </li>
                                     </ul>
+                                    <div className=''>
+                                        <button
+                                            type="button"
+                                            className="btn custum_back_btn btn_yellow mx-auto"
+                                            onClick={() => window.history.back()}
+                                        >
+                                            <img src={arrow_back} alt="back" />&nbsp;
+                                            Back
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <div className="col-md-12">
@@ -239,15 +250,15 @@ class MyProfile extends Component {
                                     <div className="cart_wrap">
                                         <div className="items_incart d-flex justify-content-between align-items-center">
                                             <span className="text-uppercase">
-                                            Personal Information
+                                                Personal Information
                                             </span>
-                                            <button
+                                            {/* <button
                                                 type="button"
                                                 className="btn custom_btn btn_yellow"
                                                 onClick={() => window.history.back()}
                                             >
                                                 Back
-                                            </button>
+                                            </button> */}
                                         </div>
                                     </div>
                                     <div className="profile_edit_wrap">

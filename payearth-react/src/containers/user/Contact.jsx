@@ -13,6 +13,7 @@ import axios from 'axios';
 import userContactSchema from '../../validation-schemas/userContactSchema'
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { Helmet } from 'react-helmet';
+import arrow_back from '../../assets/icons/arrow-back.svg'
 
 
 const UserContact = () => {
@@ -105,7 +106,19 @@ const UserContact = () => {
                                     <div className="col-lg-8">
                                         <div className="contact_form_wrap">
                                             <div className="form_wrapper">
-                                                <h4 className="form_title mb-4">Write us</h4>
+                                                <div className='d-flex justify-content-between align-items-center'>
+                                                    <h4 className="form_title mb-4 mt-4">Write us</h4>
+                                                    <div className='mb-4 pb-4'>
+                                                        <button
+                                                            type="button"
+                                                            className="btn custum_back_btn btn_yellow mx-auto"
+                                                            onClick={() => window.history.back()}
+                                                        >
+                                                            <img src={arrow_back} alt="back" />&nbsp;
+                                                            Back
+                                                        </button>
+                                                    </div>
+                                                </div>
                                                 <Formik
                                                     initialValues={{
                                                         name: '',
