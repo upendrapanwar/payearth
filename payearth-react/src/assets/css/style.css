@@ -4692,3 +4692,9 @@ h4 {
 .destopHidden {
   display: none;
 }
+
+
+@media only screen and (max-width: 600px) {
+  .iframe-container .iFrame-wrapper { height: 100px;}
+.iframe-container .iFrame-wrapper img { object-fit: cover;  height: 100%; }
+}

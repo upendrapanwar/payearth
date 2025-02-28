@@ -144,11 +144,11 @@ class ManageReports extends Component {
                 },
                 sortable: true,
             },
-            {
-                name: 'TYPE OF PAYMENT',
-                selector: (row, i) => row.paymentDetails[0]?.paymentMode,
-                sortable: true
-            },
+            // {
+            //     name: 'TYPE OF PAYMENT',
+            //     selector: (row, i) => row.paymentDetails[0]?.paymentType,
+            //     sortable: true
+            // },
             {
                 name: 'STATUS',
                 selector: (row, i) => row.paymentDetails[0]?.paymentStatus,

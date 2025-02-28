@@ -333,12 +333,13 @@
     }
 
     .comm_profile.myComm_profile_panel .poster_img {
-        width: 70px;
-        height: 70px;
+        width: 40px;
+        height: 40px;
+
     }
 
     .comm_profile.myComm_profile_panel .poster_name {
-        font-size: 16px;
+        font-size: 12px;
         margin-top: 10px;
         line-height: 1.1;
         max-width: 70px;
@@ -350,7 +351,8 @@
         display: flex;
         gap: 8px;
     }
-
+    .comm_profile.myComm_profile_panel .custum_back_btn  { max-width: 52px;}
+    .comm_profile.myComm_profile_panel .custum_back_btn .hide-mob  { display: none;}
     .comm_profile.myComm_profile_panel ul li .fp_fc {
         font-size: 20px;
         margin-bottom: 10px;
@@ -494,7 +496,7 @@
     }
 
     .header .top_bar .nav_wrapper>ul:last-child {
-        margin-left: 12px;
+        margin-left: 0px;
     }
 
     .popular_products_sec .cards_wrapper>.card>.text_wrapper,

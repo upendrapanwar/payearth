@@ -526,37 +526,42 @@ const SellerCommunity = () => {
                                         aria-labelledby="contained-modal-title-vcenter"
                                         className='modal-dialog-scrollable'
                                     >
-                                        {/* <Modal.Body> */}
-                                        {modalContent.length > 0 ? (
-                                            <ul>
-                                                {modalContent.map((item, index) => <>
-                                                    <div className="chat_user_item" key={index}>
-                                                        <a href="#" className="d-flex align-items-center chatUser_info">
-                                                            <div className="userInfo-col userThumb">
-                                                                <div className="user_thumb">
-                                                                    <img className="img-fluid" src={item.image_url} alt="user img" />
+                                        <Modal.Header closeButton>
+                                            <Modal.Title id="contained-modal-title-vcenter">
+                                                {userType}
+                                            </Modal.Title>
+                                        </Modal.Header>
+                                        <Modal.Body>
+                                            {modalContent.length > 0 ? (
+                                                <ul>
+                                                    {modalContent.map((item, index) => <>
+                                                        <div className="chat_user_item" key={index}>
+                                                            <a href="#" className="d-flex align-items-center chatUser_info">
+                                                                <div className="userInfo-col userThumb">
+                                                                    <div className="user_thumb">
+                                                                        <img className="img-fluid" src={item.image_url} alt="user img" />
+                                                                    </div>
+
+                                                                </div>
+                                                                <div className="userInfo-col userInfo">
+                                                                    <h3>{item.name}</h3>
                                                                 </div>
 
-                                                            </div>
-                                                            <div className="userInfo-col userInfo">
-                                                                <h3>{item.name}</h3>
-                                                            </div>
-
-                                                            {userType === "blockedUser" ?
-                                                                <button
-                                                                    onClick={() => { handleUnblockUser(item) }}
-                                                                >
-                                                                    Unblock
-                                                                </button> : ""}
-                                                        </a>
-                                                    </div>
-                                                </>
-                                                )}
-                                            </ul>
-                                        ) : (
-                                            <p>No users found</p>
-                                        )}
-
+                                                                {userType === "blockedUser" ?
+                                                                    <button
+                                                                        onClick={() => { handleUnblockUser(item) }}
+                                                                    >
+                                                                        Unblock
+                                                                    </button> : ""}
+                                                            </a>
+                                                        </div>
+                                                    </>
+                                                    )}
+                                                </ul>
+                                            ) : (
+                                                <p>No users found</p>
+                                            )}
+                                        </Modal.Body>
                                     </Modal>
 
                                     <div className=''>
@@ -686,68 +691,68 @@ const SellerCommunity = () => {
                                 </div>
 
                                 {/* Filter */}
-                                    <div className="cumm_sidebar_box bg-white p-3 rounded-3 mb-3">
-                                        <div className="cumm_title">advanced filter</div>
-                                        <div className="filter_box">
-                                            <div className='d-flex flex-row'>
-                                                <select
-                                                    className="form-select mb-3 me-4 w-25"
-                                                    aria-label="Default select example"
-                                                    onChange={(e) => setSelectFilterCategory(e.target.value)}
-                                                    value={selectFilterCategory}
-                                                >
-                                                    {categoryOption.map(category => (
-                                                        <option key={category.value} value={category.value} >
-                                                            {category.label}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                                <div className="form-check mt-3 me-4">
-                                                    <input
-                                                        className="form-check-input border-warning"
-                                                        type="radio"
-                                                        value=""
-                                                        id="popularPost"
-                                                        checked={showMostLiked}
-                                                        onChange={(e) => {
-                                                            setShowMostLiked(e.target.checked);
-                                                            setShowMostCommented(false);
-                                                        }}
-                                                    />
-                                                    <label className="form-check-label mt-1" htmlFor="popularPost">
-                                                        Most Popular Post
-                                                    </label>
-                                                </div>
-                                                <div className="form-check mt-3 me-4">
-                                                    <input
-                                                        className="form-check-input border-warning"
-                                                        type="radio"
-                                                        value=""
-                                                        id="CommentedPost"
-                                                        checked={showMostCommented}
-                                                        onChange={(e) => {
-                                                            setShowMostCommented(e.target.checked);
-                                                            setShowMostLiked(false);
-                                                        }}
-                                                    />
-                                                    <label className="form-check-label mt-1" htmlFor="CommentedPost">
-                                                        Most Commented Post
-                                                    </label>
-                                                </div>
+                                <div className="cumm_sidebar_box bg-white p-3 rounded-3 mb-3">
+                                    <div className="cumm_title">advanced filter</div>
+                                    <div className="filter_box">
+                                        <div className='d-flex flex-row'>
+                                            <select
+                                                className="form-select mb-3 me-4 w-25"
+                                                aria-label="Default select example"
+                                                onChange={(e) => setSelectFilterCategory(e.target.value)}
+                                                value={selectFilterCategory}
+                                            >
+                                                {categoryOption.map(category => (
+                                                    <option key={category.value} value={category.value} >
+                                                        {category.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <div className="form-check mt-3 me-4">
+                                                <input
+                                                    className="form-check-input border-warning"
+                                                    type="radio"
+                                                    value=""
+                                                    id="popularPost"
+                                                    checked={showMostLiked}
+                                                    onChange={(e) => {
+                                                        setShowMostLiked(e.target.checked);
+                                                        setShowMostCommented(false);
+                                                    }}
+                                                />
+                                                <label className="form-check-label mt-1" htmlFor="popularPost">
+                                                    Most Popular Post
+                                                </label>
+                                            </div>
+                                            <div className="form-check mt-3 me-4">
+                                                <input
+                                                    className="form-check-input border-warning"
+                                                    type="radio"
+                                                    value=""
+                                                    id="CommentedPost"
+                                                    checked={showMostCommented}
+                                                    onChange={(e) => {
+                                                        setShowMostCommented(e.target.checked);
+                                                        setShowMostLiked(false);
+                                                    }}
+                                                />
+                                                <label className="form-check-label mt-1" htmlFor="CommentedPost">
+                                                    Most Commented Post
+                                                </label>
+                                            </div>
 
-                                                <div className="filter_btn_box ms-4">
-                                                    <Link
-                                                        to="#"
-                                                        className="btn custum_back_btn btn_yellow"
-                                                        onClick={handleFilterCategory}
-                                                    >
-                                                        Filter
-                                                    </Link>
-                                                </div>
+                                            <div className="filter_btn_box ms-4">
+                                                <Link
+                                                    to="#"
+                                                    className="btn custum_back_btn btn_yellow"
+                                                    onClick={handleFilterCategory}
+                                                >
+                                                    Filter
+                                                </Link>
                                             </div>
                                         </div>
                                     </div>
-                               
+                                </div>
+
                                 {
                                     filteredData === null ? (
                                         SellerPostsData.length > 0 ? (

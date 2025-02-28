@@ -484,7 +484,9 @@ const Community = () => {
     // console.log("advertiseCat................", advertiseCat)
 
 
+    console.log("modalContent", modalContent)
 
+    console.log("userType", userType)
 
     return (
         <React.Fragment>
@@ -529,37 +531,42 @@ const Community = () => {
                                         aria-labelledby="contained-modal-title-vcenter"
                                         className='modal-dialog-scrollable'
                                     >
-                                        {/* <Modal.Body> */}
-                                        {modalContent.length > 0 ? (
-                                            <ul>
-                                                {modalContent.map((item, index) => <>
-                                                    <div className="chat_user_item" key={index}>
-                                                        <a href="#" className="d-flex align-items-center chatUser_info">
-                                                            <div className="userInfo-col userThumb">
-                                                                <div className="user_thumb">
-                                                                    <img className="img-fluid" src={item.image_url} alt="user img" />
+                                        <Modal.Header closeButton>
+                                            <Modal.Title id="contained-modal-title-vcenter">
+                                                {userType}
+                                            </Modal.Title>
+                                        </Modal.Header>
+                                        <Modal.Body>
+                                            {modalContent.length > 0 ? (
+                                                <ul>
+                                                    {modalContent.map((item, index) => <>
+                                                        <div className="chat_user_item" key={index}>
+                                                            <a href="#" className="d-flex align-items-center chatUser_info">
+                                                                <div className="userInfo-col userThumb">
+                                                                    <div className="user_thumb">
+                                                                        <img className="img-fluid" src={item.image_url} alt="user img" />
+                                                                    </div>
+
+                                                                </div>
+                                                                <div className="userInfo-col userInfo">
+                                                                    <h3>{item.name}</h3>
                                                                 </div>
 
-                                                            </div>
-                                                            <div className="userInfo-col userInfo">
-                                                                <h3>{item.name}</h3>
-                                                            </div>
-
-                                                            {userType === "blockedUser" ?
-                                                                <button
-                                                                    onClick={() => { handleUnblockUser(item) }}
-                                                                >
-                                                                    Unblock
-                                                                </button> : ""}
-                                                        </a>
-                                                    </div>
-                                                </>
-                                                )}
-                                            </ul>
-                                        ) : (
-                                            <p>No users found</p>
-                                        )}
-
+                                                                {userType === "blockedUser" ?
+                                                                    <button
+                                                                        onClick={() => { handleUnblockUser(item) }}
+                                                                    >
+                                                                        Unblock
+                                                                    </button> : ""}
+                                                            </a>
+                                                        </div>
+                                                    </>
+                                                    )}
+                                                </ul>
+                                            ) : (
+                                                <p>No users found</p>
+                                            )}
+                                        </Modal.Body>
                                     </Modal>
 
                                     <div className=''>
@@ -764,7 +771,7 @@ const Community = () => {
                                                         }
                                                     })
                                                     .map((value, index) => (
-                                                        <Post key={index} posts={value} sendEditData={handleEdit} 
+                                                        <Post key={index} posts={value} sendEditData={handleEdit}
                                                         // ref={(el) => {
                                                         //     postRefs.current[value._id] = el;
                                                         // }}
@@ -791,7 +798,7 @@ const Community = () => {
                                                         }
                                                     })
                                                     .map((value, index) => (
-                                                        <Post key={index} posts={value} sendEditData={handleEdit} 
+                                                        <Post key={index} posts={value} sendEditData={handleEdit}
                                                         // ref={(el) => {
                                                         //     postRefs.current[value._id] = el;
                                                         // }}
