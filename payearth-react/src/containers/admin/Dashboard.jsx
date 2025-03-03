@@ -838,7 +838,7 @@ class Dashboard extends Component {
                                 <div className="card bg-white rounded-3">
                                     <div className="tsc_box bg-white p-3">
                                         <div className="row">
-                                            <div className="d-flex ">
+                                            <div className="d-flex flex-wrap">
                                                 <div className="tsc_img col-lg-6 m-0 p-0">
                                                     <div className="d-flex mb-2 justify-content-between">
                                                         <p className="text-start">Active and New users</p>

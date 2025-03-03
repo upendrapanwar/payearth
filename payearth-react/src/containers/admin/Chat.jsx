@@ -1440,7 +1440,7 @@ class Chat extends Component {
                     <div className="chat_fieldRow">
                         <h3>New Group</h3>
                         <div className="chat_field">
-                            <label htmlFor="">Group name</label>
+                            <label htmlFor="">Group name</label> 
                             <div className="field_item">
                                 <input
                                     className="form-control"

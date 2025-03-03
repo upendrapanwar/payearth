@@ -313,10 +313,10 @@ class SellerBannerList extends Component {
         {loading === true ? <SpinnerLoader /> : ""}
         <Header />
         <div className="inr_top_page_title">
-          <h2>Manage Advertisement</h2>
+          <h2>Manage Advertisements</h2>
         </div>
         <Helmet>
-          <title>{"Seller - Manage Advertisement - Pay Earth"}</title>
+          <title>{"Seller - Manage Advertisements - Pay Earth"}</title>
         </Helmet>
         <section className="inr_wrap">
           <div className="container">

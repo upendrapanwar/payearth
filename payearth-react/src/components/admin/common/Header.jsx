@@ -348,7 +348,7 @@ function Header() {
                   <i className="icon">
                     <img src={bannerIcon} alt="" />
                   </i>{" "}
-                  Manage Advertisement
+                  Manage Advertisements
                 </Link>
               </li>
               <li>

@@ -662,7 +662,7 @@ class ManageDeals extends Component {
                                                             >
                                                                 {listedProducts && listedProducts.length > 0 ? (
                                                                     listedProducts.map((product) => (
-                                                                        <div className="card m-2" key={product.id}>
+                                                                        <div className="card m-2 d-flex" key={product.id}>
                                                                             <div className="row">
                                                                                 <div className="col-md-4">
                                                                                     <img
