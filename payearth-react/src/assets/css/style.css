@@ -309,11 +309,7 @@ ul {
   padding: 14px 16px;
 }
 
-/* .header .top_bar ul>li:first-child a {
-  border-right: 1px solid #595a5e;
-} */
-
-.header .top_bar ul>li> a {
+.header .top_bar ul>li:first-child a {
   border-right: 1px solid #595a5e;
 }
 
