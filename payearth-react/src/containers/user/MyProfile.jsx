@@ -503,7 +503,10 @@ class MyProfile extends Component {
                         <Modal.Title>Profile Image</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <img src={imageToView} alt="Profile" className="img-fluid" />
+                        <div className='text-center'>
+                            <img src={imageToView} alt="Profile" className="img-fluid" />
+                        </div>
+
                     </Modal.Body>
                 </Modal>
 

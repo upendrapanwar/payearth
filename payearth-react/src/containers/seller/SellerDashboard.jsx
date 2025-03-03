@@ -795,7 +795,7 @@ class SellerDashboard extends Component {
                                     <Link to="/seller/product-orders">
                                         <div className="count_box">
                                             <div className="cb_count">{data.totalProductOrders}</div>
-                                            <div className="cb_name">No. of product orders</div>
+                                            <div className="cb_name">No. of products ordered</div>
                                         </div>
                                     </Link>
                                 </div>
@@ -803,7 +803,7 @@ class SellerDashboard extends Component {
                                     <Link to="/seller/service-management">
                                         <div className="count_box">
                                             <div className="cb_count">{data.totalServiceOrders}</div>
-                                            <div className="cb_name">No. of services orders</div>
+                                            <div className="cb_name">No. of services ordered</div>
                                         </div>
                                     </Link>
                                 </div>
@@ -836,9 +836,9 @@ class SellerDashboard extends Component {
                                                                 series={[
                                                                     {
                                                                         data: topVisitedAdvertisements,
-                                                                        outerRadius: 100, 
-                                                                        cx: "40%", 
-                                                                        cy: "50%", 
+                                                                        outerRadius: 100,
+                                                                        cx: "40%",
+                                                                        cy: "50%",
                                                                     },
                                                                 ]}
                                                                 width={400}
@@ -848,8 +848,8 @@ class SellerDashboard extends Component {
                                                                 series={[
                                                                     {
                                                                         data: [],
-                                                                        outerRadius: 100, 
-                                                                        cx: "50%", 
+                                                                        outerRadius: 100,
+                                                                        cx: "50%",
                                                                         cy: "50%",
                                                                     }
                                                                 ]}
@@ -883,7 +883,7 @@ class SellerDashboard extends Component {
                                                 zIndex: 10, // Ensure it stays above the scrolling content
                                                 borderBottom: '1px solid #ddd',
                                             }}>
-                                                Total Advertise Viewed
+                                                Total Advertisements Viewed
                                             </div>
                                             <div className="rep_chart_item orderWeek">
                                                 <DataTableExtensions
@@ -910,7 +910,7 @@ class SellerDashboard extends Component {
                             <div className="row mt-4">
                                 <div className="col-md-8" >
                                     <div className="dash_graph bg-white border" style={{ borderColor: '#ddd' }}>
-                                        <div className="dash_graph_head">
+                                        <div className="mob-dashboard dash_graph_head">
                                             {
                                                 defaultSelectedOptionChart.value === 'week' ? (
                                                     <>

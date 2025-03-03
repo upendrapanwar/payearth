@@ -160,7 +160,7 @@ const ProductCard = ({ data, inWishList }) => {
           </div>
         </div>
         {data.quantity && data.quantity.stock_qty !== 0 ? (
-          <div className="prod_foot">
+          <div className="d-flex prod_foot">
             {isLoggedIn ? (
               <>
                 <Link

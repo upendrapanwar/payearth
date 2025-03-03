@@ -87,7 +87,7 @@ ul {
   font-size: 16px;
   font-family: var(--font_roboto);
   width: 126px;
-  border-radius: 80px  !important;
+  border-radius: 80px !important;
   transition: var(--transition);
 }
 
@@ -267,7 +267,8 @@ ul {
 }
 
 .header .top_bar {
-  height: 43px;
+  /* height: 43px; */
+  height: 50px;
   position: relative;
   /*overflow: hidden;*/
 }
@@ -308,7 +309,11 @@ ul {
   padding: 14px 16px;
 }
 
-.header .top_bar ul>li:first-child a {
+/* .header .top_bar ul>li:first-child a {
+  border-right: 1px solid #595a5e;
+} */
+
+.header .top_bar ul>li> a {
   border-right: 1px solid #595a5e;
 }
 
@@ -2005,7 +2010,8 @@ button.view_more img {
 }
 
 .prod_dtl_info {
-  padding: 40px 40px 0 40px;
+  /* padding: 40px 40px 0 40px; */
+  padding: 20px 0px 0 0px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -4308,7 +4314,7 @@ a.inner-block:active {
   }
 
   .header .top_bar>.btn {
-    float: right;
+    /* float: right; */
   }
 }
 
@@ -4695,6 +4701,12 @@ h4 {
 
 
 @media only screen and (max-width: 600px) {
-  .iframe-container .iFrame-wrapper { height: 100px;}
-.iframe-container .iFrame-wrapper img { object-fit: cover;  height: 100%; }
+  .iframe-container .iFrame-wrapper {
+    height: 100px;
+  }
+
+  .iframe-container .iFrame-wrapper img {
+    object-fit: cover;
+    height: 100%;
+  }
 }

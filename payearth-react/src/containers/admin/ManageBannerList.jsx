@@ -369,10 +369,10 @@ class ManageBannerList extends Component {
       <React.Fragment>
         <Header />
         <div className="inr_top_page_title">
-          <h2>Manage Advertisement</h2>
+          <h2>Manage Advertisements</h2>
         </div>
         <Helmet>
-          <title>{"Admin - Manage Advertisement - Pay Earth"}</title>
+          <title>{"Admin - Manage Advertisements - Pay Earth"}</title>
         </Helmet>
         <section className="inr_wrap">
           <div className="container">
@@ -381,7 +381,7 @@ class ManageBannerList extends Component {
                 <div className="cart adv_banner_wrapper">
                   <div className="dash_inner_wrap">
                     <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center flex_mob_none">
-                      <div className="dash_title">Manage Advertisement</div>
+                      <div className="dash_title">Manage Advertisements</div>
                       <div className="search_customer_field">
                         <div className="noti_wrap">
                           <div className="d-flex gap-4">

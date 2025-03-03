@@ -171,7 +171,7 @@ const ListedProducts = () => {
 
 
                                                     {product.quantity && product.quantity.stock_qty !== 0 ? (
-                                                        <div className="prod_foot">
+                                                        <div className="d-flex prod_foot">
                                                             {isLoggedIn ? (
                                                                 <>
                                                                     <Link

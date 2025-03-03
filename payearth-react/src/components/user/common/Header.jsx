@@ -924,9 +924,11 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                     <Link className="navbar-brand py-0" to="/">
                       <img src={logo} alt="logo" className="img-fluid" />
                     </Link>
-                    {/* <Link className="" to="#"> */}
-                    <img src={payearth_qr_code} alt="qr-code" className="img-fluid" width={100} height={100} />
-                    {/* </Link> */}
+                    <Link className="navbar-brand py-0" to="#">
+                      <img src={payearth_qr_code} alt="qr-code" className="img-fluid" width={100} height={100} />
+                    </Link>
+
+
                     <button
                       className="navbar-toggler"
                       type="button"

@@ -273,32 +273,33 @@
         min-width: 100px;
     }
 
-    .mob-dashboard > div{
-        overflow-x: scroll; 
+    .mob-dashboard>div {
+        overflow-x: scroll;
         max-width: 100%;
         max-height: 200px;
     }
-    /* width */
-    .mob-dashboard > div::-webkit-scrollbar {
-    width: 20px;
-  }
 
-  .drop{
-    z-index: 99;
-  }
-  
-  /* Track */
-  .mob-dashboard > div::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 5px grey;
-    border-radius: 10px;
-  }
-  
-  /* Handle */
-  .mob-dashboard > div::-webkit-scrollbar-thumb {
-    background: red;
-    border-radius: 10px;
-  }
-    
+    /* width */
+    .mob-dashboard>div::-webkit-scrollbar {
+        width: 20px;
+    }
+
+    .drop {
+        z-index: 99;
+    }
+
+    /* Track */
+    .mob-dashboard>div::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 5px grey;
+        border-radius: 10px;
+    }
+
+    /* Handle */
+    .mob-dashboard>div::-webkit-scrollbar-thumb {
+        background: red;
+        border-radius: 10px;
+    }
+
 
     #buyerLoginModal .modal-content .img_wrapper,
     #buyerRegisterModal .modal-content .img_wrapper,
@@ -351,8 +352,15 @@
         display: flex;
         gap: 8px;
     }
-    .comm_profile.myComm_profile_panel .custum_back_btn  { max-width: 52px;}
-    .comm_profile.myComm_profile_panel .custum_back_btn .hide-mob  { display: none;}
+
+    .comm_profile.myComm_profile_panel .custum_back_btn {
+        max-width: 52px;
+    }
+
+    .comm_profile.myComm_profile_panel .custum_back_btn .hide-mob {
+        display: none;
+    }
+
     .comm_profile.myComm_profile_panel ul li .fp_fc {
         font-size: 20px;
         margin-bottom: 10px;
@@ -407,7 +415,8 @@
     }
 
     .header .main_nav .navbar-brand {
-        max-width: 110px;
+        /* max-width: 110px; */
+        max-width: 52px;
     }
 
     #heroCarousel .carousel-inner .carousel-item>img,
@@ -519,9 +528,10 @@
     .header .top_bar .nav_wrapper .login_link {
         width: 100%;
         display: inline-block;
-        max-width: 160px;
+        /* max-width: 160px; */
+        width: max-content;
         overflow: hidden;
-        height: 32px;
+        height: 38px;
     }
 
     .popular_products_sec .cards_wrapper,

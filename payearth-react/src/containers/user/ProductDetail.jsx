@@ -453,7 +453,7 @@ class ProductDetail extends Component {
                           </div> */}
                           {productDetail.quantity &&
                             productDetail.quantity.stock_qty > 0 ? (
-                            <div className="prod_foot">
+                            <div className="d-flex prod_foot">
                               <Link className="btn custom_btn btn_yellow_bordered" to="#"
                                 onClick={() => dispatch(
                                   addToCart({
@@ -506,7 +506,7 @@ class ProductDetail extends Component {
                               4.5
                             </span>
                           </div>
-                          <div className="pdi_share_links">
+                          {/* <div className="pdi_share_links">
                             Share :
                             <Link to="#">
                               <img src={twitterIcon} alt="twitter" className="img-fluid ms-2" />
@@ -520,7 +520,7 @@ class ProductDetail extends Component {
                             <Link to="#">
                               <img src={whatsappIcon} alt="Watsapp" className="img-fluid ms-2" />
                             </Link>
-                          </div>
+                          </div> */}
                         </div>
                       </div>
                     </div>
