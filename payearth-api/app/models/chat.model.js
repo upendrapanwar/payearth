@@ -11,13 +11,20 @@ const schema = new Schema({
         default: false,
     },
 
+    // chatUsers: [{
+    //     type: {
+    //         id: String,
+    //         name: String,
+    //         image_url: String,
+    //         isGroupAdmin: { type: Boolean, default: false }
+    //     },
+    // }],
     chatUsers: [{
-        type: {
-            id: String,
-            name: String,
-            image_url: String,
-            isGroupAdmin: { type: Boolean, default: false }
-        },
+        id: { type: mongoose.Schema.Types.ObjectId, refPath: 'chatUsers.role', required: true }, // Dynamic population
+        name: { type: String, required: true },
+        image_url: { type: String, default: '' },
+        role: { type: String, enum: ['User', 'Seller', 'Admin'], required: true },
+        isGroupAdmin: { type: Boolean, default: false }
     }],
 
     // usersAll: [{

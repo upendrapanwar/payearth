@@ -3839,7 +3839,6 @@ async function createGroupChat(req) {
 
   // console.log("receiverId", receiverId)
   // console.log("authorId", authorId)
-  // console.log("receivers", receiverId)
   // console.log("groupName", groupName)
 
   if (!receiverId || !Array.isArray(receiverId) || receiverId.length === 0) {
@@ -3863,7 +3862,8 @@ async function createGroupChat(req) {
     const receiverData = receiverId.map(receiver => ({
       id: receiver.id,
       name: receiver.name,
-      image_url: receiver.image_url
+      image_url: receiver.image_url,
+      role: receiver.role
     }));
 
     receiverData.push(authorId)
@@ -3889,7 +3889,7 @@ async function createGroupChat(req) {
       // console.log("fullChatData", fullChat)
       return fullChat;
     } catch (error) {
-      console.log("error", error) 
+      console.log("error", error)
     }
   }
 }
@@ -3912,6 +3912,10 @@ async function fetchChat(req) {
         path: 'latestMessage',
         match: { isVisible: true },
         select: 'messageContent mediaContent timestamp isVisible'
+      })
+      .populate({
+        path: "chatUsers.id",
+        select: "name email image_url",
       });
 
     result = result.sort((a, b) => {
@@ -3943,7 +3947,7 @@ async function fetchBlockChat(req) {
     };
 
     const fieldsToSelect = "id chatName isGroupChat isBlock blockByUser chatUsers latestMessage";
-    const result = await Chat.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect);
+    const result = await Chat.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect).populate('chatUsers.id');
     // console.log("result", result)
     return result;
   } catch (error) {
@@ -4003,6 +4007,11 @@ async function allMessages(req) {
         path: "chat",
         model: Chat,
       })
+      .populate({
+        path: "sender.id",
+        select: "name  image_url",
+      })
+      .exec();
     // console.log("All message", message)
     return message
 
@@ -4069,25 +4078,53 @@ async function removeFromGroup(req) {
 }
 
 
-// add Group User
+
 async function addGroupMember(req) {
+  console.log('req.body', req.body);
   const chatId = req.params.id;
-  const { id, name, image_url, isGroupAdmin } = req.body;
+  const { id, name, image_url, isGroupAdmin, role } = req.body;
+
+  const formatRole = (role) => {
+    if (role === 'user' || role === 'seller') {
+      return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+    } else {
+      return 'Admin';
+    }
+  };
+
   try {
     const chat = await Chat.findById(chatId);
-
-    if (chat.chatUsers.length >= 20) {
-      return "Cannot add more then 20 members to the chat.."
+    if (!chat) {
+      return "Chat not found";
     }
 
+    if (chat.chatUsers.length >= 20) {
+      return "Cannot add more than 20 members to the chat.";
+    }
+
+    const formattedRole = formatRole(role);
+    console.log('formattedRole', formattedRole);
     const addUser = await Chat.findByIdAndUpdate(
       chatId,
-      { $push: { chatUsers: { id, name, image_url, isGroupAdmin } } },
-      { new: true });
-    //  console.log("update banner", banner)
-    return addUser
+      {
+        $push: {
+          chatUsers: {
+            id,
+            name,
+            image_url,
+            isGroupAdmin,
+            role: formattedRole 
+          }
+        }
+      },
+      { new: true }
+    );
+
+    console.log("Added User:", addUser);
+    return addUser;
   } catch (error) {
-    console.log(error)
+    console.log("Error:", error);
+    throw error;
   }
 }
 

@@ -3,12 +3,18 @@ const Schema = mongoose.Schema;
 
 const schema = new Schema({
 
+    // sender: {
+    //     type: {
+    //         id: String,
+    //         name: String,
+    //         image_url: String,
+    //     }
+    // },
     sender: {
-        type: {
-            id: String,
-            name: String,
-            image_url: String,
-        }
+        id: { type: mongoose.Schema.Types.ObjectId, refPath: 'sender.role', required: true },
+        name: { type: String, required: false },
+        image_url: { type: String, default: '' },
+        role: { type: String, enum: ['User', 'Seller', 'Admin'], required: true },
     },
     messageContent: {
         type: String,

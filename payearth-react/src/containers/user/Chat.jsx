@@ -149,6 +149,7 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 }
             }).then((response) => {
+                // console.log('fetchAllUserData----', response.data.data)
                 const users = response.data.data;
                 this.setState({ allChatUsers: users });
                 this.supportAdminChat()
@@ -196,6 +197,7 @@ class Chat extends Component {
                         'Authorization': `Bearer ${this.authInfo.token}`
                     },
                 });
+                // console.log('handleSearch---response',response)
                 // this.setState({ allChatUsers: response.data.data });
                 this.setState({ users: response.data.data });
                 this.setState({ search: "" });
@@ -212,6 +214,7 @@ class Chat extends Component {
                     'Authorization': `Bearer ${this.authInfo.token}`
                 },
             });
+            // console.log('selectAllUsers----response',response)
             // this.setState({ allChatUsers: response.data.data });
             this.setState({ users: response.data.data });
             this.setState({ search: "" });
@@ -227,6 +230,13 @@ class Chat extends Component {
         const { groupName, selectedUsers } = this.state;
         // console.log("User selected data", selectedUsers)
         // console.log("groupName", groupName)
+        const formatRole = (role) => {
+            if (role === 'user' || role === 'seller') {
+                return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+            } else {
+                return 'Admin';
+            }
+        };
 
         if (selectedUsers.length > 1) {
             try {
@@ -234,7 +244,8 @@ class Chat extends Component {
                 const receiverData = selectedUsers.map(receiver => ({
                     id: receiver._id,
                     name: receiver.name,
-                    image_url: receiver.image_url
+                    image_url: receiver.image_url,
+                    role: formatRole(receiver.role),
                 }));
                 // console.log("receiverData", receiverData)
                 // const data = { receiverId, authorId }
@@ -244,7 +255,8 @@ class Chat extends Component {
                         id: this.authInfo.id,
                         name: this.userInfo.name,
                         image_url: this.userInfo.imgUrl,
-                        isGroupAdmin: true
+                        isGroupAdmin: true,
+                        role: formatRole(this.userInfo.role),
                     },
                     groupName: groupName,
                 }, {
@@ -272,18 +284,29 @@ class Chat extends Component {
     }
 
     accessChat = (data) => {
+        // console.log('this.data', data)
         try {
             const url = '/user/accessChat';
             // const data = { receiverId, authorId }
+            const formatRole = (role) => {
+                if (role === 'user' || role === 'seller') {
+                    return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+                } else {
+                    return 'Admin';
+                }
+            };
+
             axios.post(url, {
                 receiverId: {
                     id: data.id,
                     name: data.name,
-                    image_url: data.image_url
+                    role: formatRole(data.role),
+                    image_url: data.image_url,
                 },
                 authorId: {
                     id: this.authInfo.id,
                     name: this.userInfo.name,
+                    role: formatRole(this.userInfo.role),
                     image_url: this.userInfo.imgUrl,
                 }
             }, {
@@ -355,16 +378,17 @@ class Chat extends Component {
 
     fetchAllMessage = (data) => {
         this.setState({ showChatBoard: true });
+        // console.log('In fetch all message',data)
         if (data.isGroupChat === false) {
-            const userID = data.chatUsers[0].id !== this.authInfo.id ? data.chatUsers[0].id : data.chatUsers[1].id;
+            const userID = data.chatUsers[0].id.id !== this.authInfo.id ? data.chatUsers[0].id.id : data.chatUsers[1].id.id;
             this.setState({ selectUserId: userID });
             this.socket.emit("setup", userID);
             this.getAllMessage(data._id)
             const result = {
                 chatId: data._id,
-                id: data.chatUsers[0].id !== this.authInfo.id ? data.chatUsers[0].id : data.chatUsers[1].id,
-                name: data.chatUsers[0].id !== this.authInfo.id ? data.chatUsers[0].name : data.chatUsers[1].name,
-                image_url: data.chatUsers[0].id !== this.authInfo.id ? data.chatUsers[0].image_url : data.chatUsers[1].image_url,
+                id: data.chatUsers[0].id.id !== this.authInfo.id ? data.chatUsers[0].id.id : data.chatUsers[1].id.id,
+                name: data.chatUsers[0].id.id !== this.authInfo.id ? data.chatUsers[0].id.name : data.chatUsers[1].id.name,
+                image_url: data.chatUsers[0].id.id !== this.authInfo.id ? data.chatUsers[0].id.image_url : data.chatUsers[1].id.image_url,
                 isGroupAdmin: data.chatUsers[0].id !== this.authInfo.id ? data.chatUsers[0].isGroupAdmin : data.chatUsers[1].isGroupAdmin,
                 isBlock: data.isBlock,
                 blockByUser: data.blockByUser
@@ -394,6 +418,7 @@ class Chat extends Component {
     }
 
     getAllMessage = (chatId) => {
+        // console.log('getAllMessage----run')
         axios.get(`user/allMessages/${chatId}`, {
             headers: {
                 'Authorization': `Bearer ${this.authInfo.token}`
@@ -438,6 +463,14 @@ class Chat extends Component {
 
     sendMessage = async () => {
         const { sendChatData, messageContent, selectedFile } = this.state;
+        const formatRole = (role) => {
+            if (role === 'user' || role === 'seller') {
+                return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+            } else {
+                return 'Admin';
+            }
+        };
+
         if (selectedFile !== null) {
             const formData = new FormData();
             for (let i = 0; i < selectedFile.length; i++) {
@@ -459,6 +492,7 @@ class Chat extends Component {
                                 id: this.authInfo.id,
                                 name: "",
                                 image_url: "",
+                                role: formatRole(this.userInfo.role),
                             },
                             chatId: sendChatData.chatId,
                             messageContent: messageContent || null,
@@ -504,6 +538,7 @@ class Chat extends Component {
                         id: this.authInfo.id,
                         name: "",
                         image_url: "",
+                        role: formatRole(this.userInfo.role),
                     },
                     chatId: sendChatData.chatId,
                     messageContent: !messageContent ? null : messageContent,
@@ -643,6 +678,7 @@ class Chat extends Component {
     }
 
     clickToAddUser = async (data) => {
+        console.log('clickToAddUser----'.data)
         const { sendChatData } = this.state;
         try {
             const url = `user/addGroupMember/${sendChatData.chatId}`;
@@ -884,10 +920,10 @@ class Chat extends Component {
     render() {
         const { showChatUsers, users, allChatUsers, sendChatData, userChat, notAddedUser, selectedUsers, selectedFile, onlineUsers, showEmojiPicker, showChatBoard } = this.state;
         const { loading } = store.getState().global;
-        console.log("showChatBoard>>>>>>>>>>>>>>", showChatBoard)
-        // console.log(" sendChatData", sendChatData)
-        // console.log("notAddedUser : ", notAddedUser)
-        // console.log("onlineUsers Active :>>>>", onlineUsers)
+        // console.log("showChatBoard>>>>>>>>>>>>>>", showChatBoard)
+        // console.log(" userChat", userChat)
+        //  console.log("sendChatData : ", sendChatData)
+        // console.log("users  :>>>>", users)
 
         return (
             <React.Fragment>
@@ -1004,7 +1040,7 @@ class Chat extends Component {
                                                                                     </div>
                                                                                     :
                                                                                     <div className="user_thumb">
-                                                                                        <img className="img-fluid" src={item.chatUsers[0].id !== this.authInfo.id ? item.chatUsers[0].image_url : item.chatUsers[1].image_url} alt="user img" />
+                                                                                        <img className="img-fluid" src={item.chatUsers[0].id.id !== this.authInfo.id ? item.chatUsers[0].id.image_url : item.chatUsers[1].id.image_url} alt="user img" />
                                                                                     </div>
                                                                                 }
                                                                                 {item.isGroupChat === true ? <></> : <>
@@ -1012,7 +1048,7 @@ class Chat extends Component {
                                                                                 </>}
                                                                             </div>
                                                                             <div className="userInfo-col userInfo">
-                                                                                {item.chatName !== 'sender' ? <h3>{item.chatName} <span className="badge text-bg-info">Group</span></h3> : item.chatUsers[0].id !== this.authInfo.id ? <h3>{item.chatUsers[0].name}</h3> : <h3>{item.chatUsers[1].name}</h3>}
+                                                                                {item.chatName !== 'sender' ? <h3>{item.chatName} <span className="badge text-bg-info">Group</span></h3> : item.chatUsers[0].id.id !== this.authInfo.id ? <h3>{item.chatUsers[0].id.name}</h3> : <h3>{item.chatUsers[1].id.name}</h3>}
                                                                                 {item.isBlock === true && item.latestMessage === false ? <></> : (item.latestMessage === null ? <></> : (item.latestMessage.mediaContent === null ? <p>{item.latestMessage.messageContent}</p> : <p><i><b>Media File</b></i></p>))}
                                                                             </div>
                                                                             {item.isBlock === false ? (
@@ -1043,9 +1079,9 @@ class Chat extends Component {
                                                                                 <img src={group_icon} alt="add" width="30px" height="30px" />
                                                                                 <small className="ms-1">{sendChatData.groupData.length}</small>
                                                                             </a>
-                                                                            {sendChatData.groupData.filter(item => item.isGroupAdmin === true && item.id === this.authInfo.id)
+                                                                            {sendChatData.groupData.filter(item => item.isGroupAdmin === true && item.id.id === this.authInfo.id)
                                                                                 .map(item => (
-                                                                                    <div className="chat-filter" key={item.id}>
+                                                                                    <div className="chat-filter" key={item.id.id}>
                                                                                         <a href="#" onClick={() => { this.notAddedUsers(sendChatData) }}>
                                                                                             Add Users
                                                                                         </a>
@@ -1065,18 +1101,18 @@ class Chat extends Component {
                                                                         <a href="#" className="d-flex align-items-center chatUser_info">
                                                                             <div className="userInfo-col userThumb">
                                                                                 <div className="user_thumb">
-                                                                                    <img className="img-fluid" src={item.image_url} alt="user img" />
+                                                                                    <img className="img-fluid" src={item.id.image_url} alt="user img" />
                                                                                 </div>
                                                                                 {/* <span className="user-inactive user-active"></span> */}
                                                                             </div>
                                                                             <div className="userInfo-col userInfo">
-                                                                                {item.id === this.authInfo.id ? <h3>{item.name} <span className="badge text-bg-success">You</span></h3> : <h3>{item.name}</h3>}
+                                                                                {item.id?.id === this.authInfo.id ? <h3>{item.id.name} <span className="badge text-bg-success">You</span></h3> : <h3>{item.id.name}</h3>}
                                                                                 {item.isGroupAdmin === false ? <></> : <p>Admin</p>}
                                                                             </div>
                                                                             <div className="userInfo-col chatTime">
-                                                                                {item.id === this.authInfo.id ? <button onClick={() => { this.handleRemoveFromGroup(sendChatData.chatId, item.id) }}> Exit Group </button>
+                                                                                {item.id.id === this.authInfo.id ? <button onClick={() => { this.handleRemoveFromGroup(sendChatData.chatId, item.id.id) }}> Exit Group </button>
                                                                                     :
-                                                                                    <button onClick={() => { this.handleRemoveFromGroup(sendChatData.chatId, item.id) }}>Remove</button>
+                                                                                    <button onClick={() => { this.handleRemoveFromGroup(sendChatData.chatId, item.id?.id) }}>Remove</button>
                                                                                 }
                                                                             </div>
                                                                         </a>
@@ -1161,12 +1197,12 @@ class Chat extends Component {
                                                         <>
                                                             {userChat.map((item, index) => (
                                                                 <div key={index}>
-                                                                    {item.sender.id !== this.authInfo.id ? (
+                                                                    {item.sender?.id.id !== this.authInfo.id ? (
                                                                         <ul>
                                                                             <li className="sender">
                                                                                 <div className="userThumb">
                                                                                     <div className="user_thumb">
-                                                                                        <img className="img-fluid" src={item.sender.image_url} alt="user img" />
+                                                                                        <img className="img-fluid" src={item.sender?.id.image_url} alt="user img" />
                                                                                     </div>
                                                                                     <span className="user-inactive user-active"></span>
                                                                                 </div>

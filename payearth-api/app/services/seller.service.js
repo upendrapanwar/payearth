@@ -3545,7 +3545,8 @@ async function createGroupChat(req) {
     const receiverData = receiverId.map(receiver => ({
       id: receiver.id,
       name: receiver.name,
-      image_url: receiver.image_url
+      image_url: receiver.image_url,
+      role: receiver.role
     }));
 
     receiverData.push(authorId)
@@ -3580,6 +3581,10 @@ async function fetchChat(req) {
         path: 'latestMessage',
         match: { isVisible: true },
         select: 'messageContent mediaContent timestamp'
+      })
+      .populate({
+        path: "chatUsers.id",
+        select: "name email image_url",
       });
 
     result = result.sort((a, b) => {
@@ -3609,7 +3614,7 @@ async function fetchBlockChat(req) {
     };
 
     const fieldsToSelect = "id chatName isGroupChat isBlock blockByUser chatUsers";
-    const result = await Chat.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect);
+    const result = await Chat.find(query).sort({ createdAt: "desc" }).select(fieldsToSelect).populate('chatUsers.id');
     return result;
   } catch (error) {
     console.log(error);
@@ -3658,6 +3663,11 @@ async function allMessages(req) {
         path: "chat",
         model: Chat,
       })
+      .populate({
+        path: "sender.id",
+        select: "name  image_url",
+      })
+      .exec();
 
     return message
 
@@ -3720,16 +3730,49 @@ async function removeFromGroup(req) {
 
 async function addGroupMember(req) {
   const chatId = req.params.id;
-  const { id, name, image_url, isGroupAdmin } = req.body;
+  const { id, name, image_url, isGroupAdmin, role } = req.body;
+
+  const formatRole = (role) => {
+    if (role === 'user' || role === 'seller') {
+      return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+    } else {
+      return 'Admin';
+    }
+  };
+
   try {
+    const chat = await Chat.findById(chatId);
+    if (!chat) {
+      return "Chat not found";
+    }
+
+    if (chat.chatUsers.length >= 20) {
+      return "Cannot add more than 20 members to the chat.";
+    }
+
+    const formattedRole = formatRole(role);
+    console.log('formattedRole', formattedRole);
     const addUser = await Chat.findByIdAndUpdate(
       chatId,
-      { $push: { chatUsers: { id, name, image_url, isGroupAdmin } } },
-      { new: true });
+      {
+        $push: {
+          chatUsers: {
+            id,
+            name,
+            image_url,
+            isGroupAdmin,
+            role: formattedRole 
+          }
+        }
+      },
+      { new: true }
+    );
 
+    console.log("Added User:", addUser);
     return addUser;
   } catch (error) {
-    console.log(error)
+    console.log("Error:", error);
+    throw error;
   }
 }
 
