@@ -8,7 +8,6 @@ import smLogoutIcon from "./../../../assets/icons/sm_logout.svg";
 import homeIcon from "./../../../assets/icons/sm_home.svg";
 import userImg from './../../../assets/images/user.png'
 import shoppingBagIcon from "./../../../assets/icons/shopping-bag.svg";
-import creditCardIcon from "./../../../assets/icons/credit-card.svg";
 import notificationBellIcon from "./../../../assets/icons/notification-bell.svg";
 import chatIcon from "./../../../assets/icons/chat.svg";
 import logoutIcon from "./../../../assets/icons/logout.svg";
@@ -31,7 +30,6 @@ import axios from 'axios';
 function Header() {
   const userInfo = useSelector(state => state.auth.userInfo);
   const authInfo = useSelector(state => state.auth.authInfo);
-  const history = useHistory();
   const dispatch = useDispatch();
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -119,6 +117,7 @@ function Header() {
   const handleNotificationClick = () => {
     axios.put(`front/updateNotifications/${authInfo.id}`).then(response => {
       const offlineNotifications = response.data.data;
+      console.log("offlineNotifications", offlineNotifications)
     });
     setUnreadCount(0);
   }
@@ -138,7 +137,7 @@ function Header() {
             data-bs-dismiss="offcanvas"
             aria-label="Close"
           >
-            <img src={clostBtn} className="img-fluid" alt="" /> Close
+            <img src={clostBtn} className="img-fluid" alt="" loading="lazy" decoding="async" /> Close
           </button>
         </div>
         <div className="offcanvas-body">
@@ -147,7 +146,7 @@ function Header() {
               <li>
                 <Link to="/admin/dashboard" onClick={() => removeBackdrop()}>
                   <i className="icon">
-                    <img src={homeIcon} alt="" />
+                    <img src={homeIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
                   Dashboard
                 </Link>
@@ -155,7 +154,7 @@ function Header() {
               <li>
                 <Link to="/admin/manage-posts" onClick={() => removeBackdrop()}>
                   <i className="icon">
-                    <img src={shoppingBagIcon} alt="" />
+                    <img src={shoppingBagIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
                   Manage Posts
                 </Link>
@@ -164,7 +163,7 @@ function Header() {
               <li>
                 <Link to="/admin/product-orders" onClick={() => removeBackdrop()}>
                   <i className="icon">
-                    <img src={shoppingBagIcon} alt="" />
+                    <img src={shoppingBagIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
                   Product Orders
                 </Link>
@@ -172,7 +171,7 @@ function Header() {
               <li>
                 <Link to="/admin/service-orders" onClick={() => removeBackdrop()}>
                   <i className="icon">
-                    <img src={shoppingBagIcon} alt="" />
+                    <img src={shoppingBagIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
                   Service Orders
                 </Link>
@@ -188,7 +187,7 @@ function Header() {
                   aria-expanded="false"
                 >
                   <i className="icon">
-                    <img src={shoppingBagIcon} alt="" />
+                    <img src={shoppingBagIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
                   Manage Categories
                 </Link>
@@ -229,7 +228,7 @@ function Header() {
               <li>
                 <Link to="/admin/chat" onClick={() => removeBackdrop()}>
                   <i className="icon">
-                    <img src={chatIcon} alt="" />
+                    <img src={chatIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
                   Chats
                 </Link>
@@ -240,7 +239,7 @@ function Header() {
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
-                    <img src={productIcon} alt="" />
+                    <img src={productIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
                   Manage Products
                 </Link>
@@ -252,7 +251,7 @@ function Header() {
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
-                    <img src={serviceIcon} alt="" />
+                    <img src={serviceIcon} alt="" loading="lazy" decoding="async" />
                   </i>
                   Manage Services
                 </Link>
@@ -260,7 +259,7 @@ function Header() {
               <li>
                 <Link to="/admin/manage-deals" onClick={() => removeBackdrop()}>
                   <i className="icon">
-                    <img src={discountIcon} alt="" />
+                    <img src={discountIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
                   Manage Deals
                 </Link>
@@ -268,7 +267,7 @@ function Header() {
               <li>
                 <Link to="/admin/manage-coupons" onClick={() => removeBackdrop()}>
                   <i className="icon">
-                    <img src={discountIcon} alt="" />
+                    <img src={discountIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
                   Manage Coupons
                 </Link>
@@ -276,7 +275,7 @@ function Header() {
               <li>
                 <Link to="/admin/manage-brands" onClick={() => removeBackdrop()}>
                   <i className="icon">
-                    <img src={discountIcon} alt="" />
+                    <img src={discountIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
                   Manage Brands
                 </Link>
@@ -287,7 +286,7 @@ function Header() {
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
-                    <img src={customersIcon} alt="" />
+                    <img src={customersIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
                   Manage Customers
                 </Link>
@@ -298,7 +297,7 @@ function Header() {
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
-                    <img src={vendorIcon} alt="" />
+                    <img src={vendorIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
                   Manage Vendors
                 </Link>
@@ -311,7 +310,7 @@ function Header() {
                     onClick={() => removeBackdrop()}
                   >
                     <i className="icon">
-                      <img src={vendorIcon} alt="" />
+                      <img src={vendorIcon} alt="" loading="lazy" decoding="async" />
                     </i>{" "}
                     Manage Admins
                   </Link>
@@ -324,7 +323,7 @@ function Header() {
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
-                    <img src={reportIcon} alt="" />
+                    <img src={reportIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
                   Reports
                 </Link>
@@ -335,9 +334,9 @@ function Header() {
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
-                    <img src={communityIcon} alt="" />
+                    <img src={communityIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
-                   Community
+                  Community
                 </Link>
               </li>
               <li>
@@ -346,7 +345,7 @@ function Header() {
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
-                    <img src={bannerIcon} alt="" />
+                    <img src={bannerIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
                   Manage Advertisements
                 </Link>
@@ -357,7 +356,7 @@ function Header() {
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
-                    <img src={productIcon} alt="" />
+                    <img src={productIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
                   Manage Subscription
                 </Link>
@@ -368,7 +367,7 @@ function Header() {
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
-                    <img src={supportIcon} alt="" />
+                    <img src={supportIcon} alt="" loading="lazy" decoding="async" />
                   </i>
                   Manage Support
                 </Link>
@@ -380,7 +379,7 @@ function Header() {
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
-                    <img src={notificationBellIcon} alt="" />
+                    <img src={notificationBellIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
                   Contact Buyers
                 </Link>
@@ -391,7 +390,7 @@ function Header() {
                   onClick={() => removeBackdrop()}
                 >
                   <i className="icon">
-                    <img src={notificationBellIcon} alt="" />
+                    <img src={notificationBellIcon} alt="" loading="lazy" decoding="async" />
                   </i>{" "}
                   Notifications
                 </Link>
@@ -399,7 +398,7 @@ function Header() {
               <li>
                 <Link to="#" onClick={() => logout()}>
                   <i className="icon">
-                    <img src={logoutIcon} alt="" />
+                    <img src={logoutIcon} alt="" loading="lazy" decoding="async" />
                   </i>
                   Logout
                 </Link>
@@ -427,7 +426,7 @@ function Header() {
                       </button>
                     </div>
                     <Link className="navbar-brand py-0" to="#">
-                      <img src={logo} alt="logo" className="img-fluid h-100" />
+                      <img src={logo} alt="logo" className="img-fluid h-100" loading="lazy" decoding="async" />
                     </Link>
                     <button
                       className="navbar-toggler"
@@ -458,7 +457,7 @@ function Header() {
                           <li className="nav-item">
                             <Link className="nav-link" to="/admin/notifications" onClick={handleNotificationClick}>
                               <div className="sm_icon">
-                                <img src={blackBellIcon} alt="" />
+                                <img src={blackBellIcon} alt="" loading="lazy" decoding="async" />
                                 {unreadCount > 0 && <span className="notification-count">{unreadCount}</span>}
                               </div>
                               <span>Notifications</span>
@@ -467,7 +466,7 @@ function Header() {
                           <li className="nav-item">
                             <Link className="nav-link" to="/admin/chat">
                               <div className="sm_icon">
-                                <img src={smChatIcon} alt="" />
+                                <img src={smChatIcon} alt="" loading="lazy" decoding="async" />
                               </div>
                               <span>Chat</span>
                             </Link>
@@ -478,7 +477,7 @@ function Header() {
                               to="/admin/community"
                             >
                               <div className="sm_icon">
-                                <img src={smcommunityIcon} alt="" />
+                                <img src={smcommunityIcon} alt="" loading="lazy" decoding="async" />
                               </div>
                               <span>Community</span>
                             </Link>
@@ -489,7 +488,7 @@ function Header() {
                               to="/admin/manage-support"
                             >
                               <div className="sm_icon">
-                                <img src={supports_Icon} alt="" />
+                                <img src={supports_Icon} alt="" loading="lazy" decoding="async" />
                               </div>
                               <span>Support</span>
                             </Link>
@@ -501,7 +500,7 @@ function Header() {
                               onClick={() => logout()}
                             >
                               <div className="sm_icon">
-                                <img src={smLogoutIcon} alt="" />
+                                <img src={smLogoutIcon} alt="" loading="lazy" decoding="async" />
                               </div>
                               <span>Logout</span>
                             </Link>
@@ -510,7 +509,7 @@ function Header() {
                           <li className="nav-item dropdown">
                             <Link className="nav-link dropdown-toggle" to="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                               <div className="com_user_acc">
-                                <div className="com_user_img"><img src={userInfo.imgUrl && userInfo.imgUrl.trim() !== '' ? userInfo.imgUrl : userImg} alt="" /></div>
+                                <div className="com_user_img"><img src={userInfo.imgUrl && userInfo.imgUrl.trim() !== '' ? userInfo.imgUrl : userImg} alt="" loading="lazy" decoding="async" /></div>
                                 <div className="com_user_name">
                                   <div className="cu_name">{userInfo.name}</div>
                                   <div>{userInfo.role}</div>

@@ -10,16 +10,11 @@ import SpinnerLoader from '../../components/common/SpinnerLoader';
 import store from '../../store/index';
 import { connect, useSelector, useDispatch } from "react-redux";
 import Rating from "../../components/common/Rating";
-import twitterIcon from "./../../assets/icons/twitter.svg";
-import linkedinIcon from "./../../assets/icons/linkedin.svg";
-import fbIcon from "./../../assets/icons/facebook.svg";
-import whatsappIcon from "./../../assets/icons/whatsapp.svg";
 import coins from "./../../assets/icons/coin.svg";
 import DetailTabbing from "../../components/user/common/DetailTabbing";
 import SimilarProducts from "../../components/user/common/SimilarProducts";
 import { Helmet } from 'react-helmet';
 import arrow_back from '../../assets/icons/arrow-back.svg';
-import config from "./../../config.json";
 import parse from "html-react-parser";
 import { addToCart } from "../../store/reducers/cart-slice-reducer";
 import {

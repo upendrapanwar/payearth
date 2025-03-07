@@ -17,17 +17,14 @@ const Deals = () => {
     axios.get("front/product/today-deals")
       .then((response) => {
         if (response.data.status) {
-          console.log("deals card data : ", response.data.data);
           const data = response.data.data;
           for (var i = 0; i < data.length; i++) {
             deals.push({
               image: data[i].dealImage,
-              id: data[i].id,
-              // clickEvent: "sliderClick"
+              id: data[i].id,         
               clickEvent: ((id) => () => handleDealClick(id))(data[i].id),
             })
-          }
-          // console.log("deals check......", deals)
+          }        
           setData(deals);
         } else {
           toast.error(response.data.message);
@@ -38,17 +35,10 @@ const Deals = () => {
         console.log(error);
       });
   }, []);
-  /***************************************************************************/
-
 
   const handleDealClick = (deal) => {
-    // toast.info(`Clicked on: ${deal}`);
-    // console.log("Clicked deal details: ", deal);
     history.push(`/deal-ofthe-day?id=${deal}`);
   };
-
-  /***************************************************************************/
-  /***************************************************************************/
 
   return (
     <section className="deals_sec">
@@ -67,24 +57,6 @@ const Deals = () => {
             ) : (
               ""
             )}
-            {/* <div className="cards_wrapper">
-              {data && data.length
-                ? data.map((value, index) => {
-                  return (
-                    <div key={index}>
-                      <Link to="#" className="d-inline-block">
-                        <img
-                          src={value.dealImage}
-                          alt="..."
-                          className="img-fluid"
-                        />
-                      </Link>
-                    </div>
-                  );
-                })
-                : ""}
-            </div> */}
-
           </div>
         </div>
       </div>

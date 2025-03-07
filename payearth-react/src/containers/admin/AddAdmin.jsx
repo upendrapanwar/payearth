@@ -10,13 +10,9 @@ import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { toast } from 'react-toastify';
 import { Helmet } from 'react-helmet';
 
-
-
-
 const AddAdmin = () => {
     const history = useHistory();
     const authInfo = JSON.parse(localStorage.getItem("authInfo"))
-
 
     const handleSubmit = async (values) => {
         try {

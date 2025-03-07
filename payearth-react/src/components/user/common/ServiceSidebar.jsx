@@ -194,15 +194,9 @@
 
 
 import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { setReqBody, setProducts, setTotalProducts, setMaxPrice } from '../../../store/reducers/product-reducer';
-import { setLoading } from '../../../store/reducers/global-reducer';
 import { toast } from 'react-toastify';
-import config from './../../../config.json';
 import axios from 'axios';
 import RangeTwoThumbs from './RangeTwoThumbs';
-import { getColors } from '../../../helpers/product-listing';
-import { useLocation } from 'react-router-dom';
 
 const ServiceSidebar = (props) => {
     const {

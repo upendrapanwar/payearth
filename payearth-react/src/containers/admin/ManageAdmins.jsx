@@ -8,9 +8,6 @@ import DataTable from 'react-data-table-component';
 import DataTableExtensions from 'react-data-table-component-extensions';
 import arrow_back from '../../assets/icons/arrow-back.svg';
 import { Link } from "react-router-dom";
-import adminRegistrationSchema from '../../validation-schemas/adminRegistrationSchema';
-import invisibleIcon from '../../assets/icons/invisible-icon.svg';
-import visibleIcon from '../../assets/icons/eye-icon.svg';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { Helmet } from 'react-helmet';
 

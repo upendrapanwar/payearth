@@ -4,18 +4,14 @@ import Header from './../../components/user/common/Header';
 import PageTitle from './../../components/user/common/PageTitle';
 import Sidebar from './../../components/user/common/Sidebar';
 import Footer from './../../components/common/Footer';
-import ListingHead from './../../components/user/common/ListingHead';
 import ProductCard from './../../components/common/ProductCard';
 import { NotFound } from './../../components/common/NotFound';
 import SpinnerLoader from './../../components/common/SpinnerLoader';
-import config from './../../config.json';
 import axios from 'axios';
 import { Link, useLocation, useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { setProducts, setReqBody, setTotalProducts, setMaxPrice } from './../../store/reducers/product-reducer';
-import { setLoading } from './../../store/reducers/global-reducer';
 import readUrl from './../../helpers/read-product-listing-url';
-import { getBrands, getColors } from './../../helpers/product-listing';
 import { Helmet } from 'react-helmet';
 import GoToTop from './../../helpers/GoToTop';
 import arrow_back from '../../assets/icons/arrow-back.svg'
@@ -232,7 +228,7 @@ const ProductListing = () => {
                                 onBrandChange={handleBrandChange}
                             />
                         </div>
-                        <div className="col-md-9 mt-3" style={{ overflowY: 'auto', maxHeight: '120vh', border: '1px solid #ddd', scrollbarWidth: 'thin', }}>                      
+                        <div className="col-md-9 mt-3" style={{ overflowY: 'auto', maxHeight: '120vh', border: '1px solid #ddd', scrollbarWidth: 'thin', }}>
                             <div className="row">
                                 <div className="col-sm-12">
                                     {super_rewards === true ? <Link
@@ -262,7 +258,7 @@ const ProductListing = () => {
                                         <button type="button" onClick={() => getProducts('viewMore')} className="view_more">View More</button>
                                     </div>
                                 )}
-                            </div>                           
+                            </div>
                         </div>
                     </div>
                 </div>

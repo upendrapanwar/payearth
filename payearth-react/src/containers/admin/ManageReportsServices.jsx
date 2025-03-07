@@ -473,12 +473,19 @@ class ManageReportsServices extends Component {
                                         <div className="card bg-white rounded-3">
                                             <div className="card-header">
                                                 Order this week
-                                            </div>
+                                            </div>                                          
                                             <div className="rep_chart_item orderWeek">
-                                                <div className="total_weeklly_order">
-                                                    <h2>${orderThisMonth.totalPrice}</h2>
-                                                    <h4>Avg ${orderThisMonth.averagePrice}/Order</h4>
-                                                </div>
+                                                {orderThisMonth ? (
+                                                    <div className="total_weeklly_order">
+                                                        <h2>${orderThisMonth?.totalPrice}</h2>
+                                                        <h4>Avg ${orderThisMonth?.averagePrice}/Order</h4>
+                                                    </div>
+                                                ) : (
+                                                    <div className="total_weeklly_order">
+                                                        <h2>No Orders</h2>
+                                                        <h4>This Month</h4>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

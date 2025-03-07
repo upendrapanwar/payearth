@@ -24,34 +24,34 @@ const Footer = () => {
                             <p className="mb-0">I want to get daily deals & offers in my email</p>
                             <form className="d-flex">
                                 <div>
-                                    <img src={envelopeIcon} alt="envelope-icon" />
+                                    <img src={envelopeIcon} alt="envelope-icon" loading="lazy" decoding="async" />
                                     <input className="form-control rounded-0 border-0" type="email" placeholder="Email address" aria-label="Search" />
                                 </div>
                                 <button className="btn btn_dark" type="submit">Subscribe</button>
                             </form>
                             <div className="play_store_box">
-                                <Link to="#"><img src={playStore} alt="play-store" /></Link>
+                                <Link to="#"><img src={playStore} alt="play-store" loading="lazy" decoding="async" /></Link>
                             </div>
                             <div className="app_store_box">
-                                <Link to="#"><img src={appStore} alt="app-store" /></Link>
+                                <Link to="#"><img src={appStore} alt="app-store" loading="lazy" decoding="async" /></Link>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div className="row gy-3 gy-5 gy-sm-3 py-5 body">
                     <div className="col-xs-12 col-md-4 col-lg-3">
-                        <h6 className="h6 title">Customer Care Service</h6>
+                        <h6 className="title">Customer Care Service</h6>
                         <p>Request a call<br /> to write a message<br /> e-mail: payearth@mailinator.com</p>
 
-                        <h6 className="h6 title mt-5">Follow us</h6>
+                        <h6 className="title mt-5">Follow us</h6>
                         <div className="social_links">
-                            <Link to="#" target="_blank" className="d-inline-block me-2"><img src={linkedinIcon} alt="linked-in" /></Link>
-                            <Link to="#" target="_blank" className="d-inline-block me-2"><img src={twitterIcon} alt="twitter" /></Link>
-                            <Link to="#" target="_blank"><img src={facebook} alt="facebook" /></Link>
+                            <Link to="#" target="_blank" className="d-inline-block me-2"><img src={linkedinIcon} alt="linked-in" loading="lazy" decoding="async" /></Link>
+                            <Link to="#" target="_blank" className="d-inline-block me-2"><img src={twitterIcon} alt="twitter" loading="lazy" decoding="async" /></Link>
+                            <Link to="#" target="_blank"><img src={facebook} alt="facebook" loading="lazy" decoding="async" /></Link>
                         </div>
                     </div>
                     <div className="col-xs-12 col-md-4 col-lg-3">
-                        <h6 className="h6 title">About company</h6>
+                        <h6 className="title">About company</h6>
                         <ul className="links-list">
                             <li><Link to="/page/bonus-program">Bonus program</Link></li>
                             <li><Link to="/page/how-it-works">How it works</Link></li>
@@ -64,7 +64,7 @@ const Footer = () => {
                         </ul>
                     </div>
                     <div className="col-xs-12 col-md-4 col-lg-3">
-                        <h6 className="h6 title">Categories</h6>
+                        <h6 className="title">Categories</h6>
                         <ul className="links-list">
                             <li><Link to="/product-listing?cat=60535b192565091ce443d53f&search=undefined">Clothing & accessories</Link></li>
                             <li><Link to="#">Electronics</Link></li>
@@ -75,11 +75,11 @@ const Footer = () => {
                         </ul>
                     </div>
                     <div className="col-xs-12 col-md-4 col-lg-3">
-                        <h6 className="h6 title">We accept</h6>
+                        <h6 className="title">We accept</h6>
                         <div>
-                            <Link to="#" target="_blank" className="d-inline-block me-2"><img src={bitcoin} alt="bitcoin" /></Link>
-                            <Link to="#" target="_blank" className="d-inline-block me-2"><img src={litecoin} alt="litecoin" /></Link>
-                            <Link to="#" target="_blank"><img src={monerocoin} alt="monero" /></Link>
+                            <Link to="#" target="_blank" className="d-inline-block me-2"><img src={bitcoin} alt="bitcoin" loading="lazy" decoding="async" /></Link>
+                            <Link to="#" target="_blank" className="d-inline-block me-2"><img src={litecoin} alt="litecoin" loading="lazy" decoding="async"/></Link>
+                            <Link to="#" target="_blank"><img src={monerocoin} alt="monero" loading="lazy" decoding="async" /></Link>
                         </div>
                     </div>
                 </div>
@@ -88,10 +88,10 @@ const Footer = () => {
                         <div className="bottom">
                             <p className="mb-0">pay.earth 2021. all right reserved</p>
                             <div className="payment_methods">
-                                <Link to="#" className="d-inline-block me-2"><img src={americanExpress} alt="american-express" /></Link>
-                                <Link to="#" className="d-inline-block me-2"><img src={paypal} alt="paypal" /></Link>
-                                <Link to="#" className="d-inline-block me-2"><img src={citi} alt="citi" /></Link>
-                                <Link to="#"><img src={bitcoinCard} alt="bitcoin-card" /></Link>
+                                <Link to="#" className="d-inline-block me-2"><img src={americanExpress} alt="american-express" loading="lazy" decoding="async" /></Link>
+                                <Link to="#" className="d-inline-block me-2"><img src={paypal} alt="paypal" loading="lazy" decoding="async" /></Link>
+                                <Link to="#" className="d-inline-block me-2"><img src={citi} alt="citi" loading="lazy" decoding="async" /></Link>
+                                <Link to="#"><img src={bitcoinCard} alt="bitcoin-card" loading="lazy" decoding="async" /></Link>
                             </div>
                         </div>
                     </div>

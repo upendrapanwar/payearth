@@ -8,10 +8,7 @@ import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { addToCart } from "../../store/reducers/cart-slice-reducer";
 import { toast } from "react-toastify";
-import {
-  setLoading,
-  setIsLoginModalOpen,
-} from "../../store/reducers/global-reducer";
+import { setLoading, setIsLoginModalOpen } from "../../store/reducers/global-reducer";
 import { setSelectedWishItems } from "../../store/reducers/wishlist-reducer";
 
 const ProductCard = ({ data, inWishList }) => {
@@ -113,6 +110,8 @@ const ProductCard = ({ data, inWishList }) => {
         <img
           src={coins}
           alt="coin-icon"
+          loading="lazy"
+          decoding="async"
           width={45}
           height={45}
         /> : ''}
@@ -135,6 +134,8 @@ const ProductCard = ({ data, inWishList }) => {
               <img
                 src={inWishList ? redHeartIcon : heartIconBordered}
                 alt="heart-icon"
+                loading="lazy"
+                decoding="async"
                 title={`${inWishList ? "Remove" : "Add"} to wishlist`}
               />
             </span>
@@ -143,7 +144,12 @@ const ProductCard = ({ data, inWishList }) => {
         <Link
           to={data.isService === false ? `/product-detail/${data.id}` : `/service-detail/${data.id}`}
         >
-          <img src={data.image} className="img-fluid" alt="..." />
+          <img
+            src={data.image}
+            loading="lazy"
+            decoding="async"
+            className="img-fluid"
+            alt="..." />
         </Link>
       </div>
       <div className="text_wrapper">

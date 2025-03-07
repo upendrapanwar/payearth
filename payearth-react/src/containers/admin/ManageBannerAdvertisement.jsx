@@ -4,8 +4,6 @@ import Footer from '../../components/common/Footer';
 import { toast } from 'react-toastify';
 import emptyImg from './../../assets/images/emptyimage.png'
 import emptyVid from './../../assets/images/emptyVid.png'
-import { setLoading } from '../../store/reducers/global-reducer';
-import { connect } from 'react-redux';
 import store from '../../store/index';
 import axios from 'axios';
 import { Link } from 'react-router-dom';

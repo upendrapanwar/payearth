@@ -37,40 +37,41 @@ const Banner = () => {
               <div className="carousel-indicators">
                 {data.bannerImages && data.bannerImages.length
                   ? data.bannerImages.map((value, index) => {
-                      return (
-                        <button
-                          type="button"
-                          data-bs-target="#heroCarousel"
-                          data-bs-slide-to={index}
-                          className={index === 0 ? "active" : ""}
-                          aria-current="true"
-                          aria-label={"Slide " + (index + 1)}
-                          key={index}
-                        ></button>
-                      );
-                    })
+                    return (
+                      <button
+                        type="button"
+                        data-bs-target="#heroCarousel"
+                        data-bs-slide-to={index}
+                        className={index === 0 ? "active" : ""}
+                        aria-current="true"
+                        aria-label={"Slide " + (index + 1)}
+                        key={index}
+                      ></button>
+                    );
+                  })
                   : ""}
               </div>
               <div className="carousel-inner">
                 {data.bannerImages && data.bannerImages.length
                   ? data.bannerImages.map((value, index) => {
-                      return (
-                        <div
-                          className={`carousel-item ${
-                            index === 0 ? "active" : ""
+                    return (
+                      <div
+                        className={`carousel-item ${index === 0 ? "active" : ""
                           }`}
-                          key={index}
-                        >
-                          <Link to={value.url !== null ? value.url : "#"}>
-                            <img
-                              src={config.apiURI + value.path}
-                              className="d-block w-100 img-fluid"
-                              alt={"Hero " + (index + 1)}
-                            />
-                          </Link>
-                        </div>
-                      );
-                    })
+                        key={index}
+                      >
+                        <Link to={value.url !== null ? value.url : "#"}>
+                          <img
+                            src={config.apiURI + value.path}
+                            className="d-block w-100 img-fluid"
+                            loading="lazy"
+                            decoding="async"
+                            alt={"Hero " + (index + 1)}
+                          />
+                        </Link>
+                      </div>
+                    );
+                  })
                   : ""}
               </div>
             </div>
@@ -81,6 +82,8 @@ const Banner = () => {
                 src={config.apiURI + data.singleImage}
                 alt="side-hero"
                 className="img-fluid w-100"
+                loading="lazy"
+                decoding="async"
               />
             ) : (
               ""

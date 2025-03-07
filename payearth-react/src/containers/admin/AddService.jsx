@@ -11,13 +11,9 @@ import SpinnerLoader from '../../components/common/SpinnerLoader';
 import axios from 'axios';
 import addServiceSchema from './../../validation-schemas/addServiceSchema';
 import ReactQuill from 'react-quill';
-import { Link } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
-// import { Editor } from 'react-draft-wysiwyg';
-// import { EditorState, convertToRaw  } from 'draft-js';
 import emptyImg from './../../assets/images/emptyimage.png'
 import arrow_back from './../../assets/icons/arrow-back.svg'
-import { bottom } from '@popperjs/core';
 import { Helmet } from 'react-helmet';
 
 class adminAddService extends Component {

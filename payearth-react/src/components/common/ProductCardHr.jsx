@@ -19,7 +19,6 @@ const ProductCardHr = (props) => {
         <Link className="btn custom_btn btn_yellow" to="#">
           View
         </Link>
-        {/* <Link className="btn custom_btn btn_yellow_bordered" to="#">Add to cart</Link> */}
       </div>
     </div>
   );

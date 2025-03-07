@@ -1,15 +1,10 @@
 import React, { Component } from 'react';
-
 import Footer from './Footer';
 import Header from '../user/common/Header';
 import axios from 'axios';
 import store from '../../store/index';
 import DOMPurify from 'dompurify';
-import { Link } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
-import ScrollToTop from 'react-scroll-to-top';
-import { setLoading } from '../../store/reducers/global-reducer';
 import { Helmet } from 'react-helmet';
 
 class PageDetail extends Component {
@@ -37,7 +32,6 @@ class PageDetail extends Component {
     getPageDetails = () => {
         const { slug } = this.props.match.params;
         axios.get(`/front/pageDetail/${slug}`).then((response) => {
-            // console.log("page Detail : ", response.data.data)
             let result = response.data.data;
             var pageDtls = [];
             for (var i = 0; i < result.length; i++) {
@@ -82,8 +76,7 @@ class PageDetail extends Component {
                 <Header />
                 <section className="inr_wrap">
                     {pageDetails.map(item =>
-                        <div className="container">
-                            {/* <h4><i>  Title :  <b>{item.title}</b></i></h4> */}
+                        <div className="container">                         
                             <div className="col-md-12 cart-single-page-wrapper">
                                 <div className="cart my_cart">
                                     <div className="cl_head ">
@@ -99,8 +92,8 @@ class PageDetail extends Component {
                                             {/* <span class="post_cat_col">{item.category}</span>  */}
                                             {/* <span class="post_date_col">{item.updatedAt}</span> */}
                                         </div>
-                                        {item.image == '' ? '' : <div className="blog-page-image" >
-                                            <img src={item.image} height={680} width={1080} alt="" />
+                                        {item.image === '' ? '' : <div className="blog-page-image" >
+                                            <img src={item.image} height={680} width={1080} alt="" loading="lazy" decoding="async"/>
                                         </div>}
                                         {/* <div className="blog-page-image" >
                                             <img src={item.image} height={680} width={1080} alt="" />

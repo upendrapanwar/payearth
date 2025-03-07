@@ -10,7 +10,6 @@ import "./assets/css/checkout.css";
 import "./assets/css/myStyle.css";
 
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { Elements, StripeProvider } from "react-stripe-elements";
 import Home from "./containers/user/Home";
 import ProductListing from "./containers/user/ProductListing";
 import ProductDetail from "./containers/user/ProductDetail";

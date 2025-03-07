@@ -9,7 +9,6 @@ import store from '../../store/index';
 import axios from 'axios';
 import addCouponSchema from '../../validation-schemas/addCouponSchema';
 import arrow_back from '../../assets/icons/arrow-back.svg';
-import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 
 

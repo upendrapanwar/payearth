@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import config from './../../../config.json';
 import getDate from '../../../helpers/get-formated-date';
 import parse from 'html-react-parser';
@@ -37,7 +36,6 @@ const ProductDetail = ({ data, colors, type }) => {
         }
     }, [itemDetail]);
 
-    const url = `/seller/edit-${type}/`;
     return (
         <>
             {loading === true ? <SpinnerLoader /> : ''}
@@ -59,7 +57,7 @@ const ProductDetail = ({ data, colors, type }) => {
                                         className="btn custum_back_btn btn_yellow mx-auto"
                                         onClick={() => window.history.back()}
                                     >
-                                        <img src={arrow_back} alt="back" />&nbsp;
+                                        <img src={arrow_back} alt="back" loading="lazy" decoding="async" />&nbsp;
                                         Back
                                     </button>
                                 </div>
@@ -74,6 +72,7 @@ const ProductDetail = ({ data, colors, type }) => {
                                                     alt="Featured"
                                                     className="img-fluid"
                                                     style={{ width: '400px', height: 'auto', margin: '5px' }}
+                                                    loading="lazy" decoding="async"
                                                 />
                                             ) : (
                                                 itemDetail?.featuredImage && (
@@ -82,6 +81,7 @@ const ProductDetail = ({ data, colors, type }) => {
                                                         alt="Featured"
                                                         className="img-fluid"
                                                         style={{ width: '400px', height: 'auto', margin: '5px' }}
+                                                        loading="lazy" decoding="async"
                                                     />
                                                 )
                                             )}
@@ -121,6 +121,7 @@ const ProductDetail = ({ data, colors, type }) => {
                                                             onClick={() => handleThumbnailClick(url)}
                                                             className={`img-thumbnail ${mainImage === url ? 'border border-primary' : ''}`}
                                                             style={{ width: '80px', height: 'auto', margin: '5px', cursor: 'pointer' }}
+                                                            loading="lazy" decoding="async"
                                                         />
                                                     ))}
                                                 </div>
@@ -135,6 +136,7 @@ const ProductDetail = ({ data, colors, type }) => {
                                                                 onClick={() => handleThumbnailClick(url)}
                                                                 className={`img-thumbnail ${mainImage === url ? 'border border-primary' : ''}`}
                                                                 style={{ width: '80px', height: 'auto', margin: '5px', cursor: 'pointer' }}
+                                                                loading="lazy" decoding="async"
                                                             />
                                                         ))}
                                                     </div>
@@ -247,7 +249,7 @@ const ProductDetail = ({ data, colors, type }) => {
                                                 <ul className="pro_img_listing detail ms-0">
                                                     {itemDetail?.videos?.map((video, index) => (
                                                         <li key={index} className="mb-0 me-2">
-                                                            <img src={`${config.apiURI}${video.video.thumb}`} alt="..." />
+                                                            <img src={`${config.apiURI}${video.video.thumb}`} alt="..." loading="lazy" decoding="async" />
                                                         </li>
                                                     ))}
                                                 </ul>

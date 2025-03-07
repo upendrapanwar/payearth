@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
 import Header from "./../../components/user/common/Header";
 import Footer from '../../components/common/Footer';
-import { Formik } from 'formik';
 import { toast } from 'react-toastify';
-import { setLoading } from '../../store/reducers/global-reducer';
-import { connect } from 'react-redux';
 import emptyImg from './../../assets/images/emptyimage.png'
 import emptyVid from './../../assets/images/emptyVid.png'
 import store from '../../store/index';

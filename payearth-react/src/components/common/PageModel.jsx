@@ -1,12 +1,9 @@
 import React, { Component } from 'react';
-
 import Footer from './Footer';
 import Header from '../user/common/Header';
 import axios from 'axios';
 import store from '../../store/index';
 import DOMPurify from 'dompurify';
-import { Link } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import SpinnerLoader from './SpinnerLoader';
 import { Helmet } from 'react-helmet';
 
@@ -75,7 +72,7 @@ class PageModel extends Component {
         window.scrollTo(0, 0);
     }
 
-    // Function to go to the next page
+
     nextPage = () => {
         this.setState({
             currentPage: this.state.currentPage + 1,
@@ -85,7 +82,6 @@ class PageModel extends Component {
 
     render() {
         const { pages, currentPage, itemsPerPage, searchQuery, loading, error } = this.state;
-        // console.log('pages : unde render', pages)
 
         if (loading) {
             return <SpinnerLoader />
@@ -98,7 +94,6 @@ class PageModel extends Component {
             item.title.toLowerCase().includes(searchQuery.toLowerCase())
         );
 
-        // Pagination logic
         const indexOfLastItem = currentPage * itemsPerPage;
         const indexOfFirstItem = indexOfLastItem - itemsPerPage;
         const pageData = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
@@ -113,22 +108,19 @@ class PageModel extends Component {
                         <input type="text" className="form-control" placeholder="Search" value={searchQuery} onChange={this.handleSearch} />
                     </div>
                     {pageData.map(item =>
-                        <div className="container">
-                            {/* <h4><i>  Title :  <b>{item.title}</b></i></h4> */}
+                        <div className="container">                        
                             <div className="col-md-12 cart-single-page-wrapper">
                                 <div className="cart my_cart">
                                     <div className="cl_head ">
-
                                         <div className='cart-single-heading'>
                                             <h1>{item.title}</h1>
                                         </div>
-                                        <div className='blog-list-meta'>
-                                            {/* <span class="post_cat_col">{item.category}</span>  */}
+                                        <div className='blog-list-meta'>                                          
                                             <span class="post_date_col">{item.updatedAt}</span>
                                         </div>
                                         {item.image == '' ? '' :
                                             <div className="blog-page-image" >
-                                                <img src={item.image} height={680} width={1080} alt="" />
+                                                <img src={item.image} height={680} width={1080} alt="" loading="lazy" decoding="async" />
                                             </div>
                                         }
                                         <div className='blog-single-desc'>

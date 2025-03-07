@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import config from "./../../../config.json";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -37,12 +36,18 @@ const PopularBrands = () => {
                       {brands && brands.length
                         ? brands.map((brand, index) => {
                           return (
-                            <div className="brand">
-                              <img src={brand.logoImage} alt="Brand logo" className="img-fluid"
-                                style={{ width: "120px", height: "120px" }}
+                            <div className="brand" key={brand.id || index}>
+                              <img
+                                src={brand.logoImage}
+                                alt="Brand logo"
+                                className="img-fluid"
+                                loading="lazy"
+                                decoding="async"
+                                width={95}
+                                height={95}
                               />
                             </div>
-                          )
+                          );
                         })
                         : ""}
                     </div>

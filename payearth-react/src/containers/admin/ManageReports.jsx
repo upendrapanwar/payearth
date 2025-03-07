@@ -590,121 +590,22 @@ class ManageReports extends Component {
                                                 Order this month
                                             </div>
                                             <div className="rep_chart_item orderWeek">
-                                                <div className="total_weeklly_order">
-                                                    <h2>${orderThisMonth.totalPrice}</h2>
-                                                    <h4>Avg ${orderThisMonth.averagePrice}/Order</h4>
-                                                </div>
+                                                {orderThisMonth ? (
+                                                    <div className="total_weeklly_order">
+                                                        <h2>${orderThisMonth?.totalPrice}</h2>
+                                                        <h4>Avg ${orderThisMonth?.averagePrice}/Order</h4>
+                                                    </div>
+                                                ) : (
+                                                    <div className="total_weeklly_order">
+                                                        <h2>No Orders</h2>
+                                                        <h4>This Month</h4>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-                            {/* <div className="card  bg-white rounded-3 pt-3 pb-5 report_listing_row">
-                                <div className="dash_inner_wrap">
-                                    <div className="col-md-12 pt-2 pb-3 d-flex justify-content-between align-items-center flex_mob_none">
-                                        <div className="dash_title">All Reports</div>
-                                        <div className="search_customer_field">
-                                            <form className="d-lg-flex">
-                                                <span className="search_label">Search Report</span>
-                                                <input className="form-control border-start height-auto" type="date" placeholder="Start Date" value="" />
-                                                <input className="form-control border-start height-auto" type="date" placeholder="End Date" value="" />
-                                                <button className="btn btn_dark" type="button">Search</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="orders_table reports-list-content pt-0 pb-0">
-                                    <div className="tab-pane fade show active">
-                                        <table className="table table-responsive table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>Order No</th>
-                                                    <th>Name</th>
-                                                    <th>Email</th>
-                                                    <th>Date</th>
-                                                    <th>Type of Payment</th>
-                                                    <th>Status</th>
-                                                    <th className="manage">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>#5872584</td>
-                                                    <td>Alexendra</td>
-                                                    <td>helloAlexa@gmail.com</td>
-                                                    <td>12/08/2022</td>
-                                                    <td>Credit card</td>
-                                                    <td>Success</td>
-                                                    <td><a className="custom_btn btn_yellow_bordered w-auto btn" href="#">Download</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>#5872584</td>
-                                                    <td>Alexendra</td>
-                                                    <td>helloAlexa@gmail.com</td>
-                                                    <td>12/08/2022</td>
-                                                    <td>Credit card</td>
-                                                    <td>Success</td>
-                                                    <td><a className="custom_btn btn_yellow_bordered w-auto btn" href="#">Download</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>#5872584</td>
-                                                    <td>Alexendra</td>
-                                                    <td>helloAlexa@gmail.com</td>
-                                                    <td>12/08/2022</td>
-                                                    <td>Credit card</td>
-                                                    <td>Success</td>
-                                                    <td><a className="custom_btn btn_yellow_bordered w-auto btn" href="#">Download</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>#5872584</td>
-                                                    <td>Alexendra</td>
-                                                    <td>helloAlexa@gmail.com</td>
-                                                    <td>12/08/2022</td>
-                                                    <td>Credit card</td>
-                                                    <td>Success</td>
-                                                    <td><a className="custom_btn btn_yellow_bordered w-auto btn" href="#">Download</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>#5872584</td>
-                                                    <td>Alexendra</td>
-                                                    <td>helloAlexa@gmail.com</td>
-                                                    <td>12/08/2022</td>
-                                                    <td>Credit card</td>
-                                                    <td>Success</td>
-                                                    <td><a className="custom_btn btn_yellow_bordered w-auto btn" href="#">Download</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>#5872584</td>
-                                                    <td>Alexendra</td>
-                                                    <td>helloAlexa@gmail.com</td>
-                                                    <td>12/08/2022</td>
-                                                    <td>Credit card</td>
-                                                    <td>Success</td>
-                                                    <td><a className="custom_btn btn_yellow_bordered w-auto btn" href="#">Download</a></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>#5872584</td>
-                                                    <td>Alexendra</td>
-                                                    <td>helloAlexa@gmail.com</td>
-                                                    <td>12/08/2022</td>
-                                                    <td>Credit card</td>
-                                                    <td>Success</td>
-                                                    <td><a className="custom_btn btn_yellow_bordered w-auto btn" href="#">Download</a></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                        <div className="pagination">
-                                            <ul>
-                                                <li><a className="link disabled" href="#"><span className="fa fa-angle-left me-2"></span> Prev</a></li>
-                                                <li><a className="link active" href="#">1</a></li>
-                                                <li><a className="link disabled" href="#">Next <span className="fa fa-angle-right ms-2"></span></a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> */}
 
                             <div className="card  bg-white rounded-3 pt-3 pb-5 report_listing_row">
                                 <div className="dash_inner_wrap">

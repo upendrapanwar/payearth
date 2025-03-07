@@ -1,19 +1,11 @@
 import React, { Component } from 'react';
 import Header from '../../components/admin/common/Header';
 import Footer from '../../components/common/Footer';
-
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { Formik, Form, Field } from 'formik';
 import store from '../../store/index';
-import { setLoading } from '../../store/reducers/global-reducer';
-
-
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-
-import SpinnerLoader from '../../components/common/SpinnerLoader';
-import NotFound from '../../components/common/NotFound';
 import axios from 'axios';
 
 class AdminPageEdit extends Component {

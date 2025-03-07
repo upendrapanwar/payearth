@@ -6,10 +6,9 @@ import axios from 'axios';
 import store from '../../store/index';
 import DOMPurify from 'dompurify';
 import { Link } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { Helmet } from 'react-helmet';
-import { BannerTopIframe, BannerIframe2 } from './BannerFrame';
+import { BannerTopIframe } from './BannerFrame';
 
 class BlogDetail extends Component {
     constructor(props) {
@@ -27,7 +26,7 @@ class BlogDetail extends Component {
 
     componentDidMount() {
         this.getBlogDetails();
-    } 
+    }
 
     getBlogDetails = () => {
         const { slug } = this.props.match.params;
@@ -70,7 +69,7 @@ class BlogDetail extends Component {
             return <SpinnerLoader />
         }
         if (error) {
-            return <div>Error: {error}</div>; 
+            return <div>Error: {error}</div>;
         }
 
         console.log("blog Details under render", blogDetails)
@@ -81,7 +80,7 @@ class BlogDetail extends Component {
                 <div className="inr_top_page_title">
                     <h2>Blog Detail</h2>
                 </div>
-                <section className="inr_wrap mt-2"> 
+                <section className="inr_wrap mt-2">
                     {blogDetails.map(item => <>
                         <div className="container">
                             <BannerTopIframe keywords={item.keywords} />
@@ -113,9 +112,9 @@ class BlogDetail extends Component {
                                                 <span className="post_cat_col">{item.category}</span>
                                                 <span className="post_date_col">{item.updatedAt}</span>
                                             </div>
-                                            {item.image == '' ? '' :
+                                            {item.image === '' ? '' :
                                                 <div className="blog-page-image" >
-                                                    <img src={item.image} height={680} width={1080} alt="" />
+                                                    <img src={item.image} height={680} width={1080} alt="" loading="lazy" decoding="async" />
                                                 </div>
                                             }
                                             <div className='blog-single-desc'>
@@ -124,9 +123,7 @@ class BlogDetail extends Component {
                                         </div>
                                     </div>
                                 </div>
-                                {/* <div className="col-lg-2">
-                                    <BannerIframe2 keywords={item.keywords}/>
-                                </div> */}
+
                             </div>
                         </div>
                     </>

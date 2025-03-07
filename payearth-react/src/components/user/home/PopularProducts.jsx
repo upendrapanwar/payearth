@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import SectionTitle from "./SectionTitle";
 import ProductCard from "./../../common/ProductCard";
-import config from "./../../../config.json";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
@@ -20,7 +19,6 @@ const PopularProducts = () => {
     axios
       .get("front/product/popular/8")
       .then((response) => {
-       // console.log('response----',response)
         if (response.data.status) {
           let res = response.data.data;
           res.forEach((product) => {
@@ -60,19 +58,19 @@ const PopularProducts = () => {
             <div className="cards_wrapper">
               {products && products.length
                 ? products.map((product, index) => {
-                    return (
-                      <ProductCard
-                        data={product}
-                        key={index}
-                        inWishList={
-                          selectedWishItems.length !== 0 &&
+                  return (
+                    <ProductCard
+                      data={product}
+                      key={index}
+                      inWishList={
+                        selectedWishItems.length !== 0 &&
                           selectedWishItems.includes(product.id)
-                            ? true
-                            : false
-                        }
-                      />
-                    );
-                  })
+                          ? true
+                          : false
+                      }
+                    />
+                  );
+                })
                 : ""}
             </div>
             {products && products.length ? (

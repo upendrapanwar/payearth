@@ -15,7 +15,6 @@ import "react-data-table-component-extensions/dist/index.css";
 import { DateRangePicker } from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-
 import CryptoJS from "crypto-js";
 import Modal from "react-bootstrap/Modal";
 import { Helmet } from "react-helmet";

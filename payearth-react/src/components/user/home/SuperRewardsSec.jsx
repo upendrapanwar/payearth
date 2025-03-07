@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
 import superRewards from './../../../assets/images/super-rewards.jpg';
 
 const SuperRewardsSec = () => {
@@ -16,7 +15,12 @@ const SuperRewardsSec = () => {
                                     rewards: true,
                                 }
                             }}>
-                            <img src={superRewards} alt="super-rewards" /></Link>
+                            <img
+                                src={superRewards}
+                                alt="super-rewards"
+                                loading="lazy"
+                                decoding="async"
+                            /></Link>
                     </div>
                 </div>
             </div>

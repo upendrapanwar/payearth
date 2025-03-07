@@ -553,7 +553,6 @@ class Chat extends Component {
                     }
                 }).then((response) => {
                     const data = response.data.data;
-
                     if (response.data.status === true) {
                         // console.log("Under sendMessage function send notification also...", data)
                         this.socket.emit("new message", data)

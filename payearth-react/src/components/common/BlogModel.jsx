@@ -5,7 +5,6 @@ import axios from 'axios';
 import store from '../../store/index';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import noImg from './../../assets/images/noimage.png'
-import DOMPurify from 'dompurify';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import arrow_back from './../../assets/icons/arrow-back.svg'
@@ -31,7 +30,6 @@ class Blog extends Component {
     }
 
     getBlog = () => {
-        const { textlimit } = this.state;
         let status = "published"
         axios.get(`/front/publishBlog/${status}`).then((response) => {
             let result = response.data.data;
@@ -136,7 +134,7 @@ class Blog extends Component {
                                                 className="btn custum_back_btn btn_yellow"
                                                 onClick={() => window.history.back()}
                                             >
-                                                <img src={arrow_back} alt="back" />&nbsp;
+                                                <img src={arrow_back} alt="back" loading="lazy" decoding="async"/>&nbsp;
                                                 Back
                                             </button>
                                         </div>
@@ -146,11 +144,11 @@ class Blog extends Component {
                                         {blogData.map(item =>
                                             <div className=" col-md-4 blog_item" key={item.id}>
                                                 <div className='blog-inner-panel' >
-                                                    {item.image == '' ? <div className='blog-image' >
-                                                        <img src={noImg} height={200} width={300} alt="" />
+                                                    {item.image === '' ? <div className='blog-image' >
+                                                        <img src={noImg} height={200} width={300} alt="" loading="lazy" decoding="async"/>
                                                     </div> : <div className='blog-image'>
                                                         <Link to={`/blog-detail/${item.slug}`}>
-                                                            <img src={item.image} height={200} width={300} alt="" />
+                                                            <img src={item.image} height={200} width={300} alt="" loading="lazy" decoding="async"/>
                                                         </Link>
                                                     </div>}
                                                     <div className='blog-list-meta'>

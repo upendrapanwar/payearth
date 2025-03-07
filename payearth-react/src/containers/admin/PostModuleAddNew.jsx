@@ -7,7 +7,6 @@ import 'react-quill/dist/quill.snow.css';
 import store from '../../store/index';
 import { setLoading } from '../../store/reducers/global-reducer';
 import emptyImg from './../../assets/images/emptyimage.png'
-
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Helmet } from 'react-helmet';

@@ -405,32 +405,32 @@ function ServiceCalendar(props) {
     console.log("Selected Date:", slotDate);
     console.log("Seller Available Data:", sellerAvailableData);
 
-    const currentDateTime = moment(); 
+    const currentDateTime = moment();
     const selectedDate = moment(slotDate, "YYYY-MM-DD");
-    const slotTime = moment(slot, "hh:mm A"); 
+    const slotTime = moment(slot, "hh:mm A");
 
     if (selectedDate.isBefore(currentDateTime, "day")) {
-        return true; 
+      return true;
     }
 
     if (selectedDate.isSame(currentDateTime, "day") && slotTime.isBefore(currentDateTime, "minute")) {
-        return true; 
+      return true;
     }
 
     if (!Array.isArray(sellerAvailableData) || sellerAvailableData.length === 0) {
-        return false;
+      return false;
     }
 
     return sellerAvailableData.some(({ start_datetime, end_datetime }) => {
-        if (!start_datetime || !end_datetime) return false;
+      if (!start_datetime || !end_datetime) return false;
 
-        const startTime = moment.utc(start_datetime).local().format("HH:mm");
-        const endTime = moment.utc(end_datetime).local().format("HH:mm");
-        const slotFormatted = slotTime.format("HH:mm");
+      const startTime = moment.utc(start_datetime).local().format("HH:mm");
+      const endTime = moment.utc(end_datetime).local().format("HH:mm");
+      const slotFormatted = slotTime.format("HH:mm");
 
-        return slotFormatted >= startTime && slotFormatted < endTime;
+      return slotFormatted >= startTime && slotFormatted < endTime;
     });
-};
+  };
 
 
   const getUserData = () => {

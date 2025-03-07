@@ -17,7 +17,7 @@ import LoginModal from "../../common/modals/LoginModal";
 import RegisterModal from "../../common/modals/RegisterModal";
 import ForgotPwdModal from "../../common/modals/ForgotPwdModal";
 import ResetPwdModal from "../../common/modals/ResetPwdModal";
-import logo from "./../../../assets/images/logo.png";
+import logo from "./../../../assets/images/logo.jpg";
 import closeIcon from "./../../../assets/icons/close_icon.svg";
 import shoppingBagIcon from "./../../../assets/icons/shopping-bag.svg";
 import payearth_qr_code from "./../../../assets/icons/payearth-qr-code.svg";
@@ -32,7 +32,6 @@ import serviceIcon from "./../../../assets/icons/services_icon.svg";
 import { authVerification } from "../../../helpers/auth-verification";
 import io from 'socket.io-client';
 import { clearCart } from '../../../store/reducers/cart-slice-reducer';
-import BarcodeScannerComponent from "react-qr-barcode-scanner";
 
 
 const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProductsData }) => {
@@ -169,12 +168,10 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
 
   const handleIsService = (event) => {
     const isServiceValue = parseInt(event.target.value);
-    console.log("isServiceValue", isServiceValue)
     dispatch(setIsService({ isService: isServiceValue }));
     //dispatch(setIsService({ isService: parseInt(event.target.value) }));
     // Set isToggle value based on isService
     const isToggleValue = isServiceValue === 0 ? true : false;
-    console.log("isToggleValue", isToggleValue)
     setIsToggle(isToggleValue);
     // handleIsToggle(isToggleValue);
     if (window.location.pathname === "/") {
@@ -612,8 +609,6 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
   }
 
 
-
-
   return (
     <React.Fragment>
       {/* <Helmet><title>{"Home - Pay Earth"}</title></Helmet> */}
@@ -922,10 +917,10 @@ const Header = ({ props, handleIsToggle, readStatus, sendServiceData, sendProduc
                 <nav className="navbar navbar-expand-lg py-0">
                   <div className="container-fluid p-0">
                     <Link className="navbar-brand py-0" to="/">
-                      <img src={logo} alt="logo" className="img-fluid" />
+                      <img src={logo} alt="logo" className="img-fluid" loading="lazy" decoding="async" />
                     </Link>
                     <Link className="navbar-brand py-0" to="#">
-                      <img src={payearth_qr_code} alt="qr-code" className="img-fluid" width={100} height={100} />
+                      <img src={payearth_qr_code} alt="qr-code" className="img-fluid" loading="lazy" decoding="async" width={100} height={100} />
                     </Link>
 
 

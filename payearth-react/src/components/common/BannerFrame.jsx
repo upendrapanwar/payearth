@@ -1,11 +1,9 @@
 import React from 'react'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Iframe from 'react-iframe-click';
 import { isLogin } from '../../helpers/login';
 import ReactGA from "react-ga4";
 import { toast } from 'react-toastify';
-
 
 // All details page
 export const BannerTopIframe = ({ width, height, keywords }) => {
@@ -17,7 +15,6 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
     const authInfo = JSON.parse(localStorage.getItem("authInfo"));
     const [ipAddress, setIpAddress] = useState('');
     const isloginUser = isLogin();
-
 
     useEffect(() => {
         ReactGA.initialize(process.env.REACT_APP_MEASUREMENT_ID);
@@ -63,7 +60,6 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
         }
     };
 
-
     useEffect(() => {
         const intervalId = setInterval(() => {
             setCurrentUrlIndex((prevIndex) => (prevIndex + 1) % advertisements.length);
@@ -72,41 +68,12 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
     }, [length]);
 
 
-    // const onWebsiteMove = (url) => {
-    //     window.open(url, '_blank');
-    //     const urlWithUserId = `IframePath:${url} ,userId: ${isLogin === true ? authInfo.id : ipAddress}`;
-    //     // const urlWithUserId = [
-    //     //     { iframePath: `${iframePath}`, user_id: `611bab8fed84c042781aec35` },
-    //     // ]
-    //     ReactGA.event({
-    //         category: 'button',
-    //         action: 'Visit Advertisement',
-    //         label: `${urlWithUserId}`,
-    //     });
-
-    //     closeIframe();
-    // };
     const onWebsiteMove = (url, id) => {
-        // console.log("advertise Id", id)
         window.open(url, '_blank');
-
         const userId = isloginUser === true ? authInfo.id : ipAddress;
-        const urlWithUserId = `IframePath:${url} ,userId: ${userId}`;
-        // console.log("userId", userId)
-
         window.gtag('config', 'G-TD3CF0CQ3Z', {
             'user_id': userId
         });
-
-        // window.gtag('event', 'advertise_count_event', {
-        //     user: userId,
-        //     event_category: 'button_click',
-        //     event_label: 'visit_advertisement',
-        //     value: 1,
-
-        //     // key: 'your_event_key'
-        // });
-
 
         window.gtag('event', 'advertise_count_event', {
             user: userId,
@@ -114,30 +81,15 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
             event_category: 'button_click',
             event_label: 'visit_advertisement',
             value: 1,
-
-            // key: 'your_event_key'
         });
-
-        // window.gtag('event', 'Visit Advertisement', {
-        //     event_category: 'button',
-        //     event_label: urlWithUserId,
-        //     user_id: userId, // Pass the user ID here
-        // });
-
-        // ReactGA.event({
-        //     category: 'button',
-        //     action: 'Visit Advertisement',
-        //     label: urlWithUserId,
-        // });
-
-        // advertiseEventcount(id);
         closeIframe();
     };
 
     const block = (advertisementId) => {
         const user = isLogin();
         if (user === true) {
-            const url = `https://localhost:7700/user/blockBanner/${advertisementId}`
+            const port = process.env.REACT_PORT_NAME
+            const url = `https://localhost:${port}/user/blockBanner/${advertisementId}`
             const blockId = {
                 blockByUser: authInfo.id
             }
@@ -167,30 +119,29 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
         setIframeOpen(false);
     };
 
-    const advertiseEventcount = (id) => {
-        const url = '/front/advertiseEventcount';
-        const data = {
-            advertiseId: id,
-            userId: isloginUser === true ? authInfo.id : null,
-            unknown_User: isloginUser === false ? ipAddress : null
-        };
-        axios.post(url, data, {
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8',
-            }
-        }).then((response) => {
-            console.log("advertiseEventcount ", response);
-        }).catch((error) => {
-            console.log("error in save banner date", error);
-        });
-    }
+    // const advertiseEventcount = (id) => {
+    //     const url = '/front/advertiseEventcount';
+    //     const data = {
+    //         advertiseId: id,
+    //         userId: isloginUser === true ? authInfo.id : null,
+    //         unknown_User: isloginUser === false ? ipAddress : null
+    //     };
+    //     axios.post(url, data, {
+    //         headers: {
+    //             'Accept': 'application/json',
+    //             'Content-Type': 'application/json;charset=UTF-8',
+    //         }
+    //     }).then((response) => {
+    //         console.log("advertiseEventcount ", response);
+    //     }).catch((error) => {
+    //         console.log("error in save banner date", error);
+    //     });
+    // }
 
 
 
     const renderBannerTopIframe = () => {
         if (iframeOpen === true) {
-            // console.log("advertiseData in home page", advertiseData)
             const advertiseData = advertisements[currentUrlIndex];
             const videoKey = `${advertiseData.video}-${Date.now()}`;
             return (
@@ -198,7 +149,13 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
                     <div className='iFrame-wrapper'>
                         <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
                         {advertiseData.video ? (
-                            <video key={videoKey} autoPlay muted loop onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl, advertiseData.id)} className='advertisement-media'>
+                            <video
+                                key={videoKey}
+                                autoPlay
+                                muted
+                                loop
+
+                                onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl, advertiseData.id)} className='advertisement-media'>
                                 <source
                                     src={advertiseData.video}
                                     type="video/mp4"
@@ -211,6 +168,7 @@ export const BannerTopIframe = ({ width, height, keywords }) => {
                                 alt="advertisement"
                                 className='advertisement-media'
                                 onClick={() => onWebsiteMove(advertisements[currentUrlIndex].siteUrl, advertiseData.id)}
+                                loading="lazy" decoding="async"
                             />
                         )}
                         <button className="block_button" onClick={() => block(advertisements[currentUrlIndex].id)}>Click to Block this advertise..!</button>
@@ -256,7 +214,6 @@ export const GetAllBanner = () => {
                 setUrlData(urls)
                 setLength(urls.length)
                 if (urls.length > 0 && advertisements !== null) {
-                    console.log("url", urls)
                     const timeoutId = setTimeout(() => {
                         setIframeOpen(true);
                     }, 1000);
@@ -337,6 +294,7 @@ export const GetAllBanner = () => {
                                 loop
                                 playsInline
                                 muted
+                                preload="none"
                                 onClick={() => onWebsiteMove(advertiseData.siteUrl, advertiseData.id)}
                                 className="advertisement-media"
                             >
@@ -348,6 +306,8 @@ export const GetAllBanner = () => {
                                 className="advertisement-media"
                                 src={advertiseData.image}
                                 alt="advertisement"
+                                loading="lazy"
+                                decoding="async"
                                 onClick={() => onWebsiteMove(advertiseData.siteUrl, advertiseData.id)}
                             />
                         ) : null}
@@ -414,15 +374,6 @@ export const CommunityAdvertise = ({ width, height, keywords }) => {
         }
     }, [length]);
 
-
-
-    const iframeStyles = {
-        // border: '1px solid red',
-        borderRadius: '5px',
-        // boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
-        // width: -webkit-fill-available
-    };
-
     const fetchIpAddress = async () => {
         try {
             const response = await axios.get('https://api.ipify.org?format=json');
@@ -458,10 +409,6 @@ export const CommunityAdvertise = ({ width, height, keywords }) => {
     const onWebsiteMove = (url, id) => {
         window.open(url, '_blank');
         const urlWithUserId = `IframePath:${url} ,userId: ${isLogin === true ? authInfo.id : ipAddress}`;
-        // const urlWithUserId = [
-        //     { iframePath: `${iframePath}`, user_id: `611bab8fed84c042781aec35` },
-        // ]
-
         ReactGA.event({
             category: 'Iframe Visit',
             action: 'Click',
@@ -509,7 +456,11 @@ export const CommunityAdvertise = ({ width, height, keywords }) => {
                             <div className='iFrame-wrapper'>
                                 <button onClick={closeIframe} type="button" className="btn-close banner-close" aria-label="Close"></button>
                                 {advertiseData.video ? (
-                                    <video key={videoKey} autoPlay loop muted
+                                    <video key={videoKey}
+                                        autoPlay
+                                        loop
+                                        preload="none"
+                                        muted
                                         onClick={() => onWebsiteMove(advertise[currentUrlIndex].siteUrl, advertiseData.id)}
                                         className='advertisement-media'>
                                         <source src={advertiseData.video} type="video/mp4" className='advertisement-media' />
@@ -520,6 +471,8 @@ export const CommunityAdvertise = ({ width, height, keywords }) => {
                                         src={advertiseData.image}
                                         alt="advertisement"
                                         className='advertisement-media'
+                                        loading="lazy"
+                                        decoding="async"
                                         onClick={() => onWebsiteMove(advertise[currentUrlIndex].siteUrl, advertiseData.id)}
                                     />
                                 )}
