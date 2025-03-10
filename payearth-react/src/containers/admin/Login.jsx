@@ -147,7 +147,7 @@ class Login extends Component {
                                                                     {touched.password && errors.password ? (
                                                                         <small className="text-danger">{errors.password}</small>
                                                                     ) : null}
-                                                                    <div className="mt-2 text-end"><Link to="/admin/forgot-password">Forgot Password?</Link></div>
+                                                                    {/* <div className="mt-2 text-end"><Link to="/admin/forgot-password">Forgot Password?</Link></div> */}
                                                                 </div>
                                                                 <button  type="submit" className="btn custom_btn btn_yellow text-uppercase w-100 p-3" disabled={!isValid}>Login</button>
                                                             </div>

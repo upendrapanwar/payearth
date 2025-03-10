@@ -1196,9 +1196,10 @@ class Chat extends Component {
                                                                             <li className="sender">
                                                                                 <div className="userThumb">
                                                                                     <div className="user_thumb">
-                                                                                        <img className="img-fluid" src={item.sender.id.image_url} alt="user img" />
+                                                                                        <img className="img-fluid" src={item.sender?.id.image_url} alt="user img" />
                                                                                     </div>
                                                                                     <span className="user-inactive user-active"></span>
+                                                                                    <span className='time'>{item.sender?.id.name}</span>
                                                                                 </div>
                                                                                 {item.mediaContent === null ? (item.messageContent === null ? <></> : <p>{item.messageContent}</p>) : this.renderMedia(item.mediaContent)}
                                                                                 {/* <a href="#"><img src={delete_icone} alt="add" width={"20px"} height={"20px"} onClick={() => { this.handleMessageDelete(item._id) }} /></a> */}

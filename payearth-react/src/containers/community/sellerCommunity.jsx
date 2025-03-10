@@ -690,64 +690,69 @@ const SellerCommunity = () => {
                                     </div>
                                 </div>
 
-                                {/* Filter */}
                                 <div className="cumm_sidebar_box bg-white p-3 rounded-3 mb-3">
-                                    <div className="cumm_title">advanced filter</div>
+                                    <div className="cumm_title">Advanced Filter</div>
                                     <div className="filter_box">
-                                        <div className='d-flex flex-row'>
-                                            <select
-                                                className="form-select mb-3 me-4 w-25"
-                                                aria-label="Default select example"
-                                                onChange={(e) => setSelectFilterCategory(e.target.value)}
-                                                value={selectFilterCategory}
-                                            >
-                                                {categoryOption.map(category => (
-                                                    <option key={category.value} value={category.value} >
-                                                        {category.label}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            <div className="form-check mt-3 me-4">
-                                                <input
-                                                    className="form-check-input border-warning"
-                                                    type="radio"
-                                                    value=""
-                                                    id="popularPost"
-                                                    checked={showMostLiked}
-                                                    onChange={(e) => {
-                                                        setShowMostLiked(e.target.checked);
-                                                        setShowMostCommented(false);
-                                                    }}
-                                                />
-                                                <label className="form-check-label mt-1" htmlFor="popularPost">
-                                                    Most Popular Post
-                                                </label>
+                                        <div className="row g-4 align-items-center justify-content-center">
+                                            <div className="col-12 col-md-auto">
+                                                <select
+                                                    className="form-select"
+                                                    aria-label="Default select example"
+                                                    onChange={(e) => setSelectFilterCategory(e.target.value)}
+                                                    value={selectFilterCategory}
+                                                >
+                                                    {categoryOption.map(category => (
+                                                        <option key={category.value} value={category.value}>
+                                                            {category.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
                                             </div>
-                                            <div className="form-check mt-3 me-4">
-                                                <input
-                                                    className="form-check-input border-warning"
-                                                    type="radio"
-                                                    value=""
-                                                    id="CommentedPost"
-                                                    checked={showMostCommented}
-                                                    onChange={(e) => {
-                                                        setShowMostCommented(e.target.checked);
-                                                        setShowMostLiked(false);
-                                                    }}
-                                                />
-                                                <label className="form-check-label mt-1" htmlFor="CommentedPost">
-                                                    Most Commented Post
-                                                </label>
+                                            <div className="col-12 col-md-auto">
+                                                <div className="filter_btn_box">
+                                                    <Link
+                                                        to="#"
+                                                        className="btn custum_back_btn btn_yellow"
+                                                        onClick={handleFilterCategory}
+                                                    >
+                                                        Filter
+                                                    </Link>
+                                                </div>
                                             </div>
 
-                                            <div className="filter_btn_box ms-4">
-                                                <Link
-                                                    to="#"
-                                                    className="btn custum_back_btn btn_yellow"
-                                                    onClick={handleFilterCategory}
-                                                >
-                                                    Filter
-                                                </Link>
+                                            <div className="col-12 col-md-auto">
+                                                <div className="form-check">
+                                                    <input
+                                                        className="form-check-input border-warning"
+                                                        type="checkbox"
+                                                        id="popularPost"
+                                                        checked={showMostLiked}
+                                                        onChange={(e) => {
+                                                            setShowMostLiked(e.target.checked);
+                                                            setShowMostCommented(false);
+                                                        }}
+                                                    />
+                                                    <label className="form-check-label ms-2" htmlFor="popularPost">
+                                                        Most Popular Post
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div className="col-12 col-md-auto">
+                                                <div className="form-check">
+                                                    <input
+                                                        className="form-check-input border-warning"
+                                                        type="checkbox"
+                                                        id="CommentedPost"
+                                                        checked={showMostCommented}
+                                                        onChange={(e) => {
+                                                            setShowMostCommented(e.target.checked);
+                                                            setShowMostLiked(false);
+                                                        }}
+                                                    />
+                                                    <label className="form-check-label ms-2" htmlFor="CommentedPost">
+                                                        Most Commented Post
+                                                    </label>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

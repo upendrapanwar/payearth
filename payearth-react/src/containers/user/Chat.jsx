@@ -920,7 +920,7 @@ class Chat extends Component {
         const { showChatUsers, users, allChatUsers, sendChatData, userChat, notAddedUser, selectedUsers, selectedFile, onlineUsers, showEmojiPicker, showChatBoard } = this.state;
         const { loading } = store.getState().global;
         // console.log("showChatBoard>>>>>>>>>>>>>>", showChatBoard)
-        // console.log(" userChat", userChat)
+        console.log(" userChat", userChat)
         //  console.log("sendChatData : ", sendChatData)
         // console.log("users  :>>>>", users)
 
@@ -1204,12 +1204,16 @@ class Chat extends Component {
                                                                                         <img className="img-fluid" src={item.sender?.id.image_url} alt="user img" />
                                                                                     </div>
                                                                                     <span className="user-inactive user-active"></span>
+                                                                                    <span className='time'>{item.sender?.id.name}</span>
                                                                                 </div>
                                                                                 {item.mediaContent === null ? (item.messageContent === null ? <></> : <p>{item.messageContent}</p>) : this.renderMedia(item.mediaContent)}
                                                                                 {/* <a href="#"><img src={delete_icone} alt="add" width={"20px"} height={"20px"} onClick={() => { this.handleMessageDelete(item._id) }} /></a> */}
                                                                                 <br />
                                                                                 {item.mediaContent !== null && item.messageContent !== null ? <p>{item.messageContent}</p> : <></>}
-                                                                                <span className='time'>{moment(item.timestamp).format('hh:mm A')}</span>
+                                                                                <div className='d-flex'>
+                                                                                    <span className='time'>{moment(item.timestamp).format('hh:mm A')}</span>
+
+                                                                                </div>
                                                                             </li>
                                                                         </ul>
                                                                     ) : (

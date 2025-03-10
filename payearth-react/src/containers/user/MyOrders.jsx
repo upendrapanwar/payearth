@@ -509,13 +509,13 @@ class MyOrders extends Component {
                           $ {selectedRowData.deliveryCharge}
                         </td>
                       </tr>
-                      <tr className="text-end">
+                      {/* <tr className="text-end">
                         <td></td>
                         <td style={{ width: "100px" }}>TAX</td>
                         <td className="text-end" style={{ width: "100px" }}>
                           $ {selectedRowData.taxAmount}
                         </td>
-                      </tr>
+                      </tr> */}
                       <tr className="text-end">
                         <td></td>
                         <td style={{ width: "100px" }}>DISCOUNT</td>
