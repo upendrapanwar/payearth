@@ -224,6 +224,7 @@ class SellerDashboard extends Component {
     }
 
     componentDidMount() {
+        this.updateStripeKey();
         this.getTopSellingCategories();
         this.getProductSalesGraph('year');
         this.getServiceSalesGraph('year');
@@ -236,6 +237,23 @@ class SellerDashboard extends Component {
 
         // this.getProductSales();
         // this.getTopSellingCatData();
+    }
+
+    updateStripeKey = async () => {
+        console.log("Update stripe key in backend function run...");
+        try {
+            const url = 'seller/updateStripeKey';
+            const response = await axios.get(url, {
+                headers: {
+                    'Authorization': `Bearer ${this.authInfo.token}`,
+                    'Content-Type': 'application/json',
+                }
+            });
+            console.log('updateStripeKey function run', response)
+
+        } catch (error) {
+            console.error('Error:', error);
+        }
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -970,7 +988,7 @@ class SellerDashboard extends Component {
                                                 />
                                             </div>
                                         </div>
-                                        <div className="dash_graph_body p-3">
+                                        <div className="d-flex dash_graph_body p-3">
                                             {productData.length > 0 ?
                                                 <LineChart
                                                     width={800}

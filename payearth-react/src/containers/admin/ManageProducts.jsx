@@ -13,8 +13,9 @@ import Switch from 'react-input-switch';
 import { Helmet } from 'react-helmet';
 import SpinnerLoader from '../../components/common/SpinnerLoader';
 import { NotFound } from '../../components/common/NotFound';
-//import { stubTrue } from 'lodash';
+import { Formik } from 'formik';
 import arrow_back from '../../assets/icons/arrow-back.svg'
+import ProductTaxRate from '../../validation-schemas/ProductTaxRate';
 
 
 
@@ -43,6 +44,7 @@ class ManageProducts extends Component {
             pagination: {},
             pendingProductsPagination: {},
             rejectedProductsPagination: {},
+            productTaxRate: null,
         }
         toast.configure();
 
@@ -145,6 +147,30 @@ class ManageProducts extends Component {
     componentDidMount() {
         this.getProductStock(true);
     }
+
+    getProductTaxRate = async () => {
+        try {
+            this.dispatch(setLoading({ loading: true }));
+            const response = await axios.get('admin/getDisplayedProductTax', {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Authorization': `Bearer ${this.authInfo.token}`,
+                },
+            });
+            if (response.data.status === true) {
+                this.setState({ productTaxRate: response.data.data.product_tax_rate });
+            } else {
+                this.setState({ productTaxRate: null })
+            }
+
+        } catch (error) {
+            console.error('Error fetching vendors:', error);
+            // toast.error('Failed to fetch vendors');
+        } finally {
+            this.dispatch(setLoading({ loading: false }));
+        }
+    };
 
     getProductStock = async (currentStatus, currentTab) => {
         try {
@@ -336,6 +362,41 @@ class ManageProducts extends Component {
         });
     }
 
+    handleSubmit = (values, { resetForm }) => {
+        const requestData = {
+            ...values,
+        };
+        this.dispatch(setLoading({ loading: true }));
+        const authInfo = JSON.parse(localStorage.getItem('authInfo'));
+        axios.post('/admin/productTaxRate', requestData, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json;charset=UTF-8',
+                'Authorization': `Bearer ${authInfo.token}`
+            }
+        })
+            .then(response => {
+                toast.dismiss();
+                if (response.data.status) {
+                    toast.success("Apply Successfully", { autoClose: 3000 });
+                    this.getProductTaxRate();
+                    resetForm();
+                } else {
+                    toast.error(response.data.message, { autoClose: 3000 });
+                }
+            })
+            .catch(error => {
+                toast.dismiss();
+                if (error.response) {
+                    toast.error(error.response.data.message, { autoClose: 3000 });
+                }
+            })
+            .finally(() => {
+                this.dispatch(setLoading({ loading: false }));
+            });
+    };
+
+
     render() {
         const { loading } = store.getState().global;
         const {
@@ -344,7 +405,8 @@ class ManageProducts extends Component {
             rejectedProducts,
             pagination,
             pendingProductsPagination,
-            rejectedProductsPagination
+            rejectedProductsPagination,
+            productTaxRate
         } = this.state;
 
         return (
@@ -380,8 +442,10 @@ class ManageProducts extends Component {
                                 <nav className="orders_tabs">
                                     <div className="nav nav-tabs" id="nav-tab" role="tablist">
                                         <button className="nav-link active" id="nav-pending-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-pending-orders" type="button" role="tab" aria-controls="nav-pending-orders" aria-selected="true" onClick={() => this.getProductStock(true, 'addedTab')}>Added Products</button>
-                                        {/* <button className="nav-link" id="nav-ongoing-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-ongoing-orders" type="button" role="tab" aria-controls="nav-ongoing-orders" aria-selected="false" onClick={() => this.getAddedProducts(false, null, 'pending')}>Draft </button> */}
                                         <button className="nav-link" id="nav-cancelled-orders-tab" data-bs-toggle="tab" data-bs-target="#nav-cancelled-orders" type="button" role="tab" aria-controls="nav-cancelled-orders" aria-selected="true" onClick={() => this.getProductStock(false, 'trashTab')}>Trash</button>
+                                        <button className="nav-link" id="nav-tax-tab" data-bs-toggle="tab" data-bs-target="#nav-tax" type="button" role="tab" aria-controls="nav-tax" aria-selected="false"
+                                            onClick={() => this.getProductTaxRate(false, null)}
+                                        >Tax</button>
                                     </div>
                                 </nav>
                                 <div className="orders_table tab-content pt-0 pb-0" id="nav-tabContent">
@@ -466,13 +530,73 @@ class ManageProducts extends Component {
                                             />
                                         </DataTableExtensions>
                                     </div>
+
+
+                                    <div className="tab-pane fade" id="nav-tax" role="tabpanel" aria-labelledby="nav-tax-tab">
+                                        <div className="d-flex justify-content-center mt-5">
+                                            <div className="col-md-3 col-sm-6 col-12">
+                                                <div className="form_wrapper pt-3">
+                                                    <Formik
+                                                        initialValues={{
+                                                            product_tax_rate: '',
+                                                        }}
+                                                        onSubmit={this.handleSubmit}
+                                                        validationSchema={ProductTaxRate}
+                                                    >
+                                                        {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isValid }) => (
+                                                            <form onSubmit={handleSubmit}>
+                                                                <div className="col-md-12">
+                                                                    <div className="m-4 mb-3 position-relative">
+                                                                        <label htmlFor="product_tax_rate" className="form-label">
+                                                                            Product Tax Rate in  percentage (%)<small className="text-danger">*</small>
+                                                                        </label>
+                                                                        <div className="d-flex justify-content-center">
+                                                                            <div className="input-group">
+                                                                                <input
+                                                                                    type="number"
+                                                                                    className="form-control"
+                                                                                    name="product_tax_rate"
+                                                                                    onChange={handleChange}
+                                                                                    onBlur={handleBlur}
+                                                                                    value={values.product_tax_rate}
+                                                                                />
+                                                                            </div>
+                                                                        </div>
+                                                                        {touched.product_tax_rate && errors.product_tax_rate && (
+                                                                            <small className="text-danger">{errors.product_tax_rate}</small>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+
+
+                                                                <div className="d-flex justify-content-center">
+                                                                    <button type="submit" className="btn custom_btn btn_yellow text-uppercase" disabled={!isValid}>
+                                                                        Apply Tax
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                        )}
+                                                    </Formik>
+                                                </div>
+                                            </div>
+                                            <div className="col-md-3 col-sm-6 col-12">
+                                                <div className="count_box">
+                                                    <div className="cb_count">{`${productTaxRate} %`}</div>
+                                                    <div className="cb_name">Currently Applicable Tax</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="d-flex justify-content-center mt-5">
+                                            <p>This tax is applicable to all products.</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <Footer />
                 </div>
-            </React.Fragment>
+            </React.Fragment >
         )
     }
 }

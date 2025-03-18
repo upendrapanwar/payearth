@@ -23,7 +23,7 @@ const { Admin, User, Seller, Coupon, Product, Category, Brand,
     OrderStatus, CryptoConversion, Payment, Order, OrderTrackingTimeline,
     ProductSales, cmsPost, cmsPage, cmsCategory, bannerAdvertisement,
     Chat, ChatMessage, Services, OrderDetails, Post, PostLike, PostVideos,
-    PostImages, PostComment, Support, AccessPermission, UsedCoupons, Notification,
+    PostImages, PostComment, Support, AccessPermission, UsedCoupons, Notification, Stripekeys, ProductTaxRate,
 } = require("../helpers/db");
 
 module.exports = {
@@ -247,6 +247,14 @@ module.exports = {
 
     // Notification
     removeNotification,
+
+    // tax
+    productTaxRate,
+    getDisplayedProductTax,
+
+    // Stripe Key Update
+    updateStripeKey,
+    getDisplayedStripeKeys,
 };
 
 // Validator function
@@ -3237,7 +3245,7 @@ async function fetchChat(req) {
             .populate({
                 path: "chatUsers.id",
                 select: "name email image_url",
-              });
+            });
         // console.log("result", result)
 
         result = result.sort((a, b) => {
@@ -3325,8 +3333,8 @@ async function allMessages(req) {
             .populate({
                 path: "sender.id",
                 select: "name  image_url",
-              })
-              .exec();
+            })
+            .exec();
         // console.log("All message", message)
         return message
 
@@ -3393,49 +3401,49 @@ async function removeFromGroup(req) {
 async function addGroupMember(req) {
     const chatId = req.params.id;
     const { id, name, image_url, isGroupAdmin, role } = req.body;
-    
+
     const formatRole = (role) => {
         if (role === 'user' || role === 'seller') {
-          return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+            return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
         } else {
-          return 'Admin';
+            return 'Admin';
         }
-      };
-    
-      try {
+    };
+
+    try {
         const chat = await Chat.findById(chatId);
         if (!chat) {
-          return "Chat not found";
+            return "Chat not found";
         }
-    
+
         if (chat.chatUsers.length >= 20) {
-          return "Cannot add more than 20 members to the chat.";
+            return "Cannot add more than 20 members to the chat.";
         }
-    
+
         const formattedRole = formatRole(role);
         console.log('formattedRole', formattedRole);
         const addUser = await Chat.findByIdAndUpdate(
-          chatId,
-          {
-            $push: {
-              chatUsers: {
-                id,
-                name,
-                image_url,
-                isGroupAdmin,
-                role: formattedRole 
-              }
-            }
-          },
-          { new: true }
+            chatId,
+            {
+                $push: {
+                    chatUsers: {
+                        id,
+                        name,
+                        image_url,
+                        isGroupAdmin,
+                        role: formattedRole
+                    }
+                }
+            },
+            { new: true }
         );
-    
+
         console.log("Added User:", addUser);
         return addUser;
-      } catch (error) {
+    } catch (error) {
         console.log("Error:", error);
         throw error;
-      }
+    }
 }
 
 
@@ -6381,10 +6389,73 @@ async function getServiceOrdersTotalPriceForMonth(req) {
 async function removeNotification(req) {
     // console.log('removeNotification',req.params.id)
     try {
-      const id = req.params.id;
-      const result = await Notification.deleteOne({ _id: id });
-      return result;
+        const id = req.params.id;
+        const result = await Notification.deleteOne({ _id: id });
+        return result;
     } catch (error) {
-      console.log(error);
+        console.log(error);
     }
-  }
+}
+
+// Product Tax
+
+async function productTaxRate(req) {
+    try {
+        const { product_tax_rate } = req.body;
+        const updatedData = await ProductTaxRate.findOneAndUpdate(
+            {},
+            {
+                product_tax_rate: product_tax_rate,
+            },
+            {
+                new: true,
+                upsert: true,
+                setDefaultsOnInsert: true,
+            }
+        );
+        return updatedData
+    } catch (error) {
+        console.error("Error saving Stripe keys:", error);
+    }
+}
+
+async function getDisplayedProductTax() {
+    try {
+        const tax = await ProductTaxRate.findOne().sort({ createdAt: -1 })
+        return tax;
+    } catch (error) {
+        console.log("error", error)
+    }
+
+}
+
+async function updateStripeKey(req) {
+    try {
+        const { stripe_publishable_key, stripe_secret_key } = req.body;
+        const updatedData = await Stripekeys.findOneAndUpdate(
+            {},
+            {
+                stripe_publishable_key: stripe_publishable_key,
+                stripe_secret_key: stripe_secret_key,
+            },
+            {
+                new: true,
+                upsert: true,
+                setDefaultsOnInsert: true,
+            }
+        );
+        return updatedData
+    } catch (error) {
+        console.error("Error saving Stripe keys:", error);
+    }
+}
+
+async function getDisplayedStripeKeys() {
+    try {
+        const stripeData = await Stripekeys.findOne().sort({ createdAt: -1 })
+        return stripeData;
+    } catch (error) {
+        console.log("error", error)
+    }
+
+}

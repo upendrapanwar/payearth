@@ -601,21 +601,7 @@ class AdminPostModule extends Component {
                                                         selectedRows={selectedRows}
                                                         onSelectedRowsChange={this.handleRowSelected}
                                                     />
-                                                </DataTableExtensions>
-                                                {/* <button
-                                                    className="custom_btn btn_yellow_bordered w-auto btn margin_right"
-                                                    onClick={this.handleDeleteSeletedData}
-                                                    hidden={!selectedRows.length}
-                                                >
-                                                    {selectedRows.length === 1 ? 'PERMANENT DELETE' : `PERMANENT DELETE (${selectedRows.length})`}
-                                                </button> */}
-                                                {/* <button
-                                                    className="custom_btn btn_yellow_bordered w-auto btn margin_right"
-                                                    hidden={!selectedRows.length}
-                                                >
-                                                    {selectedRows.length === 1 ? 'TRASH' : `TRASH ALL  (${selectedRows.length})`}
-                                                </button> */}
-
+                                                </DataTableExtensions>                                     
                                             </div>
                                             {/* Draft */}
                                             <div className="tab-pane fade" id="nav-draft-post" role="tabpanel" aria-labelledby="nav-draft-post-tab">
@@ -635,21 +621,7 @@ class AdminPostModule extends Component {
                                                             onSelectedRowsChange={this.handleRowSelected}
                                                         />
                                                     </DataTableExtensions>
-                                                </div>
-                                                {/* <button
-                                                    className="custom_btn btn_yellow_bordered w-auto btn margin_right"
-                                                    onClick={this.handleDeleteSeletedData}
-                                                    hidden={!selectedRows.length}
-                                                >
-                                                    {selectedRows.length === 1 ? 'DELETE' : `DELETE ALL  (${selectedRows.length})`}
-                                                </button> */}
-                                                {/* <button
-                                                    className="custom_btn btn_yellow_bordered w-auto btn margin_right"
-                                                    hidden={!selectedRows.length}
-                                                >
-                                                    {selectedRows.length === 1 ? 'PUBLISH' : `PUBLISH ALL  (${selectedRows.length})`}
-                                                </button> */}
-
+                                                </div>                                 
                                             </div>
 
                                             {/* Trash */}
@@ -670,20 +642,7 @@ class AdminPostModule extends Component {
                                                             onSelectedRowsChange={this.handleRowSelected}
                                                         />
                                                     </DataTableExtensions>
-                                                </div>
-                                                {/* <button
-                                                    className="custom_btn btn_yellow_bordered w-auto btn margin_right"
-                                                    onClick={this.handleDeleteSeletedData}
-                                                    hidden={!selectedRows.length}
-                                                >
-                                                    {selectedRows.length === 1 ? 'DELETE' : `DELETE ALL  (${selectedRows.length})`}
-                                                </button> */}
-                                                {/* <button
-                                                    className="custom_btn btn_yellow_bordered w-auto btn margin_right"
-                                                    hidden={!selectedRows.length}
-                                                >
-                                                    {selectedRows.length === 1 ? 'RESTORE' : `RESTORE ALL  (${selectedRows.length})`}
-                                                </button> */}
+                                                </div>                                              
                                             </div>
                                         </div>
                                     </div>

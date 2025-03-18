@@ -16,11 +16,9 @@ const cartSlice = createSlice({
 
     reducers: {
         addToCart: (state, action) => {
-
             if (!Array.isArray(state.cart)) {
                 state.cart = [];
             }
-
             const productinPayload = action.payload
             const itemInCart = state.cart.find((item) => item.id === action.payload.id);
             console.log("itemInCart>>>>", itemInCart)
@@ -40,6 +38,7 @@ const cartSlice = createSlice({
                         productId: itemInCart.id,
                         qty: itemInCart.quantity,
                         price: itemInCart.price,
+                        vat: itemInCart.vat,
                         discountId: itemInCart.discountId,
                     };
                     axios.post('user/addtocart', reqBody, {
@@ -70,6 +69,7 @@ const cartSlice = createSlice({
                         productId: productinPayload.id,
                         qty: productinPayload.quantity,
                         price: productinPayload.price,
+                        vat: productinPayload.vat,
                         discountId: productinPayload.discountId || null
                     };
                     console.log("reqBody", reqBody)
@@ -104,8 +104,6 @@ const cartSlice = createSlice({
                     console.log('itemInCart----in cart----- else---')
                 }
             }
-
-
         },
 
 

@@ -29,6 +29,7 @@ const {
   ServiceReview,
   Notification,
   OrderStatus,
+  ProductTaxRate,
 } = require("../helpers/db");
 
 module.exports = {
@@ -76,7 +77,8 @@ module.exports = {
   updateNotifications,
   setNotificationSeen,
   getTodayDealsProductById,
-  getdiscountStatusById
+  getdiscountStatusById,
+  getDisplayedProductTax
 };
 
 async function getReviews(id) {
@@ -626,8 +628,6 @@ async function getFilterCategories(req) {
 async function getProductsListing(req) {
   try {
     const { selectedCategories, selectedBrands, priceRange, selectedSubCategories, searchQuery, super_rewards } = req.body;
-
-    console.log("super_rewards", super_rewards)
     const query = {};
     if (Array.isArray(selectedCategories) && selectedCategories.length > 0) {
       query.category = { $in: selectedCategories }; // No ObjectId conversion, treat as strings
@@ -659,7 +659,7 @@ async function getProductsListing(req) {
     }
 
     const products = await Product.find(query)
-      .select("id name price featuredImage avgRating reviews isService quantity super_rewards")
+      .select("id name price vat featuredImage avgRating reviews isService quantity super_rewards")
       .sort({ createdAt: "desc" })
       .populate([
         {
@@ -670,7 +670,6 @@ async function getProductsListing(req) {
         },
       ])
       .populate('reviews')
-    // console.log("products lengths", products.length)
     // Return the filtered product data
     return products;
   } catch (error) {
@@ -1378,7 +1377,7 @@ async function saveNotifications(req) {
 
   try {
     const savedNotification = await newNotification.save();
-    console.log('savedNotification--',savedNotification)
+    console.log('savedNotification--', savedNotification)
     return savedNotification;
   } catch (error) {
     console.error('Error saving notification:', error);
@@ -1427,7 +1426,7 @@ async function getNotifications(req) {
     }).sort({ createdAt: 'desc' });
 
     if (!notifications || notifications.length === 0) {
-        return [];
+      return [];
     }
 
     // Iterate over notifications to get sender details for each notification
@@ -1584,4 +1583,15 @@ async function advertiseEventcount(req, res) {
   } catch (error) {
     console.error(error);
   }
+}
+
+
+async function getDisplayedProductTax() {
+  try {
+    const tax = await ProductTaxRate.findOne().sort({ createdAt: -1 })
+    return tax;
+  } catch (error) {
+    console.log("error", error)
+  }
+
 }

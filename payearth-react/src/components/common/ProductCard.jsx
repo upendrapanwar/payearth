@@ -12,6 +12,7 @@ import { setLoading, setIsLoginModalOpen } from "../../store/reducers/global-red
 import { setSelectedWishItems } from "../../store/reducers/wishlist-reducer";
 
 const ProductCard = ({ data, inWishList }) => {
+  console.log(" ProductCard data", data);
   const dispatch = useDispatch();
   const authInfo = useSelector((state) => state.auth.authInfo);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -179,6 +180,7 @@ const ProductCard = ({ data, inWishList }) => {
                         name: data.name,
                         image: data.image,
                         price: data.price,
+                        vat: data.vat,
                         coins: data.super_rewards === true ? 2 : 0
                       })
                     )
@@ -197,6 +199,7 @@ const ProductCard = ({ data, inWishList }) => {
                         name: data.name,
                         image: data.image,
                         price: data.price,
+                        vat: data.vat,
                         quantity: 1,
                         coins: data.super_rewards === true ? 2 : 0
                       })
@@ -227,6 +230,7 @@ const ProductCard = ({ data, inWishList }) => {
                         name: data.name,
                         image: data.image,
                         price: data.price,
+                        vat: data.vat,
                         coins: data.super_rewards === true ? 2 : 0
                       })
                     )

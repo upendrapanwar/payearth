@@ -60,10 +60,10 @@ const Footer = () => {
                             <li><Link to="/page/protection">Protection</Link></li>
                             <li><Link to="/page/questions-and-answers">Questions and answers</Link></li>
                             <li><Link to="/user-contact">Contacts</Link></li>
-                            <li><Link to="#">Give feedback</Link></li>
+                            {/* <li><Link to="#">Give feedback</Link></li> */}
                         </ul>
                     </div>
-                    <div className="col-xs-12 col-md-4 col-lg-3">
+                    {/* <div className="col-xs-12 col-md-4 col-lg-3">
                         <h6 className="title">Categories</h6>
                         <ul className="links-list">
                             <li><Link to="/product-listing?cat=60535b192565091ce443d53f&search=undefined">Clothing & accessories</Link></li>
@@ -73,12 +73,12 @@ const Footer = () => {
                             <li><Link to="#">Decor</Link></li>
                             <li><Link to="#">Kids, Toys & mor</Link></li>
                         </ul>
-                    </div>
+                    </div> */}
                     <div className="col-xs-12 col-md-4 col-lg-3">
                         <h6 className="title">We accept</h6>
                         <div>
                             <Link to="#" target="_blank" className="d-inline-block me-2"><img src={bitcoin} alt="bitcoin" loading="lazy" decoding="async" /></Link>
-                            <Link to="#" target="_blank" className="d-inline-block me-2"><img src={litecoin} alt="litecoin" loading="lazy" decoding="async"/></Link>
+                            <Link to="#" target="_blank" className="d-inline-block me-2"><img src={litecoin} alt="litecoin" loading="lazy" decoding="async" /></Link>
                             <Link to="#" target="_blank"><img src={monerocoin} alt="monero" loading="lazy" decoding="async" /></Link>
                         </div>
                     </div>

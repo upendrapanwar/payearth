@@ -308,6 +308,20 @@ router.get("/getOrderDetails", getOrderDetails);
 router.get("/get-topvisited-advertisements/:id", getTopVisitedAdvertisements);
 router.get("/get-advertise-viewedlist/:id", getAdvertiseViewedList);
 
+//stripe Connect
+router.post("/create-stripe-account", stripeConnectAccount);
+router.post("/complete-onboarding", completeOnboarding);
+router.post("/get-stripe-account", getAccountDetails);
+router.post("/createLoginLink", createLoginLink);
+router.get("/getSellerStripeAccountId", getSellerStripeAccountId);
+router.put("/update-stripe-accountId", updateStripeAccountId);
+router.put("/disconnect-stripe-account", disconnectStripeAccount);
+
+// stripe key 
+
+// updateStripeKey
+router.get("/updateStripeKey", updateStripeKey);
+router.post("/add-stripe-key", addStripeKey);
 
 module.exports = router;
 
@@ -1610,7 +1624,7 @@ function productSalesGraph(req, res, next) {
     .catch((err) => next(res.json({ status: false, message: err.message })));
 }
 
- function serviceSalesGraph(req, res, next) {
+function serviceSalesGraph(req, res, next) {
   sellerService.serviceSalesGraph(req)
     .then((data) => data ? res.json({ status: true, data: data }) : res.json({ status: false, data: {}, message: "ERROR" }))
     .catch((err) => next(res.json({ status: false, message: err.message })));
@@ -1618,30 +1632,88 @@ function productSalesGraph(req, res, next) {
 
 function getListedProductData(req, res, next) {
   sellerService.getListedProductData(req)
-        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
-        .catch((err) => next(res.json({ status: false, message: err })));
+    .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
 }
 
 function getListedServicesData(req, res, next) {
   sellerService.getListedServicesData(req)
-        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
-        .catch((err) => next(res.json({ status: false, message: err })));
+    .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
 }
 
 function getOrderDetails(req, res, next) {
   sellerService.getOrderDetails(req)
-        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
-        .catch((err) => next(res.json({ status: false, message: err })));
+    .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
 }
 
 function getTopVisitedAdvertisements(req, res, next) {
   sellerService.getTopVisitedAdvertisements(req)
-        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
-        .catch((err) => next(res.json({ status: false, message: err })));
+    .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
 }
 
 function getAdvertiseViewedList(req, res, next) {
-  sellerService.getAdvertiseViewedList(req)
-        .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
-        .catch((err) => next(res.json({ status: false, message: err })));
+  sellerService.getAdvertiseViewedList(req, res)
+    .then((data) => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+    .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+
+function stripeConnectAccount(req, res, next) {
+  sellerService.stripeConnectAccount(req)
+    .then(result => result ? res.status(201).json({ status: true, data: result }) : res.status(400).json({ status: false, message: "ERROR" }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function completeOnboarding(req, res, next) {
+  sellerService.completeOnboarding(req)
+    .then(result => result ? res.status(201).json({ status: true, data: result }) : res.status(400).json({ status: false, message: "ERROR" }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function getAccountDetails(req, res, next) {
+  sellerService.getAccountDetails(req)
+    .then(result => result ? res.status(201).json({ status: true, data: result }) : res.status(400).json({ status: false, message: "ERROR" }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function createLoginLink(req, res, next) {
+  sellerService.createLoginLink(req)
+    .then(result => result ? res.status(201).json({ status: true, data: result }) : res.status(400).json({ status: false, message: "ERROR" }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function getSellerStripeAccountId(req, res, next) {
+  sellerService.getSellerStripeAccountId(req)
+    .then(result => result ? res.status(201).json({ status: true, data: result }) : res.status(400).json({ status: false, message: "ERROR" }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+
+function updateStripeAccountId(req, res, next) {
+  sellerService.updateStripeAccountId(req)
+    .then(result => result ? res.status(201).json({ status: true, data: result }) : res.status(400).json({ status: false, message: "ERROR" }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+function disconnectStripeAccount(req, res, next) {
+  sellerService.disconnectStripeAccount(req)
+    .then(result => result ? res.status(201).json({ status: true, data: result }) : res.status(400).json({ status: false, message: "ERROR" }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+// updateStripeKey
+function updateStripeKey(req, res, next) {
+  sellerService.updateStripeKey(req)
+    .then(result => result ? res.status(201).json({ status: true, data: result }) : res.status(400).json({ status: false, message: "ERROR" }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
+}
+
+// addStripeKey
+function addStripeKey(req, res, next) {
+  sellerService.addStripeKey(req)
+    .then(result => result ? res.status(201).json({ status: true, data: result }) : res.status(400).json({ status: false, message: "ERROR" }))
+    .catch(err => next(res.status(400).json({ status: false, message: err })));
 }

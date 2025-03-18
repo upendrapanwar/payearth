@@ -51,7 +51,9 @@ module.exports = {
   ChatMessage: require("../models/chatmessage.model"),
   Notification: require("../models/notification.model"),
   Support: require('../models/support.model'),
-  Ticket : require('../models/ticket.model'),
+  Ticket: require('../models/ticket.model'),
   TicketMessage: require('../models/ticketmessage.model'),
   UsedCoupons: require('../models/used.coupon.model'),
+  Stripekeys: require('../models/stripekey.model'),
+  ProductTaxRate: require('../models/product.tax.model'),
 };

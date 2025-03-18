@@ -1,13 +1,19 @@
 ﻿const config = require("../config/index");
 const mongoose = require("mongoose");
+const { getStripeInstance } = require('../helpers/stripe-keys');
 mongoose.connect(process.env.MONGODB_URI || config.connectionString, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 mongoose.Promise = global.Promise;
-const stripe = require("stripe")(
-  "sk_test_51OewZgD2za5c5GtO7jqYHLMoDerwvEM69zgVsie3FNLrO0LLSLwFJGzXv4VIIGqScWn6cfBKfGbMChza2fBIQhsv00D9XQRaOk"
-);
+// const stripe = require("stripe")(
+//   "sk_test_51OewZgD2za5c5GtO7jqYHLMoDerwvEM69zgVsie3FNLrO0LLSLwFJGzXv4VIIGqScWn6cfBKfGbMChza2fBIQhsv00D9XQRaOk"
+// );
+
+// STRIPE_SECRET_KEY
+
+
+
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -17,7 +23,7 @@ const fs = require("fs");
 const ffmpeg = require("fluent-ffmpeg");
 const ffmpeg_static = require("ffmpeg-static");
 const LocationData = require("countrycitystatejson");
-const SendEmail = require("../helpers/email")
+const SendEmail = require("../helpers/email");
 
 const {
   User,
@@ -57,6 +63,7 @@ const {
   TicketMessage,
   UsedCoupons,
   TodayDeal,
+  Stripekeys,
 } = require("../helpers/db");
 
 module.exports = {
@@ -186,8 +193,17 @@ module.exports = {
   getOrderDetails,
   getTopVisitedAdvertisements,
   getAdvertiseViewedList,
+  stripeConnectAccount,
+  completeOnboarding,
+  getAccountDetails,
+  createLoginLink,
+  getSellerStripeAccountId,
+  updateStripeAccountId,
+  disconnectStripeAccount,
 
 };
+
+
 
 // function sendMail(mailOptions) {
 //   // create reusable transporter object using the default SMTP transport
@@ -217,7 +233,7 @@ module.exports = {
 async function signup(req) {
   // const file = req.file;
   const param = req.body;
-console.log('param----seller--',param)
+  console.log('param----seller--', param)
   // var fullUrl = '';
 
   if (await Seller.findOne({ email: param.email })) {
@@ -797,7 +813,7 @@ async function getListedProducts(req) {
 async function getProductById(id) {
   const product = await Product.findById(id)
     .select(
-      "name category sub_category brand description specifications color_size tier_price price images quantity isService isActive createdAt featuredImage"
+      "name category sub_category brand description specifications color_size tier_price price vat images quantity isService isActive createdAt featuredImage"
     )
     .populate([
       {
@@ -885,6 +901,7 @@ async function addProduct(req) {
       description: param.description,
       specifications: param.specifications,
       price: Number(param.price),
+      vat: Number(param.vat),
       color_size: colorSizeArr,
       tier_price: tierPriceArr,
       images,
@@ -1016,6 +1033,7 @@ async function editProduct(req) {
       description: param.description,
       specifications: param.specifications,
       price: Number(param.price),
+      vat: Number(param.vat),
       color_size: colorSizeArr,
       tier_price: tierPriceArr,
       price: param.price,
@@ -1034,7 +1052,7 @@ async function editProduct(req) {
 
     if (data) {
       let res = await Product.findById(data.id).select(
-        "name category sub_category brand description specifications color_size tier_price price images"
+        "name category sub_category brand description specifications color_size tier_price price vat images"
       );
 
       if (res) {
@@ -2399,6 +2417,7 @@ async function addServicesFeaturedImage(req) {
 async function createSubscription(req, res) {
   const { paymentMethodId, email, plan_Id, authName } = req.body;
   try {
+    const stripe = await getStripeInstance();
     const paymentMethod = await stripe.paymentMethods.create({
       type: "card",
       card: {
@@ -3761,7 +3780,7 @@ async function addGroupMember(req) {
             name,
             image_url,
             isGroupAdmin,
-            role: formattedRole 
+            role: formattedRole
           }
         }
       },
@@ -5986,9 +6005,9 @@ async function getOrderDetails(req) {
   }
 }
 
-async function getTopVisitedAdvertisements(req) {
+async function getTopVisitedAdvertisements(req, res) {
   // console.log('getTopVisitedAdvertisements---', req.params)
-  let id = req.params.id
+  let id = req.params.id;
   try {
 
     const formattedData = await bannerAdvertisement.aggregate([
@@ -6015,7 +6034,7 @@ async function getTopVisitedAdvertisements(req) {
     // console.log("Formatted Data:", formattedData);
 
     if (!formattedData.length) {
-      return res.status(404).json({ status: false, message: "No advertisements found for this author" });
+      return { status: false, message: "No advertisements found for this author" };
     }
 
 
@@ -6027,7 +6046,7 @@ async function getTopVisitedAdvertisements(req) {
   }
 }
 
- async function getAdvertiseViewedList(req) {
+async function getAdvertiseViewedList(req, res) {
   // console.log('getTopVisitedAdvertisements---', req.params)
   let id = req.params.id
   try {
@@ -6040,7 +6059,7 @@ async function getTopVisitedAdvertisements(req) {
           _id: "$_id",
           totalClicks: { $sum: "$clickCount.count" },
           advertisementName: { $first: "$bannerName" },
-          siteUrl: {$first: "$siteUrl"}
+          siteUrl: { $first: "$siteUrl" }
         },
       },
       { $sort: { totalClicks: -1 } },
@@ -6054,17 +6073,148 @@ async function getTopVisitedAdvertisements(req) {
       },
     ]);
 
-    // console.log("Formatted Data11:", formattedData);
-
     if (!formattedData.length) {
-      return res.status(404).json({ status: false, message: "No advertisements found for this author" });
+      return { status: false, message: "No advertisements found for this author" };
     }
-
-
     return formattedData;
-
   } catch (error) {
     console.error(error);
     return { status: false, message: error.message };
   }
+}
+
+
+async function stripeConnectAccount(req) {
+  try {
+    const stripe = await getStripeInstance();
+    const { email } = req.body;
+    const account = await stripe.accounts.create({
+      type: "express",
+      email: email,
+      capabilities: {
+        transfers: { requested: true },
+      },
+    });
+
+    const accountLink = await stripe.accountLinks.create({
+      account: account.id,
+      refresh_url: "https://localhost:3000/seller/payment-gateway",
+      return_url: "https://localhost:3000/seller/payment-gateway",
+      type: "account_onboarding",
+    });
+
+    return {
+      url: accountLink.url,
+      accountId: account.id
+    };
+  } catch (error) {
+    return { error: error.message };
+  }
+}
+
+async function completeOnboarding(req) {
+  try {
+    const stripe = await getStripeInstance();
+    const { stripeAccount } = req.body;
+    const accountLink = await stripe.accountLinks.create({
+      account: stripeAccount,
+      refresh_url: "https://localhost:3000/seller/payment-gateway",
+      return_url: "https://localhost:3000/seller/payment-gateway",
+      type: "account_onboarding",
+    });
+
+    return {
+      url: accountLink.url,
+    };
+
+  } catch (error) {
+    console.log("Error", error)
+  }
+}
+
+async function getAccountDetails(req) {
+  try {
+    const stripe = await getStripeInstance();
+    const { stripeAccount } = req.body;
+    const account = await stripe.accounts.retrieve(stripeAccount);
+    return account;
+  } catch (error) {
+    return { error: error.message };
+  }
+}
+
+async function createLoginLink(req) {
+  try {
+    const stripe = await getStripeInstance();
+    const { stripeAccount } = req.body;
+    const loginLink = await stripe.accounts.createLoginLink(stripeAccount);
+    return loginLink;
+  } catch (error) {
+    return { error: error.message };
+  }
+}
+
+async function getSellerStripeAccountId(req) {
+  const authId = req.query.authId;
+  if (!authId) return null;
+  const seller = await Seller.findOne({ _id: authId }, 'stripeAccountId');
+  return seller
+}
+
+async function updateStripeAccountId(req, res) {
+  try {
+    const param = req.body;
+    const { authId, stripeAccountId } = param.reqBody;
+
+    if (!authId || !stripeAccountId) {
+      return { status: false, message: 'authId and stripeAccountId are required' };
+    }
+
+    const seller = await Seller.findOne({ _id: authId });
+
+    if (!seller) {
+      return { status: false, message: 'Seller not found' };
+    }
+
+    if (seller.stripeAccountId) {
+      return { status: false, message: 'Stripe Account ID already exists' };
+    }
+
+    seller.stripeAccountId = stripeAccountId;
+    await seller.save();
+
+    return { status: true, message: 'Stripe Account ID updated successfully', seller };
+  } catch (error) {
+    console.log("error", error);
+  }
+}
+
+async function disconnectStripeAccount(req, res) {
+  try {
+    const stripe = await getStripeInstance();
+    const param = req.body;
+    const { authId, stripeAccountId } = param.reqBody;
+
+    if (!authId || !stripeAccountId) {
+      return { status: false, message: 'authId and stripeAccountId are required' };
+    }
+
+    const seller = await Seller.findOne({ _id: authId });
+
+    if (!seller) {
+      return { status: false, message: 'Seller not found' };
+    }
+
+    await stripe.accounts.del(stripeAccountId);
+
+    await Seller.findOneAndUpdate(
+      { _id: authId },
+      { $unset: { stripeAccountId: null } }
+    );
+
+    return { message: "Stripe account disconnected successfully" };
+  } catch (error) {
+    console.error("Stripe Error:", error);
+  }
+
 }

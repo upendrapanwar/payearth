@@ -336,6 +336,14 @@ router.get("/getServiceOrdersTotalPriceForMonth", getServiceOrdersTotalPriceForM
 // Notifications
 router.delete("/removeNotification/:id", removeNotification);
 
+router.post("/productTaxRate", productTaxRate);
+router.get("/getDisplayedProductTax", getDisplayedProductTax);
+
+
+// Stripe Key
+router.post("/updateStripeKey", updateStripeKey);
+router.get("/getDisplayedStripeKeys", getDisplayedStripeKeys);
+
 
 
 
@@ -1642,5 +1650,33 @@ function getServiceOrdersTotalPriceForMonth(req, res, next) {
 function removeNotification(req, res, next) {
     adminService.removeNotification(req)
         .then((result) => result ? res.status(200).json({ status: true, data: result, message: "Notification Remove Successfully", }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+// Tax
+function productTaxRate(req, res, next) {
+    adminService.productTaxRate(req)
+        .then((result) => result ? res.status(200).json({ status: true, data: result, message: "Data Get Successfully", }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+function getDisplayedProductTax(req, res, next) {
+    adminService.getDisplayedProductTax(req)
+        .then((result) => result ? res.status(200).json({ status: true, data: result, message: "Data Get Successfully", }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+// updateStripeKey
+
+function updateStripeKey(req, res, next) {
+    adminService.updateStripeKey(req)
+        .then((result) => result ? res.status(200).json({ status: true, data: result, message: "Data Get Successfully", }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
+}
+
+//getDisplayedStripeKeys
+function getDisplayedStripeKeys(req, res, next) {
+    adminService.getDisplayedStripeKeys(req)
+        .then((result) => result ? res.status(200).json({ status: true, data: result, message: "Data Get Successfully", }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
         .catch((err) => next(res.json({ status: false, message: err })));
 }

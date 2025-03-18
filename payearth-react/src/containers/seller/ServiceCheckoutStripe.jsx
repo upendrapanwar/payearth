@@ -7,6 +7,7 @@ import ServiceCheckout from './ServiceCheckout';
 const stripePromise = loadStripe(process.env.REACT_APP_PUBLISHABLE_KEY);
 
 class ServiceCheckoutStripe extends Component {
+
     render() {
         return (
             <Elements stripe={stripePromise}>

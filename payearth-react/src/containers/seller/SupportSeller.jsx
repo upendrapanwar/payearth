@@ -71,7 +71,6 @@ const SupportSeller = () => {
                     <div className="col-md-12">
                         <div className="seller_dash_wrap pt-2 pb-5">
                             <div className="container ">
-
                                 <div className="bg-white rounded-3 pt-3 pb-5">
                                     <div className="noti_wrap">
                                         <div className='d-flex justify-content-end'><span className="backbutton">
@@ -99,7 +98,6 @@ const SupportSeller = () => {
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </div>
                         </div>

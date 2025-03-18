@@ -67,6 +67,7 @@ import SellerBannerEdit from './containers/seller/ManageBannerListEdit';
 import AdvertiseShare from "./components/common/AdvertiseShare";
 import SellerManageSubscription from "./containers/seller/ManageSubscriptionPlan";
 import SellerCommunity from "./containers/community/sellerCommunity";
+import PaymentGateway from "./containers/seller/PaymentGateway";
 
 
 import AdminLogin from "./containers/admin/Login";
@@ -168,6 +169,7 @@ import EditCoupon from "./containers/admin/EditCoupon";
 
 import DealListedItems from "./components/user/home/DealListedItems";
 import AdminManageDeals from "./containers/admin/ManageDeals"
+import ManageStripeAccount from "./containers/admin/ManageStripeAccount";
 
 
 function App() {
@@ -926,6 +928,15 @@ function App() {
           />
 
           <PrivateRoute
+            path="/admin/manage-stripe-account"
+            restricted={false}
+            component={ManageStripeAccount}
+            roles={[Role.super_admin, Role.admin, Role.manager]}
+            currentUserRole={userInfo.role}
+            exact
+          />
+
+          <PrivateRoute
             path="/admin/manage-customers"
             restricted={false}
             component={ManageCustomers}
@@ -1097,6 +1108,13 @@ function App() {
             path="/seller/community"
             restricted={false}
             component={SellerCommunity}
+            exact
+          />
+
+          <PrivateRoute
+            path="/seller/payment-gateway"
+            restricted={false}
+            component={PaymentGateway}
             exact
           />
 

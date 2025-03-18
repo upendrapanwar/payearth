@@ -54,7 +54,8 @@ const schema = new Schema({
         code_valid_at: { type: Date, required: false, default: null },
         is_pass_req: { type: Boolean, required: false, default: false },
     },
-    isActive: { type: Boolean, required: false, default: true }
+    isActive: { type: Boolean, required: false, default: true },
+    stripeAccountId: { type: String, required: false, default: null },
 
 }, {
     timestamps: true

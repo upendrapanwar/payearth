@@ -151,6 +151,19 @@ function Header() {
                   Dashboard
                 </Link>
               </li>
+              {userInfo.role === 'super_admin' && (
+                <li>
+                  <Link
+                    to="/admin/manage-stripe-account"
+                    onClick={() => removeBackdrop()}
+                  >
+                    <i className="icon">
+                      <img src={vendorIcon} alt="" loading="lazy" decoding="async" />
+                    </i>{" "}
+                    Manage Stripe Account
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link to="/admin/manage-posts" onClick={() => removeBackdrop()}>
                   <i className="icon">

@@ -167,6 +167,7 @@ const ProductListing = () => {
                         name: product.name,
                         isService: product.isService,
                         price: product.price,
+                        vat: product.vat,
                         avgRating: avgRating,
                         quantity: product.quantity,
                         cryptoPrices: product.cryptoPrices,
@@ -183,8 +184,6 @@ const ProductListing = () => {
         }
     };
 
-
-    console.log("products", products)
     return (
         <React.Fragment>
             <Helmet><title>{"Products - Pay Earth"}</title></Helmet>

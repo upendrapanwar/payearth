@@ -412,6 +412,7 @@ class EditProduct extends Component {
         formData.append('description', values.description);
         formData.append('specifications', values.specifications);
         formData.append('price', values.price);
+        formData.append('vat', values.vat);
         formData.append('images', JSON.stringify(this.state.colorImages));
 
         for (let index = 0; index < colorSizes.length; index++) {
@@ -504,6 +505,7 @@ class EditProduct extends Component {
                                             description: productDetail.product ? productDetail.product.description : '',
                                             specifications: productDetail.product ? productDetail.product.specifications : '',
                                             price: productDetail.product ? productDetail.product.price : '',
+                                            vat: productDetail.product ? productDetail.product.vat : '',
                                             featuredImg: productDetail.featuredImage,
                                             colorSizes,
                                             colorImages,
@@ -603,6 +605,24 @@ class EditProduct extends Component {
 
                                                         <div className="mb-4">
                                                             <div className="controls_grp">
+                                                                <label htmlFor="name" className="form-label">Vat in (%) <small className="text-danger">*</small></label>
+                                                                <div className="input-group mb-2">
+                                                                    <span className="input-group-text" id="basic-addon1">%</span>
+                                                                    <input type="number" className="form-control"
+                                                                        name="vat"
+                                                                        onChange={handleChange}
+                                                                        onBlur={handleBlur}
+                                                                        value={values.vat}
+                                                                    />
+                                                                </div>
+                                                                {touched.vat && errors.vat ? (
+                                                                    <small className="text-danger">{errors.vat}</small>
+                                                                ) : null}
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="mb-4">
+                                                            <div className="controls_grp">
                                                                 <label htmlFor="name" className="form-label">Color & Size <small className="text-danger">*</small></label>
                                                                 {colorSizes.map((value, index) => {
                                                                     return <div className="input-group" key={index}>
@@ -665,9 +685,6 @@ class EditProduct extends Component {
                                                                                 console.log("selected option:", selectedOption.value);
                                                                                 this.getCategories(selectedOption.value);
                                                                                 this.setState({ defaultSubCatOption: { label: 'Choose Sub Category', value: '' } })
-
-
-
                                                                             }}
                                                                             onBlur={handleBlur}
                                                                         />

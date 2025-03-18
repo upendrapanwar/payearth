@@ -320,7 +320,7 @@ class AddProduct extends Component {
     }
 
     handleSubmit = values => {
-        // console.log("values::::", values)
+        console.log("values::::", values)
         let formData = new FormData();
         let tierPrices = this.state.tierPrices;
         let colorSizes = this.state.colorSizes;
@@ -332,6 +332,7 @@ class AddProduct extends Component {
         formData.append('description', values.description);
         formData.append('specifications', values.specifications);
         formData.append('price', values.price);
+        formData.append('vat', values.vat);
         formData.append('images', JSON.stringify(this.state.colorImages));
         // images
 
@@ -490,6 +491,24 @@ class AddProduct extends Component {
                                                                 </div>
                                                                 {touched.price && errors.price ? (
                                                                     <small className="text-danger">{errors.price}</small>
+                                                                ) : null}
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="mb-4">
+                                                            <div className="controls_grp">
+                                                                <label htmlFor="name" className="form-label">Vat in (%) <small className="text-danger">*</small></label>
+                                                                <div className="input-group mb-2">
+                                                                    <span className="input-group-text" id="basic-addon1">%</span>
+                                                                    <input type="number" className="form-control"
+                                                                        name="vat"
+                                                                        onChange={handleChange}
+                                                                        onBlur={handleBlur}
+                                                                        value={values.vat}
+                                                                    />
+                                                                </div>
+                                                                {touched.vat && errors.vat ? (
+                                                                    <small className="text-danger">{errors.vat}</small>
                                                                 ) : null}
                                                             </div>
                                                         </div>

@@ -27,6 +27,7 @@ const schema = new Schema({
     images: { type: Array, required: false, default: [] },
     tier_price: { type: [tierPriceSchema], required: false, default: [] },
     price: { type: Number, required: true, default: 0 },
+    vat: { type: Number, required: true, default: 0 },
     cryptoPrices: [{ type: Schema.Types.ObjectId, ref: 'CryptoConversion' }],
     isActive: { type: Boolean, required: false, default: true },
     super_rewards: { type: Boolean, required: false, default: false },

@@ -87,7 +87,7 @@ const Header = () => {
 
     return () => {
       socket.off('receive_notification');
-      socket.disconnect(); 
+      socket.disconnect();
     };
   }, [authInfo.id]);
 
@@ -136,6 +136,19 @@ const Header = () => {
                   Dashboard
                 </Link>
               </li>
+
+              <li>
+                <Link
+                  to="/seller/payment-gateway"
+                  onClick={() => removeBackdrop()}
+                >
+                  <i className="icon">
+                    <img src={bannerIcon} alt="" />
+                  </i>{" "}
+                  Payment Gateway
+                </Link>
+              </li>
+
               <li>
                 <Link to="/seller/notifications" onClick={() => removeBackdrop()}>
                   <i className="icon">

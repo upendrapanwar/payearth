@@ -186,15 +186,17 @@ function Total({ couponData }) {
     totalPrice: 0,
     totalQuantity: 0,
     actualPrice: 0,
-    dealDiscountAmount: 0,  // To store only the deal discount amount
+    dealDiscountAmount: 0,
   });
-
+  const [productTaxRate, setProductTaxRate] = useState(null);
   const [userDataAvailable, setUserDataAvailable] = useState(false)
 
   useEffect(() => {
     if (authInfo) {
       getUserData();
+
     }
+    getProductTaxRate();
   }, [])
 
   useEffect(() => {
@@ -205,8 +207,9 @@ function Total({ couponData }) {
       let dealDiscountAmount = 0;
 
       for (const item of cart) {
-        let finalPrice = item.price;
-
+        const vatRate = item.vat / 100;
+        let finalPrice = item.price + (item.price * vatRate);
+        console.log("finalPrice", finalPrice)
         if (item.discountId) {
           try {
             const response = await axios.get(`front/discount-status/${item.discountId}`);
@@ -236,11 +239,15 @@ function Total({ couponData }) {
     calculateTotal();
   }, [cart, couponData]);
 
+  console.log("cart", cart)
+
   const amount = couponData !== null ? (total.totalPrice - total.totalPrice * couponData.discount_per / 100).toFixed(2) : total.totalPrice;
-  const taxRate = 0.05; // 5% tax
+  const taxRate = productTaxRate / 100;
+  console.log("taxRate check", taxRate)        //0.05; // 5% tax 
   const finalAmount = (parseFloat(amount) + parseFloat(amount) * taxRate).toFixed(2);
   const additionalData = { finalAmount, discount: couponData ? (total.totalPrice * couponData.discount_per / 100).toFixed(2) : "0", deliveryCharge: "0", taxAmount: "0", };
-
+  const vat = cart[0]?.vat;
+  console.log("vat TEST", vat)
   const handleCheckout = () => {
     const reqBody = {
       amount: finalAmount,
@@ -315,6 +322,32 @@ function Total({ couponData }) {
     });
   }
 
+  const getProductTaxRate = async () => {
+    try {
+      console.log("getProductTaxRate function is run");
+      // this.dispatch(setLoading({ loading: true }));
+      const response = await axios.get('front/getDisplayedProductTax', {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json;charset=UTF-8',
+          // 'Authorization': `Bearer ${this.authInfo.token}`,
+        },
+      });
+      if (response.data.status === true) {
+        setProductTaxRate(response.data.data.product_tax_rate);
+      } else {
+        setProductTaxRate(false);
+      }
+
+    } catch (error) {
+      console.error('Error fetching vendors:', error);
+      // toast.error('Failed to fetch vendors');
+    } finally {
+      // this.dispatch(setLoading({ loading: false }));
+    }
+  };
+
+
   const openmodalHandler = () => {
     if (!authInfo) {
       toast.error("Buyer login failed...");
@@ -325,7 +358,7 @@ function Total({ couponData }) {
     }
   };
 
-  console.log("userDataAvailable", userDataAvailable)
+  console.log("productTaxRate", productTaxRate)
 
   return (
     <div>
@@ -344,8 +377,12 @@ function Total({ couponData }) {
             <b>{couponData ? `${couponData.discount_per}%` : "No Discount"}</b>
           </div>
           <div className="cfp">
+            <span>Vat ({ })</span>
+            <b>${amount} <small>(incl. VAT tax)</small></b>
+          </div>
+          <div className="cfp">
             <span>Final Price</span>
-            <b>${amount}</b>
+            <b>${amount} <small>(incl. VAT tax)</small></b>
           </div>
           <div className="cfp">
             <span>Delivery Charges</span>
@@ -353,7 +390,11 @@ function Total({ couponData }) {
           </div>
           <div className="cfp">
             <span>Tax</span>
-            <b>5%</b>
+            <b>{`${productTaxRate}%`}</b>
+          </div>
+          <div className="cfp">
+            <span>Vat</span>
+            <b>{`${productTaxRate}%`}</b>
           </div>
         </div>
       </div>
@@ -393,9 +434,9 @@ function Total({ couponData }) {
             </div>
           ) : (
             <div className="cfp mt-4 text-center">
-                <div class="alert alert-danger" role="alert">
-                  Login required! Login to proceed with your order.
-                </div>
+              <div class="alert alert-danger" role="alert">
+                Login required! Login to proceed with your order.
+              </div>
               {/* <div className="d-grid col-6 mx-auto">
                   <Link className="btn custom_btn btn_yellow m-2" to="/my-profile">Login</Link>
               </div> */}

@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const axios = require("axios");
 const { Base64 } = require("js-base64");
 const request = require("request");
+const { getStripeInstance } = require('../helpers/stripe-keys');
 mongoose.connect(process.env.MONGODB_URI || config.connectionString, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -18,7 +19,7 @@ var ApiContracts = require("authorizenet").APIContracts;
 var ApiControllers = require("authorizenet").APIControllers;
 var SDKConstants = require("authorizenet").Constants;
 const fs = require("fs");
-const stripe = require("stripe")(config.stripe_secret_key);
+// const stripe = require("stripe")(config.stripe_secret_key);
 const SendEmail = require("../helpers/email");
 
 const {
@@ -2762,6 +2763,7 @@ async function customerAuthorizePayment(req) {
 async function createSubscription(req, res) {
   const { paymentMethodId, email, plan_Id, authName } = req.body;
   try {
+    const stripe = await getStripeInstance();
     const paymentMethod = await stripe.paymentMethods.create({
       type: "card",
       card: {
@@ -2812,6 +2814,7 @@ async function serviceCharges(req, res) {
 
 
   try {
+    const stripe = await getStripeInstance();
     const paymentMethod = await stripe.paymentMethods.create({
       type: "card",
       card: {
@@ -2867,7 +2870,7 @@ async function serviceCharges(req, res) {
         // allow_redirects: 'always',  // Always allow redirects for payment methods that require it
       },
       confirm: true,
-      return_url: 'https://pay.earth/',
+      return_url: 'https://wwww.pay.earth/',
     });
     const response = {
       paymentIntent: paymentIntent,
@@ -2893,6 +2896,7 @@ async function createPaymentIntent(req, res) {
     coins: item.coins
   }));
   try {
+    const stripe = await getStripeInstance();
     const stringifiedCart = JSON.stringify(trimmedCart);
     const customer = await stripe.customers.create({
       email: email,
@@ -2922,7 +2926,7 @@ async function createPaymentIntent(req, res) {
 
 async function createInvoice(req, res) {
   const { paymentIntentId } = req.body;
-
+  const stripe = await getStripeInstance();
   const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
   // Create an Invoice Item with the payment amount
@@ -2954,32 +2958,6 @@ async function createInvoice(req, res) {
   return { finalizedInvoice, invoiceItem };
 
 }
-
-
-
-
-// TEST**************
-// async function serviceCharges(req, res) {
-//   // const { amount } = req.body;
-//   const amount = 1000
-//   try {
-//     const paymentIntent = await stripe.paymentIntents.create({
-//       // amount: amount * 100, // amount in cents
-//       amount: amount,
-//       currency: 'usd',
-//     });
-//     const clientSecret = paymentIntent.client_secret;
-//     return clientSecret;
-//     // res.json({ clientSecret: paymentIntent.client_secret });
-//   } catch (error) {
-//     // res.status(500).json({ error: error.message });
-//     console.log("error", error)
-//   }
-// }
-
-
-// *******************************************************************************
-// *******************************************************************************
 
 //GET Common All Services
 async function getCommonService(req) {
@@ -4113,7 +4091,7 @@ async function addGroupMember(req) {
             name,
             image_url,
             isGroupAdmin,
-            role: formattedRole 
+            role: formattedRole
           }
         }
       },

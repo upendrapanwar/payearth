@@ -7,5 +7,6 @@ export default Yup.object().shape({
     description: Yup.string().required("Description is required."),
     specifications: Yup.string().required("Specifications is required."),
     // featuredImg: Yup.string().required("Featured image is required."),
-    price: Yup.string().required("Price is required.")
+    price: Yup.string().required("Price is required."),
+    vat : Yup.string().required("VAT (%) is required."),
 });

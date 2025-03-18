@@ -279,7 +279,7 @@ class MyCart extends Component {
                                                         {cart.map((item) => {
                                                             // console.log('item---for cartItem--', item)
                                                             return (
-                                                                <CartItem key={item.id} id={item.id} image={item.image} title={item.name} price={item.price} quantity={item.quantity} discountId={item.discountId} discountPercent={item.discountPercent} coins={item.coins} />
+                                                                <CartItem key={item.id} id={item.id} image={item.image} title={item.name} price={item.price} quantity={item.quantity} discountId={item.discountId} discountPercent={item.discountPercent} coins={item.coins} vatTax={item.vat} />
                                                             );
                                                         })}
                                                     </div>

@@ -65,7 +65,7 @@ router.put('/setNotificationSeen', setNotificationSeen);
 
 router.get('/product/today-dealsById/:id', getTodayDealsProductById)
 router.get('/discount-status/:id', getdiscountStatusById)
-
+router.get("/getDisplayedProductTax", getDisplayedProductTax);
 
 
 module.exports = router;
@@ -330,4 +330,10 @@ function getdiscountStatusById(req, res, next) {
     frontService.getdiscountStatusById(req.params)
         .then(data => data ? res.status(200).json({ status: true, data: data }) : res.status(400).json({ status: false, message: msg.common.no_data_err, data: [] }))
         .catch(err => next(res.json({ status: false, message: err })));
+}
+
+function getDisplayedProductTax(req, res, next) {
+    frontService.getDisplayedProductTax(req)
+        .then((result) => result ? res.status(200).json({ status: true, data: result, message: "Data Get Successfully", }) : res.status(400).json({ status: false, message: "ERROR ", data: [] }))
+        .catch((err) => next(res.json({ status: false, message: err })));
 }
